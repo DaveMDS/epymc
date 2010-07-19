@@ -1,0 +1,38 @@
+
+                EMC THEMES REFERENCE
+
+
+main group: "main" TODO rename to epymc_main_layout
+
+### MainMenu stuff
+
+ * External parts:
+    "mainmenu_list" -> elm_list
+
+ * Signals received from the application
+    "mainmenu,show" "emc"
+    "mainmenu,hide" "emc"
+
+### ConfigGui stuff
+
+ * External parts:
+    "config_pager" -> elm_pager style:"slide_invisible"
+
+ * Signals received from the application
+    "config,show" "emc"
+    "config,hide" "emc"
+
+ 
+ ### Browser: List View
+
+ * Text parts:
+    "browser/list/page_title"
+    
+ * External parts:
+    "browser/list/flip" -> elm_pager style:"slide_invisible"
+    "browser/list/poster" -> elm_image
+    "browser/list/info" -> elm_anchorblock
+
+ * Signals received from the application
+    "browser,list,show" "emc"
+    "browser,list,hide" "emc"

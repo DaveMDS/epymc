@@ -37,7 +37,7 @@ def part_get(name):
     global _layout
     return _layout.edje_get().part_external_object_get(name)
 
-def signal_emit(sig, src):
+def signal_emit(sig, src = 'emc'):
     global _layout
     _layout.edje_get().signal_emit(sig, src)
 

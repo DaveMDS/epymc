@@ -245,13 +245,13 @@ class ViewList(object):
         
     def show(self):
         """ TODO Function doc """
-        gui.signal_emit("browser,list,show", "emc")
+        gui.signal_emit("browser,list,show")
         self.__fl.show() #TODO why clip doesn't work??
         self.__bl.show()
 
     def hide(self):
         """ TODO Function doc """
-        gui.signal_emit("browser,list,hide", "emc")
+        gui.signal_emit("browser,list,hide")
         self.__fl.hide() #TODO why clip doesn't work??
         self.__bl.hide()
 

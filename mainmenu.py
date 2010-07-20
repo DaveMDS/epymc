@@ -25,10 +25,10 @@ def init():
 def show():
     list = gui.part_get("mainmenu_list")
     list.go()
-    gui.signal_emit("mainmenu,show", "emc")
+    gui.signal_emit("mainmenu,show")
 
 def hide():
-    gui.signal_emit("mainmenu,hide", "emc")
+    gui.signal_emit("mainmenu,hide")
 
 def item_add(name, weight, label, icon = None, callback = None):
     list = gui.part_get("mainmenu_list")

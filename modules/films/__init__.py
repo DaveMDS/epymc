@@ -36,6 +36,10 @@ class FilmsModule(EpymcModule):
         # create a browser instance
         self.__browser = EpymcBrowser()
 
+        # connect info panel buttons
+        gui.part_get('infopanel_button1').callback_clicked_add(self._cb_panel_1)
+        gui.part_get('infopanel_button5').callback_clicked_add(self._cb_panel_5)
+
     def __del__(self):
         print 'Shutdown module 1: FILM'
         # delete mainmenu item
@@ -43,6 +47,10 @@ class FilmsModule(EpymcModule):
 
         # delete browser
         del self.__browser
+
+        # disconnect info panel buttons
+        gui.part_get('infopanel_button1').callback_clicked_del(self._cb_panel_1)
+        gui.part_get('infopanel_button5').callback_clicked_del(self._cb_panel_5)
 
     def create_root_page(self):
         self.__browser.page_add("film://root", "Films",
@@ -81,7 +89,8 @@ class FilmsModule(EpymcModule):
                     self.__browser.item_add("file://" + path + "/" + f, f)
                 self.__browser.item_add("emc://back", "Back")
             else:
-                mediaplayer.play_url(url)
+                self.show_film_info(url)
+                #~ mediaplayer.play_url(url)
 
         elif url == "film://root":
             self.create_root_page()
@@ -95,6 +104,35 @@ class FilmsModule(EpymcModule):
             print 'Not found'
             #~ self.__tmdb(url)
 
+    def show_film_info(self, url):
+        self.update_film_info(url)
+        self.__current_url = url
+        gui.signal_emit("infopanel,show")
+
+    def update_film_info(self, url):
+        print "Update info"
+        if self.__film_db.has_key(url):
+            print 'Found: ' + url
+            e = self.__film_db[url]
+            info = "<title>" + e['name'] + "</title><br>" + \
+                   "<hilight>Director: </hilight>" + e['name']
+            
+            gui.part_get('infopanel_text').text_set(info)
+        else:
+            # TODO print also file size, video len, codecs, streams found, file metadata, etc..
+            msg = "Media:<br>" + url + "<br><br>" + \
+                  "No info stored for this media<br>" + \
+                  "Try the GetInfo button..."
+            gui.part_get('infopanel_text').text_set(msg)
+            # TODO make thumbnail
+
+    def _cb_panel_1(self, button):
+        print "Uff..."
+        self.update_film_info(self.__current_url)
+        
+    def _cb_panel_5(self, button):
+        self.tmdb_film_search(self.__current_url)
+
     def get_film_name_from_url(self, url):
         # remove path
         film = os.path.basename(url)
@@ -103,7 +141,7 @@ class FilmsModule(EpymcModule):
         # TODO remove stuff between '[' and ']'
         return film
         
-    def __tmdb(self, url):
+    def tmdb_film_search(self, url):
         import pprint
         
         film = self.get_film_name_from_url(url)
@@ -111,12 +149,22 @@ class FilmsModule(EpymcModule):
         
         tmdb = TMDB(TMDB_API_KEY, 'json', 'en', True)
         data = tmdb.searchResults(film)
-       
-        pprint.pprint(data[0])
-        print len(data)
 
-        for res in data:
-            print " * %s [%d]" % (res['name'], res['id'])
+        if len(data) > 1:
+            print 'TODO Show a list to choose from'
+
+        movie_info = tmdb.getInfo(data[0]['id'])
+        pprint.pprint(movie_info)
+
+        # store the result in db
+        self.__film_db[url] = movie_info
+
+        # TODO download cover and fanart
+        print entry['posters'] # TODO choose the right size
+        print entry['backdrops'] # TODO choose the right size
+        
+        #~ for res in data:
+            #~ print " * %s [%d]" % (res['name'], res['id'])
 
 ###############################################################################
 #    themoviedb.org  client implementation taken from:

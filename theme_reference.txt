@@ -36,3 +36,19 @@ main group: "main" TODO rename to epymc_main_layout
  * Signals received from the application
     "browser,list,show" "emc"
     "browser,list,hide" "emc"
+
+### Info Panel
+
+* External parts:
+    "infopanel_image" -> elm_image
+    "infopanel_text" -> elm_anchorblock
+    "infopanel_button1" -> elm_button
+    "infopanel_button2" -> elm_button
+    "infopanel_button3" -> elm_button
+    "infopanel_button4" -> elm_button
+    "infopanel_button5" -> elm_button
+    "infopanel_button6" -> elm_button
+
+ * Signals received from the application
+    "infopanel,show" "emc"
+    "infopanel,hide" "emc"

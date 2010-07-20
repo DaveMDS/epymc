@@ -56,9 +56,9 @@ def root_item_del(name):
     del _root_items[name]
 
 def show():
-    gui.signal_emit("config,show", "emc")
+    gui.signal_emit("config,show")
 
 
 def hide():
-    gui.signal_emit("config,hide", "emc")
+    gui.signal_emit("config,hide")
 

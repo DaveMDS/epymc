@@ -135,13 +135,11 @@ class FilmsModule(EpymcModule):
                     director = person['name']
                 elif person['job'] == 'Actor':
                     cast += (', ' if cast else '') + person['name']
-            
-            
-            info = "<title>" + e['name'] + "</title><br>" + \
+            info = "<title>" + e['name'] + "</title> <year>(" + e['released'][0:4] + ")</year><br>" + \
                    "<hilight>Director: </hilight>" + director + "<br>" + \
                    "<hilight>Cast: </hilight>" + cast + "<br>" + \
-                   "<hilight>Rating: </hilight>" + str(e['rating']) + "/10<br>"
-            
+                   "<hilight>Rating: </hilight>" + str(e['rating']) + "/10<br>" + \
+                   "<br><hilight>Overview:</hilight><br>" + e['overview']
             gui.part_get('infopanel_text').text_set(info)
         else:
             # TODO print also file size, video len, codecs, streams found, file metadata, etc..
@@ -152,7 +150,6 @@ class FilmsModule(EpymcModule):
             # TODO make thumbnail
 
     def _cb_panel_1(self, button):
-        print "Uff..."
         self.update_film_info(self.__current_url)
         
     def _cb_panel_5(self, button):

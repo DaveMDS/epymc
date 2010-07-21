@@ -12,6 +12,7 @@ import gui
 import config_gui
 import mainmenu
 import ini
+import sdb
 
 
 
@@ -29,6 +30,7 @@ if __name__ == "__main__":
     ini.read_from_files(['epymc.conf', os.path.join(user_dir, 'epymc.conf')])
 
     # init stuff
+    sdb.init()
     gui.init_window()
     config_gui.init()
     mainmenu.init()
@@ -44,7 +46,8 @@ if __name__ == "__main__":
     elementary.run()
 
     # shutdown
-    modules.shutdown_all()
+    modules.shutdown_all() #TODO check this !!!
     ini.write_to_file(os.path.expanduser('~/.config/epymc/epymc.conf'))
+    sdb.shutdown()
     elementary.shutdown()
 

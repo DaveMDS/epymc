@@ -6,13 +6,15 @@ import elementary
 
 from modules import EpymcModule
 from browser import EpymcBrowser
+from sdb import EmcDatabase
+
 import mainmenu
 import mediaplayer
 import ini
 import gui
 
 
-TMDB_API_KEY = "19eef197b81231dff0fd1a14a8d5f863"
+TMDB_API_KEY = "19eef197b81231dff0fd1a14a8d5f863" # Key of the user DaveMDS
 
 
 class FilmsModule(EpymcModule):
@@ -21,15 +23,19 @@ class FilmsModule(EpymcModule):
 
     __browser = None
     __exts = ['.avi', '.mpg', '.mpeg'] #TODO needed? fill!!
-    __film_db = dict()
+    __film_db = None
+    __person_db = None
     
     def __init__(self):
         print 'Init module 1: FILM'
 
         # create config ini section if not exists
-        if not ini.has_section("film"):
-            ini.add_section("film")
+        ini.add_section('film')
 
+        # open film/person database (they are created if not exists)
+        self.__film_db = EmcDatabase('film')
+        self.__person_db = EmcDatabase('person')
+        
         # add an item in the mainmenu
         mainmenu.item_add('film', 10, 'Films', None, self.cb_mainmenu)
 
@@ -47,6 +53,10 @@ class FilmsModule(EpymcModule):
 
         # delete browser
         del self.__browser
+
+        ## close databases
+        del self.__film_db
+        del self.__person_db
 
         # disconnect info panel buttons
         gui.part_get('infopanel_button1').callback_clicked_del(self._cb_panel_1)
@@ -98,7 +108,7 @@ class FilmsModule(EpymcModule):
     def _cb_poster_get(self, url):
         print "poster " + url
 
-        if self.__film_db.has_key('url'):
+        if self.__film_db.id_exist('url'):
             print 'Found in DB'
         else:
             print 'Not found'
@@ -111,11 +121,26 @@ class FilmsModule(EpymcModule):
 
     def update_film_info(self, url):
         print "Update info"
-        if self.__film_db.has_key(url):
+        if self.__film_db.id_exists(url):
             print 'Found: ' + url
-            e = self.__film_db[url]
+            e = self.__film_db.get_data(url)
+            import pprint
+            pprint.pprint(e)
+
+            director = "Unknow"
+            cast = ""
+            for person in e['cast']:
+                print " CAST: " + person['job']
+                if person['job'] == 'Director':
+                    director = person['name']
+                elif person['job'] == 'Actor':
+                    cast += (', ' if cast else '') + person['name']
+            
+            
             info = "<title>" + e['name'] + "</title><br>" + \
-                   "<hilight>Director: </hilight>" + e['name']
+                   "<hilight>Director: </hilight>" + director + "<br>" + \
+                   "<hilight>Cast: </hilight>" + cast + "<br>" + \
+                   "<hilight>Rating: </hilight>" + str(e['rating']) + "/10<br>"
             
             gui.part_get('infopanel_text').text_set(info)
         else:
@@ -157,11 +182,11 @@ class FilmsModule(EpymcModule):
         pprint.pprint(movie_info)
 
         # store the result in db
-        self.__film_db[url] = movie_info
+        self.__film_db.set_data(url, movie_info[0])
 
         # TODO download cover and fanart
-        print entry['posters'] # TODO choose the right size
-        print entry['backdrops'] # TODO choose the right size
+        #~ print movie_info['posters'] # TODO choose the right size
+        #~ print movie_info['backdrops'] # TODO choose the right size
         
         #~ for res in data:
             #~ print " * %s [%d]" % (res['name'], res['id'])

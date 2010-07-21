@@ -9,8 +9,7 @@ def read_from_files(files):
     print "Readed config from files:"
     for f in readed: print " * " + f
     print ""
-    if not _config.has_section('general'):
-        _config.add_section('general')
+    add_section('general')
 
 def write_to_file(file):
     print("Writing config to file: " + file)
@@ -18,7 +17,8 @@ def write_to_file(file):
         _config.write(configfile)
 
 def add_section(section):
-    _config.add_section(section)
+    if not _config.has_section(section):
+        _config.add_section(section)
 
 def has_section(section):
     return _config.has_section(section)

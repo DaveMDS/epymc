@@ -13,6 +13,7 @@ import config_gui
 import mainmenu
 import ini
 import sdb
+import downloader
 
 
 
@@ -26,10 +27,12 @@ if __name__ == "__main__":
     if not os.path.exists(user_dir):
         os.makedirs(user_dir)
 
+    
     #TODO add a system dir...but where??
     ini.read_from_files(['epymc.conf', os.path.join(user_dir, 'epymc.conf')])
 
     # init stuff
+    downloader.init()
     sdb.init()
     gui.init_window()
     config_gui.init()
@@ -49,5 +52,6 @@ if __name__ == "__main__":
     modules.shutdown_all() #TODO check this !!!
     ini.write_to_file(os.path.expanduser('~/.config/epymc/epymc.conf'))
     sdb.shutdown()
+    downloader.shutdown()
     elementary.shutdown()
 

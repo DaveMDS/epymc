@@ -4,6 +4,7 @@ import evas
 import elementary
 
 import ini
+import downloader
 
 _win = None
 _layout = None
@@ -33,6 +34,16 @@ def init_window():
 
     win.show()
 
+    ##TESTING
+    #~ im = EmcRemoteImage("http://hwcdn.themoviedb.org/posters/900/4bc95e22017a3c57fe02a900/wanted-thumb.jpg")
+    #~ im = elementary.Image(win)
+    im = EmcRemoteImage(win)
+    im.file_set("/home/dave/icon_cancel.png")
+    im.url_set("http://hwcdn.themoviedb.org/posters/900/4bc95e22017a3c57fe02a900/wanted-thumb.jpg")
+    im.resize(300,300)
+    im.show()
+    ##
+
 def part_get(name):
     global _layout
     return _layout.edje_get().part_external_object_get(name)
@@ -48,3 +59,32 @@ def text_set(part, text):
 def shutdown():
     elementary.exit()
 
+################################################################################
+#~ import utils
+
+class EmcRemoteImage(elementary.Image):
+    """ TODO doc this """
+    
+    def __init__(self, parent):
+        elementary.Image.__init__(self, parent)
+        self._parent = parent
+
+    def url_set(self, url, dest = None):
+        #TODO start spinning animation
+
+        # if dest exists then set the image and return
+        if dest and os.path.exists(dest):
+            self.file_set(dest)
+            return
+        
+        downloader.download_url_async(url, dest=(dest if dest else "tmp"),
+                                      complete_cb = self._cb_download_complete,
+                                      progress_cb = self._cb_download_progress)
+
+    def _cb_download_complete(self, url, dest, header):
+        self.file_set(dest)
+
+    def _cb_download_progress(self):
+        pass
+
+   #TODO on image_set abort the download ? 

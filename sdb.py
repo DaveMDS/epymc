@@ -17,9 +17,7 @@ class EmcDatabase(object):
         print 'Open DB: ' + name + '  from file: ' + file
         self.__sh = shelve.open(file)
         self.__name = name
-        
-        print self.__sh
-    
+
     def __del__(self):
         self.__sh.close()
 

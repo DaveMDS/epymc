@@ -6,40 +6,38 @@ main group: "main" TODO rename to epymc_main_layout
 
 ### MainMenu stuff
 
- * External parts:
+ * Required parts:
     "mainmenu_list" -> elm_list
 
- * Signals received from the application
+ * Signals received from the application:
     "mainmenu,show" "emc"
     "mainmenu,hide" "emc"
 
 ### ConfigGui stuff
 
- * External parts:
+ * Required parts:
     "config_pager" -> elm_pager style:"slide_invisible"
 
- * Signals received from the application
+ * Signals received from the application:
     "config,show" "emc"
     "config,hide" "emc"
 
  
  ### Browser: List View
 
- * Text parts:
-    "browser/list/page_title"
-    
- * External parts:
+ * Required parts:
+    "browser/list/page_title" -> edje text
     "browser/list/flip" -> elm_pager style:"slide_invisible"
     "browser/list/poster" -> edje swallow
     "browser/list/info" -> elm_anchorblock
 
- * Signals received from the application
+ * Signals received from the application:
     "browser,list,show" "emc"
     "browser,list,hide" "emc"
 
 ### Info Panel
 
-* External parts:
+ * Required parts:
     "infopanel_image" -> elm_image
     "infopanel_text" -> elm_anchorblock
     "infopanel_button1" -> elm_button
@@ -49,6 +47,15 @@ main group: "main" TODO rename to epymc_main_layout
     "infopanel_button5" -> elm_button
     "infopanel_button6" -> elm_button
 
- * Signals received from the application
+ * Signals received from the application:
     "infopanel,show" "emc"
     "infopanel,hide" "emc"
+
+### Video Player
+
+ * Required parts:
+    "videoplayer/video" -> edje swallow
+
+ * Signals received from the application:
+    "videoplayer,show" "emc"
+    "videoplayer,hide" "emc"

@@ -76,6 +76,10 @@ class FilmsModule(EpymcModule):
         self.__browser.item_add('emc://back', "Back")
 
     def cb_mainmenu(self, list, list_item):
+        #### TESTING
+        #~ mediaplayer.play_url('/home/dave/Films/Alien.avi')
+        #~ return
+        #####
         # get film folders from config
         self.__folders = ini.get_string_list('film', 'folders', ';')
         if not self.__folders:
@@ -122,6 +126,9 @@ class FilmsModule(EpymcModule):
         self.__current_url = url
         gui.signal_emit("infopanel,show")
 
+    def hide_film_info(self):
+        gui.signal_emit("infopanel,hide")
+
     def update_film_info(self, url):
         print "Update info"
         if self.__film_db.id_exists(url):
@@ -162,7 +169,10 @@ class FilmsModule(EpymcModule):
             # TODO make thumbnail
 
     def _cb_panel_1(self, button):
-        self.update_film_info(self.__current_url)
+        #~ self.update_film_info(self.__current_url)
+        mediaplayer.play_url(self.__current_url)
+        self.hide_film_info()
+        
         
     def _cb_panel_5(self, button):
         self.tmdb_film_search(self.__current_url)

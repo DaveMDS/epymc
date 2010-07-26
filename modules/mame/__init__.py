@@ -197,10 +197,8 @@ class MameModule(EpymcModule):
             return snap_file
 
         # ...or donwload the file from progettoemma.it #TODO give credits
-        #TODO make the download async !!!
         snap_url = 'http://www.progettoemma.net/snap/%s/0000.png' % url
-        utils.download_url_sync(snap_url, snap_file)
-        return snap_file
+        return snap_url + ';' + snap_file
 
     def __cb_game_selected(self, id):
         """ A game has been selected, run it """

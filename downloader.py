@@ -8,7 +8,7 @@ import Queue
 
 import ecore
 
-NUM_WORKER_THREADS = 10
+NUM_WORKER_THREADS = 3
 
 _threads = list()
 _timer = None
@@ -80,7 +80,7 @@ def _download_worker():
     while True:
         # wait here until an item in the queue is present
         item = Q1.get()
-        print "worker " + str(item)
+        #~ print "worker " + str(item)
 
         # quit the worker if requested
         if isinstance(item, str) and item == 'exit':
@@ -94,7 +94,7 @@ def _download_worker():
 
         # check downloaded file size
         if os.path.getsize(filename) < min_size:
-            print "TOO SHORT " + str(os.path.getsize(filename))
+            #~ print "TOO SHORT " + str(os.path.getsize(filename))
             os.remove(filename)
 
         # put the item in the second queue (_check_q2() will handle this, in the main thread)

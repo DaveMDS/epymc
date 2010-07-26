@@ -76,7 +76,11 @@ class EpymcBrowser(object):
             must return the icon to use for the given url
         * poster_get_cb(url):
             Called when a view need to show the poster/cover/big_image of your
-            item, must return the full path of a valid image file
+            item, must return the full path of a valid image file.
+            You can also return a valid url (http://) to automatically
+            download the image to a random temp file. In addition you can also
+            set the destinatioon path for the give url, just use ';'.
+            ex: 'http://my.url/of/the/image;/my/local/dest/path'
         * info_get_cb(url):
             Called when a view need to show the info of your item,
             must return a string with the murkupped text that describe the item
@@ -216,6 +220,10 @@ class ViewList(object):
                                       icon_get_func=self.__genlist_icon_get,
                                       state_get_func=self.__genlist_state_get)
 
+        # RemoteImage (poster)
+        self.__im = gui.EmcRemoteImage(gui._win)
+        gui.swallow_set('browser/list/poster', self.__im)
+
 
     # Mandatory methods
     def page_show(self, title, dir):
@@ -278,8 +286,14 @@ class ViewList(object):
     def _cb_item_hilight(self, list, item):
         (url, label, parent_browser) = item.data_get()
         poster = parent_browser._poster_get(url)
-        im = gui.part_get('browser/list/poster')
-        im.file_set(poster if poster else "")
+        if poster and poster.startswith("http://"):
+            if poster.find(';') != -1:
+                (url, dest) = poster.split(';')
+                self.__im.url_set(url, dest)
+            else:
+                self.__im.url_set(poster)
+        else:
+            self.__im.file_set(poster if poster else "")
 
         info = parent_browser._info_get(url)
         anchorblock = gui.part_get('browser/list/info')

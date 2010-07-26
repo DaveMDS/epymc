@@ -30,7 +30,7 @@ main group: "main" TODO rename to epymc_main_layout
     
  * External parts:
     "browser/list/flip" -> elm_pager style:"slide_invisible"
-    "browser/list/poster" -> elm_image
+    "browser/list/poster" -> edje swallow
     "browser/list/info" -> elm_anchorblock
 
  * Signals received from the application

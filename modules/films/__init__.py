@@ -11,6 +11,8 @@ from sdb import EmcDatabase
 import mainmenu
 import mediaplayer
 import ini
+import utils
+import downloader
 import gui
 
 
@@ -42,7 +44,7 @@ class FilmsModule(EpymcModule):
         # create a browser instance
         self.__browser = EpymcBrowser()
 
-        # connect info panel buttons
+        # connect info panel buttons callback
         gui.part_get('infopanel_button1').callback_clicked_add(self._cb_panel_1)
         gui.part_get('infopanel_button5').callback_clicked_add(self._cb_panel_5)
 
@@ -106,10 +108,11 @@ class FilmsModule(EpymcModule):
             self.create_root_page()
 
     def _cb_poster_get(self, url):
-        print "poster " + url
-
-        if self.__film_db.id_exist('url'):
-            print 'Found in DB'
+        if self.__film_db.id_exists(url):
+            e = self.__film_db.get_data(url)
+            poster = self.get_poster_filename(e['id'])
+            if os.path.exists(poster):
+                return poster
         else:
             print 'Not found'
             #~ self.__tmdb(url)
@@ -127,6 +130,7 @@ class FilmsModule(EpymcModule):
             import pprint
             pprint.pprint(e)
 
+            # update text info
             director = "Unknow"
             cast = ""
             for person in e['cast']:
@@ -135,12 +139,20 @@ class FilmsModule(EpymcModule):
                     director = person['name']
                 elif person['job'] == 'Actor':
                     cast += (', ' if cast else '') + person['name']
+            
             info = "<title>" + e['name'] + "</title> <year>(" + e['released'][0:4] + ")</year><br>" + \
                    "<hilight>Director: </hilight>" + director + "<br>" + \
                    "<hilight>Cast: </hilight>" + cast + "<br>" + \
                    "<hilight>Rating: </hilight>" + str(e['rating']) + "/10<br>" + \
                    "<br><hilight>Overview:</hilight><br>" + e['overview']
-            gui.part_get('infopanel_text').text_set(info)
+            gui.part_get('infopanel_text').text_set(info.encode('utf-8'))
+
+            # update poster
+            poster = self.get_poster_filename(e['id'])
+            if os.path.exists(poster):
+                gui.part_get('infopanel_image').file_set(poster)
+            else:
+                print 'TODO show a dummy image'
         else:
             # TODO print also file size, video len, codecs, streams found, file metadata, etc..
             msg = "Media:<br>" + url + "<br><br>" + \
@@ -162,7 +174,15 @@ class FilmsModule(EpymcModule):
         (film, ext) = os.path.splitext(film)
         # TODO remove stuff between '[' and ']'
         return film
-        
+
+    def get_poster_filename(self, tmdb_id):
+        return os.path.join(utils.config_dir_get(), 'film',
+                            str(tmdb_id), 'poster.jpg')
+
+    def get_backdrop_filename(self, tmdb_id):
+        return os.path.join(utils.config_dir_get(), 'film',
+                            str(tmdb_id), 'backdrop.jpg')
+    
     def tmdb_film_search(self, url):
         import pprint
         
@@ -176,21 +196,32 @@ class FilmsModule(EpymcModule):
             print 'TODO Show a list to choose from'
 
         movie_info = tmdb.getInfo(data[0]['id'])
-        pprint.pprint(movie_info)
+        movie_info = movie_info[0]
+        #~ pprint.pprint(movie_info)
 
         # store the result in db
-        self.__film_db.set_data(url, movie_info[0])
+        self.__film_db.set_data(url, movie_info)
 
-        # TODO download cover and fanart
-        #~ print movie_info['posters'] # TODO choose the right size
-        #~ print movie_info['backdrops'] # TODO choose the right size
-        
-        #~ for res in data:
-            #~ print " * %s [%d]" % (res['name'], res['id'])
+        # download the first poster image found
+        for image in movie_info['posters']:
+            if image['image']['size'] == 'mid': # TODO make default size configurable
+                dest = self.get_poster_filename(movie_info['id'])
+                downloader.download_url_async(image['image']['url'], dest)
+                break
+
+        # download the first backdrop image found
+        for image in movie_info['backdrops']:
+            if image['image']['size'] == 'original': # TODO make default size configurable
+                dest = self.get_backdrop_filename(movie_info['id'])
+                downloader.download_url_async(image['image']['url'], dest)
+                break
+
+
 
 ###############################################################################
 #    themoviedb.org  client implementation taken from:
 #  http://forums.themoviedb.org/topic/1092/my-contribution-tmdb-api-wrapper-python/
+#  With a little modification by me to support json decode.
 #
 #  Credits goes to globald
 ###############################################################################

@@ -77,8 +77,8 @@ class FilmsModule(EpymcModule):
 
     def cb_mainmenu(self, list, list_item):
         #### TESTING
-        #~ mediaplayer.play_url('/home/dave/Films/Alien.avi')
-        #~ return
+        mediaplayer.play_video('/home/dave/Films/Alien.avi')
+        return
         #####
         # get film folders from config
         self.__folders = ini.get_string_list('film', 'folders', ';')
@@ -170,7 +170,7 @@ class FilmsModule(EpymcModule):
 
     def _cb_panel_1(self, button):
         #~ self.update_film_info(self.__current_url)
-        mediaplayer.play_url(self.__current_url)
+        mediaplayer.play_video(self.__current_url)
         self.hide_film_info()
         
         

@@ -47,6 +47,7 @@ class FilmsModule(EpymcModule):
         # connect info panel buttons callback
         gui.part_get('infopanel_button1').callback_clicked_add(self._cb_panel_1)
         gui.part_get('infopanel_button5').callback_clicked_add(self._cb_panel_5)
+        gui.part_get('infopanel_button6').callback_clicked_add(self._cb_panel_6)
 
     def __del__(self):
         print 'Shutdown module 1: FILM'
@@ -63,6 +64,7 @@ class FilmsModule(EpymcModule):
         # disconnect info panel buttons
         gui.part_get('infopanel_button1').callback_clicked_del(self._cb_panel_1)
         gui.part_get('infopanel_button5').callback_clicked_del(self._cb_panel_5)
+        gui.part_get('infopanel_button6').callback_clicked_del(self._cb_panel_6)
 
     def create_root_page(self):
         self.__browser.page_add("film://root", "Films",
@@ -77,8 +79,8 @@ class FilmsModule(EpymcModule):
 
     def cb_mainmenu(self, list, list_item):
         #### TESTING
-        mediaplayer.play_video('/home/dave/Films/Alien.avi')
-        return
+        #~ mediaplayer.play_video('/home/dave/Films/Alien.avi')
+        #~ return
         #####
         # get film folders from config
         self.__folders = ini.get_string_list('film', 'folders', ';')
@@ -176,6 +178,9 @@ class FilmsModule(EpymcModule):
         
     def _cb_panel_5(self, button):
         self.tmdb_film_search(self.__current_url)
+        
+    def _cb_panel_6(self, button):
+        self.hide_film_info()
 
     def get_film_name_from_url(self, url):
         # remove path

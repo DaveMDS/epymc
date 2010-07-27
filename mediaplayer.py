@@ -41,10 +41,10 @@ def play_video(url):
 
 def stop_video():
     global _emotion
-
     _emotion.play = False
+    hide_video_controls()
     gui.signal_emit('videoplayer,hide')
-    gui.signal_emit('videoplayer,controls,hide')
+   
 
 def show_video_controls():
     global _controls_visible

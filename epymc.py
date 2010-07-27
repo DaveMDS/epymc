@@ -55,3 +55,4 @@ if __name__ == "__main__":
     downloader.shutdown()
     elementary.shutdown()
 
+    print 'Bye Bye...'

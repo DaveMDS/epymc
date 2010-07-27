@@ -9,6 +9,9 @@ import downloader
 _win = None
 _layout = None
 
+def _cb_win_del(win):
+    elementary.exit()
+
 def init_window():
     global _win
     global _layout
@@ -16,7 +19,8 @@ def init_window():
     # window
     win = elementary.Window("emc_win", elementary.ELM_WIN_BASIC)
     win.title_set("Enlightenment Media Center")
-    win.autodel_set(True) #TODO exit app on del !!
+    #~ win.autodel_set(True) #TODO exit app on del !!
+    win.callback_destroy_add(_cb_win_del)
     _win = win
     if ini.has_option('general', 'fullscreen'):
         if ini.get_bool('general', 'fullscreen') == True:

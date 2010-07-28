@@ -2,12 +2,14 @@
 
 import os
 
+import evas
 import elementary
 
 from modules import EpymcModule
 from browser import EpymcBrowser
 from sdb import EmcDatabase
 from gui import EmcDialog
+from gui import EmcRemoteImage
 
 import mainmenu
 import mediaplayer
@@ -163,6 +165,7 @@ class FilmsModule(EpymcModule):
                 gui.part_get('infopanel_image').file_set(poster)
             else:
                 print 'TODO show a dummy image'
+                gui.part_get('infopanel_image').file_set('')
         else:
             # TODO print also file size, video len, codecs, streams found, file metadata, etc..
             msg = "Media:<br>" + url + "<br><br>" + \
@@ -170,13 +173,12 @@ class FilmsModule(EpymcModule):
                   "Try the GetInfo button..."
             gui.part_get('infopanel_text').text_set(msg)
             # TODO make thumbnail
+            gui.part_get('infopanel_image').file_set('')
 
     def _cb_panel_1(self, button):
-        #~ self.update_film_info(self.__current_url)
         mediaplayer.play_video(self.__current_url)
         self.hide_film_info()
-        
-        
+
     def _cb_panel_5(self, button):
         self.tmdb_film_search(self.__current_url)
         
@@ -200,34 +202,60 @@ class FilmsModule(EpymcModule):
                             str(tmdb_id), 'backdrop.jpg')
     
     def tmdb_film_search(self, url):
-        import pprint
-        
         film = self.get_film_name_from_url(url)
         print "Search for : " + film
 
-        ####  TESTING
-        dialog = EmcDialog(title = 'Title of thedialog',
-                           text = 'asdasdasdasdasdasda')
-        dialog.button_add('b1', None)
-        dialog.button_add('b2', None)
-        dialog.button_add('b3', None)
-        dialog.activate()
-        return
-        #################
-        
         tmdb = TMDB(TMDB_API_KEY, 'json', 'en', True)
         data = tmdb.searchResults(film)
 
-        if len(data) > 1:
-            print 'TODO Show a list to choose from'
+        if len(data) == 1:
+            # just one result, use that
+            self.tmdb_film_get_info(data[0]['id'])
 
-      
-        movie_info = tmdb.getInfo(data[0]['id'])
+        elif len(data) > 1:
+            # Create a list dialog to choose from results
+            li = elementary.List(gui._win)
+            for res in data:
+                icon = None
+                for image in res['posters']:
+                    if image['image']['size'] == 'thumb' and image['image']['url']:
+                        icon = EmcRemoteImage(li)
+                        icon.url_set(image['image']['url'])
+                        icon.size_hint_min_set(100, 100) # TODO fixme
+                        break
+                label = res['name'] + ' (' + res['released'][:4] + ')'
+                li.item_append(label, icon, None, None, res['id'])
+            li.show()
+            li.go()
+            li.size_hint_min_set(300, 300) #TODO FIXME
+            
+            dialog = EmcDialog(title = 'Found ' + str(len(data))+' results, please choose the right one.',
+                               content = li)
+            dialog.button_add('Cancel', self._cb_search_cancel, dialog)
+            dialog.button_add('Ok', self._cb_search_ok, dialog)
+            dialog.activate()
+
+    def _cb_search_cancel(self, button, dialog):
+        dialog.delete()
+        del dialog
+
+    def _cb_search_ok(self, button, dialog):
+        li = dialog.content_get()
+        item = li.selected_item_get()
+        id = item.data_get()[0][0]
+        self.tmdb_film_get_info(id)
+
+    def tmdb_film_get_info(self, tmdb_id):
+        print tmdb_id
+        print self.__current_url
+
+        tmdb = TMDB(TMDB_API_KEY, 'json', 'en', True)
+
+        movie_info = tmdb.getInfo(tmdb_id)
         movie_info = movie_info[0]
-        #~ pprint.pprint(movie_info)
 
         # store the result in db
-        self.__film_db.set_data(url, movie_info)
+        self.__film_db.set_data(self.__current_url, movie_info)
 
         # download the first poster image found
         for image in movie_info['posters']:
@@ -242,8 +270,8 @@ class FilmsModule(EpymcModule):
                 dest = self.get_backdrop_filename(movie_info['id'])
                 downloader.download_url_async(image['image']['url'], dest)
                 break
-
-
+    
+    
 
 ###############################################################################
 #    themoviedb.org  client implementation taken from:

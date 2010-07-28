@@ -94,17 +94,18 @@ class EmcRemoteImage(elementary.Image):
         self._parent = parent
         self._pb = elementary.Progressbar(parent)
         self._pb.style_set("wheel")
+        self.on_move_add(self._cb_move_resize)
+        self.on_resize_add(self._cb_move_resize)
 
     def show(self):
         (x, y, w, h) = self.geometry_get()
         print 'SHOW %d %d %d %d' % (x, y, w, h)
-        elementary.Progressbar.show(self)
-        self._pb.resize(w, h)
-        self._pb.move(x, y)
+        elementary.Image.show(self)
+        self._pb.show()
 
     def hide(self):
-        elementary.Progressbar.hide(self)
         self._pb.hide()
+        elementary.Image.hide(self)
 
     def url_set(self, url, dest = None):
         # if dest exists then set the image and return
@@ -127,10 +128,17 @@ class EmcRemoteImage(elementary.Image):
         self._pb.hide()
         self._pb.pulse(False)
 
+    def _cb_move_resize(self, obj):
+        (x, y, w, h) = self.geometry_get()
+        #~ print 'MOVE %d %d %d %d' % (x, y, w, h)
+        self._pb.resize(w, h)
+        self._pb.move(x, y)
+        self._pb.raise_()
 
     def _cb_download_complete(self, url, dest, header):
         self.stop_spin()
         self.file_set(dest)
+        self.size_hint_min_set(100, 100) #TODO FIXME (needed by tmdb search results list)
 
     def _cb_download_progress(self):
         pass
@@ -146,7 +154,7 @@ class EmcDialog(elementary.InnerWindow):
         style can be 'minimal' (default), 'minimal_vertical' or 'default'
     """
 
-    def __init__(self, title = None, text = None, style = 'minimal'):
+    def __init__(self, title = None, text = None, content = None, style = 'minimal'):
         elementary.InnerWindow.__init__(self, gui._win)
         self.style_set(style)
 
@@ -159,20 +167,28 @@ class EmcDialog(elementary.InnerWindow):
         self._hbox.show()
 
         self._vbox.pack_end(self._hbox)
-        self.content_set(self._vbox)
+        elementary.InnerWindow.content_set(self, self._vbox)
 
         if text:
             self._anchorblock = elementary.AnchorBlock(gui._win)
             self._anchorblock.text_set(text)
             self._vbox.pack_start(self._anchorblock)
             self._anchorblock.show()
-    
+        elif content:
+            self._content = content
+            self._vbox.pack_start(content)
+            
         if title:
             self._title = elementary.Label(gui._win)
             self._title.label_set(title)
             self._vbox.pack_start(self._title)
             self._title.show()
-        
+
+    def content_set(self, content):
+        self._vbox.pack_start(content)
+
+    def content_get(self):
+        return self._content
         
     def button_add(self, label, clicked_cb = None, cb_data = None):
         b = elementary.Button(self)

@@ -5,12 +5,17 @@ import elementary
 
 import ini
 import downloader
+import mediaplayer
 
 _win = None
 _layout = None
 
 def _cb_win_del(win):
     elementary.exit()
+
+# TODO move this callback somewhere...maybe in mediaplayer?
+def _cb_volume_slider_changed(slider):
+    mediaplayer.volume_set(slider.value)
 
 def init_window():
     global _win
@@ -38,6 +43,7 @@ def init_window():
 
     win.show()
 
+    part_get('volume/slider').callback_changed_add(_cb_volume_slider_changed)
     ##TESTING
     #~ im = EmcRemoteImage(win)
     #~ im.url_set("http://hwcdn.themoviedb.org/posters/900/4bc95e22017a3c57fe02a900/wanted-thumb.jpg")

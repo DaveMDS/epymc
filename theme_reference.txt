@@ -58,10 +58,24 @@ main group: "main" TODO rename to epymc_main_layout
     "videoplayer/controls/btn_play" -> elm_button
     "videoplayer/controls/btn_stop" -> elm_button
     "videoplayer/controls/btn_forward" -> elm_button
+    "videoplayer/controls/btn_fforward" -> elm_button
     "videoplayer/controls/btn_backward" -> elm_button
+    "videoplayer/controls/btn_fbackward" -> elm_button
+    "videoplayer/controls/slider" -> elm_slider
+    "videoplayer/controls/position" -> edje text
+    "videoplayer/controls/length" -> edje text
 
  * Signals received from the application:
     "videoplayer,show" "emc"
     "videoplayer,hide" "emc"
     "videoplayer,controls,show" "emc"
     "videoplayer,controls,hide" "emc"
+
+### Volume
+
+ * Required parts:
+    "volume/slider" -> elm_slider
+
+ * Signals received from the application:
+    "volume,show" "emc"
+    "volume,hide" "emc"

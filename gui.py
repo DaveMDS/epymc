@@ -11,7 +11,7 @@ _win = None
 _layout = None
 
 def _cb_win_del(win):
-    elementary.exit()
+    ask_to_exit()
 
 # TODO move this callback somewhere...maybe in mediaplayer?
 def _cb_volume_slider_changed(slider):
@@ -52,6 +52,20 @@ def init_window():
     #~ im.show()
     ##
 
+
+def ask_to_exit():
+    d = EmcDialog(title = 'Exit MediaCenter ?')
+    d.button_add('Yes', _cb_exit_yes)
+    d.button_add('No', _cb_exit_no, d)
+    d.activate()
+    
+def _cb_exit_yes(button):
+    elementary.exit()
+
+def _cb_exit_no(button, dialog):
+    dialog.delete()
+    del dialog
+
 def part_get(name):
     global _layout
     return _layout.edje_get().part_external_object_get(name)
@@ -67,9 +81,7 @@ def text_set(part, text):
 def swallow_set(part, obj):
     global _layout
     _layout.edje_get().part_swallow(part, obj)
-    
-def shutdown():
-    elementary.exit()
+
 
 ################################################################################
 import os
@@ -125,3 +137,51 @@ class EmcRemoteImage(elementary.Image):
 
         
    #TODO on image_set abort the download ? 
+
+################################################################################
+import gui
+
+class EmcDialog(elementary.InnerWindow):
+    """ TODO doc this
+        style can be 'minimal' (default), 'minimal_vertical' or 'default'
+    """
+
+    def __init__(self, title = None, text = None, style = 'minimal'):
+        elementary.InnerWindow.__init__(self, gui._win)
+        self.style_set(style)
+
+        self._vbox = elementary.Box(gui._win)
+        self._vbox.horizontal_set(False)
+        self._vbox.show()
+        
+        self._hbox = elementary.Box(gui._win)
+        self._hbox.horizontal_set(True)
+        self._hbox.show()
+
+        self._vbox.pack_end(self._hbox)
+        self.content_set(self._vbox)
+
+        if text:
+            self._anchorblock = elementary.AnchorBlock(gui._win)
+            self._anchorblock.text_set(text)
+            self._vbox.pack_start(self._anchorblock)
+            self._anchorblock.show()
+    
+        if title:
+            self._title = elementary.Label(gui._win)
+            self._title.label_set(title)
+            self._vbox.pack_start(self._title)
+            self._title.show()
+        
+        
+    def button_add(self, label, clicked_cb = None, cb_data = None):
+        b = elementary.Button(self)
+        b.label_set(label)
+
+        if clicked_cb and cb_data:
+            b.callback_clicked_add(clicked_cb, cb_data)
+        elif clicked_cb:
+            b.callback_clicked_add(clicked_cb)
+
+        self._hbox.pack_end(b)
+        b.show()

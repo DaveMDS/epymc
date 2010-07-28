@@ -11,7 +11,7 @@ _items_weight = {}  # key: elm_list_item  value: weight(int)
 
 
 def cb_exit(list, list_item):
-    gui.shutdown()
+    gui.ask_to_exit()
 
 def cb_config(list, list_item):
     config_gui.show()

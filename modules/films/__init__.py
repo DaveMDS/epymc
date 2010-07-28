@@ -7,6 +7,7 @@ import elementary
 from modules import EpymcModule
 from browser import EpymcBrowser
 from sdb import EmcDatabase
+from gui import EmcDialog
 
 import mainmenu
 import mediaplayer
@@ -203,6 +204,16 @@ class FilmsModule(EpymcModule):
         
         film = self.get_film_name_from_url(url)
         print "Search for : " + film
+
+        ####  TESTING
+        dialog = EmcDialog(title = 'Title of thedialog',
+                           text = 'asdasdasdasdasdasda')
+        dialog.button_add('b1', None)
+        dialog.button_add('b2', None)
+        dialog.button_add('b3', None)
+        dialog.activate()
+        return
+        #################
         
         tmdb = TMDB(TMDB_API_KEY, 'json', 'en', True)
         data = tmdb.searchResults(film)
@@ -210,6 +221,7 @@ class FilmsModule(EpymcModule):
         if len(data) > 1:
             print 'TODO Show a list to choose from'
 
+      
         movie_info = tmdb.getInfo(data[0]['id'])
         movie_info = movie_info[0]
         #~ pprint.pprint(movie_info)

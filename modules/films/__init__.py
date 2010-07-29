@@ -119,6 +119,7 @@ class FilmsModule(EpymcModule):
         # connect info panel buttons callbacks
         gui.part_get('infopanel_button1').callback_clicked_add(self._cb_panel_1)
         gui.part_get('infopanel_button3').callback_clicked_add(self._cb_panel_3)
+        gui.part_get('infopanel_button4').callback_clicked_add(self._cb_panel_4)
         gui.part_get('infopanel_button5').callback_clicked_add(self._cb_panel_5)
         gui.part_get('infopanel_button6').callback_clicked_add(self._cb_panel_6)
 
@@ -128,6 +129,7 @@ class FilmsModule(EpymcModule):
          # disconnect info panel buttons callbacks
         gui.part_get('infopanel_button1').callback_clicked_del(self._cb_panel_1)
         gui.part_get('infopanel_button3').callback_clicked_del(self._cb_panel_3)
+        gui.part_get('infopanel_button4').callback_clicked_del(self._cb_panel_4)
         gui.part_get('infopanel_button5').callback_clicked_del(self._cb_panel_5)
         gui.part_get('infopanel_button6').callback_clicked_del(self._cb_panel_6)
 
@@ -186,6 +188,7 @@ class FilmsModule(EpymcModule):
         mediaplayer.play_video(self.__current_url)
         self.hide_film_info()
 
+########
     def _cb_panel_3(self, button):
         if self.__film_db.id_exists(self.__current_url):
             film_info = self.__film_db.get_data(self.__current_url)
@@ -232,6 +235,19 @@ class FilmsModule(EpymcModule):
         dest = get_poster_filename(id)
         downloader.download_url_async(url, dest, self._cb_poster_done)
 
+        # kill the dialog
+        self.__poster_dialog.delete()
+        del self.__poster_dialog
+
+        # make a spinner dialog
+        spinner = elementary.Progressbar(gui._win)
+        spinner.style_set('wheel')
+        spinner.pulse(True)
+        spinner.show()
+        self.__poster_dialog = EmcDialog(title = "Downloading Poster",
+                                content = spinner)
+        self.__poster_dialog.activate()
+
     def _cb_poster_done(self, url, dest, headers):
         # kill the dialog
         self.__poster_dialog.delete()
@@ -239,6 +255,73 @@ class FilmsModule(EpymcModule):
 
         self.update_film_info(self.__current_url)
 
+########
+    def _cb_panel_4(self, button):
+        if self.__film_db.id_exists(self.__current_url):
+            film_info = self.__film_db.get_data(self.__current_url)
+
+            # create a list of backdrops
+            images = []
+            for image in film_info['backdrops']:
+                if image['image']['size'] == 'thumb':
+                    #~ print image['image']['url']
+                    images.append(image['image'])
+
+            # show the list in a dialog
+            li = elementary.List(gui._win)
+            for image in images:
+                icon = EmcRemoteImage(li)
+                icon.url_set(image['url'])
+                icon.size_hint_min_set(100, 100) # TODO fixme
+                #~ label = res['name'] + ' (' + res['released'][:4] + ')'
+                mid = image['url'][:-9]
+                mid = mid + 'mid.jpg'
+                li.item_append(" ", icon, None, None, (mid, film_info['id']))
+
+            li.show()
+            li.go()
+            li.size_hint_min_set(300, 300) #TODO FIXME
+            
+            dialog = EmcDialog(title = 'Choose a Fanart.', content = li)
+            dialog.button_add('Cancel', self._cb_backdrop_cancel, dialog)
+            dialog.button_add('Ok', self._cb_backdrop_ok, dialog)
+            dialog.activate()
+    
+    def _cb_backdrop_cancel(self, button, dialog):
+        # kill the dialog
+        dialog.delete()
+        del dialog
+    
+    def _cb_backdrop_ok(self, button, dialog):
+        li = dialog.content_get()
+        item = li.selected_item_get()
+        if not item: return
+
+        self.__backdrop_dialog = dialog
+        (url, id) = item.data_get()[0][0]
+        dest = get_backdrop_filename(id)
+        downloader.download_url_async(url, dest, self._cb_backdrop_done)
+
+        # kill the dialog
+        self.__backdrop_dialog.delete()
+        del self.__backdrop_dialog
+
+        # make a spinner dialog
+        spinner = elementary.Progressbar(gui._win)
+        spinner.style_set('wheel')
+        spinner.pulse(True)
+        spinner.show()
+        self.__backdrop_dialog = EmcDialog(title = "Downloading Fanart",
+                                content = spinner)
+        self.__backdrop_dialog.activate()
+
+    def _cb_backdrop_done(self, url, dest, headers):
+        # kill the dialog
+        self.__backdrop_dialog.delete()
+        del self.__backdrop_dialog
+        #~ self.update_film_info(self.__current_url)
+
+###############
     def _cb_panel_5(self, button):
         tmdb = TMDB2(TMDB_API_KEY)
         film = self.get_film_name_from_url(self.__current_url)

@@ -118,6 +118,7 @@ class FilmsModule(EpymcModule):
 
         # connect info panel buttons callbacks
         gui.part_get('infopanel_button1').callback_clicked_add(self._cb_panel_1)
+        gui.part_get('infopanel_button2').callback_clicked_add(self._cb_panel_2)
         gui.part_get('infopanel_button3').callback_clicked_add(self._cb_panel_3)
         gui.part_get('infopanel_button4').callback_clicked_add(self._cb_panel_4)
         gui.part_get('infopanel_button5').callback_clicked_add(self._cb_panel_5)
@@ -128,6 +129,7 @@ class FilmsModule(EpymcModule):
     def hide_film_info(self):
          # disconnect info panel buttons callbacks
         gui.part_get('infopanel_button1').callback_clicked_del(self._cb_panel_1)
+        gui.part_get('infopanel_button2').callback_clicked_del(self._cb_panel_2)
         gui.part_get('infopanel_button3').callback_clicked_del(self._cb_panel_3)
         gui.part_get('infopanel_button4').callback_clicked_del(self._cb_panel_4)
         gui.part_get('infopanel_button5').callback_clicked_del(self._cb_panel_5)
@@ -187,6 +189,31 @@ class FilmsModule(EpymcModule):
     def _cb_panel_1(self, button):
         mediaplayer.play_video(self.__current_url)
         self.hide_film_info()
+
+    def _cb_panel_2(self, button):
+        if self.__film_db.id_exists(self.__current_url):
+            film_info = self.__film_db.get_data(self.__current_url)
+
+            # create the cast list
+            li = elementary.List(gui._win)
+            for person in film_info['cast']:
+                if person['job'] == 'Actor':
+                    label = person['name'] + ' as ' + person['character']
+                    li.item_append(label, None, None, None, None)
+
+            li.show()
+            li.go()
+            li.size_hint_min_set(300, 300) #TODO FIXME
+
+            # put the list ia a dialog
+            dialog = EmcDialog(title = 'Cast', content = li)
+            dialog.button_add('Close', self._cb_cast_close, dialog)
+            dialog.activate()
+
+    def _cb_cast_close(self, button, dialog):
+        # kill the dialog
+        dialog.delete()
+        del dialog
 
 ########
     def _cb_panel_3(self, button):

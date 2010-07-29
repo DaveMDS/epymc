@@ -89,13 +89,19 @@ def _download_worker():
 
         (url, dest, complete_cb, progress_cb, min_size) = item
 
-        (filename, headers) = urllib.urlretrieve(url, dest)
-        # TODO check download result
+        if (dest):
+            (filename, headers) = urllib.urlretrieve(url, dest)
 
-        # check downloaded file size
-        if os.path.getsize(filename) < min_size:
-            #~ print "TOO SHORT " + str(os.path.getsize(filename))
-            os.remove(filename)
+            # check downloaded file size
+            if os.path.getsize(filename) < min_size:
+                #~ print "TOO SHORT " + str(os.path.getsize(filename))
+                os.remove(filename)
+
+        else:
+            client = urllib.urlopen(url)
+            filename = client.read()
+            headers = ''
+            client.close()
 
         # put the item in the second queue (_check_q2() will handle this, in the main thread)
         Q2.put((url, filename, headers, complete_cb))

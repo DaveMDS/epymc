@@ -184,9 +184,6 @@ class EmcDialog(elementary.InnerWindow):
             self._vbox.pack_start(self._title)
             self._title.show()
 
-    def content_set(self, content):
-        self._vbox.pack_start(content)
-
     def content_get(self):
         return self._content
         

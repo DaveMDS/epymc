@@ -47,11 +47,6 @@ class FilmsModule(EpymcModule):
         # create a browser instance
         self.__browser = EpymcBrowser()
 
-        # connect info panel buttons callback
-        gui.part_get('infopanel_button1').callback_clicked_add(self._cb_panel_1)
-        gui.part_get('infopanel_button5').callback_clicked_add(self._cb_panel_5)
-        gui.part_get('infopanel_button6').callback_clicked_add(self._cb_panel_6)
-
     def __del__(self):
         print 'Shutdown module 1: FILM'
         # delete mainmenu item
@@ -64,27 +59,9 @@ class FilmsModule(EpymcModule):
         del self.__film_db
         del self.__person_db
 
-        # disconnect info panel buttons
-        gui.part_get('infopanel_button1').callback_clicked_del(self._cb_panel_1)
-        gui.part_get('infopanel_button5').callback_clicked_del(self._cb_panel_5)
-        gui.part_get('infopanel_button6').callback_clicked_del(self._cb_panel_6)
 
-    def create_root_page(self):
-        self.__browser.page_add("film://root", "Films",
-                                item_selected_cb = self._cb_url_selected)
-
-        if len(self.__folders) == 1:
-            print "TODO skip first page"
-        
-        for f in self.__folders:
-            self.__browser.item_add(f, os.path.basename(f))
-        self.__browser.item_add('emc://back', "Back")
-
+###### BROWSER STUFF
     def cb_mainmenu(self, list, list_item):
-        #### TESTING
-        #~ mediaplayer.play_video('/home/dave/Films/Alien.avi')
-        #~ return
-        #####
         # get film folders from config
         self.__folders = ini.get_string_list('film', 'folders', ';')
         if not self.__folders:
@@ -96,16 +73,24 @@ class FilmsModule(EpymcModule):
         mainmenu.hide()
         self.__browser.show()
 
+    def create_root_page(self):
+        self.__browser.page_add("film://root", "Films",
+                                item_selected_cb = self.cb_url_selected)
 
-    def _cb_url_selected(self, url):
-        print "EYA!!!!! " + url
+        if len(self.__folders) == 1:
+            print "TODO skip first page"
+        
+        for f in self.__folders:
+            self.__browser.item_add(f, os.path.basename(f))
+        self.__browser.item_add('emc://back', "Back")
 
+    def cb_url_selected(self, url):
         if url.startswith("file://"):
             path = url[7:]
             if os.path.isdir(path):
                 self.__browser.page_add(url, os.path.basename(path),
-                                    item_selected_cb = self._cb_url_selected,
-                                    poster_get_cb = self._cb_poster_get)
+                                    item_selected_cb = self.cb_url_selected,
+                                    poster_get_cb = self.cb_poster_get)
                 for f in os.listdir(path):
                     self.__browser.item_add("file://" + path + "/" + f, f)
                 self.__browser.item_add("emc://back", "Back")
@@ -116,26 +101,37 @@ class FilmsModule(EpymcModule):
         elif url == "film://root":
             self.create_root_page()
 
-    def _cb_poster_get(self, url):
+    def cb_poster_get(self, url):
         if self.__film_db.id_exists(url):
             e = self.__film_db.get_data(url)
-            poster = self.get_poster_filename(e['id'])
+            poster = get_poster_filename(e['id'])
             if os.path.exists(poster):
                 return poster
         else:
             print 'Not found'
-            #~ self.__tmdb(url)
 
+
+###### INFO PANEL STUFF
     def show_film_info(self, url):
         self.update_film_info(url)
         self.__current_url = url
-        gui.signal_emit("infopanel,show")
+
+        # connect info panel buttons callbacks
+        gui.part_get('infopanel_button1').callback_clicked_add(self._cb_panel_1)
+        gui.part_get('infopanel_button5').callback_clicked_add(self._cb_panel_5)
+        gui.part_get('infopanel_button6').callback_clicked_add(self._cb_panel_6)
+
+         gui.signal_emit("infopanel,show")
 
     def hide_film_info(self):
+         # disconnect info panel buttons callbacks
+        gui.part_get('infopanel_button1').callback_clicked_del(self._cb_panel_1)
+        gui.part_get('infopanel_button5').callback_clicked_del(self._cb_panel_5)
+        gui.part_get('infopanel_button6').callback_clicked_del(self._cb_panel_6)
+
         gui.signal_emit("infopanel,hide")
 
     def update_film_info(self, url):
-        print "Update info"
         if self.__film_db.id_exists(url):
             print 'Found: ' + url
             e = self.__film_db.get_data(url)
@@ -160,7 +156,7 @@ class FilmsModule(EpymcModule):
             gui.part_get('infopanel_text').text_set(info.encode('utf-8'))
 
             # update poster
-            poster = self.get_poster_filename(e['id'])
+            poster = get_poster_filename(e['id'])
             if os.path.exists(poster):
                 gui.part_get('infopanel_image').file_set(poster)
             else:
@@ -175,16 +171,6 @@ class FilmsModule(EpymcModule):
             # TODO make thumbnail
             gui.part_get('infopanel_image').file_set('')
 
-    def _cb_panel_1(self, button):
-        mediaplayer.play_video(self.__current_url)
-        self.hide_film_info()
-
-    def _cb_panel_5(self, button):
-        self.tmdb_film_search(self.__current_url)
-        
-    def _cb_panel_6(self, button):
-        self.hide_film_info()
-
     def get_film_name_from_url(self, url):
         # remove path
         film = os.path.basename(url)
@@ -192,28 +178,81 @@ class FilmsModule(EpymcModule):
         (film, ext) = os.path.splitext(film)
         # TODO remove stuff between '[' and ']'
         return film
+        
+    def _cb_panel_1(self, button):
+        mediaplayer.play_video(self.__current_url)
+        self.hide_film_info()
 
-    def get_poster_filename(self, tmdb_id):
-        return os.path.join(utils.config_dir_get(), 'film',
-                            str(tmdb_id), 'poster.jpg')
+    def _cb_panel_5(self, button):
+        tmdb = TMDB2(TMDB_API_KEY)
+        film = self.get_film_name_from_url(self.__current_url)
+        tmdb.film_search(film, self._cb_search_complete)
 
-    def get_backdrop_filename(self, tmdb_id):
-        return os.path.join(utils.config_dir_get(), 'film',
-                            str(tmdb_id), 'backdrop.jpg')
+    def _cb_search_complete(self, tmdb, movie_info):
+        # free TMDB2 object
+        del tmdb
+        # store the result in db
+        self.__film_db.set_data(self.__current_url, movie_info)
+        # update info panel
+        self.update_film_info(self.__current_url)
+
+    def _cb_panel_6(self, button):
+        self.hide_film_info()
+
+
+###### UTILS
+def get_poster_filename(tmdb_id):
+    return os.path.join(utils.config_dir_get(), 'film',
+                        str(tmdb_id), 'poster.jpg')
+
+def get_backdrop_filename(tmdb_id):
+    return os.path.join(utils.config_dir_get(), 'film',
+                        str(tmdb_id), 'backdrop.jpg')
     
-    def tmdb_film_search(self, url):
-        film = self.get_film_name_from_url(url)
-        print "Search for : " + film
 
-        tmdb = TMDB(TMDB_API_KEY, 'json', 'en', True)
-        data = tmdb.searchResults(film)
+###############################################################################
+import urllib
+import json
+
+class TMDB2(object):
+
+    def __init__(self, api_key):
+        ''' TMDB2 Client '''
+        self.key = api_key
+        self.lang = 'en'
+        self.server = 'http://api.themoviedb.org/2.1/'
+
+    def film_search(self, film, complete_cb = None):
+        print "Search2 for : " + film
+
+        self.complete_cb = complete_cb
+        query = self.server+'Movie.search/'+self.lang+'/json/'+self.key+'/'+film
+
+        spinner = elementary.Progressbar(gui._win)
+        spinner.style_set('wheel')
+        spinner.pulse(True)
+        spinner.show()
+        
+        self.dialog = EmcDialog(title = "Searching for: " + film,
+                                content = spinner)
+        self.dialog.activate()
+
+        print "query: " + query
+        downloader.download_url_async(query, None, self._cb_search_done)
+    
+    def _cb_search_done(self, url, dest, headers):
+        data = json.loads(dest)
+
+        # kill spinner dialog
+        self.dialog.delete()
+        del self.dialog
 
         if len(data) == 1:
-            # just one result, use that
-            self.tmdb_film_get_info(data[0]['id'])
+            # just one result, assume is the correct one
+            self.film_get_info(data[0]['id'])
 
         elif len(data) > 1:
-            # Create a list dialog to choose from results
+            # create a list dialog to choose from results
             li = elementary.List(gui._win)
             for res in data:
                 icon = None
@@ -240,48 +279,78 @@ class FilmsModule(EpymcModule):
         del dialog
 
     def _cb_search_ok(self, button, dialog):
+        # get selected item id
         li = dialog.content_get()
         item = li.selected_item_get()
         id = item.data_get()[0][0]
-        self.tmdb_film_get_info(id)
+        if not item or not id: return
 
-    def tmdb_film_get_info(self, tmdb_id):
-        print tmdb_id
-        print self.__current_url
+        # kill the dialog
+        dialog.delete()
+        del dialog
+        
+        # download film info + images
+        self.film_get_info(id)
 
-        tmdb = TMDB(TMDB_API_KEY, 'json', 'en', True)
+    def film_get_info(self, id):
+        print "Get Film Info: " + str(id)
 
-        movie_info = tmdb.getInfo(tmdb_id)
-        movie_info = movie_info[0]
+        query = self.server+'Movie.getInfo/'+self.lang+'/json/'+self.key+'/'+str(id)
 
-        # store the result in db
-        self.__film_db.set_data(self.__current_url, movie_info)
+        spinner = elementary.Progressbar(gui._win)
+        spinner.style_set('wheel')
+        spinner.pulse(True)
+        spinner.show()
+        self.dialog = EmcDialog(title = "Downloading film info",
+                                content = spinner)
+        self.dialog.activate()
+
+        downloader.download_url_async(query, None, self._cb_film_info_done)
+
+    def _cb_film_info_done(self, url, dest, headers):
+        data = json.loads(dest)
+        self.movie_info = data[0]
 
         # download the first poster image found
-        for image in movie_info['posters']:
+        for image in self.movie_info['posters']:
             if image['image']['size'] == 'mid': # TODO make default size configurable
-                dest = self.get_poster_filename(movie_info['id'])
-                downloader.download_url_async(image['image']['url'], dest)
-                break
+                dest = get_poster_filename(self.movie_info['id'])
+                downloader.download_url_async(image['image']['url'], dest,
+                                              self._cb_film_poster_done)
+                return
 
+        # if no poster found go to next step
+        self._cb_film_poster_done(url, dest, headers)
+        
+    def _cb_film_poster_done(self, url, dest, headers):
         # download the first backdrop image found
-        for image in movie_info['backdrops']:
+        for image in self.movie_info['backdrops']:
             if image['image']['size'] == 'original': # TODO make default size configurable
-                dest = self.get_backdrop_filename(movie_info['id'])
-                downloader.download_url_async(image['image']['url'], dest)
-                break
-    
-    
+                dest = get_backdrop_filename(self.movie_info['id'])
+                downloader.download_url_async(image['image']['url'], dest,
+                                              self._cb_film_backdrop_done)
+                return
 
+        # if no backdrop found go to next step
+        self._cb_film_backdrop_done(url, dest, headers)
+
+    def _cb_film_backdrop_done(self, url, dest, headers):
+        # kill the spinner dialog
+        self.dialog.delete()
+        del self.dialog
+
+        if self.complete_cb:
+            self.complete_cb(self, self.movie_info)
+    
 ###############################################################################
 #    themoviedb.org  client implementation taken from:
 #  http://forums.themoviedb.org/topic/1092/my-contribution-tmdb-api-wrapper-python/
 #  With a little modification by me to support json decode.
 #
 #  Credits goes to globald
+#  Unused atm (in favor of the async one 
 ###############################################################################
-import urllib
-import json
+
 
 class TMDB(object):
 
@@ -305,7 +374,6 @@ class TMDB(object):
         except: pass
 
         if data and self.decode:
-            #~ return json.dumps(data, indent = 4)
             return json.loads(data)
         else:
             return data

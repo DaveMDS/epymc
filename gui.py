@@ -154,7 +154,8 @@ class EmcDialog(elementary.InnerWindow):
         style can be 'minimal' (default), 'minimal_vertical' or 'default'
     """
 
-    def __init__(self, title = None, text = None, content = None, style = 'minimal'):
+    def __init__(self, title = None, text = None, content = None,
+                       spinner = False, style = 'minimal'):
         elementary.InnerWindow.__init__(self, gui._win)
         self.style_set(style)
 
@@ -177,7 +178,14 @@ class EmcDialog(elementary.InnerWindow):
         elif content:
             self._content = content
             self._vbox.pack_start(content)
-            
+
+        if spinner:
+            self._spinner = elementary.Progressbar(gui._win)
+            self._spinner.style_set('wheel')
+            self._spinner.pulse(True)
+            self._spinner.show()
+            self._vbox.pack_start(self._spinner)
+
         if title:
             self._title = elementary.Label(gui._win)
             self._title.label_set(title)

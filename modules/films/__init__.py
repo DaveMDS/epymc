@@ -240,12 +240,8 @@ class FilmsModule(EpymcModule):
         del self.__poster_dialog
 
         # make a spinner dialog
-        spinner = elementary.Progressbar(gui._win)
-        spinner.style_set('wheel')
-        spinner.pulse(True)
-        spinner.show()
         self.__poster_dialog = EmcDialog(title = "Downloading Poster",
-                                content = spinner)
+                                         spinner = True)
         self.__poster_dialog.activate()
 
     def _cb_poster_done(self, url, dest, headers):
@@ -307,12 +303,8 @@ class FilmsModule(EpymcModule):
         del self.__backdrop_dialog
 
         # make a spinner dialog
-        spinner = elementary.Progressbar(gui._win)
-        spinner.style_set('wheel')
-        spinner.pulse(True)
-        spinner.show()
         self.__backdrop_dialog = EmcDialog(title = "Downloading Fanart",
-                                content = spinner)
+                                           spinner = True)
         self.__backdrop_dialog.activate()
 
     def _cb_backdrop_done(self, url, dest, headers):
@@ -367,13 +359,8 @@ class TMDB2(object):
         self.complete_cb = complete_cb
         query = self.server+'Movie.search/'+self.lang+'/json/'+self.key+'/'+film
 
-        spinner = elementary.Progressbar(gui._win)
-        spinner.style_set('wheel')
-        spinner.pulse(True)
-        spinner.show()
-        
         self.dialog = EmcDialog(title = "Searching for: " + film,
-                                content = spinner)
+                                spinner = True)
         self.dialog.activate()
 
         print "query: " + query
@@ -437,12 +424,8 @@ class TMDB2(object):
 
         query = self.server+'Movie.getInfo/'+self.lang+'/json/'+self.key+'/'+str(id)
 
-        spinner = elementary.Progressbar(gui._win)
-        spinner.style_set('wheel')
-        spinner.pulse(True)
-        spinner.show()
         self.dialog = EmcDialog(title = "Downloading film info",
-                                content = spinner)
+                                spinner = True)
         self.dialog.activate()
 
         downloader.download_url_async(query, None, self._cb_film_info_done)

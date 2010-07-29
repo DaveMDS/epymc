@@ -121,7 +121,7 @@ class FilmsModule(EpymcModule):
         gui.part_get('infopanel_button5').callback_clicked_add(self._cb_panel_5)
         gui.part_get('infopanel_button6').callback_clicked_add(self._cb_panel_6)
 
-         gui.signal_emit("infopanel,show")
+        gui.signal_emit("infopanel,show")
 
     def hide_film_info(self):
          # disconnect info panel buttons callbacks

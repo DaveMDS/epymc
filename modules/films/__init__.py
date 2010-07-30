@@ -238,13 +238,14 @@ class FilmsModule(EpymcModule):
                 mid = mid + 'mid.jpg'
                 li.item_append(" ", icon, None, None, (mid, film_info['id']))
 
+            li.items_get()[0].selected_set(1)
             li.show()
             li.go()
             li.size_hint_min_set(300, 300) #TODO FIXME
             
             dialog = EmcDialog(title = 'Choose a poster.', content = li)
-            dialog.button_add('Cancel', self._cb_poster_cancel, dialog)
             dialog.button_add('Ok', self._cb_poster_ok, dialog)
+            dialog.button_add('Cancel', self._cb_poster_cancel, dialog)
             dialog.activate()
     
     def _cb_poster_cancel(self, button, dialog):
@@ -301,13 +302,14 @@ class FilmsModule(EpymcModule):
                 mid = mid + 'mid.jpg'
                 li.item_append(" ", icon, None, None, (mid, film_info['id']))
 
+            li.items_get()[0].selected_set(1)
             li.show()
             li.go()
             li.size_hint_min_set(300, 300) #TODO FIXME
-            
+
             dialog = EmcDialog(title = 'Choose a Fanart.', content = li)
-            dialog.button_add('Cancel', self._cb_backdrop_cancel, dialog)
             dialog.button_add('Ok', self._cb_backdrop_ok, dialog)
+            dialog.button_add('Cancel', self._cb_backdrop_cancel, dialog)
             dialog.activate()
     
     def _cb_backdrop_cancel(self, button, dialog):
@@ -417,14 +419,16 @@ class TMDB2(object):
                         break
                 label = res['name'] + ' (' + res['released'][:4] + ')'
                 li.item_append(label, icon, None, None, res['id'])
+
+            li.items_get()[0].selected_set(1)
             li.show()
             li.go()
             li.size_hint_min_set(300, 300) #TODO FIXME
             
             dialog = EmcDialog(title = 'Found ' + str(len(data))+' results, please choose the right one.',
                                content = li)
-            dialog.button_add('Cancel', self._cb_search_cancel, dialog)
             dialog.button_add('Ok', self._cb_search_ok, dialog)
+            dialog.button_add('Cancel', self._cb_search_cancel, dialog)
             dialog.activate()
 
     def _cb_search_cancel(self, button, dialog):

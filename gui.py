@@ -168,6 +168,7 @@ class EmcDialog(elementary.InnerWindow):
         self._name = 'Dialog-' + str(_dialog_counter)
         self._buttons = list()
         self._current_button_num = 0
+        self._content = content
         self._vbox = elementary.Box(gui._win)
         self._vbox.horizontal_set(False)
         self._vbox.show()
@@ -185,7 +186,6 @@ class EmcDialog(elementary.InnerWindow):
             self._vbox.pack_start(self._anchorblock)
             self._anchorblock.show()
         elif content:
-            self._content = content
             self._vbox.pack_start(content)
 
         if spinner:
@@ -244,8 +244,30 @@ class EmcDialog(elementary.InnerWindow):
 
         if event == 'BACK':
             self.delete()
+            return input.EVENT_BLOCK
 
-        elif event == 'OK':
+        # if content is elm List then automanage the events
+        if self._content and type(self._content) is elementary.List:
+            list = self._content
+            item = list.selected_item_get()
+            if not item:
+                item = list.items_get()[0]
+                
+            if event == 'DOWN':
+                next = item.next_get()
+                if next:
+                    next.selected_set(1)
+                    next.show()
+                    return input.EVENT_BLOCK
+            
+            if event == 'UP':
+                prev = item.prev_get()
+                if prev:
+                    prev.selected_set(1)
+                    prev.show()
+                    return input.EVENT_BLOCK
+
+        if event == 'OK':
             self._buttons_cb(self._buttons[self._current_button_num])
 
         elif event == 'LEFT':

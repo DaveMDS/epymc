@@ -3,6 +3,7 @@
 import gui
 import mainmenu
 import config_gui
+import input
 
 
 _items = {}  # key: name  value: elm_list_item
@@ -26,8 +27,10 @@ def show():
     list = gui.part_get("mainmenu_list")
     list.go()
     gui.signal_emit("mainmenu,show")
+    input.listener_add('mainmenu', input_event_cb)
 
 def hide():
+    input.listener_del('mainmenu')
     gui.signal_emit("mainmenu,hide")
 
 def item_add(name, weight, label, icon = None, callback = None):
@@ -55,5 +58,7 @@ def item_del(name):
     item.delete()
     del _items[name]
 
-   
+def input_event_cb(event):
+    print event
+    return input.EVENT_BLOCK
 

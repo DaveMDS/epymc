@@ -6,6 +6,7 @@ import elementary
 
 import gui
 import mainmenu
+import input
 
 ## 'just for test' keyboard support 
 import ecore #TODO REMOVEME
@@ -93,7 +94,7 @@ class EpymcBrowser(object):
 
         if not _views.has_key(style):
             print "CREATE VIEW"
-            view = ViewList(self) # TODO eval here
+            view = ViewList() # TODO eval here
             _views[style] = view
         else:
             print 'VIEW EXISTS'
@@ -139,7 +140,7 @@ class EpymcBrowser(object):
         self.__is_back = True
         
         if len(self.__pages) == 1:
-            self.__pages[0]['view'].hide()
+            self.hide()
             mainmenu.show()
             return
         
@@ -158,11 +159,21 @@ class EpymcBrowser(object):
 
     def show(self):
         """ TODO Function doc """
-        page =  self.__pages[-1]['view'].show()
+        self.__pages[-1]['view'].show()
+        input.listener_add('browser-NAME', self._input_event_cb) # TODO fix -NAME if more that one browser will be show at the same time
 
     def hide(self):
         """ TODO Function doc """
-        page =  self.__pages[-1]['view'].hide()
+        input.listener_del('browser-NAME')
+        self.__pages[-1]['view'].hide()
+
+    def _input_event_cb(self, event):
+
+        if event == "BACK":
+            self.back()
+            return input.EVENT_BLOCK
+        
+        return self.__pages[-1]['view'].input_event_cb(event)
 
     # Stuff for Views
     def _item_selected(self, url):
@@ -191,7 +202,7 @@ class EpymcBrowser(object):
 class ViewList(object):
 
     # View Init
-    def __init__(self, parent_browser):
+    def __init__(self):
         """ TODO Function doc """
         print 'BrowserList __init__'
 
@@ -208,7 +219,7 @@ class ViewList(object):
         self.__visible_list = fl
 
         # back list
-        bl = elementary.Genlist(gui._win) ## TODO arent is still not clear to me.... this should be the flip object  :/
+        bl = elementary.Genlist(gui._win) ## TODO parent is still not clear to me.... this should be the flip object  :/
         bl.callback_clicked_add(self._cb_item_selected)
         bl.callback_selected_add(self._cb_item_hilight)
         self.__flip.content_back_set(bl)
@@ -263,6 +274,31 @@ class ViewList(object):
         self.__fl.hide() #TODO why clip doesn't work??
         self.__bl.hide()
 
+    def input_event_cb(self, event):
+        """ TODO Function doc """
+        print "VE: " + event
+
+        item = self.__visible_list.selected_item_get()
+        (url, label, parent_browser) = item.data_get()
+
+        if event == "DOWN":
+            next = item.next_get()
+            if next:
+                next.selected_set(1)
+                return input.EVENT_BLOCK
+        
+        elif event == "UP":
+            prev = item.prev_get()
+            if prev:
+                prev.selected_set(1)
+                return input.EVENT_BLOCK
+
+        elif event == "OK":
+            parent_browser._item_selected(url)
+            return input.EVENT_BLOCK
+
+        return input.EVENT_CONTINUE
+        
     ### GenList Item Class
     def __genlist_label_get(self, obj, part, item_data):
         (url, label, parent_browser) = item_data

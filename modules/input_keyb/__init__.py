@@ -9,13 +9,14 @@ import input
 from modules import EpymcModule
 
 # map evas keys to emc input events
-_mapping = { 'Up': 'up',
-             'Down': 'down',
-             'Left': 'left',
-             'Right': 'right',
-             'Return': 'ok',
-             'KP_Enter': 'ok',
-             'Escape': 'back',
+_mapping = { 'Up': 'UP',
+             'Down': 'DOWN',
+             'Left': 'LEFT',
+             'Right': 'RIGHT',
+             'Return': 'OK',
+             'KP_Enter': 'OK',
+             'Escape': 'BACK',
+             'BackSpace': 'BACK',
            }
 
 class KeyboardModule(EpymcModule):

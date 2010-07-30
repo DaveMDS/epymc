@@ -70,23 +70,23 @@ def input_event_cb(event):
         item = list.items_get()[0]
         item.selected_set(1)
     
-    if event == "down":
+    if event == 'DOWN':
         next = item.next_get()
         if next:
             next.selected_set(1)
             return input.EVENT_BLOCK
 
-    elif event == "up":
+    elif event == 'UP':
         prev = item.prev_get()
         if prev:
             prev.selected_set(1)
             return input.EVENT_BLOCK
 
-    elif event == "ok":
+    elif event == 'OK':
         _cb_item_selected(list, item)
         return input.EVENT_BLOCK
 
-    elif event == "back":
+    elif event == 'BACK':
         gui.ask_to_exit()
         return input.EVENT_BLOCK
 

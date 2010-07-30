@@ -3,12 +3,12 @@
 """
 Standard input events:
 
-up
-down
-left
-right
-ok
-back
+UP
+DOWN
+LEFT
+RIGHT
+OK
+BACK
 
 """
 
@@ -38,6 +38,7 @@ def listener_del(name):
 
 def event_emit(event):
     global _listeners
+
     #~ print "Emit Event: " + event + "  listeners: " + str(len(_listeners))
 
     for lis in _listeners:

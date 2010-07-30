@@ -201,6 +201,7 @@ class FilmsModule(EpymcModule):
                     label = person['name'] + ' as ' + person['character']
                     li.item_append(label, None, None, None, None)
 
+            li.items_get()[0].selected_set(1)
             li.show()
             li.go()
             li.size_hint_min_set(300, 300) #TODO FIXME

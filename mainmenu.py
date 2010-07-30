@@ -24,6 +24,8 @@ def init():
 def show():
     list = gui.part_get("mainmenu_list")
     list.callback_clicked_add(_cb_item_selected)
+    if not list.selected_item_get():
+        list.items_get()[0].selected_set(1)
     list.go()
     gui.signal_emit("mainmenu,show")
     input.listener_add('mainmenu', input_event_cb)

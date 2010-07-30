@@ -17,6 +17,8 @@ _mapping = { 'Up': 'UP',
              'KP_Enter': 'OK',
              'Escape': 'BACK',
              'BackSpace': 'BACK',
+             'space': 'TOGGLE_PAUSE',
+             'p': 'TOGGLE_PAUSE',
            }
 
 class KeyboardModule(EpymcModule):

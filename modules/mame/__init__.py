@@ -63,7 +63,7 @@ class MameModule(EpymcModule):
         self.create_root_page()
         self.__browser.show()
 
-    def __cb_mainmenu(self, list, list_item):
+    def __cb_mainmenu(self):
         """ Mainmnu clicked, build the root page """
 
         # Is mame present ?

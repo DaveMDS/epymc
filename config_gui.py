@@ -16,9 +16,13 @@ _root_items_weight = {}  # key: elm_list_item  value: weight(int)
 def cb_root_back(list, list_item):
     hide()
 
+def cb_mainmenu():
+    show()
 
 def init():
     global _root
+
+    mainmenu.item_add("config", 100, "Configurations", None, cb_mainmenu)
 
     pager = gui.part_get("config_pager")
     pager.style_set("slide_invisible")

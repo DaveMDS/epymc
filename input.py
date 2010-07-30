@@ -38,7 +38,7 @@ def listener_del(name):
 
 def event_emit(event):
     global _listeners
-    print "Emit Event: " + event + "  listeners: " + str(len(_listeners))
+    #~ print "Emit Event: " + event + "  listeners: " + str(len(_listeners))
 
     for lis in _listeners:
         (name, cb, data) = lis
@@ -48,7 +48,7 @@ def event_emit(event):
         else:
             res = cb(event)
 
-        print "  ->  '%s' (%s)" %  (name, ('continue' if res else 'block'))
+        #~ print "  ->  '%s' (%s)" %  (name, ('continue' if res else 'block'))
         
         if res == EVENT_BLOCK:
             return

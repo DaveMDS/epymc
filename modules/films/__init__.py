@@ -61,7 +61,7 @@ class FilmsModule(EpymcModule):
 
 
 ###### BROWSER STUFF
-    def cb_mainmenu(self, list, list_item):
+    def cb_mainmenu(self):
         # get film folders from config
         self.__folders = ini.get_string_list('film', 'folders', ';')
         if not self.__folders:

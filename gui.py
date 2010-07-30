@@ -148,6 +148,9 @@ class EmcRemoteImage(elementary.Image):
 
 ################################################################################
 import gui
+import input
+
+_dialog_counter = 0
 
 class EmcDialog(elementary.InnerWindow):
     """ TODO doc this
@@ -156,9 +159,15 @@ class EmcDialog(elementary.InnerWindow):
 
     def __init__(self, title = None, text = None, content = None,
                        spinner = False, style = 'minimal'):
+        global _dialog_counter
+        
         elementary.InnerWindow.__init__(self, gui._win)
         self.style_set(style)
 
+        _dialog_counter += 1
+        self._name = 'Dialog-' + str(_dialog_counter)
+        self._buttons = list()
+        self._current_button_num = 0
         self._vbox = elementary.Box(gui._win)
         self._vbox.horizontal_set(False)
         self._vbox.show()
@@ -192,17 +201,63 @@ class EmcDialog(elementary.InnerWindow):
             self._vbox.pack_start(self._title)
             self._title.show()
 
+    def activate(self):
+        input.listener_add(self._name, self._input_event_cb)
+        elementary.InnerWindow.activate(self)
+
+    def delete(self):
+        input.listener_del(self._name)
+        elementary.InnerWindow.delete(self)
+
     def content_get(self):
         return self._content
-        
-    def button_add(self, label, clicked_cb = None, cb_data = None):
+
+    def button_add(self, label, selected_cb = None, cb_data = None):
         b = elementary.Button(self)
+        self._buttons.append(b)
         b.label_set(label)
+        b.disabled_set(0 if (len(self._buttons) == 1) else 1)
+        b.data['cb'] = selected_cb
+        b.data['cb_data'] = cb_data
+        b.callback_clicked_add(self._buttons_cb)
+        b.on_mouse_in_add(self._cb_button_mouse_in)
 
-        if clicked_cb and cb_data:
-            b.callback_clicked_add(clicked_cb, cb_data)
-        elif clicked_cb:
-            b.callback_clicked_add(clicked_cb)
-
-        self._hbox.pack_end(b)
+        self._hbox.pack_start(b)
         b.show()
+    
+    def _buttons_cb(self, button):
+        selected_cb = button.data['cb']
+        cb_data = button.data['cb_data']
+        
+        if selected_cb and cb_data:
+            selected_cb(button, cb_data)
+        elif selected_cb:
+            selected_cb(button)
+
+    def _cb_button_mouse_in(self, button, event):
+        if button != self._buttons[self._current_button_num]:
+            self._buttons[self._current_button_num].disabled_set(1)
+            self._current_button_num = self._buttons.index(button)
+            self._buttons[self._current_button_num].disabled_set(0)
+    
+    def _input_event_cb(self, event):
+
+        if event == 'BACK':
+            self.delete()
+
+        elif event == 'OK':
+            self._buttons_cb(self._buttons[self._current_button_num])
+
+        elif event == 'LEFT':
+            if self._current_button_num < len(self._buttons) - 1:
+                self._buttons[self._current_button_num].disabled_set(1)
+                self._current_button_num += 1
+                self._buttons[self._current_button_num].disabled_set(0)
+
+        elif event == 'RIGHT':
+            if self._current_button_num > 0:
+                self._buttons[self._current_button_num].disabled_set(1)
+                self._current_button_num -= 1
+                self._buttons[self._current_button_num].disabled_set(0)
+
+        return input.EVENT_BLOCK

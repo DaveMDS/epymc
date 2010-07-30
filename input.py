@@ -41,7 +41,7 @@ def event_emit(event):
 
     #~ print "Emit Event: " + event + "  listeners: " + str(len(_listeners))
 
-    for lis in _listeners:
+    for lis in reversed(_listeners):
         (name, cb, data) = lis
 
         if data:

@@ -1,0 +1,1460 @@
+images {
+   image: "background.jpg" COMP;
+   image: "bg_configuration.jpg" COMP;
+}
+
+externals {
+   external: "elm";
+}
+
+collections {
+   group { name: "main";
+      min: 640 480;
+      max: 0 0;
+      data {
+         item: "pref_size" "640x480";
+      }
+
+      parts {
+         part { name: "main_bg";
+            type: IMAGE;
+            description { state: "default" 0;
+               min: 640 480;
+               rel2 {
+                  offset: 0 0;
+               }
+               image {
+                  normal: "background.jpg";
+                  middle: DEFAULT;
+               }
+               fill {
+               }
+            }
+         }
+         part { name: "browser/list/info";
+            type: EXTERNAL;
+            clip_to: "browser/list/clip";
+            source: "elm/anchorblock";
+            description { state: "default" 0;
+               rel1 {
+                  relative: 0.5 0.65;
+                  offset: 20 0;
+               }
+               rel2 {
+                  offset: -20 -20;
+               }
+               params {
+                  string: "text" "Short Info";
+               }
+            }
+         }
+         part { name: "browser/list/poster";
+            type: SWALLOW;
+            clip_to: "browser/list/clip";
+            description { state: "default" 0;
+               rel1 {
+                  relative: 0.5 0;
+                  offset: 20 20;
+               }
+               rel2 {
+                  relative: 1 0.65;
+                  offset: -20 0;
+               }
+            }
+         }
+         part { name: "browser/list/flip";
+            type: EXTERNAL;
+            clip_to: "browser/list/clip";
+            source: "elm/flip";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 20 35;
+               }
+               rel2 {
+                  relative: 0.5 1;
+                  offset: 0 -20;
+               }
+            }
+         }
+         part { name: "browser/list/page_title";
+            type: TEXT;
+            mouse_events: 0;
+            clip_to: "browser/list/clip";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 20 5;
+               }
+               rel2 {
+                  offset: 0 0;
+               }
+               text {
+                  text: "YOUR TEXT HERE";
+                  font: "Sans";
+                  size: 16;
+                  align: 0 0;
+               }
+            }
+         }
+         part { name: "browser/list/clip";
+            type: RECT;
+            mouse_events: 0;
+            description { state: "default" 0;
+               color: 255 255 255 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "visible" 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@browser_show@0.00" 0;
+               color: 255 255 255 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@browser_hide@0.00" 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@browser_hide@1.00" 0;
+               color: 255 255 255 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@browser_show@0.10" 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+         }
+         part { name: "mainmenu_list";
+            type: EXTERNAL;
+            source: "elm/list";
+            description { state: "default" 0;
+               rel1 {
+                  relative: -1 0;
+                  offset: 0 50;
+               }
+               rel2 {
+                  relative: 0 1;
+                  offset: -20 -50;
+               }
+               params {
+                  choice: "horizontal mode" "scroll";
+                  choice: "scroll horizontal" "off";
+                  choice: "scroll vertical" "off";
+                  bool: "multi" "0";
+                  bool: "always_select" "1";
+               }
+            }
+            description { state: "@mainmenu_show@0.00" 0;
+               rel1 {
+                  relative: -1 0;
+                  offset: 0 50;
+               }
+               rel2 {
+                  relative: 0 1;
+                  offset: -20 -50;
+               }
+               params {
+                  choice: "horizontal mode" "scroll";
+                  choice: "scroll horizontal" "off";
+                  choice: "scroll vertical" "off";
+                  bool: "multi" "0";
+                  bool: "always_select" "0";
+               }
+            }
+            description { state: "@mainmenu_show@0.50" 0;
+               rel1 {
+                  offset: 20 50;
+               }
+               rel2 {
+                  relative: 0.5 1;
+                  offset: 0 -50;
+               }
+               params {
+                  choice: "horizontal mode" "scroll";
+                  choice: "scroll horizontal" "auto";
+                  choice: "scroll vertical" "auto";
+                  bool: "multi" "0";
+                  bool: "always_select" "0";
+               }
+            }
+            description { state: "visible" 0;
+               rel1 {
+                  offset: 20 50;
+               }
+               rel2 {
+                  relative: 0.5 1;
+                  offset: 0 -50;
+               }
+               params {
+                  choice: "horizontal mode" "scroll";
+                  choice: "scroll horizontal" "off";
+                  choice: "scroll vertical" "off";
+                  bool: "multi" "0";
+                  bool: "always_select" "0";
+               }
+            }
+            description { state: "@mainmenu_hide@0.00" 0;
+               rel1 {
+                  offset: 20 50;
+               }
+               rel2 {
+                  relative: 0.5 1;
+                  offset: 0 -50;
+               }
+               params {
+                  choice: "horizontal mode" "scroll";
+                  choice: "scroll horizontal" "off";
+                  choice: "scroll vertical" "off";
+                  bool: "multi" "0";
+                  bool: "always_select" "0";
+               }
+            }
+            description { state: "@mainmenu_hide@0.50" 0;
+               rel1 {
+                  relative: -1 0;
+                  offset: 0 50;
+               }
+               rel2 {
+                  relative: 0 1;
+                  offset: -20 -50;
+               }
+               params {
+                  choice: "horizontal mode" "scroll";
+                  choice: "scroll horizontal" "off";
+                  choice: "scroll vertical" "off";
+                  bool: "multi" "0";
+                  bool: "always_select" "0";
+               }
+            }
+         }
+         part { name: "videoplayer/bg";
+            type: RECT;
+            mouse_events: 0;
+            clip_to: "videoplayer/clip";
+            description { state: "default" 0;
+               color: 0 0 0 255;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@videoplayer_controls_show@0.00" 0;
+               color: 0 0 0 255;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+         }
+         part { name: "videoplayer/video";
+            type: SWALLOW;
+            clip_to: "videoplayer/clip";
+            description { state: "default" 0;
+            }
+         }
+         part { name: "videoplayer/clip";
+            type: RECT;
+            mouse_events: 0;
+            description { state: "default" 0;
+               color: 255 255 255 0;
+            }
+            description { state: "visible" 0;
+            }
+            description { state: "@videoplayer_show@0.00" 0;
+               color: 255 255 255 0;
+            }
+            description { state: "@videoplayer_show@0.70" 0;
+            }
+            description { state: "@videoplayer_hide@0.00" 0;
+            }
+            description { state: "@videoplayer_hide@0.70" 0;
+               visible: 0;
+               color: 255 255 255 0;
+            }
+         }
+         part { name: "videoplayer/controls/bg";
+            type: RECT;
+            mouse_events: 0;
+            clip_to: "videoplayer/clip";
+            description { state: "default" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0 1;
+               }
+               rel2 {
+                  relative: 1 1.2;
+                  offset: 0 0;
+               }
+            }
+            description { state: "visible" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0 0.8;
+               }
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@videoplayer_controls_show@0.00" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0 1;
+               }
+               rel2 {
+                  relative: 1 1.2;
+                  offset: 0 0;
+               }
+            }
+            description { state: "@videoplayer_controls_show@0.50" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0 0.8;
+               }
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@videoplayer_controls_hide@0.00" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0 0.8;
+               }
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@videoplayer_controls_hide@0.50" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0 1;
+               }
+               rel2 {
+                  relative: 1 1.2;
+                  offset: 0 0;
+               }
+            }
+         }
+         part { name: "videoplayer/controls/btn_play";
+            type: EXTERNAL;
+            clip_to: "videoplayer/clip";
+            source: "elm/button";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 284 9;
+                  to: "videoplayer/controls/bg";
+               }
+               rel2 {
+                  offset: -291 -55;
+                  to: "videoplayer/controls/bg";
+               }
+               params {
+                  string: "label" "Play";
+               }
+            }
+         }
+         part { name: "videoplayer/controls/btn_stop";
+            type: EXTERNAL;
+            clip_to: "videoplayer/clip";
+            source: "elm/button";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 202 10;
+                  to: "videoplayer/controls/bg";
+               }
+               rel2 {
+                  offset: -373 -54;
+                  to: "videoplayer/controls/bg";
+               }
+               params {
+                  string: "label" "Stop";
+               }
+            }
+         }
+         part { name: "videoplayer/controls/btn_fbackward";
+            type: EXTERNAL;
+            clip_to: "videoplayer/clip";
+            source: "elm/button";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 19 10;
+                  to: "videoplayer/controls/bg";
+               }
+               rel2 {
+                  offset: -556 -54;
+                  to: "videoplayer/controls/bg";
+               }
+               params {
+                  string: "label" "Fast Backward";
+               }
+            }
+         }
+         part { name: "videoplayer/controls/btn_backward";
+            type: EXTERNAL;
+            clip_to: "videoplayer/clip";
+            source: "elm/button";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 107 10;
+                  to: "videoplayer/controls/bg";
+               }
+               rel2 {
+                  offset: -468 -54;
+                  to: "videoplayer/controls/bg";
+               }
+               params {
+                  string: "label" "Backward";
+               }
+            }
+         }
+         part { name: "videoplayer/controls/btn_fforward";
+            type: EXTERNAL;
+            clip_to: "videoplayer/clip";
+            source: "elm/button";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 442 11;
+                  to: "videoplayer/controls/bg";
+               }
+               rel2 {
+                  offset: -133 -53;
+                  to: "videoplayer/controls/bg";
+               }
+               params {
+                  string: "label" "Fast Forward";
+               }
+            }
+         }
+         part { name: "videoplayer/controls/btn_forward";
+            type: EXTERNAL;
+            clip_to: "videoplayer/clip";
+            source: "elm/button";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 359 10;
+                  to: "videoplayer/controls/bg";
+               }
+               rel2 {
+                  offset: -216 -54;
+                  to: "videoplayer/controls/bg";
+               }
+               params {
+                  string: "label" "Forward";
+               }
+            }
+         }
+         part { name: "videoplayer/controls/length";
+            type: TEXT;
+            mouse_events: 0;
+            clip_to: "videoplayer/clip";
+            description { state: "default" 0;
+               color: 0 0 0 255;
+               rel1 {
+                  to: "videoplayer/controls/slider";
+               }
+               rel2 {
+                  to: "videoplayer/controls/slider";
+               }
+               text {
+                  text: "0:00:00";
+                  font: "Sans";
+                  size: 16;
+                  align: 1 0;
+               }
+            }
+         }
+         part { name: "videoplayer/controls/position";
+            type: TEXT;
+            mouse_events: 0;
+            clip_to: "videoplayer/clip";
+            description { state: "default" 0;
+               color: 0 0 0 255;
+               rel1 {
+                  to: "videoplayer/controls/slider";
+               }
+               rel2 {
+                  to: "videoplayer/controls/slider";
+               }
+               text {
+                  text: "0:00:00";
+                  font: "Sans";
+                  size: 16;
+                  align: 0 0;
+               }
+            }
+         }
+         part { name: "videoplayer/controls/slider";
+            type: EXTERNAL;
+            clip_to: "videoplayer/clip";
+            source: "elm/slider";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 0 47;
+                  to: "videoplayer/controls/bg";
+               }
+               rel2 {
+                  to: "videoplayer/controls/bg";
+               }
+               params {
+                  string: "label" "";
+                  double: "min" "0";
+                  double: "max" "1";
+                  double: "value" "0.5";
+                  bool: "horizontal" "1";
+                  bool: "inverted" "0";
+                  int: "span" "0";
+                  string: "unit format" " ";
+                  string: "indicator format" "";
+               }
+            }
+         }
+         part { name: "config_bg";
+            type: IMAGE;
+            description { state: "default" 0;
+               rel1 {
+                  relative: 1 0;
+                  offset: 10 20;
+               }
+               rel2 {
+                  relative: 1.75 1;
+                  offset: 10 -20;
+               }
+               image {
+                  normal: "bg_configuration.jpg";
+                  middle: DEFAULT;
+               }
+               fill {
+               }
+            }
+            description { state: "@config_show@0.00" 0;
+               rel1 {
+                  relative: 1 0;
+                  offset: 10 20;
+               }
+               rel2 {
+                  relative: 1.75 1;
+                  offset: 10 -20;
+               }
+               image {
+                  normal: "bg_configuration.jpg";
+                  middle: DEFAULT;
+               }
+               fill {
+               }
+            }
+            description { state: "@config_show@0.50" 0;
+               rel1 {
+                  relative: 0.35 0;
+                  offset: 0 20;
+               }
+               rel2 {
+                  offset: 0 -20;
+               }
+               image {
+                  normal: "bg_configuration.jpg";
+                  middle: DEFAULT;
+               }
+               fill {
+               }
+            }
+            description { state: "visible" 0;
+               rel1 {
+                  relative: 0.35 0;
+                  offset: 0 20;
+               }
+               rel2 {
+                  offset: 0 -20;
+               }
+               image {
+                  normal: "bg_configuration.jpg";
+                  middle: DEFAULT;
+               }
+               fill {
+               }
+            }
+            description { state: "@config_hide@0.00" 0;
+               rel1 {
+                  relative: 0.35 0;
+                  offset: 0 20;
+               }
+               rel2 {
+                  offset: 0 -20;
+               }
+               image {
+                  normal: "bg_configuration.jpg";
+                  middle: DEFAULT;
+               }
+               fill {
+               }
+            }
+            description { state: "@config_hide@0.50" 0;
+               rel1 {
+                  relative: 1 0;
+                  offset: 10 20;
+               }
+               rel2 {
+                  relative: 1.75 1;
+                  offset: 10 -20;
+               }
+               image {
+                  normal: "bg_configuration.jpg";
+                  middle: DEFAULT;
+               }
+               fill {
+               }
+            }
+         }
+         part { name: "config_pager";
+            type: EXTERNAL;
+            source: "elm/pager";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 20 20;
+                  to: "config_bg";
+               }
+               rel2 {
+                  offset: -20 -20;
+                  to: "config_bg";
+               }
+               params {
+                  string: "label" "label goes here";
+               }
+            }
+         }
+         part { name: "infopanel_bg";
+            type: RECT;
+            mouse_events: 0;
+            clip_to: "infopanel_clip";
+            description { state: "default" 0;
+               color: 158 209 0 168;
+               rel1 {
+                  relative: 0.1 0.1;
+                  to: "infopanel_clip";
+               }
+               rel2 {
+                  relative: 0.9 0.9;
+                  offset: 0 0;
+                  to: "infopanel_clip";
+               }
+            }
+         }
+         part { name: "infopanel_button6";
+            type: EXTERNAL;
+            clip_to: "infopanel_clip";
+            source: "elm/button";
+            description { state: "default" 0;
+               rel1 {
+                  relative: 0 0.9;
+                  offset: 10 0;
+                  to: "infopanel_bg";
+               }
+               rel2 {
+                  relative: 0.15 1;
+                  offset: -1 -10;
+                  to: "infopanel_bg";
+               }
+               params {
+                  string: "label" "Close";
+               }
+            }
+         }
+         part { name: "infopanel_button5";
+            type: EXTERNAL;
+            clip_to: "infopanel_clip";
+            source: "elm/button";
+            description { state: "default" 0;
+               rel1 {
+                  relative: -1 0;
+                  to: "infopanel_button4";
+               }
+               rel2 {
+                  relative: 0 1;
+                  to: "infopanel_button4";
+               }
+               params {
+                  string: "label" "Get Info";
+               }
+            }
+         }
+         part { name: "infopanel_button4";
+            type: EXTERNAL;
+            clip_to: "infopanel_clip";
+            source: "elm/button";
+            description { state: "default" 0;
+               rel1 {
+                  relative: -1 0;
+                  to: "infopanel_button3";
+               }
+               rel2 {
+                  relative: 0 1;
+                  to: "infopanel_button3";
+               }
+               params {
+                  string: "label" "Fanart";
+               }
+            }
+         }
+         part { name: "infopanel_button3";
+            type: EXTERNAL;
+            clip_to: "infopanel_clip";
+            source: "elm/button";
+            description { state: "default" 0;
+               rel1 {
+                  relative: -1 0;
+                  to: "infopanel_button2";
+               }
+               rel2 {
+                  relative: 0 1;
+                  to: "infopanel_button2";
+               }
+               params {
+                  string: "label" "Poster";
+               }
+            }
+         }
+         part { name: "infopanel_button2";
+            type: EXTERNAL;
+            clip_to: "infopanel_clip";
+            source: "elm/button";
+            description { state: "default" 0;
+               rel1 {
+                  relative: -1 0;
+                  to: "infopanel_button1";
+               }
+               rel2 {
+                  relative: 0 1;
+                  to: "infopanel_button1";
+               }
+               params {
+                  string: "label" "Cast";
+               }
+            }
+         }
+         part { name: "infopanel_button1";
+            type: EXTERNAL;
+            clip_to: "infopanel_clip";
+            source: "elm/button";
+            description { state: "default" 0;
+               rel1 {
+                  relative: 0.85 0.9;
+                  to: "infopanel_bg";
+               }
+               rel2 {
+                  offset: -10 -10;
+                  to: "infopanel_bg";
+               }
+               params {
+                  string: "label" "Play";
+               }
+            }
+         }
+         part { name: "infopanel_text";
+            type: EXTERNAL;
+            clip_to: "infopanel_clip";
+            source: "elm/anchorblock";
+            description { state: "default" 0;
+               rel1 {
+                  relative: 0.5 0;
+                  offset: 10 10;
+                  to: "infopanel_bg";
+               }
+               rel2 {
+                  relative: 1 0.8;
+                  offset: -10 0;
+                  to: "infopanel_bg";
+               }
+               params {
+                  string: "text" "some text";
+               }
+            }
+         }
+         part { name: "infopanel_image";
+            type: EXTERNAL;
+            clip_to: "infopanel_clip";
+            source: "elm/image";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 10 10;
+                  to: "infopanel_bg";
+               }
+               rel2 {
+                  relative: 0.45 0.8;
+                  offset: 0 -1;
+                  to: "infopanel_bg";
+               }
+            }
+            description { state: "@videoplayer_hide@0.00" 0;
+               rel1 {
+                  offset: 10 10;
+                  to: "infopanel_bg";
+               }
+               rel2 {
+                  relative: 0.45 0.8;
+                  offset: 0 -1;
+                  to: "infopanel_bg";
+               }
+            }
+            description { state: "@videoplayer_controls_show@0.00" 0;
+               rel1 {
+                  offset: 10 10;
+                  to: "infopanel_bg";
+               }
+               rel2 {
+                  relative: 0.45 0.8;
+                  offset: 0 -1;
+                  to: "infopanel_bg";
+               }
+            }
+         }
+         part { name: "infopanel_clip";
+            type: RECT;
+            mouse_events: 0;
+            description { state: "default" 0;
+               visible: 0;
+               color: 255 255 255 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@infopanel_show@0.00" 0;
+               color: 255 255 255 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "visible" 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@infopanel_show@0.50" 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@infopanel_hide@0.00" 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@infopanel_hide@0.50" 0;
+               visible: 0;
+               color: 255 255 255 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@videoplayer_hide@0.00" 0;
+               color: 255 255 255 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@videoplayer_controls_show@0.00" 0;
+               color: 255 255 255 0;
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+         }
+         part { name: "volume/bg";
+            type: RECT;
+            mouse_events: 0;
+            description { state: "default" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0.6 0;
+                  offset: 0 -100;
+               }
+               rel2 {
+                  relative: 1 0.1;
+                  offset: 0 -100;
+               }
+            }
+            description { state: "visible" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0.6 0;
+               }
+               rel2 {
+                  relative: 1 0.1;
+                  offset: 0 0;
+               }
+            }
+            description { state: "@videoplayer_controls_show@0.00" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0 1;
+               }
+               rel2 {
+                  relative: 1 1.2;
+                  offset: 0 0;
+               }
+            }
+            description { state: "@videoplayer_controls_show@0.50" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0 0.8;
+               }
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@videoplayer_controls_hide@0.00" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0 0.8;
+               }
+               rel2 {
+                  offset: 0 0;
+               }
+            }
+            description { state: "@videoplayer_controls_hide@0.50" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0 1;
+               }
+               rel2 {
+                  relative: 1 1.2;
+                  offset: 0 0;
+               }
+            }
+            description { state: "@volume_show@0.00" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0.6 0;
+                  offset: 0 -100;
+               }
+               rel2 {
+                  relative: 1 0.1;
+                  offset: 0 -100;
+               }
+            }
+            description { state: "@volume_show@0.50" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0.6 0;
+               }
+               rel2 {
+                  relative: 1 0.1;
+                  offset: 0 0;
+               }
+            }
+            description { state: "@volume_hide@0.00" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0.6 0;
+               }
+               rel2 {
+                  relative: 1 0.1;
+                  offset: 0 0;
+               }
+            }
+            description { state: "@volume_hide@0.50" 0;
+               color: 255 255 255 145;
+               rel1 {
+                  relative: 0.6 0;
+                  offset: 0 -100;
+               }
+               rel2 {
+                  relative: 1 0.1;
+                  offset: 0 -100;
+               }
+            }
+         }
+         part { name: "volume/slider";
+            type: EXTERNAL;
+            source: "elm/slider";
+            description { state: "default" 0;
+               rel1 {
+                  to: "volume/bg";
+               }
+               rel2 {
+                  to: "volume/bg";
+               }
+               params {
+                  string: "label" "Vol";
+                  double: "min" "0";
+                  double: "max" "100";
+                  double: "value" "10";
+                  bool: "horizontal" "1";
+                  bool: "inverted" "0";
+                  int: "span" "0";
+                  string: "unit format" "%.0f";
+                  string: "indicator format" "";
+               }
+            }
+         }
+      }
+      programs {
+         program { name: "@mainmenu_show@end";
+            action: SIGNAL_EMIT "animation,end" "mainmenu_show";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@mainmenu_show@0.00";
+            signal: "animation,play";
+            source: "mainmenu_show";
+            action: STATE_SET "@mainmenu_show@0.00" 0.00;
+            transition: LINEAR 0.00000;
+            target: "mainmenu_list";
+            after: "@mainmenu_show@0.50";
+         }
+         program { name: "@mainmenu_show@stop";
+            signal: "animation,stop";
+            source: "mainmenu_show";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@mainmenu_show@0.00";
+            target: "@mainmenu_show@end";
+            target: "@mainmenu_show@0.50";
+         }
+         program { name: "@mainmenu_show@0.50";
+            action: STATE_SET "@mainmenu_show@0.50" 0.00;
+            transition: LINEAR 0.50000;
+            target: "mainmenu_list";
+            after: "@mainmenu_show@end";
+         }
+         program { name: "mainmenu_show";
+            signal: "mainmenu,show";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@mainmenu_show@0.00";
+         }
+         program { name: "@config_show@stop";
+            signal: "animation,stop";
+            source: "config_show";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@config_show@0.00";
+            target: "@config_show@end";
+            target: "@config_show@0.50";
+         }
+         program { name: "@config_show@end";
+            action: SIGNAL_EMIT "animation,end" "config_show";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@config_show@0.50";
+            action: STATE_SET "@config_show@0.50" 0.00;
+            transition: LINEAR 0.50000;
+            target: "config_bg";
+            after: "@config_show@end";
+         }
+         program { name: "@config_show@0.00";
+            signal: "animation,play";
+            source: "config_show";
+            action: STATE_SET "@config_show@0.00" 0.00;
+            transition: LINEAR 0.00000;
+            target: "config_bg";
+            after: "@config_show@0.50";
+         }
+         program { name: "config_show";
+            signal: "config,show";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@config_show@0.00";
+         }
+         program { name: "@config_hide@end";
+            action: SIGNAL_EMIT "animation,end" "config_hide";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@config_hide@0.00";
+            signal: "animation,play";
+            source: "config_hide";
+            action: STATE_SET "@config_hide@0.00" 0.00;
+            transition: LINEAR 0.00000;
+            target: "config_bg";
+            after: "@config_hide@0.50";
+         }
+         program { name: "@config_hide@stop";
+            signal: "animation,stop";
+            source: "config_hide";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@config_hide@0.00";
+            target: "@config_hide@end";
+            target: "@config_hide@0.50";
+         }
+         program { name: "@config_hide@0.50";
+            action: STATE_SET "@config_hide@0.50" 0.00;
+            transition: LINEAR 0.50000;
+            target: "config_bg";
+            after: "@config_hide@end";
+         }
+         program { name: "config_hide";
+            signal: "config,hide";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@config_hide@0.00";
+         }
+         program { name: "@mainmenu_hide@end";
+            action: SIGNAL_EMIT "animation,end" "mainmenu_hide";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@mainmenu_hide@0.00";
+            signal: "animation,play";
+            source: "mainmenu_hide";
+            action: STATE_SET "@mainmenu_hide@0.00" 0.00;
+            transition: LINEAR 0.00000;
+            target: "mainmenu_list";
+            after: "@mainmenu_hide@0.50";
+         }
+         program { name: "@mainmenu_hide@stop";
+            signal: "animation,stop";
+            source: "mainmenu_hide";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@mainmenu_hide@0.00";
+            target: "@mainmenu_hide@end";
+            target: "@mainmenu_hide@0.50";
+         }
+         program { name: "@mainmenu_hide@0.50";
+            action: STATE_SET "@mainmenu_hide@0.50" 0.00;
+            transition: LINEAR 0.50000;
+            target: "mainmenu_list";
+            after: "@mainmenu_hide@end";
+         }
+         program { name: "mainmenu_hide";
+            signal: "mainmenu,hide";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@mainmenu_hide@0.00";
+         }
+         program { name: "@browser_show@end";
+            action: SIGNAL_EMIT "animation,end" "browser_show";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@browser_show@0.00";
+            signal: "animation,play";
+            source: "browser_show";
+            action: STATE_SET "@browser_show@0.00" 0.00;
+            transition: LINEAR 0.00000;
+            target: "browser/list/clip";
+            after: "@browser_show@0.10";
+         }
+         program { name: "@browser_show@stop";
+            signal: "animation,stop";
+            source: "browser_show";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@browser_show@0.00";
+            target: "@browser_show@end";
+            target: "@browser_show@0.10";
+         }
+         program { name: "browser_list_show";
+            signal: "browser,list,show";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@browser_show@0.00";
+         }
+         program { name: "@browser_show@0.10";
+            action: STATE_SET "@browser_show@0.10" 0.00;
+            transition: LINEAR 0.10000;
+            target: "browser/list/clip";
+            after: "@browser_show@end";
+         }
+         program { name: "@browser_hide@end";
+            action: SIGNAL_EMIT "animation,end" "browser_hide";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@browser_hide@0.00";
+            signal: "animation,play";
+            source: "browser_hide";
+            action: STATE_SET "@browser_hide@0.00" 0.00;
+            transition: LINEAR 0.00000;
+            target: "browser/list/clip";
+            after: "@browser_hide@1.00";
+         }
+         program { name: "@browser_hide@stop";
+            signal: "animation,stop";
+            source: "browser_hide";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@browser_hide@0.00";
+            target: "@browser_hide@end";
+            target: "@browser_hide@1.00";
+         }
+         program { name: "@browser_hide@1.00";
+            action: STATE_SET "@browser_hide@1.00" 0.00;
+            transition: LINEAR 1.00000;
+            target: "browser/list/clip";
+            after: "@browser_hide@end";
+         }
+         program { name: "browser_list_hide";
+            signal: "browser,list,hide";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@browser_hide@0.00";
+         }
+         program { name: "@infopanel_show@end";
+            action: SIGNAL_EMIT "animation,end" "infopanel_show";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@infopanel_show@0.00";
+            signal: "animation,play";
+            source: "infopanel_show";
+            action: STATE_SET "@infopanel_show@0.00" 0.00;
+            transition: LINEAR 0.00000;
+            target: "infopanel_clip";
+            after: "@infopanel_show@0.50";
+         }
+         program { name: "@infopanel_show@stop";
+            signal: "animation,stop";
+            source: "infopanel_show";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@infopanel_show@0.00";
+            target: "@infopanel_show@end";
+            target: "@infopanel_show@0.50";
+         }
+         program { name: "@infopanel_show@0.50";
+            action: STATE_SET "@infopanel_show@0.50" 0.00;
+            transition: LINEAR 0.50000;
+            target: "infopanel_clip";
+            after: "@infopanel_show@end";
+         }
+         program { name: "@infopanel_hide@end";
+            action: SIGNAL_EMIT "animation,end" "infopanel_hide";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@infopanel_hide@0.00";
+            signal: "animation,play";
+            source: "infopanel_hide";
+            action: STATE_SET "@infopanel_hide@0.00" 0.00;
+            transition: LINEAR 0.00000;
+            target: "infopanel_clip";
+            after: "@infopanel_hide@0.50";
+         }
+         program { name: "@infopanel_hide@stop";
+            signal: "animation,stop";
+            source: "infopanel_hide";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@infopanel_hide@0.00";
+            target: "@infopanel_hide@end";
+            target: "@infopanel_hide@0.50";
+         }
+         program { name: "@infopanel_hide@0.50";
+            action: STATE_SET "@infopanel_hide@0.50" 0.00;
+            transition: LINEAR 0.50000;
+            target: "infopanel_clip";
+            after: "@infopanel_hide@end";
+         }
+         program { name: "infopanel_show";
+            signal: "infopanel,show";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@infopanel_show@0.00";
+         }
+         program { name: "infopanel_hide";
+            signal: "infopanel,hide";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@infopanel_hide@0.00";
+         }
+         program { name: "@videoplayer_show@end";
+            action: SIGNAL_EMIT "animation,end" "videoplayer_show";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@videoplayer_show@0.00";
+            signal: "animation,play";
+            source: "videoplayer_show";
+            action: STATE_SET "@videoplayer_show@0.00" 0.00;
+            transition: LINEAR 0.00000;
+            target: "videoplayer/clip";
+            after: "@videoplayer_show@0.70";
+         }
+         program { name: "@videoplayer_show@stop";
+            signal: "animation,stop";
+            source: "videoplayer_show";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@videoplayer_show@0.00";
+            target: "@videoplayer_show@end";
+            target: "@videoplayer_show@0.70";
+         }
+         program { name: "@videoplayer_show@0.70";
+            action: STATE_SET "@videoplayer_show@0.70" 0.00;
+            transition: LINEAR 0.70000;
+            target: "videoplayer/clip";
+            after: "@videoplayer_show@end";
+         }
+         program { name: "@videoplayer_hide@end";
+            action: SIGNAL_EMIT "animation,end" "videoplayer_hide";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@videoplayer_hide@0.00";
+            signal: "animation,play";
+            source: "videoplayer_hide";
+            action: STATE_SET "@videoplayer_hide@0.00" 0.00;
+            transition: LINEAR 0.00000;
+            target: "videoplayer/clip";
+            after: "@videoplayer_hide@0.70";
+         }
+         program { name: "@videoplayer_hide@stop";
+            signal: "animation,stop";
+            source: "videoplayer_hide";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@videoplayer_hide@0.00";
+            target: "@videoplayer_hide@end";
+            target: "@videoplayer_hide@0.70";
+         }
+         program { name: "@videoplayer_hide@0.70";
+            action: STATE_SET "@videoplayer_hide@0.70" 0.00;
+            transition: LINEAR 0.70000;
+            target: "videoplayer/clip";
+            after: "@videoplayer_hide@end";
+         }
+         program { name: "videoplayer_show";
+            signal: "videoplayer,show";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@videoplayer_show@0.00";
+         }
+         program { name: "videoplayer_hide";
+            signal: "videoplayer,hide";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@videoplayer_hide@0.00";
+         }
+         program { name: "@videoplayer_controls_show@end";
+            action: SIGNAL_EMIT "animation,end" "videoplayer_controls_show";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@videoplayer_controls_show@0.00";
+            signal: "animation,play";
+            source: "videoplayer_controls_show";
+            action: STATE_SET "@videoplayer_controls_show@0.00" 0.00;
+            transition: DECELERATE 0.00000;
+            target: "videoplayer/controls/bg";
+            after: "@videoplayer_controls_show@0.50";
+         }
+         program { name: "@videoplayer_controls_show@stop";
+            signal: "animation,stop";
+            source: "videoplayer_controls_show";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@videoplayer_controls_show@0.00";
+            target: "@videoplayer_controls_show@end";
+            target: "@videoplayer_controls_show@0.50";
+         }
+         program { name: "@videoplayer_controls_show@0.50";
+            action: STATE_SET "@videoplayer_controls_show@0.50" 0.00;
+            transition: DECELERATE 0.50000;
+            target: "videoplayer/controls/bg";
+            after: "@videoplayer_controls_show@end";
+         }
+         program { name: "@videoplayer_controls_hide@end";
+            action: SIGNAL_EMIT "animation,end" "videoplayer_controls_hide";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@videoplayer_controls_hide@0.00";
+            signal: "animation,play";
+            source: "videoplayer_controls_hide";
+            action: STATE_SET "@videoplayer_controls_hide@0.00" 0.00;
+            transition: ACCELERATE 0.00000;
+            target: "videoplayer/controls/bg";
+            after: "@videoplayer_controls_hide@0.50";
+         }
+         program { name: "@videoplayer_controls_hide@stop";
+            signal: "animation,stop";
+            source: "videoplayer_controls_hide";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@videoplayer_controls_hide@0.00";
+            target: "@videoplayer_controls_hide@end";
+            target: "@videoplayer_controls_hide@0.50";
+         }
+         program { name: "@videoplayer_controls_hide@0.50";
+            action: STATE_SET "@videoplayer_controls_hide@0.50" 0.00;
+            transition: ACCELERATE 0.50000;
+            target: "videoplayer/controls/bg";
+            after: "@videoplayer_controls_hide@end";
+         }
+         program { name: "videoplayer_controls_show";
+            signal: "videoplayer,controls,show";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@videoplayer_controls_show@0.00";
+         }
+         program { name: "videoplayer_controls_hide";
+            signal: "videoplayer,controls,hide";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@videoplayer_controls_hide@0.00";
+         }
+         program { name: "@volume_show@end";
+            action: SIGNAL_EMIT "animation,end" "volume_show";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@volume_show@0.00";
+            signal: "animation,play";
+            source: "volume_show";
+            action: STATE_SET "@volume_show@0.00" 0.00;
+            transition: DECELERATE 0.00000;
+            target: "volume/bg";
+            after: "@volume_show@0.50";
+         }
+         program { name: "@volume_show@stop";
+            signal: "animation,stop";
+            source: "volume_show";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@volume_show@0.00";
+            target: "@volume_show@end";
+            target: "@volume_show@0.50";
+         }
+         program { name: "@volume_show@0.50";
+            action: STATE_SET "@volume_show@0.50" 0.00;
+            transition: DECELERATE 0.50000;
+            target: "volume/bg";
+            after: "@volume_show@end";
+         }
+         program { name: "@volume_hide@end";
+            action: SIGNAL_EMIT "animation,end" "volume_hide";
+            transition: LINEAR 0.00000;
+         }
+         program { name: "@volume_hide@0.00";
+            signal: "animation,play";
+            source: "volume_hide";
+            action: STATE_SET "@volume_hide@0.00" 0.00;
+            transition: ACCELERATE 0.00000;
+            target: "volume/bg";
+            after: "@volume_hide@0.50";
+         }
+         program { name: "@volume_hide@stop";
+            signal: "animation,stop";
+            source: "volume_hide";
+            action: ACTION_STOP;
+            transition: LINEAR 0.00000;
+            target: "@volume_hide@0.00";
+            target: "@volume_hide@end";
+            target: "@volume_hide@0.50";
+         }
+         program { name: "@volume_hide@0.50";
+            action: STATE_SET "@volume_hide@0.50" 0.00;
+            transition: ACCELERATE 0.50000;
+            target: "volume/bg";
+            after: "@volume_hide@end";
+         }
+         program { name: "volume_show";
+            signal: "volume,show";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@volume_show@0.00";
+         }
+         program { name: "volume_hide";
+            signal: "volume,hide";
+            source: "emc";
+            transition: LINEAR 0.00000;
+            after: "@volume_hide@0.00";
+         }
+      }
+   }
+}
+

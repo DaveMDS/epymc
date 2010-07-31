@@ -113,36 +113,54 @@ class FilmsModule(EpymcModule):
 
 ###### INFO PANEL STUFF
     def show_film_info(self, url):
-        self.update_film_info(url)
         self.__current_url = url
 
-        # connect info panel buttons callbacks
-        gui.part_get('infopanel_button1').callback_clicked_add(self._cb_panel_1)
-        gui.part_get('infopanel_button2').callback_clicked_add(self._cb_panel_2)
-        gui.part_get('infopanel_button3').callback_clicked_add(self._cb_panel_3)
-        gui.part_get('infopanel_button4').callback_clicked_add(self._cb_panel_4)
-        gui.part_get('infopanel_button5').callback_clicked_add(self._cb_panel_5)
-        gui.part_get('infopanel_button6').callback_clicked_add(self._cb_panel_6)
+        box = elementary.Box(gui._win)
+        box.horizontal_set(1)
+        box.homogenous_set(1)
+        box.show()
 
-        gui.signal_emit("infopanel,show")
+        image = elementary.Image(gui._win)
+        image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+        image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+        image.show()
+        box.pack_end(image)
+
+        anchorblock = elementary.AnchorView(gui._win)
+        anchorblock.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+        anchorblock.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+        anchorblock.show()
+        box.pack_end(anchorblock)
+
+        dialog = EmcDialog(title = 'Film Info', style = 'default', content = box)
+        dialog.button_add('Play', self._cb_panel_1)
+        dialog.button_add('Cast', self._cb_panel_2)
+        dialog.button_add('Choose Poster', self._cb_panel_3)
+        dialog.button_add('Choose Fanart', self._cb_panel_4)
+        dialog.button_add('Search Info', self._cb_panel_5)
+        dialog.button_add('Close', self._cb_panel_6)
+
+        dialog.data['o_image'] = image
+        dialog.data['o_anchorblock'] = anchorblock
+        self._dialog = dialog
+        
+        dialog.activate()
+
+        self.update_film_info(url)
 
     def hide_film_info(self):
-         # disconnect info panel buttons callbacks
-        gui.part_get('infopanel_button1').callback_clicked_del(self._cb_panel_1)
-        gui.part_get('infopanel_button2').callback_clicked_del(self._cb_panel_2)
-        gui.part_get('infopanel_button3').callback_clicked_del(self._cb_panel_3)
-        gui.part_get('infopanel_button4').callback_clicked_del(self._cb_panel_4)
-        gui.part_get('infopanel_button5').callback_clicked_del(self._cb_panel_5)
-        gui.part_get('infopanel_button6').callback_clicked_del(self._cb_panel_6)
-
-        gui.signal_emit("infopanel,hide")
+        self._dialog.delete()
+        del self._dialog
 
     def update_film_info(self, url):
+        o_image = self._dialog.data['o_image']
+        o_anchorblock = self._dialog.data['o_anchorblock']
+
         if self.__film_db.id_exists(url):
             print 'Found: ' + url
             e = self.__film_db.get_data(url)
-            import pprint
-            pprint.pprint(e)
+            #~ import pprint
+            #~ pprint.pprint(e)
 
             # update text info
             director = "Unknow"
@@ -159,24 +177,25 @@ class FilmsModule(EpymcModule):
                    "<hilight>Cast: </hilight>" + cast + "<br>" + \
                    "<hilight>Rating: </hilight>" + str(e['rating']) + "/10<br>" + \
                    "<br><hilight>Overview:</hilight><br>" + e['overview']
-            gui.part_get('infopanel_text').text_set(info.encode('utf-8'))
+            o_anchorblock.text_set(info.encode('utf-8'))
 
             # update poster
             poster = get_poster_filename(e['id'])
             if os.path.exists(poster):
-                gui.part_get('infopanel_image').file_set('') # this is to force a reload also if the filename is the same
-                gui.part_get('infopanel_image').file_set(poster)
+                o_image.file_set('') # this is to force a reload also if the filename is the same
+                o_image.file_set(poster)
+                o_image.show() # TODO why this is needed ? probably a bug somwhere... :/
             else:
                 print 'TODO show a dummy image'
-                gui.part_get('infopanel_image').file_set('')
+                o_image.file_set('')
         else:
             # TODO print also file size, video len, codecs, streams found, file metadata, etc..
             msg = "Media:<br>" + url + "<br><br>" + \
                   "No info stored for this media<br>" + \
                   "Try the GetInfo button..."
-            gui.part_get('infopanel_text').text_set(msg)
+            o_anchorblock.text_set(msg)
             # TODO make thumbnail
-            gui.part_get('infopanel_image').file_set('')
+            o_image.file_set('')
 
     def get_film_name_from_url(self, url):
         # remove path

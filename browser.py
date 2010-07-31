@@ -276,7 +276,6 @@ class ViewList(object):
 
     def input_event_cb(self, event):
         """ TODO Function doc """
-        print "VE: " + event
 
         item = self.__visible_list.selected_item_get()
         (url, label, parent_browser) = item.data_get()

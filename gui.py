@@ -169,16 +169,20 @@ class EmcDialog(elementary.InnerWindow):
         self._buttons = list()
         self._current_button_num = 0
         self._content = content
+
+        # vbox
         self._vbox = elementary.Box(gui._win)
         self._vbox.horizontal_set(False)
+        self._vbox.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+        self._vbox.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
         self._vbox.show()
-        
+
+        # hbox (buttons)
         self._hbox = elementary.Box(gui._win)
         self._hbox.horizontal_set(True)
         self._hbox.show()
 
         self._vbox.pack_end(self._hbox)
-        elementary.InnerWindow.content_set(self, self._vbox)
 
         if text:
             self._anchorblock = elementary.AnchorBlock(gui._win)
@@ -187,6 +191,8 @@ class EmcDialog(elementary.InnerWindow):
             self._anchorblock.show()
         elif content:
             self._vbox.pack_start(content)
+            content.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+            content.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
 
         if spinner:
             self._spinner = elementary.Progressbar(gui._win)
@@ -200,6 +206,8 @@ class EmcDialog(elementary.InnerWindow):
             self._title.label_set(title)
             self._vbox.pack_start(self._title)
             self._title.show()
+
+        elementary.InnerWindow.content_set(self, self._vbox)
 
     def activate(self):
         input.listener_add(self._name, self._input_event_cb)

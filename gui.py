@@ -66,6 +66,10 @@ def _cb_exit_no(button, dialog):
     dialog.delete()
     del dialog
 
+def toggle_fullscreen():
+    pass
+    
+    
 def part_get(name):
     global _layout
     return _layout.edje_get().part_external_object_get(name)

@@ -41,6 +41,9 @@ class EmcDatabase(object):
     def id_exists(self, id):
         return self.__sh.has_key(id)
 
+    def keys(self):
+        return self.__sh.keys()
+
 ##################
 
 

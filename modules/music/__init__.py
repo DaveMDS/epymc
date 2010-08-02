@@ -12,6 +12,7 @@ from sdb import EmcDatabase
 from gui import EmcDialog
 
 import mainmenu
+import utils
 import ini
 import threading
 
@@ -32,6 +33,14 @@ class MusicModule(EpymcModule):
 
         # create config ini section if not exists
         ini.add_section('music')
+
+        # make default of covers_dir if necessary
+        if not ini.has_option('music', 'covers_dir'):
+            dir = os.path.join(utils.config_dir_get(), 'music_covers')
+            ini.set('music', 'covers_dir', dir)
+        
+        if not os.path.exists(ini.get('music', 'covers_dir')):
+            os.mkdir(ini.get('music', 'covers_dir'))
 
         # open film/person database (they are created if not exists)
         self.__songs_db = EmcDatabase('music_songs')
@@ -78,21 +87,18 @@ class MusicModule(EpymcModule):
 
     def check_thread_done(self, thread):
         if thread.is_alive():
-            return True # renew the timer callback
+            return True # renew the timer
 
-
-        print 'Donw'
+        # thread done, kill the dialog
         self.dialog.delete()
         del self.dialog
         
         return False # kill the timer
-        
+
     def create_root_page(self):
         self.__browser.page_add("music://root", "Music",
                                 item_selected_cb = self.cb_root_selected)
-        
-        #~ for f in self.__folders:
-            #~ self.__browser.item_add(f, os.path.basename(f))
+
         self.__browser.item_add('music://artists', 'Artists (TODO)')
         self.__browser.item_add('music://albums', 'Albums')
         self.__browser.item_add('music://songs', 'Songs')
@@ -107,10 +113,10 @@ class MusicModule(EpymcModule):
             self.create_root_page()
 
         elif url == 'music://songs':
-            self.__browser.page_add(url, "Songs")
-                       #~ item_selected_cb = self.__cb_game_selected,
-                       #~ poster_get_cb = self.__cb_poster_get,
-                       #~ info_get_cb = self.__cb_info_get)
+            self.__browser.page_add(url, "Songs",
+                       item_selected_cb = self.cb_song_selected,
+                       poster_get_cb = self.cb_song_poster_get,
+                       info_get_cb = self.cb_song_info_get)
 
             for key in self.__songs_db.keys():
                 print key
@@ -121,8 +127,8 @@ class MusicModule(EpymcModule):
         elif url == 'music://albums':
             self.__browser.page_add(url, "Albums",
                        item_selected_cb = self.cb_album_selected,
-                       poster_get_cb = self.cb_album_poster_get)
-                       #~ info_get_cb = self.__cb_info_get)
+                       poster_get_cb = self.cb_album_poster_get,
+                       info_get_cb = self.cb_album_info_get)
 
             for key in self.__albums_db.keys():
                 print key
@@ -130,7 +136,56 @@ class MusicModule(EpymcModule):
                 print album_data
                 label = album_data['name'] + '  by ' + album_data['artist']
                 self.__browser.item_add(key, label)
+###
+    def cb_song_selected(self, url):
+        print 'SEL ' + url
+        song_data = self.__songs_db.get_data(url)
 
+        import pprint
+        pprint.pprint(song_data)
+
+    def cb_song_poster_get(self, url):
+        song_data = self.__songs_db.get_data(url)
+
+        # Search cover in song directory:
+        #'front.jpg', 'cover.jpg' or '<Artist> - <Album>.jpg'
+        #~ if album_data['songs']:
+        path = os.path.dirname(url)
+        poster = os.path.join(path, 'front.jpg')
+        if os.path.exists(poster): return poster
+
+        poster = os.path.join(path, 'cover.jpg')
+        if os.path.exists(poster): return poster
+
+        if not song_data.has_key('artist') or not song_data.has_key('album'):
+            return None
+        
+        poster = os.path.join(path, song_data['artist'] + ' - ' + song_data['album'] + '.jpg')
+        if os.path.exists(poster): return poster
+
+        # Search cover in user dir:
+        # <config_dir>/music_covers/<Artist> - <Album>.jpg
+        poster = os.path.join(ini.get('music', 'covers_dir'),
+                              song_data['artist'] + ' - ' + song_data['album'] + '.jpg')
+        if os.path.exists(poster):
+            return poster
+
+        return None
+
+    def cb_song_info_get(self, url):
+        song_data = self.__songs_db.get_data(url)
+        text = song_data['title'] + '<br>'
+        if song_data.has_key('artist'):
+            text += 'by ' + song_data['artist'] + '<br>'
+        if song_data.has_key('album'):
+            text += 'from ' + song_data['album'] + '<br>'
+        if song_data.has_key('length'):
+            length = int(song_data['length']) / 1000
+            min = length / 60
+            sec = length % 60
+            text += 'duration: ' + str(min) + ':' + str(sec)  + '<br>'
+        return text
+###
     def cb_album_selected(self, album):
         print album
         album_data = self.__albums_db.get_data(album)
@@ -139,19 +194,45 @@ class MusicModule(EpymcModule):
         pprint.pprint(album_data)
 
     def cb_album_poster_get(self, album):
-        print 'poster get ' + album
         album_data = self.__albums_db.get_data(album)
-        print album_data['name']
-        print album_data['artist']
 
-        # TODO FIX PATH !!!!!!!!!!!!!!!!!
-        ret = '/home/dave/.cache/rhythmbox/covers/%s - %s.jpg' % \
-              (album_data['artist'],  album_data['name'])
-        if os.path.exists(ret):
-            return ret
-        else:
-            return None
+        # Search cover in first-song-of-album directory:
+        #'front.jpg', 'cover.jpg' or '<Artist> - <Album>.jpg'
+        if album_data['songs']:
+            path = os.path.dirname(album_data['songs'][0])
+            poster = os.path.join(path, 'front.jpg')
+            if os.path.exists(poster): return poster
 
+            poster = os.path.join(path, 'cover.jpg')
+            if os.path.exists(poster): return poster
+
+            poster = os.path.join(path, album_data['artist'] + ' - ' + album + '.jpg')
+            if os.path.exists(poster): return poster
+
+        # Search cover in user dir:
+        # <config_dir>/music_covers/<Artist> - <Album>.jpg
+        poster = os.path.join(ini.get('music', 'covers_dir'),
+                              album_data['artist'] + ' - ' + album + '.jpg')
+        if os.path.exists(poster):
+            return poster
+
+        return None
+
+    def cb_album_info_get(self, album):
+        album_data = self.__albums_db.get_data(album)
+        text = album_data['name'] + '<br>'
+        text += album_data['artist'] + '<br>'
+        text += str(len(album_data['songs'])) + ' songs'
+        lenght = 0
+        for song in album_data['songs']:
+            song_data = self.__songs_db.get_data(song)
+            if song_data.has_key('length'):
+                lenght += int(song_data['length'])
+            print song_data
+        text += ', ' + str(lenght / 60000) + ' min.'
+        return text
+
+###############################################################################
 from mutagen.easyid3 import EasyID3
 
 class UpdateDBThread(threading.Thread):
@@ -222,6 +303,8 @@ class UpdateDBThread(threading.Thread):
         if meta.has_key('tracknumber'):
             item_data['tracknumber'] = meta['tracknumber'][0].encode('utf-8')
 
+        if meta.has_key('length'):
+            item_data['length'] = meta['length'][0].encode('utf-8')
 
         if meta.has_key('album'):
             item_data['album'] = meta['album'][0].encode('utf-8')

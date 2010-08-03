@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import operator
 #~ 
 import ecore
 #~ import evas
@@ -117,12 +118,14 @@ class MusicModule(EpymcModule):
                        item_selected_cb = self.cb_song_selected,
                        poster_get_cb = self.cb_song_poster_get,
                        info_get_cb = self.cb_song_info_get)
-
+            L = list()
             for key in self.__songs_db.keys():
-                print key
                 item_data = self.__songs_db.get_data(key)
-                print item_data
-                self.__browser.item_add(key, item_data['title'])
+                L.append((key, item_data['title']))
+
+            L.sort(key = operator.itemgetter(1))
+            for k, t in L:
+                self.__browser.item_add(k, t)
 
         elif url == 'music://albums':
             self.__browser.page_add(url, "Albums",
@@ -130,12 +133,15 @@ class MusicModule(EpymcModule):
                        poster_get_cb = self.cb_album_poster_get,
                        info_get_cb = self.cb_album_info_get)
 
+            L = list()
             for key in self.__albums_db.keys():
-                print key
                 album_data = self.__albums_db.get_data(key)
-                print album_data
                 label = album_data['name'] + '  by ' + album_data['artist']
-                self.__browser.item_add(key, label)
+                L.append((key, label))
+            
+            L.sort(key = operator.itemgetter(1))
+            for k, l in L:
+                self.__browser.item_add(k, l)
 ###
     def cb_song_selected(self, url):
         print 'SEL ' + url

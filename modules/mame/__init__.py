@@ -2,6 +2,7 @@
 
 import os
 import xml.dom.minidom
+import operator
 
 import ecore
 
@@ -111,12 +112,17 @@ class MameModule(EpymcModule):
                        info_get_cb = self.__cb_info_get)
 
         print "ROMS " + str(self.__rompaths)
+        L = list()
         for dir in self.__rompaths:
             for rom in os.listdir(dir):
                 print "ROM" + rom
                 id = rom.strip(".zip")
                 if id and self.__games.has_key(id):
-                    self.__browser.item_add(id, self.__games[id]['name'])
+                    L.append((id, self.__games[id]['name']))
+
+        L.sort(key = operator.itemgetter(1))
+        for k, l in L:
+            self.__browser.item_add(k, l)
 
         self.__browser.item_add('emc://back', "Back")
 
@@ -127,8 +133,13 @@ class MameModule(EpymcModule):
                          poster_get_cb = self.__cb_poster_get,
                          info_get_cb = self.__cb_info_get)
 
+        L = list()
         for id, game in self.__games.items():
-            self.__browser.item_add(id, game['name'])
+            L.append((id, game['name']))
+
+        L.sort(key = operator.itemgetter(1))
+        for k, l in L:
+            self.__browser.item_add(k, l)
         
         self.__browser.item_add('emc://back', "Back")
 

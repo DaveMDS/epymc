@@ -45,7 +45,7 @@ def _cb_keyboard(event):
 _views = {}  # key = view_name  value = view class instance
 
 
-class EpymcBrowser(object):
+class EmcBrowser(object):
     """
     This is the browser object, it is used to show various page conaining
     a list. Usually you need a single instance of this class for all your needs.
@@ -57,7 +57,7 @@ class EpymcBrowser(object):
     """
 
     def __init__ (self, default_style = 'List'):
-        print 'EpymcBrowser __init__'
+        print 'EmcBrowser __init__'
         self.__default_style = default_style
         self.__pages = []
         self.__is_back = False

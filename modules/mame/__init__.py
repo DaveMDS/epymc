@@ -7,7 +7,7 @@ import operator
 import ecore
 
 from modules import EmcModule
-from browser import EpymcBrowser
+from browser import EmcBrowser
 import mainmenu
 import browser
 import utils
@@ -25,7 +25,7 @@ class MameModule(EmcModule):
         print 'Init module 2: MAME'
         mainmenu.item_add("mame", 50, "M.A.M.E", None, self.__cb_mainmenu)
 
-        self.__browser = EpymcBrowser()
+        self.__browser = EmcBrowser()
         # Aquire mame dirs from the command 'sdlmame -showconfig' TODO this shuold be done later...
         exe = ecore.Exe("sdlmame -showconfig | grep -e snapshot_directory -e rompath",
                         ecore.ECORE_EXE_PIPE_READ |

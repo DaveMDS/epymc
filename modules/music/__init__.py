@@ -8,7 +8,7 @@ import ecore
 #~ import elementary
 #~ 
 from modules import EmcModule
-from browser import EpymcBrowser
+from browser import EmcBrowser
 from sdb import EmcDatabase
 from gui import EmcDialog
 
@@ -51,7 +51,7 @@ class MusicModule(EmcModule):
         mainmenu.item_add('music', 5, 'Music', None, self.cb_mainmenu)
 
         # create a browser instance
-        self.__browser = EpymcBrowser()
+        self.__browser = EmcBrowser()
 
     def __shutdown__(self):
         print 'Shutdown module: Music'

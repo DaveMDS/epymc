@@ -6,7 +6,7 @@ import evas
 import elementary
 
 from modules import EmcModule
-from browser import EpymcBrowser
+from browser import EmcBrowser
 from sdb import EmcDatabase
 from gui import EmcDialog
 from gui import EmcRemoteImage
@@ -45,7 +45,7 @@ class FilmsModule(EmcModule):
         mainmenu.item_add('film', 10, 'Films', None, self.cb_mainmenu)
 
         # create a browser instance
-        self.__browser = EpymcBrowser()
+        self.__browser = EmcBrowser()
 
     def __shutdown__(self):
         print 'Shutdown module: Film'

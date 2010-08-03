@@ -32,8 +32,8 @@ class MameModule(EpymcModule):
                         ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
         exe.on_data_event_add(self.__showconfig_event_cb)
 
-    def __del__(self):
-        print "Shutdown module 2: MAME"
+    def __shutdown__(self):
+        print "Shutdown module: M.A.M.E."
         mainmenu.item_del("mame")
         del self.__browser
 

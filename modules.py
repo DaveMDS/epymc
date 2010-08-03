@@ -14,7 +14,7 @@ class EpymcModule(object):
 
 
 def load_all():
-    print "Loading modules:"
+    print "Searching for modules:"
 
     if not "modules/" in sys.path:
         sys.path.insert(0, "modules/")
@@ -22,7 +22,7 @@ def load_all():
     for root, dirs, files in os.walk("modules/"):
         for name in dirs:
             if os.path.isfile("modules/" + name + "/__init__.py"):
-                print " * Loading module: " + name
+                print " * found: " + name
                 mod =  __import__(name)
     print ""
 
@@ -52,8 +52,15 @@ def init_all_by_config():
 
 def shutdown_by_name(name):
     if _instances.has_key(name):
+        _instances[name].__shutdown__()
         del _instances[name]
 
 def shutdown_all():
-    _instances.clear()
+    print 'Shutting down modules:'
+    L = list()
+    for mod in _instances:
+        L.append(mod)
+    for mod in L:
+        shutdown_by_name(mod)
+    print ""
     

@@ -47,8 +47,8 @@ class FilmsModule(EpymcModule):
         # create a browser instance
         self.__browser = EpymcBrowser()
 
-    def __del__(self):
-        print 'Shutdown module 1: FILM'
+    def __shutdown__(self):
+        print 'Shutdown module: Film'
         # delete mainmenu item
         mainmenu.item_del('film')
 

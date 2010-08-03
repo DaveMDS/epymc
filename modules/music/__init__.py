@@ -53,8 +53,8 @@ class MusicModule(EpymcModule):
         # create a browser instance
         self.__browser = EpymcBrowser()
 
-    def __del__(self):
-        print 'Shutdown module: MUSIC'
+    def __shutdown__(self):
+        print 'Shutdown module: Music'
         # delete mainmenu item
         mainmenu.item_del('music')
 

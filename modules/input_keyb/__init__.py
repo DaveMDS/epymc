@@ -4,9 +4,8 @@ import evas
 import ecore
 import ecore.x
 
-import gui
-import input
 from modules import EpymcModule
+import input
 
 # map evas keys to emc input events
 _mapping = { 'Up': 'UP',
@@ -29,7 +28,7 @@ class KeyboardModule(EpymcModule):
         print 'Init module: Keyboard'
         ecore.x.on_key_down_add(self._cb_key_down)
 
-    def __del__(self):
+    def __shutdown__(self):
         print "Shutdown module: Keyboard"
         # TODO How to detach the callback?
 

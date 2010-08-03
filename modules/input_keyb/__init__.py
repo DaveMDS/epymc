@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-import evas
 import ecore
 import ecore.x
 
 from modules import EmcModule
 import input
 
-# map evas keys to emc input events
+# map ecore keys to emc input events
 _mapping = { 'Up': 'UP',
              'Down': 'DOWN',
              'Left': 'LEFT',

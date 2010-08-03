@@ -33,7 +33,7 @@ def shutdown():
     global _threads
     global _timer
 
-    print "Shutdown all downloader threads"
+    print "Shutdown all downloader threads...",
 
     # tell all the threads to exit
     for i in range(NUM_WORKER_THREADS):
@@ -43,6 +43,7 @@ def shutdown():
     for t in _threads:
         t.join()
         del t
+    print "done"
 
     # delete respond timer
     _timer.delete()
@@ -84,7 +85,6 @@ def _download_worker():
 
         # quit the worker if requested
         if isinstance(item, str) and item == 'exit':
-            print 'Download worker END'
             return
 
         (url, dest, complete_cb, progress_cb, min_size) = item

@@ -23,13 +23,13 @@ if __name__ == "__main__":
     elementary.init()
 
     # create config dir if necessary
-    user_dir = utils.config_dir_get()
-    if not os.path.exists(user_dir):
-        os.makedirs(user_dir)
+    user_config_dir = utils.config_dir_get()
+    if not os.path.exists(user_config_dir):
+        os.makedirs(user_config_dir)
 
     
     #TODO add a system dir...but where??
-    ini.read_from_files(['epymc.conf', os.path.join(user_dir, 'epymc.conf')])
+    ini.read_from_files(['epymc.conf', os.path.join(user_config_dir, 'epymc.conf')])
 
     # init stuff
     downloader.init()
@@ -49,8 +49,8 @@ if __name__ == "__main__":
     elementary.run()
 
     # shutdown
-    modules.shutdown_all() #TODO check this !!!
-    ini.write_to_file(os.path.expanduser('~/.config/epymc/epymc.conf'))
+    modules.shutdown_all()
+    ini.write_to_file(os.path.join(user_config_dir, 'epymc.conf'))
     sdb.shutdown()
     downloader.shutdown()
     elementary.shutdown()

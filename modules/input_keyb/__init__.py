@@ -4,7 +4,7 @@ import evas
 import ecore
 import ecore.x
 
-from modules import EpymcModule
+from modules import EmcModule
 import input
 
 # map evas keys to emc input events
@@ -20,7 +20,7 @@ _mapping = { 'Up': 'UP',
              'p': 'TOGGLE_PAUSE',
            }
 
-class KeyboardModule(EpymcModule):
+class KeyboardModule(EmcModule):
     name = 'input_keyb'
     label = 'Keyboard Input'
 

@@ -6,14 +6,14 @@ import operator
 
 import ecore
 
-from modules import EpymcModule
+from modules import EmcModule
 from browser import EpymcBrowser
 import mainmenu
 import browser
 import utils
 
 
-class MameModule(EpymcModule):
+class MameModule(EmcModule):
     name = 'mame'
     label = 'M.A.M.E'
 

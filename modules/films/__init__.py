@@ -5,7 +5,7 @@ import os
 import evas
 import elementary
 
-from modules import EpymcModule
+from modules import EmcModule
 from browser import EpymcBrowser
 from sdb import EmcDatabase
 from gui import EmcDialog
@@ -22,7 +22,7 @@ import gui
 TMDB_API_KEY = "19eef197b81231dff0fd1a14a8d5f863" # Key of the user DaveMDS
 
 
-class FilmsModule(EpymcModule):
+class FilmsModule(EmcModule):
     name = 'film'
     label = 'Films'
 

@@ -7,7 +7,7 @@ import ini
 
 
 
-class EpymcModule(object):
+class EmcModule(object):
     name = ''
     label = 'Films'
 
@@ -31,13 +31,13 @@ _instances = {}
 
 
 def init_by_name(name):
-    for mod in EpymcModule.__subclasses__():
+    for mod in EmcModule.__subclasses__():
         if mod.name == name:
             if not name in _instances:
                 _instances[name] = mod()
 
 def init_all():
-    for mod in EpymcModule.__subclasses__():
+    for mod in EmcModule.__subclasses__():
         if not mod.name in _instances:
             _instances[mod.name] = mod()
 

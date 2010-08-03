@@ -7,7 +7,7 @@ import ecore
 #~ import evas
 #~ import elementary
 #~ 
-from modules import EpymcModule
+from modules import EmcModule
 from browser import EpymcBrowser
 from sdb import EmcDatabase
 from gui import EmcDialog
@@ -22,7 +22,7 @@ import threading
 _audio_extensions = ['.mp3', '.MP3']
 
 
-class MusicModule(EpymcModule):
+class MusicModule(EmcModule):
     name = 'music'
     label = 'Music'
 

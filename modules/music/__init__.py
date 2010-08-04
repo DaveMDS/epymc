@@ -46,6 +46,7 @@ class MusicModule(EmcModule):
         # open film/person database (they are created if not exists)
         self.__songs_db = EmcDatabase('music_songs')
         self.__albums_db = EmcDatabase('music_albums')
+        self.__artists_db = EmcDatabase('music_artists')
         
         # add an item in the mainmenu
         mainmenu.item_add('music', 5, 'Music', None, self.cb_mainmenu)
@@ -64,6 +65,7 @@ class MusicModule(EmcModule):
         ## close databases
         del self.__songs_db
         del self.__albums_db
+        del self.__artists_db
 
 
     def cb_mainmenu(self):
@@ -82,7 +84,8 @@ class MusicModule(EmcModule):
         self.dialog = EmcDialog(title = 'Rebuilding Database, please wait...',
                            spinner = True)
         self.dialog.activate()
-        thread = UpdateDBThread(self.__folders, self.__songs_db, self.__albums_db)
+        thread = UpdateDBThread(self.__folders, self.__songs_db,
+                                self.__albums_db, self.__artists_db)
         thread.start()
         ecore.Timer(0.5, self.check_thread_done, thread)
 
@@ -100,7 +103,7 @@ class MusicModule(EmcModule):
         self.__browser.page_add("music://root", "Music",
                                 item_selected_cb = self.cb_root_selected)
 
-        self.__browser.item_add('music://artists', 'Artists (TODO)')
+        self.__browser.item_add('music://artists', 'Artists')
         self.__browser.item_add('music://albums', 'Albums')
         self.__browser.item_add('music://songs', 'Songs')
         self.__browser.item_add('music://generes', 'Generes (TODO)')
@@ -142,6 +145,40 @@ class MusicModule(EmcModule):
             L.sort(key = operator.itemgetter(1))
             for k, l in L:
                 self.__browser.item_add(k, l)
+
+        elif url == 'music://artists':
+            self.__browser.page_add(url, "Artists",
+                       item_selected_cb = self.cb_artist_selected,
+                       poster_get_cb = self.cb_artist_poster_get,
+                       info_get_cb = self.cb_artist_info_get)
+
+            L = list()
+            for key in self.__artists_db.keys():
+                artist_data = self.__artists_db.get_data(key)
+                label = artist_data['name']
+                L.append((key, label))
+            
+            L.sort(key = operator.itemgetter(1))
+            for k, l in L:
+                self.__browser.item_add(k, l)
+###
+    def cb_artist_selected(self, artist):
+        print 'SELART ' + artist
+        artist_data = self.__artists_db.get_data(artist)
+
+        import pprint
+        pprint.pprint(artist_data)
+
+    def cb_artist_poster_get(self, artist):
+        # TODO download artist image from somewhere
+        return None
+
+    def cb_artist_info_get(self, artist):
+        artist_data = self.__artists_db.get_data(artist)
+        text = '<hilight>%s</hilight><br>' % (artist_data['name'])
+        text += '%d albums, %d songs' % (len(artist_data['albums']), len(artist_data['songs']))
+        return text
+
 ###
     def cb_song_selected(self, url):
         print 'SEL ' + url
@@ -243,11 +280,12 @@ from mutagen.easyid3 import EasyID3
 
 class UpdateDBThread(threading.Thread):
 
-    def __init__(self, folders, songs_db, albums_db):
+    def __init__(self, folders, songs_db, albums_db, artists_db):
         threading.Thread.__init__(self)
         self.folders = folders
         self.songs_db = songs_db
         self.albums_db = albums_db
+        self.artists_db = artists_db
 
     def run(self):
         global _audio_extensions
@@ -268,19 +306,17 @@ class UpdateDBThread(threading.Thread):
                     if ext in _audio_extensions:
                         path = os.path.join(root, file)
 
-                        print '' # TODO REMOVE ME
-                        print count # TODO REMOVE ME
-
-                        if self.songs_db.id_exists(path):
-                            print "FOUND IN DB"
-                        else:
+                        if not self.songs_db.id_exists(path):
                             self.read_metadata(path)
+                        else:
+                            print "FOUND IN DB"
+                            # TODO Check also file modification time
                         
                         #~ count -= 1 # TODO REMOVE ME
                         #~ if count < 1:# TODO REMOVE ME
                             #~ return # TODO REMOVE ME
                     else:
-                        print "INVALID: " + file
+                        print "Error: invalid file extension for file: " + file
 
     def read_metadata(self, full_path):
         print "GET METADATA FOR: " + full_path
@@ -302,6 +338,29 @@ class UpdateDBThread(threading.Thread):
 
         if meta.has_key('artist'):
             item_data['artist'] = meta['artist'][0].encode('utf-8')
+
+            # create artist item if necesary
+            if not self.artists_db.id_exists(item_data['artist']):
+                print 'NEW ARTIST: ' + item_data['artist']
+                artist_data = dict()
+                artist_data['name'] = item_data['artist']
+                artist_data['albums'] = list()
+                artist_data['songs'] = list()
+            else:
+                print 'ARTIST EXIST'
+                artist_data = self.artists_db.get_data(item_data['artist'])
+
+            # add song to song list (in artist), only if not exists yet
+            if not full_path in artist_data['songs']:
+                artist_data['songs'].append(full_path)
+
+            # add album to albums list (in artist), only if not exist yet
+            if meta.has_key('album') and not meta['album'] in artist_data['albums']:
+                artist_data['albums'].append(meta['album'])
+            
+            # write artist to db
+            self.artists_db.set_data(item_data['artist'], artist_data, thread_safe = False) # TODO thread_safe = True
+
         else:
             item_data['artist'] = 'Unknow'
 

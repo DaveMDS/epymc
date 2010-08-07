@@ -16,7 +16,7 @@ def _cb_keyboard(event):
 
     it = _pages[-1].selected_item_get()
     if not it: return True
-    
+
     if event.key == 'Up':
         prev = it.prev_get()
         if prev:
@@ -61,7 +61,7 @@ class EmcBrowser(object):
         self.__default_style = default_style
         self.__pages = []
         self.__is_back = False
-    
+
     def page_add(self, url, title, style = 'List', item_selected_cb = None,
                  icon_get_cb = None, poster_get_cb = None, info_get_cb = None,
                  fanart_get_cb = None):
@@ -138,12 +138,12 @@ class EmcBrowser(object):
     def back(self):
         """ TODO Function doc """
         self.__is_back = True
-        
+
         if len(self.__pages) == 1:
             self.hide()
             mainmenu.show()
             return
-        
+
         page_data = self.__pages.pop()
         print page_data
 
@@ -172,7 +172,7 @@ class EmcBrowser(object):
         if event == "BACK":
             self.back()
             return input.EVENT_BLOCK
-        
+
         return self.__pages[-1]['view'].input_event_cb(event)
 
     # Stuff for Views
@@ -261,7 +261,7 @@ class ViewList(object):
         it = list.item_append(self.__itc, (url, label, parent_browser))
         if not list.selected_item_get():
             it.selected_set(1)
-        
+
     def show(self):
         """ TODO Function doc """
         gui.signal_emit("browser,list,show")
@@ -286,7 +286,7 @@ class ViewList(object):
                 next.selected_set(1)
                 next.middle_bring_in()
                 return input.EVENT_BLOCK
-        
+
         elif event == "UP":
             prev = item.prev_get()
             if prev:
@@ -299,7 +299,7 @@ class ViewList(object):
             return input.EVENT_BLOCK
 
         return input.EVENT_CONTINUE
-        
+
     ### GenList Item Class
     def __genlist_label_get(self, obj, part, item_data):
         (url, label, parent_browser) = item_data
@@ -319,7 +319,7 @@ class ViewList(object):
     def _cb_item_selected(self, list, item):
         (url, label, parent_browser) = item.data_get()
         parent_browser._item_selected(url)
-    
+
     def _cb_item_hilight(self, list, item):
         (url, label, parent_browser) = item.data_get()
         poster = parent_browser._poster_get(url)

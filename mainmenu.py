@@ -71,7 +71,7 @@ def input_event_cb(event):
     if not item:
         item = list.items_get()[0]
         item.selected_set(1)
-    
+
     if event == 'DOWN':
         next = item.next_get()
         if next:

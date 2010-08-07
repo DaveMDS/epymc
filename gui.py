@@ -20,7 +20,7 @@ def _cb_volume_slider_changed(slider):
 def init_window():
     global _win
     global _layout
-    
+
     # window
     win = elementary.Window("emc_win", elementary.ELM_WIN_BASIC)
     win.title_set("Enlightenment Media Center")
@@ -58,7 +58,7 @@ def ask_to_exit():
     d.button_add('Yes', _cb_exit_yes)
     d.button_add('No', _cb_exit_no, d)
     d.activate()
-    
+
 def _cb_exit_yes(button):
     elementary.exit()
 
@@ -68,8 +68,8 @@ def _cb_exit_no(button, dialog):
 
 def toggle_fullscreen():
     pass
-    
-    
+
+
 def part_get(name):
     global _layout
     return _layout.edje_get().part_external_object_get(name)
@@ -147,7 +147,7 @@ class EmcRemoteImage(elementary.Image):
     def _cb_download_progress(self):
         pass
 
-        
+
    #TODO on image_set abort the download ? 
 
 ################################################################################
@@ -164,7 +164,7 @@ class EmcDialog(elementary.InnerWindow):
     def __init__(self, title = None, text = None, content = None,
                        spinner = False, style = 'minimal'):
         global _dialog_counter
-        
+
         elementary.InnerWindow.__init__(self, gui._win)
         self.style_set(style)
 
@@ -236,11 +236,11 @@ class EmcDialog(elementary.InnerWindow):
 
         self._hbox.pack_start(b)
         b.show()
-    
+
     def _buttons_cb(self, button):
         selected_cb = button.data['cb']
         cb_data = button.data['cb_data']
-        
+
         if selected_cb and cb_data:
             selected_cb(button, cb_data)
         elif selected_cb:
@@ -251,7 +251,7 @@ class EmcDialog(elementary.InnerWindow):
             self._buttons[self._current_button_num].disabled_set(1)
             self._current_button_num = self._buttons.index(button)
             self._buttons[self._current_button_num].disabled_set(0)
-    
+
     def _input_event_cb(self, event):
 
         if event == 'BACK':
@@ -264,14 +264,14 @@ class EmcDialog(elementary.InnerWindow):
             item = list.selected_item_get()
             if not item:
                 item = list.items_get()[0]
-                
+
             if event == 'DOWN':
                 next = item.next_get()
                 if next:
                     next.selected_set(1)
                     next.show()
                     return input.EVENT_BLOCK
-            
+
             if event == 'UP':
                 prev = item.prev_get()
                 if prev:

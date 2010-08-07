@@ -23,7 +23,7 @@ def listener_add(name, event_cb, cb_data = None):
     global _listeners
 
     _listeners.append((name, event_cb, cb_data))
-    
+
     print 'ADD LISTENER: ' + name
     for lis in _listeners:
         (name, cb, data) = lis
@@ -52,6 +52,6 @@ def event_emit(event):
             res = cb(event)
 
         #~ print "  ->  '%s' (%s)" %  (name, ('continue' if res else 'block'))
-        
+
         if res == EVENT_BLOCK:
             return

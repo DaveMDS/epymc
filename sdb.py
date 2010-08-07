@@ -24,7 +24,7 @@ class EmcDatabase(object):
     def get_data(self, id):
         print 'Get Data on db ' + self.__name + ', id: ' + id
         return self.__sh[id]
-    
+
     def set_data(self, id, data, thread_safe = False):
         print 'Set data for db ' + self.__name + ', id: ' + id
         if thread_safe:

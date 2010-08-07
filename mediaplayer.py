@@ -13,7 +13,7 @@ _current_button_num = 3
 
 def play_video(url):
     global _emotion
-    
+
     print 'Play ' + url
     # TODO handle real url
 
@@ -38,7 +38,7 @@ def play_video(url):
     # set aspect according to video size
     (w, h) = _emotion.image_size
     edje.extern_object_aspect_set(_emotion, edje.EDJE_ASPECT_CONTROL_BOTH, w, h)
-    
+
     _emotion.play = True
     video_player_show()
 
@@ -51,12 +51,12 @@ def video_player_hide():
     hide_video_controls()
     input.listener_del("videoplayer")
     gui.signal_emit('videoplayer,hide')
-    
+
 def stop_video():
     global _emotion
     _emotion.play = False
     video_player_hide()
-   
+
 
 def show_video_controls():
     global _controls_visible
@@ -87,7 +87,7 @@ def volume_set(vol):
 def volume_get():
     global _emotion
     return int(_emotion.audio_volume_get() * 100)
-    
+
 
 def _init_emotion():
     global _emotion
@@ -102,7 +102,7 @@ def _init_emotion():
     _emotion.on_frame_decode_add(_cb_frame_decode)
     #~ _emotion.on_audio_level_change_add(_cb_volume_change)
 
-    
+
     #~ gui.part_get('videoplayer/controls/slider').min_max_set(0.0, 1.0)
 
     # connect controls callbacks & fill buttons list
@@ -142,7 +142,7 @@ def _init_emotion():
     _buttons[-1].data['cb'] =_cb_btn_fforward
     _buttons[-1].on_mouse_in_add(_cb_btns_mouse_in)
     _buttons[-1].disabled_set(1)
-   
+
 
     gui.part_get('videoplayer/controls/slider').callback_changed_add(_cb_slider_changed)
     #~ gui.part_get('videoplayer/controls/slider').callback_delay_changed_add(_cb_slider_changed)
@@ -150,7 +150,7 @@ def _init_emotion():
     gui.part_get('videoplayer/controls/btn_play').label_set('Pause')
 
     # TODO Shutdown all emotion stuff & the buttons list
-    
+
 def _cb_video_mouse_down(vid, ev):
     toggle_video_controls()
 
@@ -165,7 +165,7 @@ def _cb_btns_mouse_in(button, event):
         _buttons[_current_button_num].disabled_set(1)
         _current_button_num = _buttons.index(button)
         _buttons[_current_button_num].disabled_set(0)
-    
+
 def _cb_btn_play(btn):
     global _emotion
 
@@ -183,24 +183,24 @@ def _cb_btn_stop(btn):
 def _cb_btn_forward(btn):
     global _emotion
     _emotion.position_set(_emotion.position + 10) #TODO make this configurable
-    
+
 def _cb_btn_backward(btn):
     global _emotion
     _emotion.position_set(_emotion.position - 10) #TODO make this configurable
-    
+
 def _cb_btn_fforward(btn):
     global _emotion
     _emotion.position_set(_emotion.position + 60) #TODO make this configurable
-    
+
 def _cb_btn_fbackward(btn):
     global _emotion
     _emotion.position_set(_emotion.position - 60) #TODO make this configurable
-    
-    
+
+
 def _cb_slider_changed(slider):
     global _emotion
     _emotion.position_set(_emotion.play_length * slider.value)
-    
+
 def _update_slider():
     global _emotion
     global _controls_visible
@@ -256,5 +256,5 @@ def input_event_cb(event):
             _emotion.position_set(_emotion.position + 10) #TODO make this configurable
         elif event == 'LEFT':
             _emotion.position_set(_emotion.position - 10) #TODO make this configurable
-    
+
     return input.EVENT_BLOCK

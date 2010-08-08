@@ -20,7 +20,7 @@ class MameModule(EmcModule):
     __rompaths = []
     __snapshoot_dir = None
     __games = {} # key = game_id<str>  value = game_info<dict>
-    
+
     def __init__(self):
         print 'Init module 2: MAME'
         mainmenu.item_add("mame", 50, "M.A.M.E", None, self.__cb_mainmenu)
@@ -72,7 +72,7 @@ class MameModule(EmcModule):
             print "No mame found"
             #TODO alert the user
             return
-        
+
         # Aquire the list of all games from the command 'sdlmame -listfull'
         if not self.__games:
             exe = ecore.Exe("sdlmame -listfull",
@@ -86,8 +86,8 @@ class MameModule(EmcModule):
             self.__browser.show()
 
         mainmenu.hide()
-       
-        
+
+
     def create_root_page(self):
         self.__browser.page_add('mame://root', "M.A.M.E",
                                 item_selected_cb = self.__cb_root_selected)
@@ -95,7 +95,7 @@ class MameModule(EmcModule):
         self.__browser.item_add('mame://allgames', "All Games")
         self.__browser.item_add('mame://favgames', "Favorite Games")
         self.__browser.item_add('emc://back', "Back")
-       
+
 
     def __cb_root_selected(self, url):
         """ Item selected in root page """
@@ -140,7 +140,7 @@ class MameModule(EmcModule):
         L.sort(key = operator.itemgetter(1))
         for k, l in L:
             self.__browser.item_add(k, l)
-        
+
         self.__browser.item_add('emc://back', "Back")
 
     def fav_games_list(self):
@@ -153,7 +153,7 @@ class MameModule(EmcModule):
             # get game info from the command: sdlmame -listxml <id>
             # TODO use a better/portable way (but not async)
             os.system('sdlmame -listxml ' + url + ' > /tmp/PyEmc__MAME_tmp')
-            
+
             # parse the xml file
             doc = xml.dom.minidom.parse('/tmp/PyEmc__MAME_tmp')
             game_node = doc.getElementsByTagName('game')[0]
@@ -198,7 +198,7 @@ class MameModule(EmcModule):
                 if child.nodeType == node.TEXT_NODE:
                     rc.append(child.data)
         return ''.join(rc)
-        
+
     def __cb_poster_get(self, url):
         if not self.__games.has_key(url): return None
 
@@ -244,7 +244,7 @@ class MameModule(EmcModule):
         else:
             print 'Error: can not find a writable rom directory'
             return
-        
+
         print 'URL: ' + url
         print 'DEST: ' + dest
         headers = utils.download_url_sync(url, dest, 2000)

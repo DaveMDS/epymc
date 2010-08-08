@@ -2,11 +2,11 @@
 
 import os
 import operator
-#~ 
+#~
 import ecore
 #~ import evas
 #~ import elementary
-#~ 
+#~
 from modules import EmcModule
 from browser import EmcBrowser
 from sdb import EmcDatabase
@@ -28,7 +28,7 @@ class MusicModule(EmcModule):
 
     __browser = None
     #~ __film_db = None
-    
+
     def __init__(self):
         print 'Init module: MUSIC'
 
@@ -39,7 +39,7 @@ class MusicModule(EmcModule):
         if not ini.has_option('music', 'covers_dir'):
             dir = os.path.join(utils.config_dir_get(), 'music_covers')
             ini.set('music', 'covers_dir', dir)
-        
+
         if not os.path.exists(ini.get('music', 'covers_dir')):
             os.mkdir(ini.get('music', 'covers_dir'))
 
@@ -47,7 +47,7 @@ class MusicModule(EmcModule):
         self.__songs_db = EmcDatabase('music_songs')
         self.__albums_db = EmcDatabase('music_albums')
         self.__artists_db = EmcDatabase('music_artists')
-        
+
         # add an item in the mainmenu
         mainmenu.item_add('music', 5, 'Music', None, self.cb_mainmenu)
 
@@ -96,7 +96,7 @@ class MusicModule(EmcModule):
         # thread done, kill the dialog
         self.dialog.delete()
         del self.dialog
-        
+
         return False # kill the timer
 
     def create_root_page(self):
@@ -141,7 +141,7 @@ class MusicModule(EmcModule):
                 album_data = self.__albums_db.get_data(key)
                 label = album_data['name'] + '  by ' + album_data['artist']
                 L.append((key, label))
-            
+
             L.sort(key = operator.itemgetter(1))
             for k, l in L:
                 self.__browser.item_add(k, l)
@@ -157,7 +157,7 @@ class MusicModule(EmcModule):
                 artist_data = self.__artists_db.get_data(key)
                 label = artist_data['name']
                 L.append((key, label))
-            
+
             L.sort(key = operator.itemgetter(1))
             for k, l in L:
                 self.__browser.item_add(k, l)
@@ -202,7 +202,7 @@ class MusicModule(EmcModule):
 
         if not song_data.has_key('artist') or not song_data.has_key('album'):
             return None
-        
+
         poster = os.path.join(path, song_data['artist'] + ' - ' + song_data['album'] + '.jpg')
         if os.path.exists(poster): return poster
 
@@ -289,7 +289,7 @@ class UpdateDBThread(threading.Thread):
 
     def run(self):
         global _audio_extensions
-        
+
         print 'This is the thread speaking, HALO'
 
         for folder in self.folders:
@@ -311,7 +311,7 @@ class UpdateDBThread(threading.Thread):
                         else:
                             print "FOUND IN DB"
                             # TODO Check also file modification time
-                        
+
                         #~ count -= 1 # TODO REMOVE ME
                         #~ if count < 1:# TODO REMOVE ME
                             #~ return # TODO REMOVE ME
@@ -331,7 +331,7 @@ class UpdateDBThread(threading.Thread):
         item_data['url'] = full_path #TODO need to use a real url?
 
         if meta.has_key('title'):
-            item_data['title'] = meta['title'][0].encode('utf-8') # TODO is the encode correct? doesn't evas support unicode now?? 
+            item_data['title'] = meta['title'][0].encode('utf-8') # TODO is the encode correct? doesn't evas support unicode now??
         else:
             item_data['title'] = full_path # TODO just file name
 
@@ -357,7 +357,7 @@ class UpdateDBThread(threading.Thread):
             # add album to albums list (in artist), only if not exist yet
             if meta.has_key('album') and not meta['album'] in artist_data['albums']:
                 artist_data['albums'].append(meta['album'])
-            
+
             # write artist to db
             self.artists_db.set_data(item_data['artist'], artist_data, thread_safe = False) # TODO thread_safe = True
 

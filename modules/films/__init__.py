@@ -30,7 +30,7 @@ class FilmsModule(EmcModule):
     __exts = ['.avi', '.mpg', '.mpeg'] #TODO needed? fill!!
     __film_db = None
     __person_db = None
-    
+
     def __init__(self):
         print 'Init module 1: FILM'
 
@@ -40,7 +40,7 @@ class FilmsModule(EmcModule):
         # open film/person database (they are created if not exists)
         self.__film_db = EmcDatabase('film')
         self.__person_db = EmcDatabase('person')
-        
+
         # add an item in the mainmenu
         mainmenu.item_add('film', 10, 'Films', None, self.cb_mainmenu)
 
@@ -79,7 +79,7 @@ class FilmsModule(EmcModule):
 
         if len(self.__folders) == 1:
             print "TODO skip first page"
-        
+
         for f in self.__folders:
             self.__browser.item_add(f, os.path.basename(f))
         self.__browser.item_add('emc://back', "Back")
@@ -143,7 +143,7 @@ class FilmsModule(EmcModule):
         dialog.data['o_image'] = image
         dialog.data['o_anchorblock'] = anchorblock
         self._dialog = dialog
-        
+
         dialog.activate()
 
         self.update_film_info(url)
@@ -171,7 +171,7 @@ class FilmsModule(EmcModule):
                     director = person['name']
                 elif person['job'] == 'Actor':
                     cast += (', ' if cast else '') + person['name']
-            
+
             info = "<title>" + e['name'] + "</title> <year>(" + e['released'][0:4] + ")</year><br>" + \
                    "<hilight>Director: </hilight>" + director + "<br>" + \
                    "<hilight>Cast: </hilight>" + cast + "<br>" + \
@@ -204,7 +204,7 @@ class FilmsModule(EmcModule):
         (film, ext) = os.path.splitext(film)
         # TODO remove stuff between '[' and ']'
         return film
-        
+
     def _cb_panel_1(self, button):
         mediaplayer.play_video(self.__current_url)
         self.hide_film_info()
@@ -262,17 +262,17 @@ class FilmsModule(EmcModule):
             li.show()
             li.go()
             li.size_hint_min_set(300, 300) #TODO FIXME
-            
+
             dialog = EmcDialog(title = 'Choose a poster.', content = li)
             dialog.button_add('Ok', self._cb_poster_ok, dialog)
             dialog.button_add('Cancel', self._cb_poster_cancel, dialog)
             dialog.activate()
-    
+
     def _cb_poster_cancel(self, button, dialog):
         # kill the dialog
         dialog.delete()
         del dialog
-    
+
     def _cb_poster_ok(self, button, dialog):
         li = dialog.content_get()
         item = li.selected_item_get()
@@ -331,12 +331,12 @@ class FilmsModule(EmcModule):
             dialog.button_add('Ok', self._cb_backdrop_ok, dialog)
             dialog.button_add('Cancel', self._cb_backdrop_cancel, dialog)
             dialog.activate()
-    
+
     def _cb_backdrop_cancel(self, button, dialog):
         # kill the dialog
         dialog.delete()
         del dialog
-    
+
     def _cb_backdrop_ok(self, button, dialog):
         li = dialog.content_get()
         item = li.selected_item_get()
@@ -388,7 +388,7 @@ def get_poster_filename(tmdb_id):
 def get_backdrop_filename(tmdb_id):
     return os.path.join(utils.config_dir_get(), 'film',
                         str(tmdb_id), 'backdrop.jpg')
-    
+
 
 ###############################################################################
 import urllib
@@ -414,7 +414,7 @@ class TMDB2(object):
 
         print "query: " + query
         downloader.download_url_async(query, None, self._cb_search_done)
-    
+
     def _cb_search_done(self, url, dest, headers):
         data = json.loads(dest)
 
@@ -444,7 +444,7 @@ class TMDB2(object):
             li.show()
             li.go()
             li.size_hint_min_set(300, 300) #TODO FIXME
-            
+
             dialog = EmcDialog(title = 'Found ' + str(len(data))+' results, please choose the right one.',
                                content = li)
             dialog.button_add('Ok', self._cb_search_ok, dialog)
@@ -465,7 +465,7 @@ class TMDB2(object):
         # kill the dialog
         dialog.delete()
         del dialog
-        
+
         # download film info + images
         self.film_get_info(id)
 
@@ -495,7 +495,7 @@ class TMDB2(object):
 
         # if no poster found go to next step
         self._cb_film_poster_done(url, dest, headers)
-        
+
     def _cb_film_poster_done(self, url, dest, headers):
         # download the first backdrop image found
         for image in self.movie_info['backdrops']:
@@ -516,14 +516,14 @@ class TMDB2(object):
         if self.complete_cb:
             self.complete_cb(self, self.movie_info)
 
-    
+
 ###############################################################################
 #    themoviedb.org  client implementation taken from:
 #  http://forums.themoviedb.org/topic/1092/my-contribution-tmdb-api-wrapper-python/
 #  With a little modification by me to support json decode.
 #
 #  Credits goes to globald
-#  Unused atm (in favor of the async one 
+#  Unused atm (in favor of the async one
 ###############################################################################
 
 
@@ -560,7 +560,7 @@ class TMDB(object):
         term = str(term) # int conversion
         run = self.server+'/2.1/'+do+'/'+self.lang+'/'+self.view+'/'+self.key+'/'+term
         return run
-        
+
     def method_people(self, look, term):
         ''' Methods => search, getInfo '''
 

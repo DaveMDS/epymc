@@ -18,11 +18,10 @@ def cb_exit():
 def init():
     mainmenu.item_add("exit", 200, "Exit", None, cb_exit)
 
-    list = gui.part_get("mainmenu_list")
-
 
 def show():
-    list = gui.part_get("mainmenu_list")
+    list = gui.part_get("mainmenu/list")
+    list.style_set("mainmenu");
     list.callback_clicked_add(_cb_item_selected)
     if not list.selected_item_get():
         list.items_get()[0].selected_set(1)
@@ -31,14 +30,13 @@ def show():
     input.listener_add('mainmenu', input_event_cb)
 
 def hide():
-    list = gui.part_get("mainmenu_list")
+    list = gui.part_get("mainmenu/list")
     list.callback_clicked_del(_cb_item_selected)
     input.listener_del('mainmenu')
     gui.signal_emit("mainmenu,hide")
 
 def item_add(name, weight, label, icon = None, callback = None):
-
-    list = gui.part_get("mainmenu_list")
+    list = gui.part_get("mainmenu/list")
 
     before = None
     for it in list.items_get():
@@ -66,7 +64,7 @@ def item_del(name):
     del _items[name]
 
 def input_event_cb(event):
-    list = gui.part_get("mainmenu_list")
+    list = gui.part_get("mainmenu/list")
     item = list.selected_item_get()
     if not item:
         item = list.items_get()[0]

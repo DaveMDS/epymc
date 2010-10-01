@@ -21,6 +21,11 @@ def init_window():
     global _win
     global _layout
 
+    # TODO FIXME!!!
+    theme_file = "/home/dave/l/epymc/default.edj"
+    #~ elementary.theme_overlay_add(theme_file)
+    elementary.theme_extension_add(theme_file)
+
     # window
     win = elementary.Window("emc_win", elementary.ELM_WIN_BASIC)
     win.title_set("Enlightenment Media Center")
@@ -33,9 +38,9 @@ def init_window():
     else:
         ini.set('general', 'fullscreen', False)
 
-    # main layout
+    # main layout (main theme)
     ly = elementary.Layout(win)
-    ly.file_set("default.edj", "main")
+    ly.file_set(theme_file, "main")
     ly.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
     win.resize_object_add(ly)
     ly.show()

@@ -1,3 +1,4 @@
+
 images {
    image: "background.jpg" COMP;
    image: "bg_configuration.jpg" COMP;
@@ -7,7 +8,11 @@ externals {
    external: "elm";
 }
 
+
 collections {
+
+   #include "elm_extension.edc"
+   
    group { name: "main";
       min: 640 480;
       max: 0 0;
@@ -20,17 +25,13 @@ collections {
             type: IMAGE;
             description { state: "default" 0;
                min: 640 480;
-               rel2 {
-                  offset: 0 0;
-               }
                image {
                   normal: "background.jpg";
-                  middle: DEFAULT;
-               }
-               fill {
                }
             }
          }
+
+/// browser (cube)
          part { name: "browser/list/info";
             type: EXTERNAL;
             clip_to: "browser/list/clip";
@@ -132,17 +133,19 @@ collections {
                }
             }
          }
-         part { name: "mainmenu_list";
+
+/// mainmenu
+         part { name: "mainmenu/list";
             type: EXTERNAL;
             source: "elm/list";
             description { state: "default" 0;
                rel1 {
-                  relative: -1 0;
-                  offset: 0 50;
+                  relative: 0.3 -0.9;
+                  offset: 0 0;
                }
                rel2 {
-                  relative: 0 1;
-                  offset: -20 -50;
+                  relative: 0.7 -0.1;
+                  offset: 0 0;
                }
                params {
                   choice: "horizontal mode" "scroll";
@@ -152,89 +155,20 @@ collections {
                   bool: "always_select" "1";
                }
             }
-            description { state: "@mainmenu_show@0.00" 0;
-               rel1 {
-                  relative: -1 0;
-                  offset: 0 50;
-               }
-               rel2 {
-                  relative: 0 1;
-                  offset: -20 -50;
-               }
-               params {
-                  choice: "horizontal mode" "scroll";
-                  choice: "scroll horizontal" "off";
-                  choice: "scroll vertical" "off";
-                  bool: "multi" "0";
-                  bool: "always_select" "0";
-               }
-            }
-            description { state: "@mainmenu_show@0.50" 0;
-               rel1 {
-                  offset: 20 50;
-               }
-               rel2 {
-                  relative: 0.5 1;
-                  offset: 0 -50;
-               }
-               params {
-                  choice: "horizontal mode" "scroll";
-                  choice: "scroll horizontal" "auto";
-                  choice: "scroll vertical" "auto";
-                  bool: "multi" "0";
-                  bool: "always_select" "0";
-               }
-            }
             description { state: "visible" 0;
+               inherit: "default" 0.0;
                rel1 {
-                  offset: 20 50;
+                  relative: 0.3 0.1;
+                  offset: 0 0;
                }
                rel2 {
-                  relative: 0.5 1;
-                  offset: 0 -50;
-               }
-               params {
-                  choice: "horizontal mode" "scroll";
-                  choice: "scroll horizontal" "off";
-                  choice: "scroll vertical" "off";
-                  bool: "multi" "0";
-                  bool: "always_select" "0";
-               }
-            }
-            description { state: "@mainmenu_hide@0.00" 0;
-               rel1 {
-                  offset: 20 50;
-               }
-               rel2 {
-                  relative: 0.5 1;
-                  offset: 0 -50;
-               }
-               params {
-                  choice: "horizontal mode" "scroll";
-                  choice: "scroll horizontal" "off";
-                  choice: "scroll vertical" "off";
-                  bool: "multi" "0";
-                  bool: "always_select" "0";
-               }
-            }
-            description { state: "@mainmenu_hide@0.50" 0;
-               rel1 {
-                  relative: -1 0;
-                  offset: 0 50;
-               }
-               rel2 {
-                  relative: 0 1;
-                  offset: -20 -50;
-               }
-               params {
-                  choice: "horizontal mode" "scroll";
-                  choice: "scroll horizontal" "off";
-                  choice: "scroll vertical" "off";
-                  bool: "multi" "0";
-                  bool: "always_select" "0";
+                  relative: 0.7 0.9;
+                  offset: 0 0;
                }
             }
          }
+
+/// videoplayer
          part { name: "videoplayer/bg";
             type: RECT;
             mouse_events: 0;
@@ -513,6 +447,8 @@ collections {
                }
             }
          }
+
+///
          part { name: "config_bg";
             type: IMAGE;
             description { state: "default" 0;
@@ -756,38 +692,19 @@ collections {
          }
       }
       programs {
-         program { name: "@mainmenu_show@end";
-            action: SIGNAL_EMIT "animation,end" "mainmenu_show";
-            transition: LINEAR 0.00000;
-         }
-         program { name: "@mainmenu_show@0.00";
-            signal: "animation,play";
-            source: "mainmenu_show";
-            action: STATE_SET "@mainmenu_show@0.00" 0.00;
-            transition: LINEAR 0.00000;
-            target: "mainmenu_list";
-            after: "@mainmenu_show@0.50";
-         }
-         program { name: "@mainmenu_show@stop";
-            signal: "animation,stop";
-            source: "mainmenu_show";
-            action: ACTION_STOP;
-            transition: LINEAR 0.00000;
-            target: "@mainmenu_show@0.00";
-            target: "@mainmenu_show@end";
-            target: "@mainmenu_show@0.50";
-         }
-         program { name: "@mainmenu_show@0.50";
-            action: STATE_SET "@mainmenu_show@0.50" 0.00;
-            transition: LINEAR 0.50000;
-            target: "mainmenu_list";
-            after: "@mainmenu_show@end";
-         }
          program { name: "mainmenu_show";
             signal: "mainmenu,show";
             source: "emc";
-            transition: LINEAR 0.00000;
-            after: "@mainmenu_show@0.00";
+            action: STATE_SET "visible" 0.00;
+            transition: DECELERATE 0.5;
+            target: "mainmenu/list";
+         }
+         program { name: "mainmenu_hide";
+            signal: "mainmenu,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.00;
+            transition: ACCELERATE 0.5;
+            target: "mainmenu/list";
          }
          program { name: "@config_show@stop";
             signal: "animation,stop";
@@ -854,39 +771,6 @@ collections {
             source: "emc";
             transition: LINEAR 0.00000;
             after: "@config_hide@0.00";
-         }
-         program { name: "@mainmenu_hide@end";
-            action: SIGNAL_EMIT "animation,end" "mainmenu_hide";
-            transition: LINEAR 0.00000;
-         }
-         program { name: "@mainmenu_hide@0.00";
-            signal: "animation,play";
-            source: "mainmenu_hide";
-            action: STATE_SET "@mainmenu_hide@0.00" 0.00;
-            transition: LINEAR 0.00000;
-            target: "mainmenu_list";
-            after: "@mainmenu_hide@0.50";
-         }
-         program { name: "@mainmenu_hide@stop";
-            signal: "animation,stop";
-            source: "mainmenu_hide";
-            action: ACTION_STOP;
-            transition: LINEAR 0.00000;
-            target: "@mainmenu_hide@0.00";
-            target: "@mainmenu_hide@end";
-            target: "@mainmenu_hide@0.50";
-         }
-         program { name: "@mainmenu_hide@0.50";
-            action: STATE_SET "@mainmenu_hide@0.50" 0.00;
-            transition: LINEAR 0.50000;
-            target: "mainmenu_list";
-            after: "@mainmenu_hide@end";
-         }
-         program { name: "mainmenu_hide";
-            signal: "mainmenu,hide";
-            source: "emc";
-            transition: LINEAR 0.00000;
-            after: "@mainmenu_hide@0.00";
          }
          program { name: "@browser_show@end";
             action: SIGNAL_EMIT "animation,end" "browser_show";

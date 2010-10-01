@@ -7,7 +7,7 @@ main group: "main" TODO rename to epymc_main_layout
 ### MainMenu stuff
 
  * Required parts:
-    "mainmenu_list" -> elm_list
+    "mainmenu/list" -> elm_list
 
  * Signals received from the application:
     "mainmenu,show" "emc"

@@ -15,6 +15,7 @@ import ini
 import sdb
 import downloader
 
+
 if __name__ == "__main__":
     elementary.init()
 
@@ -24,7 +25,8 @@ if __name__ == "__main__":
         os.makedirs(user_config_dir)
 
     #TODO add a system dir...but where??
-    ini.read_from_files(['epymc.conf', os.path.join(user_config_dir, 'epymc.conf')])
+    ini.read_from_files(['epymc.conf',
+                         os.path.join(user_config_dir, 'epymc.conf')])
 
     # init stuff
     downloader.init()

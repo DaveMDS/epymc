@@ -8,6 +8,12 @@ import Queue
 
 import ecore
 
+
+def DBG(msg):
+    #~ print('DOWNLOADER: ' + msg)
+    pass
+
+
 NUM_WORKER_THREADS = 3
 
 _threads = list()
@@ -21,7 +27,7 @@ def init():
 
     # start the threads pool
     for i in range(NUM_WORKER_THREADS):
-        print "Start job " + str(i)
+        DBG('Start job ' + str(i))
         t = threading.Thread(name='DwnlTrd-'+str(i), target=_download_worker)
         t.start()
         _threads.append(t)

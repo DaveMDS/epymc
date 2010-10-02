@@ -12,6 +12,11 @@ import input
 import ini
 
 
+def DBG(msg):
+    #~ print('JOY: ' + msg)
+    pass
+
+
 class JoystickModule(EmcModule):
     name = 'input_joy'
     label = 'Joytick Input'
@@ -26,7 +31,7 @@ class JoystickModule(EmcModule):
     fdh = None
 
     def __init__(self):
-        print 'Init module: Joystick'
+        DBG('Init module')
 
         # get joystick device from config
         ini.add_section('joystick')
@@ -56,7 +61,7 @@ class JoystickModule(EmcModule):
             print 'Error: can not open joystick device: ' + self.device
         
     def __shutdown__(self):
-        print "Shutdown module: Joystick"
+        DBG('Shutdown module: Joystick')
         if self.fdh: self.fdh.delete()
         if self.dev: self.dev.close()
 

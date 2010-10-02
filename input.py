@@ -14,6 +14,12 @@ TOGGLE_PAUSE
 
 """
 
+
+def DBG(msg):
+    #~ print('INPUT: ' + msg)
+    pass
+
+
 EVENT_CONTINUE = True
 EVENT_BLOCK = False
 
@@ -24,14 +30,15 @@ def listener_add(name, event_cb, cb_data = None):
 
     _listeners.append((name, event_cb, cb_data))
 
-    print 'ADD LISTENER: ' + name
+    DBG('Add Listener: ' + name)
     for lis in _listeners:
         (name, cb, data) = lis
-        print "  * " + name
+        DBG('  * ' + name)
 
 def listener_del(name):
     global _listeners
 
+    DBG('Listener Del: ' + name)
     for lis in _listeners:
         (n, cb, data) = lis
         if n == name:
@@ -41,7 +48,7 @@ def listener_del(name):
 def event_emit(event):
     global _listeners
 
-    #~ print "Emit Event: " + event + "  listeners: " + str(len(_listeners))
+    DBG("Emit Event: " + event + "  listeners: " + str(len(_listeners)))
 
     for lis in reversed(_listeners):
         (name, cb, data) = lis

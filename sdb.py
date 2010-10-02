@@ -8,13 +8,16 @@ import Queue
 
 import utils
 
+def DBG(msg):
+    #~ print('SDB: ' + msg)
+    pass
 
 class EmcDatabase(object):
     """ TODO doc this """
 
     def __init__(self, name):
         file = os.path.join(utils.config_dir_get(), 'db_' + name)
-        print 'Open DB: ' + name + '  from file: ' + file
+        DBG('Open db: ' + name + ' from file: ' + file)
         self.__sh = shelve.open(file)
         self.__name = name
 
@@ -22,11 +25,11 @@ class EmcDatabase(object):
         self.__sh.close()
 
     def get_data(self, id):
-        print 'Get Data on db ' + self.__name + ', id: ' + id
+        DBG('Get Data on db ' + self.__name + ', id: ' + id)
         return self.__sh[id]
 
     def set_data(self, id, data, thread_safe = False):
-        print 'Set data for db ' + self.__name + ', id: ' + id
+        DBG('Set data for db ' + self.__name + ', id: ' + id)
         if thread_safe:
             # just put in queue
             pass

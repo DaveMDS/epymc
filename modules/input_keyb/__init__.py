@@ -6,6 +6,12 @@ import ecore.x
 from modules import EmcModule
 import input
 
+
+def DBG(msg):
+    #~ print('KEYB: ' + msg)
+    pass
+
+
 # map ecore keys to emc input events
 _mapping = { 'Up': 'UP',
              'Down': 'DOWN',
@@ -24,15 +30,15 @@ class KeyboardModule(EmcModule):
     label = 'Keyboard Input'
 
     def __init__(self):
-        print 'Init module: Keyboard'
+        DBG('Init module')
         ecore.x.on_key_down_add(self._cb_key_down)
 
     def __shutdown__(self):
-        print "Shutdown module: Keyboard"
+        DBG('Shutdown module')
         # TODO How to detach the callback?
 
     def _cb_key_down(self, event):
-        #~ print event
+        DBG('Key: ' + event.key)
         if _mapping.has_key(event.key):
             input.event_emit(_mapping[event.key])
         else:

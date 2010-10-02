@@ -1,53 +1,21 @@
 #!/usr/bin/env python
 
-#~ import evas
 import elementary
-
 
 import gui
 import mainmenu
 import input
 
-## 'just for test' keyboard support 
-import ecore #TODO REMOVEME
-import ecore.x #TODO REMOVEME
-
-def _cb_keyboard(event):
-
-    it = _pages[-1].selected_item_get()
-    if not it: return True
-
-    if event.key == 'Up':
-        prev = it.prev_get()
-        if prev:
-            prev.selected_set(1)
-            prev.middle_bring_in()
-
-    elif event.key == 'Down':
-        next = it.next_get()
-        if next:
-            next.selected_set(1)
-            next.middle_bring_in()
-
-    elif event.key in ['Return', 'space']:
-        _pages[-1]._cb_item_selected(_pages[-1], it)
-
-    elif event.key == 'BackSpace':
-        back()
-
-    return True
-
-####   ecore.x.on_key_down_add(_cb_keyboard)
-####
-
-
 
 _views = {}  # key = view_name  value = view class instance
 
+def DBG(msg):
+    print ('BROWSER: ' + msg)
+    #~ pass
 
 class EmcBrowser(object):
     """
-    This is the browser object, it is used to show various page conaining
+    This is the browser object, it is used to show various page each containing
     a list. Usually you need a single instance of this class for all your needs.
     In order you have to create an instance, add a page using the page_add()
     method and add items using item_add(). Later you can create new pages or
@@ -57,7 +25,7 @@ class EmcBrowser(object):
     """
 
     def __init__ (self, default_style = 'List'):
-        print 'EmcBrowser __init__'
+        DBG('EmcBrowser __init__')
         self.__default_style = default_style
         self.__pages = []
         self.__is_back = False

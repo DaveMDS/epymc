@@ -9,6 +9,11 @@ import input
 import ini
 
 
+def DBG(msg):
+    #~ print('LIRC: ' + msg)
+    pass
+
+
 class LircModule(EmcModule):
     name = 'input_lirc'
     label = 'Remote Control Input'
@@ -19,7 +24,7 @@ class LircModule(EmcModule):
     fdh = None
 
     def __init__(self):
-        print 'Init module: Lirc'
+        DBG('Init module')
 
         # get lirc device from config
         ini.add_section('lirc')
@@ -49,7 +54,7 @@ class LircModule(EmcModule):
             print 'Error: can not connect to lirc using socket: ' + self.device
 
     def __shutdown__(self):
-        print "Shutdown module: Lirc"
+        DBG('Shutdown module: Lirc')
         if self.fdh: self.fdh.delete()
         if self.sok: self.sok.close()
 

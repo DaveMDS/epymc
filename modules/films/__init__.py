@@ -19,6 +19,10 @@ import downloader
 import gui
 
 
+def DBG(msg):
+    #~ print('FILM: ' + msg)
+    pass
+
 TMDB_API_KEY = "19eef197b81231dff0fd1a14a8d5f863" # Key of the user DaveMDS
 
 
@@ -32,7 +36,7 @@ class FilmsModule(EmcModule):
     __person_db = None
 
     def __init__(self):
-        print 'Init module 1: FILM'
+        DBG('Init module')
 
         # create config ini section if not exists
         ini.add_section('film')
@@ -48,7 +52,7 @@ class FilmsModule(EmcModule):
         self.__browser = EmcBrowser()
 
     def __shutdown__(self):
-        print 'Shutdown module: Film'
+        DBG('Shutdown module')
         # delete mainmenu item
         mainmenu.item_del('film')
 

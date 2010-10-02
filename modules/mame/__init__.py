@@ -13,6 +13,11 @@ import browser
 import utils
 
 
+def DBG(msg):
+    #~ print('MAME: ' + msg)
+    pass
+
+
 class MameModule(EmcModule):
     name = 'mame'
     label = 'M.A.M.E'
@@ -22,7 +27,7 @@ class MameModule(EmcModule):
     __games = {} # key = game_id<str>  value = game_info<dict>
 
     def __init__(self):
-        print 'Init module 2: MAME'
+        DBG('Init module')
         mainmenu.item_add("mame", 50, "M.A.M.E", None, self.__cb_mainmenu)
 
         self.__browser = EmcBrowser()
@@ -33,7 +38,7 @@ class MameModule(EmcModule):
         exe.on_data_event_add(self.__showconfig_event_cb)
 
     def __shutdown__(self):
-        print "Shutdown module: M.A.M.E."
+        DBG('Shutdown module')
         mainmenu.item_del("mame")
         del self.__browser
 

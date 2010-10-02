@@ -2,24 +2,24 @@
 
 import os
 import operator
-#~
+
 import ecore
-#~ import evas
-#~ import elementary
-#~
+
 from modules import EmcModule
 from browser import EmcBrowser
 from sdb import EmcDatabase
 from gui import EmcDialog
-
 import mainmenu
 import utils
 import ini
 import threading
 
 
-
 _audio_extensions = ['.mp3', '.MP3']
+
+def DBG(msg):
+    #~ print('MUSIC: ' + msg)
+    pass
 
 
 class MusicModule(EmcModule):
@@ -30,7 +30,7 @@ class MusicModule(EmcModule):
     #~ __film_db = None
 
     def __init__(self):
-        print 'Init module: MUSIC'
+        DBG('Init module')
 
         # create config ini section if not exists
         ini.add_section('music')
@@ -55,7 +55,7 @@ class MusicModule(EmcModule):
         self.__browser = EmcBrowser()
 
     def __shutdown__(self):
-        print 'Shutdown module: Music'
+        DBG('Shutdown module')
         # delete mainmenu item
         mainmenu.item_del('music')
 
@@ -111,7 +111,7 @@ class MusicModule(EmcModule):
         self.__browser.item_add('emc://back', 'Back')
 
     def cb_root_selected(self, url):
-        print "ROOT SEL: " + url
+        DBG("ROOT SEL: " + url)
 
         if url == 'music://root':
             self.create_root_page()
@@ -163,7 +163,7 @@ class MusicModule(EmcModule):
                 self.__browser.item_add(k, l)
 ###
     def cb_artist_selected(self, artist):
-        print 'SELART ' + artist
+        DBG('SELART ' + artist)
         artist_data = self.__artists_db.get_data(artist)
 
         import pprint

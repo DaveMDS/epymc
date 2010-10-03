@@ -11,15 +11,15 @@ _views = {}  # key = view_name  value = view class instance
 
 def DBG(msg):
     print ('BROWSER: ' + msg)
-    #~ pass
+    pass
 
 class EmcBrowser(object):
     """
     This is the browser object, it is used to show various page each containing
     a list. Usually you need a single instance of this class for all your needs.
-    In order you have to create an instance, add a page using the page_add()
-    method and add items using item_add(). Later you can create new pages or
-    use the back(), clear(), show(), hide() methods.
+    In order you have to: create an instance, add a page using the page_add()
+    method and add items to the page using item_add(). Later you can
+    create new pages or use the back(), clear(), show(), hide() methods.
 
     TODO doc default_style and style in general
     """
@@ -61,11 +61,11 @@ class EmcBrowser(object):
         if not style: style = self.__default_style
 
         if not _views.has_key(style):
-            print "CREATE VIEW"
+            DBG('Create view: ' + style)
             view = ViewList() # TODO eval here
             _views[style] = view
         else:
-            print 'VIEW EXISTS'
+            DBG('View exists: ' + style)
             view = _views[style]
 
         self.__pages.append({'view': view, 'url': url, 'title': title,
@@ -105,18 +105,21 @@ class EmcBrowser(object):
 
     def back(self):
         """ TODO Function doc """
-        self.__is_back = True
 
         if len(self.__pages) == 1:
             self.hide()
             mainmenu.show()
+            self.__pages[0]['view'].clear()
+            self.__pages.pop()
             return
 
+        self.__is_back = True
+
         page_data = self.__pages.pop()
-        print page_data
+        #~ print page_data
 
         page_data2 = self.__pages.pop()
-        print page_data2
+        #~ print page_data2
 
         func = page_data2['item_selected_cb']
         if func: func(page_data2['url'])
@@ -165,14 +168,14 @@ class EmcBrowser(object):
 
 
 ################################################################################
-#### Cube List View #################################################################
+#### Cube List View ############################################################
 ################################################################################
 class ViewList(object):
 
     # View Init
     def __init__(self):
         """ TODO Function doc """
-        print 'BrowserList __init__'
+        DBG('Init view: cube list')
 
         # flip object
         self.__flip = gui.part_get('browser/list/flip')
@@ -187,7 +190,7 @@ class ViewList(object):
         self.__visible_list = fl
 
         # back list
-        bl = elementary.Genlist(gui._win) ## TODO parent is still not clear to me.... this should be the flip object  :/
+        bl = elementary.Genlist(gui._win)
         bl.callback_clicked_add(self._cb_item_selected)
         bl.callback_selected_add(self._cb_item_hilight)
         self.__flip.content_back_set(bl)
@@ -207,6 +210,7 @@ class ViewList(object):
     # Mandatory methods
     def page_show(self, title, dir):
         """ TODO Function doc """
+        DBG('page show ' + str(dir))
         gui.text_set("browser/list/page_title", title)
 
         if dir == 1:
@@ -241,6 +245,12 @@ class ViewList(object):
         gui.signal_emit("browser,list,hide")
         self.__fl.hide() #TODO why clip doesn't work??
         self.__bl.hide()
+
+    def clear(self):
+        """ TODO Function doc """
+        self.__bl.clear()
+        self.__fl.clear()
+
 
     def input_event_cb(self, event):
         """ TODO Function doc """
@@ -305,6 +315,7 @@ class ViewList(object):
         anchorblock.text_set(info if info else "")
 
     def __cb_animate_done(self, flip):
+        DBG('Animation DONE')
         if self.__visible_list == self.__fl:
             self.__bl.clear()
         else:

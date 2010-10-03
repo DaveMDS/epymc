@@ -22,7 +22,7 @@ def cb_mainmenu():
 def init():
     global _root
 
-    mainmenu.item_add("config", 100, "Configurations", None, cb_mainmenu)
+    mainmenu.item_add("config", 100, "Config", None, cb_mainmenu)
 
     pager = gui.part_get("config_pager")
     pager.style_set("slide_invisible")

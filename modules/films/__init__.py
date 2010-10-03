@@ -79,7 +79,8 @@ class FilmsModule(EmcModule):
 
     def create_root_page(self):
         self.__browser.page_add("film://root", "Films",
-                                item_selected_cb = self.cb_url_selected)
+                                item_selected_cb = self.cb_url_selected,
+                                icon_get_cb = self.cb_icon_get)
 
         if len(self.__folders) == 1:
             print "TODO skip first page"
@@ -94,16 +95,22 @@ class FilmsModule(EmcModule):
             if os.path.isdir(path):
                 self.__browser.page_add(url, os.path.basename(path),
                                     item_selected_cb = self.cb_url_selected,
+                                    icon_get_cb = self.cb_icon_get,
                                     poster_get_cb = self.cb_poster_get)
                 for f in os.listdir(path):
                     self.__browser.item_add("file://" + path + "/" + f, f)
                 self.__browser.item_add("emc://back", "Back")
             else:
                 self.show_film_info(url)
-                #~ mediaplayer.play_url(url)
 
         elif url == "film://root":
             self.create_root_page()
+
+
+    def cb_icon_get(self, url):
+        if self.__film_db.id_exists(url):
+            return None
+        return "icon/folder"
 
     def cb_poster_get(self, url):
         if self.__film_db.id_exists(url):

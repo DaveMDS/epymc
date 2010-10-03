@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import evas
 import elementary
 
 import gui
@@ -156,6 +157,18 @@ class EmcBrowser(object):
             func = self.__pages[-1]['item_selected_cb']
             if func: func(url)
 
+    def _icon_get(self, url):
+        """ TODO Function doc """
+        if url.startswith('emc://'):
+            if url.endswith('/back'):
+                return gui.load_icon('icon/back')
+        
+        func = self.__pages[-1]['icon_get_cb']
+        if not func: return None
+        icon = func(url)
+        if not icon: return None
+        return gui.load_icon(icon)
+
     def _poster_get(self, url):
         """ TODO Function doc """
         func = self.__pages[-1]['poster_get_cb']
@@ -284,10 +297,9 @@ class ViewList(object):
         return label
 
     def __genlist_icon_get(self, obj, part, data):
-        #~ ic = elementary.Icon(obj)
-        #~ ic.file_set("images/logo_small.png")
-        #~ ic.size_hint_aspect_set(evas.EVAS_ASPECT_CONTROL_VERTICAL, 1, 1)
-        #~ return ic
+        if part == 'elm.swallow.icon':
+            (url, label, parent_browser) = data
+            return parent_browser._icon_get(url)
         return None
 
     def __genlist_state_get(self, obj, part, item_data):

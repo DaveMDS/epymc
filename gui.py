@@ -9,6 +9,7 @@ import mediaplayer
 
 _win = None
 _layout = None
+_theme_file = None
 
 def _cb_win_del(win):
     ask_to_exit()
@@ -20,11 +21,12 @@ def _cb_volume_slider_changed(slider):
 def init_window():
     global _win
     global _layout
+    global _theme_file
 
     # TODO FIXME!!!
-    theme_file = "/home/dave/l/epymc/default.edj"
+    _theme_file = "/home/dave/l/epymc/default.edj"
     #~ elementary.theme_overlay_add(theme_file)
-    elementary.theme_extension_add(theme_file)
+    elementary.theme_extension_add(_theme_file)
 
     # window
     win = elementary.Window("emc_win", elementary.ELM_WIN_BASIC)
@@ -40,7 +42,7 @@ def init_window():
 
     # main layout (main theme)
     ly = elementary.Layout(win)
-    ly.file_set(theme_file, "main")
+    ly.file_set(_theme_file, "main")
     ly.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
     win.resize_object_add(ly)
     ly.show()
@@ -57,7 +59,21 @@ def init_window():
     #~ im.show()
     ##
 
-
+def load_icon(icon):
+    """
+    icon can be a full path (if start with a '/' or
+    can be a theme icon (ex: icon/folder).
+    see icons.edc for all the existing icon
+    """
+    #TODO if icon in an EvasObject just return it
+    ic = elementary.Icon(gui._win)
+    if icon[0] == '/':
+        ic.file_set(icon)
+    else:
+        ic.file_set(_theme_file, icon)
+    ic.size_hint_aspect_set(evas.EVAS_ASPECT_CONTROL_VERTICAL, 1, 1)
+    return ic
+    
 def ask_to_exit():
     d = EmcDialog(title = 'Exit MediaCenter ?')
     d.button_add('Yes', _cb_exit_yes)

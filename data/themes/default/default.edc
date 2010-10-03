@@ -12,6 +12,7 @@ externals {
 collections {
 
    #include "elm_extension.edc"
+   #include "icons.edc"
    
    group { name: "main";
       min: 640 480;

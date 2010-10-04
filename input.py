@@ -16,8 +16,8 @@ TOGGLE_PAUSE
 
 
 def DBG(msg):
-    #~ print('INPUT: ' + msg)
-    pass
+   #~ print('INPUT: ' + msg)
+   pass
 
 
 EVENT_CONTINUE = True
@@ -26,39 +26,39 @@ EVENT_BLOCK = False
 _listeners = []
 
 def listener_add(name, event_cb, cb_data = None):
-    global _listeners
+   global _listeners
 
-    _listeners.append((name, event_cb, cb_data))
+   _listeners.append((name, event_cb, cb_data))
 
-    DBG('Add Listener: ' + name)
-    for lis in _listeners:
-        (name, cb, data) = lis
-        DBG('  * ' + name)
+   DBG('Add Listener: ' + name)
+   for lis in _listeners:
+      (name, cb, data) = lis
+      DBG('  * ' + name)
 
 def listener_del(name):
-    global _listeners
+   global _listeners
 
-    DBG('Listener Del: ' + name)
-    for lis in _listeners:
-        (n, cb, data) = lis
-        if n == name:
-            _listeners.remove(lis)
-            return
+   DBG('Listener Del: ' + name)
+   for lis in _listeners:
+      (n, cb, data) = lis
+      if n == name:
+         _listeners.remove(lis)
+         return
 
 def event_emit(event):
-    global _listeners
+   global _listeners
 
-    DBG("Emit Event: " + event + "  listeners: " + str(len(_listeners)))
+   DBG("Emit Event: " + event + "  listeners: " + str(len(_listeners)))
+   
+   for lis in reversed(_listeners):
+      (name, cb, data) = lis
 
-    for lis in reversed(_listeners):
-        (name, cb, data) = lis
+      if data:
+         res = cb(event, data)
+      else:
+         res = cb(event)
 
-        if data:
-            res = cb(event, data)
-        else:
-            res = cb(event)
+      #~ print "  ->  '%s' (%s)" %  (name, ('continue' if res else 'block'))
 
-        #~ print "  ->  '%s' (%s)" %  (name, ('continue' if res else 'block'))
-
-        if res == EVENT_BLOCK:
-            return
+      if res == EVENT_BLOCK:
+         return

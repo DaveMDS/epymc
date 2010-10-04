@@ -25,7 +25,7 @@ def init_window():
 
     # TODO FIXME!!!
     _theme_file = "/home/dave/l/epymc/default.edj"
-    #~ elementary.theme_overlay_add(theme_file)
+    #~ elementary.theme_overlay_add(_theme_file)
     elementary.theme_extension_add(_theme_file)
 
     # window

@@ -87,7 +87,7 @@ class FilmsModule(EmcModule):
 
         for f in self.__folders:
             self.__browser.item_add(f, os.path.basename(f))
-        self.__browser.item_add('emc://back', "Back")
+        self.__browser.item_add('emc://back', "back")
 
     def cb_url_selected(self, url):
         if url.startswith("file://"):
@@ -99,7 +99,7 @@ class FilmsModule(EmcModule):
                                     poster_get_cb = self.cb_poster_get)
                 for f in os.listdir(path):
                     self.__browser.item_add("file://" + path + "/" + f, f)
-                self.__browser.item_add("emc://back", "Back")
+                self.__browser.item_add("emc://back", "back")
             else:
                 self.show_film_info(url)
 

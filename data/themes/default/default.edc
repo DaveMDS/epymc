@@ -15,17 +15,11 @@ collections {
    #include "icons.edc"
    
    group { name: "main";
-      min: 640 480;
-      max: 0 0;
-      data {
-         item: "pref_size" "640x480";
-      }
-
       parts {
          part { name: "main_bg";
             type: IMAGE;
             description { state: "default" 0;
-               min: 640 480;
+               min: 1280 720;
                image {
                   normal: "background.jpg";
                }

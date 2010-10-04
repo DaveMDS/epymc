@@ -11,7 +11,7 @@ import input
 _views = {}  # key = view_name  value = view class instance
 
 def DBG(msg):
-    print ('BROWSER: ' + msg)
+    #~ print ('BROWSER: ' + msg)
     pass
 
 class EmcBrowser(object):
@@ -196,6 +196,7 @@ class ViewList(object):
 
         # front list
         fl = elementary.Genlist(gui._win)
+        fl.style_set("browser")
         fl.callback_clicked_add(self._cb_item_selected)
         fl.callback_selected_add(self._cb_item_hilight)
         self.__flip.content_front_set(fl)
@@ -204,6 +205,7 @@ class ViewList(object):
 
         # back list
         bl = elementary.Genlist(gui._win)
+        bl.style_set("browser")
         bl.callback_clicked_add(self._cb_item_selected)
         bl.callback_selected_add(self._cb_item_hilight)
         self.__flip.content_back_set(bl)

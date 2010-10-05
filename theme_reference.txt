@@ -39,12 +39,7 @@ main group: "main" TODO rename to epymc_main_layout
 
  * Required parts:
     "videoplayer/video" -> edje swallow
-    "videoplayer/controls/btn_play" -> elm_button
-    "videoplayer/controls/btn_stop" -> elm_button
-    "videoplayer/controls/btn_forward" -> elm_button
-    "videoplayer/controls/btn_fforward" -> elm_button
-    "videoplayer/controls/btn_backward" -> elm_button
-    "videoplayer/controls/btn_fbackward" -> elm_button
+    "videoplayer/controls/btn_swallow" -> edje swallow
     "videoplayer/controls/slider" -> elm_slider
     "videoplayer/controls/position" -> edje text
     "videoplayer/controls/length" -> edje text

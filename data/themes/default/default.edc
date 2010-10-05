@@ -189,112 +189,12 @@ collections {
                }
             }
          }
-         part { name: "videoplayer/controls/btn_play";
-            type: EXTERNAL;
-            clip_to: "videoplayer/clip";
-            source: "elm/button";
-            description { state: "default" 0;
-               rel1 {
-                  offset: 284 9;
-                  to: "videoplayer/controls/bg";
-               }
-               rel2 {
-                  offset: -291 -55;
-                  to: "videoplayer/controls/bg";
-               }
-               params {
-                  string: "label" "Play";
-               }
-            }
-         }
-         part { name: "videoplayer/controls/btn_stop";
-            type: EXTERNAL;
-            clip_to: "videoplayer/clip";
-            source: "elm/button";
-            description { state: "default" 0;
-               rel1 {
-                  offset: 202 10;
-                  to: "videoplayer/controls/bg";
-               }
-               rel2 {
-                  offset: -373 -54;
-                  to: "videoplayer/controls/bg";
-               }
-               params {
-                  string: "label" "Stop";
-               }
-            }
-         }
-         part { name: "videoplayer/controls/btn_fbackward";
-            type: EXTERNAL;
-            clip_to: "videoplayer/clip";
-            source: "elm/button";
-            description { state: "default" 0;
-               rel1 {
-                  offset: 19 10;
-                  to: "videoplayer/controls/bg";
-               }
-               rel2 {
-                  offset: -556 -54;
-                  to: "videoplayer/controls/bg";
-               }
-               params {
-                  string: "label" "Fast Backward";
-               }
-            }
-         }
-         part { name: "videoplayer/controls/btn_backward";
-            type: EXTERNAL;
-            clip_to: "videoplayer/clip";
-            source: "elm/button";
-            description { state: "default" 0;
-               rel1 {
-                  offset: 107 10;
-                  to: "videoplayer/controls/bg";
-               }
-               rel2 {
-                  offset: -468 -54;
-                  to: "videoplayer/controls/bg";
-               }
-               params {
-                  string: "label" "Backward";
-               }
-            }
-         }
-         part { name: "videoplayer/controls/btn_fforward";
-            type: EXTERNAL;
-            clip_to: "videoplayer/clip";
-            source: "elm/button";
-            description { state: "default" 0;
-               rel1 {
-                  offset: 442 11;
-                  to: "videoplayer/controls/bg";
-               }
-               rel2 {
-                  offset: -133 -53;
-                  to: "videoplayer/controls/bg";
-               }
-               params {
-                  string: "label" "Fast Forward";
-               }
-            }
-         }
-         part { name: "videoplayer/controls/btn_forward";
-            type: EXTERNAL;
-            clip_to: "videoplayer/clip";
-            source: "elm/button";
-            description { state: "default" 0;
-               rel1 {
-                  offset: 359 10;
-                  to: "videoplayer/controls/bg";
-               }
-               rel2 {
-                  offset: -216 -54;
-                  to: "videoplayer/controls/bg";
-               }
-               params {
-                  string: "label" "Forward";
-               }
+         part { name: "videoplayer/controls/btn_swallow";
+            type: SWALLOW;
+            description { state: "default" 0.0;
+               rel1.to: "videoplayer/controls/bg";
+               rel2.relative: 1.0 0.5;
+               rel2.to: "videoplayer/controls/bg";
             }
          }
          part { name: "videoplayer/controls/length";

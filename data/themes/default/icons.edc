@@ -4,10 +4,17 @@
       images { image: "icon_"NAME".png" COMP; } \
       parts { part { name: "main_bg"; \
          description { state: "default" 0; \
-         image.normal: "icon_"NAME".png"; }}}}
+            image.normal: "icon_"NAME".png"; }}}}
 
 
+ICON("home")
 ICON("folder")
 ICON("close")
-ICON("home")
 ICON("back")
+
+ICON("play")
+ICON("stop")
+ICON("fwd")
+ICON("ffwd")
+ICON("bwd")
+ICON("fbwd")

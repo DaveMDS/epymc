@@ -1,10 +1,17 @@
 #!/usr/bin/env python
 
+import evas
 import edje
+import elementary
 import emotion
 
 import gui
 import input
+
+
+def DBG(msg):
+   print ('MEDIAPLAYER: ' + msg)
+   pass
 
 _emotion = None
 _controls_visible = False
@@ -12,27 +19,23 @@ _buttons = list()
 _current_button_num = 3
 
 def play_video(url):
-   global _emotion
-
-   print 'Play ' + url
-   # TODO handle real url
+   DBG('Play ' + url)  # TODO handle real url
 
    if not _emotion:
       _init_emotion()
 
-
    _emotion.file_set(url)
 
    ## TEST VARIOUS INFO
-   print "RATIO: " + str(_emotion.ratio_get())
-   print "VIDEO CHNS: " + str(_emotion.video_channel_count())
-   print "AUDIO CHNS: " + str(_emotion.audio_channel_count())
-   print _emotion.video_channel_get()
-   print _emotion.audio_channel_get()
-   print _emotion.meta_info_dict_get()
-   print _emotion.size
-   print _emotion.image_size
-   print _emotion.ratio
+   DBG("RATIO: " + str(_emotion.ratio_get()))
+   DBG("VIDEO CHNS: " + str(_emotion.video_channel_count()))
+   DBG("AUDIO CHNS: " + str(_emotion.audio_channel_count()))
+   DBG(str(_emotion.video_channel_get()))
+   DBG(str(_emotion.audio_channel_get()))
+   DBG(str(_emotion.meta_info_dict_get()))
+   DBG(str(_emotion.size))
+   DBG(str(_emotion.image_size))
+   DBG(str(_emotion.ratio))
    ##
 
    # set aspect according to video size
@@ -45,7 +48,6 @@ def play_video(url):
 def video_player_show():
    gui.signal_emit('videoplayer,show')
    input.listener_add("videoplayer", input_event_cb)
-   #~ video_player_show()
 
 def video_player_hide():
    hide_video_controls()
@@ -53,7 +55,6 @@ def video_player_hide():
    gui.signal_emit('videoplayer,hide')
 
 def stop_video():
-   global _emotion
    _emotion.play = False
    video_player_hide()
 
@@ -73,25 +74,21 @@ def hide_video_controls():
    _controls_visible = False
 
 def toggle_video_controls():
-   global _controls_visible
    if _controls_visible:
       hide_video_controls()
    else:
       show_video_controls()
 
 def volume_set(vol):
-   global _emotion
    _emotion.audio_volume_set(vol / 100)
    gui.part_get('volume/slider').value = vol
 
 def volume_get():
-   global _emotion
    return int(_emotion.audio_volume_get() * 100)
 
 
 def _init_emotion():
    global _emotion
-   global _buttons
 
    _emotion = emotion.Emotion(gui._win.evas_get(), module_filename='gstreamer')
    gui.swallow_set('videoplayer/video', _emotion)
@@ -99,56 +96,87 @@ def _init_emotion():
 
    #~ _emotion.on_key_down_add(_cb)
    _emotion.on_mouse_down_add(_cb_video_mouse_down)
-   _emotion.on_frame_decode_add(_cb_frame_decode)
+   _emotion.on_frame_decode_add(_cb_frame_decode) # TODO too often?
    #~ _emotion.on_audio_level_change_add(_cb_volume_change)
 
 
-   #~ gui.part_get('videoplayer/controls/slider').min_max_set(0.0, 1.0)
+   # buttons box
+   box = elementary.Box(gui._win)
+   box.horizontal_set(1)
+   gui.swallow_set("videoplayer/controls/btn_swallow", box)
+   
+   #  <<  fast backward
+   bt = elementary.Button(gui._win);
+   bt.icon_set(gui.load_icon("icon/fbwd"))
+   bt.callback_clicked_add(_cb_btn_fbackward)
+   bt.data['cb'] = _cb_btn_fbackward
+   bt.on_mouse_in_add(_cb_btns_mouse_in)
+   bt.disabled_set(1)
+   bt.show()
+   box.pack_end(bt)
+   _buttons.append(bt)
 
-   # connect controls callbacks & fill buttons list
-   _buttons.append(gui.part_get('videoplayer/controls/btn_fbackward'))
-   _buttons[-1].callback_clicked_add(_cb_btn_fbackward)
-   _buttons[-1].data['cb'] = _cb_btn_fbackward
-   _buttons[-1].on_mouse_in_add(_cb_btns_mouse_in)
-   _buttons[-1].disabled_set(1)
+   #  <   backward
+   bt = elementary.Button(gui._win);
+   bt.icon_set(gui.load_icon("icon/bwd"))
+   bt.callback_clicked_add(_cb_btn_backward)
+   bt.data['cb'] = _cb_btn_backward
+   bt.on_mouse_in_add(_cb_btns_mouse_in)
+   bt.disabled_set(1)
+   bt.show()
+   box.pack_end(bt)
+   _buttons.append(bt)
 
-   _buttons.append(gui.part_get('videoplayer/controls/btn_backward'))
-   _buttons[-1].callback_clicked_add(_cb_btn_backward)
-   _buttons[-1].data['cb'] = _cb_btn_backward
-   _buttons[-1].on_mouse_in_add(_cb_btns_mouse_in)
-   _buttons[-1].disabled_set(1)
+   #  stop
+   bt = elementary.Button(gui._win);
+   bt.icon_set(gui.load_icon("icon/stop"))
+   bt.callback_clicked_add(_cb_btn_stop)
+   bt.data['cb'] = _cb_btn_stop
+   bt.on_mouse_in_add(_cb_btns_mouse_in)
+   bt.label_set("Stop")
+   bt.disabled_set(1)
+   bt.show()
+   box.pack_end(bt)
+   _buttons.append(bt)
 
-   _buttons.append(gui.part_get('videoplayer/controls/btn_stop'))
-   _buttons[-1].callback_clicked_add(_cb_btn_stop)
-   _buttons[-1].data['cb'] =_cb_btn_stop
-   _buttons[-1].on_mouse_in_add(_cb_btns_mouse_in)
-   _buttons[-1].disabled_set(1)
+   #  play/pause
+   bt = elementary.Button(gui._win);
+   bt.icon_set(gui.load_icon("icon/play"))
+   bt.callback_clicked_add(_cb_btn_play)
+   bt.data['cb'] = _cb_btn_play
+   bt.on_mouse_in_add(_cb_btns_mouse_in)
+   bt.label_set("Pause")
+   bt.disabled_set(0)
+   bt.show()
+   box.pack_end(bt)
+   _buttons.append(bt)
 
-   _buttons.append(gui.part_get('videoplayer/controls/btn_play'))
-   _buttons[-1].callback_clicked_add(_cb_btn_play)
-   _buttons[-1].data['cb'] =_cb_btn_play
-   _buttons[-1].on_mouse_in_add(_cb_btns_mouse_in)
-   _buttons[-1].label_set('Pause')
-   _buttons[-1].disabled_set(0)
-
-   _buttons.append(gui.part_get('videoplayer/controls/btn_forward'))
-   _buttons[-1].callback_clicked_add(_cb_btn_forward)
-   _buttons[-1].data['cb'] =_cb_btn_forward
-   _buttons[-1].on_mouse_in_add(_cb_btns_mouse_in)
-   _buttons[-1].disabled_set(1)
-
-   _buttons.append(gui.part_get('videoplayer/controls/btn_fforward'))
-   _buttons[-1].callback_clicked_add(_cb_btn_fforward)
-   _buttons[-1].data['cb'] =_cb_btn_fforward
-   _buttons[-1].on_mouse_in_add(_cb_btns_mouse_in)
-   _buttons[-1].disabled_set(1)
+   #  >   forward
+   bt = elementary.Button(gui._win);
+   bt.icon_set(gui.load_icon("icon/fwd"))
+   bt.callback_clicked_add(_cb_btn_forward)
+   bt.data['cb'] = _cb_btn_forward
+   bt.on_mouse_in_add(_cb_btns_mouse_in)
+   bt.disabled_set(1)
+   bt.show()
+   box.pack_end(bt)
+   _buttons.append(bt)
+   
+   #  >>  fast forward
+   bt = elementary.Button(gui._win);
+   bt.icon_set(gui.load_icon("icon/ffwd"))
+   bt.callback_clicked_add(_cb_btn_fforward)
+   bt.data['cb'] = _cb_btn_fforward
+   bt.on_mouse_in_add(_cb_btns_mouse_in)
+   bt.disabled_set(1)
+   bt.show()
+   box.pack_end(bt)
+   _buttons.append(bt)
 
 
    gui.part_get('videoplayer/controls/slider').callback_changed_add(_cb_slider_changed)
    #~ gui.part_get('videoplayer/controls/slider').callback_delay_changed_add(_cb_slider_changed)
-
-   gui.part_get('videoplayer/controls/btn_play').label_set('Pause')
-
+   
    # TODO Shutdown all emotion stuff & the buttons list
 
 def _cb_video_mouse_down(vid, ev):
@@ -158,17 +186,13 @@ def _cb_frame_decode(vid):
    _update_slider()
 
 def _cb_btns_mouse_in(button, event):
-   global _buttons
-   global _current_button_num
-
    if button != _buttons[_current_button_num]:
       _buttons[_current_button_num].disabled_set(1)
       _current_button_num = _buttons.index(button)
       _buttons[_current_button_num].disabled_set(0)
 
 def _cb_btn_play(btn):
-   global _emotion
-
+   DBG("Play cb");
    if _emotion.play:
       _emotion.play = False
       btn.label_set('Play')
@@ -178,33 +202,30 @@ def _cb_btn_play(btn):
 
 
 def _cb_btn_stop(btn):
+   DBG("Stop cb");
    stop_video()
 
 def _cb_btn_forward(btn):
-   global _emotion
+   DBG("Forward cb");
    _emotion.position_set(_emotion.position + 10) #TODO make this configurable
 
 def _cb_btn_backward(btn):
-   global _emotion
+   DBG("Backward cb");
    _emotion.position_set(_emotion.position - 10) #TODO make this configurable
 
 def _cb_btn_fforward(btn):
-   global _emotion
+   DBG("FastForward cb");
    _emotion.position_set(_emotion.position + 60) #TODO make this configurable
 
 def _cb_btn_fbackward(btn):
-   global _emotion
+   DBG("FastBackward cb");
    _emotion.position_set(_emotion.position - 60) #TODO make this configurable
 
 
 def _cb_slider_changed(slider):
-   global _emotion
    _emotion.position_set(_emotion.play_length * slider.value)
 
 def _update_slider():
-   global _emotion
-   global _controls_visible
-
    if _controls_visible:
       pos = _emotion.position
       len = _emotion.play_length
@@ -223,9 +244,6 @@ def _update_slider():
 
 
 def input_event_cb(event):
-   global _emotion
-   global _controls_visible
-   global _buttons
    global _current_button_num
 
    if _controls_visible:
@@ -250,11 +268,12 @@ def input_event_cb(event):
          stop_video()
       elif event == 'OK':
          show_video_controls()
-      elif event == 'TOGGLE_PAUSE':
-         _emotion.play = not _emotion.play
       elif event == 'RIGHT':
          _emotion.position_set(_emotion.position + 10) #TODO make this configurable
       elif event == 'LEFT':
          _emotion.position_set(_emotion.position - 10) #TODO make this configurable
+
+   if event == 'TOGGLE_PAUSE':
+      _cb_btn_play(_buttons[3])
 
    return input.EVENT_BLOCK

@@ -13,10 +13,12 @@ def DBG(msg):
    print ('MEDIAPLAYER: ' + msg)
    pass
 
+
 _emotion = None
 _controls_visible = False
 _buttons = list()
 _current_button_num = 3
+
 
 def play_video(url):
    DBG('Play ' + url)  # TODO handle real url
@@ -45,39 +47,8 @@ def play_video(url):
    _emotion.play = True
    video_player_show()
 
-def video_player_show():
-   gui.signal_emit('videoplayer,show')
-   input.listener_add("videoplayer", input_event_cb)
-
-def video_player_hide():
-   hide_video_controls()
-   input.listener_del("videoplayer")
-   gui.signal_emit('videoplayer,hide')
-
-def stop_video():
+def stop():
    _emotion.play = False
-   video_player_hide()
-
-
-def show_video_controls():
-   global _controls_visible
-   gui.signal_emit('videoplayer,controls,show')
-   gui.signal_emit('volume,show')
-   _controls_visible = True
-   # update volume slider
-   volume_set(volume_get())
-
-def hide_video_controls():
-   global _controls_visible
-   gui.signal_emit('videoplayer,controls,hide')
-   gui.signal_emit('volume,hide')
-   _controls_visible = False
-
-def toggle_video_controls():
-   if _controls_visible:
-      hide_video_controls()
-   else:
-      show_video_controls()
 
 def volume_set(vol):
    _emotion.audio_volume_set(vol / 100)
@@ -85,6 +56,55 @@ def volume_set(vol):
 
 def volume_get():
    return int(_emotion.audio_volume_get() * 100)
+
+def forward():
+   DBG("Forward cb" + str(_emotion.position))
+   _emotion.position += 10 #TODO make this configurable
+
+def backward():
+   DBG("Backward cb" + str(_emotion.position))
+   _emotion.position -= 10 #TODO make this configurable
+
+def fforward():
+   DBG("FastForward cb" + str(_emotion.position))
+   _emotion.position += 60 #TODO make this configurable
+
+def fbackward():
+   DBG("FastBackward cb" + str(_emotion.position))
+   _emotion.position -= 60 #TODO make this configurable
+
+
+
+def video_player_show():
+   gui.signal_emit('videoplayer,show')
+   input.listener_add("videoplayer", input_event_cb)
+
+def video_player_hide():
+   video_controls_hide()
+   input.listener_del("videoplayer")
+   gui.signal_emit('videoplayer,hide')
+
+def video_controls_show():
+   global _controls_visible
+   gui.signal_emit('videoplayer,controls,show')
+   gui.signal_emit('volume,show')
+   _controls_visible = True
+   # update volume slider
+   volume_set(volume_get())
+
+def video_controls_hide():
+   global _controls_visible
+   gui.signal_emit('videoplayer,controls,hide')
+   gui.signal_emit('volume,hide')
+   _controls_visible = False
+
+def video_controls_toggle():
+   if _controls_visible:
+      video_controls_hide()
+   else:
+      video_controls_show()
+
+
 
 
 def _init_emotion():
@@ -180,7 +200,7 @@ def _init_emotion():
    # TODO Shutdown all emotion stuff & the buttons list
 
 def _cb_video_mouse_down(vid, ev):
-   toggle_video_controls()
+   video_controls_toggle()
 
 def _cb_frame_decode(vid):
    _update_slider()
@@ -192,7 +212,7 @@ def _cb_btns_mouse_in(button, event):
       _buttons[_current_button_num].disabled_set(0)
 
 def _cb_btn_play(btn):
-   DBG("Play cb");
+   DBG("Play cb")
    if _emotion.play:
       _emotion.play = False
       btn.label_set('Play')
@@ -200,26 +220,21 @@ def _cb_btn_play(btn):
       _emotion.play = True
       btn.label_set('Pause')
 
-
 def _cb_btn_stop(btn):
-   DBG("Stop cb");
-   stop_video()
+   stop()
+   video_player_hide()
 
 def _cb_btn_forward(btn):
-   DBG("Forward cb");
-   _emotion.position_set(_emotion.position + 10) #TODO make this configurable
+   forward()
 
 def _cb_btn_backward(btn):
-   DBG("Backward cb");
-   _emotion.position_set(_emotion.position - 10) #TODO make this configurable
+   backward()
 
 def _cb_btn_fforward(btn):
-   DBG("FastForward cb");
-   _emotion.position_set(_emotion.position + 60) #TODO make this configurable
+   fforward()
 
 def _cb_btn_fbackward(btn):
-   DBG("FastBackward cb");
-   _emotion.position_set(_emotion.position - 60) #TODO make this configurable
+   fbackward()
 
 
 def _cb_slider_changed(slider):
@@ -248,11 +263,13 @@ def input_event_cb(event):
 
    if _controls_visible:
       if event == 'BACK':
-         hide_video_controls()
+         video_controls_hide()
       if event == 'OK':
          button = _buttons[_current_button_num]
          cb = button.data['cb']
          cb(button)
+         # TODO TRY THIS INSTEAD:
+         # evas_object_smart_callback_call(obj, "sig", NULL);
       elif event == 'RIGHT':
          if _current_button_num < len(_buttons) - 1:
             _buttons[_current_button_num].disabled_set(1)
@@ -265,13 +282,14 @@ def input_event_cb(event):
             _buttons[_current_button_num].disabled_set(0)
    else:
       if event == 'BACK':
-         stop_video()
+         stop()
+         video_player_hide()
       elif event == 'OK':
-         show_video_controls()
+         video_controls_show()
       elif event == 'RIGHT':
-         _emotion.position_set(_emotion.position + 10) #TODO make this configurable
+         forward()
       elif event == 'LEFT':
-         _emotion.position_set(_emotion.position - 10) #TODO make this configurable
+         backward()
 
    if event == 'TOGGLE_PAUSE':
       _cb_btn_play(_buttons[3])

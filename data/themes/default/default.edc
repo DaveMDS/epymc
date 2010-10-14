@@ -26,10 +26,10 @@ collections {
             }
          }
 
-/// browser (cube)
-         part { name: "browser/list/info";
+/// browser view: cubelist
+         part { name: "browser/cubelist/info";
             type: EXTERNAL;
-            clip_to: "browser/list/clip";
+            clip_to: "browser/cubelist/clip";
             source: "elm/anchorblock";
             description { state: "default" 0;
                rel1 {
@@ -41,6 +41,94 @@ collections {
                }
                params {
                   string: "text" "Short Info";
+               }
+            }
+         }
+         part { name: "browser/cubelist/poster";
+            type: SWALLOW;
+            clip_to: "browser/cubelist/clip";
+            description { state: "default" 0;
+               rel1 {
+                  relative: 0.5 0;
+                  offset: 20 20;
+               }
+               rel2 {
+                  relative: 1 0.65;
+                  offset: -20 0;
+               }
+            }
+         }
+         part { name: "browser/cubelist/flip";
+            type: EXTERNAL;
+            clip_to: "browser/cubelist/clip";
+            source: "elm/flip";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 20 35;
+               }
+               rel2 {
+                  relative: 0.5 1;
+                  offset: 0 -20;
+               }
+            }
+         }
+         part { name: "browser/cubelist/page_title";
+            type: TEXT;
+            mouse_events: 0;
+            clip_to: "browser/cubelist/clip";
+            description { state: "default" 0;
+               rel1 {
+                  offset: 20 5;
+               }
+               rel2 {
+                  offset: 0 0;
+               }
+               text {
+                  text: "YOUR TEXT HERE";
+                  font: "Sans";
+                  size: 16;
+                  align: 0 0;
+               }
+            }
+         }
+         part { name: "browser/cubelist/clip";
+            type: RECT;
+            mouse_events: 0;
+            description { state: "default" 0;
+               color: 255 255 255 0;
+            }
+            description { state: "visible" 0;
+               color: 255 255 255 255;
+            }
+         }
+
+/// browser view: list
+         part { name: "browser/list/page_title";
+            type: TEXT;
+            mouse_events: 0;
+            clip_to: "browser/list/clip";
+            description { state: "default" 0;
+               rel1.offset: 20 5;
+               text {
+                  text: "Title";
+                  font: "Sans";
+                  size: 16;
+                  align: 0 0;
+               }
+            }
+         }
+         part { name: "browser/list/genlist";
+            type: EXTERNAL;
+            source: "elm/genlist";
+            clip_to: "browser/list/clip";
+            description { state: "default" 0;
+               color: 255 0 255 100;
+               rel1 {
+                  offset: 20 35;
+               }
+               rel2 {
+                  relative: 0.5 1;
+                  offset: 0 -20;
                }
             }
          }
@@ -58,36 +146,17 @@ collections {
                }
             }
          }
-         part { name: "browser/list/flip";
+         part { name: "browser/list/info";
             type: EXTERNAL;
             clip_to: "browser/list/clip";
-            source: "elm/flip";
+            source: "elm/anchorblock";
             description { state: "default" 0;
                rel1 {
-                  offset: 20 35;
+                  relative: 0.5 0.65;
+                  offset: 20 0;
                }
                rel2 {
-                  relative: 0.5 1;
-                  offset: 0 -20;
-               }
-            }
-         }
-         part { name: "browser/list/page_title";
-            type: TEXT;
-            mouse_events: 0;
-            clip_to: "browser/list/clip";
-            description { state: "default" 0;
-               rel1 {
-                  offset: 20 5;
-               }
-               rel2 {
-                  offset: 0 0;
-               }
-               text {
-                  text: "YOUR TEXT HERE";
-                  font: "Sans";
-                  size: 16;
-                  align: 0 0;
+                  offset: -20 -20;
                }
             }
          }
@@ -96,14 +165,9 @@ collections {
             mouse_events: 0;
             description { state: "default" 0;
                color: 255 255 255 0;
-               rel2 {
-                  offset: 0 0;
-               }
             }
             description { state: "visible" 0;
-               rel2 {
-                  offset: 0 0;
-               }
+               color: 255 255 255 255;
             }
          }
 
@@ -390,6 +454,20 @@ collections {
             action: STATE_SET "default" 0.00;
             transition: ACCELERATE 0.5;
             target: "config_bg";
+         }
+         program { name: "browser_cubelist_show";
+            signal: "browser,cubelist,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: LINEAR 1.0;
+            target: "browser/cubelist/clip";
+         }
+         program { name: "browser_cubelist_hide";
+            signal: "browser,cubelist,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: LINEAR 1.0;
+            target: "browser/cubelist/clip";
          }
          program { name: "browser_list_show";
             signal: "browser,list,show";

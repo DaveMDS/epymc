@@ -11,7 +11,7 @@ import input
 _views = {}  # key = view_name  value = view class instance
 
 def DBG(msg):
-   #~ print ('BROWSER: ' + msg)
+   print ('BROWSER: ' + msg)
    pass
 
 class EmcBrowser(object):
@@ -63,7 +63,7 @@ class EmcBrowser(object):
 
       if not _views.has_key(style):
          DBG('Create view: ' + style)
-         view = ViewList() # TODO eval here
+         view = ViewListCube() # TODO eval here
          _views[style] = view
       else:
          DBG('View exists: ' + style)
@@ -181,9 +181,150 @@ class EmcBrowser(object):
 
 
 ################################################################################
-#### Cube List View ############################################################
+#### List View      ############################################################
 ################################################################################
 class ViewList(object):
+   """
+   This is the basic view, it use a genlist to show items and have a
+   poster and a short info on the right. No animation is done when
+   changing page.
+   This view is the reference one with all the documentation, can be
+   used as a starting base for new views.
+   """
+
+   ### Mandatory methods, all the views must implement this functions
+   def __init__(self):
+      """
+      This is the init founction for the view, it is called one time only
+      when the view is needed for the first time.
+      """
+      DBG('Init view: plain list')
+
+      # EXTERNAL Genlist
+      self.__list = gui.part_get('browser/list/genlist')
+      self.__list.style_set("browser")
+      self.__list.callback_clicked_add(self._cb_item_selected)
+      self.__list.callback_selected_add(self._cb_item_hilight)
+
+      # genlist item class
+      self.__itc = elementary.GenlistItemClass(item_style="default",
+                                 label_get_func = self.__genlist_label_get,
+                                 icon_get_func = self.__genlist_icon_get,
+                                 state_get_func = self.__genlist_state_get)
+
+      # RemoteImage (poster)
+      self.__im = gui.EmcRemoteImage(gui._win)
+      gui.swallow_set('browser/list/poster', self.__im)
+
+   def page_show(self, title, dir):
+      """
+      This function is called everytime a new page need to be showed.
+      The 'dir' param tell you direction of the browse:
+        -1 means we are going back
+         1 means forward
+         0 means no previous page
+      You can use the 'dir' param to perform the correct animation if needed
+      """
+      DBG('page show ' + str(dir))
+      self.clear()
+      gui.text_set("browser/list/page_title", title)
+
+   def item_add(self, url, label, parent_browser):
+      """
+      Here you must add the item to the current visible page
+      You can use the 'parent_browser' object to query more info about
+      the item using: parent_browser._icon_get() _poster_get() ect..
+
+      When an item will be selected you should call:
+      parent_browser._item_selected(url) with the url of the selected item
+      """
+      item_data = (url, label, parent_browser)
+      it = self.__list.item_append(self.__itc, item_data)
+      if not self.__list.selected_item_get():
+         it.selected_set(1)
+
+   def show(self):
+      """ Show the view """
+      gui.signal_emit("browser,list,show")
+
+   def hide(self):
+      """ Hide the view """
+      gui.signal_emit("browser,list,hide")
+
+   def clear(self):
+      """ Clear the view """
+      self.__list.clear()
+
+   def input_event_cb(self, event):
+      """ Here you can manage input events for the view """
+
+      item = self.__list.selected_item_get()
+      (url, label, parent_browser) = item.data_get()
+
+      if event == "DOWN":
+         next = item.next_get()
+         if next:
+            next.selected_set(1)
+            next.middle_bring_in()
+            return input.EVENT_BLOCK
+
+      elif event == "UP":
+         prev = item.prev_get()
+         if prev:
+            prev.selected_set(1)
+            prev.middle_bring_in()
+            return input.EVENT_BLOCK
+
+      elif event == "OK":
+         parent_browser._item_selected(url)
+         return input.EVENT_BLOCK
+
+      return input.EVENT_CONTINUE
+
+   ### GenList Item Class
+   def __genlist_label_get(self, obj, part, item_data):
+      (url, label, parent_browser) = item_data
+      return label
+
+   def __genlist_icon_get(self, obj, part, data):
+      if part == 'elm.swallow.icon':
+         (url, label, parent_browser) = data
+         return parent_browser._icon_get(url)
+      return None
+
+   def __genlist_state_get(self, obj, part, item_data):
+      return False
+
+   ### GenList Callbacks
+   def _cb_item_selected(self, list, item):
+      (url, label, parent_browser) = item.data_get()
+      parent_browser._item_selected(url)
+
+   def _cb_item_hilight(self, list, item):
+      (url, label, parent_browser) = item.data_get()
+
+      # Ask for the item poster and show (or download) it
+      poster = parent_browser._poster_get(url)
+      if poster and poster.startswith("http://"):
+         if poster.find(';') != -1:
+            (url, dest) = poster.split(';')
+            self.__im.url_set(url, dest)
+         else:
+            self.__im.url_set(poster)
+      else:
+         self.__im.file_set(poster if poster else "")
+
+      # Fill the anchorblock with item info info 
+      info = parent_browser._info_get(url)
+      anchorblock = gui.part_get('browser/list/info')
+      anchorblock.text_set(info if info else "")
+
+
+
+################################################################################
+#### Cube List View ############################################################
+################################################################################
+class ViewListCube(object):
 
    # View Init
    def __init__(self):
@@ -191,7 +332,7 @@ class ViewList(object):
       DBG('Init view: cube list')
 
       # flip object
-      self.__flip = gui.part_get('browser/list/flip')
+      self.__flip = gui.part_get('browser/cubelist/flip')
       self.__flip.callback_animate_done_add(self.__cb_animate_done)
 
       # front list
@@ -219,14 +360,14 @@ class ViewList(object):
 
       # RemoteImage (poster)
       self.__im = gui.EmcRemoteImage(gui._win)
-      gui.swallow_set('browser/list/poster', self.__im)
+      gui.swallow_set('browser/cubelist/poster', self.__im)
 
 
    # Mandatory methods
    def page_show(self, title, dir):
       """ TODO Function doc """
       DBG('page show ' + str(dir))
-      gui.text_set("browser/list/page_title", title)
+      gui.text_set("browser/cubelist/page_title", title)
 
       if dir == 1:
          self.__flip.go(elementary.ELM_FLIP_CUBE_LEFT)
@@ -251,13 +392,13 @@ class ViewList(object):
 
    def show(self):
       """ TODO Function doc """
-      gui.signal_emit("browser,list,show")
+      gui.signal_emit("browser,cubelist,show")
       self.__fl.show() #TODO why clip doesn't work??
       self.__bl.show()
 
    def hide(self):
       """ TODO Function doc """
-      gui.signal_emit("browser,list,hide")
+      gui.signal_emit("browser,cubelist,hide")
       self.__fl.hide() #TODO why clip doesn't work??
       self.__bl.hide()
 
@@ -325,7 +466,7 @@ class ViewList(object):
          self.__im.file_set(poster if poster else "")
 
       info = parent_browser._info_get(url)
-      anchorblock = gui.part_get('browser/list/info')
+      anchorblock = gui.part_get('browser/cubelist/info')
       anchorblock.text_set(info if info else "")
 
    def __cb_animate_done(self, flip):

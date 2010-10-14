@@ -8,6 +8,10 @@ externals {
    external: "elm";
 }
 
+#define FONT "Sans"
+#define FONT_BOLD "Sans:style=Bold"
+#define FONT_SIZE 16
+#define FONT_COLOR 255 255 255 255
 
 collections {
 
@@ -15,13 +19,104 @@ collections {
    #include "icons.edc"
    
    group { name: "main";
+
+/// clock embryo script
+      script {
+          public clock_cb(val) {
+            new year, month, day, yearday, weekday, hour, minute;
+            new Float:second;
+            new buf[32];
+
+            date(year, month, day, yearday, weekday, hour, minute, second);
+            snprintf(buf, sizeof(buf), "%d:%d", hour, minute);
+            set_text(PART:"topbar/clock", buf);
+            timer(60.0 - (second), "clock_cb", 1);
+         }
+      }
+
       parts {
+
+/// main background
          part { name: "main_bg";
             type: IMAGE;
-            description { state: "default" 0;
+            description { state: "default" 0.0;
                min: 1280 720;
                image {
                   normal: "background.jpg";
+               }
+            }
+         }
+
+/// top bar
+         part { name: "topbar/clip";
+            type: RECT;
+            description { state: "default" 0.0;
+               color: 255 255 255 255;
+               rel1 {
+                  offset: 0 -40;
+               }
+               rel2 {
+                  relative: 1.0 0.0;
+               }
+            }
+            description { state: "visible" 0.0;
+               color: 255 255 255 255;
+               rel2 {
+                  relative: 1.0 0.0;
+                  offset: -1 39;
+               }
+            }
+         }
+         part { name: "topbar/bg";
+            type: RECT;
+            clip_to: "topbar/clip";
+            description { state: "default" 0.0;
+               color: 255 0 0 100;
+               rel1.to: "topbar/clip";
+               rel2.to: "topbar/clip";
+            }
+         }
+         part { name: "topbar/title";
+            type: TEXT;
+            clip_to: "topbar/clip";
+            description { state: "default" 0.0;
+               color: FONT_COLOR;
+               rel1 {
+                  to: "topbar/clip";
+                  offset: 60 0;
+               }
+               rel2 {
+                  to: "topbar/clip";
+                  relative: 0.7 1.0;
+               }
+               text {
+                  text: "asd";
+                  font: FONT;
+                  size: FONT_SIZE;
+                  align: 0.0 0.5;
+               }
+            }
+         }
+         part { name: "topbar/clock";
+            // TODO Make the clock work
+            type: TEXT;
+            clip_to: "topbar/clip";
+            description { state: "default" 0.0;
+               color: FONT_COLOR;
+               rel1 {
+                  to: "topbar/clip";
+                  relative: 1.0 0.0;
+                  offset: -150 0;
+               }
+               rel2 {
+                  to: "topbar/clip";
+                  offset: -10 0;
+               }
+               text {
+                  text: "12:24";
+                  font: FONT;
+                  size: FONT_SIZE;
+                  align: 1.0 0.5;
                }
             }
          }
@@ -64,30 +159,11 @@ collections {
             source: "elm/flip";
             description { state: "default" 0;
                rel1 {
-                  offset: 20 35;
+                  offset: 20 50;
                }
                rel2 {
                   relative: 0.5 1;
                   offset: 0 -20;
-               }
-            }
-         }
-         part { name: "browser/cubelist/page_title";
-            type: TEXT;
-            mouse_events: 0;
-            clip_to: "browser/cubelist/clip";
-            description { state: "default" 0;
-               rel1 {
-                  offset: 20 5;
-               }
-               rel2 {
-                  offset: 0 0;
-               }
-               text {
-                  text: "YOUR TEXT HERE";
-                  font: "Sans";
-                  size: 16;
-                  align: 0 0;
                }
             }
          }
@@ -103,20 +179,6 @@ collections {
          }
 
 /// browser view: list
-         part { name: "browser/list/page_title";
-            type: TEXT;
-            mouse_events: 0;
-            clip_to: "browser/list/clip";
-            description { state: "default" 0;
-               rel1.offset: 20 5;
-               text {
-                  text: "Title";
-                  font: "Sans";
-                  size: 16;
-                  align: 0 0;
-               }
-            }
-         }
          part { name: "browser/list/genlist";
             type: EXTERNAL;
             source: "elm/genlist";
@@ -266,7 +328,7 @@ collections {
             mouse_events: 0;
             clip_to: "videoplayer/clip";
             description { state: "default" 0;
-               color: 0 0 0 255;
+               color: FONT_COLOR;
                rel1 {
                   to: "videoplayer/controls/slider";
                }
@@ -275,8 +337,8 @@ collections {
                }
                text {
                   text: "0:00:00";
-                  font: "Sans";
-                  size: 16;
+                  font: FONT;
+                  size: FONT_SIZE;
                   align: 1 0;
                }
             }
@@ -286,7 +348,7 @@ collections {
             mouse_events: 0;
             clip_to: "videoplayer/clip";
             description { state: "default" 0;
-               color: 0 0 0 255;
+               color: FONT_COLOR;
                rel1 {
                   to: "videoplayer/controls/slider";
                }
@@ -295,8 +357,8 @@ collections {
                }
                text {
                   text: "0:00:00";
-                  font: "Sans";
-                  size: 16;
+                  font: FONT;
+                  size: FONT_SIZE;
                   align: 0 0;
                }
             }
@@ -425,6 +487,13 @@ collections {
          }
       }
       programs {
+         program { name: "init";
+            signal: "load";
+            source: "";
+            script {
+               clock_cb(0);
+            }
+         }
          program { name: "mainmenu_show";
             signal: "mainmenu,show";
             source: "emc";
@@ -482,6 +551,20 @@ collections {
             action: STATE_SET "default" 0.0;
             transition: LINEAR 1.0;
             target: "browser/list/clip";
+         }
+         program { name: "topbar_show";
+            signal: "topbar,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.4;
+            target: "topbar/clip";
+         }
+         program { name: "topbar_hide";
+            signal: "topbar,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.4;
+            target: "topbar/clip";
          }
          program { name: "videoplayer_show";
             signal: "videoplayer,show";

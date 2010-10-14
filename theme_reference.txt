@@ -4,6 +4,16 @@
 
 main group: "main" TODO rename to epymc_main_layout
 
+
+### TopBar stuff
+
+ * Required parts:
+   "topbar/title" -> edje text
+
+ * Signals received from the application:
+    "topbar,show" "emc"
+    "topbar,hide" "emc"
+
 ### MainMenu stuff
 
  * Required parts:
@@ -13,21 +23,20 @@ main group: "main" TODO rename to epymc_main_layout
     "mainmenu,show" "emc"
     "mainmenu,hide" "emc"
 
-### ConfigGui stuff
 
+### Browser: CubeList View
  * Required parts:
-    "config_pager" -> elm_pager style:"slide_invisible"
+    "browser/cubelist/flip" -> elm_pager style:"slide_invisible"
+    "browser/cubelist/poster" -> edje swallow
+    "browser/cubelist/info" -> elm_anchorblock
 
  * Signals received from the application:
-    "config,show" "emc"
-    "config,hide" "emc"
+    "browser,cubelist,show" "emc"
+    "browser,cubelist,hide" "emc"
 
- 
- ### Browser: List View
-
+### Browser: List View
  * Required parts:
-    "browser/list/page_title" -> edje text
-    "browser/list/flip" -> elm_pager style:"slide_invisible"
+    "browser/list/genlist" -> elm_genlist style: "browser"
     "browser/list/poster" -> edje swallow
     "browser/list/info" -> elm_anchorblock
 
@@ -58,3 +67,14 @@ main group: "main" TODO rename to epymc_main_layout
  * Signals received from the application:
     "volume,show" "emc"
     "volume,hide" "emc"
+
+
+### ConfigGui stuff
+
+ * Required parts:
+    "config_pager" -> elm_pager style:"slide_invisible"
+
+ * Signals received from the application:
+    "config,show" "emc"
+    "config,hide" "emc"
+

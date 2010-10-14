@@ -80,13 +80,16 @@ class EmcBrowser(object):
       full = ''.join([page['title'] + ' > ' for page in self.__pages])
       full = full[0:-3]
 
+      # set topbar title
+      gui.text_set("topbar/title", full)
+      
       if self.__is_back:
-         view.page_show(full, -1)
+         view.page_show(page['title'], -1)
          self.__is_back = False
       elif len(self.__pages) < 2:
-         view.page_show(full, 0)
+         view.page_show(page['title'], 0)
       else:
-         view.page_show(full, 1)
+         view.page_show(page['title'], 1)
 
    def item_add(self, url, label):
       """
@@ -131,11 +134,13 @@ class EmcBrowser(object):
 
    def show(self):
       """ TODO Function doc """
+      gui.signal_emit("topbar,show")
       self.__pages[-1]['view'].show()
       input.listener_add('browser-NAME', self._input_event_cb) # TODO fix -NAME if more that one browser will be show at the same time
 
    def hide(self):
       """ TODO Function doc """
+      gui.signal_emit("topbar,hide")
       input.listener_del('browser-NAME')
       self.__pages[-1]['view'].hide()
 
@@ -227,7 +232,6 @@ class ViewList(object):
       """
       DBG('page show ' + str(dir))
       self.clear()
-      gui.text_set("browser/list/page_title", title)
 
    def item_add(self, url, label, parent_browser):
       """
@@ -367,7 +371,6 @@ class ViewListCube(object):
    def page_show(self, title, dir):
       """ TODO Function doc """
       DBG('page show ' + str(dir))
-      gui.text_set("browser/cubelist/page_title", title)
 
       if dir == 1:
          self.__flip.go(elementary.ELM_FLIP_CUBE_LEFT)

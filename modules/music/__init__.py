@@ -52,7 +52,10 @@ class MusicModule(EmcModule):
       mainmenu.item_add('music', 5, 'Music', None, self.cb_mainmenu)
 
       # create a browser instance
-      self.__browser = EmcBrowser()
+      self.__browser = EmcBrowser('Music', 'ListCube',
+                           item_selected_cb = self.cb_item_selected,
+                           poster_get_cb = self.cb_poster_get,
+                           info_get_cb = self.cb_info_get)
 
    def __shutdown__(self):
       DBG('Shutdown module')
@@ -76,7 +79,7 @@ class MusicModule(EmcModule):
          #TODO alert the user. and instruct how to add folders
          return
 
-      self.create_root_page()
+      self.make_root_page()
       mainmenu.hide()
       self.__browser.show()
 
@@ -98,10 +101,9 @@ class MusicModule(EmcModule):
       del self.dialog
 
       return False # kill the timer
-
-   def create_root_page(self):
-      self.__browser.page_add("music://root", "Music",
-                              item_selected_cb = self.cb_root_selected)
+### pages
+   def make_root_page(self):
+      self.__browser.page_add("music://root", "Music")
 
       self.__browser.item_add('music://artists', 'Artists')
       self.__browser.item_add('music://albums', 'Albums')
@@ -110,84 +112,105 @@ class MusicModule(EmcModule):
       self.__browser.item_add('music://playlists', 'Playlists (TODO)')
       self.__browser.item_add('emc://back', 'Back')
 
-   def cb_root_selected(self, url):
-      DBG("ROOT SEL: " + url)
+   def make_songs_list(self):
+      self.__browser.page_add('music://songs', 'Songs')
+                       #~ item_selected_cb = self.cb_song_selected,
+                       #~ info_get_cb = self.cb_song_info_get)
+      L = list()
+      for key in self.__songs_db.keys():
+         item_data = self.__songs_db.get_data(key)
+         L.append((key, item_data['title']))
 
-      if url == 'music://root':
-         self.create_root_page()
+      L.sort(key = operator.itemgetter(1))
+      for k, t in L:
+         self.__browser.item_add(k, t)
 
-      elif url == 'music://songs':
-         self.__browser.page_add(url, "Songs",
-                       item_selected_cb = self.cb_song_selected,
-                       poster_get_cb = self.cb_song_poster_get,
-                       info_get_cb = self.cb_song_info_get)
-         L = list()
-         for key in self.__songs_db.keys():
-            item_data = self.__songs_db.get_data(key)
-            L.append((key, item_data['title']))
+   def make_albums_list(self):
+      self.__browser.page_add('music://albums', 'Albums')
+                       #~ item_selected_cb = self.cb_album_selected,
+                       #~ info_get_cb = self.cb_album_info_get)
+      L = list()
+      for key in self.__albums_db.keys():
+         album_data = self.__albums_db.get_data(key)
+         label = album_data['name'] + '  by ' + album_data['artist']
+         L.append((key, label))
 
-         L.sort(key = operator.itemgetter(1))
-         for k, t in L:
-            self.__browser.item_add(k, t)
+      L.sort(key = operator.itemgetter(1))
+      for k, l in L:
+         self.__browser.item_add(k, l)
 
-      elif url == 'music://albums':
-         self.__browser.page_add(url, "Albums",
-                       item_selected_cb = self.cb_album_selected,
-                       poster_get_cb = self.cb_album_poster_get,
-                       info_get_cb = self.cb_album_info_get)
+   def make_artists_list(self):
+      self.__browser.page_add('music://artists', 'Artists')
+                       #~ item_selected_cb = self.cb_artist_selected,
+                       #~ info_get_cb = self.cb_artist_info_get)
+      L = list()
+      for key in self.__artists_db.keys():
+         artist_data = self.__artists_db.get_data(key)
+         label = artist_data['name']
+         L.append((key, label))
 
-         L = list()
-         for key in self.__albums_db.keys():
-            album_data = self.__albums_db.get_data(key)
-            label = album_data['name'] + '  by ' + album_data['artist']
-            L.append((key, label))
+      L.sort(key = operator.itemgetter(1))
+      for k, l in L:
+         self.__browser.item_add(k, l)
+### browser callback 'dispatcher'
+   def cb_item_selected(self, page_url, item_url):
+      if item_url == 'music://root':
+         self.make_root_page()
+      elif item_url == 'music://songs':
+         self.make_songs_list()
+      elif item_url == 'music://albums':
+         self.make_albums_list()
+      elif item_url == 'music://artists':
+         self.make_artists_list()
+      else:
+         if page_url == 'music://songs':
+            self.song_selected(item_url)
+         elif page_url == 'music://albums':
+            self.album_selected(item_url)
+         elif page_url == 'music://artists':
+            self.artist_selected(item_url)
 
-         L.sort(key = operator.itemgetter(1))
-         for k, l in L:
-            self.__browser.item_add(k, l)
+   def cb_poster_get(self, page_url, item_url):
+      if page_url == 'music://albums':
+         return self.album_poster_get(item_url)
+      elif page_url == 'music://songs':
+         return self.song_poster_get(item_url)
+      elif page_url == 'music://artists':
+         return self.artist_poster_get(item_url)
+      return None
 
-      elif url == 'music://artists':
-         self.__browser.page_add(url, "Artists",
-                       item_selected_cb = self.cb_artist_selected,
-                       poster_get_cb = self.cb_artist_poster_get,
-                       info_get_cb = self.cb_artist_info_get)
-
-         L = list()
-         for key in self.__artists_db.keys():
-            artist_data = self.__artists_db.get_data(key)
-            label = artist_data['name']
-            L.append((key, label))
-
-         L.sort(key = operator.itemgetter(1))
-         for k, l in L:
-            self.__browser.item_add(k, l)
-###
-   def cb_artist_selected(self, artist):
-      DBG('SELART ' + artist)
+   def cb_info_get(self, page_url, item_url):
+      if page_url == 'music://albums':
+         return self.album_info_get(item_url)
+      elif page_url == 'music://songs':
+         return self.song_info_get(item_url)
+      elif page_url == 'music://artists':
+         return self.artist_info_get(item_url)
+      return None
+### artists stuff
+   def artist_selected(self, artist):
       artist_data = self.__artists_db.get_data(artist)
-
       import pprint
       pprint.pprint(artist_data)
 
-   def cb_artist_poster_get(self, artist):
-      # TODO download artist image from somewhere
+   def artist_poster_get(self, artist):
+      # TODO implement
       return None
-
-   def cb_artist_info_get(self, artist):
+   
+   def artist_info_get(self, artist):
       artist_data = self.__artists_db.get_data(artist)
       text = '<hilight>%s</hilight><br>' % (artist_data['name'])
       text += '%d albums, %d songs' % (len(artist_data['albums']), len(artist_data['songs']))
       return text
-
-###
-   def cb_song_selected(self, url):
+### songs stuff
+   def song_selected(self, url):
       print 'SEL ' + url
       song_data = self.__songs_db.get_data(url)
 
       import pprint
       pprint.pprint(song_data)
 
-   def cb_song_poster_get(self, url):
+   def song_poster_get(self, url):
       song_data = self.__songs_db.get_data(url)
 
       # Search cover in song directory:
@@ -215,7 +238,7 @@ class MusicModule(EmcModule):
 
       return None
 
-   def cb_song_info_get(self, url):
+   def song_info_get(self, url):
       song_data = self.__songs_db.get_data(url)
       text = song_data['title'] + '<br>'
       if song_data.has_key('artist'):
@@ -228,15 +251,13 @@ class MusicModule(EmcModule):
          sec = length % 60
          text += 'duration: ' + str(min) + ':' + str(sec)  + '<br>'
       return text
-###
-   def cb_album_selected(self, album):
-      print album
+### albums stuff
+   def album_selected(self, album):
       album_data = self.__albums_db.get_data(album)
-
       import pprint
       pprint.pprint(album_data)
 
-   def cb_album_poster_get(self, album):
+   def album_poster_get(self, album):
       album_data = self.__albums_db.get_data(album)
 
       # Search cover in first-song-of-album directory:
@@ -261,7 +282,7 @@ class MusicModule(EmcModule):
 
       return None
 
-   def cb_album_info_get(self, album):
+   def album_info_get(self, album):
       album_data = self.__albums_db.get_data(album)
       text = album_data['name'] + '<br>'
       text += album_data['artist'] + '<br>'

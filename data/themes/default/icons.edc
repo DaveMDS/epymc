@@ -12,6 +12,9 @@ ICON("folder")
 ICON("close")
 ICON("back")
 
+ICON("list")
+ICON("grid")
+
 ICON("play")
 ICON("stop")
 ICON("fwd")

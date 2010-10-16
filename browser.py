@@ -22,74 +22,96 @@ class EmcBrowser(object):
    method and add items to the page using item_add(). Later you can
    create new pages or use the back(), clear(), show(), hide() methods.
 
-   TODO doc default_style and style in general
-   """
-
-   def __init__ (self, default_style = 'List'):
-      DBG('EmcBrowser __init__')
-      self.__default_style = default_style
-      self.__pages = []
-      self.__is_back = False
-
-   def page_add(self, url, title, style = 'List', item_selected_cb = None,
-                icon_get_cb = None, poster_get_cb = None, info_get_cb = None,
-                fanart_get_cb = None):
-      """
-      When you create a page you need to give at least the url and the title,
-      but you should (if needed) also attach callbacks to the page.
-
-      You can attach the following callback to a page:
-      * item_selected_cb(url):
+   At creation you can set the following callbacks:
+      * item_selected_cb(page_url, item_url):
          Called when an item is selected
-      * icon_get_cb(url):
+      * icon_get_cb(page_url, item_url):
          Called when a view need to show the icon of your item,
          must return the icon to use for the given url
-      * poster_get_cb(url):
+         TODO what icon are supported?? name? object? standard?
+      * poster_get_cb(page_url, item_url):
          Called when a view need to show the poster/cover/big_image of your
          item, must return the full path of a valid image file.
          You can also return a valid url (http://) to automatically
          download the image to a random temp file. In addition you can also
          set the destinatioon path for the give url, just use ';'.
          ex: 'http://my.url/of/the/image;/my/local/dest/path'
-      * info_get_cb(url):
+      * info_get_cb(page_url, item_url):
          Called when a view need to show the info of your item,
          must return a string with the murkupped text that describe the item
-      * fanart_get_cb(url):
+      * fanart_get_cb(page_url, item_url):
          Called when a view need to show the fanart of your item,
          must return the full path of a valid image file
+         
+   TODO doc default_style and style in general
+   """
+
+   def __init__ (self, name, default_style = 'ListCube', item_selected_cb = None,
+                  icon_get_cb = None, info_get_cb = None,
+                  poster_get_cb = None, fanart_get_cb = None):
+
+      DBG('EmcBrowser __init__')
+      self.__name = name
+      self.__default_style = default_style
+      self.__item_selected_cb = item_selected_cb
+      self.__icon_get_cb = icon_get_cb
+      self.__info_get_cb = info_get_cb
+      self.__poster_get_cb = poster_get_cb
+      self.__fanart_get_cb = fanart_get_cb
+      
+      self.__pages = []
+      self.__current_view = None
+      self.__is_back = False
+      self.__is_refresh = False
+
+   def page_add(self, url, title, style = None):
       """
-      print "Browser(%d): page add '%s' '%s'" % (len(self.__pages), title, url)
-      if not style: style = self.__default_style
+      When you create a page you need to give at least the url and the title
+      """
 
-      if not _views.has_key(style):
-         DBG('Create view: ' + style)
-         view = ViewListCube() # TODO eval here
-         _views[style] = view
+      # create a new page data (if not a refresh operation)
+      if self.__is_refresh:
+         view = self.__pages[-1]['view']
       else:
-         DBG('View exists: ' + style)
-         view = _views[style]
+         # choose the style/view of the new page
+         if not style: style = self.__default_style
+         #~ if len(self.__pages) > 1: style = 'List'
+         view = self._create_or_get_view(style)
+         
+         # record the new page info in the __pages list
+         self.__pages.append( {'view': view, 'url': url, 'title': title} )
 
-      self.__pages.append({'view': view, 'url': url, 'title': title,
-                           'item_selected_cb': item_selected_cb,
-                           'icon_get_cb': icon_get_cb,
-                           'poster_get_cb': poster_get_cb,
-                           'info_get_cb': info_get_cb,
-                           'fanart_get_cb': fanart_get_cb})
-
-
-      full = ''.join([page['title'] + ' > ' for page in self.__pages])
-      full = full[0:-3]
+      # first time, we don't have a current_view, set it
+      if not self.__current_view:
+         self.__current_view = view
 
       # set topbar title
+      full = ''.join([page['title'] + ' > ' for page in self.__pages])
+      full = full[0:-3]
       gui.text_set("topbar/title", full)
-      
-      if self.__is_back:
-         view.page_show(page['title'], -1)
-         self.__is_back = False
-      elif len(self.__pages) < 2:
-         view.page_show(page['title'], 0)
+
+      # same style for the 2 pages, ask the view to perform the correct animation
+      if (view == self.__current_view):
+         if self.__is_back:
+            view.page_show(page['title'], -1)
+         elif len(self.__pages) < 2:
+            view.page_show(page['title'], 0)
+         else:
+            view.page_show(page['title'], 1)
       else:
-         view.page_show(page['title'], 1)
+         # different style...hide one and show the other
+         self.__current_view.clear()
+         self.__current_view.hide()
+         view.page_show(page['title'], 0)
+         view.show()
+
+      # update state
+      self.__current_view = view
+      self.__is_refresh = False
+      self.__is_back = False
+
+      # just for debug
+      self._dump_all()
 
    def item_add(self, url, label):
       """
@@ -109,24 +131,48 @@ class EmcBrowser(object):
 
    def back(self):
       """ TODO Function doc """
+      
+      # discard current page
+      self.__pages.pop()
 
-      if len(self.__pages) == 1:
+      # no more page to go back, hide view and return to main menu
+      if len(self.__pages) <= 0:
          self.hide()
+         self.__current_view.clear()
          mainmenu.show()
-         self.__pages[0]['view'].clear()
-         self.__pages.pop()
          return
 
       self.__is_back = True
 
+      # discard previous also, will recreate...
       page_data = self.__pages.pop()
-      #~ print page_data
 
-      page_data2 = self.__pages.pop()
-      #~ print page_data2
+      # recreate the page
+      parent_url = self.__pages[-1]['url'] if len(self.__pages) > 1 else None
+      func = self.__item_selected_cb
+      if func: func(parent_url, page_data['url'])
 
-      func = page_data2['item_selected_cb']
-      if func: func(page_data2['url'])
+   def change_style(self, style):
+      DBG('Change to view: ' + style)
+
+      view = self._create_or_get_view(style)
+      
+      # change only if needed
+      if view == self.__current_view: return
+
+      # clear & hide the current view
+      self.__current_view.clear()
+      self.__current_view.hide()
+
+      # set the new view in the current (always the last) page
+      self.__pages[-1]['view'] = view
+
+      # ask to recreate the page
+      self.__is_refresh = True
+      page_url = self.__pages[-1]['url']
+      parent_url = self.__pages[-2]['url'] if len(self.__pages) > 1 else None
+      func = self.__item_selected_cb
+      if func: func(parent_url, page_url)
 
    def clear(self):
       """ TODO Function doc """
@@ -135,22 +181,50 @@ class EmcBrowser(object):
    def show(self):
       """ TODO Function doc """
       gui.signal_emit("topbar,show")
-      self.__pages[-1]['view'].show()
-      input.listener_add('browser-NAME', self._input_event_cb) # TODO fix -NAME if more that one browser will be show at the same time
+      self.__current_view.show()
+      input.listener_add('browser-' + self.__name, self._input_event_cb)
 
    def hide(self):
       """ TODO Function doc """
       gui.signal_emit("topbar,hide")
-      input.listener_del('browser-NAME')
-      self.__pages[-1]['view'].hide()
+      input.listener_del('browser-' + self.__name)
+      self.__current_view.hide()
 
    def _input_event_cb(self, event):
 
       if event == "BACK":
          self.back()
-         return input.EVENT_BLOCK
+      elif event == 'VIEW_LIST':
+         self.change_style("List")
+      elif event == 'VIEW_GRID':
+         self.change_style("Grid")
+      elif event == 'VIEW_CUBE':
+         self.change_style("ListCube")
+      else:
+         return self.__current_view.input_event_cb(event)
 
-      return self.__pages[-1]['view'].input_event_cb(event)
+      return input.EVENT_BLOCK
+
+   def _create_or_get_view(self, view_name):
+      if _views.has_key(view_name):
+         DBG('View exists: ' + view_name)
+         return _views[view_name]
+      # call the constructor of the given class style ex: ViewList()
+      DBG('Create view: ' + view_name)
+      _views[view_name] = eval('View' + view_name + '()')
+      return _views[view_name]
+
+   def _dump_all(self):
+      DBG('*' * 70)
+      DBG('*' * 70)
+      DBG('name: ' + self.__name + '  pages: ' + str(len(self.__pages)));
+      for p in self.__pages:
+         DBG('page: ' + str(p));
+      DBG('current view: ' + str(self.__current_view))
+      DBG('*' * 70)
+      for v in _views:
+         DBG('view: ' + str(v));
+      DBG('*' * 70)
 
    # Stuff for Views
    def _item_selected(self, url):
@@ -159,8 +233,8 @@ class EmcBrowser(object):
          if url.endswith("//back"):
             self.back()
       else:
-         func = self.__pages[-1]['item_selected_cb']
-         if func: func(url)
+         func = self.__item_selected_cb
+         if func: func(self.__pages[-1]["url"], url)
 
    def _icon_get(self, url):
       """ TODO Function doc """
@@ -168,21 +242,21 @@ class EmcBrowser(object):
          if url.endswith('/back'):
             return gui.load_icon('icon/back')
         
-      func = self.__pages[-1]['icon_get_cb']
+      func = self.__icon_get_cb
       if not func: return None
-      icon = func(url)
+      icon = func(self.__pages[-1]["url"], url)
       if not icon: return None
       return gui.load_icon(icon)
 
    def _poster_get(self, url):
       """ TODO Function doc """
-      func = self.__pages[-1]['poster_get_cb']
-      return func(url) if func else None
+      func = self.__poster_get_cb
+      return func(self.__pages[-1]["url"], url) if func else None
 
    def _info_get(self, url):
       """ TODO Function doc """
-      func = self.__pages[-1]['info_get_cb']
-      return func(url) if func else None
+      func = self.__info_get_cb
+      return func(self.__pages[-1]["url"], url) if func else None
 
 
 ################################################################################
@@ -324,7 +398,6 @@ class ViewList(object):
       anchorblock.text_set(info if info else "")
 
 
-
 ################################################################################
 #### Cube List View ############################################################
 ################################################################################
@@ -341,7 +414,7 @@ class ViewListCube(object):
 
       # front list
       fl = elementary.Genlist(gui._win)
-      fl.style_set("browser")
+      #~ fl.style_set("browser") TODO uncomment
       fl.callback_clicked_add(self._cb_item_selected)
       fl.callback_selected_add(self._cb_item_hilight)
       self.__flip.content_front_set(fl)
@@ -350,7 +423,7 @@ class ViewListCube(object):
 
       # back list
       bl = elementary.Genlist(gui._win)
-      bl.style_set("browser")
+      #~ bl.style_set("browser") TODO uncomment
       bl.callback_clicked_add(self._cb_item_selected)
       bl.callback_selected_add(self._cb_item_hilight)
       self.__flip.content_back_set(bl)
@@ -478,3 +551,36 @@ class ViewListCube(object):
          self.__bl.clear()
       else:
          self.__fl.clear()
+
+
+################################################################################
+#### Grid View  ################################################################
+################################################################################
+class ViewGrid(object):
+   def __init__(self):
+      """ TODO Function doc """
+      DBG('Init view: grid')
+      gd = elementary.Gengrid(gui._win)
+      gd.show()
+
+      gui.swallow_set("browser/grid/gengrid", gd)
+
+   def page_show(self, title, dir):
+      pass
+
+   def item_add(self, url, label, parent_browser):
+      pass
+
+   def show(self):
+      gui.signal_emit("browser,grid,show")
+
+   def hide(self):
+       gui.signal_emit("browser,grid,hide")
+
+   def clear(self):
+      pass
+
+   def input_event_cb(self, event):
+      return input.EVENT_CONTINUE
+
+      

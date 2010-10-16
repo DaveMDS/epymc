@@ -51,6 +51,29 @@ def init_window():
    win.show()
 
    part_get('volume/slider').callback_changed_add(_cb_volume_slider_changed)
+
+
+   # fill view buttons box in topbar
+   bt = elementary.Button(win)
+   bt.icon_set(load_icon('icon/list'))
+   bt.callback_clicked_add(_cb_btn_view_list)
+   ly.edje_get().part_box_append('topbar/box', bt)
+   bt.show()
+
+   bt = elementary.Button(win)
+   bt.icon_set(load_icon('icon/grid'))
+   bt.callback_clicked_add(_cb_btn_view_grid)
+   ly.edje_get().part_box_append('topbar/box', bt)
+   bt.show()
+
+   bt = elementary.Button(win)
+   #~ bt.icon_set(load_icon('icon/grid'))
+   bt.label_set('cube')
+   bt.callback_clicked_add(_cb_btn_view_cube)
+   ly.edje_get().part_box_append('topbar/box', bt)
+   bt.show()
+
+
    ##TESTING
    #~ im = EmcRemoteImage(win)
    #~ im.url_set("http://hwcdn.themoviedb.org/posters/900/4bc95e22017a3c57fe02a900/wanted-thumb.jpg")
@@ -58,6 +81,15 @@ def init_window():
    #~ im.move(100,200)
    #~ im.show()
    ##
+
+def _cb_btn_view_list(btn):
+   input.event_emit("VIEW_LIST")
+
+def _cb_btn_view_grid(btn):
+   input.event_emit("VIEW_GRID")
+
+def _cb_btn_view_cube(btn):
+   input.event_emit("VIEW_CUBE")
 
 def load_icon(icon):
    """

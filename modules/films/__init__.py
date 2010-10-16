@@ -49,7 +49,10 @@ class FilmsModule(EmcModule):
       mainmenu.item_add('film', 10, 'Films', None, self.cb_mainmenu)
 
       # create a browser instance
-      self.__browser = EmcBrowser()
+      self.__browser = EmcBrowser('Films', 'ListCube',
+                              item_selected_cb = self.cb_url_selected,
+                              icon_get_cb = self.cb_icon_get,
+                              poster_get_cb = self.cb_poster_get)
 
    def __shutdown__(self):
       DBG('Shutdown module')
@@ -78,9 +81,7 @@ class FilmsModule(EmcModule):
       self.__browser.show()
 
    def create_root_page(self):
-      self.__browser.page_add("film://root", "Films",
-                              item_selected_cb = self.cb_url_selected,
-                              icon_get_cb = self.cb_icon_get)
+      self.__browser.page_add("film://root", "Films")
 
       if len(self.__folders) == 1:
          print "TODO skip first page"
@@ -89,32 +90,29 @@ class FilmsModule(EmcModule):
          self.__browser.item_add(f, os.path.basename(f))
       self.__browser.item_add('emc://back', "back")
 
-   def cb_url_selected(self, url):
-      if url.startswith("file://"):
-         path = url[7:]
+   def cb_url_selected(self, page_url, item_url):
+      if item_url.startswith("file://"):
+         path = item_url[7:]
          if os.path.isdir(path):
-            self.__browser.page_add(url, os.path.basename(path),
-                              item_selected_cb = self.cb_url_selected,
-                              icon_get_cb = self.cb_icon_get,
-                              poster_get_cb = self.cb_poster_get)
+            self.__browser.page_add(item_url, os.path.basename(path))
             for f in os.listdir(path):
                self.__browser.item_add("file://" + path + "/" + f, f)
             self.__browser.item_add("emc://back", "back")
          else:
-            self.show_film_info(url)
+            self.show_film_info(item_url)
 
-      elif url == "film://root":
+      elif item_url == "film://root":
          self.create_root_page()
 
 
-   def cb_icon_get(self, url):
-      if self.__film_db.id_exists(url):
+   def cb_icon_get(self, page_url, item_url):
+      if self.__film_db.id_exists(item_url):
          return None
       return "icon/folder"
 
-   def cb_poster_get(self, url):
-      if self.__film_db.id_exists(url):
-         e = self.__film_db.get_data(url)
+   def cb_poster_get(self, page_url, item_url):
+      if self.__film_db.id_exists(item_url):
+         e = self.__film_db.get_data(item_url)
          poster = get_poster_filename(e['id'])
          if os.path.exists(poster):
             return poster

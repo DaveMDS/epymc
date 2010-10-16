@@ -30,7 +30,11 @@ class MameModule(EmcModule):
       DBG('Init module')
       mainmenu.item_add("mame", 50, "M.A.M.E", None, self.__cb_mainmenu)
 
-      self.__browser = EmcBrowser()
+      self.__browser = EmcBrowser('MAME',
+                       item_selected_cb = self.__cb_item_selected,
+                       poster_get_cb = self.__cb_poster_get,
+                       info_get_cb = self.__cb_info_get)
+
       # Aquire mame dirs from the command 'sdlmame -showconfig' TODO this shuold be done later...
       exe = ecore.Exe("sdlmame -showconfig | grep -e snapshot_directory -e rompath",
                      ecore.ECORE_EXE_PIPE_READ |
@@ -94,27 +98,15 @@ class MameModule(EmcModule):
 
 
    def create_root_page(self):
-      self.__browser.page_add('mame://root', "M.A.M.E",
-                              item_selected_cb = self.__cb_root_selected)
+      self.__browser.page_add('mame://root', "M.A.M.E")
       self.__browser.item_add('mame://mygames', "My Games")
       self.__browser.item_add('mame://allgames', "All Games")
       self.__browser.item_add('mame://favgames', "Favorite Games")
       self.__browser.item_add('emc://back', "Back")
 
-
-   def __cb_root_selected(self, url):
-      """ Item selected in root page """
-      if url == "mame://root": self.create_root_page()
-      elif url == "mame://mygames": self.my_games_list()
-      elif url == "mame://allgames": self.all_games_list()
-      elif url == "mame://favgames": self.fav_games_list()
-
    def my_games_list(self):
       """ Create the list of personal games """
-      self.__browser.page_add('my_games', "My Games",
-                       item_selected_cb = self.__cb_game_selected,
-                       poster_get_cb = self.__cb_poster_get,
-                       info_get_cb = self.__cb_info_get)
+      self.__browser.page_add('my_games', "My Games")
 
       print "ROMS " + str(self.__rompaths)
       L = list()
@@ -133,10 +125,7 @@ class MameModule(EmcModule):
 
    def all_games_list(self):
       """ Create the list of all know mame games """
-      self.__browser.page_add('all_games', "All Games",
-                         item_selected_cb = self.__cb_game_selected,
-                         poster_get_cb = self.__cb_poster_get,
-                         info_get_cb = self.__cb_info_get)
+      self.__browser.page_add('all_games', "All Games")
 
       L = list()
       for id, game in self.__games.items():
@@ -151,18 +140,18 @@ class MameModule(EmcModule):
    def fav_games_list(self):
       print ' - Favorite Games'
 
-   def __cb_info_get(self, url):
-      if not self.__games.has_key(url): return None
-      game = self.__games[url]
+   def __cb_info_get(self, page_url, item_url):
+      if not self.__games.has_key(item_url): return None
+      game = self.__games[item_url]
       if len(game) < 2: # at the start only one element in the dict (the name)
          # get game info from the command: sdlmame -listxml <id>
          # TODO use a better/portable way (but not async)
-         os.system('sdlmame -listxml ' + url + ' > /tmp/PyEmc__MAME_tmp')
+         os.system('sdlmame -listxml ' + item_url + ' > /tmp/PyEmc__MAME_tmp')
 
          # parse the xml file
          doc = xml.dom.minidom.parse('/tmp/PyEmc__MAME_tmp')
          game_node = doc.getElementsByTagName('game')[0]
-         if game_node.getAttribute('name') != url: return None
+         if game_node.getAttribute('name') != item_url: return None
 
          game['year'] = self.__getTextFromXml(game_node.getElementsByTagName('year'))
          game['manufacturer'] = self.__getTextFromXml(game_node.getElementsByTagName('manufacturer'))
@@ -204,11 +193,11 @@ class MameModule(EmcModule):
                rc.append(child.data)
       return ''.join(rc)
 
-   def __cb_poster_get(self, url):
-      if not self.__games.has_key(url): return None
+   def __cb_poster_get(self, page_url, item_url):
+      if not self.__games.has_key(item_url): return None
 
       # check local snapshot...
-      snap_file = os.path.join(self.__snapshoot_dir, url, '0000.png')
+      snap_file = os.path.join(self.__snapshoot_dir, item_url, '0000.png')
       if os.path.isfile(snap_file):
          return snap_file
 
@@ -216,24 +205,28 @@ class MameModule(EmcModule):
       snap_url = 'http://www.progettoemma.net/snap/%s/0000.png' % url
       return snap_url + ';' + snap_file
 
-   def __cb_game_selected(self, id):
-      """ A game has been selected, run it """
-      print "GAME RUN: " + id
+   def __cb_item_selected(self, page_url, item_url):
 
-      zip = None
-      for dir in self.__rompaths:
-         print "DIR" + dir
-         path = os.path.join(dir, id) + '.zip'
-         if os.path.isfile(path):
-            zip = path
-         #~ id = rom.strip(".zip")
-            #~ if id and self.__games.has_key(id):
-               #~ self.__browser.item_add(id, self.__games[id]['name'])
-
-      if zip:
-         os.system('sdlmame ' + zip)
+      if item_url == "mame://root": self.create_root_page()
+      elif item_url == "mame://mygames": self.my_games_list()
+      elif item_url == "mame://allgames": self.all_games_list()
+      elif item_url == "mame://favgames": self.fav_games_list()
       else:
-         self.download_game(id)
+         print "GAME RUN: " + item_url
+         zip = None
+         for dir in self.__rompaths:
+            print "DIR" + dir
+            path = os.path.join(dir, item_url) + '.zip'
+            if os.path.isfile(path):
+               zip = path
+            #~ id = rom.strip(".zip")
+               #~ if id and self.__games.has_key(id):
+                  #~ self.__browser.item_add(id, self.__games[id]['name'])
+
+         if zip:
+            os.system('sdlmame ' + zip)
+         else:
+            self.download_game(item_url)
 
    def download_game(self, id):
       print 'Download ' + id

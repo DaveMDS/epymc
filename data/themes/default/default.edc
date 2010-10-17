@@ -107,7 +107,7 @@ collections {
          }
 
 /// browser view: list
-         part { name: "browser/list/genlist";
+         part { name: "browser/list/genlist1";
             type: EXTERNAL;
             source: "elm/genlist";
             clip_to: "browser/list/clip";
@@ -119,6 +119,22 @@ collections {
                rel2 {
                   relative: 0.5 1;
                   offset: 0 -20;
+               }
+            }
+         }
+         part { name: "browser/list/genlist2";
+            type: EXTERNAL;
+            source: "elm/genlist";
+            clip_to: "browser/list/clip";
+            description { state: "default" 0;
+               color: 255 0 255 100;
+               rel1 {
+                  to: "browser/list/genlist1";
+                  relative: 1.0 0.0;
+               }
+               rel2 {
+                  to: "browser/list/genlist1";
+                  relative: 2.0 1.0;
                }
             }
          }

@@ -575,6 +575,7 @@ class ViewGrid(object):
                                        state_get_func=self.gg_state_get,
                                        del_func=self.gg_del)
       gg = elementary.Gengrid(gui._win)
+      gg.style_set("browser")
       gg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       gg.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       gg.horizontal_set(False)

@@ -12,6 +12,7 @@ externals {
 #define FONT_BOLD "Sans:style=Bold"
 #define FONT_SIZE 16
 #define FONT_COLOR 255 255 255 255
+#define FONT_COLOR3 0 0 0 64
 
 collections {
 

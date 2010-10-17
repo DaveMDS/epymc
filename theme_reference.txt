@@ -44,6 +44,15 @@ main group: "main" TODO rename to epymc_main_layout
     "browser,list,show" "emc"
     "browser,list,hide" "emc"
 
+### Browser: Grid View
+ * Required parts:
+    "browser/grid/gengrid" -> edje swallow
+    "browser/grid/title" -> edje text part
+
+ * Signals received from the application:
+    "browser,grid,show" "emc"
+    "browser,grid,hide" "emc"
+
 ### Video Player
 
  * Required parts:

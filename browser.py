@@ -6,14 +6,25 @@ import elementary
 import gui
 import mainmenu
 import input
-
-
-_views = {}  # key = view_name  value = view class instance
-_style_memory = {}  # key = page url  value = style name
+from sdb import EmcDatabase
 
 def DBG(msg):
    print ('BROWSER: ' + msg)
    pass
+
+
+_views = {}  # key = view_name  value = view class instance
+_memorydb = None  # EmcDatabase  key = page url  value = style name
+
+
+def init():
+   global _memorydb
+   _memorydb = EmcDatabase('broser_view_memory')
+
+def shutdown():
+   global _memorydb
+   del _memorydb
+
 
 class EmcBrowser(object):
    """
@@ -66,6 +77,12 @@ class EmcBrowser(object):
       self.is_back = False
       self.is_refresh = False
 
+   def _search_style_in_parent(self):
+      for p in self.pages:
+         if _memorydb.id_exists(p['url']):
+            return _memorydb.get_data(p['url'])
+      return None
+      
    def page_add(self, url, title, style = None):
       """
       When you create a page you need to give at least the url and the title
@@ -75,15 +92,18 @@ class EmcBrowser(object):
       if self.is_refresh:
          view = self.pages[-1]['view']
       else:
-         # choose the style/view of the new page
-         if _style_memory.has_key(url):
-            style = _style_memory[url]
-         # TODO search also in parent pages
-         elif not style:
+         # choose the style of the new page
+         if _memorydb.id_exists(url):
+            style = _memorydb.get_data(url)
+         else:
+            style = self._search_style_in_parent()
+         if not style:
             style = self.default_style
+
+         # get the correct view instance
          view = self._create_or_get_view(style)
          
-         # record the new page info in the pages list
+         # append the new page info in the pages list
          self.pages.append( {'view': view, 'url': url, 'title': title} )
 
       # first time, we don't have a current_view, set it
@@ -116,7 +136,7 @@ class EmcBrowser(object):
       self.is_back = False
 
       # just for debug
-      self._dump_all()
+      #~ self._dump_all()
 
    def item_add(self, url, label):
       """
@@ -156,6 +176,7 @@ class EmcBrowser(object):
       if func: func(parent_url, page_data['url'])
 
    def change_style(self, style):
+
       view = self._create_or_get_view(style)
       
       # change only if needed
@@ -170,8 +191,9 @@ class EmcBrowser(object):
       self.pages[-1]['view'] = view
 
       # remember the user choice
+      global _memorydb
       page_url = self.pages[-1]['url']
-      _style_memory[page_url] = style
+      _memorydb.set_data(page_url, style)
 
       # ask to recreate the page
       self.is_refresh = True

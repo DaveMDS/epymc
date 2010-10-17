@@ -15,6 +15,7 @@ import mainmenu
 import ini
 import sdb
 import downloader
+import browser
 
 
 if __name__ == "__main__":
@@ -32,6 +33,7 @@ if __name__ == "__main__":
    # init stuff
    downloader.init()
    sdb.init()
+   browser.init()
    gui.init_window()
    config_gui.init()
    mainmenu.init()
@@ -49,6 +51,7 @@ if __name__ == "__main__":
    # shutdown
    modules.shutdown_all()
    ini.write_to_file(os.path.join(user_config_dir, 'epymc.conf'))
+   browser.shutdown()
    sdb.shutdown()
    downloader.shutdown()
    elementary.shutdown()

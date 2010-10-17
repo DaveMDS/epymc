@@ -48,7 +48,6 @@ collections {
             }
          }
 
-
 /// browser view: cubelist
          part { name: "browser/cubelist/info";
             type: EXTERNAL;
@@ -115,7 +114,7 @@ collections {
             description { state: "default" 0;
                color: 255 0 255 100;
                rel1 {
-                  offset: 20 35;
+                  offset: 20 50;
                }
                rel2 {
                   relative: 0.5 1;
@@ -200,7 +199,6 @@ collections {
             }
          }
 
-
 /// browser top bar
          part { name: "topbar/clip";
             type: RECT;
@@ -230,6 +228,27 @@ collections {
                rel2.to: "topbar/clip";
             }
          }
+         part { name: "topbar/home_icon";
+            type: IMAGE;
+            clip_to: "topbar/clip";
+            description { state: "default" 0.0;
+               color: 255 255 255 200;
+               rel1 {
+                  to: "topbar/clip";
+                  offset: 20 10;
+               }
+               rel2 {
+                  to: "topbar/clip";
+                  relative: 0.0 1.0;
+                  offset: 55 -10;
+               }
+               image {
+                  normal: "icon_home.png";
+               }
+               aspect: 1 1;
+               
+            }
+         }
          part { name: "topbar/title";
             type: TEXT;
             clip_to: "topbar/clip";
@@ -247,7 +266,7 @@ collections {
                   text: "asd";
                   font: FONT;
                   size: FONT_SIZE;
-                  align: 0.0 0.5;
+                  align: 0.0 0.7;
                }
             }
          }
@@ -296,7 +315,6 @@ collections {
                }
             }
          }
-
 
 /// mainmenu
          part { name: "mainmenu/list";

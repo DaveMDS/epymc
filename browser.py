@@ -111,7 +111,7 @@ class EmcBrowser(object):
          self.current_view = view
 
       # set topbar title
-      full = ''.join([page['title'] + ' > ' for page in self.pages])
+      full = '> ' + ''.join([page['title'] + ' > ' for page in self.pages])
       full = full[0:-3]
       gui.text_set("topbar/title", full)
 

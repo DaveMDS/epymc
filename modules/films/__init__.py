@@ -49,7 +49,7 @@ class FilmsModule(EmcModule):
       mainmenu.item_add('film', 10, 'Films', None, self.cb_mainmenu)
 
       # create a browser instance
-      self.__browser = EmcBrowser('Films', 'ListCube',
+      self.__browser = EmcBrowser('Films', 'List',
                               item_selected_cb = self.cb_url_selected,
                               icon_get_cb = self.cb_icon_get,
                               poster_get_cb = self.cb_poster_get)

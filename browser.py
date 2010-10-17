@@ -78,7 +78,7 @@ class EmcBrowser(object):
       self.is_refresh = False
 
    def _search_style_in_parent(self):
-      for p in self.pages:
+      for p in reversed(self.pages):
          if _memorydb.id_exists(p['url']):
             return _memorydb.get_data(p['url'])
       return None

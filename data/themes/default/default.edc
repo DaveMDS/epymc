@@ -168,7 +168,23 @@ collections {
             clip_to: "browser/grid/clip";
             description { state: "default" 0;
                color: 255 255 255 100;
+               rel1.offset: 0 100;
+            }
+         }
+         part { name: "browser/grid/title";
+            type: TEXT;
+            clip_to: "browser/grid/clip";
+            effect: FAR_SOFT_SHADOW;
+            description { state: "default" 0;
+               color: 200 200 200 255;
+               color3: 50 50 50 100;
                rel1.offset: 0 40;
+               rel2.relative: 1.0 0.0;
+               rel2.offset: 0 100;
+               text {
+                  font: FONT_BOLD;
+                  size: 40;
+               }
             }
          }
          part { name: "browser/grid/clip";

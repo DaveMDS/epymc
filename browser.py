@@ -560,27 +560,101 @@ class ViewGrid(object):
    def __init__(self):
       """ TODO Function doc """
       DBG('Init view: grid')
-      gd = elementary.Gengrid(gui._win)
-      gd.show()
 
-      gui.swallow_set("browser/grid/gengrid", gd)
+      self.itc = elementary.GengridItemClass(item_style="default",
+                                       label_get_func=self.gg_label_get,
+                                       icon_get_func=self.gg_icon_get,
+                                       state_get_func=self.gg_state_get,
+                                       del_func=self.gg_del)
+
+      gg = elementary.Gengrid(gui._win)
+      gg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      gg.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+      gg.horizontal_set(False)
+      gg.bounce_set(False, True)
+      gg.item_size_set(150, 150)
+      gg.align_set(0.5, 0.0)
+      gg.callback_selected_add(self.gg_higlight)
+      gg.callback_clicked_add(self.gg_selected)
+      gui.swallow_set("browser/grid/gengrid", gg)
+      self.gg = gg
 
    def page_show(self, title, dir):
-      pass
+      gui.text_set("browser/grid/title", title)
 
    def item_add(self, url, label, parent_browser):
-      pass
+      item_data = (url, label, parent_browser)
+      it = self.gg.item_append(self.itc, item_data)
+      if not self.gg.selected_item_get():
+         it.selected_set(True)
 
    def show(self):
       gui.signal_emit("browser,grid,show")
 
    def hide(self):
-       gui.signal_emit("browser,grid,hide")
+      gui.signal_emit("browser,grid,hide")
 
    def clear(self):
-      pass
+      self.gg.clear()
 
    def input_event_cb(self, event):
+      item = self.gg.selected_item_get()
+      (url, label, parent_browser) = item.data_get()
+
+      if event == "RIGHT":
+         # TODO FIX DOUBLE MOVE
+         # elm_focus_highlight_enable_set(Eina_Bool enable); ????
+         # elm_object_focus_allow_set
+         next = item.next_get()
+         if next:
+            next.selected_set(1)
+            next.bring_in()
+            return input.EVENT_BLOCK
+
+      elif event == "LEFT":
+         prev = item.prev_get()
+         if prev:
+            prev.selected_set(1)
+            prev.bring_in()
+            return input.EVENT_BLOCK
+
+      elif event == "UP":
+         (x, y) = item.pos_get()
+         # TODO
+         return input.EVENT_BLOCK
+
+      elif event == "DOWN":
+         (x, y) = item.pos_get()
+         # TODO
+         return input.EVENT_BLOCK
+
+      elif event == "OK":
+         parent_browser._item_selected(url)
+         return input.EVENT_BLOCK
+
       return input.EVENT_CONTINUE
 
-      
+   # gengrid model
+   def gg_label_get(self, obj, part, item_data):
+      (url, label, parent_browser) = item_data
+      return label
+
+   def gg_icon_get(self, obj, part, data):
+      if part == 'elm.swallow.icon':
+         (url, label, parent_browser) = data
+         return parent_browser._icon_get(url)
+      return None
+
+   def gg_state_get(self, obj, part, item_data):
+      return False
+
+   def gg_del(self, obj, item_data):
+      pass
+
+   # gengrid callbacks
+   def gg_higlight(self, gg, item, *args, **kwargs):
+      pass
+
+   def gg_selected(self, gg, item, *args, **kwargs):
+      (url, label, parent_browser) = item.data_get()
+      parent_browser._item_selected(url)

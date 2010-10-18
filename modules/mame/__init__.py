@@ -169,16 +169,16 @@ class MameModule(EmcModule):
          game['driver_savestate'] = driver_node.getAttribute('savestate')
          doc.unlink()
 
-      text = 'Year: %s<br>' \
-             'Manufacturer: %s<br>' \
-             'Players: %s<br>' \
-             'Buttons: %s<br>' \
-             'Savestate: %s<br>' \
-             'Driver status: %s<br>' \
-             '   emulation: %s<br>' \
-             '   color: %s<br>' \
-             '   sound: %s<br>' \
-             '   graphic: %s<br>' % \
+      text = '<hilight>Year:</> %s<br>' \
+             '<hilight>Manufacturer:</> %s<br>' \
+             '<hilight>Players:</> %s<br>' \
+             '<hilight>Buttons:</> %s<br>' \
+             '<hilight>Savestate:</> %s<br>' \
+             '<hilight>Driver status:</> %s<br>' \
+             '   <hilight>emulation:</> %s<br>' \
+             '   <hilight>color:</> %s<br>' \
+             '   <hilight>sound:</> %s<br>' \
+             '   <hilight>graphic:</> %s<br>' % \
              (game['year'], game['manufacturer'], game['players'],
               game['buttons'], game['driver_savestate'], game['driver_status'],
               game['driver_emulation'], game['driver_color'],

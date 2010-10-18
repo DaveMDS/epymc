@@ -295,9 +295,9 @@ class EmcBrowser(object):
 class ViewList(object):
    """
    This is the basic view, it use a genlist to show items and have a
-   poster and a short info on the right. No animation is done when
-   changing page.
-   This view is the reference one with all the documentation, can be
+   poster and a short info on the right. 2 genlist are used to perform
+   animation between the page.
+   This view is the reference one with all the documentation, can be also
    used as a starting base for new views.
    """
 
@@ -305,13 +305,16 @@ class ViewList(object):
    def __init__(self):
       """
       This is the init founction for the view, it is called one time only
-      when the view is needed for the first time.
+      when the view is needed for the first time. Here you must do your
+      initialization stuff.
       """
       DBG('Init view: plain list')
 
       # EXTERNAL Genlist1
       self.gl1 = gui.part_get('browser/list/genlist1')
       self.gl1.style_set("browser")
+      self.gl1.homogeneous_set(True)
+      self.gl1.always_select_mode_set(True)
       self.gl1.callback_clicked_add(self._cb_item_selected)
       self.gl1.callback_selected_add(self._cb_item_hilight)
       self.current_list = self.gl1
@@ -319,6 +322,8 @@ class ViewList(object):
       # EXTERNAL Genlist2
       self.gl2 = gui.part_get('browser/list/genlist2')
       self.gl2.style_set("browser")
+      self.gl2.homogeneous_set(True)
+      self.gl2.always_select_mode_set(True)
       self.gl2.callback_clicked_add(self._cb_item_selected)
       self.gl2.callback_selected_add(self._cb_item_hilight)
 
@@ -327,6 +332,10 @@ class ViewList(object):
                                  label_get_func = self.__genlist_label_get,
                                  icon_get_func = self.__genlist_icon_get,
                                  state_get_func = self.__genlist_state_get)
+
+      # EXTERNAL info anchorblock
+      self.infoblock = gui.part_get('browser/list/info') # TODO rename in ../infoblock
+      self.infoblock.style_set("browser")
 
       # RemoteImage (poster)
       self.__im = gui.EmcRemoteImage(gui._win)
@@ -342,18 +351,16 @@ class ViewList(object):
       You can use the 'dir' param to perform the correct animation if needed
       """
       DBG('page show ' + str(dir))
-      
-      if dir == 1: # forward
+
+      if (dir != 0):
          if self.current_list == self.gl1:
             self.current_list = self.gl2
          else:
             self.current_list = self.gl1
+
+      if dir == 1:
          gui.signal_emit('browser,list,flip_left')
-      elif dir == -1: # back
-         if self.current_list == self.gl1:
-            self.current_list = self.gl2
-         else:
-            self.current_list = self.gl1
+      elif dir == -1:
          gui.signal_emit('browser,list,flip_right')
 
       self.current_list.clear()
@@ -446,8 +453,7 @@ class ViewList(object):
 
       # Fill the anchorblock with item info info 
       info = parent_browser._info_get(url)
-      anchorblock = gui.part_get('browser/list/info')
-      anchorblock.text_set(info if info else "")
+      self.infoblock.text_set(info if info else "")
 
 
 ################################################################################

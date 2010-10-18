@@ -199,7 +199,7 @@ class MusicModule(EmcModule):
    
    def artist_info_get(self, artist):
       artist_data = self.__artists_db.get_data(artist)
-      text = '<hilight>%s</hilight><br>' % (artist_data['name'])
+      text = '<hilight>%s</><br>' % (artist_data['name'])
       text += '%d albums, %d songs' % (len(artist_data['albums']), len(artist_data['songs']))
       return text
 ### songs stuff
@@ -240,9 +240,9 @@ class MusicModule(EmcModule):
 
    def song_info_get(self, url):
       song_data = self.__songs_db.get_data(url)
-      text = song_data['title'] + '<br>'
+      text = '<hilight>' + song_data['title'] + '</><br>'
       if song_data.has_key('artist'):
-         text += 'by ' + song_data['artist'] + '<br>'
+         text += '<em>by ' + song_data['artist'] + '</><br>'
       if song_data.has_key('album'):
          text += 'from ' + song_data['album'] + '<br>'
       if song_data.has_key('length'):
@@ -284,8 +284,8 @@ class MusicModule(EmcModule):
 
    def album_info_get(self, album):
       album_data = self.__albums_db.get_data(album)
-      text = album_data['name'] + '<br>'
-      text += album_data['artist'] + '<br>'
+      text = '<hilight>' + album_data['name'] + '</><br>'
+      text += '<em>by ' + album_data['artist'] + '</><br>'
       text += str(len(album_data['songs'])) + ' songs'
       lenght = 0
       for song in album_data['songs']:

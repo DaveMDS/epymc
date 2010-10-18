@@ -1,89 +1,95 @@
 
-                EMC THEMES REFERENCE
+                EpyMC THEMES REFERENCE
 
 
-main group: "main" TODO rename to epymc_main_layout
+Main elementary layout group: "epymc_main_layout"
 
 
-### TopBar stuff
+### TopBar stuff ###
+   * Required parts:
+      "topbar/title" -> edje text
+      "topbar/box" -> edje box
 
- * Required parts:
-   "topbar/title" -> edje text
-
- * Signals received from the application:
-    "topbar,show" "emc"
-    "topbar,hide" "emc"
-
-### MainMenu stuff
-
- * Required parts:
-    "mainmenu/list" -> elm_list
-
- * Signals received from the application:
-    "mainmenu,show" "emc"
-    "mainmenu,hide" "emc"
+   * Signals received from the application:
+      "topbar,show" "emc"
+      "topbar,hide" "emc"
 
 
-### Browser: CubeList View
- * Required parts:
-    "browser/cubelist/flip" -> elm_pager style:"slide_invisible"
-    "browser/cubelist/poster" -> edje swallow
-    "browser/cubelist/info" -> elm_anchorblock
+### MainMenu stuff ###
+   * Required parts:
+      "mainmenu/list" -> elm_list
 
- * Signals received from the application:
-    "browser,cubelist,show" "emc"
-    "browser,cubelist,hide" "emc"
-
-### Browser: List View
- * Required parts:
-    "browser/list/genlist" -> elm_genlist style: "browser"
-    "browser/list/poster" -> edje swallow
-    "browser/list/info" -> elm_anchorblock
-
- * Signals received from the application:
-    "browser,list,show" "emc"
-    "browser,list,hide" "emc"
-
-### Browser: Grid View
- * Required parts:
-    "browser/grid/gengrid" -> edje swallow
-    "browser/grid/title" -> edje text part
-
- * Signals received from the application:
-    "browser,grid,show" "emc"
-    "browser,grid,hide" "emc"
-
-### Video Player
-
- * Required parts:
-    "videoplayer/video" -> edje swallow
-    "videoplayer/controls/btn_swallow" -> edje swallow
-    "videoplayer/controls/slider" -> elm_slider
-    "videoplayer/controls/position" -> edje text
-    "videoplayer/controls/length" -> edje text
-
- * Signals received from the application:
-    "videoplayer,show" "emc"
-    "videoplayer,hide" "emc"
-    "videoplayer,controls,show" "emc"
-    "videoplayer,controls,hide" "emc"
-
-### Volume
-
- * Required parts:
-    "volume/slider" -> elm_slider
-
- * Signals received from the application:
-    "volume,show" "emc"
-    "volume,hide" "emc"
+   * Signals received from the application:
+      "mainmenu,show" "emc"
+      "mainmenu,hide" "emc"
 
 
-### ConfigGui stuff
+### Browser: CubeList View ###
+   * Required parts:
+      "browser/cubelist/flip" -> elm_pager style:"slide_invisible"
+      "browser/cubelist/poster" -> edje swallow
+      "browser/cubelist/info" -> elm_anchorblock
 
- * Required parts:
-    "config_pager" -> elm_pager style:"slide_invisible"
+   * Signals received from the application:
+      "browser,cubelist,show" "emc"
+      "browser,cubelist,hide" "emc"
 
- * Signals received from the application:
-    "config,show" "emc"
-    "config,hide" "emc"
+
+### Browser: List View ###
+   * Required parts:
+      "browser/list/genlist1" -> elm_genlist style: "browser"
+      "browser/list/genlist2" -> elm_genlist style: "browser"
+      "browser/list/poster" -> edje swallow
+      "browser/list/info" -> elm_anchorblock
+
+   * Signals received from the application:
+      "browser,list,show" "emc"
+      "browser,list,hide" "emc"
+      "browser_list_flip_left" "emc"
+      "browser_list_flip_right" "emc"
+
+
+### Browser: Grid View ###
+   * Required parts:
+      "browser/grid/gengrid" -> edje swallow
+      "browser/grid/title" -> edje text part
+
+   * Signals received from the application:
+      "browser,grid,show" "emc"
+      "browser,grid,hide" "emc"
+
+
+### Video Player ###
+   * Required parts:
+      "videoplayer/video" -> edje swallow
+      "videoplayer/controls/btn_swallow" -> edje swallow
+      "videoplayer/controls/slider" -> elm_slider
+      "videoplayer/controls/position" -> edje text
+      "videoplayer/controls/length" -> edje text
+
+   * Signals received from the application:
+      "videoplayer,show" "emc"
+      "videoplayer,hide" "emc"
+      "videoplayer,controls,show" "emc"
+      "videoplayer,controls,hide" "emc"
+
+
+### Volume ###
+
+   * Required parts:
+      "volume/slider" -> elm_slider
+
+   * Signals received from the application:
+      "volume,show" "emc"
+      "volume,hide" "emc"
+
+
+### ConfigGui stuff ###
+
+   * Required parts:
+      "config_pager" -> elm_pager style:"slide_invisible"
+
+   * Signals received from the application:
+      "config,show" "emc"
+      "config,hide" "emc"
 

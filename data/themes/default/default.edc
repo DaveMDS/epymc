@@ -1,4 +1,15 @@
 
+#define DEBUG_ENABLE 0
+#if DEBUG_ENABLE
+#define DBG(...) { \
+   new _buf[128]; \
+   snprintf(_buf, sizeof(_buf), __VA_ARGS__); \
+   set_text(PART:"embryo_dbg", _buf); }
+#else
+#define DBG(...)
+#endif
+
+
 images {
    image: "background.jpg" COMP;
    image: "bg_configuration.jpg" COMP;
@@ -19,7 +30,7 @@ collections {
    #include "elm_extension.edc"
    #include "icons.edc"
    
-   group { name: "main";
+   group { name: "epymc_main_layout";
 
 /// clock embryo script
       script {
@@ -49,7 +60,7 @@ collections {
          }
 
 /// browser view: cubelist
-         part { name: "browser/cubelist/info";
+         part { name: "browser/cubelist/info"; /* API */
             type: EXTERNAL;
             clip_to: "browser/cubelist/clip";
             source: "elm/anchorblock";
@@ -66,7 +77,7 @@ collections {
                }
             }
          }
-         part { name: "browser/cubelist/poster";
+         part { name: "browser/cubelist/poster"; /* API */
             type: SWALLOW;
             clip_to: "browser/cubelist/clip";
             description { state: "default" 0;
@@ -80,7 +91,7 @@ collections {
                }
             }
          }
-         part { name: "browser/cubelist/flip";
+         part { name: "browser/cubelist/flip"; /* API */
             type: EXTERNAL;
             clip_to: "browser/cubelist/clip";
             source: "elm/flip";
@@ -107,27 +118,74 @@ collections {
          }
 
 /// browser view: list
-         part { name: "browser/list/genlist1";
-            type: EXTERNAL;
-            source: "elm/genlist";
-            clip_to: "browser/list/clip";
-            description { state: "default" 0;
-               color: 255 0 255 100;
-               rel1 {
-                  offset: 20 50;
-               }
-               rel2 {
-                  relative: 0.5 1;
-                  offset: 0 -20;
-               }
+         part { name: "browser/list/clip";
+            type: RECT;
+            description { state: "default" 0.0;
+               color: 255 255 255 0;
+               visible: 0;
+            }
+            description { state: "visible" 0.0;
+               color: 255 255 255 255;
+               visible: 1;
             }
          }
-         part { name: "browser/list/genlist2";
+         part { name: "browser/list/list_frame";
+            type: RECT;
+            clip_to: "browser/list/clip";
+            description { state: "default" 0.0;
+               color: 0 100 150 70;
+               rel1.offset: 10 50;
+               rel2.relative: 0.5 1.0;
+               rel2.offset: -1 -10;
+            }
+         }
+         part { name: "browser/list/list_clip";
+            type: RECT;
+            description { state: "default" 0.0;
+               visible: 0;
+               color: 255 255 255 0;
+               rel1 {
+                  to: "browser/list/list_frame";
+                  offset: 5 5;
+               }
+               rel2 {
+                  to: "browser/list/list_frame";
+                  offset: -6 -6;
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               color: 255 255 255 255;
+               visible: 1;
+            }
+         }
+         part { name: "browser/list/genlist1"; /* API */
             type: EXTERNAL;
             source: "elm/genlist";
-            clip_to: "browser/list/clip";
-            description { state: "default" 0;
-               color: 255 0 255 100;
+            clip_to: "browser/list/list_clip";
+            description { state: "default" 0.0;
+               rel1.to: "browser/list/list_clip";
+               rel2.to: "browser/list/list_clip";
+            }
+            description { state: "center" 0.0;
+               inherit: "default" 0.0;
+            }
+            description { state: "left" 0.0;
+               inherit: "default" 0.0;
+               rel1.relative: -1.0 0.0;
+               rel2.relative: 0.0 1.0;
+            }
+            description { state: "right" 0.0;
+               inherit: "default" 0.0;
+               rel1.relative: 1.0 0.0;
+               rel2.relative: 2.0 1.0;
+            }
+         }
+         part { name: "browser/list/genlist2"; /* API */
+            type: EXTERNAL;
+            source: "elm/genlist";
+            clip_to: "browser/list/list_clip";
+            description { state: "default" 0.0;
                rel1 {
                   to: "browser/list/genlist1";
                   relative: 1.0 0.0;
@@ -137,26 +195,39 @@ collections {
                   relative: 2.0 1.0;
                }
             }
+            description { state: "on_the_right" 0.0;
+               inherit: "default" 0.0;
+            }
+            description { state: "on_the_left" 0.0;
+               rel1 {
+                  to: "browser/list/genlist1";
+                  relative: -1.0 0.0;
+               }
+               rel2 {
+                  to: "browser/list/genlist1";
+                  relative: 0.0 1.0;
+               }
+            }
          }
-         part { name: "browser/list/poster";
+         part { name: "browser/list/poster"; /* API */
             type: SWALLOW;
             clip_to: "browser/list/clip";
-            description { state: "default" 0;
+            description { state: "default" 0.0;
                rel1 {
-                  relative: 0.5 0;
+                  relative: 0.5 0.0;
                   offset: 20 50;
                }
                rel2 {
-                  relative: 1 0.65;
+                  relative: 1.0 0.65;
                   offset: -20 0;
                }
             }
          }
-         part { name: "browser/list/info";
+         part { name: "browser/list/info"; /* API */
             type: EXTERNAL;
             clip_to: "browser/list/clip";
             source: "elm/anchorblock";
-            description { state: "default" 0;
+            description { state: "default" 0.0;
                rel1 {
                   relative: 0.5 0.65;
                   offset: 20 0;
@@ -166,20 +237,9 @@ collections {
                }
             }
          }
-         part { name: "browser/list/clip";
-            type: RECT;
-            description { state: "default" 0;
-               color: 255 255 255 0;
-               visible: 0;
-            }
-            description { state: "visible" 0;
-               color: 255 255 255 255;
-               visible: 1;
-            }
-         }
 
 /// browser view: grid
-         part { name: "browser/grid/gengrid";
+         part { name: "browser/grid/gengrid"; /* API */
             type: SWALLOW;
             clip_to: "browser/grid/clip";
             description { state: "default" 0;
@@ -187,7 +247,7 @@ collections {
                rel1.offset: 0 100;
             }
          }
-         part { name: "browser/grid/title";
+         part { name: "browser/grid/title"; /* API */
             type: TEXT;
             clip_to: "browser/grid/clip";
             effect: FAR_SOFT_SHADOW;
@@ -265,7 +325,7 @@ collections {
                
             }
          }
-         part { name: "topbar/title";
+         part { name: "topbar/title"; /* API */
             type: TEXT;
             clip_to: "topbar/clip";
             description { state: "default" 0.0;
@@ -286,7 +346,7 @@ collections {
                }
             }
          }
-         part { name: "topbar/box";
+         part { name: "topbar/box"; /* API */
             type: BOX;
             mouse_events: 1;
             repeat_events: 1;
@@ -333,7 +393,7 @@ collections {
          }
 
 /// mainmenu
-         part { name: "mainmenu/list";
+         part { name: "mainmenu/list"; /* API */
             type: EXTERNAL;
             source: "elm/list";
             description { state: "default" 0;
@@ -375,7 +435,7 @@ collections {
                color: 0 0 0 255;
             }
          }
-         part { name: "videoplayer/video";
+         part { name: "videoplayer/video"; /* API */
             type: SWALLOW;
             clip_to: "videoplayer/clip";
             description { state: "default" 0;
@@ -414,7 +474,7 @@ collections {
                }
             }
          }
-         part { name: "videoplayer/controls/btn_swallow";
+         part { name: "videoplayer/controls/btn_swallow"; /* API */
             type: SWALLOW;
             description { state: "default" 0.0;
                rel1.to: "videoplayer/controls/bg";
@@ -422,7 +482,7 @@ collections {
                rel2.to: "videoplayer/controls/bg";
             }
          }
-         part { name: "videoplayer/controls/length";
+         part { name: "videoplayer/controls/length"; /* API */
             type: TEXT;
             mouse_events: 0;
             clip_to: "videoplayer/clip";
@@ -442,7 +502,7 @@ collections {
                }
             }
          }
-         part { name: "videoplayer/controls/position";
+         part { name: "videoplayer/controls/position"; /* API */
             type: TEXT;
             mouse_events: 0;
             clip_to: "videoplayer/clip";
@@ -462,7 +522,7 @@ collections {
                }
             }
          }
-         part { name: "videoplayer/controls/slider";
+         part { name: "videoplayer/controls/slider"; /* API */
             type: EXTERNAL;
             clip_to: "videoplayer/clip";
             source: "elm/slider";
@@ -561,7 +621,7 @@ collections {
                }
             }
          }
-         part { name: "volume/slider";
+         part { name: "volume/slider"; /* API */
             type: EXTERNAL;
             source: "elm/slider";
             description { state: "default" 0;
@@ -584,6 +644,22 @@ collections {
                }
             }
          }
+
+/// debug label for embryo scripting
+         #if DEBUG_ENABLE
+         part { name: "embryo_dbg";
+            type: TEXT;
+            description { state: "default" 0.0;
+               color: FONT_COLOR;
+               text {
+                  text: "EMBRYO DEBUG ENABLED";
+                  font: FONT;
+                  size: FONT_SIZE;
+                  align: 1.0 1.0;
+               }
+            }
+         }
+         #endif
       }
       programs {
          program { name: "init";
@@ -593,21 +669,23 @@ collections {
                clock_cb(0);
             }
          }
-         program { name: "mainmenu_show";
+///
+         program { name: "mainmenu_show"; /* API */
             signal: "mainmenu,show";
             source: "emc";
             action: STATE_SET "visible" 0.00;
             transition: DECELERATE 0.5;
             target: "mainmenu/list";
          }
-         program { name: "mainmenu_hide";
+         program { name: "mainmenu_hide"; /* API */
             signal: "mainmenu,hide";
             source: "emc";
             action: STATE_SET "default" 0.00;
             transition: ACCELERATE 0.5;
             target: "mainmenu/list";
          }
-         program { name: "config_show";
+///
+         program { name: "config_show"; /* API */
             signal: "config,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -616,70 +694,142 @@ collections {
             
             
          }
-         program { name: "config_hide";
+         program { name: "config_hide"; /* API */
             signal: "config,hide";
             source: "emc";
             action: STATE_SET "default" 0.00;
             transition: ACCELERATE 0.5;
             target: "config_bg";
          }
-         program { name: "browser_cubelist_show";
+///
+         program { name: "browser_cubelist_show"; /* API */
             signal: "browser,cubelist,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: LINEAR 1.0;
             target: "browser/cubelist/clip";
          }
-         program { name: "browser_cubelist_hide";
+         program { name: "browser_cubelist_hide"; /* API */
             signal: "browser,cubelist,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: LINEAR 1.0;
             target: "browser/cubelist/clip";
          }
-         program { name: "browser_list_show";
+///
+         program { name: "browser_list_show"; /* API */
             signal: "browser,list,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: LINEAR 1.0;
             target: "browser/list/clip";
+            target: "browser/list/list_clip";
          }
-         program { name: "browser_list_hide";
+         program { name: "browser_list_hide"; /* API */
             signal: "browser,list,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: LINEAR 1.0;
             target: "browser/list/clip";
+            target: "browser/list/list_clip";
          }
-         program { name: "browser_grid_show";
+         program { name: "browser_list_flip_left"; /* API */
+            signal: "browser,list,flip_left";
+            source: "emc";
+            script {
+               new buf[16];
+               new Float:val;
+               get_state(PART:"browser/list/genlist1", buf, sizeof(buf), val);
+               DBG("%s   %f", buf, val)
+               if (!strcmp(buf, "default") || !strcmp(buf, "center")) {
+                  DBG("CASE 1")
+                  set_state(PART:"browser/list/genlist2", "on_the_right", 0.0);
+                  run_program(PROGRAM:"gl1_to_left");
+               }
+               else if (!strcmp(buf, "left")) {
+                  DBG("CASE 2")
+                  set_state(PART:"browser/list/genlist1", "right", 0.0);
+                  set_state(PART:"browser/list/genlist2", "on_the_left", 0.0);
+                  run_program(PROGRAM:"gl1_to_center");
+               }
+               else if (!strcmp(buf, "right")) {
+                  DBG("CASE 3")
+                  run_program(PROGRAM:"gl1_to_center");
+               }
+            }
+         }
+         program { name: "browser_list_flip_right"; /* API */
+            signal: "browser,list,flip_right";
+            source: "emc";
+            script {
+               new buf[16];
+               new Float:val;
+               get_state(PART:"browser/list/genlist1", buf, sizeof(buf), val);
+               DBG("%s   %f", buf, val)
+               if (!strcmp(buf, "default") || !strcmp(buf, "center")) {
+                  DBG("CASE 1 (back)")
+                  set_state(PART:"browser/list/genlist2", "on_the_left", 0.0);
+                  run_program(PROGRAM:"gl1_to_right");
+               }
+               else if (!strcmp(buf, "right")) {
+                  DBG("CASE 2 (back)")
+                  set_state(PART:"browser/list/genlist1", "left", 0.0);
+                  set_state(PART:"browser/list/genlist2", "on_the_right", 0.0);
+                  run_program(PROGRAM:"gl1_to_center");
+               }
+               else if (!strcmp(buf, "left")) {
+                  DBG("CASE 3 (back)")
+                  run_program(PROGRAM:"gl1_to_center");
+               }
+            }
+         }
+         program { name: "gl1_to_left";
+            action: STATE_SET "left" 0.0;
+            transition: LINEAR 0.4;
+            target: "browser/list/genlist1";
+         }
+         program { name: "gl1_to_right";
+            action: STATE_SET "right" 0.0;
+            transition: LINEAR 0.4;
+            target: "browser/list/genlist1";
+         }
+         program { name: "gl1_to_center";
+            action: STATE_SET "center" 0.0;
+            transition: LINEAR 0.4;
+            target: "browser/list/genlist1";
+         }
+///
+         program { name: "browser_grid_show"; /* API */
             signal: "browser,grid,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: LINEAR 1.0;
             target: "browser/grid/clip";
          }
-         program { name: "browser_grid_hide";
+         program { name: "browser_grid_hide"; /* API */
             signal: "browser,grid,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: LINEAR 1.0;
             target: "browser/grid/clip";
          }
-         program { name: "topbar_show";
+///
+         program { name: "topbar_show"; /* API */
             signal: "topbar,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.4;
             target: "topbar/clip";
          }
-         program { name: "topbar_hide";
+         program { name: "topbar_hide"; /* API */
             signal: "topbar,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: ACCELERATE 0.4;
             target: "topbar/clip";
          }
-         program { name: "videoplayer_show";
+///
+         program { name: "videoplayer_show"; /* API */
             signal: "videoplayer,show";
             source: "emc";
             action: STATE_SET "visible" 0.00;
@@ -687,35 +837,36 @@ collections {
             target: "videoplayer/clip";
             
          }
-         program { name: "videoplayer_hide";
+         program { name: "videoplayer_hide"; /* API */
             signal: "videoplayer,hide";
             source: "emc";
             action: STATE_SET "default" 0.00;
             transition: LINEAR 0.5;
             target: "videoplayer/clip";
          }
-         program { name: "videoplayer_controls_show";
+         program { name: "videoplayer_controls_show"; /* API */
             signal: "videoplayer,controls,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.5;
             target: "videoplayer/controls/bg";
          }
-         program { name: "videoplayer_controls_hide";
+         program { name: "videoplayer_controls_hide"; /* API */
             signal: "videoplayer,controls,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: DECELERATE 0.5;
             target: "videoplayer/controls/bg";
          }
-         program { name: "volume_show";
+///
+         program { name: "volume_show"; /* API */
             signal: "volume,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.5;
             target: "volume/bg";
          }
-         program { name: "volume_hide";
+         program { name: "volume_hide"; /* API */
             signal: "volume,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;

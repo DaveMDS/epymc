@@ -42,7 +42,7 @@ def init_window():
 
    # main layout (main theme)
    ly = elementary.Layout(win)
-   ly.file_set(_theme_file, "main")
+   ly.file_set(_theme_file, "epymc_main_layout")
    ly.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
    win.resize_object_add(ly)
    ly.show()

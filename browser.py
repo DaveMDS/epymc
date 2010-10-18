@@ -314,6 +314,7 @@ class ViewList(object):
       self.gl1.style_set("browser")
       self.gl1.callback_clicked_add(self._cb_item_selected)
       self.gl1.callback_selected_add(self._cb_item_hilight)
+      self.current_list = self.gl1
 
       # EXTERNAL Genlist2
       self.gl2 = gui.part_get('browser/list/genlist2')
@@ -341,7 +342,21 @@ class ViewList(object):
       You can use the 'dir' param to perform the correct animation if needed
       """
       DBG('page show ' + str(dir))
-      self.clear()
+      
+      if dir == 1: # forward
+         if self.current_list == self.gl1:
+            self.current_list = self.gl2
+         else:
+            self.current_list = self.gl1
+         gui.signal_emit('browser,list,flip_left')
+      elif dir == -1: # back
+         if self.current_list == self.gl1:
+            self.current_list = self.gl2
+         else:
+            self.current_list = self.gl1
+         gui.signal_emit('browser,list,flip_right')
+
+      self.current_list.clear()
 
    def item_add(self, url, label, parent_browser):
       """
@@ -353,8 +368,8 @@ class ViewList(object):
       parent_browser._item_selected(url) with the url of the selected item
       """
       item_data = (url, label, parent_browser)
-      it = self.gl1.item_append(self.itc, item_data)
-      if not self.gl1.selected_item_get():
+      it = self.current_list.item_append(self.itc, item_data)
+      if not self.current_list.selected_item_get():
          it.selected_set(1)
 
    def show(self):
@@ -368,11 +383,12 @@ class ViewList(object):
    def clear(self):
       """ Clear the view """
       self.gl1.clear()
+      self.gl2.clear()
 
    def input_event_cb(self, event):
       """ Here you can manage input events for the view """
 
-      item = self.gl1.selected_item_get()
+      item = self.current_list.selected_item_get()
       (url, label, parent_browser) = item.data_get()
 
       if event == "DOWN":

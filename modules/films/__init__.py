@@ -52,7 +52,8 @@ class FilmsModule(EmcModule):
       self.__browser = EmcBrowser('Films', 'List',
                               item_selected_cb = self.cb_url_selected,
                               icon_get_cb = self.cb_icon_get,
-                              poster_get_cb = self.cb_poster_get)
+                              poster_get_cb = self.cb_poster_get,
+                              info_get_cb = self.cb_info_get)
 
    def __shutdown__(self):
       DBG('Shutdown module')
@@ -117,8 +118,36 @@ class FilmsModule(EmcModule):
          if os.path.exists(poster):
             return poster
       else:
-         print 'Not found'
+         return None
 
+   def cb_info_get(self, page_url, item_url):
+      if self.__film_db.id_exists(item_url):
+         e = self.__film_db.get_data(item_url)
+         text = '<title>%s (%s %s)</><br>' \
+                '<hilight>Rating:</> %.0f/10<br>' \
+                '<hilight>Director:</> %s<br>' \
+                '<hilight>Cast:</> %s<br>%s' % \
+                (e['name'], e['countries'][0]['code'], e['released'][:4],
+                e['rating'], self._get_director(e), self._get_cast(e, 3),
+                e['overview'])
+                # TODO genres
+         return text
+      else:
+         return 'Not found'
+
+   def _get_director(self,e):
+      for person in e['cast']:
+         if person['job'] == 'Director':
+            return person['name']
+      return "Unknow"
+      
+   def _get_cast(self, e, max_num = 99): # TODO make max_num works
+      cast = ''
+      for person in e['cast']:
+         if person['job'] == 'Actor':
+            cast = cast + (', ' if cast else '') + person['name']
+      return cast
+      
 
 ###### INFO PANEL STUFF
    def show_film_info(self, url):
@@ -172,18 +201,9 @@ class FilmsModule(EmcModule):
          #~ pprint.pprint(e)
 
          # update text info
-         director = "Unknow"
-         cast = ""
-         for person in e['cast']:
-            print " CAST: " + person['job']
-            if person['job'] == 'Director':
-               director = person['name']
-            elif person['job'] == 'Actor':
-               cast += (', ' if cast else '') + person['name']
-
          info = "<title>" + e['name'] + "</title> <year>(" + e['released'][0:4] + ")</year><br>" + \
-                  "<hilight>Director: </hilight>" + director + "<br>" + \
-                  "<hilight>Cast: </hilight>" + cast + "<br>" + \
+                  "<hilight>Director: </hilight>" + self._get_director(e) + "<br>" + \
+                  "<hilight>Cast: </hilight>" + self._get_cast(e) + "<br>" + \
                   "<hilight>Rating: </hilight>" + str(e['rating']) + "/10<br>" + \
                   "<br><hilight>Overview:</hilight><br>" + e['overview']
          o_anchorblock.text_set(info.encode('utf-8'))

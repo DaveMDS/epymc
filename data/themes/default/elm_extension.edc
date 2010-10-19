@@ -1429,6 +1429,7 @@ group { name: "elm/entry/base-noedit/browser";
             tag:  "b" "+ font=Sans:style=Bold";
             tag:  "link" "+ color=#800 underline=on underline_color=#8008";
             tag:  "hilight" "+ font=Sans:style=Bold";
+            tag:  "title" "+ font=Sans:style=Bold font_size=25"(FONT_SIZE + 8);
          }
          style { name: "entry_textblock_disabled_style";
             base: "font=Sans font_size=20 color=#888 wrap=word";

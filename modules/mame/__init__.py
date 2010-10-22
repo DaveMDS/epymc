@@ -35,8 +35,8 @@ class MameModule(EmcModule):
                        poster_get_cb = self.__cb_poster_get,
                        info_get_cb = self.__cb_info_get)
 
-      # Aquire mame dirs from the command 'sdlmame -showconfig' TODO this shuold be done later...
-      exe = ecore.Exe("sdlmame -showconfig | grep -e snapshot_directory -e rompath",
+      # Aquire mame dirs from the command 'mame -showconfig' TODO this shuold be done later...
+      exe = ecore.Exe("mame -showconfig | grep -e snapshot_directory -e rompath",
                      ecore.ECORE_EXE_PIPE_READ |
                      ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
       exe.on_data_event_add(self.__showconfig_event_cb)
@@ -47,7 +47,7 @@ class MameModule(EmcModule):
       del self.__browser
 
    def __showconfig_event_cb(self, exe, event):
-      """ Data from the command 'sdlmame -showconfig' received.
+      """ Data from the command 'mame -showconfig' received.
          Parse the line and fill the class vars """
       for l in event.lines:
          (key, val) = l.split()
@@ -59,7 +59,7 @@ class MameModule(EmcModule):
                self.__snapshoot_dir = dir_real
 
    def __listfull_event_cb(self, exe, event):
-      """ Data from the command 'sdlmame -listfull' received.
+      """ Data from the command 'mame -listfull' received.
          Parse the line and fill the games list """
       for l in event.lines:
          id = l[0:l.find(' ')]
@@ -69,7 +69,7 @@ class MameModule(EmcModule):
             self.__games[id] = {'name': name} # TODO add more info now??
 
    def __listfull_end_event_cb(self, exe, event):
-      """ The command 'sdlmame -listfull' is done, create the root page """
+      """ The command 'mame -listfull' is done, create the root page """
       self.create_root_page()
       self.__browser.show()
 
@@ -144,9 +144,9 @@ class MameModule(EmcModule):
       if not self.__games.has_key(item_url): return None
       game = self.__games[item_url]
       if len(game) < 2: # at the start only one element in the dict (the name)
-         # get game info from the command: sdlmame -listxml <id>
+         # get game info from the command: mame -listxml <id>
          # TODO use a better/portable way (but not async)
-         os.system('sdlmame -listxml ' + item_url + ' > /tmp/PyEmc__MAME_tmp')
+         os.system('mame -listxml ' + item_url + ' > /tmp/PyEmc__MAME_tmp')
 
          # parse the xml file
          doc = xml.dom.minidom.parse('/tmp/PyEmc__MAME_tmp')

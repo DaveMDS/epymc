@@ -24,8 +24,9 @@ def init():
 
    mainmenu.item_add("config", 100, "Config", None, cb_mainmenu)
 
-   pager = gui.part_get("config_pager")
+   pager = elementary.Pager(gui._win)
    pager.style_set("slide_invisible")
+   gui.swallow_set("config/pager", pager)
 
    _root = elementary.List(pager)
    pager.content_push(_root)

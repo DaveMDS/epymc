@@ -494,7 +494,7 @@ collections {
          }
 
 ///
-         part { name: "config_bg";
+         part { name: "config/bg";
             type: IMAGE;
             description { state: "default" 0;
                rel1 {
@@ -522,21 +522,18 @@ collections {
                }
             }
          }
-         part { name: "config_pager";
-            type: EXTERNAL;
-            source: "elm/pager";
+         part { name: "config/pager";
+            type: SWALLOW;
             description { state: "default" 0;
                rel1 {
                   offset: 20 20;
-                  to: "config_bg";
+                  to: "config/bg";
                }
                rel2 {
                   offset: -20 -20;
-                  to: "config_bg";
+                  to: "config/bg";
                }
-               params {
-                  string: "label" "label goes here";
-               }
+
             }
          }
 
@@ -635,7 +632,7 @@ collections {
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.5;
-            target: "config_bg";
+            target: "config/bg";
             
             
          }
@@ -644,7 +641,7 @@ collections {
             source: "emc";
             action: STATE_SET "default" 0.00;
             transition: ACCELERATE 0.5;
-            target: "config_bg";
+            target: "config/bg";
          }
 ///
          program { name: "browser_list_show"; /* API */

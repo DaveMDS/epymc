@@ -76,7 +76,7 @@ Main elementary layout group: "epymc_main_layout"
 ### ConfigGui stuff ###
 
    * Required parts:
-      "config_pager" -> elm_pager style:"slide_invisible"
+      "config/pager" -> edje swallow (elm_pager style:"slide_invisible")
 
    * Signals received from the application:
       "config,show" "emc"

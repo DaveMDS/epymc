@@ -3,6 +3,7 @@
 import evas
 import elementary
 
+import utils
 import ini
 import downloader
 import mediaplayer
@@ -18,20 +19,28 @@ def _cb_win_del(win):
 def _cb_volume_slider_changed(slider):
    mediaplayer.volume_set(slider.value)
 
-def init_window():
+def init():
    global _win
    global _layout
    global _theme_file
 
-   # TODO FIXME!!!
-   _theme_file = "/home/dave/l/epymc/default.edj"
+   # set default theme in config file
+   if not ini.has_option('general', 'theme'):
+      ini.set('general', 'theme', 'default')
+   name = ini.get('general', 'theme');
+
+   # search the theme file, or use the default one
+   _theme_file = utils.get_resource_file('themes', name + '.edj', 'default.edj')
+   if not _theme_file:
+      print "ERROR: can't find a working theme file, exiting..."
+      return False
+   
    elementary.theme_overlay_add(_theme_file) #TODO REMOVE ME (but the 'browser' class  of anchorblock dont work)
    elementary.theme_extension_add(_theme_file)
 
    # window
    win = elementary.Window("emc_win", elementary.ELM_WIN_BASIC)
    win.title_set("Enlightenment Media Center")
-   #~ win.autodel_set(True) #TODO exit app on del !!
    win.callback_destroy_add(_cb_win_del)
    _win = win
    if ini.has_option('general', 'fullscreen'):
@@ -66,7 +75,6 @@ def init_window():
    ly.edje_get().part_box_append('topbar/box', bt)
    bt.show()
 
-
    ##TESTING
    #~ im = EmcRemoteImage(win)
    #~ im.url_set("http://hwcdn.themoviedb.org/posters/900/4bc95e22017a3c57fe02a900/wanted-thumb.jpg")
@@ -74,6 +82,10 @@ def init_window():
    #~ im.move(100,200)
    #~ im.show()
    ##
+   return True
+
+def shoutdown():
+   pass
 
 def _cb_btn_view_list(btn):
    input.event_emit("VIEW_LIST")

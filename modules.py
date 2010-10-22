@@ -4,30 +4,46 @@ import sys
 import os
 
 import ini
+import utils
 
 
 
 class EmcModule(object):
    name = ''
-   label = 'Films'
+   label = ''
 
+
+_instances = {}
 
 
 def load_all():
    print "Searching for modules:"
 
-   if not "modules/" in sys.path:
-      sys.path.insert(0, "modules/")
+   # first check in ~/.config/epymc/modules ...
+   path = os.path.join(utils.config_dir_get(), 'modules')
+   if not path in sys.path:
+      sys.path.insert(0, path)
 
-   for root, dirs, files in os.walk("modules/"):
+   for root, dirs, files in os.walk(path):
       for name in dirs:
-         if os.path.isfile("modules/" + name + "/__init__.py"):
-            print " * found: " + name
+         f = os.path.join(root, name, '__init__.py')
+         if os.path.isfile(f):
+            print " * load: " + f
+            mod =  __import__(name)
+   
+   # ... then in the modules/ dir relative to script position
+   path = os.path.join(os.path.dirname(__file__), 'modules')
+   if not path in sys.path:
+      sys.path.insert(0, path)
+
+   for root, dirs, files in os.walk(path):
+      for name in dirs:
+         f = os.path.join(root, name, '__init__.py')
+         if os.path.isfile(f):
+            print " * load: " + f
             mod =  __import__(name)
    print ""
 
-
-_instances = {}
 
 
 def init_by_name(name):

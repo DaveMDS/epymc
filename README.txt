@@ -10,3 +10,11 @@ Usefull list of premade lird.conf files for many remote:
   http://lirc.sourceforge.net/remotes/
 and also:
   http://lircconfig.commandir.com/lircd.conf/
+
+
+
+SEARCH PATH:
+ ~/.config/epymc/epymc.conf
+ ~/.config/epymc/themes
+ ~/.config/epymc/modules
+ 

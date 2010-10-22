@@ -1,7 +1,9 @@
 
 DEPENDENCIES:
 
-mutagen (sudo easy_install mutagen)
+mutagen
+ * sudo easy_install mutagen  OR
+ * apt-get install python-mutagen
 
 
 LIRC:

@@ -29,7 +29,7 @@ class LircModule(EmcModule):
       # get lirc device from config
       ini.add_section('lirc')
       if not ini.has_option('lirc', 'device'):
-         ini.set('lirc', 'device', DEFAULT_LIRC_SOCKET)
+         ini.set('lirc', 'device', self.DEFAULT_LIRC_SOCKET)
       self.device = ini.get('lirc', 'device')
 
       # get joystick mapping from config

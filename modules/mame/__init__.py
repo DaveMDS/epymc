@@ -82,9 +82,9 @@ class MameModule(EmcModule):
          #TODO alert the user
          return
 
-      # Aquire the list of all games from the command 'sdlmame -listfull'
+      # Aquire the list of all games from the command 'mame -listfull'
       if not self.__games:
-         exe = ecore.Exe("sdlmame -listfull",
+         exe = ecore.Exe("mame -listfull",
                            ecore.ECORE_EXE_PIPE_READ |
                            ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
          exe.on_data_event_add(self.__listfull_event_cb)
@@ -224,7 +224,7 @@ class MameModule(EmcModule):
                   #~ self.__browser.item_add(id, self.__games[id]['name'])
 
          if zip:
-            os.system('sdlmame ' + zip)
+            os.system('mame ' + zip)
          else:
             self.download_game(item_url)
 

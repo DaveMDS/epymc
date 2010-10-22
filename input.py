@@ -12,6 +12,9 @@ BACK
 
 TOGGLE_PAUSE
 
+VIEW_LIST
+VIEW_GRID
+
 """
 
 

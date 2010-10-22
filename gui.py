@@ -66,13 +66,6 @@ def init_window():
    ly.edje_get().part_box_append('topbar/box', bt)
    bt.show()
 
-   bt = elementary.Button(win)
-   #~ bt.icon_set(load_icon('icon/grid'))
-   bt.label_set('cube')
-   bt.callback_clicked_add(_cb_btn_view_cube)
-   ly.edje_get().part_box_append('topbar/box', bt)
-   bt.show()
-
 
    ##TESTING
    #~ im = EmcRemoteImage(win)
@@ -87,9 +80,6 @@ def _cb_btn_view_list(btn):
 
 def _cb_btn_view_grid(btn):
    input.event_emit("VIEW_GRID")
-
-def _cb_btn_view_cube(btn):
-   input.event_emit("VIEW_CUBE")
 
 def load_icon(icon):
    """

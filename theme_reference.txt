@@ -24,17 +24,6 @@ Main elementary layout group: "epymc_main_layout"
       "mainmenu,hide" "emc"
 
 
-### Browser: CubeList View ###
-   * Required parts:
-      "browser/cubelist/flip" -> elm_pager style:"slide_invisible"
-      "browser/cubelist/poster" -> edje swallow
-      "browser/cubelist/info" -> elm_anchorblock
-
-   * Signals received from the application:
-      "browser,cubelist,show" "emc"
-      "browser,cubelist,hide" "emc"
-
-
 ### Browser: List View ###
    * Required parts:
       "browser/list/genlist1" -> elm_genlist style: "browser"

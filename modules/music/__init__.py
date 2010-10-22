@@ -52,7 +52,7 @@ class MusicModule(EmcModule):
       mainmenu.item_add('music', 5, 'Music', None, self.cb_mainmenu)
 
       # create a browser instance
-      self.__browser = EmcBrowser('Music', 'ListCube',
+      self.__browser = EmcBrowser('Music', 'List',
                            item_selected_cb = self.cb_item_selected,
                            poster_get_cb = self.cb_poster_get,
                            info_get_cb = self.cb_info_get)

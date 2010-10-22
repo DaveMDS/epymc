@@ -58,9 +58,10 @@ def main():
    downloader.shutdown()
    browser.shutdown()
    sdb.shutdown()
-   
-   elementary.shutdown()
 
+   # shutdown elementary
+   elementary.shutdown()
+   
    print 'Bye Bye...'
 
 if __name__ == "__main__":

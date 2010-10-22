@@ -110,7 +110,7 @@ def video_controls_toggle():
 def _init_emotion():
    global _emotion
 
-   _emotion = emotion.Emotion(gui._win.evas_get(), module_filename='gstreamer')
+   _emotion = emotion.Emotion(gui.win.evas_get(), module_filename='gstreamer')
    gui.swallow_set('videoplayer/video', _emotion)
    _emotion.smooth_scale = True # TODO Needed? make it configurable?
 
@@ -121,12 +121,12 @@ def _init_emotion():
 
 
    # buttons box
-   box = elementary.Box(gui._win)
+   box = elementary.Box(gui.win)
    box.horizontal_set(1)
    gui.swallow_set("videoplayer/controls/btn_swallow", box)
    
    #  <<  fast backward
-   bt = elementary.Button(gui._win);
+   bt = elementary.Button(gui.win);
    bt.icon_set(gui.load_icon("icon/fbwd"))
    bt.callback_clicked_add(_cb_btn_fbackward)
    bt.data['cb'] = _cb_btn_fbackward
@@ -137,7 +137,7 @@ def _init_emotion():
    _buttons.append(bt)
 
    #  <   backward
-   bt = elementary.Button(gui._win);
+   bt = elementary.Button(gui.win);
    bt.icon_set(gui.load_icon("icon/bwd"))
    bt.callback_clicked_add(_cb_btn_backward)
    bt.data['cb'] = _cb_btn_backward
@@ -148,7 +148,7 @@ def _init_emotion():
    _buttons.append(bt)
 
    #  stop
-   bt = elementary.Button(gui._win);
+   bt = elementary.Button(gui.win);
    bt.icon_set(gui.load_icon("icon/stop"))
    bt.callback_clicked_add(_cb_btn_stop)
    bt.data['cb'] = _cb_btn_stop
@@ -160,7 +160,7 @@ def _init_emotion():
    _buttons.append(bt)
 
    #  play/pause
-   bt = elementary.Button(gui._win);
+   bt = elementary.Button(gui.win);
    bt.icon_set(gui.load_icon("icon/play"))
    bt.callback_clicked_add(_cb_btn_play)
    bt.data['cb'] = _cb_btn_play
@@ -172,7 +172,7 @@ def _init_emotion():
    _buttons.append(bt)
 
    #  >   forward
-   bt = elementary.Button(gui._win);
+   bt = elementary.Button(gui.win);
    bt.icon_set(gui.load_icon("icon/fwd"))
    bt.callback_clicked_add(_cb_btn_forward)
    bt.data['cb'] = _cb_btn_forward
@@ -183,7 +183,7 @@ def _init_emotion():
    _buttons.append(bt)
    
    #  >>  fast forward
-   bt = elementary.Button(gui._win);
+   bt = elementary.Button(gui.win);
    bt.icon_set(gui.load_icon("icon/ffwd"))
    bt.callback_clicked_add(_cb_btn_fforward)
    bt.data['cb'] = _cb_btn_fforward

@@ -8,9 +8,9 @@ import ini
 import downloader
 import mediaplayer
 
-_win = None
-_layout = None
-_theme_file = None
+win = None
+layout = None
+theme_file = None
 
 def _cb_win_del(win):
    ask_to_exit()
@@ -20,9 +20,9 @@ def _cb_volume_slider_changed(slider):
    mediaplayer.volume_set(slider.value)
 
 def init():
-   global _win
-   global _layout
-   global _theme_file
+   global win
+   global layout
+   global theme_file
 
    # set default theme in config file
    if not ini.has_option('general', 'theme'):
@@ -30,19 +30,18 @@ def init():
    name = ini.get('general', 'theme');
 
    # search the theme file, or use the default one
-   _theme_file = utils.get_resource_file('themes', name + '.edj', 'default.edj')
-   if not _theme_file:
+   theme_file = utils.get_resource_file('themes', name + '.edj', 'default.edj')
+   if not theme_file:
       print "ERROR: can't find a working theme file, exiting..."
       return False
    
-   elementary.theme_overlay_add(_theme_file) #TODO REMOVE ME (but the 'browser' class  of anchorblock dont work)
-   elementary.theme_extension_add(_theme_file)
+   elementary.theme_overlay_add(theme_file) #TODO REMOVE ME (but the 'browser' class  of anchorblock dont work)
+   elementary.theme_extension_add(theme_file)
 
    # window
    win = elementary.Window("emc_win", elementary.ELM_WIN_BASIC)
    win.title_set("Enlightenment Media Center")
    win.callback_destroy_add(_cb_win_del)
-   _win = win
    if ini.has_option('general', 'fullscreen'):
       if ini.get_bool('general', 'fullscreen') == True:
          win.fullscreen_set(1)
@@ -50,12 +49,11 @@ def init():
       ini.set('general', 'fullscreen', False)
 
    # main layout (main theme)
-   ly = elementary.Layout(win)
-   ly.file_set(_theme_file, "epymc_main_layout")
-   ly.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-   win.resize_object_add(ly)
-   ly.show()
-   _layout = ly;
+   layout = elementary.Layout(win)
+   layout.file_set(theme_file, "epymc_main_layout")
+   layout.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+   win.resize_object_add(layout)
+   layout.show()
 
    win.show()
 
@@ -66,13 +64,13 @@ def init():
    bt = elementary.Button(win)
    bt.icon_set(load_icon('icon/list'))
    bt.callback_clicked_add(_cb_btn_view_list)
-   ly.edje_get().part_box_append('topbar/box', bt)
+   layout.edje_get().part_box_append('topbar/box', bt)
    bt.show()
 
    bt = elementary.Button(win)
    bt.icon_set(load_icon('icon/grid'))
    bt.callback_clicked_add(_cb_btn_view_grid)
-   ly.edje_get().part_box_append('topbar/box', bt)
+   layout.edje_get().part_box_append('topbar/box', bt)
    bt.show()
 
    ##TESTING
@@ -100,11 +98,11 @@ def load_icon(icon):
    see icons.edc for all the existing icon
    """
    #TODO if icon in an EvasObject just return it
-   ic = elementary.Icon(gui._win)
+   ic = elementary.Icon(gui.win)
    if icon[0] == '/':
       ic.file_set(icon)
    else:
-      ic.file_set(_theme_file, icon)
+      ic.file_set(theme_file, icon)
    ic.size_hint_aspect_set(evas.EVAS_ASPECT_CONTROL_VERTICAL, 1, 1)
    return ic
     
@@ -126,20 +124,20 @@ def toggle_fullscreen():
 
 
 def part_get(name):
-   global _layout
-   return _layout.edje_get().part_external_object_get(name)
+   global layout
+   return layout.edje_get().part_external_object_get(name)
 
 def signal_emit(sig, src = 'emc'):
-   global _layout
-   _layout.edje_get().signal_emit(sig, src)
+   global layout
+   layout.edje_get().signal_emit(sig, src)
 
 def text_set(part, text):
-   global _layout
-   _layout.edje_get().part_text_set(part, text)
+   global layout
+   layout.edje_get().part_text_set(part, text)
 
 def swallow_set(part, obj):
-   global _layout
-   _layout.edje_get().part_swallow(part, obj)
+   global layout
+   layout.edje_get().part_swallow(part, obj)
 
 
 ################################################################################
@@ -220,7 +218,7 @@ class EmcDialog(elementary.InnerWindow):
                 spinner = False, style = 'minimal'):
       global _dialog_counter
 
-      elementary.InnerWindow.__init__(self, gui._win)
+      elementary.InnerWindow.__init__(self, gui.win)
       self.style_set(style)
       
       _dialog_counter += 1
@@ -230,21 +228,21 @@ class EmcDialog(elementary.InnerWindow):
       self._content = content
 
       # vbox
-      self._vbox = elementary.Box(gui._win)
+      self._vbox = elementary.Box(gui.win)
       self._vbox.horizontal_set(False)
       self._vbox.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       self._vbox.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       self._vbox.show()
 
       # hbox (buttons)
-      self._hbox = elementary.Box(gui._win)
+      self._hbox = elementary.Box(gui.win)
       self._hbox.horizontal_set(True)
       self._hbox.show()
 
       self._vbox.pack_end(self._hbox)
       
       if text:
-         self._anchorblock = elementary.AnchorBlock(gui._win)
+         self._anchorblock = elementary.AnchorBlock(gui.win)
          self._anchorblock.text_set(text)
          self._vbox.pack_start(self._anchorblock)
          self._anchorblock.show()
@@ -254,14 +252,14 @@ class EmcDialog(elementary.InnerWindow):
          content.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
 
       if spinner:
-         self._spinner = elementary.Progressbar(gui._win)
+         self._spinner = elementary.Progressbar(gui.win)
          self._spinner.style_set('wheel')
          self._spinner.pulse(True)
          self._spinner.show()
          self._vbox.pack_start(self._spinner)
 
       if title:
-         self._title = elementary.Label(gui._win)
+         self._title = elementary.Label(gui.win)
          self._title.label_set(title)
          self._vbox.pack_start(self._title)
          self._title.show()

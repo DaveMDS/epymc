@@ -153,18 +153,18 @@ class FilmsModule(EmcModule):
    def show_film_info(self, url):
       self.__current_url = url
 
-      box = elementary.Box(gui._win)
+      box = elementary.Box(gui.win)
       box.horizontal_set(1)
       box.homogenous_set(1)
       box.show()
 
-      image = elementary.Image(gui._win)
+      image = elementary.Image(gui.win)
       image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       image.show()
       box.pack_end(image)
 
-      anchorblock = elementary.AnchorView(gui._win)
+      anchorblock = elementary.AnchorView(gui.win)
       anchorblock.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       anchorblock.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       anchorblock.show()
@@ -243,7 +243,7 @@ class FilmsModule(EmcModule):
          film_info = self.__film_db.get_data(self.__current_url)
 
          # create the cast list
-         li = elementary.List(gui._win)
+         li = elementary.List(gui.win)
          for person in film_info['cast']:
             if person['job'] == 'Actor':
                label = person['name'] + ' as ' + person['character']
@@ -277,7 +277,7 @@ class FilmsModule(EmcModule):
                images.append(image['image'])
 
          # show the list in a dialog
-         li = elementary.List(gui._win)
+         li = elementary.List(gui.win)
          for image in images:
             icon = EmcRemoteImage(li)
             icon.url_set(image['url'])
@@ -341,7 +341,7 @@ class FilmsModule(EmcModule):
                images.append(image['image'])
 
          # show the list in a dialog
-         li = elementary.List(gui._win)
+         li = elementary.List(gui.win)
          for image in images:
             icon = EmcRemoteImage(li)
             icon.url_set(image['url'])
@@ -457,7 +457,7 @@ class TMDB2(object):
 
       elif len(data) > 1:
          # create a list dialog to choose from results
-         li = elementary.List(gui._win)
+         li = elementary.List(gui.win)
          for res in data:
             icon = None
             for image in res['posters']:

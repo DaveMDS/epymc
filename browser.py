@@ -9,7 +9,7 @@ import input
 from sdb import EmcDatabase
 
 def DBG(msg):
-   print ('BROWSER: ' + msg)
+   #~ print ('BROWSER: ' + msg)
    pass
 
 
@@ -336,7 +336,7 @@ class ViewList(object):
       self.infoblock.style_set("browser")
 
       # RemoteImage (poster)
-      self.__im = gui.EmcRemoteImage(gui._win)
+      self.__im = gui.EmcRemoteImage(gui.win)
       gui.swallow_set('browser/list/poster', self.__im)
 
    def page_show(self, title, dir):
@@ -467,7 +467,7 @@ class ViewGrid(object):
                                        icon_get_func=self.gg_icon_get,
                                        state_get_func=self.gg_state_get,
                                        del_func=self.gg_del)
-      gg = elementary.Gengrid(gui._win)
+      gg = elementary.Gengrid(gui.win)
       gg.style_set("browser")
       gg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       gg.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)

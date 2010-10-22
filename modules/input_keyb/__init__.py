@@ -23,6 +23,7 @@ _mapping = { 'Up': 'UP',
              'BackSpace': 'BACK',
              'space': 'TOGGLE_PAUSE',
              'p': 'TOGGLE_PAUSE',
+             'f': 'TOGGLE_FULLSCREEN',
            }
 
 class KeyboardModule(EmcModule):

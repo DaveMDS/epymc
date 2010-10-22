@@ -17,11 +17,12 @@ def cb_exit():
 
 def init():
    mainmenu.item_add("exit", 200, "Exit", None, cb_exit)
+   list = gui.part_get("mainmenu/list")
+   list.style_set("mainmenu");
 
 
 def show():
    list = gui.part_get("mainmenu/list")
-   list.style_set("mainmenu");
    list.callback_clicked_add(_cb_item_selected)
    if not list.selected_item_get():
       list.items_get()[0].selected_set(1)

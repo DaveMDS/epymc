@@ -8,16 +8,11 @@ import ini
 import downloader
 import mediaplayer
 
+
 win = None
 layout = None
 theme_file = None
 
-def _cb_win_del(win):
-   ask_to_exit()
-
-# TODO move this callback somewhere...maybe in mediaplayer?
-def _cb_volume_slider_changed(slider):
-   mediaplayer.volume_set(slider.value)
 
 def init():
    global win
@@ -39,7 +34,7 @@ def init():
    elementary.theme_extension_add(theme_file)
 
    # window
-   win = elementary.Window("emc_win", elementary.ELM_WIN_BASIC)
+   win = elementary.Window("epymc", elementary.ELM_WIN_BASIC)
    win.title_set("Enlightenment Media Center")
    win.callback_destroy_add(_cb_win_del)
    if ini.has_option('general', 'fullscreen'):
@@ -63,13 +58,13 @@ def init():
    # fill view buttons box in topbar
    bt = elementary.Button(win)
    bt.icon_set(load_icon('icon/list'))
-   bt.callback_clicked_add(_cb_btn_view_list)
+   bt.callback_clicked_add(_cb_btn_change_view, "VIEW_LIST")
    layout.edje_get().part_box_append('topbar/box', bt)
    bt.show()
 
    bt = elementary.Button(win)
    bt.icon_set(load_icon('icon/grid'))
-   bt.callback_clicked_add(_cb_btn_view_grid)
+   bt.callback_clicked_add(_cb_btn_change_view, "VIEW_GRID")
    layout.edje_get().part_box_append('topbar/box', bt)
    bt.show()
 
@@ -80,16 +75,31 @@ def init():
    #~ im.move(100,200)
    #~ im.show()
    ##
+   input.listener_add('gui', input_event_cb)
+   
    return True
 
 def shoutdown():
+   input.listener_del('gui')
    pass
 
-def _cb_btn_view_list(btn):
-   input.event_emit("VIEW_LIST")
+def input_event_cb(event):
+   if event == "TOGGLE_FULLSCREEN":
+      #~ win.fullscreen_set(not win.fullscreen_get())
+      win.fullscreen = not win.fullscreen
+      return input.EVENT_BLOCK
 
-def _cb_btn_view_grid(btn):
-   input.event_emit("VIEW_GRID")
+   input.EVENT_CONTINUE
+
+def _cb_win_del(win):
+   ask_to_exit()
+
+# TODO move this callback somewhere...maybe in mediaplayer?
+def _cb_volume_slider_changed(slider):
+   mediaplayer.volume_set(slider.value)
+
+def _cb_btn_change_view(btn, view):
+   input.event_emit(view)
 
 def load_icon(icon):
    """

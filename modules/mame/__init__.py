@@ -62,8 +62,9 @@ class MameModule(EmcModule):
    def cb_mainmenu(self):
       """ Mainmenu clicked, build the root page """
 
-      # read favorite list from config
-      MameModule._favorites = ini.get_string_list('mame', 'favorites', ',')
+      # read favorite list from config (just the first time)
+      if not MameModule._favorites:
+         MameModule._favorites = ini.get_string_list('mame', 'favorites', ',')
 
       # show the spinning dialog
       self.dialog = EmcDialog(title = 'Searching games, please wait...',

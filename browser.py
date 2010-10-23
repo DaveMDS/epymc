@@ -403,14 +403,14 @@ class ViewList(object):
          next = item.next_get()
          if next:
             next.selected_set(1)
-            next.middle_bring_in()
+            next.show()
             return input.EVENT_BLOCK
 
       elif event == "UP":
          prev = item.prev_get()
          if prev:
             prev.selected_set(1)
-            prev.middle_bring_in()
+            prev.show()
             return input.EVENT_BLOCK
 
       elif event == "OK":

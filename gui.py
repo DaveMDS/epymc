@@ -168,25 +168,24 @@ class EmcRemoteImage(elementary.Image):
 
    def show(self):
       (x, y, w, h) = self.geometry_get()
-      print 'SHOW %d %d %d %d' % (x, y, w, h)
+      #~ print 'SHOW %d %d %d %d' % (x, y, w, h)
       elementary.Image.show(self)
-      self._pb.show()
 
    def hide(self):
       self._pb.hide()
       elementary.Image.hide(self)
 
    def url_set(self, url, dest = None):
-      # if dest exists then set the image and return
       if dest and os.path.exists(dest):
+         # if dest exists then just set the image
          self.file_set(dest)
-         return
-
-      downloader.download_url_async(url, dest=(dest if dest else "tmp"),
-                                    complete_cb=self._cb_download_complete,
-                                    progress_cb=self._cb_download_progress)
-      self.file_set('')
-      self.start_spin()
+      else:
+         # else start spin & download
+         self.file_set('')
+         self.start_spin()
+         downloader.download_url_async(url, dest = (dest if dest else "tmp"),
+                                    complete_cb = self._cb_download_complete,
+                                    progress_cb = self._cb_download_progress)
 
    def start_spin(self):
       self.show()
@@ -220,12 +219,13 @@ class EmcDialog(elementary.InnerWindow):
    """ TODO doc this
    style can be 'minimal' (default), 'minimal_vertical' or 'default'
    you can also apply special style that perform specific task:
-      'error', 'warning'
+      'info', 'error', 'warning'
    note that special style don't need activate() to be called
 
    TODO does we need activate at all?
    """
 
+   special_styles = ['info', 'error', 'warning']
    dialogs_counter = 0
    
    def __init__(self, title = None, text = None, content = None,
@@ -233,7 +233,7 @@ class EmcDialog(elementary.InnerWindow):
       elementary.InnerWindow.__init__(self, gui.win)
       EmcDialog.dialogs_counter += 1
 
-      if style in ['error', 'warning']:
+      if style in EmcDialog.special_styles:
          self.style_set('minimal')
       else:
          self.style_set(style)
@@ -281,8 +281,8 @@ class EmcDialog(elementary.InnerWindow):
          self._vbox.pack_start(self._title)
          self._title.show()
 
-      if style in ['error', 'warning']:
-         self.button_add('OK', (lambda btn: self.delete()))
+      if style in EmcDialog.special_styles:
+         self.button_add('Ok', (lambda btn: self.delete()))
          self.activate()
 
 
@@ -309,6 +309,15 @@ class EmcDialog(elementary.InnerWindow):
 
       self._hbox.pack_start(b)
       b.show()
+
+   def text_set(self, text):
+      self._anchorblock.text_set(text)
+
+   def spinner_start(self):
+      self._spinner.pulse(True)
+
+   def spinner_stop(self):
+      self._spinner.pulse(False)
 
    def _cb_buttons(self, button):
       selected_cb = button.data['cb']

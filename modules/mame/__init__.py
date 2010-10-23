@@ -4,7 +4,9 @@ import os
 import xml.dom.minidom
 import operator
 
+import evas
 import ecore
+import elementary
 
 from modules import EmcModule
 from browser import EmcBrowser
@@ -12,6 +14,8 @@ from gui import EmcDialog
 import mainmenu
 import browser
 import utils
+import gui
+import downloader
 
 
 def DBG(msg):
@@ -170,33 +174,56 @@ class MameModule(EmcModule):
 ## browser model functions
    def browser_info_get(self, page_url, item_url):
       if not self._games.has_key(item_url): return None
+      self.get_more_info(item_url)
       game = self._games[item_url]
-      if len(game) < 2: # at the start only one element in the dict (the name)
-         # get game info from the command: mame -listxml <id>
-         # TODO use a better/portable way (but not async)
-         os.system(MAME_EXE + ' -listxml ' + item_url + ' > /tmp/PyEmc__MAME_tmp')
+      text = '<hilight>Year:</> %s<br>' \
+             '<hilight>Manufacturer:</> %s<br>' \
+             '<hilight>Players:</> %s<br>' \
+             '<hilight>Buttons:</> %s<br>' % \
+             (game['year'], game['manufacturer'], game['players'],
+              game['buttons'])
+      return text
 
-         # parse the xml file
-         doc = xml.dom.minidom.parse('/tmp/PyEmc__MAME_tmp')
-         game_node = doc.getElementsByTagName('game')[0]
-         if game_node.getAttribute('name') != item_url: return None
+   def getTextFromXml(self, nodelist):
+      rc = []
+      for node in nodelist:
+         for child in node.childNodes:
+            if child.nodeType == node.TEXT_NODE:
+               rc.append(child.data)
+      return ''.join(rc)
 
-         game['year'] = self.getTextFromXml(game_node.getElementsByTagName('year'))
-         game['manufacturer'] = self.getTextFromXml(game_node.getElementsByTagName('manufacturer'))
+   def browser_poster_get(self, page_url, item_url):
+      if not self._games.has_key(item_url): return None
+      (local, url) = self.get_game_poster(item_url)
+      return local if not url else url + ';' + local
 
-         input_node = game_node.getElementsByTagName('input')[0]
-         game['players'] = input_node.getAttribute('players')
-         game['buttons'] = input_node.getAttribute('buttons')
+   def browser_item_selected(self, page_url, item_url):
+      if item_url == "mame://root": self.create_root_page()
+      elif item_url == "mame://mygames": self.my_games_list()
+      elif item_url == "mame://allgames": self.all_games_list()
+      elif item_url == "mame://favgames": self.fav_games_list()
+      else: self.show_game_dialog(item_url)
 
-         driver_node = game_node.getElementsByTagName('driver')[0]
-         game['driver_status'] = driver_node.getAttribute('status')
-         game['driver_emulation'] = driver_node.getAttribute('emulation')
-         game['driver_color'] = driver_node.getAttribute('color')
-         game['driver_sound'] = driver_node.getAttribute('sound')
-         game['driver_graphic'] = driver_node.getAttribute('graphic')
-         game['driver_savestate'] = driver_node.getAttribute('savestate')
-         doc.unlink()
+## dialog stuff
+   def show_game_dialog(self, id):
+      game = self._games[id]
 
+      box = elementary.Box(gui.win)
+      box.horizontal_set(1)
+      box.homogenous_set(1)
+      box.show()
+
+      image = gui.EmcRemoteImage(gui.win)
+      image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+      (local, url) = self.get_game_poster(id)
+      image.url_set(url, local)
+      image.show()
+      box.pack_end(image)
+
+      anchorblock = elementary.AnchorView(gui.win)
+      anchorblock.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      anchorblock.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       text = '<hilight>Year:</> %s<br>' \
              '<hilight>Manufacturer:</> %s<br>' \
              '<hilight>Players:</> %s<br>' \
@@ -211,34 +238,19 @@ class MameModule(EmcModule):
               game['buttons'], game['driver_savestate'], game['driver_status'],
               game['driver_emulation'], game['driver_color'],
               game['driver_sound'], game['driver_graphic'])
-      return text
+      anchorblock.text_set(text)
+      anchorblock.show()
+      box.pack_end(anchorblock)
 
-   def getTextFromXml(self, nodelist):
-      rc = []
-      for node in nodelist:
-         for child in node.childNodes:
-            if child.nodeType == node.TEXT_NODE:
-               rc.append(child.data)
-      return ''.join(rc)
 
-   def browser_poster_get(self, page_url, item_url):
-      if not self._games.has_key(item_url): return None
-
-      # check local snapshot...
-      snap_file = os.path.join(self._snapshoot_dir, item_url, '0000.png')
-      if os.path.isfile(snap_file):
-         return snap_file
-
-      # ...or donwload the file from progettoemma.it #TODO give credits
-      snap_url = 'http://www.progettoemma.net/snap/%s/0000.png' % url
-      return snap_url + ';' + snap_file
-
-   def browser_item_selected(self, page_url, item_url):
-      if item_url == "mame://root": self.create_root_page()
-      elif item_url == "mame://mygames": self.my_games_list()
-      elif item_url == "mame://allgames": self.all_games_list()
-      elif item_url == "mame://favgames": self.fav_games_list()
-      else: self.run_game(item_url)
+      self.dialog = EmcDialog(game['name'], style = 'default', content = box)
+      if self.get_game_file(id):
+         self.dialog.button_add("Run", (lambda btn: self.run_game(id)))
+         self.dialog.button_add("Delete", (lambda btn: self.delete_game(id)))
+      else:
+         self.dialog.button_add("Download Game", (lambda btn: self.download_game(id)))
+      self.dialog.button_add("Close", (lambda btn: self.dialog.delete()))
+      self.dialog.activate()
 
 ## mame functions
    def count_roms(self):
@@ -249,27 +261,106 @@ class MameModule(EmcModule):
                tot += 1
       return tot
 
+   def get_more_info(self, id):
+      # do this only once
+      game = self._games[id]
+      if len(game) > 1: return
+      
+      # get game info from the command: mame -listxml <id>
+      # TODO use a better/portable way (but not async)
+      os.system(MAME_EXE + ' -listxml ' + id + ' > /tmp/PyEmc__MAME_tmp')
+
+      # parse the xml file
+      doc = xml.dom.minidom.parse('/tmp/PyEmc__MAME_tmp')
+      game_node = doc.getElementsByTagName('game')[0]
+      if game_node.getAttribute('name') != id: return None
+
+      # fill the game infos
+      game['year'] = self.getTextFromXml(game_node.getElementsByTagName('year'))
+      game['manufacturer'] = self.getTextFromXml(game_node.getElementsByTagName('manufacturer'))
+
+      input_node = game_node.getElementsByTagName('input')[0]
+      game['players'] = input_node.getAttribute('players')
+      game['buttons'] = input_node.getAttribute('buttons')
+
+      driver_node = game_node.getElementsByTagName('driver')[0]
+      game['driver_status'] = driver_node.getAttribute('status')
+      game['driver_emulation'] = driver_node.getAttribute('emulation')
+      game['driver_color'] = driver_node.getAttribute('color')
+      game['driver_sound'] = driver_node.getAttribute('sound')
+      game['driver_graphic'] = driver_node.getAttribute('graphic')
+      game['driver_savestate'] = driver_node.getAttribute('savestate')
+      doc.unlink()
+
+   def get_game_file(self, id):
+      for dir in self._rompaths:
+         f = os.path.join(dir, id + '.zip')
+         if (os.access(f, os.R_OK)):
+            return f
+      return None
+
+   def get_game_poster(self, id):
+      if not self._games.has_key(id): return None
+
+      snap_file = os.path.join(self._snapshoot_dir, id, '0000.png')
+      snap_url = 'http://www.progettoemma.net/snap/%s/0000.png' % id
+
+      if os.path.isfile(snap_file):
+         return (snap_file, None)
+      else:
+         return (snap_file, snap_url)
+
    def run_game(self, id):
       DBG('RUN GAME: ' + id)
       os.system(MAME_EXE + ' ' + id)
 
-   def download_game(self, id):
-      print 'Download ' + id
-      url = 'http://roms3.freeroms.com/mame_roms/%c/%s.zip' % (id[0], id)
+   def delete_game(self, id):
+      done = False
+      for dir in self._rompaths:
+         f = os.path.join(dir, id + '.zip')
+         if (os.access(f, os.W_OK)):
+            os.remove(f)
+            done = True
+      if done:
+         EmcDialog(title = 'Game deleted', style = 'info')
+         self.dialog.delete()
+      else:
+         EmcDialog(title = 'Can not delete game', style = 'error')
 
+   def download_game(self, id):
+      # choose a writable folder in rompath
       dest = None
       for dir in self._rompaths:
          if os.path.isdir(dir) and os.access(dir, os.W_OK):
             dest = dir
-
-      if dest:
-         dest = os.path.join(dest, id + '.zip')
-      else:
-         print 'Error: can not find a writable rom directory'
+      if dest is None:
+         EmcDialog(title = 'Error, can not find a writable rom directory',
+                   text = 'You sould check your mame configuration',
+                   style = 'error')
          return
+      dest = os.path.join(dest, id + '.zip')
+      DBG('DEST: ' + dest)
+      
+      # create the new download dialog
+      self.dialog.delete()
+      self.dialog = EmcDialog(title = 'Game download', spinner = True,
+                              text = ' ', style= 'minimal')
+      self.dialog.button_add('Close', lambda btn: self.dialog.delete()) # TODO abort download well if needed
+      self.dialog.activate()
 
-      print 'URL: ' + url
-      print 'DEST: ' + dest
-      headers = utils.download_url_sync(url, dest, 2000)
-      if not headers:
-         print 'ERROR DOWNLOADING ' + url
+      # try at freeroms.com
+      url = 'http://roms3.freeroms.com/mame_roms/%c/%s.zip' % (id[0], id)
+      DBG('try freeroms.org: ' + url)
+      self.dialog.text_set('Search at freeroms.com...')
+      downloader.download_url_async(url, dest, min_size = 2000,
+                           complete_cb = self._cb_download_freeromsorg_complete,
+                           progress_cb = None)
+
+   def _cb_download_freeromsorg_complete(self, url, dest, header):
+      if os.path.exists(dest):
+         self.dialog.text_set('Download done :)')
+         self.dialog.spinner_stop()
+      else:
+         self.dialog.text_set('Can not find the game online, sorry.')
+         self.dialog.spinner_stop()
+         # TODO search on other site

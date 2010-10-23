@@ -67,8 +67,9 @@ def download_url_async(url, dest = 'tmp',
        complete_cb, if given, will be called when the download is done
           def complete_cb(url, dest, header):
        progress_cb will be called while the download proceed
-       if min_size is set the downloaded data that is shorter than min_size
-          will be discarted
+
+       If min_size is set (and grater than 0) then downloaded data that
+          is shorter than min_size will be discarted. (in byte)
    """
 
    # create dest dirs if necessary, or a random temp file

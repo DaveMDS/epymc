@@ -1417,7 +1417,7 @@ group { name: "elm/gengrid/item/default/browser";
 
 //// BROWSER INFO ANCHORBLOCK (elm/entry/base-noedit/default) /////////////////
 group { name: "elm/entry/base-noedit/browser";
-      name: "elm/entry/base-noedit/default"; // TODO REMOVE ME (but the 'browser' class dont work)
+      name: "elm/entry/base-noedit/default_"; // TODO REMOVE ME (but the 'browser' class dont work)
       styles
       {
          style { name: "entry_textblock_style";
@@ -1488,5 +1488,3 @@ group { name: "elm/entry/base-noedit/browser";
          }
       }
    }
-
-

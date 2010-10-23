@@ -12,6 +12,12 @@ class EmcModule(object):
    name = ''
    label = ''
 
+   def __init__(self):
+      pass
+
+   def __shoutdown__(self):
+      pass
+
 
 _instances = {}
 

@@ -28,13 +28,13 @@ class MameModule(EmcModule):
    name = 'mame'
    label = 'M.A.M.E'
 
+   _snapshoot_dir = None
+   _rompaths = []
+
    def __init__(self):
       DBG('Init MAME')
-      
-      self._rompaths = []
-      self._games = {} # key = game_id<str>  value = game_info<dict>
-      self._snapshoot_dir = None
 
+      self._games = {} # key = game_id<str>  value = <MameGame> instance
       self._browser = EmcBrowser('MAME',
                        item_selected_cb = self.browser_item_selected,
                        poster_get_cb = self.browser_poster_get,
@@ -46,6 +46,7 @@ class MameModule(EmcModule):
       DBG('Shutdown MAME')
       del self._browser
       mainmenu.item_del("mame")
+      del self._games
 
    def cb_mainmenu(self):
       """ Mainmenu clicked, build the root page """
@@ -56,13 +57,21 @@ class MameModule(EmcModule):
       self.dialog.activate()
 
       # Aquire mame dirs from the command 'mame -showconfig'
-      self._rompaths = []
-      self._snapshoot_dir = None
+      MameModule._rompaths = []
+      MameModule._snapshoot_dir = None
       exe = ecore.Exe(MAME_EXE + " -showconfig | grep -e snapshot_directory -e rompath",
                      ecore.ECORE_EXE_PIPE_READ |
                      ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
       exe.on_data_event_add(self.cb_exe_event_showconfig)
       exe.on_del_event_add(self.cb_exe_end_showconfig)
+
+   def count_roms(self):
+      tot = 0
+      for dir in MameModule._rompaths:
+         for f in os.listdir(dir):
+            if f.endswith('.zip'):
+               tot += 1
+      return tot
 
 ## async mame stuff
    def cb_exe_event_showconfig(self, exe, event):
@@ -73,23 +82,23 @@ class MameModule(EmcModule):
          for dir in val.split(';'):
             dir_real = dir.replace('$HOME', os.getenv('HOME'))
             if key == 'rompath':
-               self._rompaths.append(dir_real)
+               MameModule._rompaths.append(dir_real)
             elif key == 'snapshot_directory':
-               self._snapshoot_dir = dir_real
+               MameModule._snapshoot_dir = dir_real
 
    def cb_exe_end_showconfig(self, exe, event):
       """ The command 'mame -showconfig' is done """
       if event.exit_code == 0:
          DBG('mame found')
-         DBG('ROM PATHS: ' + str(self._rompaths))
-         DBG('SNAP PATH: ' + self._snapshoot_dir)
+         DBG('ROM PATHS: ' + str(MameModule._rompaths))
+         DBG('SNAP PATH: ' + MameModule._snapshoot_dir)
 
          # build the full list only the first time
          if self._games:
             self.cb_exe_end_listfull(None, None)
             return
 
-         if len(self._rompaths) > 0:
+         if len(MameModule._rompaths) > 0:
             # get the list of games now
             exe = ecore.Exe(MAME_EXE + " -listfull",
                            ecore.ECORE_EXE_PIPE_READ |
@@ -110,12 +119,13 @@ class MameModule(EmcModule):
    def cb_exe_event_listfull(self, exe, event):
       """ Data from the command 'mame -listfull' received.
          Parse the line and fill the games list """
+      first = True
       for l in event.lines:
          id = l[0:l.find(' ')]
          name = l[l.find('"') + 1:l.rfind('"')]
-         #~ print "ID '" + id + "' NAME '"+name+"'"
-         if id != 'Name:':
-            self._games[id] = {'name': name} # TODO add more info now??
+         #~ DBG("ID '" + id + "' NAME '"+name+"'")
+         if id != 'Name:': #skip first line
+            self._games[id] = MameGame(id, name)
 
    def cb_exe_end_listfull(self, exe, event):
       """ The command 'mame -listfull' is done, create the root page """
@@ -141,11 +151,11 @@ class MameModule(EmcModule):
       self._browser.page_add('my_games', "My Games")
 
       L = list()
-      for dir in self._rompaths:
+      for dir in MameModule._rompaths:
          for rom in os.listdir(dir):
             id = rom.strip(".zip")
             if id and self._games.has_key(id):
-               L.append((id, self._games[id]['name']))
+               L.append((id, self._games[id].name))
 
       L.sort(key = operator.itemgetter(1))
       for k, l in L:
@@ -158,8 +168,8 @@ class MameModule(EmcModule):
       self._browser.page_add('all_games', "All Games")
 
       L = list()
-      for id, game in self._games.items():
-         L.append((id, game['name']))
+      for id, g in self._games.items():
+         L.append((id, g.name))
 
       L.sort(key = operator.itemgetter(1))
       for k, l in L:
@@ -173,41 +183,64 @@ class MameModule(EmcModule):
 
 ## browser model functions
    def browser_info_get(self, page_url, item_url):
-      if not self._games.has_key(item_url): return None
-      self.get_more_info(item_url)
-      game = self._games[item_url]
-      text = '<hilight>Year:</> %s<br>' \
-             '<hilight>Manufacturer:</> %s<br>' \
-             '<hilight>Players:</> %s<br>' \
-             '<hilight>Buttons:</> %s<br>' % \
-             (game['year'], game['manufacturer'], game['players'],
-              game['buttons'])
-      return text
-
-   def getTextFromXml(self, nodelist):
-      rc = []
-      for node in nodelist:
-         for child in node.childNodes:
-            if child.nodeType == node.TEXT_NODE:
-               rc.append(child.data)
-      return ''.join(rc)
+      if self._games.has_key(item_url):
+         return self._games[item_url].short_info_get()
+      return None
 
    def browser_poster_get(self, page_url, item_url):
-      if not self._games.has_key(item_url): return None
-      (local, url) = self.get_game_poster(item_url)
-      return local if not url else url + ';' + local
+      if self._games.has_key(item_url):
+         g = self._games[item_url]
+         (local, url) = g.poster_get()
+         return local if not url else url + ';' + local
+      return None
 
    def browser_item_selected(self, page_url, item_url):
       if item_url == "mame://root": self.create_root_page()
       elif item_url == "mame://mygames": self.my_games_list()
       elif item_url == "mame://allgames": self.all_games_list()
       elif item_url == "mame://favgames": self.fav_games_list()
-      else: self.show_game_dialog(item_url)
+      elif self._games.has_key(item_url):
+         self._games[item_url].show_dialog()
 
-## dialog stuff
-   def show_game_dialog(self, id):
-      game = self._games[id]
 
+class MameGame(object):
+   """
+   This class describe a single mame game.
+   """
+   def __init__(self, gid, name):
+      self.gid = gid
+      self.name = name
+      self.parsed = False
+
+   def run(self):
+      DBG('RUN GAME: ' + self.gid)
+      os.system(MAME_EXE + ' ' + self.gid)
+
+   def poster_get(self):
+      snap_file = os.path.join(MameModule._snapshoot_dir, self.gid, '0000.png')
+      snap_url = 'http://www.progettoemma.net/snap/%s/0000.png' % self.gid
+      if os.path.isfile(snap_file):
+         return (snap_file, None)
+      else:
+         return (snap_file, snap_url)
+
+   def short_info_get(self):
+      self._more_game_info()
+      return '<hilight>Year:</> %s<br>' \
+             '<hilight>Manufacturer:</> %s<br>' \
+             '<hilight>Players:</> %s<br>' \
+             '<hilight>Buttons:</> %s<br>' % \
+             (self.year, self.manufacturer, self.players,
+              self.buttons)
+
+   def file_name_get(self):
+      for dir in MameModule._rompaths:
+         f = os.path.join(dir, self.gid + '.zip')
+         if (os.access(f, os.R_OK)):
+            return f
+      return None
+
+   def show_dialog(self):
       box = elementary.Box(gui.win)
       box.horizontal_set(1)
       box.homogenous_set(1)
@@ -216,7 +249,7 @@ class MameModule(EmcModule):
       image = gui.EmcRemoteImage(gui.win)
       image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      (local, url) = self.get_game_poster(id)
+      (local, url) = self.poster_get()
       image.url_set(url, local)
       image.show()
       box.pack_end(image)
@@ -234,103 +267,41 @@ class MameModule(EmcModule):
              '   <hilight>color:</> %s<br>' \
              '   <hilight>sound:</> %s<br>' \
              '   <hilight>graphic:</> %s<br>' % \
-             (game['year'], game['manufacturer'], game['players'],
-              game['buttons'], game['driver_savestate'], game['driver_status'],
-              game['driver_emulation'], game['driver_color'],
-              game['driver_sound'], game['driver_graphic'])
+             (self.year, self.manufacturer, self.players,
+              self.buttons, self.driver_savestate, self.driver_status,
+              self.driver_emulation, self.driver_color,
+              self.driver_sound, self.driver_graphic)
       anchorblock.text_set(text)
       anchorblock.show()
       box.pack_end(anchorblock)
 
-
-      self.dialog = EmcDialog(game['name'], style = 'default', content = box)
-      if self.get_game_file(id):
-         self.dialog.button_add("Run", (lambda btn: self.run_game(id)))
-         self.dialog.button_add("Delete", (lambda btn: self.delete_game(id)))
+      self.dialog = EmcDialog(self.name, style = 'default', content = box)
+      if self.file_name_get():
+         self.dialog.button_add("Run", (lambda btn: self.run()))
+         self.dialog.button_add("Delete", (lambda btn: self.delete_zip()))
       else:
-         self.dialog.button_add("Download Game", (lambda btn: self.download_game(id)))
+         self.dialog.button_add("Download Game", (lambda btn: self.download_zip()))
+      self.dialog.button_add("Favorite", (lambda btn: self.favorite_set(True)))
       self.dialog.button_add("Close", (lambda btn: self.dialog.delete()))
       self.dialog.activate()
 
-## mame functions
-   def count_roms(self):
-      tot = 0
-      for dir in self._rompaths:
-         for f in os.listdir(dir):
-            if f.endswith('.zip'):
-               tot += 1
-      return tot
-
-   def get_more_info(self, id):
-      # do this only once
-      game = self._games[id]
-      if len(game) > 1: return
-      
-      # get game info from the command: mame -listxml <id>
-      # TODO use a better/portable way (but not async)
-      os.system(MAME_EXE + ' -listxml ' + id + ' > /tmp/PyEmc__MAME_tmp')
-
-      # parse the xml file
-      doc = xml.dom.minidom.parse('/tmp/PyEmc__MAME_tmp')
-      game_node = doc.getElementsByTagName('game')[0]
-      if game_node.getAttribute('name') != id: return None
-
-      # fill the game infos
-      game['year'] = self.getTextFromXml(game_node.getElementsByTagName('year'))
-      game['manufacturer'] = self.getTextFromXml(game_node.getElementsByTagName('manufacturer'))
-
-      input_node = game_node.getElementsByTagName('input')[0]
-      game['players'] = input_node.getAttribute('players')
-      game['buttons'] = input_node.getAttribute('buttons')
-
-      driver_node = game_node.getElementsByTagName('driver')[0]
-      game['driver_status'] = driver_node.getAttribute('status')
-      game['driver_emulation'] = driver_node.getAttribute('emulation')
-      game['driver_color'] = driver_node.getAttribute('color')
-      game['driver_sound'] = driver_node.getAttribute('sound')
-      game['driver_graphic'] = driver_node.getAttribute('graphic')
-      game['driver_savestate'] = driver_node.getAttribute('savestate')
-      doc.unlink()
-
-   def get_game_file(self, id):
-      for dir in self._rompaths:
-         f = os.path.join(dir, id + '.zip')
-         if (os.access(f, os.R_OK)):
-            return f
-      return None
-
-   def get_game_poster(self, id):
-      if not self._games.has_key(id): return None
-
-      snap_file = os.path.join(self._snapshoot_dir, id, '0000.png')
-      snap_url = 'http://www.progettoemma.net/snap/%s/0000.png' % id
-
-      if os.path.isfile(snap_file):
-         return (snap_file, None)
-      else:
-         return (snap_file, snap_url)
-
-   def run_game(self, id):
-      DBG('RUN GAME: ' + id)
-      os.system(MAME_EXE + ' ' + id)
-
-   def delete_game(self, id):
+   def delete_zip(self):
       done = False
-      for dir in self._rompaths:
-         f = os.path.join(dir, id + '.zip')
+      for dir in MameModule._rompaths:
+         f = os.path.join(dir, self.gid + '.zip')
          if (os.access(f, os.W_OK)):
             os.remove(f)
             done = True
       if done:
-         EmcDialog(title = 'Game deleted', style = 'info')
          self.dialog.delete()
+         EmcDialog(title = 'Game deleted', style = 'info')
       else:
          EmcDialog(title = 'Can not delete game', style = 'error')
 
-   def download_game(self, id):
+   def download_zip(self):
       # choose a writable folder in rompath
       dest = None
-      for dir in self._rompaths:
+      for dir in MameModule._rompaths:
          if os.path.isdir(dir) and os.access(dir, os.W_OK):
             dest = dir
       if dest is None:
@@ -338,7 +309,7 @@ class MameModule(EmcModule):
                    text = 'You sould check your mame configuration',
                    style = 'error')
          return
-      dest = os.path.join(dest, id + '.zip')
+      dest = os.path.join(dest, self.gid + '.zip')
       DBG('DEST: ' + dest)
       
       # create the new download dialog
@@ -349,7 +320,7 @@ class MameModule(EmcModule):
       self.dialog.activate()
 
       # try at freeroms.com
-      url = 'http://roms3.freeroms.com/mame_roms/%c/%s.zip' % (id[0], id)
+      url = 'http://roms3.freeroms.com/mame_roms/%c/%s.zip' % (self.gid[0], self.gid)
       DBG('try freeroms.org: ' + url)
       self.dialog.text_set('Search at freeroms.com...')
       downloader.download_url_async(url, dest, min_size = 2000,
@@ -357,10 +328,49 @@ class MameModule(EmcModule):
                            progress_cb = None)
 
    def _cb_download_freeromsorg_complete(self, url, dest, header):
+      self.dialog.spinner_stop()
       if os.path.exists(dest):
          self.dialog.text_set('Download done :)')
-         self.dialog.spinner_stop()
       else:
          self.dialog.text_set('Can not find the game online, sorry.')
-         self.dialog.spinner_stop()
          # TODO search on other site
+
+   def _more_game_info(self):
+      # do this only once
+      if self.parsed: return
+
+      # get game info from the command: mame -listxml <id>
+      # TODO use a better/portable way (but not async)
+      os.system(MAME_EXE + ' -listxml ' + self.gid + ' > /tmp/PyEmc__MAME_tmp')
+
+      # parse the xml file
+      doc = xml.dom.minidom.parse('/tmp/PyEmc__MAME_tmp')
+      game_node = doc.getElementsByTagName('game')[0]
+      if game_node.getAttribute('name') != self.gid: return
+
+      # fill the game infos
+      self.year = self._get_text_from_xml(game_node.getElementsByTagName('year'))
+      self.manufacturer = self._get_text_from_xml(game_node.getElementsByTagName('manufacturer'))
+
+      input_node = game_node.getElementsByTagName('input')[0]
+      self.players = input_node.getAttribute('players')
+      self.buttons = input_node.getAttribute('buttons')
+
+      driver_node = game_node.getElementsByTagName('driver')[0]
+      self.driver_status = driver_node.getAttribute('status')
+      self.driver_emulation = driver_node.getAttribute('emulation')
+      self.driver_color = driver_node.getAttribute('color')
+      self.driver_sound = driver_node.getAttribute('sound')
+      self.driver_graphic = driver_node.getAttribute('graphic')
+      self.driver_savestate = driver_node.getAttribute('savestate')
+      doc.unlink()
+
+      self.parsed = True
+
+   def _get_text_from_xml(self, nodelist):
+      rc = []
+      for node in nodelist:
+         for child in node.childNodes:
+            if child.nodeType == node.TEXT_NODE:
+               rc.append(child.data)
+      return ''.join(rc)

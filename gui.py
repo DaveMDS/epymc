@@ -219,17 +219,17 @@ class EmcDialog(elementary.InnerWindow):
    """ TODO doc this
    style can be 'minimal' (default), 'minimal_vertical' or 'default'
    you can also apply special style that perform specific task:
-      'info', 'error', 'warning'
+      'info', 'error', 'warning', 'yesno'
    note that special style don't need activate() to be called
 
    TODO does we need activate at all?
    """
 
-   special_styles = ['info', 'error', 'warning']
+   special_styles = ['info', 'error', 'warning', 'yesno']
    dialogs_counter = 0
    
    def __init__(self, title = None, text = None, content = None,
-                spinner = False, style = 'minimal'):
+                spinner = False, style = 'minimal', done_cb = None):
       elementary.InnerWindow.__init__(self, gui.win)
       EmcDialog.dialogs_counter += 1
 
@@ -242,6 +242,7 @@ class EmcDialog(elementary.InnerWindow):
       self._buttons = list()
       self._current_button_num = 0
       self._content = content
+      self._done_cb = done_cb
 
       # vbox
       self._vbox = elementary.Box(gui.win)
@@ -281,10 +282,14 @@ class EmcDialog(elementary.InnerWindow):
          self._vbox.pack_start(self._title)
          self._title.show()
 
-      if style in EmcDialog.special_styles:
+      if style in ['info', 'error', 'warning']:
          self.button_add('Ok', (lambda btn: self.delete()))
          self.activate()
 
+      if style in ['yesno']:
+         self.button_add('Yes', (lambda btn: self._done_cb(self)))
+         self.button_add('No', (lambda btn: self.delete()))
+         self.activate()
 
    def activate(self):
       input.listener_add(self._name, self._input_event_cb)

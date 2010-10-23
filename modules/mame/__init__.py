@@ -328,6 +328,15 @@ class MameGame(object):
          btn.icon_set(gui.load_icon('icon/star'))
 
    def delete_zip(self):
+      def _cb_done(dialog):
+         self._delete_zip_real()
+         dialog.delete()
+      EmcDialog(text = 'Really delete this game?', style='yesno',
+                done_cb = _cb_done)
+
+   
+
+   def _delete_zip_real(self):
       done = False
       for dir in MameModule._rompaths:
          f = os.path.join(dir, self.gid + '.zip')

@@ -15,6 +15,9 @@ ICON("back")
 ICON("list")
 ICON("grid")
 
+ICON("star")
+ICON("star_off")
+
 ICON("play")
 ICON("stop")
 ICON("fwd")

@@ -3,7 +3,7 @@
 
 
 Main elementary layout group: "epymc_main_layout"
-
+All the icons in icons.edc must be implemented
 
 ### TopBar stuff ###
    * Required parts:

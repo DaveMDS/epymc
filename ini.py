@@ -52,3 +52,7 @@ def get_bool(section, option):
 def set(section, option, value):
    _config.set(section, option, value)
 
+def set_string_list(section, option, values, separator = ' '):
+   string = separator.join(values)
+   set(section, option, string)
+

@@ -15,6 +15,7 @@ import mainmenu
 import browser
 import utils
 import gui
+import ini
 import downloader
 
 
@@ -30,6 +31,7 @@ class MameModule(EmcModule):
 
    _snapshoot_dir = None
    _rompaths = []
+   _favorites = []
 
    def __init__(self):
       DBG('Init MAME')
@@ -38,18 +40,30 @@ class MameModule(EmcModule):
       self._browser = EmcBrowser('MAME',
                        item_selected_cb = self.browser_item_selected,
                        poster_get_cb = self.browser_poster_get,
-                       info_get_cb = self.browser_info_get)
+                       info_get_cb = self.browser_info_get,
+                       icon_get_cb = self.browser_icon_get)
 
       mainmenu.item_add("mame", 50, "M.A.M.E", None, self.cb_mainmenu)
 
+      # create config ini section if not exists
+      ini.add_section('mame')
+
    def __shutdown__(self):
       DBG('Shutdown MAME')
+
+      # save favorite games
+      ini.set_string_list("mame", "favorites", MameModule._favorites, ',')
+
+      # clear stuff
       del self._browser
       mainmenu.item_del("mame")
       del self._games
 
    def cb_mainmenu(self):
       """ Mainmenu clicked, build the root page """
+
+      # read favorite list from config
+      MameModule._favorites = ini.get_string_list('mame', 'favorites', ',')
 
       # show the spinning dialog
       self.dialog = EmcDialog(title = 'Searching games, please wait...',
@@ -143,12 +157,12 @@ class MameModule(EmcModule):
       self._browser.item_add('mame://allgames',
                              'All Games (%d)' % (len(self._games)))
       self._browser.item_add('mame://favgames',
-                             'Favorite Games (TODO)')
+                             'Favorite Games (%d)' % (len(MameModule._favorites)))
       self._browser.item_add('emc://back', "Back")
 
    def my_games_list(self):
       """ Create the list of personal games """
-      self._browser.page_add('my_games', "My Games")
+      self._browser.page_add('mame://mygames', "My Games")
 
       L = list()
       for dir in MameModule._rompaths:
@@ -165,7 +179,7 @@ class MameModule(EmcModule):
 
    def all_games_list(self):
       """ Create the list of all know mame games """
-      self._browser.page_add('all_games', "All Games")
+      self._browser.page_add('mame://allgames', "All Games")
 
       L = list()
       for id, g in self._games.items():
@@ -178,7 +192,12 @@ class MameModule(EmcModule):
       self._browser.item_add('emc://back', "Back")
 
    def fav_games_list(self):
-      print ' - Favorite Games'
+      """ Create the list of favorite games """
+      self._browser.page_add('mame://favgames', "Favorite Games")
+
+      for gid in MameModule._favorites:
+         g = self._games[gid]
+         if g: self._browser.item_add(gid, g.name)
 
 
 ## browser model functions
@@ -193,6 +212,11 @@ class MameModule(EmcModule):
          (local, url) = g.poster_get()
          return local if not url else url + ';' + local
       return None
+
+   def browser_icon_get(self, page_url, item_url):
+      if not item_url.startswith('mame://'):
+         if item_url in MameModule._favorites:
+            return 'icon/star'
 
    def browser_item_selected(self, page_url, item_url):
       if item_url == "mame://root": self.create_root_page()
@@ -276,14 +300,28 @@ class MameGame(object):
       box.pack_end(anchorblock)
 
       self.dialog = EmcDialog(self.name, style = 'default', content = box)
+
       if self.file_name_get():
          self.dialog.button_add("Run", (lambda btn: self.run()))
          self.dialog.button_add("Delete", (lambda btn: self.delete_zip()))
       else:
          self.dialog.button_add("Download Game", (lambda btn: self.download_zip()))
-      self.dialog.button_add("Favorite", (lambda btn: self.favorite_set(True)))
+
+      if self.gid in MameModule._favorites:
+         self.dialog.button_add("", self._cb_favorite_button, icon = 'icon/star')
+      else:
+         self.dialog.button_add("", self._cb_favorite_button, icon = 'icon/star_off')
+
       self.dialog.button_add("Close", (lambda btn: self.dialog.delete()))
       self.dialog.activate()
+
+   def _cb_favorite_button(self, btn):
+      if self.gid in MameModule._favorites:
+         btn.icon_set(gui.load_icon('icon/star_off'))
+         MameModule._favorites.remove(self.gid)
+      else:
+         MameModule._favorites.append(self.gid)
+         btn.icon_set(gui.load_icon('icon/star'))
 
    def delete_zip(self):
       done = False
@@ -311,7 +349,7 @@ class MameGame(object):
          return
       dest = os.path.join(dest, self.gid + '.zip')
       DBG('DEST: ' + dest)
-      
+
       # create the new download dialog
       self.dialog.delete()
       self.dialog = EmcDialog(title = 'Game download', spinner = True,

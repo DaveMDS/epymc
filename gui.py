@@ -297,7 +297,7 @@ class EmcDialog(elementary.InnerWindow):
    def content_get(self):
       return self._content
 
-   def button_add(self, label, selected_cb = None, cb_data = None):
+   def button_add(self, label, selected_cb = None, cb_data = None, icon = None):
       b = elementary.Button(self)
       self._buttons.append(b)
       b.label_set(label)
@@ -306,6 +306,8 @@ class EmcDialog(elementary.InnerWindow):
       b.data['cb_data'] = cb_data
       b.callback_clicked_add(self._cb_buttons)
       b.on_mouse_in_add(self._cb_button_mouse_in)
+      if icon:
+         b.icon_set(load_icon(icon))
 
       self._hbox.pack_start(b)
       b.show()

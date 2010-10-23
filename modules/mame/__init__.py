@@ -334,8 +334,6 @@ class MameGame(object):
       EmcDialog(text = 'Really delete this game?', style='yesno',
                 done_cb = _cb_done)
 
-   
-
    def _delete_zip_real(self):
       done = False
       for dir in MameModule._rompaths:

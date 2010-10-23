@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import evas
+import ecore
 import elementary
 
 import gui
@@ -308,6 +309,8 @@ class ViewList(object):
       """
       DBG('Init view: plain list')
 
+      self.timer = None
+
       # EXTERNAL Genlist1
       self.gl1 = gui.part_get('browser/list/genlist1')
       self.gl1.style_set("browser")
@@ -436,9 +439,13 @@ class ViewList(object):
       parent_browser._item_selected(url)
 
    def _cb_item_hilight(self, list, item):
-      (url, label, parent_browser) = item.data_get()
+      if self.timer: self.timer.delete()
+      self.timer = ecore.timer_add(0.5, self._cb_timer, item.data_get())
 
-      # Ask for the item poster and show (or download) it
+   def _cb_timer(self, data):
+      (url, label, parent_browser) = data
+
+      # Ask for the item poster and show (or auto-download) it
       poster = parent_browser._poster_get(url)
       if poster and poster.startswith("http://"):
          if poster.find(';') != -1:
@@ -453,6 +460,8 @@ class ViewList(object):
       info = parent_browser._info_get(url)
       self.infoblock.text_set(info if info else "")
 
+      return False # don't repeat the timer
+      
 
 ################################################################################
 #### Grid View  ################################################################

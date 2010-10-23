@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import os
+
 import evas
 import elementary
 
@@ -7,6 +9,8 @@ import utils
 import ini
 import downloader
 import mediaplayer
+import gui
+import input
 
 
 win = None
@@ -151,8 +155,6 @@ def swallow_set(part, obj):
 
 
 ################################################################################
-import os
-
 class EmcRemoteImage(elementary.Image):
    """ TODO doc this """
 
@@ -214,25 +216,29 @@ class EmcRemoteImage(elementary.Image):
    #TODO on image_set abort the download ? 
 
 ################################################################################
-import gui
-import input
-
-_dialog_counter = 0
-
 class EmcDialog(elementary.InnerWindow):
    """ TODO doc this
-        style can be 'minimal' (default), 'minimal_vertical' or 'default'
+   style can be 'minimal' (default), 'minimal_vertical' or 'default'
+   you can also apply special style that perform specific task:
+      'error', 'warning'
+   note that special style don't need activate() to be called
+
+   TODO does we need activate at all?
    """
 
+   dialogs_counter = 0
+   
    def __init__(self, title = None, text = None, content = None,
                 spinner = False, style = 'minimal'):
-      global _dialog_counter
-
       elementary.InnerWindow.__init__(self, gui.win)
-      self.style_set(style)
-      
-      _dialog_counter += 1
-      self._name = 'Dialog-' + str(_dialog_counter)
+      EmcDialog.dialogs_counter += 1
+
+      if style in ['error', 'warning']:
+         self.style_set('minimal')
+      else:
+         self.style_set(style)
+
+      self._name = 'Dialog-' + str(EmcDialog.dialogs_counter)
       self._buttons = list()
       self._current_button_num = 0
       self._content = content
@@ -243,6 +249,7 @@ class EmcDialog(elementary.InnerWindow):
       self._vbox.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       self._vbox.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       self._vbox.show()
+      elementary.InnerWindow.content_set(self, self._vbox)
 
       # hbox (buttons)
       self._hbox = elementary.Box(gui.win)
@@ -274,7 +281,10 @@ class EmcDialog(elementary.InnerWindow):
          self._vbox.pack_start(self._title)
          self._title.show()
 
-      elementary.InnerWindow.content_set(self, self._vbox)
+      if style in ['error', 'warning']:
+         self.button_add('OK', (lambda btn: self.delete()))
+         self.activate()
+
 
    def activate(self):
       input.listener_add(self._name, self._input_event_cb)
@@ -294,13 +304,13 @@ class EmcDialog(elementary.InnerWindow):
       b.disabled_set(0 if (len(self._buttons) == 1) else 1)
       b.data['cb'] = selected_cb
       b.data['cb_data'] = cb_data
-      b.callback_clicked_add(self._buttons_cb)
+      b.callback_clicked_add(self._cb_buttons)
       b.on_mouse_in_add(self._cb_button_mouse_in)
 
       self._hbox.pack_start(b)
       b.show()
 
-   def _buttons_cb(self, button):
+   def _cb_buttons(self, button):
       selected_cb = button.data['cb']
       cb_data = button.data['cb_data']
 
@@ -343,7 +353,7 @@ class EmcDialog(elementary.InnerWindow):
                return input.EVENT_BLOCK
 
       if event == 'OK':
-         self._buttons_cb(self._buttons[self._current_button_num])
+         self._cb_buttons(self._buttons[self._current_button_num])
 
       elif event == 'LEFT':
          if self._current_button_num < len(self._buttons) - 1:

@@ -8,13 +8,14 @@ import ecore
 
 from modules import EmcModule
 from browser import EmcBrowser
+from gui import EmcDialog
 import mainmenu
 import browser
 import utils
 
 
 def DBG(msg):
-   print('MAME: ' + msg)
+   print('MAME: ' + str(msg))
    pass
 
 MAME_EXE = 'mame'
@@ -23,55 +24,43 @@ class MameModule(EmcModule):
    name = 'mame'
    label = 'M.A.M.E'
 
-   _rompaths = []
-   _games = {} # key = game_id<str>  value = game_info<dict>
-   _snapshoot_dir = None
-   _browser = None
-
    def __init__(self):
       DBG('Init MAME')
-
-      mainmenu.item_add("mame", 50, "M.A.M.E", None, self.cb_mainmenu)
+      
+      self._rompaths = []
+      self._games = {} # key = game_id<str>  value = game_info<dict>
+      self._snapshoot_dir = None
 
       self._browser = EmcBrowser('MAME',
                        item_selected_cb = self.browser_item_selected,
                        poster_get_cb = self.browser_poster_get,
                        info_get_cb = self.browser_info_get)
 
-      # Aquire mame dirs from the command 'mame -showconfig' TODO this shuold be done later...
-      exe = ecore.Exe(MAME_EXE + " -showconfig | grep -e snapshot_directory -e rompath",
-                     ecore.ECORE_EXE_PIPE_READ |
-                     ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
-      exe.on_data_event_add(self.cb_exe_event_showconfig)
+      mainmenu.item_add("mame", 50, "M.A.M.E", None, self.cb_mainmenu)
 
    def __shutdown__(self):
       DBG('Shutdown MAME')
-      mainmenu.item_del("mame")
       del self._browser
+      mainmenu.item_del("mame")
 
    def cb_mainmenu(self):
       """ Mainmenu clicked, build the root page """
 
-      # did we found mame earlier ?
-      if not self._rompaths:
-         print "No mame found"
-         #TODO alert the user
-         return
+      # show the spinning dialog
+      self.dialog = EmcDialog(title = 'Searching games, please wait...',
+                              spinner = True)
+      self.dialog.activate()
 
-      # Aquire the list of all games from the command 'mame -listfull'
-      if not self._games:
-         exe = ecore.Exe(MAME_EXE + " -listfull",
-                           ecore.ECORE_EXE_PIPE_READ |
-                           ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
-         exe.on_data_event_add(self.cb_exe_event_listfull)
-         exe.on_del_event_add(self.cb_exe_end_listfull)
-         #TODO show a popup while loading ??
-      else:
-         self.create_root_page()
-         self._browser.show()
+      # Aquire mame dirs from the command 'mame -showconfig'
+      self._rompaths = []
+      self._snapshoot_dir = None
+      exe = ecore.Exe(MAME_EXE + " -showconfig | grep -e snapshot_directory -e rompath",
+                     ecore.ECORE_EXE_PIPE_READ |
+                     ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
+      exe.on_data_event_add(self.cb_exe_event_showconfig)
+      exe.on_del_event_add(self.cb_exe_end_showconfig)
 
-      mainmenu.hide()
-
+## async mame stuff
    def cb_exe_event_showconfig(self, exe, event):
       """ Data from the command 'mame -showconfig' received.
          Parse the line and fill the class vars """
@@ -83,6 +72,36 @@ class MameModule(EmcModule):
                self._rompaths.append(dir_real)
             elif key == 'snapshot_directory':
                self._snapshoot_dir = dir_real
+
+   def cb_exe_end_showconfig(self, exe, event):
+      """ The command 'mame -showconfig' is done """
+      if event.exit_code == 0:
+         DBG('mame found')
+         DBG('ROM PATHS: ' + str(self._rompaths))
+         DBG('SNAP PATH: ' + self._snapshoot_dir)
+
+         # build the full list only the first time
+         if self._games:
+            self.cb_exe_end_listfull(None, None)
+            return
+
+         if len(self._rompaths) > 0:
+            # get the list of games now
+            exe = ecore.Exe(MAME_EXE + " -listfull",
+                           ecore.ECORE_EXE_PIPE_READ |
+                           ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
+            exe.on_data_event_add(self.cb_exe_event_listfull)
+            exe.on_del_event_add(self.cb_exe_end_listfull)
+         else:
+            self.dialog.delete()
+            EmcDialog(title = 'Can\'t get rom path from M.A.M.E.',
+                      text = 'Is your mame well configured?',
+                      style = 'error')
+      else:
+         DBG('ERROR: mame not found in PATH')
+         self.dialog.delete()
+         EmcDialog(title = 'M.A.M.E not found', style = 'error',
+                   text = '<br>Is mame in your path?')
 
    def cb_exe_event_listfull(self, exe, event):
       """ Data from the command 'mame -listfull' received.
@@ -98,24 +117,28 @@ class MameModule(EmcModule):
       """ The command 'mame -listfull' is done, create the root page """
       self.create_root_page()
       self._browser.show()
+      mainmenu.hide()
+      self.dialog.delete()
 
 
+## browser pages
    def create_root_page(self):
       self._browser.page_add('mame://root', "M.A.M.E")
-      self._browser.item_add('mame://mygames', "My Games")
-      self._browser.item_add('mame://allgames', "All Games")
-      self._browser.item_add('mame://favgames', "Favorite Games")
+      self._browser.item_add('mame://mygames',
+                             'My Games (%d)' % (self.count_roms()))
+      self._browser.item_add('mame://allgames',
+                             'All Games (%d)' % (len(self._games)))
+      self._browser.item_add('mame://favgames',
+                             'Favorite Games (TODO)')
       self._browser.item_add('emc://back', "Back")
 
    def my_games_list(self):
       """ Create the list of personal games """
       self._browser.page_add('my_games', "My Games")
 
-      print "ROMS " + str(self._rompaths)
       L = list()
       for dir in self._rompaths:
          for rom in os.listdir(dir):
-            print "ROM" + rom
             id = rom.strip(".zip")
             if id and self._games.has_key(id):
                L.append((id, self._games[id]['name']))
@@ -144,6 +167,7 @@ class MameModule(EmcModule):
       print ' - Favorite Games'
 
 
+## browser model functions
    def browser_info_get(self, page_url, item_url):
       if not self._games.has_key(item_url): return None
       game = self._games[item_url]
@@ -210,27 +234,24 @@ class MameModule(EmcModule):
       return snap_url + ';' + snap_file
 
    def browser_item_selected(self, page_url, item_url):
-
       if item_url == "mame://root": self.create_root_page()
       elif item_url == "mame://mygames": self.my_games_list()
       elif item_url == "mame://allgames": self.all_games_list()
       elif item_url == "mame://favgames": self.fav_games_list()
-      else:
-         print "GAME RUN: " + item_url
-         zip = None
-         for dir in self._rompaths:
-            print "DIR" + dir
-            path = os.path.join(dir, item_url) + '.zip'
-            if os.path.isfile(path):
-               zip = path
-            #~ id = rom.strip(".zip")
-               #~ if id and self._games.has_key(id):
-                  #~ self._browser.item_add(id, self._games[id]['name'])
+      else: self.run_game(item_url)
 
-         if zip:
-            os.system(MAME_EXE + ' ' + zip)
-         else:
-            self.download_game(item_url)
+## mame functions
+   def count_roms(self):
+      tot = 0
+      for dir in self._rompaths:
+         for f in os.listdir(dir):
+            if f.endswith('.zip'):
+               tot += 1
+      return tot
+
+   def run_game(self, id):
+      DBG('RUN GAME: ' + id)
+      os.system(MAME_EXE + ' ' + id)
 
    def download_game(self, id):
       print 'Download ' + id

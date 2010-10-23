@@ -37,7 +37,8 @@ def get_string_list(section, option, separator = ' '):
    string = get(section, option)
    ret = []
    for s in string.split(separator):
-      ret.append(s if separator == ' ' else s.strip())
+      if len(s) > 0:
+         ret.append(s if separator == ' ' else s.strip())
    return ret
 
 def get_int(section, option):

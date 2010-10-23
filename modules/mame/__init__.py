@@ -65,6 +65,8 @@ class MameModule(EmcModule):
       # read favorite list from config (just the first time)
       if not MameModule._favorites:
          MameModule._favorites = ini.get_string_list('mame', 'favorites', ',')
+         print "**************"
+         print MameModule._favorites
 
       # show the spinning dialog
       self.dialog = EmcDialog(title = 'Searching games, please wait...',

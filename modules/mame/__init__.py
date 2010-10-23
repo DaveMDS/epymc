@@ -197,8 +197,9 @@ class MameModule(EmcModule):
       self._browser.page_add('mame://favgames', "Favorite Games")
 
       for gid in MameModule._favorites:
-         g = self._games[gid]
-         if g: self._browser.item_add(gid, g.name)
+         if self._games.has_key(gid):
+            g = self._games[gid]
+            self._browser.item_add(gid, g.name)
 
 
 ## browser model functions

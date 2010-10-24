@@ -1,0 +1,10 @@
+
+CORE
+=====
+ * Make bindings for ecore_file_download instead of use the internal downloader
+
+MAME
+=====
+ * catver.ini: instead of reading a single file, scan a directory (~/.mame/cats/)
+   for *.ini files and create a menu entry for each. The namein the root could
+   be the name of the file (minus the extension)

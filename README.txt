@@ -20,3 +20,7 @@ SEARCH PATH:
  ~/.config/epymc/themes
  ~/.config/epymc/modules
  
+GREATINGS:
+tmdb.org
+progettoemma.net
+arcadehistory.com

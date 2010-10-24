@@ -32,6 +32,7 @@ class MameModule(EmcModule):
    _snapshoot_dir = None
    _rompaths = []
    _favorites = []
+   _categories = {}
 
    def __init__(self):
       DBG('Init MAME')
@@ -161,6 +162,7 @@ class MameModule(EmcModule):
                              'All Games (%d)' % (len(self._games)))
       self._browser.item_add('mame://favgames',
                              'Favorite Games (%d)' % (len(MameModule._favorites)))
+      self._browser.item_add('mame://cats', 'Categories')
       self._browser.item_add('emc://back', "Back")
 
    def my_games_list(self):
@@ -203,6 +205,65 @@ class MameModule(EmcModule):
             g = self._games[gid]
             self._browser.item_add(gid, g.name)
 
+   def cats_list(self):
+      """ Create the list of categories """
+      # get catver file from config (or set the default one)
+      catver_file = ini.get('mame', 'catver_file')
+      if not catver_file:
+         catver_file = os.path.join(os.getenv('HOME'), '.mame', 'Catver.ini')
+         ini.set('mame', 'catver_file', catver_file)
+
+      # parse the cats list (if not yet done)
+      if not self._parse_cats_file(): return
+
+      self._browser.page_add('mame://cats', "Categories")
+
+      for cat_name in sorted(self._categories.keys()):
+         self._browser.item_add('mame://cats/' + cat_name,
+                  cat_name + ' (' + str(len(self._categories[cat_name])) + ')')
+
+   def game_by_cat_list(self, cat_name):
+      """ Create the list of games in the given cat """
+      self._browser.page_add('mame://cats/' + cat_name, cat_name)
+
+      for gid in MameModule._categories[cat_name]:
+         self._browser.item_add(gid, self._games[gid].name)
+
+   def _parse_cats_file(self):
+      # just the first time
+      if MameModule._categories: return True
+
+      catver_file = ini.get('mame', 'catver_file')
+      if not os.path.exists(catver_file):
+         EmcDialog(title = 'No category file found',style = 'error',
+                   text = 'The category file is not included in mame, you '
+                          'need to download a copy from the net. <br>'
+                          'The file must be placed in ' + catver_file)
+         return False
+
+      f = open(catver_file, 'r')
+      state = 0
+      for line in f:
+         #state0: searching for '[Category]'
+         if state == 0:
+            if line.startswith('[Category]'):
+               state = 1
+         #state1: filling cats
+         elif state == 1:
+            stripped = line.strip()
+            if (stripped == ''):
+               state = 2
+            else:
+               (game_id, cat) = stripped.split('=')
+               if MameModule._categories.has_key(cat):
+                  MameModule._categories[cat].append(game_id)
+               else:
+                  MameModule._categories[cat] = [game_id]
+         #state2: end
+         elif state == 2:
+            break
+      f.close()
+      return True
 
 ## browser model functions
    def browser_info_get(self, page_url, item_url):
@@ -223,10 +284,15 @@ class MameModule(EmcModule):
             return 'icon/star'
 
    def browser_item_selected(self, page_url, item_url):
+      DBG("PAGE: " + str(page_url))
+      DBG("ITEM: " + str(item_url))
       if item_url == "mame://root": self.create_root_page()
       elif item_url == "mame://mygames": self.my_games_list()
       elif item_url == "mame://allgames": self.all_games_list()
       elif item_url == "mame://favgames": self.fav_games_list()
+      elif item_url == "mame://cats": self.cats_list()
+      elif item_url.startswith("mame://cats/"):
+         self.game_by_cat_list(item_url[12:])
       elif self._games.has_key(item_url):
          self._games[item_url].dialog_show()
 

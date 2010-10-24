@@ -227,7 +227,8 @@ class MameModule(EmcModule):
       self._browser.page_add('mame://cats/' + cat_name, cat_name)
 
       for gid in MameModule._categories[cat_name]:
-         self._browser.item_add(gid, self._games[gid].name)
+         if self._games.has_key(gid):
+            self._browser.item_add(gid, self._games[gid].name)
 
    def _parse_cats_file(self):
       # just the first time

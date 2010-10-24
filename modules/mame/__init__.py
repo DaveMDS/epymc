@@ -228,7 +228,7 @@ class MameModule(EmcModule):
       elif item_url == "mame://allgames": self.all_games_list()
       elif item_url == "mame://favgames": self.fav_games_list()
       elif self._games.has_key(item_url):
-         self._games[item_url].show_dialog()
+         self._games[item_url].dialog_show()
 
 
 class MameGame(object):
@@ -239,6 +239,7 @@ class MameGame(object):
       self.gid = gid
       self.name = name
       self.parsed = False
+      self.history = ''
 
    def run(self):
       DBG('RUN GAME: ' + self.gid)
@@ -268,7 +269,7 @@ class MameGame(object):
             return f
       return None
 
-   def show_dialog(self):
+   def dialog_show(self):
       box = elementary.Box(gui.win)
       box.horizontal_set(1)
       box.homogenous_set(1)
@@ -307,7 +308,6 @@ class MameGame(object):
 
       if self.file_name_get():
          self.dialog.button_add("Run", (lambda btn: self.run()))
-         self.dialog.button_add("Delete", (lambda btn: self.delete_zip()))
       else:
          self.dialog.button_add("Download Game", (lambda btn: self.download_zip()))
 
@@ -315,6 +315,11 @@ class MameGame(object):
          self.dialog.button_add("", self._cb_favorite_button, icon = 'icon/star')
       else:
          self.dialog.button_add("", self._cb_favorite_button, icon = 'icon/star_off')
+
+      self.dialog.button_add("History", (lambda btn: self.history_show()))
+
+      if self.file_name_get():
+         self.dialog.button_add("Delete", (lambda btn: self.delete_zip()))
 
       self.dialog.button_add("Close", (lambda btn: self.dialog.delete()))
       self.dialog.activate()
@@ -326,6 +331,71 @@ class MameGame(object):
       else:
          MameModule._favorites.append(self.gid)
          btn.icon_set(gui.load_icon('icon/star'))
+
+   def history_show(self):
+      # get history file from config (or set the default one)
+      history_file = ini.get('mame', 'history_file')
+      if not history_file:
+         history_file = os.path.join(os.getenv('HOME'), '.mame', 'history.dat')
+         ini.set('mame', 'history_file', history_file)
+
+      # history.dat file not found
+      if not os.path.exists(history_file):
+         EmcDialog(title = 'No History file found',style = 'error',
+                   text = 'The History file is not included in mame, you '
+                          'should download a copy from aracade-history.com <br>'
+                          'The file must be unzipped and placed in ' + f)
+         return
+
+      # parse the history file
+      if not self.history:
+         history = ''
+         state = 0
+         f = open(history_file, 'r')
+         for line in f:
+            # state0: search line that start with '$info'
+            if state == 0:
+               #~ DBG('0')
+               if line.startswith('$info'):
+                  names = line[6:].split(',')
+                  names.pop() # discard last element (is a '\n\r')
+                  print names
+                  if self.gid in names:
+                     print names
+                     state = 1
+            # state1: skip until '$bio'
+            elif state == 1:
+               DBG('1')
+               if line.startswith('$bio'):
+                  state = 2
+            # state2: copy text until '$end'
+            elif state == 2:
+               DBG('2')
+               if line.startswith('$end'):
+                  state = 3 # done
+               else:
+                  history = history + line + '<br>'
+            #state3: end
+            elif state == 3:
+               DBG('3')
+               break
+
+         f.close()
+         self.history = history
+      
+      if not self.history:
+         EmcDialog(title = 'Game not found in history file', style = 'error')
+         return
+
+      # build the dialog
+      av = elementary.AnchorView(gui.win)
+      av.show()
+      av.bounce_set(0, 1)
+      av.text_set(self.history)
+
+      dia = EmcDialog(title = self.name, content = av, style = 'default')
+      dia.button_add('Close', lambda btn: dia.delete())
+      dia.activate()
 
    def delete_zip(self):
       def _cb_done(dialog):

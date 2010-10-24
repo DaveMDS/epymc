@@ -3,8 +3,8 @@
 import ecore
 import ecore.x
 
-from modules import EmcModule
-import input
+from epymc.modules import EmcModule
+import epymc.input as input
 
 
 def DBG(msg):

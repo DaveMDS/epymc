@@ -5,18 +5,18 @@ import os
 import evas
 import elementary
 
-from modules import EmcModule
-from browser import EmcBrowser
-from sdb import EmcDatabase
-from gui import EmcDialog
-from gui import EmcRemoteImage
+from epymc.modules import EmcModule
+from epymc.browser import EmcBrowser
+from epymc.sdb import EmcDatabase
+from epymc.gui import EmcDialog
+from epymc.gui import EmcRemoteImage
 
-import mainmenu
-import mediaplayer
-import ini
-import utils
-import downloader
-import gui
+import epymc.mainmenu as mainmenu
+import epymc.mediaplayer as mediaplayer
+import epymc.ini as ini
+import epymc.utils as utils
+import epymc.downloader as downloader
+import epymc.gui as gui
 
 
 def DBG(msg):

@@ -3,10 +3,22 @@
 import os
 import urllib
 
+_base_dir = None
+_config_dir = None
+
+def base_dir_set(d):
+   global _base_dir
+   _base_dir = d
+
+def base_dir_get():
+   return _base_dir
+
 
 def config_dir_get():
-   # TODO 'cache' this
-   return os.path.expanduser('~/.config/epymc')
+   global _config_dir
+   if not _config_dir:
+      _config_dir = os.path.expanduser('~/.config/epymc')
+   return _config_dir
 
 
 def get_resource_file(type, resource, default = None):
@@ -21,9 +33,8 @@ def get_resource_file(type, resource, default = None):
       if os.path.exists(f):
          return f
 
-      # search relative to the script
-      path = os.path.dirname(__file__)
-      f = os.path.join(path, "data", type, res)
+      # search relative to the script (epymc.py) dir
+      f = os.path.join(base_dir_get(), "data", type, res)
       if os.path.exists(f):
          return f
 

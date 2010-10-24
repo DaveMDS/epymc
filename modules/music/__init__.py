@@ -2,17 +2,18 @@
 
 import os
 import operator
+import threading
 
 import ecore
 
-from modules import EmcModule
-from browser import EmcBrowser
-from sdb import EmcDatabase
-from gui import EmcDialog
-import mainmenu
-import utils
-import ini
-import threading
+from epymc.modules import EmcModule
+from epymc.browser import EmcBrowser
+from epymc.sdb import EmcDatabase
+from epymc.gui import EmcDialog
+import epymc.mainmenu as mainmenu
+import epymc.utils as utils
+import epymc.ini as ini
+
 
 
 _audio_extensions = ['.mp3', '.MP3']

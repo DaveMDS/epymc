@@ -7,20 +7,23 @@ import evas
 import edje
 import elementary
 
-import modules
-import utils
-import gui
-import config_gui
-import mainmenu
-import ini
-import sdb
-import downloader
-import browser
+import epymc.modules as modules
+import epymc.utils as utils
+import epymc.gui as gui
+import epymc.config_gui as config_gui
+import epymc.mainmenu as mainmenu
+import epymc.ini as ini
+import epymc.sdb as sdb
+import epymc.downloader as downloader
+import epymc.browser as browser
 
 
 def main():
    #init elementary
    elementary.init()
+
+   # set the base path
+   utils.base_dir_set(os.path.dirname(__file__))
 
    # create config dir if necessary
    user_config_dir = utils.config_dir_get()

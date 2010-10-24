@@ -8,15 +8,15 @@ import evas
 import ecore
 import elementary
 
-from modules import EmcModule
-from browser import EmcBrowser
-from gui import EmcDialog
-import mainmenu
-import browser
-import utils
-import gui
-import ini
-import downloader
+from epymc.modules import EmcModule
+from epymc.browser import EmcBrowser
+from epymc.gui import EmcDialog
+import epymc.mainmenu as mainmenu
+import epymc.browser as browser
+import epymc.utils as utils
+import epymc.gui as gui
+import epymc.ini as ini
+import epymc.downloader as downloader
 
 
 def DBG(msg):

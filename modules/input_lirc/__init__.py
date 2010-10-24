@@ -4,9 +4,9 @@ from socket import *
 
 import ecore
 
-from modules import EmcModule
-import input
-import ini
+from epymc.modules import EmcModule
+import epymc.input as input
+import epymc.ini as ini
 
 
 def DBG(msg):

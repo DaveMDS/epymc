@@ -38,7 +38,7 @@ def load_all():
             mod =  __import__(name)
    
    # ... then in the modules/ dir relative to script position
-   path = os.path.join(os.path.dirname(__file__), 'modules')
+   path = os.path.join(utils.base_dir_get(), 'modules')
    if not path in sys.path:
       sys.path.insert(0, path)
 

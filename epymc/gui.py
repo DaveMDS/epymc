@@ -34,7 +34,7 @@ def init():
       print "ERROR: can't find a working theme file, exiting..."
       return False
    
-   elementary.theme_overlay_add(theme_file) #TODO REMOVE ME (but the 'browser' class  of anchorblock dont work)
+   #~ elementary.theme_overlay_add(theme_file)
    elementary.theme_extension_add(theme_file)
 
    # window

@@ -28,8 +28,8 @@ All the icons in icons.edc must be implemented
    * Required parts:
       "browser/list/genlist1" -> elm_genlist style: "browser"
       "browser/list/genlist2" -> elm_genlist style: "browser"
-      "browser/list/poster" -> edje swallow
-      "browser/list/info" -> elm_anchorblock
+      "browser/list/poster" -> edje swallow -> EmcRemoteImage
+      "browser/list/info" -> edje TEXTBLOCK
 
    * Signals received from the application:
       "browser,list,show" "emc"

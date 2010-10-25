@@ -9,21 +9,34 @@
 #define DBG(...)
 #endif
 
+#define FONT "Sans"
+#define FONT_BOLD "Sans:style=Bold"
+#define FONT_SIZE 16
+#define FONT_COLOR 255 255 255 255
+#define FONT_COLOR3 0 0 0 64
 
 images {
    image: "background.jpg" COMP;
    image: "bg_configuration.jpg" COMP;
 }
 
+styles
+{
+   style { name: "epymc_default_style";
+      base: "font=Sans font_size="FONT_SIZE" color=#bbb wrap=word";
+      tag:  "br" "\n";
+      tag:  "ps" "ps";
+      tag:  "tab" "\t";
+      tag:  "em" "+ font=Sans:style=Oblique";
+      tag:  "b" "+ font=Sans:style=Bold";
+      tag:  "link" "+ color=#800 underline=on underline_color=#8008";
+      tag:  "hilight" "+ font=Sans:style=Bold";
+      tag:  "title" "+ font=Sans:style=Bold font_size=25"(FONT_SIZE + 8);
+   }
+}
 externals {
    external: "elm";
 }
-
-#define FONT "Sans"
-#define FONT_BOLD "Sans:style=Bold"
-#define FONT_SIZE 16
-#define FONT_COLOR 255 255 255 255
-#define FONT_COLOR3 0 0 0 64
 
 collections {
 
@@ -166,9 +179,9 @@ collections {
             }
          }
          part { name: "browser/list/info"; /* API */
-            type: EXTERNAL;
+            type: TEXTBLOCK;
             clip_to: "browser/list/clip";
-            source: "elm/anchorblock";
+            multiline: 1;
             description { state: "default" 0.0;
                rel1 {
                   relative: 0.5 0.65;
@@ -176,6 +189,9 @@ collections {
                }
                rel2 {
                   offset: -20 -20;
+               }
+               text {
+                  style: "epymc_default_style";
                }
             }
          }

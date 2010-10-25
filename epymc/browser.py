@@ -334,10 +334,6 @@ class ViewList(object):
                                  icon_get_func = self.__genlist_icon_get,
                                  state_get_func = self.__genlist_state_get)
 
-      # EXTERNAL info anchorblock
-      self.infoblock = gui.part_get('browser/list/info') # TODO rename in ../infoblock
-      self.infoblock.style_set("browser")
-
       # RemoteImage (poster)
       self.__im = gui.EmcRemoteImage(gui.win)
       gui.swallow_set('browser/list/poster', self.__im)
@@ -457,8 +453,7 @@ class ViewList(object):
          self.__im.file_set(poster if poster else "")
 
       # Fill the anchorblock with item info info 
-      info = parent_browser._info_get(url)
-      self.infoblock.text_set(info if info else "")
+      gui.text_set('browser/list/info', parent_browser._info_get(url))
 
       return False # don't repeat the timer
       

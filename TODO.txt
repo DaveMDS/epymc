@@ -1,7 +1,6 @@
 
 CORE
 =====
- * Make bindings for ecore_file_download instead of use the internal downloader
 
 MAME
 =====

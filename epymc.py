@@ -66,6 +66,7 @@ def main():
    elementary.shutdown()
    
    print 'Bye Bye...'
+   return 0
 
 if __name__ == "__main__":
    sys.exit(main())

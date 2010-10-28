@@ -4,8 +4,11 @@ import sys
 import os
 
 import evas
+import ecore
+import ecore.file
 import edje
 import elementary
+import emotion
 
 import epymc.modules as modules
 import epymc.utils as utils
@@ -14,7 +17,6 @@ import epymc.config_gui as config_gui
 import epymc.mainmenu as mainmenu
 import epymc.ini as ini
 import epymc.sdb as sdb
-import epymc.downloader as downloader
 import epymc.browser as browser
 
 
@@ -36,13 +38,16 @@ def main():
    ini.read_from_files(['epymc.conf',
                         os.path.join(user_config_dir, 'epymc.conf')])
 
+   # alert if CURL support not available (no download ability)
+   if not ecore.file.download_protocol_available("http://"):
+      print("WARNING. Ecore must be comiled with CURL support. Download disabled")
+
    # init stuff
    sdb.init()
    browser.init()
    if not gui.init(): return 2
    config_gui.init()
    mainmenu.init()
-   downloader.init()
 
    # load & init modules
    modules.load_all()
@@ -58,7 +63,6 @@ def main():
    modules.shutdown_all()
    ini.write_to_file(os.path.join(user_config_dir, 'epymc.conf'))
    gui.shoutdown()
-   downloader.shutdown()
    browser.shutdown()
    sdb.shutdown()
 

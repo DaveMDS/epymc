@@ -259,7 +259,7 @@ class EmcDialog(elementary.InnerWindow):
 
       self._vbox.pack_end(self._hbox)
       
-      if text:
+      if text is not None:
          self._anchorblock = elementary.AnchorBlock(gui.win)
          self._anchorblock.text_set(text)
          self._vbox.pack_start(self._anchorblock)
@@ -276,7 +276,7 @@ class EmcDialog(elementary.InnerWindow):
          self._spinner.show()
          self._vbox.pack_start(self._spinner)
 
-      if title:
+      if title is not None:
          self._title = elementary.Label(gui.win)
          self._title.label_set(title)
          self._vbox.pack_start(self._title)
@@ -287,8 +287,8 @@ class EmcDialog(elementary.InnerWindow):
          self.activate()
 
       if style in ['yesno']:
-         self.button_add('Yes', (lambda btn: self._done_cb(self)))
          self.button_add('No', (lambda btn: self.delete()))
+         self.button_add('Yes', (lambda btn: self._done_cb(self)))
          self.activate()
 
    def activate(self):
@@ -319,6 +319,12 @@ class EmcDialog(elementary.InnerWindow):
 
    def text_set(self, text):
       self._anchorblock.text_set(text)
+
+   def text_get(self):
+      return self._anchorblock.text_get()
+
+   def text_append(self, text):
+      self._anchorblock.text_set(self._anchorblock.text_get() + text)
 
    def spinner_start(self):
       self._spinner.pulse(True)

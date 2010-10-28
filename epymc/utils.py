@@ -3,6 +3,8 @@
 import os
 import urllib
 
+import ecore.file
+
 _base_dir = None
 _config_dir = None
 
@@ -57,4 +59,68 @@ def download_url_sync(url, dest, min_size = 0):
       return None
 
    return headers
+
+def download_url_async(url, dest = 'tmp', min_size = 0,
+                       complete_cb = None, progress_cb = None,
+                       *args, **kargs):
+   """
+   Download the given url in async way.
+   url must be a valid url to download
+   If dest is set to a local file name then the download data will
+      be written to that file (created and overwritten if necessary, also
+      the necessary parent directories are created)
+   If dest is omitted (or is 'tmp') than the data will be written
+      to a random new temp file
+
+   if min_size is set (and > 0) than downloaded files smaller that min_size
+      will be discarted
+
+   complete_cb, if given, will be called when the download is done
+         def complete_cb(file, status, *args, **kargs):
+
+   progress_cb will be called while the download is in progress
+         def progress_cb(file, dltotal, dlnow, *args, **kargs):
+
+   TODO If dest is set to None than the data will be passed as the dest param
+      in the complete_cb
+
+   """
+
+   def _cb_download_complete(dest, status, dwl_data, *args, **kargs):
+      (complete_cb, progress_cb, min_size) = dwl_data
+
+      # if file size < min_size: report as error
+      if status == 0 and min_size > 0 and os.path.getsize(dest) < min_size:
+         status = 1
+
+      # on errors delete the downloaded file
+      if status > 0 and os.path.exists(dest):
+         os.remove(dest)
+
+      # call the user complete_cb if available
+      if complete_cb and callable(complete_cb):
+         complete_cb(dest, status, *args, **kargs)
+
+   def _cb_download_progress(dest, dltotal, dlnow, uptotal, upnow, dwl_data, *args, **kargs):
+      (complete_cb, progress_cb, min_size) = dwl_data
+      #TODO filter out some call (maybe report only when dlnow change)
+      if progress_cb and callable(progress_cb):
+         progress_cb(dest, dltotal, dlnow, *args, **kargs)
+      return 0 # always continue the download
+
+
+   # create dest dirs if necessary, or use a random temp file
+   if dest == 'tmp':
+      dest = tempfile.mktemp()
+   elif dest:
+      dirname = os.path.dirname(dest)
+      if not os.path.exists(dirname):
+         os.makedirs(dirname)
+
+   # store download data for later use
+   dwl_data = (complete_cb, progress_cb, min_size)
+
+   # start the download
+   return ecore.file.download(url, dest, _cb_download_complete,
+               _cb_download_progress, dwl_data = dwl_data, *args, **kargs)
 

@@ -1,5 +1,19 @@
 #!/usr/bin/env python
 
+
+"""
+
+ WARNING: THIS FILE IS DEPRECATED, DONT USE THIS FILE !!!
+
+   Use utils.download_url_sync/async() instead
+
+   The file is still here just for reference in case we will need
+   to code something similar in the future.
+
+
+"""
+
+
 import os
 import urllib
 import tempfile
@@ -121,3 +135,4 @@ def _check_q2():
       if complete_cb:
          complete_cb(url, filename, headers)
    return True
+

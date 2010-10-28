@@ -335,7 +335,7 @@ class MameGame(object):
          if (os.access(f, os.R_OK)):
             return f
       return None
-
+## game dialog
    def dialog_show(self):
       box = elementary.Box(gui.win)
       box.horizontal_set(1)
@@ -463,7 +463,7 @@ class MameGame(object):
       dia = EmcDialog(title = self.name, content = av, style = 'default')
       dia.button_add('Close', lambda btn: dia.delete())
       dia.activate()
-
+## delete game
    def delete_zip(self):
       def _cb_done(dialog):
          self._delete_zip_real()
@@ -483,7 +483,7 @@ class MameGame(object):
          EmcDialog(title = 'Game deleted', style = 'info')
       else:
          EmcDialog(title = 'Can not delete game', style = 'error')
-
+## download game
    def download_zip(self):
       # choose a writable folder in rompath
       dest = None
@@ -501,26 +501,56 @@ class MameGame(object):
       # create the new download dialog
       self.dialog.delete()
       self.dialog = EmcDialog(title = 'Game download', spinner = True,
-                              text = ' ', style= 'minimal')
+                              text = '', style= 'minimal')
       self.dialog.button_add('Close', lambda btn: self.dialog.delete()) # TODO abort download well if needed
       self.dialog.activate()
 
-      # try at freeroms.com
-      url = 'http://roms3.freeroms.com/mame_roms/%c/%s.zip' % (self.gid[0], self.gid)
-      DBG('try freeroms.org: ' + url)
-      self.dialog.text_set('Search at freeroms.com...')
-      downloader.download_url_async(url, dest, min_size = 2000,
-                           complete_cb = self._cb_download_freeromsorg_complete,
-                           progress_cb = None)
+      # Try to download the game from various roms site
+      sources = []
+      # freeroms.com
+      title = "Trying at freeroms.org...<br>"
+      prefix = 'NUM' if self.gid[0].isdigit() else self.gid[0]
+      url = 'http://freeroms67.freeroms.com/mame_roms/%s/%s.zip' % (prefix, self.gid)
+      sources.append((title, url))
+       # try somewhere else
+      title = "Trying not_work.com...<br>"
+      url = 'http://freeroms67.freeroms.com/mame_roms/%c/%s.zip' % (self.gid[0], self.gid)
+      sources.append((title, url))
 
-   def _cb_download_freeromsorg_complete(self, url, dest, header):
-      self.dialog.spinner_stop()
-      if os.path.exists(dest):
-         self.dialog.text_set('Download done :)')
+      self._try_download_multi_sources(sources, dest)
+
+   def _try_download_multi_sources(self, sources, dest):
+      (title, url) = sources.pop(0)
+      self.dialog.text_append(title)
+      DBG(title)
+      DBG(url)
+      try:
+         utils.download_url_async(url, dest, min_size = 2000,
+                           complete_cb = self._cb_multi_download_complete,
+                           progress_cb = self._cb_multi_download_progress,
+                           sources = sources)
+      except SystemError:
+         if sources:
+            self._try_download_multi_sources(sources, dest)
+         else:
+            self.dialog.text_append('<b>Can not find the game online, sorry.</>')
       else:
-         self.dialog.text_set('Can not find the game online, sorry.')
-         # TODO search on other site
+         self.dialog.spinner_start()
 
+   def _cb_multi_download_complete(self, dest, status, sources):
+      self.dialog.spinner_stop()
+      if status == 0: # no errors
+         self.dialog.text_append('<b>Download done :)</>')
+      else:
+         if sources:
+            self._try_download_multi_sources(sources, dest)
+         else:
+            self.dialog.text_append('<b>Can not find the game online, sorry.</b>')
+
+   def _cb_multi_download_progress(self, file, dltotal, dlnow, sources):
+      #~ print dlnow
+      pass
+## game history
    def _more_game_info(self):
       # do this only once
       if self.parsed: return

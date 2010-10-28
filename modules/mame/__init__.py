@@ -16,7 +16,6 @@ import epymc.browser as browser
 import epymc.utils as utils
 import epymc.gui as gui
 import epymc.ini as ini
-import epymc.downloader as downloader
 
 
 def DBG(msg):

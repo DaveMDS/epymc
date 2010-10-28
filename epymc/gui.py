@@ -7,7 +7,6 @@ import elementary
 
 import utils
 import ini
-import downloader
 import mediaplayer
 import gui
 import input
@@ -183,9 +182,8 @@ class EmcRemoteImage(elementary.Image):
          # else start spin & download
          self.file_set('')
          self.start_spin()
-         downloader.download_url_async(url, dest = (dest if dest else "tmp"),
-                                    complete_cb = self._cb_download_complete,
-                                    progress_cb = self._cb_download_progress)
+         utils.download_url_async(url, dest if dest else "tmp",
+                                  complete_cb = self._cb_download_complete)
 
    def start_spin(self):
       self.show()
@@ -203,14 +201,14 @@ class EmcRemoteImage(elementary.Image):
       self._pb.move(x, y)
       self._pb.raise_()
 
-   def _cb_download_complete(self, url, dest, header):
+   def _cb_download_complete(self, dest, status):
       self.stop_spin()
-      self.file_set(dest)
-      self.size_hint_min_set(100, 100) #TODO FIXME (needed by tmdb search results list)
-
-   def _cb_download_progress(self):
-      pass
-
+      if status == 0: # Successfull
+         self.file_set(dest)
+         self.size_hint_min_set(100, 100) #TODO FIXME (needed by tmdb search results list)
+      else:
+         self.file_set(None)
+         # TODO show a dummy image
 
    #TODO on image_set abort the download ? 
 

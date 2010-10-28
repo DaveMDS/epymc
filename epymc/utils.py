@@ -2,8 +2,15 @@
 
 import os
 import urllib
+import tempfile
 
 import ecore.file
+
+
+def DBG(msg):
+   print('UTILS: ' + str(msg))
+   pass
+
 
 _base_dir = None
 _config_dir = None
@@ -44,17 +51,20 @@ def get_resource_file(type, resource, default = None):
    return None
 
 def download_url_sync(url, dest, min_size = 0):
-   """Copy the contents of a file from a given URL to a local file. """
-
+   """
+   Copy the contents of a file from a given URL to a local file, blocking
+   the code while the download is in progress, you should use the async
+   version instead.
+   """
    dir = os.path.dirname(dest)
    if not os.path.exists(dir):
       os.makedirs(dir)
 
    (filename, headers) = urllib.urlretrieve(url, dest)
-   print "Filename: " + filename
+   DBG("Filename: " + filename)
    #~ print headers
    if os.path.getsize(filename) < min_size:
-      print "TOO SHORT " + str(os.path.getsize(filename))
+      DBG("TOO SHORT " + str(os.path.getsize(filename)))
       os.remove(filename)
       return None
 
@@ -91,10 +101,12 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
 
       # if file size < min_size: report as error
       if status == 0 and min_size > 0 and os.path.getsize(dest) < min_size:
+         DBG("MIN_SIZE not reached, discard download")
          status = 1
 
       # on errors delete the downloaded file
       if status > 0 and os.path.exists(dest):
+         DBG("download error")
          os.remove(dest)
 
       # call the user complete_cb if available
@@ -108,19 +120,26 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
          progress_cb(dest, dltotal, dlnow, *args, **kargs)
       return 0 # always continue the download
 
-
-   # create dest dirs if necessary, or use a random temp file
+   # urlencode the url (but not the http:// part, or ':' will be converted)
+   (_prot, _url) = url.split('://', 1)
+   encoded = '://'.join((_prot, urllib.quote(_url)))
+   
+   # use a random temp file
    if dest == 'tmp':
       dest = tempfile.mktemp()
    elif dest:
+      # create dest path if necessary,
       dirname = os.path.dirname(dest)
       if not os.path.exists(dirname):
          os.makedirs(dirname)
+      # remove destination file if exists (overwrite)
+      if os.path.exists(dest):
+         os.remove(dest)
 
    # store download data for later use
    dwl_data = (complete_cb, progress_cb, min_size)
 
    # start the download
-   return ecore.file.download(url, dest, _cb_download_complete,
+   return ecore.file.download(encoded, dest, _cb_download_complete,
                _cb_download_progress, dwl_data = dwl_data, *args, **kargs)
 

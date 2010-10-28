@@ -15,7 +15,6 @@ import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
 import epymc.ini as ini
 import epymc.utils as utils
-import epymc.downloader as downloader
 import epymc.gui as gui
 
 
@@ -310,7 +309,7 @@ class FilmsModule(EmcModule):
       self.__poster_dialog = dialog
       (url, id) = item.data_get()[0][0]
       dest = get_poster_filename(id)
-      downloader.download_url_async(url, dest, self._cb_poster_done)
+      utils.download_url_async(url, dest, complete_cb = self._cb_poster_done)
 
       # kill the dialog
       self.__poster_dialog.delete()
@@ -321,7 +320,7 @@ class FilmsModule(EmcModule):
                                          spinner = True)
       self.__poster_dialog.activate()
 
-   def _cb_poster_done(self, url, dest, headers):
+   def _cb_poster_done(self, dest, status):
       # kill the dialog
       self.__poster_dialog.delete()
       del self.__poster_dialog
@@ -374,7 +373,7 @@ class FilmsModule(EmcModule):
       self.__backdrop_dialog = dialog
       (url, id) = item.data_get()[0][0]
       dest = get_backdrop_filename(id)
-      downloader.download_url_async(url, dest, self._cb_backdrop_done)
+      utils.download_url_async(url, dest, complete_cb = self._cb_backdrop_done)
 
       # kill the dialog
       self.__backdrop_dialog.delete()
@@ -385,11 +384,10 @@ class FilmsModule(EmcModule):
                                          spinner = True)
       self.__backdrop_dialog.activate()
 
-   def _cb_backdrop_done(self, url, dest, headers):
+   def _cb_backdrop_done(self, dest, status):
       # kill the dialog
       self.__backdrop_dialog.delete()
       del self.__backdrop_dialog
-      #~ self.update_film_info(self.__current_url)
 
 ###############
    def _cb_panel_5(self, button):
@@ -442,10 +440,13 @@ class TMDB2(object):
       self.dialog.activate()
 
       print "query: " + query
-      downloader.download_url_async(query, None, self._cb_search_done)
+      utils.download_url_async(query, "tmp", complete_cb = self._cb_search_done)
 
-   def _cb_search_done(self, url, dest, headers):
-      data = json.loads(dest)
+   def _cb_search_done(self, dest, status):
+      f = open(dest, "r")
+      data = json.loads(f.read())
+      f.close()
+      os.remove(dest)
 
       # kill spinner dialog
       self.dialog.delete()
@@ -508,36 +509,40 @@ class TMDB2(object):
                               spinner = True)
       self.dialog.activate()
 
-      downloader.download_url_async(query, None, self._cb_film_info_done)
+      utils.download_url_async(query, "tmp", complete_cb = self._cb_film_info_done)
 
-   def _cb_film_info_done(self, url, dest, headers):
-      data = json.loads(dest)
+   def _cb_film_info_done(self, dest, status):
+      f = open(dest, "r")
+      data = json.loads(f.read())
+      f.close()
+      os.remove(dest)
+
       self.movie_info = data[0]
 
       # download the first poster image found
       for image in self.movie_info['posters']:
          if image['image']['size'] == 'mid': # TODO make default size configurable
             dest = get_poster_filename(self.movie_info['id'])
-            downloader.download_url_async(image['image']['url'], dest,
-                                          self._cb_film_poster_done)
+            utils.download_url_async(image['image']['url'], dest,
+                                     complete_cb = self._cb_film_poster_done)
             return
 
       # if no poster found go to next step
-      self._cb_film_poster_done(url, dest, headers)
+      self._cb_film_poster_done(dest, 1)
 
-   def _cb_film_poster_done(self, url, dest, headers):
+   def _cb_film_poster_done(self, dest, status):
       # download the first backdrop image found
       for image in self.movie_info['backdrops']:
          if image['image']['size'] == 'original': # TODO make default size configurable
             dest = get_backdrop_filename(self.movie_info['id'])
-            downloader.download_url_async(image['image']['url'], dest,
-                                          self._cb_film_backdrop_done)
+            utils.download_url_async(image['image']['url'], dest,
+                                     complete_cb = self._cb_film_backdrop_done)
             return
 
       # if no backdrop found go to next step
-      self._cb_film_backdrop_done(url, dest, headers)
+      self._cb_film_backdrop_done(dest, 1)
 
-   def _cb_film_backdrop_done(self, url, dest, headers):
+   def _cb_film_backdrop_done(self, dest, status):
       # kill the spinner dialog
       self.dialog.delete()
       del self.dialog

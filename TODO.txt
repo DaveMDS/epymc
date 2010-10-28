@@ -1,7 +1,8 @@
 
 CORE
 =====
-
+ * RemoteImage: the spinner is not clipped well, look at the 'Choose Poster"
+   dialog: the spinner is visible outside the dialog.
 MAME
 =====
  * catver.ini: instead of reading a single file, scan a directory (~/.mame/cats/)

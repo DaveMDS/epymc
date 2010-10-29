@@ -163,11 +163,13 @@ class FilmsModule(EmcModule):
       image.show()
       box.pack_end(image)
 
-      anchorblock = elementary.AnchorView(gui.win)
-      anchorblock.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      anchorblock.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      anchorblock.show()
-      box.pack_end(anchorblock)
+      sentry = elementary.ScrolledEntry(gui.win)
+      sentry.style_set("dialog")
+      sentry.editable_set(False)
+      sentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      sentry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+      sentry.show()
+      box.pack_end(sentry)
 
       dialog = EmcDialog(title = 'Film Info', style = 'default', content = box)
       dialog.button_add('Play', self._cb_panel_1)
@@ -178,7 +180,7 @@ class FilmsModule(EmcModule):
       dialog.button_add('Close', self._cb_panel_6)
 
       dialog.data['o_image'] = image
-      dialog.data['o_anchorblock'] = anchorblock
+      dialog.data['o_sentry'] = sentry
       self._dialog = dialog
 
       dialog.activate()
@@ -191,7 +193,7 @@ class FilmsModule(EmcModule):
 
    def update_film_info(self, url):
       o_image = self._dialog.data['o_image']
-      o_anchorblock = self._dialog.data['o_anchorblock']
+      o_sentry = self._dialog.data['o_sentry']
 
       if self.__film_db.id_exists(url):
          print 'Found: ' + url
@@ -205,7 +207,7 @@ class FilmsModule(EmcModule):
                   "<hilight>Cast: </hilight>" + self._get_cast(e) + "<br>" + \
                   "<hilight>Rating: </hilight>" + str(e['rating']) + "/10<br>" + \
                   "<br><hilight>Overview:</hilight><br>" + e['overview']
-         o_anchorblock.text_set(info.encode('utf-8'))
+         o_sentry.entry_set(info.encode('utf-8'))
 
          # update poster
          poster = get_poster_filename(e['id'])
@@ -221,7 +223,7 @@ class FilmsModule(EmcModule):
          msg = "Media:<br>" + url + "<br><br>" + \
                "No info stored for this media<br>" + \
                "Try the GetInfo button..."
-         o_anchorblock.text_set(msg)
+         o_sentry.entry_set(msg)
          # TODO make thumbnail
          o_image.file_set('')
 
@@ -263,7 +265,7 @@ class FilmsModule(EmcModule):
       dialog.delete()
       del dialog
 
-########
+######## Choose poster
    def _cb_panel_3(self, button):
       if self.__film_db.id_exists(self.__current_url):
          film_info = self.__film_db.get_data(self.__current_url)
@@ -317,8 +319,7 @@ class FilmsModule(EmcModule):
 
       # make a spinner dialog
       self.__poster_dialog = EmcDialog(title = "Downloading Poster",
-                                         spinner = True)
-      self.__poster_dialog.activate()
+                                         spinner = True, style = 'cancel')
 
    def _cb_poster_done(self, dest, status):
       # kill the dialog
@@ -327,7 +328,7 @@ class FilmsModule(EmcModule):
 
       self.update_film_info(self.__current_url)
 
-########
+######## Choose fanart
    def _cb_panel_4(self, button):
       if self.__film_db.id_exists(self.__current_url):
          film_info = self.__film_db.get_data(self.__current_url)
@@ -381,15 +382,14 @@ class FilmsModule(EmcModule):
 
       # make a spinner dialog
       self.__backdrop_dialog = EmcDialog(title = "Downloading Fanart",
-                                         spinner = True)
-      self.__backdrop_dialog.activate()
+                                         spinner = True, style = 'cancel')
 
    def _cb_backdrop_done(self, dest, status):
       # kill the dialog
       self.__backdrop_dialog.delete()
       del self.__backdrop_dialog
 
-###############
+######## Get info
    def _cb_panel_5(self, button):
       tmdb = TMDB2(TMDB_API_KEY)
       film = self.get_film_name_from_url(self.__current_url)
@@ -436,9 +436,7 @@ class TMDB2(object):
       query = self.server+'Movie.search/'+self.lang+'/json/'+self.key+'/'+film
 
       self.dialog = EmcDialog(title = "Searching for: " + film,
-                              spinner = True)
-      self.dialog.activate()
-
+                              spinner = True, style = 'cancel')
       print "query: " + query
       utils.download_url_async(query, "tmp", complete_cb = self._cb_search_done)
 
@@ -506,8 +504,7 @@ class TMDB2(object):
       query = self.server+'Movie.getInfo/'+self.lang+'/json/'+self.key+'/'+str(id)
 
       self.dialog = EmcDialog(title = "Downloading film info",
-                              spinner = True)
-      self.dialog.activate()
+                              spinner = True, style = 'cancel')
 
       utils.download_url_async(query, "tmp", complete_cb = self._cb_film_info_done)
 

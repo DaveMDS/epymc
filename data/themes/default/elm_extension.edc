@@ -951,6 +951,7 @@ group { name: "elm/genlist/item/default/browser";
       }
    }
 }
+
 //// BROWSER GENLIST ITEM COMP (elm/genlist/item_compress/default/default) ////
 group { name: "elm/genlist/item_compress/default/browser";
    alias: "elm/genlist/item_compress_odd/default/browser";
@@ -1414,3 +1415,52 @@ group { name: "elm/gengrid/item/default/browser";
       }
    }
 }
+
+//// DIALOGS ENTRY (elm/entry/base-noedit/default) ////////////////////////////
+ group { name: "elm/entry/base-noedit/dialog";
+      parts {
+         part { name: "elm.text";
+            type: TEXTBLOCK;
+            mouse_events: 1;
+            scale: 1;
+            entry_mode: PLAIN;
+            select_mode: EXPLICIT;
+            multiline: 1;
+            source: "elm/entry/selection/default"; // selection under
+            source5: "elm/entry/anchor/default"; // anchor under
+            description { state: "default" 0.0;
+               fixed: 1 0;
+               text {
+                  style: "epymc_dialog_style";
+                  min: 0 1;
+               }
+            }
+            description { state: "disabled" 0.0;
+               inherit: "default" 0.0;
+               text {
+                  style: "epymc_dialog_style";
+               }
+            }
+         }
+      }
+      programs {
+         program { name: "focus";
+            signal: "load";
+            source: "";
+            action: FOCUS_SET;
+            target: "elm.text";
+         }
+         program { name: "disable";
+            signal: "elm,state,disabled";
+            source: "elm";
+            action: STATE_SET "disabled" 0.0;
+            target: "elm.text";
+         }
+         program { name: "enable";
+            signal: "elm,state,enabled";
+            source: "elm";
+            action: STATE_SET "default" 0.0;
+            target: "elm.text";
+         }
+      }
+   }

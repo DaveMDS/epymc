@@ -452,8 +452,9 @@ class ViewList(object):
       else:
          self.__im.file_set(poster if poster else "")
 
-      # Fill the anchorblock with item info info 
-      gui.text_set('browser/list/info', parent_browser._info_get(url))
+      # Fill the textblock with item info info
+      text = parent_browser._info_get(url)
+      gui.text_set('browser/list/info', text or "")
 
       return False # don't repeat the timer
       

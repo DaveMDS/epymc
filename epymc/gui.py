@@ -33,7 +33,7 @@ def init():
       print "ERROR: can't find a working theme file, exiting..."
       return False
    
-   #~ elementary.theme_overlay_add(theme_file)
+   #~ elementary.theme_overlay_add(theme_file) # TODO REMOVE ME!!!
    elementary.theme_extension_add(theme_file)
 
    # window
@@ -215,19 +215,20 @@ class EmcRemoteImage(elementary.Image):
 ################################################################################
 class EmcDialog(elementary.InnerWindow):
    """ TODO doc this
-   style can be 'minimal' (default), 'minimal_vertical' or 'default'
+   style can be 'default', 'minimal' or 'minimal_vertical'
+
    you can also apply special style that perform specific task:
-      'info', 'error', 'warning', 'yesno'
+      'info', 'error', 'warning', 'yesno', 'cancel'
    note that special style don't need activate() to be called
 
    TODO does we need activate at all?
    """
 
-   special_styles = ['info', 'error', 'warning', 'yesno']
+   special_styles = ['info', 'error', 'warning', 'yesno', 'cancel']
    dialogs_counter = 0
    
    def __init__(self, title = None, text = None, content = None,
-                spinner = False, style = 'minimal', done_cb = None):
+                spinner = False, style = 'default', done_cb = None):
       elementary.InnerWindow.__init__(self, gui.win)
       EmcDialog.dialogs_counter += 1
 
@@ -258,10 +259,16 @@ class EmcDialog(elementary.InnerWindow):
       self._vbox.pack_end(self._hbox)
       
       if text is not None:
-         self._anchorblock = elementary.AnchorBlock(gui.win)
-         self._anchorblock.text_set(text)
-         self._vbox.pack_start(self._anchorblock)
-         self._anchorblock.show()
+         self._textentry = elementary.Entry(gui.win)
+         self._textentry.style_set('dialog')
+         self._textentry.editable_set(False)
+         self._textentry.context_menu_disabled_set(True)
+         self._textentry.entry_set(text)
+         self._textentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+         self._textentry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+         #~ self._textentry.size_hint_align_set(0.5, 0.5)
+         self._vbox.pack_start(self._textentry)
+         self._textentry.show()
       elif content:
          self._vbox.pack_start(content)
          content.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
@@ -287,6 +294,10 @@ class EmcDialog(elementary.InnerWindow):
       if style in ['yesno']:
          self.button_add('No', (lambda btn: self.delete()))
          self.button_add('Yes', (lambda btn: self._done_cb(self)))
+         self.activate()
+
+      if style in ['cancel']:
+         self.button_add('Cancel', (lambda btn: self.delete()))
          self.activate()
 
    def activate(self):
@@ -316,13 +327,13 @@ class EmcDialog(elementary.InnerWindow):
       b.show()
 
    def text_set(self, text):
-      self._anchorblock.text_set(text)
+      self._textentry.entry_set(text)
 
    def text_get(self):
-      return self._anchorblock.text_get()
+      return self._textentry.entry_get()
 
    def text_append(self, text):
-      self._anchorblock.text_set(self._anchorblock.text_get() + text)
+      self._textentry.entry_set(self._textentry.entry_get() + text)
 
    def spinner_start(self):
       self._spinner.pulse(True)

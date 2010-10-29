@@ -86,8 +86,8 @@ class MusicModule(EmcModule):
 
       # Update db in a parallel thread
       self.dialog = EmcDialog(title = 'Rebuilding Database, please wait...',
-                              spinner = True)
-      self.dialog.activate()
+                              spinner = True, style = 'cancel')
+
       thread = UpdateDBThread(self.__folders, self.__songs_db,
                               self.__albums_db, self.__artists_db)
       thread.start()

@@ -65,13 +65,10 @@ class MameModule(EmcModule):
       # read favorite list from config (just the first time)
       if not MameModule._favorites:
          MameModule._favorites = ini.get_string_list('mame', 'favorites', ',')
-         print "**************"
-         print MameModule._favorites
 
       # show the spinning dialog
       self.dialog = EmcDialog(title = 'Searching games, please wait...',
-                              spinner = True)
-      self.dialog.activate()
+                              spinner = True, style = 'cancel')
 
       # Aquire mame dirs from the command 'mame -showconfig'
       MameModule._rompaths = []
@@ -334,7 +331,7 @@ class MameGame(object):
          if (os.access(f, os.R_OK)):
             return f
       return None
-## game dialog
+## game dialog stuff
    def dialog_show(self):
       box = elementary.Box(gui.win)
       box.horizontal_set(1)
@@ -349,10 +346,13 @@ class MameGame(object):
       image.show()
       box.pack_end(image)
 
-      anchorblock = elementary.AnchorView(gui.win)
-      anchorblock.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      anchorblock.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      text = '<hilight>Year:</> %s<br>' \
+      sentry = elementary.ScrolledEntry(gui.win)
+      sentry.style_set("dialog")
+      sentry.editable_set(False)
+      sentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      sentry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+      text = '<title>%s</><br>' \
+             '<hilight>Year:</> %s<br>' \
              '<hilight>Manufacturer:</> %s<br>' \
              '<hilight>Players:</> %s<br>' \
              '<hilight>Buttons:</> %s<br>' \
@@ -362,13 +362,13 @@ class MameGame(object):
              '   <hilight>color:</> %s<br>' \
              '   <hilight>sound:</> %s<br>' \
              '   <hilight>graphic:</> %s<br>' % \
-             (self.year, self.manufacturer, self.players,
+             (self.name, self.year, self.manufacturer, self.players,
               self.buttons, self.driver_savestate, self.driver_status,
               self.driver_emulation, self.driver_color,
               self.driver_sound, self.driver_graphic)
-      anchorblock.text_set(text)
-      anchorblock.show()
-      box.pack_end(anchorblock)
+      sentry.entry_set(text)
+      sentry.show()
+      box.pack_end(sentry)
 
       self.dialog = EmcDialog(self.name, style = 'default', content = box)
 
@@ -454,15 +454,18 @@ class MameGame(object):
          return
 
       # build the dialog
-      av = elementary.AnchorView(gui.win)
-      av.show()
-      av.bounce_set(0, 1)
-      av.text_set(self.history)
+      se = elementary.ScrolledEntry(gui.win)
+      se.style_set('dialog')
+      se.editable_set(False)
+      se.show()
+      #~ se.bounce_set(0, 1)
+      se.entry_set(self.history)
 
-      dia = EmcDialog(title = self.name, content = av, style = 'default')
+      dia = EmcDialog(title = self.name, content = se, style = 'default')
       dia.button_add('Close', lambda btn: dia.delete())
       dia.activate()
-## delete game
+
+## delete game stuff
    def delete_zip(self):
       def _cb_done(dialog):
          self._delete_zip_real()
@@ -479,10 +482,10 @@ class MameGame(object):
             done = True
       if done:
          self.dialog.delete()
-         EmcDialog(title = 'Game deleted', style = 'info')
+         EmcDialog(text = 'Game deleted', style = 'info')
       else:
-         EmcDialog(title = 'Can not delete game', style = 'error')
-## download game
+         EmcDialog(text = 'Can not delete game', style = 'error')
+## download game stuff
    def download_zip(self):
       # choose a writable folder in rompath
       dest = None
@@ -549,7 +552,7 @@ class MameGame(object):
    def _cb_multi_download_progress(self, file, dltotal, dlnow, sources):
       #~ print dlnow
       pass
-## game history
+## game info (from mame -listxml <rom>)
    def _more_game_info(self):
       # do this only once
       if self.parsed: return

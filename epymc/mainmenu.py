@@ -75,13 +75,17 @@ def input_event_cb(event):
       next = item.next_get()
       if next:
          next.selected_set(1)
-         return input.EVENT_BLOCK
+      else:
+         list.items_get()[0].selected_set(1)
+      return input.EVENT_BLOCK
 
    elif event == 'UP':
       prev = item.prev_get()
       if prev:
          prev.selected_set(1)
-         return input.EVENT_BLOCK
+      else:
+         list.items_get()[-1].selected_set(1)
+      return input.EVENT_BLOCK
 
    elif event == 'OK':
       _cb_item_selected(list, item)

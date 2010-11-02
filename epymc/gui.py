@@ -120,17 +120,11 @@ def load_icon(icon):
    return ic
     
 def ask_to_exit():
-   d = EmcDialog(title = 'Exit MediaCenter ?')
-   d.button_add('Yes', _cb_exit_yes)
-   d.button_add('No', _cb_exit_no, d)
-   d.activate()
+   d = EmcDialog(title = 'Exit MediaCenter ?', style = 'yesno',
+                 done_cb = _cb_exit_yes)
 
 def _cb_exit_yes(button):
    elementary.exit()
-
-def _cb_exit_no(button, dialog):
-   dialog.delete()
-   del dialog
 
 def toggle_fullscreen():
    pass

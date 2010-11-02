@@ -171,7 +171,7 @@ class FilmsModule(EmcModule):
       sentry.show()
       box.pack_end(sentry)
 
-      dialog = EmcDialog(title = 'Film Info', style = 'default', content = box)
+      dialog = EmcDialog(style = 'default', content = box)
       dialog.button_add('Play', self._cb_panel_1)
       dialog.button_add('Cast', self._cb_panel_2)
       dialog.button_add('Choose Poster', self._cb_panel_3)

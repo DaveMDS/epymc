@@ -334,8 +334,8 @@ class MameGame(object):
 ## game dialog stuff
    def dialog_show(self):
       box = elementary.Box(gui.win)
-      box.horizontal_set(1)
-      box.homogenous_set(1)
+      box.horizontal_set(True)
+      box.homogenous_set(False)
       box.show()
 
       image = gui.EmcRemoteImage(gui.win)
@@ -351,8 +351,7 @@ class MameGame(object):
       sentry.editable_set(False)
       sentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       sentry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      text = '<title>%s</><br>' \
-             '<hilight>Year:</> %s<br>' \
+      text = '<hilight>Year:</> %s<br>' \
              '<hilight>Manufacturer:</> %s<br>' \
              '<hilight>Players:</> %s<br>' \
              '<hilight>Buttons:</> %s<br>' \
@@ -362,7 +361,7 @@ class MameGame(object):
              '   <hilight>color:</> %s<br>' \
              '   <hilight>sound:</> %s<br>' \
              '   <hilight>graphic:</> %s<br>' % \
-             (self.name, self.year, self.manufacturer, self.players,
+             (self.year, self.manufacturer, self.players,
               self.buttons, self.driver_savestate, self.driver_status,
               self.driver_emulation, self.driver_color,
               self.driver_sound, self.driver_graphic)
@@ -370,7 +369,7 @@ class MameGame(object):
       sentry.show()
       box.pack_end(sentry)
 
-      self.dialog = EmcDialog(self.name, style = 'default', content = box)
+      self.dialog = EmcDialog(self.name, content = box)
 
       if self.file_name_get():
          self.dialog.button_add("Run", (lambda btn: self.run()))
@@ -470,7 +469,7 @@ class MameGame(object):
       def _cb_done(dialog):
          self._delete_zip_real()
          dialog.delete()
-      EmcDialog(text = 'Really delete this game?', style='yesno',
+      EmcDialog(title = 'Really delete this game?', style='yesno',
                 done_cb = _cb_done)
 
    def _delete_zip_real(self):

@@ -235,7 +235,7 @@ class EmcDialog(elementary.InnerWindow):
       if style in EmcDialog.special_styles:
          self.style_set('minimal')
       else:
-         self.style_set(style)
+         self.style_set('panel')
 
       self._name = 'Dialog-' + str(EmcDialog.dialogs_counter)
       self._buttons = list()
@@ -270,9 +270,13 @@ class EmcDialog(elementary.InnerWindow):
          self._vbox.pack_start(self._textentry)
          self._textentry.show()
       elif content:
-         self._vbox.pack_start(content)
-         content.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-         content.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+         frame = elementary.Frame(gui.win)
+         frame.style_set("pad_medium")
+         frame.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+         frame.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+         frame.content_set(content)
+         frame.show()
+         self._vbox.pack_start(frame)
 
       if spinner:
          self._spinner = elementary.Progressbar(gui.win)
@@ -283,7 +287,8 @@ class EmcDialog(elementary.InnerWindow):
 
       if title is not None:
          self._title = elementary.Label(gui.win)
-         self._title.label_set(title)
+         self._title.style_set("dialog")
+         self._title.label_set("<title>" + title + "</>")
          self._vbox.pack_start(self._title)
          self._title.show()
 
@@ -399,3 +404,4 @@ class EmcDialog(elementary.InnerWindow):
             self._buttons[self._current_button_num].disabled_set(0)
 
       return input.EVENT_BLOCK
+

@@ -1417,50 +1417,134 @@ group { name: "elm/gengrid/item/default/browser";
 }
 
 //// DIALOGS ENTRY (elm/entry/base-noedit/default) ////////////////////////////
- group { name: "elm/entry/base-noedit/dialog";
-      parts {
-         part { name: "elm.text";
-            type: TEXTBLOCK;
-            mouse_events: 1;
-            scale: 1;
-            entry_mode: PLAIN;
-            select_mode: EXPLICIT;
-            multiline: 1;
-            source: "elm/entry/selection/default"; // selection under
-            source5: "elm/entry/anchor/default"; // anchor under
-            description { state: "default" 0.0;
-               fixed: 1 0;
-               text {
-                  style: "epymc_dialog_style";
-                  min: 0 1;
-               }
-            }
-            description { state: "disabled" 0.0;
-               inherit: "default" 0.0;
-               text {
-                  style: "epymc_dialog_style";
-               }
+group { name: "elm/entry/base-noedit/dialog";
+   parts {
+      part { name: "elm.text";
+         type: TEXTBLOCK;
+         mouse_events: 1;
+         scale: 1;
+         entry_mode: PLAIN;
+         select_mode: EXPLICIT;
+         multiline: 1;
+         source: "elm/entry/selection/default"; // selection under
+         source5: "elm/entry/anchor/default"; // anchor under
+         description { state: "default" 0.0;
+            fixed: 1 0;
+            text {
+               style: "epymc_dialog_style";
+               min: 0 1;
             }
          }
-      }
-      programs {
-         program { name: "focus";
-            signal: "load";
-            source: "";
-            action: FOCUS_SET;
-            target: "elm.text";
-         }
-         program { name: "disable";
-            signal: "elm,state,disabled";
-            source: "elm";
-            action: STATE_SET "disabled" 0.0;
-            target: "elm.text";
-         }
-         program { name: "enable";
-            signal: "elm,state,enabled";
-            source: "elm";
-            action: STATE_SET "default" 0.0;
-            target: "elm.text";
+         description { state: "disabled" 0.0;
+            inherit: "default" 0.0;
+            text {
+               style: "epymc_dialog_style";
+            }
          }
       }
    }
+   programs {
+      program { name: "focus";
+         signal: "load";
+         source: "";
+         action: FOCUS_SET;
+         target: "elm.text";
+      }
+      program { name: "disable";
+         signal: "elm,state,disabled";
+         source: "elm";
+         action: STATE_SET "disabled" 0.0;
+         target: "elm.text";
+      }
+      program { name: "enable";
+         signal: "elm,state,enabled";
+         source: "elm";
+         action: STATE_SET "default" 0.0;
+         target: "elm.text";
+      }
+   }
+}
+
+//// DIALOG TITLE (elm/label/base/default) ////////////////////////////////////
+group { name: "elm/label/base/dialog";
+   parts {
+      part { name: "label.swallow.background";
+         type: SWALLOW;
+         description { state: "default" 0.0;
+            visible: 1;
+            rel1 { relative: 0 0; to: "elm.text"; }
+            rel2 { relative: 1 1; to: "elm.text"; }
+         }
+      }
+      part { name: "elm.text";
+         type: TEXTBLOCK;
+         mouse_events: 0;
+         scale: 1;
+         description { state: "default" 0.0;
+            text {
+               style: "epymc_dialog_style";
+               min: 1 1;
+            }
+         }
+      }
+   }
+}
+
+//// PANEL DIALOG (elm/win/inwin/default) /////////////////////////////////////
+group { name: "elm/win/inwin/panel";
+   images {
+      image: "bt_dis_base.png" COMP;
+   }
+   parts {
+      part { name: "clip";
+         type: RECT;
+         mouse_events: 1;
+         description { state: "default" 0.0;
+            color: 0 0 0 0;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255;
+         }
+      }
+      part { name: "bg";
+         mouse_events: 1;
+         clip_to: "clip";
+         description { state: "default" 0.0;
+            rel1.to: "elm.swallow.content";
+            rel1.offset: -10 -10;
+            rel2.to: "elm.swallow.content";
+            rel2.offset: 9 9;
+            image {
+               normal: "bt_dis_base.png";
+               border: 4 4 4 4;
+            }
+         }
+      }
+      part { name: "elm.swallow.content";
+         type: SWALLOW;
+         clip_to: "clip";
+         description { state: "default" 0.0;
+            rel1.relative: 0.1 0.1;
+            rel2.relative: 0.9 0.9;
+         }
+      }
+   }
+   programs {
+      program { name: "show";
+         signal: "elm,action,show";
+         source: "elm";
+         action: STATE_SET "visible" 0.0;
+         transition: SINUSOIDAL 0.5;
+         target: "clip";
+      }
+      program { name: "hide";
+         signal: "elm,action,hide";
+         source: "elm";
+         action: STATE_SET "default" 0.0;
+         transition: SINUSOIDAL 0.5;
+         target: "clip";
+      }
+   }
+}
+

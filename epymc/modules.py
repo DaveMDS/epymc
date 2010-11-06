@@ -11,6 +11,8 @@ import utils
 class EmcModule(object):
    name = ''
    label = ''
+   icon = ''
+   info = ''
 
    def __init__(self):
       pass
@@ -23,7 +25,7 @@ _instances = {}
 
 
 def load_all():
-   print "Searching for modules:"
+   print ('Searching for modules:')
 
    # first check in ~/.config/epymc/modules ...
    path = os.path.join(utils.config_dir_get(), 'modules')
@@ -34,7 +36,7 @@ def load_all():
       for name in dirs:
          f = os.path.join(root, name, '__init__.py')
          if os.path.isfile(f):
-            print " * load: " + f
+            print (' * load: ' + f)
             mod =  __import__(name)
    
    # ... then in the modules/ dir relative to script position
@@ -46,11 +48,21 @@ def load_all():
       for name in dirs:
          f = os.path.join(root, name, '__init__.py')
          if os.path.isfile(f):
-            print " * load: " + f
+            print (' * load: ' + f)
             mod =  __import__(name)
-   print ""
+   print ''
 
+def get_module_by_name(name):
+   for mod in EmcModule.__subclasses__():
+      if mod.name == name:
+         return mod
+   return None
 
+def list_get():
+   return EmcModule.__subclasses__()
+
+def is_enabled(name):
+   return _instances.has_key(name)
 
 def init_by_name(name):
    for mod in EmcModule.__subclasses__():
@@ -72,6 +84,9 @@ def init_all_by_config():
       init_all()
       ini.set('general', 'modules', " ".join(_instances.keys()))
 
+def save_enabled():
+   ini.set('general', 'modules', " ".join(_instances.keys()))
+
 def shutdown_by_name(name):
    if _instances.has_key(name):
       _instances[name].__shutdown__()
@@ -85,4 +100,3 @@ def shutdown_all():
    for mod in L:
       shutdown_by_name(mod)
    print ""
-

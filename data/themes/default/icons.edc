@@ -11,6 +11,8 @@ ICON("home")
 ICON("folder")
 ICON("close")
 ICON("back")
+ICON("check_on")
+ICON("check_off")
 
 ICON("list")
 ICON("grid")
@@ -18,9 +20,16 @@ ICON("grid")
 ICON("star")
 ICON("star_off")
 
+ICON("module")
+
 ICON("play")
 ICON("stop")
 ICON("fwd")
 ICON("ffwd")
 ICON("bwd")
 ICON("fbwd")
+
+
+// Those should go in a module specific edc...
+ICON("mame")
+ICON("joystick")

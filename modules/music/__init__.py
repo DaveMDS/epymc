@@ -26,6 +26,11 @@ def DBG(msg):
 class MusicModule(EmcModule):
    name = 'music'
    label = 'Music'
+   icon = 'icon/module'
+   info = """Long info for the <b>Music</b> module, explain what it does
+and what it need to work well, can also use markup like <title>this</> or
+<b>this</>"""
+
 
    __browser = None
    #~ __film_db = None

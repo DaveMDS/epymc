@@ -60,6 +60,7 @@ def main():
    elementary.run()
 
    # shutdown
+   modules.save_enabled()
    modules.shutdown_all()
    ini.write_to_file(os.path.join(user_config_dir, 'epymc.conf'))
    gui.shoutdown()

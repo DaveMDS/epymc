@@ -10,16 +10,21 @@ import ecore
 from epymc.modules import EmcModule
 import epymc.input as input
 import epymc.ini as ini
+import epymc.config_gui as config_gui
 
 
 def DBG(msg):
-   #~ print('JOY: ' + msg)
+   print('JOY: ' + msg)
    pass
 
 
 class JoystickModule(EmcModule):
    name = 'input_joy'
    label = 'Joytick Input'
+   icon = 'icon/joystick'
+   info = """Long info for the <b>Joystick</b> module, explain what it does
+and what it need to work well, can also use markup like <title>this</> or
+<b>this</>"""
 
    EVENT_BUTTON = 0x01 # button pressed/released 
    EVENT_AXIS = 0x02   # axis moved  
@@ -49,19 +54,25 @@ class JoystickModule(EmcModule):
          self.invert_h = ini.get_bool('joystick', 'invert_h');
          self.invert_v = ini.get_bool('joystick', 'invert_v');
       except:
-         print "Error: Joystick configuration value missed"
+         print ("Error: Joystick configuration value missed")
          # TODO spawn the configurator
          return
+
+      # add an entry in the config gui
+      config_gui.root_item_add("joystick", 50, "Joystick", icon = None,
+                               callback = self.start_configurator)
 
       # open the joystick device
       try:
          self.dev = open(self.device)
-         self.fdh = ecore.FdHandler(self.dev, ecore.ECORE_FD_READ, self.joy_event_cb)
+         self.fdh = ecore.FdHandler(self.dev, ecore.ECORE_FD_READ,
+                                    self.joy_event_cb)
       except:
-         print 'Error: can not open joystick device: ' + self.device
-        
+         print ('Error: can not open joystick device: ' + self.device)
+
    def __shutdown__(self):
       DBG('Shutdown module: Joystick')
+      config_gui.root_item_del("joystick")
       if self.fdh: self.fdh.delete()
       if self.dev: self.dev.close()
 
@@ -92,7 +103,7 @@ class JoystickModule(EmcModule):
          else:
             print 'Unknow Joystick Axis: %s  Value: %s' % (number, value)
 
-        # buttons event
+      # buttons event
       elif event == self.EVENT_BUTTON and not init and value > 0:
          if number == self.button_ok:
             signal = 'OK'
@@ -105,6 +116,11 @@ class JoystickModule(EmcModule):
       elif init:
          #~ print 'INIT %s %s %s' % (number,value,init)
          pass
-        
+
+      # emit the emc input event  
       if signal: input.event_emit(signal)
+      
       return True # keep tha handler alive
+
+   def start_configurator(self):
+      print self.dev

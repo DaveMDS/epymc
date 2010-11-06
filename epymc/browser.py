@@ -60,8 +60,9 @@ class EmcBrowser(object):
    """
 
    def __init__ (self, name, default_style = 'List', item_selected_cb = None,
-                  icon_get_cb = None, info_get_cb = None,
-                  poster_get_cb = None, fanart_get_cb = None):
+                  icon_get_cb = None, icon_end_get_cb = None,
+                  info_get_cb = None, poster_get_cb = None,
+                  fanart_get_cb = None):
 
       DBG('EmcBrowser __init__')
       self.name = name
@@ -69,6 +70,7 @@ class EmcBrowser(object):
 
       self.item_selected_cb = item_selected_cb
       self.icon_get_cb = icon_get_cb
+      self.icon_end_get_cb = icon_end_get_cb
       self.info_get_cb = info_get_cb
       self.poster_get_cb = poster_get_cb
       self.fanart_get_cb = fanart_get_cb
@@ -84,7 +86,9 @@ class EmcBrowser(object):
             return _memorydb.get_data(p['url'])
       return None
       
-   def page_add(self, url, title, style = None):
+   def page_add(self, url, title, style = None, item_selected_cb = None,
+                 icon_get_cb = None, icon_end_get_cb = None,
+                 info_get_cb = None, poster_get_cb = None):
       """
       When you create a page you need to give at least the url and the title
       """
@@ -105,7 +109,12 @@ class EmcBrowser(object):
          view = self._create_or_get_view(style)
          
          # append the new page info in the pages list
-         self.pages.append( {'view': view, 'url': url, 'title': title} )
+         self.pages.append({'view': view, 'url': url, 'title': title,
+                            'item_selected_cb': item_selected_cb,
+                            'icon_get_cb': icon_get_cb,
+                            'icon_end_get_cb': icon_end_get_cb,
+                            'info_get_cb': info_get_cb,
+                            'poster_get_cb': poster_get_cb})
 
       # first time, we don't have a current_view, set it
       if not self.current_view:
@@ -176,6 +185,9 @@ class EmcBrowser(object):
       func = self.item_selected_cb
       if func: func(parent_url, page_data['url'])
 
+   def refresh(self):
+      self.current_view.refresh()
+
    def change_style(self, style):
 
       view = self._create_or_get_view(style)
@@ -218,6 +230,7 @@ class EmcBrowser(object):
       input.listener_del('browser-' + self.name)
       self.current_view.hide()
 
+   # private stuff
    def _input_event_cb(self, event):
 
       if event == "BACK":
@@ -262,30 +275,55 @@ class EmcBrowser(object):
          if url.endswith("//back"):
             self.back()
       else:
-         func = self.item_selected_cb
-         if func: func(self.pages[-1]["url"], url)
+         if self.pages[-1]['item_selected_cb']:
+            func = self.pages[-1]['item_selected_cb']
+         else:
+            func = self.item_selected_cb
+         if callable(func): func(self.pages[-1]["url"], url)
 
    def _icon_get(self, url):
       """ TODO Function doc """
       if url.startswith('emc://'):
          if url.endswith('/back'):
             return gui.load_icon('icon/back')
-        
-      func = self.icon_get_cb
-      if not func: return None
+
+      if self.pages[-1]['icon_get_cb']:
+         func = self.pages[-1]['icon_get_cb']
+      else:
+         func = self.icon_get_cb
+      if not callable(func): return None
+      icon = func(self.pages[-1]["url"], url)
+      if not icon: return None
+      return gui.load_icon(icon)
+
+   def _icon_end_get(self, url):
+      """ TODO Function doc """
+      if url.startswith('emc://'):
+         return None
+      if self.pages[-1]['icon_end_get_cb']:
+         func = self.pages[-1]['icon_end_get_cb']
+      else:
+         func = self.icon_end_get_cb
+      if not callable(func): return None
       icon = func(self.pages[-1]["url"], url)
       if not icon: return None
       return gui.load_icon(icon)
 
    def _poster_get(self, url):
       """ TODO Function doc """
-      func = self.poster_get_cb
-      return func(self.pages[-1]["url"], url) if func else None
+      if self.pages[-1]['poster_get_cb']:
+         func = self.pages[-1]['poster_get_cb']
+      else:
+         func = self.poster_get_cb
+      return func(self.pages[-1]["url"], url) if callable(func) else None
 
    def _info_get(self, url):
       """ TODO Function doc """
-      func = self.info_get_cb
-      return func(self.pages[-1]["url"], url) if func else None
+      if self.pages[-1]['info_get_cb']:
+         func = self.pages[-1]['info_get_cb']
+      else:
+         func = self.info_get_cb
+      return func(self.pages[-1]["url"], url) if callable(func) else None
 
 
 ################################################################################
@@ -389,6 +427,12 @@ class ViewList(object):
       self.gl1.clear()
       self.gl2.clear()
 
+   def refresh(self):
+      item = self.current_list.first_item_get()
+      while item:
+         item.update()
+         item = item.next_get()
+
    def input_event_cb(self, event):
       """ Here you can manage input events for the view """
 
@@ -421,9 +465,11 @@ class ViewList(object):
       return label
 
    def __genlist_icon_get(self, obj, part, data):
+      (url, label, parent_browser) = data
       if part == 'elm.swallow.icon':
-         (url, label, parent_browser) = data
          return parent_browser._icon_get(url)
+      elif part == 'elm.swallow.end':
+         return parent_browser._icon_end_get(url)
       return None
 
    def __genlist_state_get(self, obj, part, item_data):
@@ -449,6 +495,8 @@ class ViewList(object):
             self.__im.url_set(url, dest)
          else:
             self.__im.url_set(poster)
+      elif poster and poster.startswith("icon/"):
+         self.__im.file_set(gui.theme_file, poster)
       else:
          self.__im.file_set(poster if poster else "")
 
@@ -503,6 +551,12 @@ class ViewGrid(object):
 
    def clear(self):
       self.gg.clear()
+
+   def refresh(self):
+      item = self.gg.first_item_get()
+      while item:
+         item.update()
+         item = item.next_get()
 
    def input_event_cb(self, event):
       item = self.gg.selected_item_get()

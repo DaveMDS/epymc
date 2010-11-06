@@ -17,6 +17,11 @@ def DBG(msg):
 class LircModule(EmcModule):
    name = 'input_lirc'
    label = 'Remote Control Input'
+   icon = 'icon/module'
+   info = """Long info for the <b>LIRC</b> module, explain what it does
+and what it need to work well, can also use markup like <title>this</> or
+<b>this</>"""
+
 
    DEFAULT_LIRC_SOCKET = '/dev/lircd'
 

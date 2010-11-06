@@ -27,6 +27,11 @@ MAME_EXE = 'mame'
 class MameModule(EmcModule):
    name = 'mame'
    label = 'M.A.M.E'
+   icon = 'icon/mame'
+   info = """Long info for the <b>M.A.M.E</b> module, explain what it does
+and what it need to work well, can also use markup like <title>this</> or
+<b>this</>"""
+
 
    _snapshoot_dir = None
    _rompaths = []

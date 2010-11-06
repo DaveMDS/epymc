@@ -29,14 +29,19 @@ _mapping = { 'Up': 'UP',
 class KeyboardModule(EmcModule):
    name = 'input_keyb'
    label = 'Keyboard Input'
+   icon = 'icon/module'
+   info = """Long info for the <b>Keyboard</b> module, explain what it does
+and what it need to work well, can also use markup like <title>this</> or
+<b>this</>"""
+
 
    def __init__(self):
       DBG('Init module')
-      ecore.x.on_key_down_add(self._cb_key_down)
+      self.handler = ecore.x.on_key_down_add(self._cb_key_down)
 
    def __shutdown__(self):
       DBG('Shutdown module')
-      # TODO How to detach the callback?
+      if self.handler: self.handler.delete()
 
    def _cb_key_down(self, event):
       DBG('Key: ' + event.key)

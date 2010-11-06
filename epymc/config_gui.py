@@ -33,7 +33,8 @@ def init():
                                #~ info_get_cb = self.cb_info_get)
 
    root_item_add("modules", 1, "Modules", None, _modules_list)
-   root_item_add("fs", 30, "Fullscreen (TODO)", None, None)
+   root_item_add("fs", 30, "Toggle Fullscreen / Windowed mode",
+                 None, _toggle_fullscreen)
    root_item_add("emc://back", 999, "Close", None, None)
 
 def show():
@@ -81,6 +82,12 @@ def _item_selected_cb(page, item):
                cb()
             break
 
+##############  FULLSCREEN  ###################################################
+import ini
+
+def _toggle_fullscreen():
+   ini.set('general', 'fullscreen', not gui.win.fullscreen)
+   input.event_emit('TOGGLE_FULLSCREEN')
 
 ##############  MODULES  ######################################################
 import modules

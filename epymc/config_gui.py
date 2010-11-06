@@ -32,8 +32,8 @@ def init():
                                #~ poster_get_cb = self.cb_poster_get,
                                #~ info_get_cb = self.cb_info_get)
 
-   root_item_add("modules", 1, "Modules", None, _modules_list)
-   root_item_add("fs", 30, "Toggle Fullscreen / Windowed mode",
+   root_item_add("config://modules/", 1, "Modules", None, _modules_list)
+   root_item_add("config://fs/", 30, "Toggle Fullscreen / Windowed mode",
                  None, _toggle_fullscreen)
    root_item_add("emc://back", 999, "Close", None, None)
 

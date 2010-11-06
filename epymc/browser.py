@@ -601,9 +601,11 @@ class ViewGrid(object):
       return label
 
    def gg_icon_get(self, obj, part, data):
+      (url, label, parent_browser) = data
       if part == 'elm.swallow.icon':
-         (url, label, parent_browser) = data
          return parent_browser._icon_get(url)
+      elif part == 'elm.swallow.end':
+         return parent_browser._icon_end_get(url)
       return None
 
    def gg_state_get(self, obj, part, item_data):

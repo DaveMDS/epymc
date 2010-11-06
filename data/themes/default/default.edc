@@ -331,9 +331,6 @@ collections {
                }
                box {
                   layout: "horizontal";
-                  padding: 0 0;
-                  align: 1.0 0.5;
-                  min: 0 0;
                 }
             }
          }

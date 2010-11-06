@@ -72,13 +72,3 @@ All the icons in icons.edc must be implemented
       "volume,show" "emc"
       "volume,hide" "emc"
 
-
-### ConfigGui stuff ###
-
-   * Required parts:
-      "config/pager" -> edje swallow (elm_pager style:"slide_invisible")
-
-   * Signals received from the application:
-      "config,show" "emc"
-      "config,hide" "emc"
-

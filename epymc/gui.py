@@ -300,7 +300,10 @@ class EmcDialog(elementary.InnerWindow):
          self.activate()
 
       if style in ['cancel']:
-         self.button_add('Cancel', (lambda btn: self.delete()))
+         if done_cb:
+            self.button_add('Cancel', (lambda btn: self._done_cb(self)))
+         else:
+            self.button_add('Cancel', (lambda btn: self.delete()))
          self.activate()
 
    def activate(self):

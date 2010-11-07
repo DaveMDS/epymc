@@ -29,7 +29,7 @@ _mapping = { 'Up': 'UP',
 class KeyboardModule(EmcModule):
    name = 'input_keyb'
    label = 'Keyboard Input'
-   icon = 'icon/module'
+   icon = 'icon/keyboard'
    info = """Long info for the <b>Keyboard</b> module, explain what it does
 and what it need to work well, can also use markup like <title>this</> or
 <b>this</>"""

@@ -66,6 +66,9 @@ def make_root():
    for (name, label, weight, icon, cb) in _root_items:
       _browser.item_add(name, label)
 
+def browser_get():
+   return _browser
+
 ### private stuff
 def _mainmenu_cb():
    make_root()

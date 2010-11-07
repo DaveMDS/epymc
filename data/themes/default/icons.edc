@@ -33,3 +33,5 @@ ICON("fbwd")
 // Those should go in a module specific edc...
 ICON("mame")
 ICON("joystick")
+ICON("keyboard")
+ICON("remote")

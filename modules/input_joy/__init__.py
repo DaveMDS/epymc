@@ -9,6 +9,7 @@ import ecore
 
 from epymc.modules import EmcModule
 from epymc.gui import EmcDialog
+from epymc.gui import EmcVKeyboard
 import epymc.input as input
 import epymc.ini as ini
 import epymc.config_gui as config_gui
@@ -145,9 +146,14 @@ and what it need to work well, can also use markup like <title>this</> or
       
    def config_selected_cb(self, page, item):
       if item.endswith('/device'):
-         pass # TODO implement virtual keyboard before
+         EmcVKeyboard(accept_cb = self.device_changed_cb,
+                      title = 'Insert joystick device', text = self.device)
       elif item.endswith('/configurator'):
          self.start_configurator()
+
+   def device_changed_cb(self, vkbd, new_device):
+      ini.set('joystick', 'device', new_device)
+      self.restart()
 
    def start_configurator(self):
       # recheck device

@@ -11,6 +11,8 @@ ICON("home")
 ICON("folder")
 ICON("close")
 ICON("back")
+ICON("ok")
+ICON("cancel")
 ICON("check_on")
 ICON("check_off")
 

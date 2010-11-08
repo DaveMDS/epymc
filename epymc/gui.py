@@ -406,3 +406,225 @@ class EmcDialog(elementary.InnerWindow):
 
       return input.EVENT_BLOCK
 
+
+###############################################################################
+class EmcFocusManager(object):
+   """
+   This class manage a list of elementary objects, usually buttons.
+   You provide all the objects that can receive focus and the class
+   will take care of selecting the right object when you move the selection
+   """
+   def __init__(self):
+      self.objs = []
+      self.focused = None
+
+   def delete(self):
+      """
+      Delete the FocusManager instance and free all the resources used
+      """
+      del self.objs
+
+   def obj_add(self, obj):
+      """
+      Add an object to the chain, obj must be an evas object that support
+      disabled_set() 'interface', usually an elementary obj will do the work.
+      """
+      if len(self.objs) == 0:
+         self.focused = obj
+      else:
+         obj.disabled_set(True)
+      obj.on_mouse_in_add(self._mouse_in_cb)
+      self.objs.append(obj)
+
+   def focused_set(self, obj):
+      """
+      Give focus to the given obj
+      """
+      if self.focused:
+         self.focused.disabled_set(True)
+      obj.disabled_set(False)
+      self.focused = obj
+
+   def focused_get(self):
+      """
+      Get the object that has focus
+      """
+      return self.focused
+
+   def focus_move(self, direction):
+      """
+      Try to move the selection in th given direction.
+      direction can be: 'l'eft, 'r'ight, 'u'p or 'd'own
+      """
+      x, y = self.focused.center
+      nearest = None
+      distance = 99999
+      for obj in self.objs:
+         if obj != self.focused:
+            ox, oy = obj.center
+            # discard objects in the wrong direction
+            if   direction == 'l' and ox >= x: continue
+            elif direction == 'r' and ox <= x: continue
+            elif direction == 'u' and oy >= y: continue
+            elif direction == 'd' and oy <= y: continue
+
+            # simple calc distance (with priority in the current direction)
+            if direction in ['l', 'r']:
+               dis = abs(x - ox) + (abs(y - oy) * 10)
+            else:
+               dis = (abs(x - ox) * 10) + abs(y - oy)
+
+            # remember the nearest object
+            if dis < distance:
+               distance = dis
+               nearest = obj
+
+      # select the new object if found
+      if nearest:
+         self.focused_set(nearest)
+
+   def all_get(self):
+      """
+      Get the list of all the objects that was previously added
+      """
+      return self.objs
+
+   def _mouse_in_cb(self, obj, event):
+      if self.focused != obj:
+         self.focused_set(obj)
+   
+###############################################################################
+class EmcVKeyboard(elementary.InnerWindow):
+   """ TODO doc this """
+   def __init__(self, accept_cb = None, dismiss_cb = None,
+                title = None, text = None):
+      """ TODO doc this """
+      elementary.InnerWindow.__init__(self, gui.win)
+      self.style_set('minimal')
+
+      self.current_button = None
+      self.accept_cb = accept_cb
+      self.dismiss_cb = dismiss_cb
+
+      # table
+      tb = elementary.Table(gui.win)
+      tb.homogenous_set(True)
+      tb.show()
+
+      # title
+      label = elementary.Label(gui.win)
+      label.style_set('dialog')
+      label.label_set('<title>%s</>' % (title or 'Insert text'))
+      label.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      label.size_hint_align_set(0.5, evas.EVAS_HINT_FILL)
+      label.show()
+      tb.pack(label, 0, 0, 10, 1)
+
+      # entry
+      self.entry = elementary.Entry(gui.win) # TODO use scrolled_entry instead
+      self.entry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      self.entry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+      self.entry.single_line_set(True)
+      if text: self.text_set(text)
+      tb.pack(self.entry, 0, 1, 10, 1)
+      self.entry.show()
+
+      # focus manager
+      efm = EmcFocusManager()
+      self.efm = efm
+
+      # standard keyb
+      for i, c in enumerate(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']):
+         self._pack_btn(tb, i, 2, 1, 1, c, cb = self._default_btn_cb)
+      for i, c in enumerate(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']):
+         if c == 'a': b = self._pack_btn(tb, i, 3, 1, 1, c, cb = self._default_btn_cb, focused = True)
+         else:        b = self._pack_btn(tb, i, 3, 1, 1, c, cb = self._default_btn_cb)
+      for i, c in enumerate(['k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't']):
+         self._pack_btn(tb, i, 4, 1, 1, c, cb = self._default_btn_cb)
+      for i, c in enumerate(['u', 'v', 'w', 'x', 'y', 'z', '.', '@', '-', '_']):
+         self._pack_btn(tb, i, 5, 1, 1, c, cb = self._default_btn_cb)
+
+      self._pack_btn(tb, 0, 6, 3, 1, 'ERASE', cb = self._erase_cb)
+      self._pack_btn(tb, 3, 6, 4, 1, 'SPACE', cb = self._space_cb)
+      self._pack_btn(tb, 7, 6, 3, 1, 'UPPERCASE', cb = self._uppercase_cb)
+
+      self._pack_btn(tb, 0, 7, 4, 1, 'Dismiss', 'icon/cancel', self._dismiss_cb)
+      self._pack_btn(tb, 6, 7, 4, 1, 'Accept',  'icon/ok',     self._accept_cb)
+
+      # activate the inwin
+      self.content_set(tb)
+      self.activate()
+      self.entry.focus()
+
+      # catch input events
+      input.listener_add("vkbd", self.input_event_cb)
+
+   def _pack_btn(self, tb, x, y, w, h, label, icon = None, cb = None, focused = False):
+      b = elementary.Button(gui.win)
+      b.size_hint_weight_set(evas.EVAS_HINT_EXPAND, 0.0)
+      b.size_hint_align_set(evas.EVAS_HINT_FILL, 0.0)
+      if icon: b.icon_set(gui.load_icon(icon))
+      if cb: b.callback_clicked_add(cb)
+      b.label_set(label)
+      self.efm.obj_add(b)
+      if focused: self.efm.focused_set(b)
+      b.show()
+      tb.pack(b, x, y, w, h)
+      return b
+
+   def delete(self):
+      input.listener_del("vkbd")
+      self.efm.delete()
+      elementary.InnerWindow.delete(self)
+
+   def text_set(self, text):
+      self.entry.entry_set(text)
+      self.entry.cursor_end_set()
+      self.entry.focus()
+
+   def _dismiss_cb(self, button):
+      if self.dismiss_cb and callable(self.dismiss_cb):
+         self.dismiss_cb(self)
+      self.delete()
+
+   def _accept_cb(self, button):
+      if self.accept_cb and callable(self.accept_cb):
+         self.accept_cb(self, self.entry.entry_get())
+      self.delete()
+
+   def _default_btn_cb(self, button):
+      self.entry.focus()
+      self.entry.entry_insert(button.label)
+
+   def _erase_cb(self, button):
+      self.entry.focus()
+      gui.win.evas_get().feed_key_down('BackSpace', 'BackSpace', '\b', '\b', 0)
+
+   def _space_cb(self, button):
+      self.entry.focus()
+      self.entry.entry_insert(' ')
+
+   def _uppercase_cb(self, button):
+      for btn in self.efm.all_get():
+         c = btn.label
+         if len(c) == 1 and c.isalpha():
+            if c.islower():
+               btn.label = c.upper()
+               button.label = "LOWERCASE"
+            else:
+               btn.label = c.lower()
+               button.label = "UPPERCASE"
+
+   def input_event_cb(self, event):
+      if event == 'OK':
+         btn = self.efm.focused_get()
+         btn.callback_call('clicked') # TODO COMMIT THIS
+      elif event == 'EXIT':
+         self._dismiss_cb(None)
+      elif event == 'LEFT':  self.efm.focus_move('l')
+      elif event == 'RIGHT': self.efm.focus_move('r')
+      elif event == 'UP':    self.efm.focus_move('u')
+      elif event == 'DOWN':  self.efm.focus_move('d')         
+      
+      return input.EVENT_BLOCK
+  

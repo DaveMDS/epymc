@@ -236,8 +236,6 @@ class EmcDialog(elementary.InnerWindow):
          self.style_set('panel')
 
       self._name = 'Dialog-' + str(EmcDialog.dialogs_counter)
-      self._buttons = list()
-      self._current_button_num = 0
       self._content = content
       self._done_cb = done_cb
 
@@ -252,9 +250,11 @@ class EmcDialog(elementary.InnerWindow):
       # hbox (buttons)
       self._hbox = elementary.Box(gui.win)
       self._hbox.horizontal_set(True)
+      self._vbox.pack_end(self._hbox)
       self._hbox.show()
 
-      self._vbox.pack_end(self._hbox)
+      # focus manageer
+      self.fman = EmcFocusManager()
       
       if text is not None:
          self._textentry = elementary.Entry(gui.win)
@@ -312,6 +312,7 @@ class EmcDialog(elementary.InnerWindow):
 
    def delete(self):
       input.listener_del(self._name)
+      self.fman.delete()
       elementary.InnerWindow.delete(self)
 
    def content_get(self):
@@ -319,16 +320,12 @@ class EmcDialog(elementary.InnerWindow):
 
    def button_add(self, label, selected_cb = None, cb_data = None, icon = None):
       b = elementary.Button(self)
-      self._buttons.append(b)
       b.label_set(label)
-      b.disabled_set(0 if (len(self._buttons) == 1) else 1)
+      if icon: b.icon_set(load_icon(icon))
       b.data['cb'] = selected_cb
       b.data['cb_data'] = cb_data
       b.callback_clicked_add(self._cb_buttons)
-      b.on_mouse_in_add(self._cb_button_mouse_in)
-      if icon:
-         b.icon_set(load_icon(icon))
-
+      self.fman.obj_add(b)
       self._hbox.pack_start(b)
       b.show()
 
@@ -356,15 +353,9 @@ class EmcDialog(elementary.InnerWindow):
       elif selected_cb:
          selected_cb(button)
 
-   def _cb_button_mouse_in(self, button, event):
-      if button != self._buttons[self._current_button_num]:
-         self._buttons[self._current_button_num].disabled_set(1)
-         self._current_button_num = self._buttons.index(button)
-         self._buttons[self._current_button_num].disabled_set(0)
-
    def _input_event_cb(self, event):
 
-      if event == 'BACK':
+      if event in ['BACK', 'EXIT']:
          self.delete()
          return input.EVENT_BLOCK
 
@@ -390,19 +381,13 @@ class EmcDialog(elementary.InnerWindow):
                return input.EVENT_BLOCK
 
       if event == 'OK':
-         self._cb_buttons(self._buttons[self._current_button_num])
+         self._cb_buttons(self.fman.focused_get())
 
       elif event == 'LEFT':
-         if self._current_button_num < len(self._buttons) - 1:
-            self._buttons[self._current_button_num].disabled_set(1)
-            self._current_button_num += 1
-            self._buttons[self._current_button_num].disabled_set(0)
+         self.fman.focus_move('l')
 
       elif event == 'RIGHT':
-         if self._current_button_num > 0:
-            self._buttons[self._current_button_num].disabled_set(1)
-            self._current_button_num -= 1
-            self._buttons[self._current_button_num].disabled_set(0)
+         self.fman.focus_move('r')
 
       return input.EVENT_BLOCK
 

@@ -164,8 +164,7 @@ class EmcRemoteImage(elementary.Image):
       self.on_resize_add(self._cb_move_resize)
 
    def show(self):
-      (x, y, w, h) = self.geometry_get()
-      #~ print 'SHOW %d %d %d %d' % (x, y, w, h)
+      #~ print 'SHOW %d %d %d %d' % self.geometry_get()
       elementary.Image.show(self)
 
    def hide(self):
@@ -194,10 +193,12 @@ class EmcRemoteImage(elementary.Image):
 
    def _cb_move_resize(self, obj):
       (x, y, w, h) = self.geometry_get()
-      #~ print 'MOVE %d %d %d %d' % (x, y, w, h)
+      #~ print ('MOVE %d %d %d %d' % (x, y, w, h))
       self._pb.resize(w, h)
       self._pb.move(x, y)
       self._pb.raise_()
+      if self._pb.clip != self.clip:
+         self._pb.clip = self.clip
 
    def _cb_download_complete(self, dest, status):
       self.stop_spin()

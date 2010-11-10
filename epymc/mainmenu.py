@@ -91,7 +91,7 @@ def input_event_cb(event):
       _cb_item_selected(list, item)
       return input.EVENT_BLOCK
 
-   elif event == 'BACK':
+   elif event == 'EXIT':
       gui.ask_to_exit()
       return input.EVENT_BLOCK
 

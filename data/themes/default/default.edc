@@ -63,9 +63,14 @@ collections {
             new buf[32];
 
             date(year, month, day, yearday, weekday, hour, minute, second);
-            snprintf(buf, sizeof(buf), "%d:%d", hour, minute);
-            set_text(PART:"topbar/clock", buf);
             timer(60.0 - (second), "clock_cb", 1);
+
+            buf[0] = 0;
+            if (minute < 10 && hour < 10) { snprintf(buf, 10, "0%i:0%i", hour, minute); }
+            else if (minute < 10)         { snprintf(buf, 10, "%i:0%i", hour, minute); }
+            else if (hour < 10)           { snprintf(buf, 10, "0%i:%i", hour, minute); }
+            else                          { snprintf(buf, 10, "%i:%i", hour, minute); }
+            set_text(PART:"topbar/clock", buf);
          }
       }
 

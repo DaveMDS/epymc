@@ -35,7 +35,6 @@ def init():
    root_item_add("config://modules/", 1, "Modules", None, _modules_list)
    root_item_add("config://fs/", 30, "Toggle Fullscreen / Windowed mode",
                  None, _toggle_fullscreen)
-   root_item_add("emc://back", 999, "Close", None, None)
 
 def show():
    _browser.show()
@@ -105,8 +104,6 @@ def _modules_list():
 
    for mod in modules.list_get():
       _browser.item_add(mod.name, mod.label)
-
-   _browser.item_add('emc://back', 'Back')
 
 def _module_icon_get(page, item):
    mod = modules.get_module_by_name(item)

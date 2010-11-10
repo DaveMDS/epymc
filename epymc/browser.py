@@ -7,6 +7,7 @@ import elementary
 import gui
 import mainmenu
 import input
+import ini
 from sdb import EmcDatabase
 
 def DBG(msg):
@@ -21,6 +22,10 @@ _memorydb = None  # EmcDatabase  key = page url  value = style name
 def init():
    global _memorydb
    _memorydb = EmcDatabase('broser_view_memory')
+   if not ini.has_option('general', 'back_in_lists'):
+      ini.set('general', 'back_in_lists', 'True') # 'True' should be True,
+                                                  # but rise an error if option
+                                                  # doesn't exist in .conf  :/
 
 def shutdown():
    global _memorydb
@@ -139,6 +144,10 @@ class EmcBrowser(object):
          self.current_view.hide()
          view.page_show(page['title'], 0)
          view.show()
+
+      # back item (optional)
+      if ini.get_bool('general', 'back_in_lists') == True:
+         self.item_add('emc://back', 'back')
 
       # update state
       self.current_view = view

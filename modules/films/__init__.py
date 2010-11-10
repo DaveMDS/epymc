@@ -91,7 +91,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       for f in self.__folders:
          self.__browser.item_add(f, os.path.basename(f))
-      self.__browser.item_add('emc://back', "back")
 
    def cb_url_selected(self, page_url, item_url):
       if item_url.startswith("file://"):
@@ -100,7 +99,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
             self.__browser.page_add(item_url, os.path.basename(path))
             for f in os.listdir(path):
                self.__browser.item_add("file://" + path + "/" + f, f)
-            self.__browser.item_add("emc://back", "back")
          else:
             self.show_film_info(item_url)
 

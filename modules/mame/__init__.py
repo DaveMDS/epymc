@@ -164,7 +164,6 @@ and what it need to work well, can also use markup like <title>this</> or
       self._browser.item_add('mame://favgames',
                              'Favorite Games (%d)' % (len(MameModule._favorites)))
       self._browser.item_add('mame://cats', 'Categories')
-      self._browser.item_add('emc://back', "Back")
 
    def my_games_list(self):
       """ Create the list of personal games """
@@ -181,8 +180,6 @@ and what it need to work well, can also use markup like <title>this</> or
       for k, l in L:
          self._browser.item_add(k, l)
 
-      self._browser.item_add('emc://back', "Back")
-
    def all_games_list(self):
       """ Create the list of all know mame games """
       self._browser.page_add('mame://allgames', "All Games")
@@ -194,8 +191,6 @@ and what it need to work well, can also use markup like <title>this</> or
       L.sort(key = operator.itemgetter(1))
       for k, l in L:
          self._browser.item_add(k, l)
-
-      self._browser.item_add('emc://back', "Back")
 
    def fav_games_list(self):
       """ Create the list of favorite games """

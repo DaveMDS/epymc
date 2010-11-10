@@ -10,7 +10,6 @@ CORE
  * RemoteImage: the spinner is not clipped well, look at the 'Choose Poster"
    dialog: the spinner is visible outside the dialog.
  * Input: rename to something else, 'input' is a reserved word
- * Browser: manage the back entry internally, configurable, hidden, on top or bottom
  * Browser: label must go in 'item_class' or refresh will not work :(
  * Gui: hide (& move to 0,0) the mouse pointer on input events
  * VKeyboard resolv left/right conflict  !!!!!!!

@@ -116,7 +116,6 @@ and what it need to work well, can also use markup like <title>this</> or
       self.__browser.item_add('music://songs', 'Songs')
       self.__browser.item_add('music://generes', 'Generes (TODO)')
       self.__browser.item_add('music://playlists', 'Playlists (TODO)')
-      self.__browser.item_add('emc://back', 'Back')
 
    def make_songs_list(self):
       self.__browser.page_add('music://songs', 'Songs')

@@ -10,7 +10,7 @@ import ecore
 from epymc.modules import EmcModule
 from epymc.gui import EmcDialog
 from epymc.gui import EmcVKeyboard
-import epymc.input as input
+import epymc.input_events as input_events
 import epymc.ini as ini
 import epymc.config_gui as config_gui
 
@@ -132,7 +132,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
       # emit the emc input event
       if signal:
-         input.event_emit(signal)
+         input_events.event_emit(signal)
       
       return True # keep tha handler alive
 

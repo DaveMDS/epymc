@@ -9,7 +9,7 @@ import utils
 import ini
 import mediaplayer
 import gui
-import input
+import input_events
 
 
 win = None
@@ -82,21 +82,21 @@ def init():
    #~ im.move(100,200)
    #~ im.show()
    ##
-   input.listener_add('gui', input_event_cb)
+   input_events.listener_add('gui', input_event_cb)
    
    return True
 
 def shoutdown():
-   input.listener_del('gui')
+   input_events.listener_del('gui')
    pass
 
 def input_event_cb(event):
    if event == "TOGGLE_FULLSCREEN":
       #~ win.fullscreen_set(not win.fullscreen_get())
       win.fullscreen = not win.fullscreen
-      return input.EVENT_BLOCK
+      return input_events.EVENT_BLOCK
 
-   input.EVENT_CONTINUE
+   input_events.EVENT_CONTINUE
 
 def _cb_win_del(win):
    ask_to_exit()
@@ -106,7 +106,7 @@ def _cb_volume_slider_changed(slider):
    mediaplayer.volume_set(slider.value)
 
 def _cb_btn_change_view(btn, view):
-   input.event_emit(view)
+   input_events.event_emit(view)
 
 def load_icon(icon):
    """
@@ -308,11 +308,11 @@ class EmcDialog(elementary.InnerWindow):
          self.activate()
 
    def activate(self):
-      input.listener_add(self._name, self._input_event_cb)
+      input_events.listener_add(self._name, self._input_event_cb)
       elementary.InnerWindow.activate(self)
 
    def delete(self):
-      input.listener_del(self._name)
+      input_events.listener_del(self._name)
       self.fman.delete()
       elementary.InnerWindow.delete(self)
 
@@ -358,7 +358,7 @@ class EmcDialog(elementary.InnerWindow):
 
       if event in ['BACK', 'EXIT']:
          self.delete()
-         return input.EVENT_BLOCK
+         return input_events.EVENT_BLOCK
 
       # if content is elm List then automanage the events
       if self._content and type(self._content) is elementary.List:
@@ -372,14 +372,14 @@ class EmcDialog(elementary.InnerWindow):
             if next:
                next.selected_set(1)
                next.show()
-               return input.EVENT_BLOCK
+               return input_events.EVENT_BLOCK
 
          if event == 'UP':
             prev = item.prev_get()
             if prev:
                prev.selected_set(1)
                prev.show()
-               return input.EVENT_BLOCK
+               return input_events.EVENT_BLOCK
 
       if event == 'OK':
          self._cb_buttons(self.fman.focused_get())
@@ -390,7 +390,7 @@ class EmcDialog(elementary.InnerWindow):
       elif event == 'RIGHT':
          self.fman.focus_move('r')
 
-      return input.EVENT_BLOCK
+      return input_events.EVENT_BLOCK
 
 
 ###############################################################################
@@ -543,7 +543,7 @@ class EmcVKeyboard(elementary.InnerWindow):
       self.entry.focus()
 
       # catch input events
-      input.listener_add("vkbd", self.input_event_cb)
+      input_events.listener_add("vkbd", self.input_event_cb)
 
    def _pack_btn(self, tb, x, y, w, h, label, icon = None, cb = None, focused = False):
       b = elementary.Button(gui.win)
@@ -559,7 +559,7 @@ class EmcVKeyboard(elementary.InnerWindow):
       return b
 
    def delete(self):
-      input.listener_del("vkbd")
+      input_events.listener_del("vkbd")
       self.efm.delete()
       elementary.InnerWindow.delete(self)
 
@@ -612,5 +612,5 @@ class EmcVKeyboard(elementary.InnerWindow):
       elif event == 'UP':    self.efm.focus_move('u')
       elif event == 'DOWN':  self.efm.focus_move('d')         
       
-      return input.EVENT_BLOCK
+      return input_events.EVENT_BLOCK
   

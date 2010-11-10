@@ -5,7 +5,7 @@ from socket import *
 import ecore
 
 from epymc.modules import EmcModule
-import epymc.input as input
+import epymc.input_events as input_events
 import epymc.ini as ini
 
 

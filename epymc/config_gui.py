@@ -6,7 +6,7 @@ import elementary #REMOVEME
 
 import gui
 import mainmenu
-import input
+import input_events
 
 from browser import EmcBrowser
 
@@ -89,7 +89,7 @@ import ini
 
 def _toggle_fullscreen():
    ini.set('general', 'fullscreen', not gui.win.fullscreen)
-   input.event_emit('TOGGLE_FULLSCREEN')
+   input_events.event_emit('TOGGLE_FULLSCREEN')
 
 ##############  MODULES  ######################################################
 import modules

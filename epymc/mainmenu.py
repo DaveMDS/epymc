@@ -3,7 +3,7 @@
 import gui
 import mainmenu
 import config_gui
-import input
+import input_events
 
 
 _items = {}  # key: name  value: elm_list_item
@@ -28,12 +28,12 @@ def show():
       list.items_get()[0].selected_set(1)
    list.go()
    gui.signal_emit("mainmenu,show")
-   input.listener_add('mainmenu', input_event_cb)
+   input_events.listener_add('mainmenu', input_event_cb)
 
 def hide():
    list = gui.part_get("mainmenu/list")
    list.callback_clicked_del(_cb_item_selected)
-   input.listener_del('mainmenu')
+   input_events.listener_del('mainmenu')
    gui.signal_emit("mainmenu,hide")
 
 def item_add(name, weight, label, icon = None, callback = None):
@@ -77,7 +77,7 @@ def input_event_cb(event):
          next.selected_set(1)
       else:
          list.items_get()[0].selected_set(1)
-      return input.EVENT_BLOCK
+      return input_events.EVENT_BLOCK
 
    elif event == 'UP':
       prev = item.prev_get()
@@ -85,15 +85,15 @@ def input_event_cb(event):
          prev.selected_set(1)
       else:
          list.items_get()[-1].selected_set(1)
-      return input.EVENT_BLOCK
+      return input_events.EVENT_BLOCK
 
    elif event == 'OK':
       _cb_item_selected(list, item)
-      return input.EVENT_BLOCK
+      return input_events.EVENT_BLOCK
 
    elif event == 'EXIT':
       gui.ask_to_exit()
-      return input.EVENT_BLOCK
+      return input_events.EVENT_BLOCK
 
 
-   return input.EVENT_CONTINUE
+   return input_events.EVENT_CONTINUE

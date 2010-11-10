@@ -4,7 +4,7 @@ import ecore
 import ecore.x
 
 from epymc.modules import EmcModule
-import epymc.input as input
+import epymc.input_events as input_events
 
 
 def DBG(msg):
@@ -46,7 +46,7 @@ and what it need to work well, can also use markup like <title>this</> or
    def _cb_key_down(self, event):
       DBG('Key: ' + event.key)
       if _mapping.has_key(event.key):
-         input.event_emit(_mapping[event.key])
+         input_events.event_emit(_mapping[event.key])
       else:
          print "Unhandled key: " + event.key
 

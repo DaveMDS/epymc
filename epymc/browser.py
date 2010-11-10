@@ -6,7 +6,7 @@ import elementary
 
 import gui
 import mainmenu
-import input
+import input_events
 import ini
 from sdb import EmcDatabase
 
@@ -231,12 +231,12 @@ class EmcBrowser(object):
       """ TODO Function doc """
       gui.signal_emit("topbar,show")
       self.current_view.show()
-      input.listener_add('browser-' + self.name, self._input_event_cb)
+      input_events.listener_add('browser-' + self.name, self._input_event_cb)
 
    def hide(self):
       """ TODO Function doc """
       gui.signal_emit("topbar,hide")
-      input.listener_del('browser-' + self.name)
+      input_events.listener_del('browser-' + self.name)
       self.current_view.hide()
 
    # private stuff
@@ -251,7 +251,7 @@ class EmcBrowser(object):
       else:
          return self.current_view.input_event_cb(event)
 
-      return input.EVENT_BLOCK
+      return input_events.EVENT_BLOCK
 
    def _create_or_get_view(self, view_name):
       if _views.has_key(view_name):
@@ -453,20 +453,20 @@ class ViewList(object):
          if next:
             next.selected_set(1)
             next.show()
-            return input.EVENT_BLOCK
+            return input_events.EVENT_BLOCK
 
       elif event == "UP":
          prev = item.prev_get()
          if prev:
             prev.selected_set(1)
             prev.show()
-            return input.EVENT_BLOCK
+            return input_events.EVENT_BLOCK
 
       elif event == "OK":
          parent_browser._item_selected(url)
-         return input.EVENT_BLOCK
+         return input_events.EVENT_BLOCK
 
-      return input.EVENT_CONTINUE
+      return input_events.EVENT_CONTINUE
 
    ### GenList Item Class
    def __genlist_label_get(self, obj, part, item_data):
@@ -579,30 +579,30 @@ class ViewGrid(object):
          if next:
             next.selected_set(1)
             next.bring_in()
-            return input.EVENT_BLOCK
+            return input_events.EVENT_BLOCK
 
       elif event == "LEFT":
          prev = item.prev_get()
          if prev:
             prev.selected_set(1)
             prev.bring_in()
-            return input.EVENT_BLOCK
+            return input_events.EVENT_BLOCK
 
       elif event == "UP":
          (x, y) = item.pos_get()
          # TODO
-         return input.EVENT_BLOCK
+         return input_events.EVENT_BLOCK
 
       elif event == "DOWN":
          (x, y) = item.pos_get()
          # TODO
-         return input.EVENT_BLOCK
+         return input_events.EVENT_BLOCK
 
       elif event == "OK":
          parent_browser._item_selected(url)
-         return input.EVENT_BLOCK
+         return input_events.EVENT_BLOCK
 
-      return input.EVENT_CONTINUE
+      return input_events.EVENT_CONTINUE
 
    # gengrid model
    def gg_label_get(self, obj, part, item_data):

@@ -6,7 +6,7 @@ import elementary
 import emotion
 
 import gui
-import input
+import input_events
 
 
 def DBG(msg):
@@ -77,11 +77,11 @@ def fbackward():
 
 def video_player_show():
    gui.signal_emit('videoplayer,show')
-   input.listener_add("videoplayer", input_event_cb)
+   input_events.listener_add("videoplayer", input_event_cb)
 
 def video_player_hide():
    video_controls_hide()
-   input.listener_del("videoplayer")
+   input_events.listener_del("videoplayer")
    gui.signal_emit('videoplayer,hide')
 
 def video_controls_show():
@@ -294,4 +294,4 @@ def input_event_cb(event):
    if event == 'TOGGLE_PAUSE':
       _cb_btn_play(_buttons[3])
 
-   return input.EVENT_BLOCK
+   return input_events.EVENT_BLOCK

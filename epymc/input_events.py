@@ -22,7 +22,7 @@ VIEW_GRID
 
 
 def DBG(msg):
-   #~ print('INPUT: ' + msg)
+   print('INPUT_EVENTS: ' + msg)
    pass
 
 

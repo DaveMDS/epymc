@@ -19,6 +19,7 @@
 images {
    image: "background.jpg" COMP;
    image: "frame.png" COMP;
+   image: "frame2.png" COMP;
    image: "separator.png" COMP;
    image: "header.png" COMP;
 }
@@ -27,9 +28,10 @@ fonts {
    font: "Cuprum.ttf" "Cuprum";
    font: "Lobster.ttf" "Lobster";
 }
+
 styles {
    style { name: "epymc_default_style";
-      base: "font=Sans font_size="FONT_SIZE" color=#bbb wrap=word";
+      base: "font="FONT" font_size="FONT_SIZE" color=#fff wrap=word";
       tag:  "br" "\n";
       tag:  "tab" "\t";
       tag:  "em" "+ font=Sans:style=Oblique";
@@ -235,6 +237,22 @@ collections {
                }
             }
          }
+         part { name: "browser/list/info_bg";
+            type: IMAGE;
+            clip_to: "browser/list/clip";
+            description { state: "default" 0.0;
+               image.normal: "frame2.png";
+               image.border: 8 8 8 8;
+               rel1 {
+                  to: "browser/list/info";
+                  offset: -9 -9;
+               }
+               rel2 {
+                  to: "browser/list/info";
+                  offset: 8 8;
+               }
+            }
+         }
          part { name: "browser/list/info"; /* API */
             type: TEXTBLOCK;
             clip_to: "browser/list/clip";
@@ -242,10 +260,10 @@ collections {
             description { state: "default" 0.0;
                rel1 {
                   relative: 0.5 0.65;
-                  offset: 20 10;
+                  offset: 30 10;
                }
                rel2 {
-                  offset: -20 -20;
+                  offset: -20 -30;
                }
                text {
                   style: "epymc_default_style";

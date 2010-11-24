@@ -10,6 +10,7 @@ CORE
  * Browser: label must go in 'item_class' or refresh will not work :(
  * Gui: hide (& move to 0,0) the mouse pointer on input events
  * VKeyboard resolv left/right conflict  !!!!!!!
+ * Make elementary engine configurable, or at least tell what engine is active
 
 MAME
 =====

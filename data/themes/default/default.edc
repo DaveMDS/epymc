@@ -18,6 +18,9 @@
 
 images {
    image: "background.jpg" COMP;
+   image: "frame.png" COMP;
+   image: "separator.png" COMP;
+   image: "header.png" COMP;
 }
 
 styles {
@@ -100,13 +103,14 @@ collections {
             }
          }
          part { name: "browser/list/list_frame";
-            type: RECT;
+            type: IMAGE;
             clip_to: "browser/list/clip";
             description { state: "default" 0.0;
-               color: 0 100 150 70;
                rel1.offset: 10 50;
                rel2.relative: 0.5 1.0;
                rel2.offset: -1 -10;
+               image.normal: "frame.png";
+               image.border: 0 0 92 78;
             }
          }
          part { name: "browser/list/list_clip";
@@ -116,11 +120,11 @@ collections {
                color: 255 255 255 0;
                rel1 {
                   to: "browser/list/list_frame";
-                  offset: 5 5;
+                  offset: 14 20;
                }
                rel2 {
                   to: "browser/list/list_frame";
-                  offset: -6 -6;
+                  offset: -17 -75;
                }
             }
             description { state: "visible" 0.0;
@@ -176,6 +180,30 @@ collections {
                rel2 {
                   to: "browser/list/genlist1";
                   relative: 0.0 1.0;
+               }
+            }
+         }
+         part { name: "browser/list/total"; /* API */
+            type: TEXT;
+            clip_to: "browser/list/clip";
+            effect: SHADOW;
+            description { state: "default" 0.0;
+               color: FONT_COLOR;
+               color3: 0 0 0 255;
+               rel1 {
+                  to: "browser/list/list_frame";
+                  relative: 1.0 1.0;
+                  offset: -185 -70;
+               }
+               rel2 {
+                  to: "browser/list/list_frame";
+                  relative: 1.0 1.0;
+                  offset: -27 -38;
+               }
+               text {
+                  text: "Total: 10";
+                  font: FONT;
+                  size: FONT_SIZE;
                }
             }
          }
@@ -253,28 +281,25 @@ collections {
             type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 255;
-               rel1 {
-                  offset: 0 -40;
-               }
-               rel2 {
-                  relative: 1.0 0.0;
-               }
+               rel1.offset: 0 -60;
+               rel2.relative: 1.0 0.0;
             }
             description { state: "visible" 0.0;
                color: 255 255 255 255;
                rel2 {
                   relative: 1.0 0.0;
-                  offset: -1 39;
+                  offset: -1 59;
                }
             }
          }
          part { name: "topbar/bg";
-            type: RECT;
+            type: IMAGE;
             clip_to: "topbar/clip";
             description { state: "default" 0.0;
-               color: 255 0 0 100;
                rel1.to: "topbar/clip";
                rel2.to: "topbar/clip";
+               image.normal: "header.png";
+               image.border: 40 40 0 40;
             }
          }
          part { name: "topbar/home_icon";
@@ -289,7 +314,7 @@ collections {
                rel2 {
                   to: "topbar/clip";
                   relative: 0.0 1.0;
-                  offset: 55 -10;
+                  offset: 55 -40;
                }
                image {
                   normal: "icon_home.png";
@@ -310,6 +335,7 @@ collections {
                rel2 {
                   to: "topbar/clip";
                   relative: 0.7 1.0;
+                  offset: -1 -30;
                }
                text {
                   text: "asd";
@@ -327,12 +353,10 @@ collections {
                rel1 {
                   to: "topbar/title";
                   relative: 1.0 0.0;
-                  offset: 0 5;
                }
                rel2 {
                   to: "topbar/clock";
                   relative: 0.0 1.0;
-                  offset: 0 -6;
                }
                box {
                   layout: "horizontal";
@@ -347,11 +371,11 @@ collections {
                rel1 {
                   to: "topbar/clip";
                   relative: 1.0 0.0;
-                  offset: -150 0;
+                  offset: -120 0;
                }
                rel2 {
                   to: "topbar/clip";
-                  offset: -10 0;
+                  offset: -45 -30;
                }
                text {
                   text: "12:24";

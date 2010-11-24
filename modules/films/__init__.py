@@ -55,6 +55,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                               item_selected_cb = self.cb_url_selected,
                               icon_get_cb = self.cb_icon_get,
                               poster_get_cb = self.cb_poster_get,
+                              fanart_get_cb = self.cb_fanart_get,
                               info_get_cb = self.cb_info_get)
 
    def __shutdown__(self):
@@ -117,6 +118,15 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          poster = get_poster_filename(e['id'])
          if os.path.exists(poster):
             return poster
+      else:
+         return None
+
+   def cb_fanart_get(self, page_url, item_url):
+      if self.__film_db.id_exists(item_url):
+         e = self.__film_db.get_data(item_url)
+         fanart = get_backdrop_filename(e['id'])
+         if os.path.exists(fanart):
+            return fanart
       else:
          return None
 

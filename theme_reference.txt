@@ -5,6 +5,12 @@
 Main elementary layout group: "epymc_main_layout"
 All the icons in icons.edc must be implemented
 
+### Backdrop stuff ###
+   * Required parts:
+      "backdrop/1" -> edje SWALLOW
+      "backdrop/2" -> edje SWALLOW  __unused__
+
+
 ### TopBar stuff ###
    * Required parts:
       "topbar/title" -> edje text
@@ -30,6 +36,7 @@ All the icons in icons.edc must be implemented
       "browser/list/genlist2" -> elm_genlist style: "browser"
       "browser/list/poster" -> edje swallow -> EmcRemoteImage
       "browser/list/info" -> edje TEXTBLOCK
+      "browser/list/total" -> edje TEXT
 
    * Signals received from the application:
       "browser,list,show" "emc"

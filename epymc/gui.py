@@ -15,6 +15,7 @@ import input_events
 win = None
 layout = None
 theme_file = None
+backdrop_im = None
 
 
 def init():
@@ -133,6 +134,17 @@ def _cb_exit_yes(button):
 def toggle_fullscreen():
    pass
 
+def mouse_hide():
+   print "MOUSE HIDE"
+   # elm coursor
+   #~ from elementary import cursors
+   #~ layout.cursor_set(cursors.ELM_CURSOR_CLOCK)
+
+   #ecore win cursor
+   #~ Ecore.x.Window.cursor_hide()
+
+def mouse_show():
+   print "MOUSE SHOW"
 
 def part_get(name):
    global layout
@@ -147,9 +159,20 @@ def text_set(part, text):
    layout.edje_get().part_text_set(part, text)
 
 def swallow_set(part, obj):
-   global layout
+   old = layout.edje_get().part_swallow_get(part)
+   if old: old.delete()
    layout.edje_get().part_swallow(part, obj)
 
+################################################################################
+def background_set(image):
+   global backdrop_im
+
+   if not backdrop_im:
+      backdrop_im = elementary.Image(gui.win)
+      backdrop_im.fill_outside_set(True)
+      swallow_set("backdrop/1", backdrop_im)
+
+   backdrop_im.file_set(image)
 
 ################################################################################
 class EmcRemoteImage(elementary.Image):

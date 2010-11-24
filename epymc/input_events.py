@@ -20,9 +20,10 @@ VIEW_GRID
 
 """
 
+import gui
 
 def DBG(msg):
-   print('INPUT_EVENTS: ' + msg)
+   #~ print('INPUT_EVENTS: ' + msg)
    pass
 
 
@@ -55,7 +56,9 @@ def event_emit(event):
    global _listeners
 
    DBG("Emit Event: " + event + "  listeners: " + str(len(_listeners)))
-   
+
+   gui.mouse_hide()
+
    for lis in reversed(_listeners):
       (name, cb, data) = lis
 

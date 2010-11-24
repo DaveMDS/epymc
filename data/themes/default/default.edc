@@ -89,6 +89,16 @@ collections {
                }
             }
          }
+         part { name: "backdrop/1"; /* API */
+            type: SWALLOW;
+            description { state: "default" 0.0;
+            }
+         }
+         part { name: "backdrop/2"; /* API _unused_ */
+            type: SWALLOW;
+            description { state: "default" 0.0;
+            }
+         }
 
 /// browser view: list
          part { name: "browser/list/clip";

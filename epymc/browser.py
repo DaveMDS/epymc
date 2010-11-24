@@ -93,7 +93,7 @@ class EmcBrowser(object):
       
    def page_add(self, url, title, style = None, item_selected_cb = None,
                  icon_get_cb = None, icon_end_get_cb = None,
-                 info_get_cb = None, poster_get_cb = None):
+                 info_get_cb = None, poster_get_cb = None, fanart_get_cb = None):
       """
       When you create a page you need to give at least the url and the title
       """
@@ -119,7 +119,8 @@ class EmcBrowser(object):
                             'icon_get_cb': icon_get_cb,
                             'icon_end_get_cb': icon_end_get_cb,
                             'info_get_cb': info_get_cb,
-                            'poster_get_cb': poster_get_cb})
+                            'poster_get_cb': poster_get_cb,
+                            'fanart_get_cb': fanart_get_cb})
 
       # first time, we don't have a current_view, set it
       if not self.current_view:
@@ -326,6 +327,14 @@ class EmcBrowser(object):
          func = self.poster_get_cb
       return func(self.pages[-1]["url"], url) if callable(func) else None
 
+   def _fanart_get(self, url):
+      """ TODO Function doc """
+      if self.pages[-1]['fanart_get_cb']:
+         func = self.pages[-1]['fanart_get_cb']
+      else:
+         func = self.fanart_get_cb
+      return func(self.pages[-1]["url"], url) if callable(func) else None
+
    def _info_get(self, url):
       """ TODO Function doc """
       if self.pages[-1]['info_get_cb']:
@@ -356,7 +365,7 @@ class ViewList(object):
       """
       DBG('Init view: plain list')
 
-      self.timer = None
+      self.timer = self.timer2 = None
 
       # EXTERNAL Genlist1
       self.gl1 = gui.part_get('browser/list/genlist1')
@@ -491,7 +500,9 @@ class ViewList(object):
 
    def _cb_item_hilight(self, list, item):
       if self.timer: self.timer.delete()
+      if self.timer2: self.timer2.delete()
       self.timer = ecore.timer_add(0.5, self._cb_timer, item.data_get())
+      self.timer2 = ecore.timer_add(1.0, self._cb_timer2, item.data_get())
 
    def _cb_timer(self, data):
       (url, label, parent_browser) = data
@@ -514,7 +525,16 @@ class ViewList(object):
       gui.text_set('browser/list/info', text or "")
 
       return False # don't repeat the timer
-      
+
+   def _cb_timer2(self, data):
+      (url, label, parent_browser) = data
+
+      # Ask for the item poster and show (or auto-download) it
+      fanart = parent_browser._fanart_get(url)
+      if fanart: gui.background_set(fanart)
+
+      return False # don't repeat the timer
+
 
 ################################################################################
 #### Grid View  ################################################################

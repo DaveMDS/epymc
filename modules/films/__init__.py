@@ -359,7 +359,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
             icon.size_hint_min_set(100, 100) # TODO fixme
             #~ label = res['name'] + ' (' + res['released'][:4] + ')'
             mid = image['url'][:-9]
-            mid = mid + 'mid.jpg'
+            mid = mid + 'original.jpg'
             li.item_append(" ", icon, None, None, (mid, film_info['id']))
 
          li.items_get()[0].selected_set(1)
@@ -385,7 +385,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.__backdrop_dialog = dialog
       (url, id) = item.data_get()[0][0]
       dest = get_backdrop_filename(id)
-      utils.download_url_async(url, dest, complete_cb = self._cb_backdrop_done)
+      
+      utils.download_url_async(url, dest, min_size = 2000,
+                               complete_cb = self._cb_backdrop_done)
 
       # kill the dialog
       self.__backdrop_dialog.delete()
@@ -399,6 +401,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # kill the dialog
       self.__backdrop_dialog.delete()
       del self.__backdrop_dialog
+
+      if status > 0:
+         EmcDialog(title = "Download error !!", style = 'error')
 
 ######## Get info
    def _cb_panel_5(self, button):

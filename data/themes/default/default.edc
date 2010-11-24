@@ -9,8 +9,8 @@
 #define DBG(...)
 #endif
 
-#define FONT "Sans"
-#define FONT_BOLD "Sans:style=Bold"
+#define FONT "Cuprum"
+#define FONT_BOLD "Cuprum:style=Bold"
 #define FONT_SIZE 16
 #define FONT_SIZE_BIG 24
 #define FONT_COLOR 255 255 255 255
@@ -23,6 +23,10 @@ images {
    image: "header.png" COMP;
 }
 
+fonts {
+   font: "Cuprum.ttf" "Cuprum";
+   font: "Lobster.ttf" "Lobster";
+}
 styles {
    style { name: "epymc_default_style";
       base: "font=Sans font_size="FONT_SIZE" color=#bbb wrap=word";

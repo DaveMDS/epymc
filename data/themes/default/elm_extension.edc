@@ -574,9 +574,9 @@ group { name: "elm/list/item/mainmenu";
                offset:   -1 -5;
             }
             color: 255 255 255 255;
-            color3: 100 100 100 100;
+            color3: 0 0 0 255;
             text {
-               font: "Sans";
+               font: "Lobster";
                size: 35;
                min: 1 1;
 //                  min: 0 1;
@@ -585,8 +585,6 @@ group { name: "elm/list/item/mainmenu";
          }
          description { state: "selected" 0.0;
             inherit: "default" 0.0;
-            color: 224 224 224 255;
-            color3: 0 0 0 64;
          }
       }
       part { name: "fg1";

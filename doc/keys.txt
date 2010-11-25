@@ -1,0 +1,16 @@
+
+                     EpyMC KEY BINDINGS
+
+This is the list of supported key, look at modules/input_keyb/__init__.py
+to see the real mapping.
+
+
+KEYS                             ACTION
+
+Arrows                           UP,DOWN,LEFT,RIGHT
+Enter or KP_Enter                OK
+BackSpace                        BACK
+Esc                              EXIT
+Space or P                       TOGGLE_PAUSE
+F                                TOGGLE_FULLSCREEN
+

@@ -1,7 +1,6 @@
 
 MAIN
 =====
- * Add license headers
  * Use setuptools ?
 
 

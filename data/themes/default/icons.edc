@@ -15,6 +15,8 @@ ICON("ok")
 ICON("cancel")
 ICON("check_on")
 ICON("check_off")
+ICON("minus")
+ICON("plus")
 
 ICON("list")
 ICON("grid")

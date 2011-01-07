@@ -74,7 +74,6 @@ and what it need to work well, can also use markup like <title>this</> or
       except:
          print ("Error: Joystick configuration value missed")
          # TODO spawn the configurator
-         return
 
       # add an entry in the config gui
       config_gui.root_item_add("joystick", 50, "Joystick", icon = None,

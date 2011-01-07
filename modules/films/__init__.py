@@ -92,10 +92,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def cb_mainmenu(self):
       # get film folders from config
       self.__folders = ini.get_string_list('film', 'folders', ';')
-      if not self.__folders:
-         print "NO FOLDERS"
+
+      # if not self.__folders:
          #TODO alert the user. and instruct how to add folders
-         return
 
       self.create_root_page()
       mainmenu.hide()
@@ -109,6 +108,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       for f in self.__folders:
          self.__browser.item_add(f, os.path.basename(f))
+      
+      self.__browser.item_add('film://add_source', 'Add source');
 
    def cb_url_selected(self, page_url, item_url):
       if item_url.startswith("file://"):
@@ -122,11 +123,15 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       elif item_url == "film://root":
          self.create_root_page()
-
+      elif item_url == "film://add_source":
+         EmcDialog(text="Source Browser").activate()
 
    def cb_icon_get(self, page_url, item_url):
-      if self.__film_db.id_exists(item_url):
-         return None
+      if item_url.startswith("file://"):
+         if self.__film_db.id_exists(item_url):
+            return None
+      elif (item_url == 'film://add_source'):
+         return 'icon/plus'
       return "icon/folder"
 
    def cb_poster_get(self, page_url, item_url):

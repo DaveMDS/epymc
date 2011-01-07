@@ -48,8 +48,8 @@ def main():
    user_config_dir = utils.config_dir_get()
    if not os.path.exists(user_config_dir):
       os.makedirs(user_config_dir)
-      os.makedir(os.path.join(user_config_dir, "modules"))
-      os.makedir(os.path.join(user_config_dir, "themes"))
+      os.mkdir(os.path.join(user_config_dir, "modules"))
+      os.mkdir(os.path.join(user_config_dir, "themes"))
 
    #TODO add a system dir...but where??
    ini.read_from_files(['epymc.conf',

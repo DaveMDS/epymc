@@ -67,6 +67,10 @@ def get_resource_file(type, resource, default = None):
    # not found :(
    return None
 
+def url2path(url):
+   # TODO ... convert the url to a local path !!
+   return url[7:]
+
 def download_url_sync(url, dest, min_size = 0):
    """
    Copy the contents of a file from a given URL to a local file, blocking

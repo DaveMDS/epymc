@@ -35,6 +35,7 @@ import epymc.mainmenu as mainmenu
 import epymc.ini as ini
 import epymc.sdb as sdb
 import epymc.browser as browser
+import epymc.browser2 as browser2
 
 
 def main():
@@ -57,11 +58,13 @@ def main():
 
    # alert if CURL support not available (no download ability)
    if not ecore.file.download_protocol_available("http://"):
-      print("WARNING. Ecore must be comiled with CURL support. Download disabled")
+      print('ERROR. Ecore does not have CURL support.')
+      return 2
 
    # init stuff
    sdb.init()
    browser.init()
+   browser2.init()
    if not gui.init(): return 2
    config_gui.init()
    mainmenu.init()
@@ -82,6 +85,7 @@ def main():
    ini.write_to_file(os.path.join(user_config_dir, 'epymc.conf'))
    gui.shoutdown()
    browser.shutdown()
+   browser2.shutdown()
    sdb.shutdown()
 
    # shutdown elementary

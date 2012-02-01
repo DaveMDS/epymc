@@ -107,6 +107,7 @@ def video_controls_show():
    gui.signal_emit('volume,show')
    _controls_visible = True
    # update volume slider
+   DBG("Volume: " + volume_get())
    volume_set(volume_get())
 
 def video_controls_hide():
@@ -212,6 +213,8 @@ def _init_emotion():
 
 
    gui.part_get('videoplayer/controls/slider').callback_changed_add(_cb_slider_changed)
+   gui.part_get('videoplayer/controls/slider').focus_allow_set(False)
+   gui.part_get('volume/slider').focus_allow_set(False)
    #~ gui.part_get('videoplayer/controls/slider').callback_delay_changed_add(_cb_slider_changed)
    
    # TODO Shutdown all emotion stuff & the buttons list

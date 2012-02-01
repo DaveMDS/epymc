@@ -322,7 +322,18 @@ class MameGame(object):
       self.gid = gid
       self.name = name
       self.parsed = False
-      self.history = ''
+      self.history = None
+      self.year = None
+      self.manufacturer = None
+      self.players = None
+      self.buttons = None
+      self.driver_savestate = None
+      self.driver_status = None
+      self.driver_emulation = None
+      self.driver_color = None
+      self.driver_sound = None
+      self.driver_graphic = None
+      
 
    def run(self):
       DBG('RUN GAME: ' + self.gid)
@@ -352,18 +363,19 @@ class MameGame(object):
          if (os.access(f, os.R_OK)):
             return f
       return None
+
 ## game dialog stuff
    def dialog_show(self):
       box = elementary.Box(gui.win)
       box.horizontal_set(True)
-      box.homogenous_set(False)
+      box.homogenous_set(True)
       box.show()
 
       image = gui.EmcRemoteImage(gui.win)
       image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      (local, url) = self.poster_get()
-      image.url_set(url, local)
+      (local, remote) = self.poster_get()
+      image.url_set(remote, local)
       image.show()
       box.pack_end(image)
 
@@ -388,26 +400,26 @@ class MameGame(object):
               self.driver_sound, self.driver_graphic)
       sentry.entry_set(text)
       sentry.show()
-      box.pack_end(sentry)
+      box.pack_start(sentry)
 
       self.dialog = EmcDialog(self.name, content = box)
 
       if self.file_name_get():
-         self.dialog.button_add("Run", (lambda btn: self.run()))
+         self.dialog.button_add('Run', (lambda btn: self.run()))
       else:
-         self.dialog.button_add("Download Game", (lambda btn: self.download_zip()))
+         self.dialog.button_add('Download', (lambda btn: self.download_zip()))
 
       if self.gid in MameModule._favorites:
-         self.dialog.button_add("", self._cb_favorite_button, icon = 'icon/star')
+         self.dialog.button_add('', self._cb_favorite_button, icon = 'icon/star')
       else:
-         self.dialog.button_add("", self._cb_favorite_button, icon = 'icon/star_off')
+         self.dialog.button_add('', self._cb_favorite_button, icon = 'icon/star_off')
 
-      self.dialog.button_add("History", (lambda btn: self.history_show()))
+      self.dialog.button_add('History', (lambda btn: self.history_show()))
 
       if self.file_name_get():
-         self.dialog.button_add("Delete", (lambda btn: self.delete_zip()))
+         self.dialog.button_add('Delete', (lambda btn: self.delete_zip()))
 
-      self.dialog.button_add("Close", (lambda btn: self.dialog.delete()))
+      self.dialog.button_add('Close', (lambda btn: self.dialog.delete()))
       self.dialog.activate()
 
    def _cb_favorite_button(self, btn):
@@ -451,19 +463,16 @@ class MameGame(object):
                      state = 1
             # state1: skip until '$bio'
             elif state == 1:
-               DBG('1')
                if line.startswith('$bio'):
                   state = 2
             # state2: copy text until '$end'
             elif state == 2:
-               DBG('2')
                if line.startswith('$end'):
                   state = 3 # done
                else:
                   history = history + line + '<br>'
             #state3: end
             elif state == 3:
-               DBG('3')
                break
 
          f.close()
@@ -505,6 +514,7 @@ class MameGame(object):
          EmcDialog(text = 'Game deleted', style = 'info')
       else:
          EmcDialog(text = 'Can not delete game', style = 'error')
+
 ## download game stuff
    def download_zip(self):
       # choose a writable folder in rompath
@@ -518,12 +528,12 @@ class MameGame(object):
                    style = 'error')
          return
       dest = os.path.join(dest, self.gid + '.zip')
-      DBG('DEST: ' + dest)
+      DBG('Download to: ' + dest)
 
       # create the new download dialog
       self.dialog.delete()
       self.dialog = EmcDialog(title = 'Game download', spinner = True,
-                              text = '', style= 'minimal')
+                              text = '', style= 'minimal_vertical')
       self.dialog.button_add('Close', lambda btn: self.dialog.delete()) # TODO abort download well if needed
       self.dialog.activate()
 
@@ -532,9 +542,9 @@ class MameGame(object):
       # freeroms.com
       title = "Trying at freeroms.org...<br>"
       prefix = 'NUM' if self.gid[0].isdigit() else self.gid[0]
-      url = 'http://freeroms67.freeroms.com/mame_roms/%s/%s.zip' % (prefix, self.gid)
+      url = 'http://roms.freeroms.com/mame_roms/%s/%s.zip' % (prefix, self.gid)
       sources.append((title, url))
-       # try somewhere else
+       # try somewhere else (suggestions are welcome)
       title = "Trying not_work.com...<br>"
       url = 'http://freeroms67.freeroms.com/mame_roms/%c/%s.zip' % (self.gid[0], self.gid)
       sources.append((title, url))
@@ -544,6 +554,7 @@ class MameGame(object):
    def _try_download_multi_sources(self, sources, dest):
       (title, url) = sources.pop(0)
       self.dialog.text_append(title)
+      DBG('Download from: ' + url)
       try:
          utils.download_url_async(url, dest, min_size = 2000,
                            complete_cb = self._cb_multi_download_complete,

@@ -121,12 +121,12 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
       (complete_cb, progress_cb, min_size) = dwl_data
 
       # if file size < min_size: report as error
-      if status == 0 and min_size > 0 and os.path.getsize(dest) < min_size:
+      if status == 200 and min_size > 0 and os.path.getsize(dest) < min_size:
          DBG("MIN_SIZE not reached, discard download")
-         status = 1
+         status = 404 # HTTP NotFound code
 
       # on errors delete the downloaded file
-      if status > 0 and os.path.exists(dest):
+      if status != 200 and os.path.exists(dest):
          DBG("download error")
          os.remove(dest)
 

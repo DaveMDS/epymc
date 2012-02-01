@@ -104,9 +104,10 @@ and what it need to work well, can also use markup like <title>this</> or
    def count_roms(self):
       tot = 0
       for dir in MameModule._rompaths:
-         for f in os.listdir(dir):
-            if f.endswith('.zip'):
-               tot += 1
+         if os.path.exists(dir):
+            for f in os.listdir(dir):
+               if f.endswith('.zip'):
+                  tot += 1
       return tot
 
 ## async mame stuff
@@ -118,6 +119,8 @@ and what it need to work well, can also use markup like <title>this</> or
          for dir in val.split(';'):
             dir_real = dir.replace('$HOME', os.getenv('HOME'))
             if key == 'rompath':
+               if not os.path.exists(dir_real):
+                  os.makedirs(dir_real)
                MameModule._rompaths.append(dir_real)
             elif key == 'snapshot_directory':
                MameModule._snapshoot_dir = dir_real
@@ -335,11 +338,12 @@ class MameGame(object):
 
    def short_info_get(self):
       self._more_game_info()
-      return '<hilight>Year:</> %s<br>' \
+      return '<title>%s</><br>' \
+             '<hilight>Year:</> %s<br>' \
              '<hilight>Manufacturer:</> %s<br>' \
              '<hilight>Players:</> %s<br>' \
              '<hilight>Buttons:</> %s<br>' % \
-             (self.year, self.manufacturer, self.players,
+             (self.name, self.year, self.manufacturer, self.players,
               self.buttons)
 
    def file_name_get(self):
@@ -426,7 +430,7 @@ class MameGame(object):
          EmcDialog(title = 'No History file found',style = 'error',
                    text = 'The History file is not included in mame, you '
                           'should download a copy from aracade-history.com <br>'
-                          'The file must be unzipped and placed in ' + f)
+                          'The file must be unzipped and placed in ' + history_file)
          return
 
       # parse the history file
@@ -540,8 +544,6 @@ class MameGame(object):
    def _try_download_multi_sources(self, sources, dest):
       (title, url) = sources.pop(0)
       self.dialog.text_append(title)
-      DBG(title)
-      DBG(url)
       try:
          utils.download_url_async(url, dest, min_size = 2000,
                            complete_cb = self._cb_multi_download_complete,
@@ -557,7 +559,7 @@ class MameGame(object):
 
    def _cb_multi_download_complete(self, dest, status, sources):
       self.dialog.spinner_stop()
-      if status == 0: # no errors
+      if status == 200: # no errors
          self.dialog.text_append('<b>Download done :)</>')
       else:
          if sources:
@@ -568,6 +570,7 @@ class MameGame(object):
    def _cb_multi_download_progress(self, file, dltotal, dlnow, sources):
       #~ print dlnow
       pass
+
 ## game info (from mame -listxml <rom>)
    def _more_game_info(self):
       # do this only once

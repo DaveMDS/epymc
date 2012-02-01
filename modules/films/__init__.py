@@ -27,6 +27,7 @@ from epymc.browser import EmcBrowser
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog
 from epymc.gui import EmcRemoteImage
+from epymc.gui import EmcSourceSelector
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
@@ -36,7 +37,7 @@ import epymc.gui as gui
 
 
 def DBG(msg):
-   #~ print('FILM: ' + msg)
+   print('FILM: ' + msg)
    pass
 
 TMDB_API_KEY = "19eef197b81231dff0fd1a14a8d5f863" # Key of the user DaveMDS
@@ -112,27 +113,41 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.__browser.item_add('film://add_source', 'Add source');
 
    def cb_url_selected(self, page_url, item_url):
-      if item_url.startswith("file://"):
+      if item_url.startswith('file://'):
          path = item_url[7:]
          if os.path.isdir(path):
             self.__browser.page_add(item_url, os.path.basename(path))
-            for f in os.listdir(path):
-               self.__browser.item_add("file://" + path + "/" + f, f)
+            dirs, files = [], []
+            for fname in sorted(os.listdir(path), key=str.lower):
+               if os.path.isdir(os.path.join(path, fname)):
+                  dirs.append(fname)
+               else:
+                  files.append(fname)
+               
+            for fname in dirs + files:
+               self.__browser.item_add('file://' + path + '/' + fname, fname)
          else:
             self.show_film_info(item_url)
 
-      elif item_url == "film://root":
+      elif item_url == 'film://root':
          self.create_root_page()
-      elif item_url == "film://add_source":
-         EmcDialog(text="Source Browser").activate()
+      elif item_url == 'film://add_source':
+         EmcSourceSelector(done_cb = self.cb_source_selected)
+
+   def cb_source_selected(self, fullpath):
+      self.__folders.append(fullpath)
+      ini.set_string_list('film', 'folders', self.__folders, ';')
 
    def cb_icon_get(self, page_url, item_url):
-      if item_url.startswith("file://"):
+      DBG(item_url[8:])
+      if item_url.startswith('file://'):
+         if os.path.isdir(item_url[7:]):
+            return 'icon/folder'
          if self.__film_db.id_exists(item_url):
             return None
       elif (item_url == 'film://add_source'):
          return 'icon/plus'
-      return "icon/folder"
+      return None
 
    def cb_poster_get(self, page_url, item_url):
       if self.__film_db.id_exists(item_url):

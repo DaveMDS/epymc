@@ -407,7 +407,7 @@ class ViewList(object):
 
       # genlist item class
       self.itc = elementary.GenlistItemClass(item_style="default",
-                                 label_get_func = self.__genlist_label_get,
+                                 text_get_func = self.__genlist_label_get,
                                  icon_get_func = self.__genlist_icon_get,
                                  state_get_func = self.__genlist_state_get)
 

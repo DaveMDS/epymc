@@ -28,7 +28,7 @@ import ini
 from sdb import EmcDatabase
 
 def DBG(msg):
-   #~ print ('BROWSER: ' + msg)
+   # print ('BROWSER: ' + msg)
    pass
 
 
@@ -389,7 +389,8 @@ class ViewList(object):
       self.gl1.style_set("browser")
       self.gl1.homogeneous_set(True)
       self.gl1.always_select_mode_set(True)
-      self.gl1.callback_clicked_add(self._cb_item_selected)
+      self.gl1.focus_allow_set(False)
+      self.gl1.callback_clicked_double_add(self._cb_item_selected)
       self.gl1.callback_selected_add(self._cb_item_hilight)
       self.current_list = self.gl1
 
@@ -398,13 +399,14 @@ class ViewList(object):
       self.gl2.style_set("browser")
       self.gl2.homogeneous_set(True)
       self.gl2.always_select_mode_set(True)
-      self.gl2.callback_clicked_add(self._cb_item_selected)
+      self.gl2.focus_allow_set(False)
+      self.gl2.callback_clicked_double_add(self._cb_item_selected)
       self.gl2.callback_selected_add(self._cb_item_hilight)
 
       # genlist item class
       self.itc = elementary.GenlistItemClass(item_style="default",
-                                 label_get_func = self.__genlist_label_get,
-                                 icon_get_func = self.__genlist_icon_get,
+                                 text_get_func = self.__genlist_label_get,
+                                 content_get_func = self.__genlist_icon_get,
                                  state_get_func = self.__genlist_state_get)
 
       # RemoteImage (poster)
@@ -444,6 +446,7 @@ class ViewList(object):
       When an item will be selected you should call:
       parent_browser._item_selected(url) with the url of the selected item
       """
+      DBG("item_add( , %s, %s)" % (url, label))
       item_data = (url, label, parent_browser)
       it = self.current_list.item_append(self.itc, item_data)
       if not self.current_list.selected_item_get():
@@ -497,10 +500,12 @@ class ViewList(object):
    ### GenList Item Class
    def __genlist_label_get(self, obj, part, item_data):
       (url, label, parent_browser) = item_data
+      DBG("LABEL: " + label)
       return label
 
    def __genlist_icon_get(self, obj, part, data):
       (url, label, parent_browser) = data
+      DBG("_content get(): " + label)
       if part == 'elm.swallow.icon':
          return parent_browser._icon_get(url)
       elif part == 'elm.swallow.end':
@@ -524,6 +529,10 @@ class ViewList(object):
    def _cb_timer(self, data):
       (url, label, parent_browser) = data
 
+      # Fill the textblock with item info info
+      text = parent_browser._info_get(url)
+      gui.text_set('browser/list/info', text or "")
+
       # Ask for the item poster and show (or auto-download) it
       poster = parent_browser._poster_get(url)
       if poster and poster.startswith("http://"):
@@ -536,10 +545,6 @@ class ViewList(object):
          self.__im.file_set(gui.theme_file, poster)
       else:
          self.__im.file_set(poster if poster else "")
-
-      # Fill the textblock with item info info
-      text = parent_browser._info_get(url)
-      gui.text_set('browser/list/info', text or "")
 
       return False # don't repeat the timer
 
@@ -562,8 +567,8 @@ class ViewGrid(object):
       DBG('Init view: grid')
 
       self.itc = elementary.GengridItemClass(item_style="default",
-                                       label_get_func=self.gg_label_get,
-                                       icon_get_func=self.gg_icon_get,
+                                       text_get_func=self.gg_label_get,
+                                       content_get_func=self.gg_icon_get,
                                        state_get_func=self.gg_state_get,
                                        del_func=self.gg_del)
       gg = elementary.Gengrid(gui.win)

@@ -34,6 +34,9 @@ layout = None
 theme_file = None
 backdrop_im = None
 
+def DBG(msg):
+   print ('GUI: ' + msg)
+   pass
 
 def init():
    global win
@@ -101,7 +104,7 @@ def init():
    #~ im.show()
    ##
    input_events.listener_add('gui', input_event_cb)
-   
+
    return True
 
 def shoutdown():
@@ -152,13 +155,15 @@ def toggle_fullscreen():
    pass
 
 def mouse_hide():
-   print "MOUSE HIDE"
+   pass
+   # print "MOUSE HIDE"
    # elm coursor
-   #~ from elementary import cursors
-   #~ layout.cursor_set(cursors.ELM_CURSOR_CLOCK)
+   # from elementary import cursors
+   # layout.cursor_set(cursors.ELM_CURSOR_CLOCK)
 
    #ecore win cursor
-   #~ Ecore.x.Window.cursor_hide()
+   # import ecore
+   # ecore.x.Window.cursor_hide()
 
 def mouse_show():
    print "MOUSE SHOW"
@@ -242,11 +247,11 @@ class EmcRemoteImage(elementary.Image):
 
    def _cb_download_complete(self, dest, status):
       self.stop_spin()
-      if status == 0: # Successfull
+      if status == 200: # Successfull HTTP code
          self.file_set(dest)
          self.size_hint_min_set(100, 100) #TODO FIXME (needed by tmdb search results list)
       else:
-         self.file_set(None)
+         self.file_set("")
          # TODO show a dummy image
 
    #TODO on image_set abort the download ? 
@@ -327,7 +332,7 @@ class EmcDialog(elementary.InnerWindow):
       if title is not None:
          self._title = elementary.Label(gui.win)
          self._title.style_set("dialog")
-         self._title.label_set("<title>" + title + "</>")
+         self._title.text_set("<title>" + title + "</>")
          self._vbox.pack_start(self._title)
          self._title.show()
 
@@ -361,14 +366,16 @@ class EmcDialog(elementary.InnerWindow):
 
    def button_add(self, label, selected_cb = None, cb_data = None, icon = None):
       b = elementary.Button(self)
-      b.label_set(label)
+      b.text_set(label)
       if icon: b.icon_set(load_icon(icon))
       b.data['cb'] = selected_cb
       b.data['cb_data'] = cb_data
       b.callback_clicked_add(self._cb_buttons)
+      b.focus_allow_set(False)
       self.fman.obj_add(b)
       self._hbox.pack_start(b)
       b.show()
+      return b
 
    def text_set(self, text):
       self._textentry.entry_set(text)
@@ -386,6 +393,7 @@ class EmcDialog(elementary.InnerWindow):
       self._spinner.pulse(False)
 
    def _cb_buttons(self, button):
+      if not button: return
       selected_cb = button.data['cb']
       cb_data = button.data['cb_data']
 
@@ -400,8 +408,8 @@ class EmcDialog(elementary.InnerWindow):
          self.delete()
          return input_events.EVENT_BLOCK
 
-      # if content is elm List then automanage the events
-      if self._content and type(self._content) is elementary.List:
+      # if content is elm List or Genlist then automanage the events
+      if self._content and type(self._content) in (elementary.List, elementary.Genlist):
          list = self._content
          item = list.selected_item_get()
          if not item:
@@ -431,6 +439,79 @@ class EmcDialog(elementary.InnerWindow):
          self.fman.focus_move('r')
 
       return input_events.EVENT_BLOCK
+
+###############################################################################
+class EmcSourceSelector(EmcDialog):
+   """ TODO doc this
+   """
+
+   def __init__(self, title = "Source Selector", done_cb = None):
+      self._selected_cb = done_cb
+      self._glist = elementary.Genlist(gui.win)
+      self._glist.homogeneous_set(True)
+      self._glist.always_select_mode_set(True)
+      self._glist.focus_allow_set(False)
+      self._glist.callback_clicked_double_add(self._cb_item_selected)
+      self._glist_itc = elementary.GenlistItemClass(item_style="default",
+                                 text_get_func = self._genlist_folder_label_get,
+                                 content_get_func = self._genlist_folder_icon_get)
+      self._glist_itc_back = elementary.GenlistItemClass(item_style="default",
+                                 text_get_func = self._genlist_back_label_get,
+                                 content_get_func = self._genlist_back_icon_get)
+      
+      EmcDialog.__init__(self, title, text, content=self._glist, style='panel')
+      self.button_add('select', selected_cb = self._cb_done_selected)
+      btn = self.button_add('browse', selected_cb = self._cb_browse_selected)
+      self.button_add('close', (lambda btn: self.delete()))
+      self.fman.focused_set(btn)
+
+      self.populate(os.getenv('HOME'))
+      self.activate()
+
+   def populate(self, folder):
+      self._glist.clear()
+
+      parent_folder = os.path.normpath(os.path.join(folder, ".."))
+      if folder != parent_folder:
+         self._glist.item_append(self._glist_itc_back, parent_folder)
+
+      for fname in sorted(os.listdir(folder)):
+         fullpath = os.path.join(folder, fname)
+         if fname[0] != '.' and os.path.isdir(fullpath):
+            self._glist.item_append(self._glist_itc, fullpath)
+
+      self._glist.first_item.selected = True;
+
+   def _cb_item_selected(self, list, item):
+      self.populate(item.data_get())
+
+   def _cb_done_selected(self, button):
+      item = self._glist.selected_item_get()
+      if item and callable(self._selected_cb):
+         self._selected_cb('file://' + item.data_get())
+      self.delete()
+
+   def _cb_browse_selected(self, button):
+      item = self._glist.selected_item_get()
+      self.populate(item.data_get())
+
+   def _genlist_folder_label_get(self, obj, part, item_data):
+      return os.path.basename(item_data)
+
+   def _genlist_folder_icon_get(self, obj, part, item_data):
+      if part == 'elm.swallow.icon':
+         return gui.load_icon('icon/folder')
+      return None
+   
+   def _genlist_back_label_get(self, obj, part, item_data):
+      return "back"
+
+   def _genlist_back_icon_get(self, obj, part, data):
+      if part == 'elm.swallow.icon':
+         return gui.load_icon('icon/back')
+      return None
+
+
 
 
 ###############################################################################

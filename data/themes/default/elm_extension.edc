@@ -655,8 +655,8 @@ group { name: "elm/genlist/item_compress/default/browser";
    alias: "elm/genlist/item_compress_odd/default/browser";
    data.item: "stacking" "above";
    data.item: "selectraise" "on";
-   data.item: "labels" "elm.text";
-   data.item: "icons" "elm.swallow.icon elm.swallow.end";
+   data.item: "texts" "elm.text";
+   data.item: "contents" "elm.swallow.icon elm.swallow.end";
    data.item: "treesize" "20";
 // data.item: "states" "";
    images {
@@ -900,8 +900,8 @@ group { name: "elm/genlist/item_compress/default/browser";
 
 //// BROWSER GENGRID ITEM (elm/gengrid/item/default/default) //////////////////
 group { name: "elm/gengrid/item/default/browser";
-   data.item: "labels" "elm.text";
-   data.item: "icons" "elm.swallow.icon elm.swallow.end";
+   data.item: "texts" "elm.text";
+   data.item: "contents" "elm.swallow.icon elm.swallow.end";
    images {
       image: "bt_sm_base1.png" COMP;
       image: "bt_sm_shine.png" COMP;
@@ -1169,6 +1169,30 @@ group { name: "elm/entry/base-noedit/dialog";
          source: "elm";
          action: STATE_SET "default" 0.0;
          target: "elm.text";
+      }
+   }
+}
+
+group { name: "elm/entry/selection/default";
+   parts {
+      part { name: "bg";
+         type: RECT;
+         mouse_events: 0;
+         description { state: "default" 0.0;
+            color: 128 128 128 128;
+         }
+      }
+   }
+}
+
+group { name: "elm/entry/anchor/default";
+   parts {
+      part { name: "bg";
+         type: RECT;
+         mouse_events: 0;
+         description { state: "default" 0.0;
+            color: 128 0 0 64;
+         }
       }
    }
 }

@@ -39,7 +39,7 @@ def DBG(msg):
 
 class JoystickModule(EmcModule):
    name = 'input_joy'
-   label = 'Joytick Input'
+   label = 'Input - Joytick'
    icon = 'icon/joystick'
    info = """Long info for the <b>Joystick</b> module, explain what it does
 and what it need to work well, can also use markup like <title>this</> or

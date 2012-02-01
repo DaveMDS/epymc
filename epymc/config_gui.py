@@ -17,9 +17,10 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
+from operator import itemgetter, attrgetter
+
 import evas
 import elementary #REMOVEME
-
 
 import gui
 import mainmenu
@@ -119,7 +120,7 @@ def _modules_list():
                      info_get_cb = _module_info_get,
                      poster_get_cb = _module_icon_get)
 
-   for mod in modules.list_get():
+   for mod in sorted(modules.list_get(), key=attrgetter('name')):
       _browser.item_add(mod.name, mod.label)
 
 def _module_icon_get(page, item):

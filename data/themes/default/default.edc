@@ -1,13 +1,13 @@
 
 #define DEBUG_ENABLE 0
-#if DEBUG_ENABLE
-#define DBG(...) { \
-   new _buf[128]; \
-   snprintf(_buf, sizeof(_buf), __VA_ARGS__); \
-   set_text(PART:"embryo_dbg", _buf); }
-#else
-#define DBG(...)
-#endif
+// #if DEBUG_ENABLE
+// #define DBG(...) { \
+   // new _buf[128]; \
+   // snprintf(_buf, sizeof(_buf), __VA_ARGS__); \
+   // set_text(PART:"embryo_dbg", _buf); }
+// #else
+// #define DBG(...)
+// #endif
 
 #define FONT "Cuprum"
 #define FONT_BOLD "Cuprum:style=Bold"
@@ -691,20 +691,20 @@ collections {
                new buf[16];
                new Float:val;
                get_state(PART:"browser/list/genlist1", buf, sizeof(buf), val);
-               DBG("%s   %f", buf, val)
+               // DBG("%s   %f", buf, val)
                if (!strcmp(buf, "default") || !strcmp(buf, "center")) {
-                  DBG("CASE 1")
+                  // DBG("CASE 1")
                   set_state(PART:"browser/list/genlist2", "on_the_right", 0.0);
                   run_program(PROGRAM:"gl1_to_left");
                }
                else if (!strcmp(buf, "left")) {
-                  DBG("CASE 2")
+                  // DBG("CASE 2")
                   set_state(PART:"browser/list/genlist1", "right", 0.0);
                   set_state(PART:"browser/list/genlist2", "on_the_left", 0.0);
                   run_program(PROGRAM:"gl1_to_center");
                }
                else if (!strcmp(buf, "right")) {
-                  DBG("CASE 3")
+                  // DBG("CASE 3")
                   run_program(PROGRAM:"gl1_to_center");
                }
             }
@@ -716,20 +716,20 @@ collections {
                new buf[16];
                new Float:val;
                get_state(PART:"browser/list/genlist1", buf, sizeof(buf), val);
-               DBG("%s   %f", buf, val)
+               // DBG("%s   %f", buf, val)
                if (!strcmp(buf, "default") || !strcmp(buf, "center")) {
-                  DBG("CASE 1 (back)")
+                  // DBG("CASE 1 (back)")
                   set_state(PART:"browser/list/genlist2", "on_the_left", 0.0);
                   run_program(PROGRAM:"gl1_to_right");
                }
                else if (!strcmp(buf, "right")) {
-                  DBG("CASE 2 (back)")
+                  // DBG("CASE 2 (back)")
                   set_state(PART:"browser/list/genlist1", "left", 0.0);
                   set_state(PART:"browser/list/genlist2", "on_the_right", 0.0);
                   run_program(PROGRAM:"gl1_to_center");
                }
                else if (!strcmp(buf, "left")) {
-                  DBG("CASE 3 (back)")
+                  // DBG("CASE 3 (back)")
                   run_program(PROGRAM:"gl1_to_center");
                }
             }

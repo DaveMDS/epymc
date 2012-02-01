@@ -33,14 +33,14 @@ def cb_exit():
 
 
 def init():
+   li = gui.part_get("mainmenu/list")
+   li.style_set("mainmenu");
+   li.focus_allow_set(False)
    mainmenu.item_add("exit", 200, "Exit", None, cb_exit)
-   list = gui.part_get("mainmenu/list")
-   list.style_set("mainmenu");
-
 
 def show():
    list = gui.part_get("mainmenu/list")
-   list.callback_clicked_add(_cb_item_selected)
+   list.callback_clicked_double_add(_cb_item_selected)
    if not list.selected_item_get():
       list.items_get()[0].selected_set(1)
    list.go()
@@ -49,7 +49,7 @@ def show():
 
 def hide():
    list = gui.part_get("mainmenu/list")
-   list.callback_clicked_del(_cb_item_selected)
+   list.callback_clicked_double_del(_cb_item_selected)
    input_events.listener_del('mainmenu')
    gui.signal_emit("mainmenu,hide")
 

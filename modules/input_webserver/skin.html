@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+   <meta name="robots" content="noindex,nofollow">
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+   <!--<link rel="shortcut icon" href=" http://www.google.com/favicon.ico" type="image/x-icon"/>
+   <link rel="icon" href="http://www.google.com/favicon.ico" type="image/x-icon"/>-->
+   <title>EpyMC Remote Interface</title>
+   <script>
+   function doGet(url) {
+      if (window.XMLHttpRequest)
+          var request = new XMLHttpRequest();
+      else
+          var request = new ActiveXObject('Microsoft.XMLHTTP');
+      request.open('GET', url);
+      request.send();
+   }
+   </script>
+
+</head>
+
+<body>
+
+   <h3>EpyMC Remote Control</h3>
+   <table border=1>
+      <tr>
+         <td></td>
+         <td><input type="button" value="up" onClick="doGet('/input/UP')"></td>
+         <td></td>
+      </tr>
+      <tr>
+         <td><input type="button" value="left" onClick="doGet('/input/LEFT')"></td>
+         <td><input type="button" value="ok" onClick="doGet('/input/OK')"></td>
+         <td><input type="button" value="right" onClick="doGet('/input/RIGHT')"></td>
+      </tr>
+      <tr>
+         <td></td>
+         <td><input type="button" value="down"  onClick="doGet('/input/DOWN')"></td>
+         <td></td>
+      </tr>
+      <tr>
+         <td><input type="button" value="back" onClick="doGet('/input/BACK')"></td>
+         <td></td>
+         <td><input type="button" value="play/pause" onClick="doGet('/input/TOGGLE_PAUSE')"></td>
+      </tr>
+      <tr>
+         <td><input type="button" value="fullscreen" onClick="doGet('/input/TOGGLE_FULLSCREEN')"></td>
+         <td></td>
+         <td></td>
+      </tr>
+   </table>
+   
+
+</body>
+</html>

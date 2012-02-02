@@ -64,7 +64,7 @@ def main():
    # init stuff
    sdb.init()
    browser.init()
-   browser2.init()
+   # browser2.init()
    if not gui.init(): return 2
    config_gui.init()
    mainmenu.init()
@@ -85,7 +85,7 @@ def main():
    ini.write_to_file(os.path.join(user_config_dir, 'epymc.conf'))
    gui.shoutdown()
    browser.shutdown()
-   browser2.shutdown()
+   # browser2.shutdown()
    sdb.shutdown()
 
    # shutdown elementary

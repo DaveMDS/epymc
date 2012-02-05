@@ -67,21 +67,23 @@ def play_video(url):
    _emotion.file_set(url)
    volume_set(_volume)
 
-   ## TEST VARIOUS INFO
-   DBG("RATIO: " + str(_emotion.ratio_get()))
-   DBG("VIDEO CHNS: " + str(_emotion.video_channel_count()))
-   DBG("AUDIO CHNS: " + str(_emotion.audio_channel_count()))
-   DBG(str(_emotion.video_channel_get()))
-   DBG(str(_emotion.audio_channel_get()))
-   DBG(str(_emotion.meta_info_dict_get()))
-   DBG(str(_emotion.size))
-   DBG(str(_emotion.image_size))
-   DBG(str(_emotion.ratio))
-   ##
-
    # set aspect according to video size
-   (w, h) = _emotion.image_size
-   edje.extern_object_aspect_set(_emotion, edje.EDJE_ASPECT_CONTROL_BOTH, w, h)
+   def _cb_frame_resize(obj):
+      (w, h) = _emotion.image_size
+      edje.extern_object_aspect_set(_emotion, edje.EDJE_ASPECT_CONTROL_BOTH, w, h)
+   _emotion.on_frame_resize_add(_cb_frame_resize)
+
+   ## TEST VARIOUS INFO
+   DBG("TITLE: " + str(_emotion.title_get()))
+   DBG("VIDEO CHNS COUNT: " + str(_emotion.video_channel_count()))
+   DBG("AUDIO CHNS COUNT: " + str(_emotion.audio_channel_count()))
+   DBG("VIDEO CHANS GET: " + str(_emotion.video_channel_get()))
+   DBG("AUDIO CHANS GET: " + str(_emotion.audio_channel_get()))
+   DBG("INFO DICT: " + str(_emotion.meta_info_dict_get()))
+   DBG("SIZE: " + str(_emotion.size))
+   DBG("IMAGE_SIZE: " + str(_emotion.image_size))
+   DBG("RATIO: " + str(_emotion.ratio_get()))
+   ##
 
    _emotion.play = True
    video_player_show()

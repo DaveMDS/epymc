@@ -20,6 +20,7 @@
 import os
 
 import evas
+import ecore
 import elementary
 
 import utils
@@ -96,6 +97,17 @@ def init():
 
    input_events.listener_add('gui', input_event_cb)
 
+   # once a minute ping the screensaver to prevent it to disturb us
+   def _sscb():
+      try:
+         ecore.exe_run('xdg-screensaver reset')
+         return True
+      except:
+         return False
+   ecore.Timer(59, _sscb)
+
+
+      
    return True
 
 def shoutdown():

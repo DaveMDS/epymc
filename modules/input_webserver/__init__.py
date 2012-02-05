@@ -84,7 +84,7 @@ class WebserverModule(EmcModule):
    def queue_timer(self):
       if not input_queue.empty():
          input_events.event_emit(input_queue.get())
-      return 1 # renew
+      return True # renew
 
 
 class RequestHandler(BaseHTTPRequestHandler):

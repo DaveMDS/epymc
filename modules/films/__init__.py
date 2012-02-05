@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# This Python file uses the following encoding: utf-8
 #
 # Copyright (C) 2010 Davide Andreoli <dave@gurumeditation.it>
 #
@@ -17,7 +18,9 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
+
 import os
+import re
 
 import evas
 import elementary
@@ -170,15 +173,21 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def cb_info_get(self, page_url, item_url):
       if self.__film_db.id_exists(item_url):
          e = self.__film_db.get_data(item_url)
+         country = ""
+         if len(e['countries']) > 0:
+            country = e['countries'][0]['code']
          text = '<title>%s (%s %s)</><br>' \
                 '<hilight>Rating:</> %.0f/10<br>' \
                 '<hilight>Director:</> %s<br>' \
                 '<hilight>Cast:</> %s<br>%s' % \
-                (e['name'], e['countries'][0]['code'], e['released'][:4],
-                e['rating'], self._get_director(e), self._get_cast(e, 3),
-                e['overview'])
+                (e['name'], country, e['released'][:4],
+                e['rating'], self._get_director(e),
+                self._get_cast(e, 3), e['overview'])
                 # TODO genres
-         return text
+         # ARGHHHHH the encode doesn't work :(
+         # text = 'àèé'
+         return text.encode('utf-8','replace')
+         # return text
       else:
          return 'Not found'
 
@@ -187,14 +196,14 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          if person['job'] == 'Director':
             return person['name']
       return "Unknow"
-      
+
    def _get_cast(self, e, max_num = 99): # TODO make max_num works
       cast = ''
       for person in e['cast']:
          if person['job'] == 'Actor':
             cast = cast + (', ' if cast else '') + person['name']
       return cast
-      
+
 
 ###### INFO PANEL STUFF
    def show_film_info(self, url):
@@ -221,9 +230,10 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       dialog = EmcDialog(style = 'default', content = box)
       dialog.button_add('Play', self._cb_panel_1)
-      dialog.button_add('Cast', self._cb_panel_2)
-      dialog.button_add('Choose Poster', self._cb_panel_3)
-      dialog.button_add('Choose Fanart', self._cb_panel_4)
+      if (0):
+         dialog.button_add('Cast', self._cb_panel_2)
+         dialog.button_add('Choose Poster', self._cb_panel_3)
+         dialog.button_add('Choose Fanart', self._cb_panel_4)
       dialog.button_add('Search Info', self._cb_panel_5)
       dialog.button_add('Close', self._cb_panel_6)
 
@@ -276,11 +286,17 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          o_image.file_set('')
 
    def get_film_name_from_url(self, url):
-      # remove path
+      # remove path & extension
       film = os.path.basename(url)
-      # remove extension
       (film, ext) = os.path.splitext(film)
-      # TODO remove stuff between '[' and ']'
+      # remove stuff between '<[{' and '}]>' 
+      film = re.sub(r'<.*?>', '', film)
+      film = re.sub(r'\[.*?\]', '', film)
+      film = re.sub(r'\{.*?\}', '', film)
+      # remove blacklisted words
+      blacklist = ['dvdrip', 'ITA', 'ENG', 'sub', 'AAC', 'x264']
+      for word in blacklist:
+         film = re.sub('(?i)'+word, '', film)
       return film
 
    def _cb_panel_1(self, button):
@@ -293,6 +309,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
          # create the cast list
          li = elementary.List(gui.win)
+         li.focus_allow_set(False)
          for person in film_info['cast']:
             if person['job'] == 'Actor':
                label = person['name'] + ' as ' + person['character']
@@ -319,22 +336,23 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          film_info = self.__film_db.get_data(self.__current_url)
 
          # create a list of posters
-         images = []
+         images_thumb = []
+         images_big = []
          for image in film_info['posters']:
             if image['image']['size'] == 'thumb':
-               print image['image']['url']
-               images.append(image['image'])
+               images_thumb.append(image['image'])
+            if image['image']['size'] == 'original': # TODO choose better the wanted size
+               images_big.append(image['image'])
 
          # show the list in a dialog
          li = elementary.List(gui.win)
-         for image in images:
+         li.focus_allow_set(False)
+         for (image_thumb, image_big) in zip(images_thumb, images_big):
             icon = EmcRemoteImage(li)
-            icon.url_set(image['url'])
+            icon.url_set(image_thumb['url'])
             icon.size_hint_min_set(100, 100) # TODO fixme
             #~ label = res['name'] + ' (' + res['released'][:4] + ')'
-            mid = image['url'][:-9]
-            mid = mid + 'mid.jpg'
-            li.item_append(" ", icon, None, None, (mid, film_info['id']))
+            li.item_append(" ", icon, None, None, (image_big['url'], film_info['id']))
 
          li.items_get()[0].selected_set(1)
          li.show()
@@ -382,22 +400,23 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          film_info = self.__film_db.get_data(self.__current_url)
 
          # create a list of backdrops
-         images = []
+         images_thumb = []
+         images_big = []
          for image in film_info['backdrops']:
             if image['image']['size'] == 'thumb':
-               #~ print image['image']['url']
-               images.append(image['image'])
+               images_thumb.append(image['image'])
+            elif image['image']['size'] == 'original': # TODO choose better the wanted size
+               images_big.append(image['image'])
 
          # show the list in a dialog
          li = elementary.List(gui.win)
-         for image in images:
+         li.focus_allow_set(False)
+         for (image_thumb, image_big) in zip(images_thumb, images_big):
             icon = EmcRemoteImage(li)
-            icon.url_set(image['url'])
+            icon.url_set(image_thumb['url'])
             icon.size_hint_min_set(100, 100) # TODO fixme
             #~ label = res['name'] + ' (' + res['released'][:4] + ')'
-            mid = image['url'][:-9]
-            mid = mid + 'original.jpg'
-            li.item_append(" ", icon, None, None, (mid, film_info['id']))
+            li.item_append(" ", icon, None, None, (image_big['url'], film_info['id']))
 
          li.items_get()[0].selected_set(1)
          li.show()
@@ -422,8 +441,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.__backdrop_dialog = dialog
       (url, id) = item.data_get()[0][0]
       dest = get_backdrop_filename(id)
-      
-      utils.download_url_async(url, dest, min_size = 2000,
+      utils.download_url_async(url, dest,
                                complete_cb = self._cb_backdrop_done)
 
       # kill the dialog
@@ -438,11 +456,13 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # kill the dialog
       self.__backdrop_dialog.delete()
       del self.__backdrop_dialog
-
-      if status > 0:
+      print status
+      if status == 200:
+         pass # TODO Update backdrop
+      else:
          EmcDialog(title = "Download error !!", style = 'error')
 
-######## Get info
+######## Get film info from themoviedb.org
    def _cb_panel_5(self, button):
       tmdb = TMDB2(TMDB_API_KEY)
       film = self.get_film_name_from_url(self.__current_url)
@@ -488,7 +508,8 @@ class TMDB2(object):
       self.complete_cb = complete_cb
       query = self.server+'Movie.search/'+self.lang+'/json/'+self.key+'/'+film
 
-      self.dialog = EmcDialog(title = "Searching for: " + film,
+      self.dialog = EmcDialog(title = "themoviedb query",
+                              text = "Searching for: " + film,
                               spinner = True, style = 'cancel')
       print "query: " + query
       utils.download_url_async(query, "tmp", complete_cb = self._cb_search_done)
@@ -499,15 +520,18 @@ class TMDB2(object):
       f.close()
       os.remove(dest)
 
-      # kill spinner dialog
-      self.dialog.delete()
-      del self.dialog
-
       if len(data) == 1:
          # just one result, assume is the correct one
-         self.film_get_info(data[0]['id'])
+         try:
+            self.film_get_info(data[0]['id'])
+         except:
+            self.dialog.spinner_stop()
+            self.dialog.text_append('<br><br><b>nothing found</><br>')
+         # else:
+            # self.dialog.delete()
 
       elif len(data) > 1:
+         self.dialog.delete()
          # create a list dialog to choose from results
          li = elementary.List(gui.win)
          for res in data:
@@ -556,8 +580,8 @@ class TMDB2(object):
 
       query = self.server+'Movie.getInfo/'+self.lang+'/json/'+self.key+'/'+str(id)
 
-      self.dialog = EmcDialog(title = "Downloading film info",
-                              spinner = True, style = 'cancel')
+      self.dialog2 = EmcDialog(title = "Downloading film info",
+                               spinner = True)
 
       utils.download_url_async(query, "tmp", complete_cb = self._cb_film_info_done)
 
@@ -601,16 +625,16 @@ class TMDB2(object):
          self.complete_cb(self, self.movie_info)
 
 
+
+
 ###############################################################################
 #    themoviedb.org  client implementation taken from:
 #  http://forums.themoviedb.org/topic/1092/my-contribution-tmdb-api-wrapper-python/
 #  With a little modification by me to support json decode.
 #
 #  Credits goes to globald
-#  Unused atm (in favor of the async one
+#  Unused atm (in favor of the async one)
 ###############################################################################
-
-
 class TMDB(object):
 
    def __init__(self, api_key, view='xml', lang='en', decode = False):

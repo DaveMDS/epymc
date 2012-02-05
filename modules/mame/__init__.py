@@ -337,7 +337,7 @@ class MameGame(object):
 
    def run(self):
       DBG('RUN GAME: ' + self.gid)
-      os.system(MAME_EXE + ' ' + self.gid)
+      ecore.exe_run('%s %s' % (MAME_EXE, self.gid))
 
    def poster_get(self):
       snap_file = os.path.join(MameModule._snapshoot_dir, self.gid, '0000.png')
@@ -590,6 +590,7 @@ class MameGame(object):
       # get game info from the command: mame -listxml <id>
       # TODO use a better/portable way (but not async)
       os.system(MAME_EXE + ' -listxml ' + self.gid + ' > /tmp/PyEmc__MAME_tmp')
+      #ecore.exe_run('%s -listxml %s > /tmp/PyEmc__MAME_tmp' % (MAME_EXE, self.gid))
 
       # parse the xml file
       doc = xml.dom.minidom.parse('/tmp/PyEmc__MAME_tmp')

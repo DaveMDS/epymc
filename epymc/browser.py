@@ -165,7 +165,7 @@ class EmcBrowser(object):
 
       # back item (optional)
       if ini.get_bool('general', 'back_in_lists') == True:
-         self.item_add('emc://back', 'back')
+         self.item_add('emc://back', 'back', dont_count = True)
 
       # update state
       self.current_view = view
@@ -175,7 +175,7 @@ class EmcBrowser(object):
       # just for debug
       #~ self._dump_all()
 
-   def item_add(self, url, label):
+   def item_add(self, url, label, dont_count = False):
       """
       Use this method to add an item in the current (last added) page
       Url should be (but its not mandatory) a full correct url in the form:
@@ -185,10 +185,8 @@ class EmcBrowser(object):
       emc://back - If you use this url the item will automatically make the
                   browser go back when selected, and no item_selected_cb
                   will be called
-
-
       """
-      self.current_view.item_add(url, label, self)
+      self.current_view.item_add(url, label, self, dont_count)
 
    def back(self):
       """ TODO Function doc """
@@ -383,6 +381,7 @@ class ViewList(object):
       DBG('Init view: plain list')
 
       self.timer = self.timer2 = None
+      self.items_count = 0;
 
       # EXTERNAL Genlist1
       self.gl1 = gui.part_get('browser/list/genlist1')
@@ -436,8 +435,9 @@ class ViewList(object):
          gui.signal_emit('browser,list,flip_right')
 
       self.current_list.clear()
+      self.items_count = 0
 
-   def item_add(self, url, label, parent_browser):
+   def item_add(self, url, label, parent_browser, dont_count = False):
       """
       Here you must add the item to the current visible page
       You can use the 'parent_browser' object to query more info about
@@ -452,6 +452,10 @@ class ViewList(object):
       if not self.current_list.selected_item_get():
          it.selected_set(1)
 
+      if not dont_count:
+         self.items_count += 1
+         gui.text_set('browser/list/total', '%d items' % (self.items_count))
+
    def show(self):
       """ Show the view """
       gui.signal_emit("browser,list,show")
@@ -464,6 +468,7 @@ class ViewList(object):
       """ Clear the view """
       self.gl1.clear()
       self.gl2.clear()
+      self.items_count = 0
 
    def refresh(self):
       item = self.current_list.first_item_get()
@@ -588,7 +593,7 @@ class ViewGrid(object):
       self.gg.clear()
       gui.text_set("browser/grid/title", title)
 
-   def item_add(self, url, label, parent_browser):
+   def item_add(self, url, label, parent_browser, dont_count = False):
       item_data = (url, label, parent_browser)
       it = self.gg.item_append(self.itc, item_data)
       if not self.gg.selected_item_get():

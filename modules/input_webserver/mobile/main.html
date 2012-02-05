@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+   <meta name="robots" content="noindex,nofollow">
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+   <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">  
+   <link rel="apple-touch-icon" href="iphone-icon-57x57.png"/>  
+
+   <title>EpyMC Remote</title>
+
+   <link rel="stylesheet" href="/mobile.css" type="text/css" media="screen" />
+
+   <script type="text/javascript">
+   function doGet(url) {
+      if (window.XMLHttpRequest)
+          var request = new XMLHttpRequest();
+      else
+          var request = new ActiveXObject('Microsoft.XMLHTTP');
+      request.open('GET', url);
+      request.send();
+   }
+
+   </script>
+
+</head>
+
+<body>
+
+   <div id="page_wrapper">  
+      <h1>EpyMC Remote</h1>  
+
+      <table border=0 width="100%">
+         <tr>
+            <map name="navimap">
+               <area shape="rect" coords="46,0,159,48" onClick="doGet('/input/UP')" href="#">
+               <area shape="rect" coords="45,156,160,202" onClick="doGet('/input/DOWN')" href="#">
+               <area shape="rect" coords="0,45,47,156" onClick="doGet('/input/LEFT')" href="#">
+               <area shape="rect" coords="150,45,202,162" onClick="doGet('/input/RIGHT')" href="#">
+               <area shape="circle" coords="102,100,45" onClick="doGet('/input/OK')" href="#">
+            </map>
+            <td rowspan="3"><img src="navi.png" usemap="#navimap"></td>
+            <td><img src="volup.png" onClick="doGet('/input/VOLUME_UP')"></td>
+         </tr>
+         <tr>
+            <td><img src="voldown.png" onClick="doGet('/input/VOLUME_DOWN')"></td>
+         </tr>
+         <tr>
+            <td><img src="back.png" onClick="doGet('/input/VOLUME_MUTE')"></td>
+         </tr>
+      </table>
+      <table border=1 width="100%">
+         <tr>
+            <td><img src="backward.png" onClick="doGet('/input/TOGGLE_FULLSCREEN')"></td>
+            <td><img src="pause.png" onClick="doGet('/input/TOGGLE_PAUSE')"></td>
+            <td><img src="forward.png" onClick="doGet('/input/TOGGLE_FULLSCREEN')"></td>
+         </tr>
+         <tr>
+            <td><img src="back.png" onClick="doGet('/input/BACK')"></td>
+            <td><img src="fullscreen.png" onClick="doGet('/input/TOGGLE_FULLSCREEN')"></td>
+            <td></td>
+         </tr>
+      </table>
+
+   </div>
+
+</body>
+</html>

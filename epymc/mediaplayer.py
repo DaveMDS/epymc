@@ -18,11 +18,13 @@
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
 import evas
+import ecore
 import edje
 import elementary
 import emotion
 
 import gui
+import ini
 import input_events
 
 
@@ -31,19 +33,39 @@ def DBG(msg):
    pass
 
 
+_volume = 0
 _emotion = None
 _controls_visible = False
+_volume_visible = False
+_volume_hide_timer = None
 _buttons = list()
 _current_button_num = 3
 
+### API ###
+def init():
+   global _volume
 
+   # default config values
+   ini.add_section('mediaplayer')
+   if not ini.has_option('mediaplayer', 'volume'):
+      ini.set('mediaplayer', 'volume', '75')
+   if not ini.has_option('mediaplayer', 'backend'):
+      ini.set('mediaplayer', 'backend', 'gstremer')
+   _volume = ini.get_int('mediaplayer', 'volume')
+
+   # emotion init delayed to play_video() for faster startup
+   # _init_emotion()
+
+def shutdown():
+    # TODO Shutdown all emotion stuff & the buttons list
+   pass
+
+### mediaplyer API ###
 def play_video(url):
    DBG('Play ' + url)  # TODO handle real url
-
-   if not _emotion:
-      _init_emotion()
-
+   if not _emotion: _init_emotion()
    _emotion.file_set(url)
+   volume_set(_volume)
 
    ## TEST VARIOUS INFO
    DBG("RATIO: " + str(_emotion.ratio_get()))
@@ -67,13 +89,6 @@ def play_video(url):
 def stop():
    _emotion.play = False
 
-def volume_set(vol):
-   _emotion.audio_volume_set(vol / 100)
-   gui.part_get('volume/slider').value = vol
-
-def volume_get():
-   return int(_emotion.audio_volume_get() * 100)
-
 def forward():
    DBG("Forward cb" + str(_emotion.position))
    _emotion.position += 10 #TODO make this configurable
@@ -90,8 +105,22 @@ def fbackward():
    DBG("FastBackward cb" + str(_emotion.position))
    _emotion.position -= 60 #TODO make this configurable
 
+def volume_set(vol):
+   global _volume
 
+   _volume = max(0, min(vol, 100))
+   ini.set('mediaplayer', 'volume', _volume)
+   gui.part_get('volume/slider').value = _volume
+   if _emotion:
+      _emotion.audio_volume_set(_volume / 100.0)
 
+def volume_get():
+   return _volume
+
+def volume_mute():
+   _emotion.audio_mute = not _emotion.audio_mute
+
+### gui API ###
 def video_player_show():
    gui.signal_emit('videoplayer,show')
    input_events.listener_add("videoplayer", input_event_cb)
@@ -103,17 +132,14 @@ def video_player_hide():
 
 def video_controls_show():
    global _controls_visible
+
    gui.signal_emit('videoplayer,controls,show')
-   gui.signal_emit('volume,show')
    _controls_visible = True
-   # update volume slider
-   DBG("Volume: " + volume_get())
-   volume_set(volume_get())
 
 def video_controls_hide():
    global _controls_visible
+
    gui.signal_emit('videoplayer,controls,hide')
-   gui.signal_emit('volume,hide')
    _controls_visible = False
 
 def video_controls_toggle():
@@ -122,13 +148,31 @@ def video_controls_toggle():
    else:
       video_controls_show()
 
+def volume_show(hidein = 0):
+   global _volume_visible
+   global _volume_hide_timer
+
+   gui.signal_emit('volume,show')
+   _volume_visible = True
+   if hidein > 0:
+      if _volume_hide_timer: _volume_hide_timer.delete()
+      _volume_hide_timer = ecore.Timer(hidein, volume_hide)
+
+def volume_hide():
+   global _volume_visible
+   global _volume_hide_timer
+
+   gui.signal_emit('volume,hide')
+   _volume_visible = False
+   _volume_hide_timer = None
 
 
-
+### internals ###
 def _init_emotion():
    global _emotion
 
-   _emotion = emotion.Emotion(gui.win.evas_get(), module_filename='gstreamer')
+   backend = ini.get('mediaplayer', 'backend')
+   _emotion = emotion.Emotion(gui.win.evas_get(), module_filename=backend)
    gui.swallow_set('videoplayer/video', _emotion)
    _emotion.smooth_scale = True # TODO Needed? make it configurable?
 
@@ -171,7 +215,7 @@ def _init_emotion():
    bt.callback_clicked_add(_cb_btn_stop)
    bt.data['cb'] = _cb_btn_stop
    bt.on_mouse_in_add(_cb_btns_mouse_in)
-   bt.label_set("Stop")
+   bt.text_set("Stop")
    bt.disabled_set(1)
    bt.show()
    box.pack_end(bt)
@@ -183,7 +227,7 @@ def _init_emotion():
    bt.callback_clicked_add(_cb_btn_play)
    bt.data['cb'] = _cb_btn_play
    bt.on_mouse_in_add(_cb_btns_mouse_in)
-   bt.label_set("Pause")
+   bt.text_set("Pause")
    bt.disabled_set(0)
    bt.show()
    box.pack_end(bt)
@@ -213,11 +257,14 @@ def _init_emotion():
 
 
    gui.part_get('videoplayer/controls/slider').callback_changed_add(_cb_slider_changed)
-   gui.part_get('videoplayer/controls/slider').focus_allow_set(False)
-   gui.part_get('volume/slider').focus_allow_set(False)
    #~ gui.part_get('videoplayer/controls/slider').callback_delay_changed_add(_cb_slider_changed)
-   
-   # TODO Shutdown all emotion stuff & the buttons list
+   gui.part_get('videoplayer/controls/slider').focus_allow_set(False)
+
+   gui.part_get('volume/slider').callback_changed_add(_cb_volume_slider_changed)
+   gui.part_get('volume/slider').focus_allow_set(False)
+
+def _cb_volume_slider_changed(slider):
+   volume_set(slider.value)
 
 def _cb_video_mouse_down(vid, ev):
    video_controls_toggle()
@@ -235,10 +282,10 @@ def _cb_btn_play(btn):
    DBG("Play cb")
    if _emotion.play:
       _emotion.play = False
-      btn.label_set('Play')
+      btn.text_set('Play')
    else:
       _emotion.play = True
-      btn.label_set('Pause')
+      btn.text_set('Pause')
 
 def _cb_btn_stop(btn):
    stop()
@@ -255,7 +302,6 @@ def _cb_btn_fforward(btn):
 
 def _cb_btn_fbackward(btn):
    fbackward()
-
 
 def _cb_slider_changed(slider):
    _emotion.position_set(_emotion.play_length * slider.value)
@@ -277,41 +323,50 @@ def _update_slider():
       gui.text_set('videoplayer/controls/position', '%i:%02i:%02i' % (ph,pm,ps))
       gui.text_set('videoplayer/controls/length', '%i:%02i:%02i' % (lh,lm,ls))
 
-
+### input events ###
 def input_event_cb(event):
    global _current_button_num
 
    if _controls_visible:
       if event == 'BACK':
          video_controls_hide()
+         return input_events.EVENT_BLOCK
       if event == 'OK':
          button = _buttons[_current_button_num]
          cb = button.data['cb']
          cb(button)
          # TODO TRY THIS INSTEAD:
          # evas_object_smart_callback_call(obj, "sig", NULL);
+         return input_events.EVENT_BLOCK
       elif event == 'RIGHT':
          if _current_button_num < len(_buttons) - 1:
             _buttons[_current_button_num].disabled_set(1)
             _current_button_num += 1
             _buttons[_current_button_num].disabled_set(0)
+         return input_events.EVENT_BLOCK
       elif event == 'LEFT':
          if _current_button_num > 0:
             _buttons[_current_button_num].disabled_set(1)
             _current_button_num -= 1
             _buttons[_current_button_num].disabled_set(0)
+         return input_events.EVENT_BLOCK
    else:
       if event == 'BACK':
          stop()
          video_player_hide()
+         return input_events.EVENT_BLOCK
       elif event == 'OK':
          video_controls_show()
+         return input_events.EVENT_BLOCK
       elif event == 'RIGHT':
          forward()
+         return input_events.EVENT_BLOCK
       elif event == 'LEFT':
          backward()
+         return input_events.EVENT_BLOCK
 
    if event == 'TOGGLE_PAUSE':
       _cb_btn_play(_buttons[3])
+      return input_events.EVENT_BLOCK
 
-   return input_events.EVENT_BLOCK
+   return input_events.EVENT_CONTINUE

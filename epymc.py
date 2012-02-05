@@ -32,6 +32,7 @@ import epymc.utils as utils
 import epymc.gui as gui
 import epymc.config_gui as config_gui
 import epymc.mainmenu as mainmenu
+import epymc.mediaplayer as mediaplayer
 import epymc.ini as ini
 import epymc.sdb as sdb
 import epymc.browser as browser
@@ -68,6 +69,7 @@ def main():
    if not gui.init(): return 2
    config_gui.init()
    mainmenu.init()
+   mediaplayer.init()
 
    # load & init modules
    modules.load_all()
@@ -83,6 +85,7 @@ def main():
    modules.save_enabled()
    modules.shutdown_all()
    ini.write_to_file(os.path.join(user_config_dir, 'epymc.conf'))
+   mediaplayer.shutdown()
    gui.shoutdown()
    browser.shutdown()
    # browser2.shutdown()

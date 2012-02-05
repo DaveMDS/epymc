@@ -76,8 +76,6 @@ def init():
 
    win.show()
 
-   part_get('volume/slider').callback_changed_add(_cb_volume_slider_changed)
-
 
    # fill view buttons box in topbar
    bt = elementary.Button(win)
@@ -96,35 +94,34 @@ def init():
    layout.edje_get().part_box_append('topbar/box', bt)
    bt.show()
 
-   ##TESTING
-   #~ im = EmcRemoteImage(win)
-   #~ im.url_set("http://hwcdn.themoviedb.org/posters/900/4bc95e22017a3c57fe02a900/wanted-thumb.jpg")
-   #~ im.resize(300,300)
-   #~ im.move(100,200)
-   #~ im.show()
-   ##
    input_events.listener_add('gui', input_event_cb)
 
    return True
 
 def shoutdown():
    input_events.listener_del('gui')
-   pass
 
 def input_event_cb(event):
    if event == "TOGGLE_FULLSCREEN":
-      #~ win.fullscreen_set(not win.fullscreen_get())
       win.fullscreen = not win.fullscreen
+      return input_events.EVENT_BLOCK
+   elif event == 'VOLUME_UP':
+      mediaplayer.volume_set(mediaplayer.volume_get() + 10)
+      mediaplayer.volume_show(hidein=3)
+      return input_events.EVENT_BLOCK
+   elif event == 'VOLUME_DOWN':
+      mediaplayer.volume_set(mediaplayer.volume_get() - 10)
+      mediaplayer.volume_show(hidein=3)
+      return input_events.EVENT_BLOCK
+   elif event == 'VOLUME_MUTE':
+      mediaplayer.volume_mute()
+      mediaplayer.volume_show(hidein=3)
       return input_events.EVENT_BLOCK
 
    input_events.EVENT_CONTINUE
 
 def _cb_win_del(win):
    ask_to_exit()
-
-# TODO move this callback somewhere...maybe in mediaplayer?
-def _cb_volume_slider_changed(slider):
-   mediaplayer.volume_set(slider.value)
 
 def _cb_btn_change_view(btn, view):
    input_events.event_emit(view)
@@ -459,7 +456,7 @@ class EmcSourceSelector(EmcDialog):
                                  text_get_func = self._genlist_back_label_get,
                                  content_get_func = self._genlist_back_icon_get)
       
-      EmcDialog.__init__(self, title, text, content=self._glist, style='panel')
+      EmcDialog.__init__(self, title, content=self._glist, style='panel')
       self.button_add('select', selected_cb = self._cb_done_selected)
       btn = self.button_add('browse', selected_cb = self._cb_browse_selected)
       self.button_add('close', (lambda btn: self.delete()))

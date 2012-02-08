@@ -84,6 +84,7 @@ def main():
    # shutdown
    modules.save_enabled()
    modules.shutdown_all()
+   config_gui.shutdown()
    ini.write_to_file(os.path.join(user_config_dir, 'epymc.conf'))
    mediaplayer.shutdown()
    gui.shoutdown()

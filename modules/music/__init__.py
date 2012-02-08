@@ -86,7 +86,7 @@ and what it need to work well, can also use markup like <title>this</> or
       mainmenu.item_del('music')
 
       # delete browser
-      del self.__browser
+      self.__browser.delete()
 
       ## close databases
       del self.__songs_db

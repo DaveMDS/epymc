@@ -34,7 +34,7 @@ _config_dir = None
 
 def base_dir_set(d):
    global _base_dir
-   _base_dir = d
+   _base_dir = os.path.abspath(d)
 
 def base_dir_get():
    return _base_dir

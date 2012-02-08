@@ -54,6 +54,9 @@ def init():
    root_item_add("config://fs/", 30, "Toggle Fullscreen / Windowed mode",
                  None, _toggle_fullscreen)
 
+def shutdown():
+   _browser.delete()
+
 def show():
    _browser.show()
    mainmenu.hide()

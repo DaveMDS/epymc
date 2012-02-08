@@ -653,6 +653,8 @@ group { name: "elm/list/item/mainmenu";
 //// BROWSER GENLIST ITEM COMP (elm/genlist/item_compress/default/default) ////
 group { name: "elm/genlist/item_compress/default/browser";
    alias: "elm/genlist/item_compress_odd/default/browser";
+   alias: "elm/genlist/item_compress/default/dialog";
+   alias: "elm/genlist/item_compress_odd/default/dialog";
    data.item: "stacking" "above";
    data.item: "selectraise" "on";
    data.item: "texts" "elm.text";
@@ -1575,7 +1577,7 @@ group { name: "elm/win/inwin/minimal";
             rel1.to: "titlebg";
             rel1.offset: -2 -2;
             rel2.to: "elm.swallow.content";
-            rel2.offset: 2 15;
+            rel2.offset: 25+2 15;
             image {
                normal: "bt_dis_base.png";
                border: 4 4 4 4;
@@ -1602,13 +1604,7 @@ group { name: "elm/win/inwin/minimal";
             rel2.to: "elm.swallow.content";
             rel2.relative: 1.0 0.0;
             rel1.offset: -25 -65;
-            rel2.offset: 0 20;
-       
-            // rel1.to: "pop";
-            // rel2.to: "pop";
-            // rel2.relative: 1.0 0.0;
-            // rel1.offset: 0 2;
-            // rel2.offset: 0 85;
+            rel2.offset: 25 20;
             color: 255 255 255 100;
             image.normal: "header_dialog.png";
             image.border: 0 0 0 40;
@@ -1619,8 +1615,6 @@ group { name: "elm/win/inwin/minimal";
          description { state: "default" 0.0;
             rel1.to: "titlebg";
             rel2.to: "titlebg";
-            // rel2.relative: 1.0 0.0;
-            // rel1.offset: 0 -50;
             text {
                text:"missing title...";
                min: 0 0;

@@ -77,7 +77,7 @@ and what it need to work well, can also use markup like <title>this</> or
       ini.set_string_list("mame", "favorites", MameModule._favorites, ',')
 
       # clear stuff
-      del self._browser
+      self._browser.delete()
       mainmenu.item_del("mame")
       del self._games
 
@@ -405,7 +405,7 @@ class MameGame(object):
       self.dialog = EmcDialog(self.name, content = box)
 
       if self.file_name_get():
-         self.dialog.button_add('Run', (lambda btn: self.run()))
+         self.dialog.button_add('Play', (lambda btn: self.run()))
       else:
          self.dialog.button_add('Download', (lambda btn: self.download_zip()))
 

@@ -85,7 +85,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       mainmenu.item_del('film')
 
       # delete browser
-      del self.__browser
+      self.__browser.delete()
 
       ## close databases
       del self.__film_db

@@ -47,7 +47,7 @@ def init():
    # set default theme in config file
    if not ini.has_option('general', 'theme'):
       ini.set('general', 'theme', 'default')
-   name = ini.get('general', 'theme');
+   name = ini.get('general', 'theme')
 
    # search the theme file, or use the default one
    theme_file = utils.get_resource_file('themes', name + '.edj', 'default.edj')
@@ -277,6 +277,8 @@ class EmcDialog(elementary.InnerWindow):
 
    special_styles = ['info', 'error', 'warning', 'yesno', 'cancel']
    dialogs_counter = 0
+
+   fman = None
    
    def __init__(self, title = None, text = None, content = None,
                 spinner = False, style = 'default', done_cb = None):
@@ -291,7 +293,7 @@ class EmcDialog(elementary.InnerWindow):
       self._name = 'Dialog-' + str(EmcDialog.dialogs_counter)
       self._content = content
       self._done_cb = done_cb
-      self._fman = EmcFocusManager()
+      self.fman = EmcFocusManager()
 
       # vbox
       self._vbox = elementary.Box(gui.win)
@@ -360,7 +362,7 @@ class EmcDialog(elementary.InnerWindow):
 
    def delete(self):
       input_events.listener_del(self._name)
-      self._fman.delete()
+      self.fman.delete()
       elementary.InnerWindow.delete(self)
 
    def content_get(self):
@@ -374,7 +376,7 @@ class EmcDialog(elementary.InnerWindow):
       b.data['cb_data'] = cb_data
       b.callback_clicked_add(self._cb_buttons)
       b.focus_allow_set(False)
-      self._fman.obj_add(b)
+      self.fman.obj_add(b)
       self._hbox.pack_start(b)
       b.show()
       return b
@@ -440,13 +442,13 @@ class EmcDialog(elementary.InnerWindow):
                return input_events.EVENT_BLOCK
 
       if event == 'OK':
-         self._cb_buttons(self._fman.focused_get())
+         self._cb_buttons(self.fman.focused_get())
 
       elif event == 'LEFT':
-         self._fman.focus_move('l')
+         self.fman.focus_move('l')
 
       elif event == 'RIGHT':
-         self._fman.focus_move('r')
+         self.fman.focus_move('r')
 
       return input_events.EVENT_BLOCK
 
@@ -458,6 +460,7 @@ class EmcSourceSelector(EmcDialog):
    def __init__(self, title = "Source Selector", done_cb = None):
       self._selected_cb = done_cb
       self._glist = elementary.Genlist(gui.win)
+      self._glist.style_set("dialog")
       self._glist.homogeneous_set(True)
       self._glist.always_select_mode_set(True)
       self._glist.focus_allow_set(False)
@@ -626,13 +629,14 @@ class EmcVKeyboard(elementary.InnerWindow):
       tb.show()
 
       # title
-      label = elementary.Label(gui.win)
-      label.style_set('dialog')
-      label.label_set('<title>%s</>' % (title or 'Insert text'))
-      label.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      label.size_hint_align_set(0.5, evas.EVAS_HINT_FILL)
-      label.show()
-      tb.pack(label, 0, 0, 10, 1)
+      self.text_part_set("elm.text.title", title or 'Insert text')
+      # label = elementary.Label(gui.win)
+      # label.style_set('dialog')
+      # label.label_set('<title>%s</>' % (title or 'Insert text'))
+      # label.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      # label.size_hint_align_set(0.5, evas.EVAS_HINT_FILL)
+      # label.show()
+      # tb.pack(label, 0, 0, 10, 1)
 
       # entry
       self.entry = elementary.Entry(gui.win) # TODO use scrolled_entry instead
@@ -640,7 +644,7 @@ class EmcVKeyboard(elementary.InnerWindow):
       self.entry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       self.entry.single_line_set(True)
       if text: self.text_set(text)
-      tb.pack(self.entry, 0, 1, 10, 1)
+      tb.pack(self.entry, 0, 0, 10, 1)
       self.entry.show()
 
       # focus manager
@@ -649,21 +653,21 @@ class EmcVKeyboard(elementary.InnerWindow):
 
       # standard keyb
       for i, c in enumerate(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']):
-         self._pack_btn(tb, i, 2, 1, 1, c, cb = self._default_btn_cb)
+         self._pack_btn(tb, i, 1, 1, 1, c, cb = self._default_btn_cb)
       for i, c in enumerate(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']):
-         if c == 'a': b = self._pack_btn(tb, i, 3, 1, 1, c, cb = self._default_btn_cb, focused = True)
-         else:        b = self._pack_btn(tb, i, 3, 1, 1, c, cb = self._default_btn_cb)
+         if c == 'a': b = self._pack_btn(tb, i, 2, 1, 1, c, cb = self._default_btn_cb, focused = True)
+         else:        b = self._pack_btn(tb, i, 2, 1, 1, c, cb = self._default_btn_cb)
       for i, c in enumerate(['k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't']):
-         self._pack_btn(tb, i, 4, 1, 1, c, cb = self._default_btn_cb)
+         self._pack_btn(tb, i, 3, 1, 1, c, cb = self._default_btn_cb)
       for i, c in enumerate(['u', 'v', 'w', 'x', 'y', 'z', '.', '@', '-', '_']):
-         self._pack_btn(tb, i, 5, 1, 1, c, cb = self._default_btn_cb)
+         self._pack_btn(tb, i, 4, 1, 1, c, cb = self._default_btn_cb)
 
-      self._pack_btn(tb, 0, 6, 3, 1, 'ERASE', cb = self._erase_cb)
-      self._pack_btn(tb, 3, 6, 4, 1, 'SPACE', cb = self._space_cb)
-      self._pack_btn(tb, 7, 6, 3, 1, 'UPPERCASE', cb = self._uppercase_cb)
+      self._pack_btn(tb, 0, 5, 3, 1, 'ERASE', cb = self._erase_cb)
+      self._pack_btn(tb, 3, 5, 4, 1, 'SPACE', cb = self._space_cb)
+      self._pack_btn(tb, 7, 5, 3, 1, 'UPPERCASE', cb = self._uppercase_cb)
 
-      self._pack_btn(tb, 0, 7, 4, 1, 'Dismiss', 'icon/cancel', self._dismiss_cb)
-      self._pack_btn(tb, 6, 7, 4, 1, 'Accept',  'icon/ok',     self._accept_cb)
+      self._pack_btn(tb, 0, 6, 4, 1, 'Dismiss', 'icon/cancel', self._dismiss_cb)
+      self._pack_btn(tb, 6, 6, 4, 1, 'Accept',  'icon/ok',     self._accept_cb)
 
       # activate the inwin
       self.content_set(tb)

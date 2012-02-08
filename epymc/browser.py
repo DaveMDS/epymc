@@ -34,20 +34,25 @@ def DBG(msg):
 
 _views = {}  # key = view_name  value = view class instance
 _memorydb = None  # EmcDatabase  key = page url  value = style name
+_instances = [] # keep track of EmcBrowser instances. just for dump_all()
 
 
 def init():
    global _memorydb
    _memorydb = EmcDatabase('broser_view_memory')
    if not ini.has_option('general', 'back_in_lists'):
-      ini.set('general', 'back_in_lists', 'True') # 'True' should be True,
-                                                  # but rise an error if option
-                                                  # doesn't exist in .conf  :/
+      ini.set('general', 'back_in_lists', 'True')
 
 def shutdown():
    global _memorydb
    del _memorydb
 
+def dump_everythings():
+   print('*' * 70)
+   for v in _views:
+      print ('loaded view: ' + str(v))
+   for b in _instances:
+      print b
 
 class EmcBrowser(object):
    """
@@ -87,6 +92,7 @@ class EmcBrowser(object):
                   fanart_get_cb = None):
 
       DBG('EmcBrowser __init__')
+      _instances.append(self)
       self.name = name
       self.default_style = default_style
 
@@ -102,6 +108,24 @@ class EmcBrowser(object):
       self.is_back = False
       self.is_refresh = False
 
+   def __str__(self):
+      text  = '=' * 70 + '\n'
+      text += '===  %s  %s\n' % (self.name, '=' * (63-len(self.name)))
+      text += '== name: %s  pages: %d curview: %s\n' % \
+              (self.name, len(self.pages), self.current_view)
+      for p in self.pages:
+         text += '== page: ' + str(p) + '\n'
+      text += '=' * 70 + '\n'
+      # for s in _style_memory:
+         # text += 'style mem: %s  style: %s\n' % (s, _style_memory[s])
+      # text += '*' * 70 + '\n'
+      return text
+
+   def delete(self):
+      _instances.remove(self)
+      del self
+      
+      
    def _search_style_in_parent(self):
       for p in reversed(self.pages):
          if _memorydb.id_exists(p['url']):
@@ -173,7 +197,7 @@ class EmcBrowser(object):
       self.is_back = False
 
       # just for debug
-      #~ self._dump_all()
+      # print self
 
    def item_add(self, url, label, dont_count = False):
       """
@@ -277,21 +301,6 @@ class EmcBrowser(object):
       DBG('Create view: ' + view_name)
       _views[view_name] = eval('View' + view_name + '()')
       return _views[view_name]
-
-   def _dump_all(self):
-      DBG('*' * 70)
-      DBG('*' * 70)
-      DBG('name: ' + self.name + '  pages: ' + str(len(self.pages)));
-      for p in self.pages:
-         DBG('page: ' + str(p));
-      DBG('current view: ' + str(self.current_view))
-      DBG('*' * 70)
-      for v in _views:
-         DBG('view: ' + str(v));
-      DBG('*' * 70)
-      for s in _style_memory:
-         DBG('style mem: %s  style: %s' % (s, _style_memory[s]));
-      DBG('*' * 70)
 
    # Stuff for Views
    def _item_selected(self, url):

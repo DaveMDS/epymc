@@ -230,10 +230,10 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       dialog = EmcDialog(style = 'default', content = box)
       dialog.button_add('Play', self._cb_panel_1)
-      if (0):
+      if self.__film_db.id_exists(url):
          dialog.button_add('Cast', self._cb_panel_2)
-         dialog.button_add('Choose Poster', self._cb_panel_3)
-         dialog.button_add('Choose Fanart', self._cb_panel_4)
+         dialog.button_add('Poster', self._cb_panel_3)
+         dialog.button_add('Fanart', self._cb_panel_4)
       dialog.button_add('Search Info', self._cb_panel_5)
       dialog.button_add('Close', self._cb_panel_6)
 
@@ -508,7 +508,7 @@ class TMDB2(object):
       self.complete_cb = complete_cb
       query = self.server+'Movie.search/'+self.lang+'/json/'+self.key+'/'+film
 
-      self.dialog = EmcDialog(title = "themoviedb query",
+      self.dialog = EmcDialog(title = "themoviedb.org",
                               text = "Searching for: " + film,
                               spinner = True, style = 'cancel')
       print "query: " + query

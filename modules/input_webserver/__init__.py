@@ -28,7 +28,7 @@ import epymc.ini as ini
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 def DBG(msg):
-   print('WEBSERVER: ' + msg)
+   # print('WEBSERVER: ' + msg)
    pass
 
 

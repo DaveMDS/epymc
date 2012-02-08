@@ -13,6 +13,7 @@
 #define FONT_BOLD "Cuprum:style=Bold"
 #define FONT_SIZE 16
 #define FONT_SIZE_BIG 24
+#define FONT_SIZE_BIGGER 48
 #define FONT_COLOR 255 255 255 255
 #define FONT_COLOR3 0 0 0 64
 
@@ -51,6 +52,12 @@ styles {
       tag:  "hilight" "+ font=Sans:style=Bold";
       //~ tag:  "link" "+ color=#800 underline=on underline_color=#8008";
    }
+
+   style { name: "epymc_dialog_title_style";
+      base: "font=Cuprum align=center font_size="FONT_SIZE_BIGGER" color=#B00 wrap=none";
+   }
+   // base: "font=Sans font_size=10 align=center color=#fff wrap=mixed ellipsis=1.0";
+   // base: "font=Sans text_class=fileman_icon wrap=mixed style=soft_shadow shadow_color=#0002";
 }
 
 externals {
@@ -232,7 +239,7 @@ collections {
                   offset: 20 50;
                }
                rel2 {
-                  relative: 1.0 0.65;
+                  relative: 1.0 0.62;
                   offset: -20 0;
                }
             }
@@ -245,7 +252,7 @@ collections {
                image.border: 8 8 8 8;
                rel1 {
                   to: "browser/list/info";
-                  offset: -9 -9;
+                  offset: -20 -15;
                }
                rel2 {
                   to: "browser/list/info";
@@ -267,6 +274,7 @@ collections {
                }
                text {
                   style: "epymc_default_style";
+                  align: 0.0 0.0;
                }
             }
          }

@@ -64,7 +64,7 @@ class UiTestsModule(EmcModule):
       self._browser.page_add('uitests://root', 'UI tests')
 
       self._browser.item_add('uitests://brdump', 'Dump Browser pages')
-      self._browser.item_add('uitests://vkbd', 'Virtual Keyboard')
+      self._browser.item_add('uitests://vkbd', 'Virtual Keyboard (need to fix callback_call())')
       self._browser.item_add('uitests://sselector', 'Source Selector')
       self._browser.item_add('uitests://dlg-info', 'Dialog - Info')
       self._browser.item_add('uitests://dlg-warning', 'Dialog - Warning')

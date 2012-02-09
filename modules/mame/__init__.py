@@ -40,6 +40,7 @@ def DBG(msg):
    pass
 
 MAME_EXE = 'mame'
+_instance = None
 
 class MameModule(EmcModule):
    name = 'mame'
@@ -56,8 +57,9 @@ and what it need to work well, can also use markup like <title>this</> or
    _categories = {}
 
    def __init__(self):
+      global _instance
       DBG('Init MAME')
-
+      _instance = self
       self._games = {} # key = game_id<str>  value = <MameGame> instance
       self._browser = EmcBrowser('MAME',
                        item_selected_cb = self.browser_item_selected,
@@ -333,7 +335,6 @@ class MameGame(object):
       self.driver_color = None
       self.driver_sound = None
       self.driver_graphic = None
-      
 
    def run(self):
       DBG('RUN GAME: ' + self.gid)
@@ -429,6 +430,7 @@ class MameGame(object):
       else:
          MameModule._favorites.append(self.gid)
          btn.icon_set(gui.load_icon('icon/star'))
+      _instance._browser.refresh()
 
    def history_show(self):
       # get history file from config (or set the default one)
@@ -512,6 +514,7 @@ class MameGame(object):
       if done:
          self.dialog.delete()
          EmcDialog(text = 'Game deleted', style = 'info')
+         _instance._browser.refresh(recreate=True)
       else:
          EmcDialog(text = 'Can not delete game', style = 'error')
 
@@ -542,7 +545,7 @@ class MameGame(object):
       # freeroms.com
       title = "Trying at freeroms.org...<br>"
       prefix = 'NUM' if self.gid[0].isdigit() else self.gid[0]
-      url = 'http://roms.freeroms.com/mame_roms/%s/%s.zip' % (prefix, self.gid)
+      url = 'http://download.freeroms.com/mame_roms/%s/%s.zip' % (prefix, self.gid)
       sources.append((title, url))
        # try somewhere else (suggestions are welcome)
       title = "Trying not_work.com...<br>"

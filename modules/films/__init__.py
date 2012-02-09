@@ -107,9 +107,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def create_root_page(self):
       self.__browser.page_add("film://root", "Films")
 
-      if len(self.__folders) == 1:
-         print "TODO skip first page"
-
       for f in self.__folders:
          self.__browser.item_add(f, os.path.basename(f))
       
@@ -140,9 +137,10 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def cb_source_selected(self, fullpath):
       self.__folders.append(fullpath)
       ini.set_string_list('film', 'folders', self.__folders, ';')
+      self.__browser.refresh(recreate=True)
 
    def cb_icon_get(self, page_url, item_url):
-      DBG(item_url[8:])
+      DBG(item_url[7:])
       if item_url.startswith('file://'):
          if os.path.isdir(item_url[7:]):
             return 'icon/folder'
@@ -393,6 +391,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       del self.__poster_dialog
 
       self.update_film_info(self.__current_url)
+      self.__browser.refresh()
 
 ######## Choose fanart
    def _cb_panel_4(self, button):
@@ -458,7 +457,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       del self.__backdrop_dialog
       print status
       if status == 200:
-         pass # TODO Update backdrop
+          self.__browser.refresh()
       else:
          EmcDialog(title = "Download error !!", style = 'error')
 
@@ -475,6 +474,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.__film_db.set_data(self.__current_url, movie_info)
       # update info panel
       self.update_film_info(self.__current_url)
+      # update browser
+      self.__browser.refresh()
 
    def _cb_panel_6(self, button):
       self.hide_film_info()

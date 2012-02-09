@@ -124,8 +124,7 @@ class EmcBrowser(object):
    def delete(self):
       _instances.remove(self)
       del self
-      
-      
+
    def _search_style_in_parent(self):
       for p in reversed(self.pages):
          if _memorydb.id_exists(p['url']):
@@ -138,7 +137,6 @@ class EmcBrowser(object):
       """
       When you create a page you need to give at least the url and the title
       """
-
       # create a new page data (if not a refresh operation)
       if self.is_refresh:
          view = self.pages[-1]['view']
@@ -174,7 +172,9 @@ class EmcBrowser(object):
 
       # same style for the 2 pages, ask the view to perform the correct animation
       if (view == self.current_view):
-         if self.is_back:
+         if self.is_refresh:
+            view.page_show(page['title'], 0)
+         elif self.is_back:
             view.page_show(page['title'], -1)
          elif len(self.pages) < 2:
             view.page_show(page['title'], 0)
@@ -187,16 +187,16 @@ class EmcBrowser(object):
          view.page_show(page['title'], 0)
          view.show()
 
-      # back item (optional)
-      if ini.get_bool('general', 'back_in_lists') == True:
-         self.item_add('emc://back', 'back', dont_count = True)
-
       # update state
       self.current_view = view
       self.is_refresh = False
       self.is_back = False
 
-      # just for debug
+      # back item (optional)
+      if ini.get_bool('general', 'back_in_lists') == True:
+         self.item_add('emc://back', 'back', dont_count = True)
+
+      # use this for extra debug
       # print self
 
    def item_add(self, url, label, dont_count = False):
@@ -234,8 +234,16 @@ class EmcBrowser(object):
       func = self.item_selected_cb
       if func: func(parent_url, page_data['url'])
 
-   def refresh(self):
-      self.current_view.refresh()
+   def refresh(self, recreate=False):
+      if recreate:
+         # recreate the page calling the selected_cb on the parent-page
+         self.is_refresh = True
+         page_url = self.pages[-1]['url'] if len(self.pages) > 0 else None
+         parent_url = self.pages[-2]['url'] if len(self.pages) > 1 else None
+         func = self.item_selected_cb
+         if func: func(parent_url, page_url)
+      else:
+         self.current_view.refresh()
 
    def change_style(self, style):
 
@@ -257,11 +265,8 @@ class EmcBrowser(object):
       page_url = self.pages[-1]['url']
       _memorydb.set_data(page_url, style)
 
-      # ask to recreate the page
-      self.is_refresh = True
-      parent_url = self.pages[-2]['url'] if len(self.pages) > 1 else None
-      func = self.item_selected_cb
-      if func: func(parent_url, page_url)
+      # recreate the page
+      self.refresh(recreate=True)
 
    def clear(self):
       """ TODO Function doc """
@@ -480,10 +485,11 @@ class ViewList(object):
       self.items_count = 0
 
    def refresh(self):
-      item = self.current_list.first_item_get()
-      while item:
+      for item in self.current_list.realized_items_get():
          item.update()
-         item = item.next_get()
+      # fake an item-hilight to refresh info, poster and fanart
+      self._cb_item_hilight(self.current_list, self.current_list.selected_item)
+      
 
    def input_event_cb(self, event):
       """ Here you can manage input events for the view """
@@ -565,7 +571,7 @@ class ViewList(object):
    def _cb_timer2(self, data):
       (url, label, parent_browser) = data
 
-      # Ask for the item poster and show (or auto-download) it
+      # Ask for the item fanart
       fanart = parent_browser._fanart_get(url)
       if fanart: gui.background_set(fanart)
 

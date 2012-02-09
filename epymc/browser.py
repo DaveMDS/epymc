@@ -476,10 +476,14 @@ class ViewList(object):
 
    def hide(self):
       """ Hide the view """
+      if self.timer: self.timer.delete()
+      if self.timer2: self.timer2.delete()
       gui.signal_emit("browser,list,hide")
 
    def clear(self):
       """ Clear the view """
+      if self.timer: self.timer.delete()
+      if self.timer2: self.timer2.delete()
       self.gl1.clear()
       self.gl2.clear()
       self.items_count = 0

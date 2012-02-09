@@ -672,7 +672,7 @@ class EmcVKeyboard(elementary.InnerWindow):
       # activate the inwin
       self.content_set(tb)
       self.activate()
-      self.entry.focus()
+      self.entry.focus_set(True)
 
       # catch input events
       input_events.listener_add("vkbd", self.input_event_cb)
@@ -683,7 +683,7 @@ class EmcVKeyboard(elementary.InnerWindow):
       b.size_hint_align_set(evas.EVAS_HINT_FILL, 0.0)
       if icon: b.icon_set(gui.load_icon(icon))
       if cb: b.callback_clicked_add(cb)
-      b.label_set(label)
+      b.text_set(label)
       self.efm.obj_add(b)
       if focused: self.efm.focused_set(b)
       b.show()
@@ -698,7 +698,7 @@ class EmcVKeyboard(elementary.InnerWindow):
    def text_set(self, text):
       self.entry.entry_set(text)
       self.entry.cursor_end_set()
-      self.entry.focus()
+      self.entry.focus_set(True)
 
    def _dismiss_cb(self, button):
       if self.dismiss_cb and callable(self.dismiss_cb):
@@ -711,8 +711,8 @@ class EmcVKeyboard(elementary.InnerWindow):
       self.delete()
 
    def _default_btn_cb(self, button):
-      self.entry.focus()
-      self.entry.entry_insert(button.label)
+      self.entry.focus_set(True)
+      self.entry.entry_insert(button.text)
 
    def _erase_cb(self, button):
       self.entry.focus()

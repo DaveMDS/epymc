@@ -164,3 +164,5 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
    return ecore.file.download(encoded, dest, _cb_download_complete,
                _cb_download_progress, dwl_data = dwl_data, *args, **kargs)
 
+def download_abort(dwl_handler):
+   ecore.file.download_abort(dwl_handler)

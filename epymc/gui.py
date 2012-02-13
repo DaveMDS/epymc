@@ -29,7 +29,6 @@ import mediaplayer
 import gui
 import input_events
 
-
 win = None
 layout = None
 theme_file = None
@@ -364,6 +363,7 @@ class EmcDialog(elementary.InnerWindow):
       input_events.listener_del(self._name)
       self.fman.delete()
       elementary.InnerWindow.delete(self)
+      del self
 
    def content_get(self):
       return self._content
@@ -539,7 +539,8 @@ class EmcFocusManager(object):
       """
       Delete the FocusManager instance and free all the resources used
       """
-      del self.objs
+      if self.objs:
+         del self.objs
 
    def obj_add(self, obj):
       """

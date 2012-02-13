@@ -30,6 +30,8 @@ import epymc.ini as ini
 import epymc.gui as gui
 import epymc.browser as browser
 
+from films import TMDB_WithGui
+
 
 def DBG(msg):
    print('UITESTS: ' + msg)
@@ -63,7 +65,7 @@ class UiTestsModule(EmcModule):
    def make_root_page(self):
       self._browser.page_add('uitests://root', 'UI tests')
 
-      self._browser.item_add('uitests://brdump', 'Dump Browser pages')
+      self._browser.item_add('uitests://tmdb', 'Themoviedb.org query with gui')
       self._browser.item_add('uitests://vkbd', 'Virtual Keyboard (need to fix callback_call())')
       self._browser.item_add('uitests://sselector', 'Source Selector')
       self._browser.item_add('uitests://dlg-info', 'Dialog - Info')
@@ -71,6 +73,7 @@ class UiTestsModule(EmcModule):
       self._browser.item_add('uitests://dlg-error', 'Dialog - Error')
       self._browser.item_add('uitests://dlg-yesno', 'Dialog - YesNo')
       self._browser.item_add('uitests://dlg-cancel', 'Dialog - Cancel')
+      self._browser.item_add('uitests://brdump', 'Dump Browser pages')
 
    def cb_poster_get(self, page_url, item_url):
       return None
@@ -88,6 +91,12 @@ class UiTestsModule(EmcModule):
 
       if item_url == 'uitests://root':
          self.make_root_page()
+
+      # TMDB
+      elif item_url == 'uitests://tmdb':
+         DBG('Testing TMDB')
+         s = TMDB_WithGui()
+         s.movie_search('alien')
 
       # VKeyboard
       elif item_url == 'uitests://vkbd':

@@ -28,9 +28,7 @@ import elementary
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser
 from epymc.sdb import EmcDatabase
-from epymc.gui import EmcDialog
-from epymc.gui import EmcRemoteImage
-from epymc.gui import EmcSourceSelector
+from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourceSelector, EmcVKeyboard
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
@@ -40,7 +38,7 @@ import epymc.gui as gui
 
 
 def DBG(msg):
-   print('FILM: ' + msg)
+   print('FILM: %s' % (msg))
    pass
 
 TMDB_API_KEY = "19eef197b81231dff0fd1a14a8d5f863" # Key of the user DaveMDS
@@ -140,7 +138,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.__browser.refresh(recreate=True)
 
    def cb_icon_get(self, page_url, item_url):
-      DBG(item_url[7:])
       if item_url.startswith('file://'):
          if os.path.isdir(item_url[7:]):
             return 'icon/folder'
@@ -268,9 +265,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # update poster
          poster = get_poster_filename(e['id'])
          if os.path.exists(poster):
-            o_image.file_set('') # this is to force a reload also if the filename is the same
+            # TODO FIXME!!  This will crash If the downloaded poster
+            #                is the same as the old one...dunno why :/
+            # force a reload also if the filename is the same
+            o_image.file_set('')
             o_image.file_set(poster)
-            o_image.show() # TODO why this is needed ? probably a bug somwhere... :/
          else:
             print 'TODO show a dummy image'
             o_image.file_set('')
@@ -463,19 +462,20 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
 ######## Get film info from themoviedb.org
    def _cb_panel_5(self, button):
-      tmdb = TMDB2(TMDB_API_KEY)
+      # tmdb = TMDB2(TMDB_API_KEY)
+      tmdb = TMDB_WithGui()
       film = self.get_film_name_from_url(self.__current_url)
-      tmdb.film_search(film, self._cb_search_complete)
+      tmdb.movie_search(film, self._cb_search_complete)
 
    def _cb_search_complete(self, tmdb, movie_info):
-      # free TMDB2 object
-      del tmdb
       # store the result in db
       self.__film_db.set_data(self.__current_url, movie_info)
-      # update info panel
-      self.update_film_info(self.__current_url)
       # update browser
       self.__browser.refresh()
+      # update info panel
+      self.update_film_info(self.__current_url)
+      # delete TMDB2 object
+      del tmdb
 
    def _cb_panel_6(self, button):
       self.hide_film_info()
@@ -495,46 +495,68 @@ def get_backdrop_filename(tmdb_id):
 import urllib
 import json
 
-class TMDB2(object):
 
-   def __init__(self, api_key):
-      ''' TMDB2 Client '''
+class TMDB_WithGui(object):
+   """ Another try """
+   def __init__(self, api_key=TMDB_API_KEY, lang='en'):
       self.key = api_key
-      self.lang = 'en'
-      self.server = 'http://api.themoviedb.org/2.1/'
-## FILM SEARCH
-   def film_search(self, film, complete_cb = None):
-      print "Search2 for : " + film
+      self.lang = lang
+      self.server = 'http://api.themoviedb.org/2.1'
+      self.complete_cb = None
+      self.dialog = None
+      self.dwl_handler = None
 
+   def movie_search(self, query, complete_cb = None):
+      DBG('TMDB Film search: ' + query)
       self.complete_cb = complete_cb
-      query = self.server+'Movie.search/'+self.lang+'/json/'+self.key+'/'+film
-
-      self.dialog = EmcDialog(title = "themoviedb.org",
-                              text = "Searching for: " + film,
+      self.dialog = EmcDialog(title = 'themoviedb.org',
+                              text = '<b>Searching for:</>',
                               spinner = True, style = 'cancel')
-      print "query: " + query
-      utils.download_url_async(query, "tmp", complete_cb = self._cb_search_done)
+      self.dialog.button_add('Change name', self._change_name_cb, query)
+      self._do_movie_search_query(query)
 
-   def _cb_search_done(self, dest, status):
+   def _change_name_cb(self, button, query):
+      if self.dwl_handler:
+         utils.download_abort(self.dwl_handler)
+         self.dwl_handler = None
+
+      EmcVKeyboard(text = query,
+         accept_cb = (lambda vkb, txt: self._do_movie_search_query(txt)))
+
+   # Movie.search/
+   def _do_movie_search_query(self, query):
+      url = '%s/Movie.search/%s/json/%s/%s' % \
+            (self.server, self.lang, self.key, query)
+      self.dwl_handler = utils.download_url_async(url, 'tmp',
+                              complete_cb = self._movie_search_done_cb)
+      self.dialog.text_set('<b>Searching for:</><br>' + query + '<br>')
+
+   def _movie_search_done_cb(self, dest, status):
+      self.dwl_handler = None
+
+      if status != 200:
+         self.dialog.text_append('<b>ERROR</b><br>')
+         return
+
       f = open(dest, "r")
       data = json.loads(f.read())
       f.close()
       os.remove(dest)
 
-      if len(data) == 1:
-         # just one result, assume is the correct one
-         try:
-            self.film_get_info(data[0]['id'])
-         except:
-            self.dialog.spinner_stop()
-            self.dialog.text_append('<br><br><b>nothing found</><br>')
-         # else:
-            # self.dialog.delete()
+      # no result found :(
+      if len(data) == 0 or data[0] == 'Nothing found.':
+         self.dialog.spinner_stop()
+         self.dialog.text_append('<br>nothing found, please try with a better name')#TODO explain better the format
 
-      elif len(data) > 1:
-         self.dialog.delete()
-         # create a list dialog to choose from results
+      # 1 result found, yhea! get the full movie data
+      elif len(data) == 1:
+         self._do_movie_getinfo_query(data[0]['id'])
+
+      # more matching results, show a list to choose from
+      else:
+         self.dialog.text_append('<b>Found %d results</b><br>' % (len(data)))
          li = elementary.List(gui.win)
+         li.focus_allow_set(False)
          for res in data:
             icon = None
             for image in res['posters']:
@@ -543,100 +565,121 @@ class TMDB2(object):
                   icon.url_set(image['image']['url'])
                   icon.size_hint_min_set(100, 100) # TODO fixme
                   break
-            label = res['name'] + ' (' + res['released'][:4] + ')'
+            DBG(res['name'])
+            DBG(res['released'])
+            if res['released']:
+               label = '%s (%s)' % (res['name'], res['released'][:4])
+            else:
+               label = res['name']
             li.item_append(label, icon, None, None, res['id'])
 
-         li.items_get()[0].selected_set(1)
+         li.items_get()[0].selected_set(True)
          li.show()
          li.go()
-         li.size_hint_min_set(300, 300) #TODO FIXME
 
-         dialog = EmcDialog(title = 'Found ' + str(len(data))+' results, please choose the right one.',
-                            content = li)
-         dialog.button_add('Ok', self._cb_search_ok, dialog)
-         dialog.button_add('Cancel', self._cb_search_cancel, dialog)
-         dialog.activate()
+         # TODO add the title in theme
+         title = 'Found %d results, which one?'
+         dialog2 = EmcDialog(title = title, content = li)
+         dialog2.button_add('Ok', self._cb_list_ok, dialog2)
+         dialog2.button_add('Cancel', self._cb_list_cancel, dialog2)
+         dialog2.activate()
 
-   def _cb_search_cancel(self, button, dialog):
-      dialog.delete()
-      del dialog
+   def _cb_list_cancel(self, button, dialog2):
+      dialog2.delete()
+      self.dialog.spinner_stop()
+      self.dialog.delete()
 
-   def _cb_search_ok(self, button, dialog):
+   def _cb_list_ok(self, button, dialog2):
       # get selected item id
-      li = dialog.content_get()
+      li = dialog2.content_get()
       item = li.selected_item_get()
-      id = item.data_get()[0][0]
-      if not item or not id: return
+      (args, kargs) = item.data_get()
+      tid = args[0]
+      if not item or not tid: return
 
-      # kill the dialog
-      dialog.delete()
-      del dialog
+      # kill the list dialog
+      dialog2.delete()
 
-      # download film info + images
-      self.film_get_info(id)
+      # download selected movie info + images
+      self._do_movie_getinfo_query(tid)
 
-## FILM GET INFO
-   def film_get_info(self, id):
-      print "Get Film Info: " + str(id)
+   ## Movie.getInfo/
+   def _do_movie_getinfo_query(self, tid):
+      DBG('downloading movie info, id: ' + str(tid))
+      self.dialog.text_append('<b>Downloading movie data, </b>')
+      url = '%s/Movie.getInfo/%s/json/%s/%s' % \
+             (self.server, self.lang, self.key, tid)
+      self.dwl_handler = utils.download_url_async(url, "tmp",
+                           complete_cb = self._movie_getinfo_done_cb)
 
-      query = self.server+'Movie.getInfo/'+self.lang+'/json/'+self.key+'/'+str(id)
+   def _movie_getinfo_done_cb(self, dest, status):
+      self.dwl_handler = None
 
-      self.dialog2 = EmcDialog(title = "Downloading film info",
-                               spinner = True)
-
-      utils.download_url_async(query, "tmp", complete_cb = self._cb_film_info_done)
-
-   def _cb_film_info_done(self, dest, status):
+      if status != 200:
+         self.dialog.text_append('<b>ERROR</b><br>')
+         return
+   
       f = open(dest, "r")
       data = json.loads(f.read())
       f.close()
       os.remove(dest)
 
+      if len(data) < 1:
+         self.dialog.text_append('<b>ERROR</b><br>')
+         return
+
+      # store the movie data
       self.movie_info = data[0]
 
       # download the first poster image found
+      self.dialog.text_append("<b>poster, </b>")
       for image in self.movie_info['posters']:
          if image['image']['size'] == 'mid': # TODO make default size configurable
             dest = get_poster_filename(self.movie_info['id'])
-            utils.download_url_async(image['image']['url'], dest,
-                                     complete_cb = self._cb_film_poster_done)
+            self.dwl_handler = utils.download_url_async(image['image']['url'],
+                              dest, complete_cb = self._movie_poster_done_cb)
             return
 
       # if no poster found go to next step
-      self._cb_film_poster_done(dest, 1)
+      self._movie_poster_done_cb(dest, 200)
 
-   def _cb_film_poster_done(self, dest, status):
+   def _movie_poster_done_cb(self, dest, status):
+      DBG('Poster: ' + dest)
+      self.dwl_handler = None
       # download the first backdrop image found
+      self.dialog.text_append("<b>fanart, </b>")
       for image in self.movie_info['backdrops']:
          if image['image']['size'] == 'original': # TODO make default size configurable
             dest = get_backdrop_filename(self.movie_info['id'])
-            utils.download_url_async(image['image']['url'], dest,
-                                     complete_cb = self._cb_film_backdrop_done)
+            self.dwl_handler = utils.download_url_async(image['image']['url'],
+                              dest, complete_cb = self._movie_backdrop_done_cb)
             return
 
       # if no backdrop found go to next step
-      self._cb_film_backdrop_done(dest, 1)
+      self._movie_backdrop_done_cb(dest, 200)
 
-   def _cb_film_backdrop_done(self, dest, status):
-      # kill the spinner dialog
+   def _movie_backdrop_done_cb(self, dest, status):
+      DBG('Fanart: ' + dest)
+      self.dwl_handler = None
+      # kill the main dialog
       self.dialog.delete()
-      del self.dialog
 
+      # call the complete callback
       if self.complete_cb:
          self.complete_cb(self, self.movie_info)
 
 
 
-
 ###############################################################################
-#    themoviedb.org  client implementation taken from:
+#  Original  themoviedb.org  client implementation taken from:
 #  http://forums.themoviedb.org/topic/1092/my-contribution-tmdb-api-wrapper-python/
 #  With a little modification by me to support json decode.
 #
 #  Credits goes to globald
+#
 #  Unused atm (in favor of the async one)
 ###############################################################################
-class TMDB(object):
+class TMDB_Original(object):
 
    def __init__(self, api_key, view='xml', lang='en', decode = False):
       ''' TMDB Client '''

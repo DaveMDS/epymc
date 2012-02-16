@@ -1,7 +1,15 @@
 
+
+BUGS
+=====
+ * double click in list (usually the back item) will segfault
+ * utf-8 -> ascii problem in some moviedb query (try searching for alien...)
+ * downloading a poster 2 times (the same image) will segfault
+
 MAIN
 =====
  * Use setuptools ?
+ * lirc module + lirc configuration gui
 
 
 CORE
@@ -14,5 +22,5 @@ CORE
 MAME
 =====
  * catver.ini: instead of reading a single file, scan a directory (~/.mame/cats/)
-   for *.ini files and create a menu entry for each. The namein the root could
+   for *.ini files and create a menu entry for each. The name in the root could
    be the name of the file (minus the extension)

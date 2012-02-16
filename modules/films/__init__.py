@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 #
-# Copyright (C) 2010 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2010-2012 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of EpyMC.
 #
@@ -297,7 +297,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       film = re.sub(r'\[.*?\]', '', film)
       film = re.sub(r'\{.*?\}', '', film)
       # remove blacklisted words
-      blacklist = ['dvdrip', 'ITA', 'ENG', 'sub', 'AAC', 'x264']
+      blacklist = ['dvdrip', 'ITA', 'ENG', 'sub', 'AAC', 'x264']# TODO make this configurable
       for word in blacklist:
          film = re.sub('(?i)'+word, '', film)
       return film

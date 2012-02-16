@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2010 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2010-2012 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of EpyMC.
 #

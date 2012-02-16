@@ -37,6 +37,9 @@ import epymc.utils as utils
 import epymc.gui as gui
 
 
+# debuggin stuff
+from pprint import pprint
+import pdb
 def DBG(msg):
    print('FILM: %s' % (msg))
    pass
@@ -223,7 +226,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       sentry.show()
       box.pack_end(sentry)
 
-      dialog = EmcDialog(style = 'default', content = box)
+      dialog = EmcDialog(style = 'panel', content = box)
       dialog.button_add('Play', self._cb_panel_1)
       if self.__film_db.id_exists(url):
          dialog.button_add('Cast', self._cb_panel_2)
@@ -255,11 +258,14 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          #~ pprint.pprint(e)
 
          # update text info
-         info = "<title>" + e['name'] + "</title> <year>(" + e['released'][0:4] + ")</year><br>" + \
-                  "<hilight>Director: </hilight>" + self._get_director(e) + "<br>" + \
-                  "<hilight>Cast: </hilight>" + self._get_cast(e) + "<br>" + \
-                  "<hilight>Rating: </hilight>" + str(e['rating']) + "/10<br>" + \
-                  "<br><hilight>Overview:</hilight><br>" + e['overview']
+         self._dialog.title_set(e['name'])
+         info = '<hilight>Director: </hilight> %s <br>' \
+                '<hilight>Cast: </hilight> %s <br>' \
+                '<hilight>Released: </hilight> %s <br>' \
+                '<hilight>Rating: </hilight> %s <br>' \
+                '<br><hilight>Overview:</hilight> %s' \
+                  % (self._get_director(e), self._get_cast(e), e['released'],
+                     e['rating'], e['overview'])
          o_sentry.entry_set(info.encode('utf-8'))
 
          # update poster
@@ -335,38 +341,32 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # create a list of posters
          images_thumb = []
          images_big = []
+         pprint(film_info['posters'])
          for image in film_info['posters']:
-            if image['image']['size'] == 'thumb':
+            if image['image']['size'] == 'mid':
                images_thumb.append(image['image'])
-            if image['image']['size'] == 'original': # TODO choose better the wanted size
+            if image['image']['size'] == 'original':
                images_big.append(image['image'])
 
          # show the list in a dialog
          li = elementary.List(gui.win)
+         li.horizontal = True
+         li.style_set('image_list')
          li.focus_allow_set(False)
          for (image_thumb, image_big) in zip(images_thumb, images_big):
             icon = EmcRemoteImage(li)
             icon.url_set(image_thumb['url'])
-            icon.size_hint_min_set(100, 100) # TODO fixme
-            #~ label = res['name'] + ' (' + res['released'][:4] + ')'
-            li.item_append(" ", icon, None, None, (image_big['url'], film_info['id']))
+            li.item_append('', icon, None, None, (image_big['url'], film_info['id']))
 
          li.items_get()[0].selected_set(1)
          li.show()
          li.go()
-         li.size_hint_min_set(300, 300) #TODO FIXME
 
-         dialog = EmcDialog(title = 'Choose a poster.', content = li)
-         dialog.button_add('Ok', self._cb_poster_ok, dialog)
-         dialog.button_add('Cancel', self._cb_poster_cancel, dialog)
+         dialog = EmcDialog(title = 'Choose a poster', content = li,
+                            done_cb = self._cb_poster_ok)
          dialog.activate()
 
-   def _cb_poster_cancel(self, button, dialog):
-      # kill the dialog
-      dialog.delete()
-      del dialog
-
-   def _cb_poster_ok(self, button, dialog):
+   def _cb_poster_ok(self, dialog):
       li = dialog.content_get()
       item = li.selected_item_get()
       if not item: return
@@ -408,30 +408,23 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
          # show the list in a dialog
          li = elementary.List(gui.win)
+         li.horizontal = True
          li.focus_allow_set(False)
+         li.style_set('image_list')
          for (image_thumb, image_big) in zip(images_thumb, images_big):
             icon = EmcRemoteImage(li)
             icon.url_set(image_thumb['url'])
-            icon.size_hint_min_set(100, 100) # TODO fixme
-            #~ label = res['name'] + ' (' + res['released'][:4] + ')'
-            li.item_append(" ", icon, None, None, (image_big['url'], film_info['id']))
+            li.item_append('', icon, None, None, (image_big['url'], film_info['id']))
 
          li.items_get()[0].selected_set(1)
          li.show()
          li.go()
-         li.size_hint_min_set(300, 300) #TODO FIXME
 
-         dialog = EmcDialog(title = 'Choose a Fanart.', content = li)
-         dialog.button_add('Ok', self._cb_backdrop_ok, dialog)
-         dialog.button_add('Cancel', self._cb_backdrop_cancel, dialog)
+         dialog = EmcDialog(title = 'Choose a Fanart', content = li,
+                            done_cb = self._cb_backdrop_ok)
          dialog.activate()
 
-   def _cb_backdrop_cancel(self, button, dialog):
-      # kill the dialog
-      dialog.delete()
-      del dialog
-
-   def _cb_backdrop_ok(self, button, dialog):
+   def _cb_backdrop_ok(self, dialog):
       li = dialog.content_get()
       item = li.selected_item_get()
       if not item: return

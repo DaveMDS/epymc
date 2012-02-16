@@ -21,6 +21,7 @@ import os
 
 import evas
 import ecore
+import edje
 import elementary
 
 import utils
@@ -244,7 +245,7 @@ class EmcRemoteImage(elementary.Image):
 
    def _cb_move_resize(self, obj):
       (x, y, w, h) = self.geometry_get()
-      print ('MOVE %d %d %d %d' % (x, y, w, h))
+      # print ('MOVE %d %d %d %d' % (x, y, w, h))
       self._pb.resize(w, h)
       self._pb.move(x, y)
       # self._pb.raise_()  :/
@@ -263,7 +264,223 @@ class EmcRemoteImage(elementary.Image):
    #TODO on image_set abort the download ? 
 
 ################################################################################
-class EmcDialog(elementary.InnerWindow):
+class EmcDialog(edje.Edje):
+   """ TODO doc this
+   style can be 'panel' or 'minimal'
+
+   you can also apply special style that perform specific task:
+      'info', 'error', 'warning', 'yesno', 'cancel'
+   """
+
+   special_styles = ['info', 'error', 'warning', 'yesno', 'cancel']
+   dialogs_counter = 0
+
+   fman = None
+   
+   def __init__(self, title = None, text = None, content = None,
+                spinner = False, style = 'panel', done_cb = None):
+      # load the right edje object
+      if style == 'minimal' or style in EmcDialog.special_styles:
+         group = 'emc/dialog/minimal'
+      else:
+         group = 'emc/dialog/panel'
+      edje.Edje.__init__(self, gui.win.evas, file = theme_file, group = group)
+      self.signal_callback_add('emc,dialog,close', '',
+                               (lambda A,s,d: self.delete()))
+      self.signal_callback_add('emc,dialog,hide,done', '',
+                               (lambda a,S,d: self._delete_real()))
+      self.signal_callback_add('emc,dialog,show,done', '',
+                               (lambda a,s,D: None))
+      win.resize_object_add(self)
+
+      EmcDialog.dialogs_counter += 1
+      self._name = 'Dialog-' + str(EmcDialog.dialogs_counter)
+      self._content = content
+      self._done_cb = done_cb
+      self._buttons = []
+      self.fman = EmcFocusManager()
+
+      # vbox
+      self._vbox = elementary.Box(gui.win)
+      self._vbox.horizontal_set(False)
+      self._vbox.size_hint_align_set(evas.EVAS_HINT_FILL, 0.0)
+      self._vbox.size_hint_weight_set(evas.EVAS_HINT_EXPAND, 0.0)
+      self._vbox.show()
+      self.part_swallow('emc.swallow.content', self._vbox)
+
+      if title is not None:
+         self.part_text_set("emc.text.title", title)
+         self.signal_emit('emc,dialog,title,show', 'emc')
+         # TODO hide the title in None
+      
+      if text is not None:
+         self._textentry = elementary.Entry(gui.win)
+         self._textentry.style_set('dialog')
+         self._textentry.editable_set(False)
+         self._textentry.context_menu_disabled_set(True)
+         self._textentry.entry_set(text)
+         self._textentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+         self._textentry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+         #~ self._textentry.size_hint_align_set(0.5, 0.5)
+         self._vbox.pack_end(self._textentry)
+         self._textentry.show()
+      elif content is not None:
+         frame = elementary.Frame(gui.win)
+         frame.style_set("pad_medium")
+         frame.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+         frame.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+         frame.content_set(content)
+         frame.show()
+         self._vbox.pack_end(frame)
+
+      if spinner:
+         self._spinner = elementary.Progressbar(gui.win)
+         self._spinner.style_set('wheel')
+         self._spinner.pulse(True)
+         self._spinner.show()
+         self._vbox.pack_end(self._spinner)
+
+      if style in EmcDialog.special_styles:
+         self.signal_emit('emc,dialog,%s,set' % (style), 'emc')
+
+      if style in ('info', 'error', 'warning'):
+         self.button_add('Ok', (lambda btn: self.delete()))
+
+      if style in ('yesno'):
+         self.button_add('No', (lambda btn: self.delete()))
+         self.button_add('Yes', (lambda btn: self._done_cb(self)))
+
+      if style in ('cancel'):
+         if done_cb:
+            self.button_add('Cancel', (lambda btn: self._done_cb(self)))
+         else:
+            self.button_add('Cancel', (lambda btn: self.delete()))
+
+      input_events.listener_add(self._name, self._input_event_cb)
+      
+      self.show()
+      self.signal_emit('emc,dialog,show', 'emc')
+
+   def activate(self):
+      print 'DEPRECATED EmcDialog.activate()'
+
+   def delete(self):
+      input_events.listener_del(self._name)
+      self.fman.delete()
+      self.signal_emit('emc,dialog,hide', 'emc')
+
+   def _delete_real(self):
+      if self.part_swallow_get('emc.swallow.content'):
+         self.part_swallow_get('emc.swallow.content').delete()
+      for b in self._buttons:
+         b.delete()
+      win.resize_object_del(self)
+      edje.Edje.delete(self)
+      del self
+
+   def content_get(self):
+      return self._content
+
+   def button_add(self, label, selected_cb = None, cb_data = None, icon = None):
+      if not self._buttons:
+         self.signal_emit('emc,dialog,buttons,show', 'emc')
+      b = elementary.Button(self)
+      b.text_set(label)
+      if icon: b.icon_set(load_icon(icon))
+      b.data['cb'] = selected_cb
+      b.data['cb_data'] = cb_data
+      b.callback_clicked_add(self._cb_buttons)
+      b.focus_allow_set(False)
+      self.fman.obj_add(b)
+      self.part_box_prepend('emc.box.buttons', b)
+      b.show()
+      self._buttons.append(b)
+      return b
+
+   def title_set(self, text):
+      if text is not None:
+         self.part_text_set('emc.text.title', text)
+         self.signal_emit('emc,dialog,title,show', 'emc')
+      else:
+         self.signal_emit('emc,dialog,title,hide', 'emc')
+
+   def title_get(self):
+      return self.part_text_get('emc.text.title')
+
+   def text_set(self, text):
+      self._textentry.entry_set(text)
+
+   def text_get(self):
+      return self._textentry.entry_get()
+
+   def text_append(self, text):
+      self._textentry.entry_set(self._textentry.entry_get() + text)
+
+   def spinner_start(self):
+      self._spinner.show()
+      self._spinner.pulse(True)
+
+   def spinner_stop(self):
+      self._spinner.pulse(False)
+      self._spinner.hide()
+
+   def _cb_buttons(self, button):
+      selected_cb = button.data['cb']
+      cb_data = button.data['cb_data']
+
+      if selected_cb and cb_data:
+         selected_cb(button, cb_data)
+      elif selected_cb:
+         selected_cb(button)
+
+   def _input_event_cb(self, event):
+
+      if event in ['BACK', 'EXIT']:
+         self.delete()
+         return input_events.EVENT_BLOCK
+
+      # if content is elm List or Genlist then automanage the events
+      if self._content and type(self._content) in (elementary.List, elementary.Genlist):
+         list = self._content
+         item = list.selected_item_get()
+         if not item:
+            item = list.items_get()[0]
+
+         horiz = False
+         if type(self._content) is elementary.List:
+            horiz = list.horizontal
+
+         if (horiz and event == 'RIGHT') or \
+            (not horiz and event == 'DOWN'):
+            next = item.next_get()
+            if next:
+               next.selected_set(1)
+               next.show()
+               return input_events.EVENT_BLOCK
+
+         if (horiz and event == 'LEFT') or \
+            (not horiz and event == 'UP'):
+            prev = item.prev_get()
+            if prev:
+               prev.selected_set(1)
+               prev.show()
+               return input_events.EVENT_BLOCK
+
+      if self._buttons:
+         if event == 'LEFT':
+            self.fman.focus_move('l')
+         if event == 'RIGHT':
+            self.fman.focus_move('r')
+   
+      if event == 'OK':
+         if self._buttons:
+            self._cb_buttons(self.fman.focused_get())
+         elif self._done_cb:
+            self._done_cb(self)
+
+      return input_events.EVENT_BLOCK
+
+class EmcDialog_OLD(elementary.InnerWindow):
    """ TODO doc this
    style can be 'default', 'minimal' or 'minimal_vertical'
 
@@ -427,28 +644,34 @@ class EmcDialog(elementary.InnerWindow):
          if not item:
             item = list.items_get()[0]
 
-         if event == 'DOWN':
+         if (list.horizontal and event == 'RIGHT') or \
+            (not list.horizontal and event == 'DOWN'):
             next = item.next_get()
             if next:
                next.selected_set(1)
                next.show()
                return input_events.EVENT_BLOCK
 
-         if event == 'UP':
+         if (list.horizontal and event == 'LEFT') or \
+            (not list.horizontal and event == 'UP'):
             prev = item.prev_get()
             if prev:
                prev.selected_set(1)
                prev.show()
                return input_events.EVENT_BLOCK
-
+      else:
+         if event == 'LEFT':
+            self.fman.focus_move('l')
+         if event == 'RIGHT':
+            self.fman.focus_move('r')
+   
       if event == 'OK':
-         self._cb_buttons(self.fman.focused_get())
+         if self.fman.all_get():
+            self._cb_buttons(self.fman.focused_get())
+         else:
+            self._done_cb(self)
 
-      elif event == 'LEFT':
-         self.fman.focus_move('l')
-
-      elif event == 'RIGHT':
-         self.fman.focus_move('r')
+      
 
       return input_events.EVENT_BLOCK
 
@@ -612,32 +835,24 @@ class EmcFocusManager(object):
          self.focused_set(obj)
    
 ###############################################################################
-class EmcVKeyboard(elementary.InnerWindow):
+# class EmcVKeyboard(elementary.InnerWindow):
+class EmcVKeyboard(EmcDialog):
    """ TODO doc this """
    def __init__(self, accept_cb = None, dismiss_cb = None,
                 title = None, text = None):
       """ TODO doc this """
-      elementary.InnerWindow.__init__(self, gui.win)
-      self.style_set('minimal')
 
-      self.current_button = None
       self.accept_cb = accept_cb
       self.dismiss_cb = dismiss_cb
+      self.current_button = None
 
       # table
       tb = elementary.Table(gui.win)
       tb.homogenous_set(True)
       tb.show()
 
-      # title
-      self.text_part_set("elm.text.title", title or 'Insert text')
-      # label = elementary.Label(gui.win)
-      # label.style_set('dialog')
-      # label.label_set('<title>%s</>' % (title or 'Insert text'))
-      # label.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      # label.size_hint_align_set(0.5, evas.EVAS_HINT_FILL)
-      # label.show()
-      # tb.pack(label, 0, 0, 10, 1)
+      # set dialog title
+      self.part_text_set("emc.text.title", title or 'Insert text')
 
       # entry
       self.entry = elementary.Entry(gui.win) # TODO use scrolled_entry instead
@@ -649,8 +864,7 @@ class EmcVKeyboard(elementary.InnerWindow):
       self.entry.show()
 
       # focus manager
-      efm = EmcFocusManager()
-      self.efm = efm
+      self.efm = EmcFocusManager()
 
       # standard keyb
       for i, c in enumerate(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']):
@@ -671,11 +885,13 @@ class EmcVKeyboard(elementary.InnerWindow):
       self._pack_btn(tb, 6, 6, 4, 1, 'Accept',  'icon/ok',     self._accept_cb)
 
       # activate the inwin
-      self.content_set(tb)
-      self.activate()
-      self.entry.focus_set(True)
+      # self.entry.focus_set(True)  #  :(  ARGGG
+      self.entry.focus_allow_set(False)
 
-      # catch input events
+      # elementary.InnerWindow.__init__(self, gui.win)
+      EmcDialog.__init__(self, title = title, style = 'minimal', content = tb)
+
+       # catch input events
       input_events.listener_add("vkbd", self.input_event_cb)
 
    def _pack_btn(self, tb, x, y, w, h, label, icon = None, cb = None, focused = False):
@@ -687,14 +903,14 @@ class EmcVKeyboard(elementary.InnerWindow):
       b.text_set(label)
       self.efm.obj_add(b)
       if focused: self.efm.focused_set(b)
-      b.show()
       tb.pack(b, x, y, w, h)
+      b.show()
       return b
 
    def delete(self):
       input_events.listener_del("vkbd")
       self.efm.delete()
-      elementary.InnerWindow.delete(self)
+      EmcDialog.delete(self)
 
    def text_set(self, text):
       self.entry.entry_set(text)

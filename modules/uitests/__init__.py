@@ -38,6 +38,26 @@ def DBG(msg):
    pass
 
 
+LOREM = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum
+consectetur est laoreet est consequat ultricies. Vivamus lectus tellus, egestas
+condimentum sollicitudin dictum, congue ac quam. Proin eu erat arcu. Ut tellus
+augue, consectetur at lacinia ac, pharetra ornare leo. Quisque ut metus sit
+amet risus luctus condimentum. Suspendisse sodales suscipit arcu ut interdum.
+Aenean luctus, leo in lacinia pretium, felis odio euismod sapien, eu varius
+ipsum odio sit amet elit. Proin porta lectus sit amet ipsum pretium posuere.
+<br><br>Sed vel nisi vitae est ultricies ullamcorper sed non purus. Donec porta
+diam sed nulla volutpat non pretium ipsum lobortis. Donec quam mauris, porta
+sit amet congue a, mollis et nulla. Nulla facilisi. In augue eros, elementum
+quis interdum sed, tristique et dolor. Nam eget tempor nisi. Curabitur
+sollicitudin fermentum tortor, at commodo ipsum egestas sit amet. Lorem ipsum
+dolor sit amet, consectetur adipiscing elit. In urna neque, malesuada et
+tempus ac, adipiscing et sapien. Ut arcu tellus, molestie sit amet feugiat
+a, faucibus at dui. Aenean posuere ligula tellus. Cras interdum sollicitudin
+posuere. Donec laoreet pretium purus malesuada rhoncus. Sed pulvinar volutpat
+vulputate. 
+"""
+
+
 class UiTestsModule(EmcModule):
    name = 'uitests'
    label = 'UI tests'
@@ -65,14 +85,17 @@ class UiTestsModule(EmcModule):
    def make_root_page(self):
       self._browser.page_add('uitests://root', 'UI tests')
 
-      self._browser.item_add('uitests://tmdb', 'Themoviedb.org query with gui')
-      self._browser.item_add('uitests://vkbd', 'Virtual Keyboard (need to fix callback_call())')
+      self._browser.item_add('uitests://tmdb', 'Themoviedb.org query with gui (need fix for non ascii)')
+      self._browser.item_add('uitests://vkbd', 'Virtual Keyboard (need some fixes)')
       self._browser.item_add('uitests://sselector', 'Source Selector')
       self._browser.item_add('uitests://dlg-info', 'Dialog - Info')
       self._browser.item_add('uitests://dlg-warning', 'Dialog - Warning')
       self._browser.item_add('uitests://dlg-error', 'Dialog - Error')
       self._browser.item_add('uitests://dlg-yesno', 'Dialog - YesNo')
       self._browser.item_add('uitests://dlg-cancel', 'Dialog - Cancel')
+      self._browser.item_add('uitests://dlg-panel1', 'Dialog - Panel full')
+      self._browser.item_add('uitests://dlg-panel2', 'Dialog - Panel no buttons')
+      self._browser.item_add('uitests://dlg-panel3', 'Dialog - Panel no title')
       self._browser.item_add('uitests://brdump', 'Dump Browser pages')
 
    def cb_poster_get(self, page_url, item_url):
@@ -94,51 +117,64 @@ class UiTestsModule(EmcModule):
 
       # TMDB
       elif item_url == 'uitests://tmdb':
-         DBG('Testing TMDB')
          s = TMDB_WithGui()
          s.movie_search('alien')
 
       # VKeyboard
       elif item_url == 'uitests://vkbd':
-         DBG('Testing Virtual Keyboard')
          EmcVKeyboard(title = 'Virtual Keyboard', text = 'This is the keyboard test!')
 
       # Source Selector
       elif item_url == 'uitests://sselector':
-         DBG('Testing Source Selector')
          EmcSourceSelector(title = "Source Selector Test")
 
       # Dialog - Info
       elif item_url == 'uitests://dlg-info':
-         DBG('Testing Dialog - Info')
          text = 'This is an <br><br><b>Info</><br>dialog<br>'
          EmcDialog(title = 'Dialog - Info', text = text, style = 'info')
 
       # Dialog - Warning
       elif item_url == 'uitests://dlg-warning':
-         DBG('Testing Dialog - Warning')
          text = 'This is an <br><br><b>Warning</><br>dialog<br>'
-         EmcDialog(title = 'Dialog - Info', text = text, style = 'warning')
+         EmcDialog(title = 'Dialog - Warning', text = text, style = 'warning')
 
       # Dialog - Error
       elif item_url == 'uitests://dlg-error':
-         DBG('Testing Dialog - Error')
          text = 'This is an <br><br><b>Error</><br>dialog<br>'
          EmcDialog(title = 'Dialog - Error', text = text, style = 'error')
 
       # Dialog - YesNo
       elif item_url == 'uitests://dlg-yesno':
-         DBG('Testing Dialog - YesNo')
          text = 'This is an <br><br><b>Yes/No</><br>dialog<br>'
          EmcDialog(title = 'Dialog - YesNo', text = text, style = 'yesno',
                    done_cb =  (lambda btn: DBG('done')))
 
       # Dialog - Cancel
       elif item_url == 'uitests://dlg-cancel':
-         DBG('Testing Dialog - Cancel')
          text = 'This is an <br><br><b>Cancel operation</><br>dialog<br>'
          EmcDialog(title = 'Dialog - Cancel', text = text, style = 'cancel',
                    spinner = True)
+
+      # Dialog - Panel full
+      elif item_url == 'uitests://dlg-panel1':
+         text = LOREM
+         d = EmcDialog(title = 'Dialog - Panel full', text = text, style = 'panel',
+                       spinner = True)
+         d.button_add("One")
+         d.button_add("Two")
+         d.button_add("Tree")
+
+      # Dialog - Panel no buttons
+      elif item_url == 'uitests://dlg-panel2':
+         text = LOREM
+         d = EmcDialog(title = 'Dialog - Panel full', text = text, style = 'panel',
+                       spinner = True)
+
+      # Dialog - Panel no title
+      elif item_url == 'uitests://dlg-panel3':
+         text = LOREM
+         d = EmcDialog(text = text, style = 'panel',
+                       spinner = True)
 
       # Browser Dump
       elif item_url == 'uitests://brdump':

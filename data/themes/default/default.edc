@@ -70,7 +70,7 @@ collections {
    #include "elm_extension.edc"
    #include "icons.edc"
    
-   group { name: "epymc_main_layout";
+   group { name: "epymc_main_layout"; /* API */
 
 /// clock embryo script
       script {
@@ -835,5 +835,441 @@ collections {
          }
       }
    }
+   group { name: "emc/dialog/panel"; /* API */
+      images {
+         image: "shad_circ.png" COMP;
+         image: "bt_dis_base.png" COMP;
+         image: "roundclose.png" COMP;
+      }
+      parts {
+         part { name: "clipper";
+            type: RECT;
+            description { state: "default" 0.0;
+               color: 0 0 0 0;
+            }
+            description { state: "visible" 0.0;
+               color: 255 255 255 255;
+            }
+         }
+         part { name: "bg";
+            type: RECT;
+            clip_to: "clipper";
+            description { state: "default" 0.0;
+               color: 0 0 0 64;
+            }
+         }
+         part { name: "base";
+            clip_to: "clipper";
+            description { state: "default" 0.0;
+               rel1.relative: 0.1 0.1;
+               rel2.relative: 0.9 0.9;
+               image {
+                  normal: "bt_dis_base.png";
+                  border: 4 4 4 4;
+               }
+               image.middle: SOLID;
+            }
+         }
+         part { name: "emc.text.title"; /* API */
+            type: TEXTBLOCK;
+            clip_to: "clipper";
+            description { state: "default" 0.0;
+               rel1.to: "base";
+               rel2.to: "base";
+               rel1.relative: 0.0 0.0;
+               rel2.relative: 1.0 0.0;
+               visible: 0;
+               text {
+                  text:"missing title...";
+                  align: 0.5 1.0;
+                  style: "epymc_dialog_title_style";
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               rel2.relative: 1.0 0.1;
+            }
+         }
+         part { name: "emc.swallow.content"; /* API */
+            type: SWALLOW;
+            clip_to: "clipper";
+            description { state: "default" 0.0;
+               rel1 {
+                  to: "emc.text.title";
+                  relative: 0.0 1.0;
+                  offset: 10 10;
+               }
+               rel2 {
+                  to_y: "emc.box.buttons";
+                  to_x: "base";
+                  relative: 1.0 0.0;
+                  offset: -15 -10;
+               }
+            }
+         }
+         part { name: "close";
+            type: IMAGE;
+            clip_to: "clipper";
+            mouse_events: 1;
+            description { state: "default" 0.0;
+               min: 60 60;
+               fixed: 1 1;
+               aspect: 1 1;
+               color: 255 255 255 140;
+               image.normal: "roundclose.png";
+               rel1 {
+                  to: "base";
+                  relative: 1.0 0.0;
+                  offset: -9 10;
+               }
+               rel2 {
+                  to: "base";
+                  relative: 1.0 0.0;
+                  offset: -9 10;
+               }
+            }
+            description { state: "bigger" 0.0;
+               inherit: "default" 0.0;
+               color: 255 255 255 240;
+            }
+         }
+         part { name: "emc.box.buttons"; /* API */
+            type: BOX;
+            clip_to: "clipper";
+            description { state: "default" 0.0;
+               box {
+                  layout: "horizontal";
+                  padding: 0 4;
+                  min: 0 1; // this doesn't work...it should
+               }
+               rel1 {
+                  to: "base";
+                  relative: 0.0 1.0;
+                  offset: 8 8;
+               }
+               rel2 {
+                  to: "base";
+                  relative: 1.0 1.0;
+                  offset: -9 -9;
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               rel1.relative: 0.0 0.85;
+            }
+         }
+      }
+      programs {
+         program { name: "close_mouse_in";
+            signal: "mouse,in";
+            source: "close";
+            action: STATE_SET "bigger" 0.0;
+            transition: LINEAR 0.15 CURRENT;
+            target: "close";
+         }
+         program { name: "close_mouse_out";
+            signal: "mouse,out";
+            source: "close";
+            action: STATE_SET "default" 0.0;
+            transition: LINEAR 0.15 CURRENT;
+            target: "close";
+         }
+         program { name: "close_mouse_click"; /* API */
+            signal: "mouse,down,1";
+            source: "close";
+            action: SIGNAL_EMIT "emc,dialog,close" "";
+         }
+         program { name: "show"; /* API */
+            signal: "emc,dialog,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.5;
+            target: "clipper";
+            after: "show_done";
+         }
+         program { name: "show_done"; /* API */
+            action: SIGNAL_EMIT "emc,dialog,show,done" "";
+         }
+         program { name: "hide"; /* API */
+            signal: "emc,dialog,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: DECELERATE 0.5;
+            target: "clipper";
+            after: "hide_done";
+         }
+         program { name: "hide_done"; /* API */
+            action: SIGNAL_EMIT "emc,dialog,hide,done" "";
+         }
+         program { name: "show_title"; /* API */
+            signal: "emc,dialog,title,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            target: "emc.text.title";
+         }
+         program { name: "hide_title"; /* API */
+            signal: "emc,dialog,title,show";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            target: "emc.text.title";
+         }
+         program { name: "show_buttons"; /* API */
+            signal: "emc,dialog,buttons,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            target: "emc.box.buttons";
+         }
+         program { name: "hide_buttons"; /* API */
+            signal: "emc,dialog,buttons,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            target: "emc.box.buttons";
+         }
+      }
+   }
+   group { name: "emc/dialog/minimal"; /* API */
+      min: 500 200;
+      images {
+         image: "bt_dis_base.png" COMP;
+         image: "header_dialog.png" COMP;
+         image: "bulb-0.png" COMP;
+         image: "warning.png" COMP;
+      }
+      parts {
+         part { name: "clipper";
+            type: RECT;
+            description { state: "default" 0.0;
+               color: 0 0 0 0;
+            }
+            description { state: "visible" 0.0;
+               color: 255 255 255 255;
+            }
+         }
+         part { name: "base";
+            type: RECT;
+            clip_to: "clipper";
+            description { state: "default" 0.0;
+               color: 0 0 0 64;
+            }
+         }
+         part { name: "pop";
+            clip_to: "clipper";
+            description { state: "default" 0.0;
+               rel1.to: "titlebg";
+               rel1.offset: -2 -2;
+               rel2.to_x: "emc.swallow.content";
+               rel2.to_y: "emc.box.buttons";
+               rel2.offset: 25+2 10;
+               image {
+                  normal: "bt_dis_base.png";
+                  border: 4 4 4 4;
+               }
+               image.middle: SOLID;
+            }
+         }
+         part { name: "tagimage";
+            type: IMAGE;
+            clip_to: "clipper";
+            description { state: "default" 0.0;
+               rel1.to: "pop";
+               rel2.to: "pop";
+               rel1.relative: 0.0 0.4;
+               aspect: 1 1;
+               aspect_preference: BOTH;
+               align: 0.95 0.9;
+               visible: 0;
+            }
+            description { state: "info" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               image.normal: "bulb-0.png";
+            }
+            description { state: "warning" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               image.normal: "warning.png";
+               color: 170 170 170 170;
+            }
+            description { state: "error" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               image.normal: "warning.png";
+            }
+            description { state: "yesno" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               image.normal: "bulb-0.png";
+            }
+         }
+         part { name: "titlebg";
+            type: IMAGE;
+            clip_to: "clipper";
+            description { state: "default" 0.0;
+               rel1.to: "emc.swallow.content";
+               rel2.to: "emc.swallow.content";
+               rel2.relative: 1.0 0.0;
+               rel1.offset: -25 -65;
+               rel2.offset: 25 20;
+               color: 255 255 255 100;
+               image.normal: "header_dialog.png";
+               image.border: 0 0 0 40;
+            }
+         }
+         part { name: "emc.text.title"; /* API */
+            type: TEXTBLOCK;
+            clip_to: "clipper";
+            description { state: "default" 0.0;
+               rel1.to: "titlebg";
+               rel2.to: "titlebg";
+               text {
+                  text:"missing title...";
+                  min: 0 0;
+                  align: 0.5 0.25;
+                  style: "epymc_dialog_title_style";
+               }
+            }
+         }
+         part { name: "emc.swallow.content"; /* API */
+            type: SWALLOW;
+            clip_to: "clipper";
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               min: 600 200;
+               rel1.relative: 0.5 0.5;
+               rel2.relative: 0.5 0.5;
+            }
+         }
+         part { name: "close";
+            type: IMAGE;
+            clip_to: "clipper";
+            mouse_events: 1;
+            description { state: "default" 0.0;
+               min: 60 60;
+               fixed: 1 1;
+               aspect: 1 1;
+               color: 255 255 255 140;
+               image.normal: "roundclose.png";
+               rel1 {
+                  to: "pop";
+                  relative: 1.0 0.0;
+                  offset: -9 10;
+               }
+               rel2 {
+                  to: "pop";
+                  relative: 1.0 0.0;
+                  offset: -9 10;
+               }
+            }
+            description { state: "bigger" 0.0;
+               inherit: "default" 0.0;
+               color: 255 255 255 240;
+            }
+         }
+         part { name: "emc.box.buttons"; /* API */
+            type: BOX;
+            clip_to: "clipper";
+            description { state: "default" 0.0;
+               box {
+                  layout: "horizontal";
+                  padding: 0 4;
+                  align: 0.2 0.5;
+                  min: 0 1; // this doesn't work...it should
+               }
+               rel1 {
+                  to: "emc.swallow.content";
+                  relative: 0.0 1.0;
+               }
+               rel2 {
+                  to: "emc.swallow.content";
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               rel2.offset: 0 60;
+            }
+         }
+      }
+      programs {
+         program { name: "close_mouse_in";
+            signal: "mouse,in";
+            source: "close";
+            action: STATE_SET "bigger" 0.0;
+            transition: LINEAR 0.15 CURRENT;
+            target: "close";
+         }
+         program { name: "close_mouse_out";
+            signal: "mouse,out";
+            source: "close";
+            action: STATE_SET "default" 0.0;
+            transition: LINEAR 0.15 CURRENT;
+            target: "close";
+         }
+         program { name: "close_mouse_click"; /* API */
+            signal: "mouse,down,1";
+            source: "close";
+            action: SIGNAL_EMIT "emc,dialog,close" "";
+         }
+         program { name: "show"; /* API */
+            signal: "emc,dialog,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.5;
+            target: "clipper";
+            after: "show_done";
+         }
+         program { name: "show_done"; /* API */
+            action: SIGNAL_EMIT "emc,dialog,show,done" "";
+         }
+         program { name: "hide"; /* API */
+            signal: "emc,dialog,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: DECELERATE 0.5;
+            target: "clipper";
+            after: "hide_done";
+         }
+         program { name: "hide_done"; /* API */
+            action: SIGNAL_EMIT "emc,dialog,hide,done" "";
+         }
+         program { name: "show_buttons"; /* API */
+            signal: "emc,dialog,buttons,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            target: "emc.box.buttons";
+         }
+         program { name: "hide_buttons"; /* API */
+            signal: "emc,dialog,buttons,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            target: "emc.box.buttons";
+         }
+         program { name: "set_info"; /* API */
+            signal: "emc,dialog,info,set";
+            source: "emc";
+            action: STATE_SET "info" 0.0;
+            target: "tagimage";
+         }
+         program { name: "set_warning"; /* API */
+            signal: "emc,dialog,warning,set";
+            source: "emc";
+            action: STATE_SET "warning" 0.0;
+            target: "tagimage";
+         }
+         program { name: "set_error"; /* API */
+            signal: "emc,dialog,error,set";
+            source: "emc";
+            action: STATE_SET "error" 0.0;
+            target: "tagimage";
+         }
+         program { name: "set_yesno"; /* API */
+            signal: "emc,dialog,yesno,set";
+            source: "emc";
+            action: STATE_SET "yesno" 0.0;
+            target: "tagimage";
+         }
+      }
+   }
+
 }
 

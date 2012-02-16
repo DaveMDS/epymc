@@ -6,7 +6,6 @@
          description { state: "default" 0; \
             image.normal: "icon_"NAME".png"; }}}}
 
-
 ICON("home")
 ICON("folder")
 ICON("close")

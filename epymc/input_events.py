@@ -43,7 +43,7 @@ VIEW_GRID
 import gui
 
 def DBG(msg):
-   #~ print('INPUT_EVENTS: ' + msg)
+   # print('INPUT_EVENTS: ' + msg)
    pass
 
 

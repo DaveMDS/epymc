@@ -85,6 +85,9 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def cb_mainmenu(self):
       """ Mainmenu clicked, build the root page """
+      #set backdrop image
+      bg = os.path.join(utils.base_dir_get(), 'modules', 'mame', 'mamebg.jpg')
+      gui.background_set(bg)
 
       # read favorite list from config (just the first time)
       if not MameModule._favorites:
@@ -513,7 +516,7 @@ class MameGame(object):
             done = True
       if done:
          self.dialog.delete()
-         EmcDialog(text = 'Game deleted', style = 'info')
+         EmcDialog(title = 'Game deleted', style = 'info')
          _instance._browser.refresh(recreate=True)
       else:
          EmcDialog(text = 'Can not delete game', style = 'error')

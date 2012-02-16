@@ -13,4 +13,7 @@ BackSpace                        BACK
 Esc                              EXIT
 Space or P                       TOGGLE_PAUSE
 F                                TOGGLE_FULLSCREEN
++ or KP_+                        VOLUME_UP
+- or KP_-                        VOLUME_DOWN
+M                                VOLUME_MUTE
 

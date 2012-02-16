@@ -79,3 +79,43 @@ All the icons in icons.edc must be implemented
       "volume,show" "emc"
       "volume,hide" "emc"
 
+
+### Dialog (panel) ###
+
+   * Group: "emc/dialog/panel"
+
+   * Required parts:
+      "emc.text.title" -> edje text
+      "emc.swallow.content" -> edje swallow
+      "emc.box.buttons" -> edje box
+
+   * Signals received from the application:
+      "emc,dialog,show"
+      "emc,dialog,hide"
+      "emc,dialog,title,show" "emc"
+      "emc,dialog,title,hide" "emc"
+      "emc,dialog,buttons,show" "emc"
+      "emc,dialog,buttons,hide" "emc"
+
+   * Signal that should/must be sent to the app
+      "emc,dialog,close" ""
+      "emc,dialog,show,done" ""
+      "emc,dialog,hide,done" ""
+
+
+### Dialog (minimal) ###
+
+   * Group: "emc/dialog/minimal"
+
+   * Required parts:
+      ...the same as panel dialog
+
+   * Signals received from the application:
+      ...all the ones from panel dialog plus:
+      "emc,dialog,info,set" ""
+      "emc,dialog,warning,set" ""
+      "emc,dialog,error,set" ""
+      "emc,dialog,yesno,set" ""
+
+   * Signal that should/must be sent to the app
+      ...the same as panel dialog

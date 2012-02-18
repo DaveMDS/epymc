@@ -249,7 +249,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          self._dialog.button_add('Poster', self._cb_panel_3)
          self._dialog.button_add('Fanart', self._cb_panel_4)
       self._dialog.button_add('Search Info', self._cb_panel_5)
-      self._dialog.button_add('Close', self._cb_panel_6)
       
       if self.__film_db.id_exists(url):
          print 'Found: ' + url
@@ -323,12 +322,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
          # put the list ia a dialog
          dialog = EmcDialog(title = 'Cast', content = li)
-         dialog.button_add('Close', self._cb_cast_close, dialog)
 
-   def _cb_cast_close(self, button, dialog):
-      # kill the dialog
-      dialog.delete()
-      del dialog
 
 ######## Choose poster
    def _cb_panel_3(self, button):
@@ -350,6 +344,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          li.horizontal = True
          li.style_set('image_list')
          li.focus_allow_set(False)
+
          count = 0 
          for (image_thumb, image_big) in zip(images_thumb, images_big):
             icon = EmcRemoteImage(li)
@@ -364,6 +359,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          title = '%d posters available' % (count)
          dialog = EmcDialog(title = title, content = li,
                             done_cb = self._cb_poster_ok)
+         li.callback_clicked_double_add((lambda l,i: self._cb_poster_ok(dialog)))
 
    def _cb_poster_ok(self, dialog):
       li = dialog.content_get()
@@ -385,7 +381,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                                        style = 'progress')
 
    def _cb_poster_progress(self, dest, tot, done):
-      self.__poster_dialog.progress_set(float(done) / float(tot))
+      if tot > 0: self.__poster_dialog.progress_set(float(done) / float(tot))
 
    def _cb_poster_done(self, dest, status):
       # kill the dialog
@@ -428,6 +424,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          title = '%d images available' % (count)
          dialog = EmcDialog(title = title, content = li,
                             done_cb = self._cb_backdrop_ok)
+         li.callback_clicked_double_add((lambda l,i: self._cb_backdrop_ok(dialog)))
 
    def _cb_backdrop_ok(self, dialog):
       li = dialog.content_get()
@@ -449,7 +446,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                                          style = 'progress')
 
    def _cb_backdrop_progress(self, dest, tot, done):
-      self.__backdrop_dialog.progress_set(float(done) / float(tot))
+      if tot > 0: self.__backdrop_dialog.progress_set(float(done) / float(tot))
 
    def _cb_backdrop_done(self, dest, status):
       # kill the dialog
@@ -477,9 +474,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.update_film_info(self.__current_url)
       # delete TMDB2 object
       del tmdb
-
-   def _cb_panel_6(self, button):
-      self.hide_film_info()
 
 
 ###### UTILS
@@ -524,8 +518,7 @@ class TMDB_WithGui(object):
          accept_cb = (lambda vkb, txt: self._do_movie_search_query(txt)))
 
    def _cb_downloads_progress(self, dest, tot, done):
-      print dest, tot, done
-      self.dialog.progress_set(float(done) / float(tot))
+      if tot > 0:self.dialog.progress_set(float(done) / float(tot))
 
    # Movie.search/
    def _do_movie_search_query(self, query):

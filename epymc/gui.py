@@ -269,7 +269,7 @@ class EmcDialog(edje.Edje):
    style can be 'panel' or 'minimal'
 
    you can also apply special style that perform specific task:
-      'info', 'error', 'warning', 'yesno', 'cancel'
+      'info', 'error', 'warning', 'yesno', 'cancel', 'progress'
    """
 
    special_styles = ['info', 'error', 'warning', 'yesno', 'cancel', 'progress']
@@ -278,7 +278,8 @@ class EmcDialog(edje.Edje):
    fman = None
    
    def __init__(self, title = None, text = None, content = None,
-                spinner = False, style = 'panel', done_cb = None):
+                spinner = False, style = 'panel',
+                done_cb = None, canc_cb = None):
       # load the right edje object
       if style == 'minimal' or style in EmcDialog.special_styles:
          group = 'emc/dialog/minimal'
@@ -296,6 +297,7 @@ class EmcDialog(edje.Edje):
       self._name = 'Dialog-' + str(EmcDialog.dialogs_counter)
       self._content = content
       self._done_cb = done_cb
+      self._canc_cb = canc_cb
       self._buttons = []
       self.fman = EmcFocusManager()
 
@@ -349,11 +351,12 @@ class EmcDialog(edje.Edje):
          self.button_add('No', (lambda btn: self.delete()))
          self.button_add('Yes', (lambda btn: self._done_cb(self)))
 
-      if style in ('cancel'):
-         if done_cb:
-            self.button_add('Cancel', (lambda btn: self._done_cb(self)))
-         else:
-            self.button_add('Cancel', (lambda btn: self.delete()))
+      # Do we want the cancel button? we have the red-round-close...
+      # if style in ('cancel'):
+         # if canc_cb:
+            # self.button_add('Cancel', (lambda btn: self._canc_cb(self)))
+         # else:
+            # self.button_add('Cancel', (lambda btn: self.delete()))
 
       input_events.listener_add(self._name, self._input_event_cb)
       
@@ -378,8 +381,8 @@ class EmcDialog(edje.Edje):
       del self
 
    def _close_pressed(self, a, s, d):
-      if self._done_cb:
-         self._done_cb(self)
+      if self._canc_cb:
+         self._canc_cb(self)
       else:
          self.delete()
 
@@ -453,8 +456,8 @@ class EmcDialog(edje.Edje):
    def _input_event_cb(self, event):
 
       if event in ['BACK', 'EXIT']:
-         if self._done_cb:
-            self._done_cb(self)
+         if self._canc_cb:
+            self._canc_cb(self)
          else:
             self.delete()
          return input_events.EVENT_BLOCK
@@ -718,7 +721,6 @@ class EmcSourceSelector(EmcDialog):
       EmcDialog.__init__(self, title, content=self._glist, style='panel')
       self.button_add('select', selected_cb = self._cb_done_selected)
       btn = self.button_add('browse', selected_cb = self._cb_browse_selected)
-      self.button_add('close', (lambda btn: self.delete()))
       self.fman.focused_set(btn)
 
       self.populate(os.getenv('HOME'))

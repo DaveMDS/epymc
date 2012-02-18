@@ -423,8 +423,6 @@ class MameGame(object):
       if self.file_name_get():
          self.dialog.button_add('Delete', (lambda btn: self.delete_zip()))
 
-      self.dialog.button_add('Close', (lambda btn: self.dialog.delete()))
-
    def _cb_favorite_button(self, btn):
       if self.gid in MameModule._favorites:
          btn.icon_set(gui.load_icon('icon/star_off'))

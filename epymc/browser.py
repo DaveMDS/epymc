@@ -214,14 +214,13 @@ class EmcBrowser(object):
 
    def back(self):
       """ TODO Function doc """
-      
       # discard current page
       self.pages.pop()
 
       # no more page to go back, hide view and return to main menu
-      if len(self.pages) <= 0:
+      if len(self.pages) == 0:
          self.hide()
-         self.current_view.clear()
+         # self.current_view.clear() # this fix the double click-in-back segfault :)
          mainmenu.show()
          return
 
@@ -350,6 +349,7 @@ class EmcBrowser(object):
 
    def _poster_get(self, url):
       """ TODO Function doc """
+      if not self.pages: return None
       if self.pages[-1]['poster_get_cb']:
          func = self.pages[-1]['poster_get_cb']
       else:
@@ -358,6 +358,7 @@ class EmcBrowser(object):
 
    def _fanart_get(self, url):
       """ TODO Function doc """
+      if not self.pages: return None
       if self.pages[-1]['fanart_get_cb']:
          func = self.pages[-1]['fanart_get_cb']
       else:
@@ -366,6 +367,7 @@ class EmcBrowser(object):
 
    def _info_get(self, url):
       """ TODO Function doc """
+      if not self.pages: return None
       if self.pages[-1]['info_get_cb']:
          func = self.pages[-1]['info_get_cb']
       else:

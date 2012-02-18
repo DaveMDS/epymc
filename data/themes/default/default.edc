@@ -845,7 +845,7 @@ collections {
          part { name: "clipper";
             type: RECT;
             description { state: "default" 0.0;
-               color: 0 0 0 0;
+               color: 255 255 255 0;
             }
             description { state: "visible" 0.0;
                color: 255 255 255 255;
@@ -1041,7 +1041,7 @@ collections {
          part { name: "clipper";
             type: RECT;
             description { state: "default" 0.0;
-               color: 0 0 0 0;
+               color: 255 255 255 0;
             }
             description { state: "visible" 0.0;
                color: 255 255 255 255;
@@ -1179,7 +1179,7 @@ collections {
                box {
                   layout: "horizontal";
                   padding: 0 4;
-                  align: 0.2 0.5;
+                  align: 0.5 0.5;
                   min: 0 1; // this doesn't work...it should
                }
                rel1 {

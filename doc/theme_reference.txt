@@ -108,8 +108,9 @@ All the icons in icons.edc must be implemented
    * Group: "emc/dialog/minimal"
 
    * Required parts:
-      ...the same as panel dialog
-
+      ...the same as panel dialogplus:
+      "emc.dialog.progress" -> elm_progressbar
+         
    * Signals received from the application:
       ...all the ones from panel dialog plus:
       "emc,dialog,info,set" ""

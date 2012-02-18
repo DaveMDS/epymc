@@ -227,19 +227,10 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       box.pack_end(sentry)
 
       dialog = EmcDialog(style = 'panel', content = box)
-      dialog.button_add('Play', self._cb_panel_1)
-      if self.__film_db.id_exists(url):
-         dialog.button_add('Cast', self._cb_panel_2)
-         dialog.button_add('Poster', self._cb_panel_3)
-         dialog.button_add('Fanart', self._cb_panel_4)
-      dialog.button_add('Search Info', self._cb_panel_5)
-      dialog.button_add('Close', self._cb_panel_6)
 
       dialog.data['o_image'] = image
       dialog.data['o_sentry'] = sentry
       self._dialog = dialog
-
-      dialog.activate()
 
       self.update_film_info(url)
 
@@ -251,11 +242,18 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       o_image = self._dialog.data['o_image']
       o_sentry = self._dialog.data['o_sentry']
 
+      self._dialog.buttons_clear()
+      self._dialog.button_add('Play', self._cb_panel_1)
+      if self.__film_db.id_exists(url):
+         self._dialog.button_add('Cast', self._cb_panel_2)
+         self._dialog.button_add('Poster', self._cb_panel_3)
+         self._dialog.button_add('Fanart', self._cb_panel_4)
+      self._dialog.button_add('Search Info', self._cb_panel_5)
+      self._dialog.button_add('Close', self._cb_panel_6)
+      
       if self.__film_db.id_exists(url):
          print 'Found: ' + url
          e = self.__film_db.get_data(url)
-         #~ import pprint
-         #~ pprint.pprint(e)
 
          # update text info
          self._dialog.title_set(e['name'])
@@ -281,9 +279,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
             o_image.file_set('')
       else:
          # TODO print also file size, video len, codecs, streams found, file metadata, etc..
-         msg = "Media:<br>" + url + "<br><br>" + \
-               "No info stored for this media<br>" + \
-               "Try the GetInfo button..."
+         msg = 'Media:<br>' + url + '<br><br>' + \
+               'No info stored for this media<br>' + \
+               'Try the Search info button...'
          o_sentry.entry_set(msg)
          # TODO make thumbnail
          o_image.file_set('')
@@ -326,7 +324,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # put the list ia a dialog
          dialog = EmcDialog(title = 'Cast', content = li)
          dialog.button_add('Close', self._cb_cast_close, dialog)
-         dialog.activate()
 
    def _cb_cast_close(self, button, dialog):
       # kill the dialog
@@ -353,18 +350,20 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          li.horizontal = True
          li.style_set('image_list')
          li.focus_allow_set(False)
+         count = 0 
          for (image_thumb, image_big) in zip(images_thumb, images_big):
             icon = EmcRemoteImage(li)
             icon.url_set(image_thumb['url'])
             li.item_append('', icon, None, None, (image_big['url'], film_info['id']))
+            count += 1
 
          li.items_get()[0].selected_set(1)
          li.show()
          li.go()
 
-         dialog = EmcDialog(title = 'Choose a poster', content = li,
+         title = '%d posters available' % (count)
+         dialog = EmcDialog(title = title, content = li,
                             done_cb = self._cb_poster_ok)
-         dialog.activate()
 
    def _cb_poster_ok(self, dialog):
       li = dialog.content_get()
@@ -374,15 +373,19 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.__poster_dialog = dialog
       (url, id) = item.data_get()[0][0]
       dest = get_poster_filename(id)
-      utils.download_url_async(url, dest, complete_cb = self._cb_poster_done)
+      utils.download_url_async(url, dest, complete_cb = self._cb_poster_done,
+                                          progress_cb = self._cb_poster_progress)
 
       # kill the dialog
       self.__poster_dialog.delete()
       del self.__poster_dialog
 
-      # make a spinner dialog
+      # make a progress dialog
       self.__poster_dialog = EmcDialog(title = "Downloading Poster",
-                                         spinner = True, style = 'cancel')
+                                       style = 'progress')
+
+   def _cb_poster_progress(self, dest, tot, done):
+      self.__poster_dialog.progress_set(float(done) / float(tot))
 
    def _cb_poster_done(self, dest, status):
       # kill the dialog
@@ -411,18 +414,20 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          li.horizontal = True
          li.focus_allow_set(False)
          li.style_set('image_list')
+         count = 0
          for (image_thumb, image_big) in zip(images_thumb, images_big):
             icon = EmcRemoteImage(li)
             icon.url_set(image_thumb['url'])
             li.item_append('', icon, None, None, (image_big['url'], film_info['id']))
+            count += 1
 
          li.items_get()[0].selected_set(1)
          li.show()
          li.go()
 
-         dialog = EmcDialog(title = 'Choose a Fanart', content = li,
+         title = '%d images available' % (count)
+         dialog = EmcDialog(title = title, content = li,
                             done_cb = self._cb_backdrop_ok)
-         dialog.activate()
 
    def _cb_backdrop_ok(self, dialog):
       li = dialog.content_get()
@@ -432,8 +437,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.__backdrop_dialog = dialog
       (url, id) = item.data_get()[0][0]
       dest = get_backdrop_filename(id)
-      utils.download_url_async(url, dest,
-                               complete_cb = self._cb_backdrop_done)
+      utils.download_url_async(url, dest, complete_cb = self._cb_backdrop_done,
+                                          progress_cb = self._cb_backdrop_progress)
 
       # kill the dialog
       self.__backdrop_dialog.delete()
@@ -441,7 +446,10 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       # make a spinner dialog
       self.__backdrop_dialog = EmcDialog(title = "Downloading Fanart",
-                                         spinner = True, style = 'cancel')
+                                         style = 'progress')
+
+   def _cb_backdrop_progress(self, dest, tot, done):
+      self.__backdrop_dialog.progress_set(float(done) / float(tot))
 
    def _cb_backdrop_done(self, dest, status):
       # kill the dialog
@@ -502,9 +510,8 @@ class TMDB_WithGui(object):
    def movie_search(self, query, complete_cb = None):
       DBG('TMDB Film search: ' + query)
       self.complete_cb = complete_cb
-      self.dialog = EmcDialog(title = 'themoviedb.org',
-                              text = '<b>Searching for:</>',
-                              spinner = True, style = 'cancel')
+      self.dialog = EmcDialog(title = 'themoviedb.org', style = 'progress',
+                              text = '<b>Searching for:</>')
       self.dialog.button_add('Change name', self._change_name_cb, query)
       self._do_movie_search_query(query)
 
@@ -516,12 +523,17 @@ class TMDB_WithGui(object):
       EmcVKeyboard(text = query,
          accept_cb = (lambda vkb, txt: self._do_movie_search_query(txt)))
 
+   def _cb_downloads_progress(self, dest, tot, done):
+      print dest, tot, done
+      self.dialog.progress_set(float(done) / float(tot))
+
    # Movie.search/
    def _do_movie_search_query(self, query):
       url = '%s/Movie.search/%s/json/%s/%s' % \
             (self.server, self.lang, self.key, query)
       self.dwl_handler = utils.download_url_async(url, 'tmp',
-                              complete_cb = self._movie_search_done_cb)
+                              complete_cb = self._movie_search_done_cb,
+                              progress_cb = self._cb_downloads_progress)
       self.dialog.text_set('<b>Searching for:</><br>' + query + '<br>')
 
    def _movie_search_done_cb(self, dest, status):
@@ -538,7 +550,6 @@ class TMDB_WithGui(object):
 
       # no result found :(
       if len(data) == 0 or data[0] == 'Nothing found.':
-         self.dialog.spinner_stop()
          self.dialog.text_append('<br>nothing found, please try with a better name')#TODO explain better the format
 
       # 1 result found, yhea! get the full movie data
@@ -570,16 +581,13 @@ class TMDB_WithGui(object):
          li.show()
          li.go()
 
-         # TODO add the title in theme
-         title = 'Found %d results, which one?'
+         title = 'Found %d results, which one?' % (len(data))
          dialog2 = EmcDialog(title = title, content = li)
          dialog2.button_add('Ok', self._cb_list_ok, dialog2)
          dialog2.button_add('Cancel', self._cb_list_cancel, dialog2)
-         dialog2.activate()
 
    def _cb_list_cancel(self, button, dialog2):
       dialog2.delete()
-      self.dialog.spinner_stop()
       self.dialog.delete()
 
    def _cb_list_ok(self, button, dialog2):
@@ -603,7 +611,8 @@ class TMDB_WithGui(object):
       url = '%s/Movie.getInfo/%s/json/%s/%s' % \
              (self.server, self.lang, self.key, tid)
       self.dwl_handler = utils.download_url_async(url, "tmp",
-                           complete_cb = self._movie_getinfo_done_cb)
+                           complete_cb = self._movie_getinfo_done_cb,
+                           progress_cb = self._cb_downloads_progress)
 
    def _movie_getinfo_done_cb(self, dest, status):
       self.dwl_handler = None
@@ -630,7 +639,8 @@ class TMDB_WithGui(object):
          if image['image']['size'] == 'mid': # TODO make default size configurable
             dest = get_poster_filename(self.movie_info['id'])
             self.dwl_handler = utils.download_url_async(image['image']['url'],
-                              dest, complete_cb = self._movie_poster_done_cb)
+                              dest, complete_cb = self._movie_poster_done_cb,
+                              progress_cb = self._cb_downloads_progress)
             return
 
       # if no poster found go to next step
@@ -645,7 +655,8 @@ class TMDB_WithGui(object):
          if image['image']['size'] == 'original': # TODO make default size configurable
             dest = get_backdrop_filename(self.movie_info['id'])
             self.dwl_handler = utils.download_url_async(image['image']['url'],
-                              dest, complete_cb = self._movie_backdrop_done_cb)
+                              dest, complete_cb = self._movie_backdrop_done_cb,
+                              progress_cb = self._cb_downloads_progress)
             return
 
       # if no backdrop found go to next step

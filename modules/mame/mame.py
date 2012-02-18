@@ -424,7 +424,6 @@ class MameGame(object):
          self.dialog.button_add('Delete', (lambda btn: self.delete_zip()))
 
       self.dialog.button_add('Close', (lambda btn: self.dialog.delete()))
-      self.dialog.activate()
 
    def _cb_favorite_button(self, btn):
       if self.gid in MameModule._favorites:
@@ -497,7 +496,6 @@ class MameGame(object):
 
       dia = EmcDialog(title = self.name, content = se, style = 'default')
       dia.button_add('Close', lambda btn: dia.delete())
-      dia.activate()
 
 ## delete game stuff
    def delete_zip(self):
@@ -539,9 +537,8 @@ class MameGame(object):
       # create the new download dialog
       self.dialog.delete()
       self.dialog = EmcDialog(title = 'Game download', spinner = True,
-                              text = '', style= 'minimal_vertical')
+                              text = '', style= 'cancel')
       self.dialog.button_add('Close', lambda btn: self.dialog.delete()) # TODO abort download well if needed
-      self.dialog.activate()
 
       # Try to download the game from various roms site
       sources = []

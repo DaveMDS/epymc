@@ -272,7 +272,7 @@ class EmcDialog(edje.Edje):
       'info', 'error', 'warning', 'yesno', 'cancel'
    """
 
-   special_styles = ['info', 'error', 'warning', 'yesno', 'cancel']
+   special_styles = ['info', 'error', 'warning', 'yesno', 'cancel', 'progress']
    dialogs_counter = 0
 
    fman = None
@@ -285,8 +285,7 @@ class EmcDialog(edje.Edje):
       else:
          group = 'emc/dialog/panel'
       edje.Edje.__init__(self, gui.win.evas, file = theme_file, group = group)
-      self.signal_callback_add('emc,dialog,close', '',
-                               (lambda A,s,d: self.delete()))
+      self.signal_callback_add('emc,dialog,close', '', self._close_pressed)
       self.signal_callback_add('emc,dialog,hide,done', '',
                                (lambda a,S,d: self._delete_real()))
       self.signal_callback_add('emc,dialog,show,done', '',
@@ -378,6 +377,12 @@ class EmcDialog(edje.Edje):
       edje.Edje.delete(self)
       del self
 
+   def _close_pressed(self, a, s, d):
+      if self._done_cb:
+         self._done_cb(self)
+      else:
+         self.delete()
+
    def content_get(self):
       return self._content
 
@@ -396,6 +401,14 @@ class EmcDialog(edje.Edje):
       b.show()
       self._buttons.append(b)
       return b
+
+   def buttons_clear(self):
+      self.fman.delete()
+      self.fman = EmcFocusManager()
+      for b in self._buttons:
+         b.delete()
+      del self._buttons
+      self._buttons = []
 
    def title_set(self, text):
       if text is not None:
@@ -424,6 +437,10 @@ class EmcDialog(edje.Edje):
       self._spinner.pulse(False)
       self._spinner.hide()
 
+   def progress_set(self, val):
+      self.part_external_object_get('emc.dialog.progress').value_set(val)
+      
+
    def _cb_buttons(self, button):
       selected_cb = button.data['cb']
       cb_data = button.data['cb_data']
@@ -436,7 +453,10 @@ class EmcDialog(edje.Edje):
    def _input_event_cb(self, event):
 
       if event in ['BACK', 'EXIT']:
-         self.delete()
+         if self._done_cb:
+            self._done_cb(self)
+         else:
+            self.delete()
          return input_events.EVENT_BLOCK
 
       # if content is elm List or Genlist then automanage the events

@@ -127,7 +127,7 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
 
       # on errors delete the downloaded file
       if status != 200 and os.path.exists(dest):
-         DBG("download error")
+         DBG("download error, HTTP code: " + str(status))
          os.remove(dest)
 
       # call the user complete_cb if available

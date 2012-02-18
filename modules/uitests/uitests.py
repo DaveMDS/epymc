@@ -93,6 +93,7 @@ class UiTestsModule(EmcModule):
       self._browser.item_add('uitests://dlg-error', 'Dialog - Error')
       self._browser.item_add('uitests://dlg-yesno', 'Dialog - YesNo')
       self._browser.item_add('uitests://dlg-cancel', 'Dialog - Cancel')
+      self._browser.item_add('uitests://dlg-progress', 'Dialog - Progress')
       self._browser.item_add('uitests://dlg-panel1', 'Dialog - Panel full')
       self._browser.item_add('uitests://dlg-panel2', 'Dialog - Panel no buttons')
       self._browser.item_add('uitests://dlg-panel3', 'Dialog - Panel no title')
@@ -154,6 +155,27 @@ class UiTestsModule(EmcModule):
          text = 'This is an <br><br><b>Cancel operation</><br>dialog<br>'
          EmcDialog(title = 'Dialog - Cancel', text = text, style = 'cancel',
                    spinner = True)
+
+      # Dialog - Progress
+      elif item_url == 'uitests://dlg-progress':
+         def _done_cb(dialog):
+            t.delete()
+            d.delete()
+
+         text = 'This is a <br><br><b>Progress operation</><br>dialog<br>'
+         d = EmcDialog(title = 'Dialog - Progress', text = text,
+                         style = 'progress', done_cb = _done_cb)
+         self._progress = 0.0
+         d.progress_set(self._progress)
+
+         def _progress_timer():
+            d.progress_set(self._progress)
+            self._progress += 0.01
+            if self._progress > 1: self._progress = 0;
+            return True # renew the callback
+         t = ecore.Timer(0.2, _progress_timer)
+
+      
 
       # Dialog - Panel full
       elif item_url == 'uitests://dlg-panel1':

@@ -158,24 +158,22 @@ class UiTestsModule(EmcModule):
 
       # Dialog - Progress
       elif item_url == 'uitests://dlg-progress':
-         def _done_cb(dialog):
+         def _canc_cb(dialog):
             t.delete()
             d.delete()
-
-         text = 'This is a <br><br><b>Progress operation</><br>dialog<br>'
-         d = EmcDialog(title = 'Dialog - Progress', text = text,
-                         style = 'progress', done_cb = _done_cb)
-         self._progress = 0.0
-         d.progress_set(self._progress)
 
          def _progress_timer():
             d.progress_set(self._progress)
             self._progress += 0.01
             if self._progress > 1: self._progress = 0;
             return True # renew the callback
-         t = ecore.Timer(0.2, _progress_timer)
 
-      
+         text = 'This is a <br><br><b>Progress operation</><br>dialog<br>'
+         d = EmcDialog(title = 'Dialog - Progress', text = text,
+                         style = 'progress', canc_cb = _canc_cb)
+         self._progress = 0.0
+         d.progress_set(self._progress)
+         t = ecore.Timer(0.2, _progress_timer)
 
       # Dialog - Panel full
       elif item_url == 'uitests://dlg-panel1':

@@ -47,9 +47,13 @@ a {
 -----------------------------*/
 
 h1 {
-   background-color:black;
    padding-top: 0.6em;
    padding-bottom: 0.3em;
+}
+
+.header {
+  background-color:black;
+  width: 100%;
 }
 
 /*-----------------------------

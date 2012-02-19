@@ -49,6 +49,8 @@ _mapping = { 'Up': 'UP',
              'f': 'TOGGLE_FULLSCREEN',
              'F6': 'BIGGER',
              'F5': 'SMALLER',
+             'F1': 'VIEW_LIST',
+             'F2': 'VIEW_GRID',
            }
 
 class KeyboardModule(EmcModule):

@@ -74,7 +74,7 @@ def init():
 
    # main layout (main theme)
    layout = elementary.Layout(win)
-   layout.file_set(theme_file, "epymc_main_layout")
+   layout.file_set(theme_file, "emc/main/layout")
    layout.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
    win.resize_object_add(layout)
    layout.show()
@@ -89,7 +89,7 @@ def init():
    bt.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
    bt.icon_set(load_icon('icon/list'))
    bt.callback_clicked_add(_cb_btn_change_view, "VIEW_LIST")
-   layout.edje_get().part_box_append('topbar/box', bt)
+   layout.edje_get().part_box_append('topbar.box', bt)
    bt.show()
 
    bt = elementary.Button(win)
@@ -97,7 +97,7 @@ def init():
    bt.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
    bt.icon_set(load_icon('icon/grid'))
    bt.callback_clicked_add(_cb_btn_change_view, "VIEW_GRID")
-   layout.edje_get().part_box_append('topbar/box', bt)
+   layout.edje_get().part_box_append('topbar.box', bt)
    bt.show()
 
    input_events.listener_add('gui', input_event_cb)
@@ -225,7 +225,7 @@ def background_set(image):
    if not backdrop_im:
       backdrop_im = elementary.Image(gui.win)
       backdrop_im.fill_outside_set(True)
-      swallow_set("backdrop/1", backdrop_im)
+      swallow_set("bg.swallow.backdrop1", backdrop_im)
 
    backdrop_im.file_set(image)
 

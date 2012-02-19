@@ -172,7 +172,7 @@ class EmcBrowser(object):
 
       # set topbar title
       full = '> ' + ''.join([page['title'] + ' > ' for page in self.pages])
-      gui.text_set("topbar/title", full[0:-3])
+      gui.text_set("topbar.title", full[0:-3])
 
       # same style for the 2 pages, ask the view to perform the correct animation
       if (view == self.current_view):
@@ -389,7 +389,7 @@ class ViewList(object):
       self.timer = self.timer2 = None
 
       # EXTERNAL Genlist1
-      self.gl1 = gui.part_get('browser/list/genlist1')
+      self.gl1 = gui.part_get('browser.list.genlist1')
       self.gl1.style_set("browser")
       self.gl1.homogeneous_set(True)
       self.gl1.always_select_mode_set(True)
@@ -398,7 +398,7 @@ class ViewList(object):
       self.current_list = self.gl1
 
       # EXTERNAL Genlist2
-      self.gl2 = gui.part_get('browser/list/genlist2')
+      self.gl2 = gui.part_get('browser.list.genlist2')
       self.gl2.style_set("browser")
       self.gl2.homogeneous_set(True)
       self.gl2.always_select_mode_set(True)
@@ -413,7 +413,7 @@ class ViewList(object):
 
       # RemoteImage (poster)
       self.__im = gui.EmcRemoteImage(gui.win)
-      gui.swallow_set('browser/list/poster', self.__im)
+      gui.swallow_set('browser.list.poster', self.__im)
 
    def page_show(self, title, dir):
       """
@@ -549,7 +549,7 @@ class ViewList(object):
 
       # Fill the textblock with item info info
       text = em_itc.info_get(url, browser, user_data)
-      gui.text_set('browser/list/info', text or "")
+      gui.text_set('browser.list.info', text or "")
 
       return False # don't repeat the timer
 
@@ -586,12 +586,12 @@ class ViewGrid(object):
       gg.align_set(0.5, 0.0)
       gg.callback_selected_add(self.gg_higlight)
       gg.callback_clicked_add(self.gg_selected)
-      gui.swallow_set("browser/grid/gengrid", gg)
+      gui.swallow_set('browser.grid.gengrid', gg)
       self.gg = gg
 
    def page_show(self, title, dir):
       self.gg.clear()
-      gui.text_set("browser/grid/title", title)
+      gui.text_set("browser.grid.title", title)
 
    def item_add(self, item_data):
       it = self.gg.item_append(self.itc, item_data)

@@ -72,7 +72,7 @@ collections {
    #include "elm_extension.edc"
    #include "icons.edc"
    
-   group { name: "epymc_main_layout"; /* API */
+   group { name: "emc/main/layout"; /* API */
 
 /// clock embryo script
       script {
@@ -89,35 +89,33 @@ collections {
             else if (minute < 10)         { snprintf(buf, 10, "%i:0%i", hour, minute); }
             else if (hour < 10)           { snprintf(buf, 10, "0%i:%i", hour, minute); }
             else                          { snprintf(buf, 10, "%i:%i", hour, minute); }
-            set_text(PART:"topbar/clock", buf);
+            set_text(PART:"topbar.clock", buf);
          }
       }
 
       parts {
 
 /// main background
-         part { name: "main_bg";
+         part { name: "bg.bg";
             type: IMAGE;
             description { state: "default" 0.0;
                min: 1280 720;
-               image {
-                  normal: "background.jpg";
-               }
+               image.normal: "background.jpg";
             }
          }
-         part { name: "backdrop/1"; /* API */
+         part { name: "bg.swallow.backdrop1"; /* API */
             type: SWALLOW;
             description { state: "default" 0.0;
             }
          }
-         part { name: "backdrop/2"; /* API _unused_ */
+         part { name: "bg.swallow.backdrop2"; /* API _unused_ */
             type: SWALLOW;
             description { state: "default" 0.0;
             }
          }
 
 /// browser view: list
-         part { name: "browser/list/clip";
+         part { name: "browser.list.clip";
             type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 0;
@@ -128,9 +126,9 @@ collections {
                visible: 1;
             }
          }
-         part { name: "browser/list/list_frame";
+         part { name: "browser.list.list_frame";
             type: IMAGE;
-            clip_to: "browser/list/clip";
+            clip_to: "browser.list.clip";
             description { state: "default" 0.0;
                rel1.offset: 10 50;
                rel2.relative: 0.5 1.0;
@@ -139,17 +137,17 @@ collections {
                image.border: 0 0 92 78;
             }
          }
-         part { name: "browser/list/list_clip";
+         part { name: "browser.list.list_clip";
             type: RECT;
             description { state: "default" 0.0;
                visible: 0;
                color: 255 255 255 0;
                rel1 {
-                  to: "browser/list/list_frame";
+                  to: "browser.list.list_frame";
                   offset: 14 20;
                }
                rel2 {
-                  to: "browser/list/list_frame";
+                  to: "browser.list.list_frame";
                   offset: -17 -75;
                }
             }
@@ -159,13 +157,13 @@ collections {
                visible: 1;
             }
          }
-         part { name: "browser/list/genlist1"; /* API */
+         part { name: "browser.list.genlist1"; /* API */
             type: EXTERNAL;
             source: "elm/genlist";
-            clip_to: "browser/list/list_clip";
+            clip_to: "browser.list.list_clip";
             description { state: "default" 0.0;
-               rel1.to: "browser/list/list_clip";
-               rel2.to: "browser/list/list_clip";
+               rel1.to: "browser.list.list_clip";
+               rel2.to: "browser.list.list_clip";
             }
             description { state: "center" 0.0;
                inherit: "default" 0.0;
@@ -181,17 +179,17 @@ collections {
                rel2.relative: 2.0 1.0;
             }
          }
-         part { name: "browser/list/genlist2"; /* API */
+         part { name: "browser.list.genlist2"; /* API */
             type: EXTERNAL;
             source: "elm/genlist";
-            clip_to: "browser/list/list_clip";
+            clip_to: "browser.list.list_clip";
             description { state: "default" 0.0;
                rel1 {
-                  to: "browser/list/genlist1";
+                  to: "browser.list.genlist1";
                   relative: 1.0 0.0;
                }
                rel2 {
-                  to: "browser/list/genlist1";
+                  to: "browser.list.genlist1";
                   relative: 2.0 1.0;
                }
             }
@@ -200,29 +198,29 @@ collections {
             }
             description { state: "on_the_left" 0.0;
                rel1 {
-                  to: "browser/list/genlist1";
+                  to: "browser.list.genlist1";
                   relative: -1.0 0.0;
                }
                rel2 {
-                  to: "browser/list/genlist1";
+                  to: "browser.list.genlist1";
                   relative: 0.0 1.0;
                }
             }
          }
-         part { name: "browser/list/total"; /* API */
+         part { name: "browser.list.total"; /* API */
             type: TEXT;
-            clip_to: "browser/list/clip";
+            clip_to: "browser.list.clip";
             effect: SHADOW;
             description { state: "default" 0.0;
                color: FONT_COLOR;
                color3: 0 0 0 255;
                rel1 {
-                  to: "browser/list/list_frame";
+                  to: "browser.list.list_frame";
                   relative: 1.0 1.0;
                   offset: -185 -70;
                }
                rel2 {
-                  to: "browser/list/list_frame";
+                  to: "browser.list.list_frame";
                   relative: 1.0 1.0;
                   offset: -27 -38;
                }
@@ -233,9 +231,9 @@ collections {
                }
             }
          }
-         part { name: "browser/list/poster"; /* API */
+         part { name: "browser.list.poster"; /* API */
             type: SWALLOW;
-            clip_to: "browser/list/clip";
+            clip_to: "browser.list.clip";
             description { state: "default" 0.0;
                rel1 {
                   relative: 0.5 0.0;
@@ -247,25 +245,25 @@ collections {
                }
             }
          }
-         part { name: "browser/list/info_bg";
+         part { name: "browser.list.info_bg";
             type: IMAGE;
-            clip_to: "browser/list/clip";
+            clip_to: "browser.list.clip";
             description { state: "default" 0.0;
                image.normal: "frame2.png";
                image.border: 8 8 8 8;
                rel1 {
-                  to: "browser/list/info";
+                  to: "browser.list.info";
                   offset: -20 -15;
                }
                rel2 {
-                  to: "browser/list/info";
+                  to: "browser.list.info";
                   offset: 8 8;
                }
             }
          }
-         part { name: "browser/list/info"; /* API */
+         part { name: "browser.list.info"; /* API */
             type: TEXTBLOCK;
-            clip_to: "browser/list/clip";
+            clip_to: "browser.list.clip";
             multiline: 1;
             description { state: "default" 0.0;
                rel1 {
@@ -283,17 +281,17 @@ collections {
          }
 
 /// browser view: grid
-         part { name: "browser/grid/gengrid"; /* API */
+         part { name: "browser.grid.gengrid"; /* API */
             type: SWALLOW;
-            clip_to: "browser/grid/clip";
+            clip_to: "browser.grid.clip";
             description { state: "default" 0.0;
                color: 255 255 255 100;
                rel1.offset: 0 100;
             }
          }
-         part { name: "browser/grid/title"; /* API */
+         part { name: "browser.grid.title"; /* API */
             type: TEXT;
-            clip_to: "browser/grid/clip";
+            clip_to: "browser.grid.clip";
             effect: FAR_SOFT_SHADOW;
             description { state: "default" 0.0;
                color: 200 200 200 255;
@@ -307,7 +305,7 @@ collections {
                }
             }
          }
-         part { name: "browser/grid/clip";
+         part { name: "browser.grid.clip";
             type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 0;
@@ -320,7 +318,7 @@ collections {
          }
 
 /// browser top bar
-         part { name: "topbar/clip";
+         part { name: "topbar.clip";
             type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 255;
@@ -335,27 +333,27 @@ collections {
                }
             }
          }
-         part { name: "topbar/bg";
+         part { name: "topbar.bg";
             type: IMAGE;
-            clip_to: "topbar/clip";
+            clip_to: "topbar.clip";
             description { state: "default" 0.0;
-               rel1.to: "topbar/clip";
-               rel2.to: "topbar/clip";
+               rel1.to: "topbar.clip";
+               rel2.to: "topbar.clip";
                image.normal: "header.png";
                image.border: 40 40 0 40;
             }
          }
-         part { name: "topbar/home_icon";
+         part { name: "topbar.home_icon";
             type: IMAGE;
-            clip_to: "topbar/clip";
+            clip_to: "topbar.clip";
             description { state: "default" 0.0;
                color: 255 255 255 200;
                rel1 {
-                  to: "topbar/clip";
+                  to: "topbar.clip";
                   offset: 20 10;
                }
                rel2 {
-                  to: "topbar/clip";
+                  to: "topbar.clip";
                   relative: 0.0 1.0;
                   offset: 55 -40;
                }
@@ -366,17 +364,17 @@ collections {
                
             }
          }
-         part { name: "topbar/title"; /* API */
+         part { name: "topbar.title"; /* API */
             type: TEXT;
-            clip_to: "topbar/clip";
+            clip_to: "topbar.clip";
             description { state: "default" 0.0;
                color: FONT_COLOR;
                rel1 {
-                  to: "topbar/clip";
+                  to: "topbar.clip";
                   offset: 60 0;
                }
                rel2 {
-                  to: "topbar/clip";
+                  to: "topbar.clip";
                   relative: 0.7 1.0;
                   offset: -1 -30;
                }
@@ -388,17 +386,17 @@ collections {
                }
             }
          }
-         part { name: "topbar/box"; /* API */
+         part { name: "topbar.box"; /* API */
             type: BOX;
             mouse_events: 1;
             repeat_events: 1;
             description { state: "default" 0.0;
                rel1 {
-                  to: "topbar/title";
+                  to: "topbar.title";
                   relative: 1.0 0.0;
                }
                rel2 {
-                  to: "topbar/clock";
+                  to: "topbar.clock";
                   relative: 0.0 1.0;
                }
                box {
@@ -406,18 +404,18 @@ collections {
                 }
             }
          }
-         part { name: "topbar/clock";
+         part { name: "topbar.clock";
             type: TEXT;
-            clip_to: "topbar/clip";
+            clip_to: "topbar.clip";
             description { state: "default" 0.0;
                color: FONT_COLOR;
                rel1 {
-                  to: "topbar/clip";
+                  to: "topbar.clip";
                   relative: 1.0 0.0;
                   offset: -120 0;
                }
                rel2 {
-                  to: "topbar/clip";
+                  to: "topbar.clip";
                   offset: -45 -30;
                }
                text {
@@ -430,7 +428,7 @@ collections {
          }
 
 /// mainmenu
-         part { name: "mainmenu/list"; /* API */
+         part { name: "mainmenu.list"; /* API */
             type: EXTERNAL;
             source: "elm/list";
             description { state: "default" 0.0;
@@ -464,21 +462,21 @@ collections {
          }
 
 /// videoplayer
-         part { name: "videoplayer/bg";
+         part { name: "videoplayer.bg";
             type: RECT;
             mouse_events: 0;
-            clip_to: "videoplayer/clip";
+            clip_to: "videoplayer.clip";
             description { state: "default" 0.0;
                color: 0 0 0 255;
             }
          }
-         part { name: "videoplayer/video"; /* API */
+         part { name: "videoplayer.video"; /* API */
             type: SWALLOW;
-            clip_to: "videoplayer/clip";
+            clip_to: "videoplayer.clip";
             description { state: "default" 0.0;
             }
          }
-         part { name: "videoplayer/clip";
+         part { name: "videoplayer.clip";
             type: RECT;
             mouse_events: 0;
             description { state: "default" 0.0;
@@ -490,10 +488,10 @@ collections {
                visible: 1;
             }
          }
-         part { name: "videoplayer/controls/bg";
+         part { name: "videoplayer.controls.bg";
             type: IMAGE;
             mouse_events: 0;
-            clip_to: "videoplayer/clip";
+            clip_to: "videoplayer.clip";
             description { state: "default" 0.0;
                color: 255 255 255 255;
                rel1.relative: 0.0 1.0;
@@ -508,13 +506,13 @@ collections {
                rel2.offset: 0.0 0.0;
             }
          }
-         part { name: "videoplayer/controls/btn_box"; /* API   todoc*/ 
+         part { name: "videoplayer.controls.btn_box"; /* API   todoc*/ 
             type: BOX;
             description { state: "default" 0.0;
-               rel1.to: "videoplayer/controls/bg";
+               rel1.to: "videoplayer.controls.bg";
                rel1.offset: 0 15;
                rel2.relative: 1.0 0.0;
-               rel2.to: "videoplayer/controls/bg";
+               rel2.to: "videoplayer.controls.bg";
                rel2.offset: 0 50;
                box {
                   layout: "horizontal";
@@ -522,20 +520,20 @@ collections {
                }
             }
          }
-         part { name: "videoplayer/controls/length"; /* API */
+         part { name: "videoplayer.controls.length"; /* API */
             type: TEXT;
             mouse_events: 0;
-            clip_to: "videoplayer/clip";
+            clip_to: "videoplayer.clip";
             effect: FAR_SHADOW;
             description { state: "default" 0.0;
                color: FONT_COLOR;
                color3: FONT_COLOR3;
                rel1 {
-                  to: "videoplayer/controls/bg";
+                  to: "videoplayer.controls.bg";
                   offset: 10 0;
                }
                rel2 {
-                  to: "videoplayer/controls/bg";
+                  to: "videoplayer.controls.bg";
                   offset: -11 0;
                }
                text {
@@ -546,20 +544,20 @@ collections {
                }
             }
          }
-         part { name: "videoplayer/controls/position"; /* API */
+         part { name: "videoplayer.controls.position"; /* API */
             type: TEXT;
             mouse_events: 0;
-            clip_to: "videoplayer/clip";
+            clip_to: "videoplayer.clip";
             effect: FAR_SHADOW;
             description { state: "default" 0.0;
                color: FONT_COLOR;
                color3: FONT_COLOR3;
                rel1 {
-                  to: "videoplayer/controls/bg";
+                  to: "videoplayer.controls.bg";
                   offset: 10 0;
                }
                rel2 {
-                  to: "videoplayer/controls/bg";
+                  to: "videoplayer.controls.bg";
                }
                text {
                   text: "0:00:00";
@@ -569,17 +567,17 @@ collections {
                }
             }
          }
-         part { name: "videoplayer/controls/slider"; /* API */
+         part { name: "videoplayer.controls.slider"; /* API */
             type: EXTERNAL;
-            clip_to: "videoplayer/clip";
+            clip_to: "videoplayer.clip";
             source: "elm/slider";
             description { state: "default" 0.0;
                rel1 {
-                  to: "videoplayer/controls/bg";
+                  to: "videoplayer.controls.bg";
                   relative: 0.0 0.5;
                }
                rel2 {
-                  to: "videoplayer/controls/bg";
+                  to: "videoplayer.controls.bg";
                }
                params {
                   string: "label" "";
@@ -596,7 +594,7 @@ collections {
          }
 
 /// volume
-         part { name: "volume/bg";
+         part { name: "volume.bg";
             type: IMAGE;
             mouse_events: 0;
             description { state: "default" 0.0;
@@ -620,16 +618,16 @@ collections {
                rel2.offset: 0 0;
             }
          }
-         part { name: "volume/slider"; /* API */
+         part { name: "volume.slider"; /* API */
             type: EXTERNAL;
             source: "elm/slider";
             description { state: "default" 0.0;
                rel1 {
-                  to: "volume/bg";
+                  to: "volume.bg";
                   relative: 0.1 0.0;
                }
                rel2 {
-                  to: "volume/bg";
+                  to: "volume.bg";
                }
                params {
                   string: "label" "";
@@ -644,7 +642,7 @@ collections {
                }
             }
          }
-         part { name: "volume/icon";
+         part { name: "volume.icon";
             type: IMAGE;
             description { state: "default" 0.0;
                image.normal: "volume.png";
@@ -652,12 +650,12 @@ collections {
                aspect: 1 1;
                aspect_preference: VERTICAL;
                rel1 {
-                  to: "volume/bg";
+                  to: "volume.bg";
                   relative: 0.0 0.0;
                   offset: 8 2;
                }
                rel2 {
-                  to: "volume/bg";
+                  to: "volume.bg";
                   relative: 1.0 1.0;
                   offset: -1 -3;
                }
@@ -694,14 +692,14 @@ collections {
             source: "emc";
             action: STATE_SET "visible" 0.00;
             transition: DECELERATE 0.5;
-            target: "mainmenu/list";
+            target: "mainmenu.list";
          }
          program { name: "mainmenu_hide"; /* API */
             signal: "mainmenu,hide";
             source: "emc";
             action: STATE_SET "default" 0.00;
             transition: ACCELERATE 0.5;
-            target: "mainmenu/list";
+            target: "mainmenu.list";
          }
 ///
          program { name: "browser_list_show"; /* API */
@@ -709,16 +707,16 @@ collections {
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: LINEAR 1.0;
-            target: "browser/list/clip";
-            target: "browser/list/list_clip";
+            target: "browser.list.clip";
+            target: "browser.list.list_clip";
          }
          program { name: "browser_list_hide"; /* API */
             signal: "browser,list,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: LINEAR 1.0;
-            target: "browser/list/clip";
-            target: "browser/list/list_clip";
+            target: "browser.list.clip";
+            target: "browser.list.list_clip";
          }
          program { name: "browser_list_flip_left"; /* API */
             signal: "browser,list,flip_left";
@@ -726,17 +724,17 @@ collections {
             script {
                new buf[16];
                new Float:val;
-               get_state(PART:"browser/list/genlist1", buf, sizeof(buf), val);
+               get_state(PART:"browser.list.genlist1", buf, sizeof(buf), val);
                // DBG("%s   %f", buf, val)
                if (!strcmp(buf, "default") || !strcmp(buf, "center")) {
                   // DBG("CASE 1")
-                  set_state(PART:"browser/list/genlist2", "on_the_right", 0.0);
+                  set_state(PART:"browser.list.genlist2", "on_the_right", 0.0);
                   run_program(PROGRAM:"gl1_to_left");
                }
                else if (!strcmp(buf, "left")) {
                   // DBG("CASE 2")
-                  set_state(PART:"browser/list/genlist1", "right", 0.0);
-                  set_state(PART:"browser/list/genlist2", "on_the_left", 0.0);
+                  set_state(PART:"browser.list.genlist1", "right", 0.0);
+                  set_state(PART:"browser.list.genlist2", "on_the_left", 0.0);
                   run_program(PROGRAM:"gl1_to_center");
                }
                else if (!strcmp(buf, "right")) {
@@ -751,17 +749,17 @@ collections {
             script {
                new buf[16];
                new Float:val;
-               get_state(PART:"browser/list/genlist1", buf, sizeof(buf), val);
+               get_state(PART:"browser.list.genlist1", buf, sizeof(buf), val);
                // DBG("%s   %f", buf, val)
                if (!strcmp(buf, "default") || !strcmp(buf, "center")) {
                   // DBG("CASE 1 (back)")
-                  set_state(PART:"browser/list/genlist2", "on_the_left", 0.0);
+                  set_state(PART:"browser.list.genlist2", "on_the_left", 0.0);
                   run_program(PROGRAM:"gl1_to_right");
                }
                else if (!strcmp(buf, "right")) {
                   // DBG("CASE 2 (back)")
-                  set_state(PART:"browser/list/genlist1", "left", 0.0);
-                  set_state(PART:"browser/list/genlist2", "on_the_right", 0.0);
+                  set_state(PART:"browser.list.genlist1", "left", 0.0);
+                  set_state(PART:"browser.list.genlist2", "on_the_right", 0.0);
                   run_program(PROGRAM:"gl1_to_center");
                }
                else if (!strcmp(buf, "left")) {
@@ -773,17 +771,17 @@ collections {
          program { name: "gl1_to_left";
             action: STATE_SET "left" 0.0;
             transition: LINEAR 0.4;
-            target: "browser/list/genlist1";
+            target: "browser.list.genlist1";
          }
          program { name: "gl1_to_right";
             action: STATE_SET "right" 0.0;
             transition: LINEAR 0.4;
-            target: "browser/list/genlist1";
+            target: "browser.list.genlist1";
          }
          program { name: "gl1_to_center";
             action: STATE_SET "center" 0.0;
             transition: LINEAR 0.4;
-            target: "browser/list/genlist1";
+            target: "browser.list.genlist1";
          }
 ///
          program { name: "browser_grid_show"; /* API */
@@ -791,14 +789,14 @@ collections {
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: LINEAR 1.0;
-            target: "browser/grid/clip";
+            target: "browser.grid.clip";
          }
          program { name: "browser_grid_hide"; /* API */
             signal: "browser,grid,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: LINEAR 1.0;
-            target: "browser/grid/clip";
+            target: "browser.grid.clip";
          }
 ///
          program { name: "topbar_show"; /* API */
@@ -806,14 +804,14 @@ collections {
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.4;
-            target: "topbar/clip";
+            target: "topbar.clip";
          }
          program { name: "topbar_hide"; /* API */
             signal: "topbar,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: ACCELERATE 0.4;
-            target: "topbar/clip";
+            target: "topbar.clip";
          }
 ///
          program { name: "videoplayer_show"; /* API */
@@ -821,7 +819,7 @@ collections {
             source: "emc";
             action: STATE_SET "visible" 0.00;
             transition: LINEAR 0.5;
-            target: "videoplayer/clip";
+            target: "videoplayer.clip";
             
          }
          program { name: "videoplayer_hide"; /* API */
@@ -829,21 +827,21 @@ collections {
             source: "emc";
             action: STATE_SET "default" 0.00;
             transition: LINEAR 0.5;
-            target: "videoplayer/clip";
+            target: "videoplayer.clip";
          }
          program { name: "videoplayer_controls_show"; /* API */
             signal: "videoplayer,controls,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.5;
-            target: "videoplayer/controls/bg";
+            target: "videoplayer.controls.bg";
          }
          program { name: "videoplayer_controls_hide"; /* API */
             signal: "videoplayer,controls,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: DECELERATE 0.5;
-            target: "videoplayer/controls/bg";
+            target: "videoplayer.controls.bg";
          }
 ///
          program { name: "volume_show"; /* API */
@@ -851,14 +849,14 @@ collections {
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.5;
-            target: "volume/bg";
+            target: "volume.bg";
          }
          program { name: "volume_hide"; /* API */
             signal: "volume,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: ACCELERATE 0.5;
-            target: "volume/bg";
+            target: "volume.bg";
          }
       }
    }

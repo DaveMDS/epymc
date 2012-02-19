@@ -112,7 +112,7 @@ def volume_set(vol):
 
    _volume = max(0, min(int(vol), 100))
    ini.set('mediaplayer', 'volume', _volume)
-   gui.part_get('volume/slider').value = _volume
+   gui.part_get('volume.slider').value = _volume
    if _emotion:
       _emotion.audio_volume_set(_volume / 100.0)
 
@@ -177,7 +177,7 @@ def _init_emotion():
 
    backend = ini.get('mediaplayer', 'backend')
    _emotion = emotion.Emotion(gui.win.evas_get(), module_filename=backend)
-   gui.swallow_set('videoplayer/video', _emotion)
+   gui.swallow_set('videoplayer.video', _emotion)
    _emotion.smooth_scale = True # TODO Needed? make it configurable?
 
    #~ _emotion.on_key_down_add(_cb)
@@ -194,7 +194,7 @@ def _init_emotion():
    bt.on_mouse_in_add(_cb_btns_mouse_in)
    bt.disabled_set(1)
    bt.show()
-   gui.box_append('videoplayer/controls/btn_box', bt)
+   gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
    #  <   backward
@@ -205,7 +205,7 @@ def _init_emotion():
    bt.on_mouse_in_add(_cb_btns_mouse_in)
    bt.disabled_set(1)
    bt.show()
-   gui.box_append('videoplayer/controls/btn_box', bt)
+   gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
    #  stop
@@ -216,7 +216,7 @@ def _init_emotion():
    bt.on_mouse_in_add(_cb_btns_mouse_in)
    bt.disabled_set(1)
    bt.show()
-   gui.box_append('videoplayer/controls/btn_box', bt)
+   gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
    #  play/pause
@@ -227,7 +227,7 @@ def _init_emotion():
    bt.on_mouse_in_add(_cb_btns_mouse_in)
    bt.disabled_set(0)
    bt.show()
-   gui.box_append('videoplayer/controls/btn_box', bt)
+   gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
    #  >   forward
@@ -238,7 +238,7 @@ def _init_emotion():
    bt.on_mouse_in_add(_cb_btns_mouse_in)
    bt.disabled_set(1)
    bt.show()
-   gui.box_append('videoplayer/controls/btn_box', bt)
+   gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
    
    #  >>  fast forward
@@ -249,16 +249,16 @@ def _init_emotion():
    bt.on_mouse_in_add(_cb_btns_mouse_in)
    bt.disabled_set(1)
    bt.show()
-   gui.box_append('videoplayer/controls/btn_box', bt)
+   gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
 
-   gui.part_get('videoplayer/controls/slider').callback_changed_add(_cb_slider_changed)
-   #~ gui.part_get('videoplayer/controls/slider').callback_delay_changed_add(_cb_slider_changed)
-   gui.part_get('videoplayer/controls/slider').focus_allow_set(False)
+   gui.part_get('videoplayer.controls.slider').callback_changed_add(_cb_slider_changed)
+   #~ gui.part_get('videoplayer.controls.slider').callback_delay_changed_add(_cb_slider_changed)
+   gui.part_get('videoplayer.controls.slider').focus_allow_set(False)
 
-   gui.part_get('volume/slider').callback_changed_add(_cb_volume_slider_changed)
-   gui.part_get('volume/slider').focus_allow_set(False)
+   gui.part_get('volume.slider').callback_changed_add(_cb_volume_slider_changed)
+   gui.part_get('volume.slider').focus_allow_set(False)
 
 def _cb_volume_slider_changed(slider):
    volume_set(slider.value)
@@ -312,9 +312,9 @@ def _update_slider():
       pm = int((pos / 60) - (ph * 60))
       ps = int(pos - (pm * 60) - (ph * 3600))
 
-      gui.part_get('videoplayer/controls/slider').value = pos / len
-      gui.text_set('videoplayer/controls/position', '%i:%02i:%02i' % (ph,pm,ps))
-      gui.text_set('videoplayer/controls/length', '%i:%02i:%02i' % (lh,lm,ls))
+      gui.part_get('videoplayer.controls.slider').value = pos / len
+      gui.text_set('videoplayer.controls.position', '%i:%02i:%02i' % (ph,pm,ps))
+      gui.text_set('videoplayer.controls.length', '%i:%02i:%02i' % (lh,lm,ls))
 
 ### input events ###
 def input_event_cb(event):

@@ -2,19 +2,19 @@
                 EpyMC THEMES REFERENCE
 
 
-Main elementary layout group: "epymc_main_layout"
+Main elementary layout group: "emc/main/layout"
 All the icons in icons.edc must be implemented
 
 ### Backdrop stuff ###
    * Required parts:
-      "backdrop/1" -> edje SWALLOW
-      "backdrop/2" -> edje SWALLOW  __unused__
+      "bg.swallow.backdrop1" -> edje SWALLOW
+      "bg.swallow.backdrop2" -> edje SWALLOW  __unused__
 
 
 ### TopBar stuff ###
    * Required parts:
-      "topbar/title" -> edje text
-      "topbar/box" -> edje box
+      "topbar.title" -> edje text
+      "topbar.box" -> edje box
 
    * Signals received from the application:
       "topbar,show" "emc"
@@ -23,7 +23,7 @@ All the icons in icons.edc must be implemented
 
 ### MainMenu stuff ###
    * Required parts:
-      "mainmenu/list" -> elm_list
+      "mainmenu.list" -> elm_list
 
    * Signals received from the application:
       "mainmenu,show" "emc"
@@ -32,11 +32,11 @@ All the icons in icons.edc must be implemented
 
 ### Browser: List View ###
    * Required parts:
-      "browser/list/genlist1" -> elm_genlist style: "browser"
-      "browser/list/genlist2" -> elm_genlist style: "browser"
-      "browser/list/poster" -> edje swallow -> EmcRemoteImage
-      "browser/list/info" -> edje TEXTBLOCK
-      "browser/list/total" -> edje TEXT
+      "browser.list.genlist1" -> elm_genlist style: "browser"
+      "browser.list.genlist2" -> elm_genlist style: "browser"
+      "browser.list.poster" -> edje swallow -> EmcRemoteImage
+      "browser.list.info" -> edje TEXTBLOCK
+      "browser.list.total" -> edje TEXT
 
    * Signals received from the application:
       "browser,list,show" "emc"
@@ -47,8 +47,8 @@ All the icons in icons.edc must be implemented
 
 ### Browser: Grid View ###
    * Required parts:
-      "browser/grid/gengrid" -> edje swallow
-      "browser/grid/title" -> edje text part
+      "browser.grid.gengrid" -> edje swallow
+      "browser.grid.title" -> edje text part
 
    * Signals received from the application:
       "browser,grid,show" "emc"
@@ -57,11 +57,11 @@ All the icons in icons.edc must be implemented
 
 ### Video Player ###
    * Required parts:
-      "videoplayer/video" -> edje swallow
+      "videoplayer.video" -> edje swallow
       "videoplayer/controls/btn_swallow" -> edje swallow
-      "videoplayer/controls/slider" -> elm_slider
-      "videoplayer/controls/position" -> edje text
-      "videoplayer/controls/length" -> edje text
+      "videoplayer.controls.slider" -> elm_slider
+      "videoplayer.controls.position" -> edje text
+      "videoplayer.controls.length" -> edje text
 
    * Signals received from the application:
       "videoplayer,show" "emc"
@@ -73,7 +73,7 @@ All the icons in icons.edc must be implemented
 ### Volume ###
 
    * Required parts:
-      "volume/slider" -> elm_slider
+      "volume.slider" -> elm_slider
 
    * Signals received from the application:
       "volume,show" "emc"

@@ -168,7 +168,7 @@ class EmcBrowser(object):
       # set topbar title
       full = '> ' + ''.join([page['title'] + ' > ' for page in self.pages])
       full = full[0:-3]
-      gui.text_set("topbar/title", full)
+      gui.text_set("topbar.title", full)
 
       # same style for the 2 pages, ask the view to perform the correct animation
       if (view == self.current_view):
@@ -403,7 +403,7 @@ class ViewList(object):
       self.items_count = 0;
 
       # EXTERNAL Genlist1
-      self.gl1 = gui.part_get('browser/list/genlist1')
+      self.gl1 = gui.part_get('browser.list.genlist1')
       self.gl1.style_set("browser")
       self.gl1.homogeneous_set(True)
       self.gl1.always_select_mode_set(True)
@@ -413,7 +413,7 @@ class ViewList(object):
       self.current_list = self.gl1
 
       # EXTERNAL Genlist2
-      self.gl2 = gui.part_get('browser/list/genlist2')
+      self.gl2 = gui.part_get('browser.list.genlist2')
       self.gl2.style_set("browser")
       self.gl2.homogeneous_set(True)
       self.gl2.always_select_mode_set(True)
@@ -429,7 +429,7 @@ class ViewList(object):
 
       # RemoteImage (poster)
       self.__im = gui.EmcRemoteImage(gui.win)
-      gui.swallow_set('browser/list/poster', self.__im)
+      gui.swallow_set('browser.list.poster', self.__im)
 
    def page_show(self, title, dir):
       """
@@ -473,7 +473,7 @@ class ViewList(object):
 
       if not dont_count:
          self.items_count += 1
-         gui.text_set('browser/list/total', '%d items' % (self.items_count))
+         gui.text_set('browser.list.total', '%d items' % (self.items_count))
 
    def show(self):
       """ Show the view """
@@ -560,7 +560,7 @@ class ViewList(object):
 
       # Fill the textblock with item info info
       text = parent_browser._info_get(url)
-      gui.text_set('browser/list/info', text or "")
+      gui.text_set('browser.list.info', text or "")
 
       # Ask for the item poster and show (or auto-download) it
       poster = parent_browser._poster_get(url)
@@ -595,13 +595,13 @@ class ViewGrid(object):
       """ TODO Function doc """
       DBG('Init view: grid')
 
-      self.itc = elementary.GengridItemClass(item_style="default",
+      self.itc = elementary.GengridItemClass(item_style='default',
                                        text_get_func=self.gg_label_get,
                                        content_get_func=self.gg_icon_get,
                                        state_get_func=self.gg_state_get,
                                        del_func=self.gg_del)
       gg = elementary.Gengrid(gui.win)
-      gg.style_set("browser")
+      gg.style_set('browser')
       gg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       gg.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       gg.horizontal_set(False)
@@ -610,12 +610,12 @@ class ViewGrid(object):
       gg.align_set(0.5, 0.0)
       gg.callback_selected_add(self.gg_higlight)
       gg.callback_clicked_add(self.gg_selected)
-      gui.swallow_set("browser/grid/gengrid", gg)
+      gui.swallow_set('browser.grid.gengrid', gg)
       self.gg = gg
 
    def page_show(self, title, dir):
       self.gg.clear()
-      gui.text_set("browser/grid/title", title)
+      gui.text_set('browser.grid.title', title)
 
    def item_add(self, url, label, parent_browser, dont_count = False):
       item_data = (url, label, parent_browser)
@@ -624,10 +624,10 @@ class ViewGrid(object):
          it.selected_set(True)
 
    def show(self):
-      gui.signal_emit("browser,grid,show")
+      gui.signal_emit('browser,grid,show')
 
    def hide(self):
-      gui.signal_emit("browser,grid,hide")
+      gui.signal_emit('browser,grid,hide')
 
    def clear(self):
       self.gg.clear()
@@ -642,7 +642,7 @@ class ViewGrid(object):
       item = self.gg.selected_item_get()
       (url, label, parent_browser) = item.data_get()
 
-      if event == "RIGHT":
+      if event == 'RIGHT':
          # TODO FIX DOUBLE MOVE
          # elm_focus_highlight_enable_set(Eina_Bool enable); ????
          # elm_object_focus_allow_set
@@ -652,24 +652,24 @@ class ViewGrid(object):
             next.bring_in()
             return input_events.EVENT_BLOCK
 
-      elif event == "LEFT":
+      elif event == 'LEFT':
          prev = item.prev_get()
          if prev:
             prev.selected_set(1)
             prev.bring_in()
             return input_events.EVENT_BLOCK
 
-      elif event == "UP":
+      elif event == 'UP':
          (x, y) = item.pos_get()
          # TODO
          return input_events.EVENT_BLOCK
 
-      elif event == "DOWN":
+      elif event == 'DOWN':
          (x, y) = item.pos_get()
          # TODO
          return input_events.EVENT_BLOCK
 
-      elif event == "OK":
+      elif event == 'OK':
          parent_browser._item_selected(url)
          return input_events.EVENT_BLOCK
 

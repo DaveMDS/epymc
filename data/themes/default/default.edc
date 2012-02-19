@@ -1165,12 +1165,13 @@ collections {
          part { name: "emc.text.title"; /* API */
             type: TEXTBLOCK;
             clip_to: "clipper";
+            scale: 1; // TODO why doesn't it scale ??
             description { state: "default" 0.0;
                rel1.to: "titlebg";
                rel2.to: "titlebg";
                text {
                   text:"missing title...";
-                  min: 0 0;
+                  min: 1 1;
                   align: 0.5 0.25;
                   style: "epymc_dialog_title_style";
                }

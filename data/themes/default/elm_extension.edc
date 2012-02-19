@@ -1517,31 +1517,6 @@ group { name: "elm/entry/anchor/default";
    }
 }
 
-//// DIALOG TITLE (elm/label/base/default) ////////////////////////////////////
-group { name: "elm/label/base/dialog";
-   parts {
-      part { name: "label.swallow.background";
-         type: SWALLOW;
-         description { state: "default" 0.0;
-            visible: 1;
-            rel1 { relative: 0 0; to: "elm.text"; }
-            rel2 { relative: 1 1; to: "elm.text"; }
-         }
-      }
-      part { name: "elm.text";
-         type: TEXTBLOCK;
-         mouse_events: 0;
-         scale: 1;
-         description { state: "default" 0.0;
-            text {
-               style: "epymc_dialog_style";
-               min: 1 1;
-            }
-         }
-      }
-   }
-}
-
 //// BUTTONS (elm/button/base/default) ////////////////////////////////////////
 group { name: "elm/button/base/default";
    images {

@@ -99,10 +99,10 @@ def init_all_by_config():
          init_by_name(modname)
    else:
       init_all()
-      ini.set('general', 'modules', " ".join(_instances.keys()))
+      ini.set('general', 'modules', ' '.join(_instances.keys()))
 
 def save_enabled():
-   ini.set('general', 'modules', " ".join(_instances.keys()))
+   ini.set('general', 'modules', ' '.join(_instances.keys()))
 
 def shutdown_by_name(name):
    if _instances.has_key(name):
@@ -116,4 +116,4 @@ def shutdown_all():
       L.append(mod)
    for mod in L:
       shutdown_by_name(mod)
-   print ""
+   print ''

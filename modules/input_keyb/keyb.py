@@ -73,6 +73,6 @@ and what it need to work well, can also use markup like <title>this</> or
       if _mapping.has_key(event.key):
          input_events.event_emit(_mapping[event.key])
       else:
-         print "Unhandled key: " + event.key
+         print 'Unhandled key: ' + event.key
 
       return True

@@ -40,11 +40,11 @@ class WebserverModule(EmcModule):
    name = 'input_webserver'
    label = 'Input - Webserver'
    icon = 'icon/keyboard'
-   info = "This module provide a way to control the application from " \
-   "your web browser.<br>" \
-   "The server (by default) listen on port 8080, to connect just point " \
-   "to: <br>http://your_ip:8080<br>" \
-   "You can change listening port and the theme from the configurtion file."
+   info = 'This module provide a way to control the application from ' \
+   'your web browser.<br>' \
+   'The server (by default) listen on port 8080, to connect just point ' \
+   'to: <br>http://your_ip:8080<br>' \
+   'You can change listening port and the theme from the configurtion file.'
 
 
    def __init__(self):
@@ -67,14 +67,14 @@ class WebserverModule(EmcModule):
       self._queue_timer = ecore.Timer(0.1, self.queue_timer)
 
    def http_server_in_a_thread(self, port):
-      DBG("starting httpd on port " + port)
+      DBG('starting httpd on port ' + port)
       try:
          self._httpd = HTTPServer(('', int(port)), RequestHandler)
          self._httpd.serve_forever(poll_interval=0.3)
       except:
-         DBG("Error starting server on port")
+         DBG('Error starting server on port')
       else:
-         DBG("httpd stopped")
+         DBG('httpd stopped')
 
    def __shutdown__(self):
       DBG('Shutdown module')
@@ -91,7 +91,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
    def do_GET(self):
       (host, port) = self.client_address
-      DBG("GET from client: %s:%d [%s]" % (host, port, self.path))
+      DBG('GET from client: %s:%d [%s]' % (host, port, self.path))
 
       if self.path == '/':
          self.serve_file('main.html')
@@ -114,7 +114,7 @@ class RequestHandler(BaseHTTPRequestHandler):
          if   path.endswith('.html'): cont_type = 'text/html'
          elif path.endswith('.css'):  cont_type = 'text/css'
          elif path.endswith('.png'):  cont_type = 'image/png'
-         else: cont_type = "text/plain"
+         else: cont_type = 'text/plain'
          self.send_header('Content-type', cont_type)
          self.end_headers()
          self.wfile.write(f.read())

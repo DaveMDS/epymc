@@ -74,15 +74,15 @@ def play_video(url):
    _emotion.on_frame_resize_add(_cb_frame_resize)
 
    ## TEST VARIOUS INFO
-   DBG("TITLE: " + str(_emotion.title_get()))
-   DBG("VIDEO CHNS COUNT: " + str(_emotion.video_channel_count()))
-   DBG("AUDIO CHNS COUNT: " + str(_emotion.audio_channel_count()))
-   DBG("VIDEO CHANS GET: " + str(_emotion.video_channel_get()))
-   DBG("AUDIO CHANS GET: " + str(_emotion.audio_channel_get()))
-   DBG("INFO DICT: " + str(_emotion.meta_info_dict_get()))
-   DBG("SIZE: " + str(_emotion.size))
-   DBG("IMAGE_SIZE: " + str(_emotion.image_size))
-   DBG("RATIO: " + str(_emotion.ratio_get()))
+   DBG('TITLE: ' + str(_emotion.title_get()))
+   DBG('VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
+   DBG('AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
+   DBG('VIDEO CHANS GET: ' + str(_emotion.video_channel_get()))
+   DBG('AUDIO CHANS GET: ' + str(_emotion.audio_channel_get()))
+   DBG('INFO DICT: ' + str(_emotion.meta_info_dict_get()))
+   DBG('SIZE: ' + str(_emotion.size))
+   DBG('IMAGE_SIZE: ' + str(_emotion.image_size))
+   DBG('RATIO: ' + str(_emotion.ratio_get()))
    ##
 
    _emotion.play = True
@@ -92,19 +92,19 @@ def stop():
    _emotion.play = False
 
 def forward():
-   DBG("Forward cb" + str(_emotion.position))
+   DBG('Forward cb' + str(_emotion.position))
    _emotion.position += 10 #TODO make this configurable
 
 def backward():
-   DBG("Backward cb" + str(_emotion.position))
+   DBG('Backward cb' + str(_emotion.position))
    _emotion.position -= 10 #TODO make this configurable
 
 def fforward():
-   DBG("FastForward cb" + str(_emotion.position))
+   DBG('FastForward cb' + str(_emotion.position))
    _emotion.position += 60 #TODO make this configurable
 
 def fbackward():
-   DBG("FastBackward cb" + str(_emotion.position))
+   DBG('FastBackward cb' + str(_emotion.position))
    _emotion.position -= 60 #TODO make this configurable
 
 def volume_set(vol):
@@ -188,7 +188,7 @@ def _init_emotion():
 
    #  <<  fast backward
    bt = elementary.Button(gui.win);
-   bt.icon_set(gui.load_icon("icon/fbwd"))
+   bt.icon_set(gui.load_icon('icon/fbwd'))
    bt.callback_clicked_add(_cb_btn_fbackward)
    bt.data['cb'] = _cb_btn_fbackward
    bt.on_mouse_in_add(_cb_btns_mouse_in)
@@ -199,7 +199,7 @@ def _init_emotion():
 
    #  <   backward
    bt = elementary.Button(gui.win);
-   bt.icon_set(gui.load_icon("icon/bwd"))
+   bt.icon_set(gui.load_icon('icon/bwd'))
    bt.callback_clicked_add(_cb_btn_backward)
    bt.data['cb'] = _cb_btn_backward
    bt.on_mouse_in_add(_cb_btns_mouse_in)
@@ -210,7 +210,7 @@ def _init_emotion():
 
    #  stop
    bt = elementary.Button(gui.win);
-   bt.icon_set(gui.load_icon("icon/stop"))
+   bt.icon_set(gui.load_icon('icon/stop'))
    bt.callback_clicked_add(_cb_btn_stop)
    bt.data['cb'] = _cb_btn_stop
    bt.on_mouse_in_add(_cb_btns_mouse_in)
@@ -221,7 +221,7 @@ def _init_emotion():
 
    #  play/pause
    bt = elementary.Button(gui.win);
-   bt.icon_set(gui.load_icon("icon/play"))
+   bt.icon_set(gui.load_icon('icon/play'))
    bt.callback_clicked_add(_cb_btn_play)
    bt.data['cb'] = _cb_btn_play
    bt.on_mouse_in_add(_cb_btns_mouse_in)
@@ -232,7 +232,7 @@ def _init_emotion():
 
    #  >   forward
    bt = elementary.Button(gui.win);
-   bt.icon_set(gui.load_icon("icon/fwd"))
+   bt.icon_set(gui.load_icon('icon/fwd'))
    bt.callback_clicked_add(_cb_btn_forward)
    bt.data['cb'] = _cb_btn_forward
    bt.on_mouse_in_add(_cb_btns_mouse_in)
@@ -243,7 +243,7 @@ def _init_emotion():
    
    #  >>  fast forward
    bt = elementary.Button(gui.win);
-   bt.icon_set(gui.load_icon("icon/ffwd"))
+   bt.icon_set(gui.load_icon('icon/ffwd'))
    bt.callback_clicked_add(_cb_btn_fforward)
    bt.data['cb'] = _cb_btn_fforward
    bt.on_mouse_in_add(_cb_btns_mouse_in)
@@ -276,7 +276,7 @@ def _cb_btns_mouse_in(button, event):
       _buttons[_current_button_num].disabled_set(0)
 
 def _cb_btn_play(btn):
-   DBG("Play cb")
+   DBG('Play cb')
    _emotion.play = not _emotion.play
 
 def _cb_btn_stop(btn):
@@ -336,7 +336,7 @@ def input_event_cb(event):
          cb = button.data['cb']
          cb(button)
          # TODO TRY THIS INSTEAD:
-         # evas_object_smart_callback_call(obj, "sig", NULL);
+         # evas_object_smart_callback_call(obj, 'sig', NULL);
          return input_events.EVENT_BLOCK
       elif event == 'RIGHT':
          if _current_button_num < len(_buttons) - 1:

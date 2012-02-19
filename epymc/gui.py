@@ -56,15 +56,15 @@ def init():
    # search the theme file, or use the default one
    theme_file = utils.get_resource_file('themes', name + '.edj', 'default.edj')
    if not theme_file:
-      print "ERROR: can't find a working theme file, exiting..."
+      print 'ERROR: can\'t find a working theme file, exiting...'
       return False
    
    elementary.theme_overlay_add(theme_file) # TODO REMOVE ME!!! is here for buttons
    elementary.theme_extension_add(theme_file)
 
    # window
-   win = elementary.Window("epymc", elementary.ELM_WIN_BASIC)
-   win.title_set("Enlightenment Media Center")
+   win = elementary.Window('epymc', elementary.ELM_WIN_BASIC)
+   win.title_set('Enlightenment Media Center')
    win.callback_destroy_add(_cb_win_del)
    if ini.has_option('general', 'fullscreen'):
       if ini.get_bool('general', 'fullscreen') == True:
@@ -74,7 +74,7 @@ def init():
 
    # main layout (main theme)
    layout = elementary.Layout(win)
-   layout.file_set(theme_file, "emc/main/layout")
+   layout.file_set(theme_file, 'emc/main/layout')
    layout.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
    win.resize_object_add(layout)
    layout.show()
@@ -88,7 +88,7 @@ def init():
    bt.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
    bt.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
    bt.icon_set(load_icon('icon/list'))
-   bt.callback_clicked_add(_cb_btn_change_view, "VIEW_LIST")
+   bt.callback_clicked_add(_cb_btn_change_view, 'VIEW_LIST')
    layout.edje_get().part_box_append('topbar.box', bt)
    bt.show()
 
@@ -96,7 +96,7 @@ def init():
    bt.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
    bt.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
    bt.icon_set(load_icon('icon/grid'))
-   bt.callback_clicked_add(_cb_btn_change_view, "VIEW_GRID")
+   bt.callback_clicked_add(_cb_btn_change_view, 'VIEW_GRID')
    layout.edje_get().part_box_append('topbar.box', bt)
    bt.show()
 
@@ -117,7 +117,7 @@ def shoutdown():
    input_events.listener_del('gui')
 
 def input_event_cb(event):
-   if event == "TOGGLE_FULLSCREEN":
+   if event == 'TOGGLE_FULLSCREEN':
       win.fullscreen = not win.fullscreen
       return input_events.EVENT_BLOCK
    elif event == 'VOLUME_UP':
@@ -174,7 +174,7 @@ def toggle_fullscreen():
 
 def mouse_hide():
    pass
-   # print "MOUSE HIDE"
+   # print 'MOUSE HIDE'
    # elm coursor
    # from elementary import cursors
    # layout.cursor_set(cursors.ELM_CURSOR_CLOCK)
@@ -184,7 +184,7 @@ def mouse_hide():
    # ecore.x.Window.cursor_hide()
 
 def mouse_show():
-   print "MOUSE SHOW"
+   print 'MOUSE SHOW'
 
 def part_get(name):
    global layout
@@ -225,7 +225,7 @@ def background_set(image):
    if not backdrop_im:
       backdrop_im = elementary.Image(gui.win)
       backdrop_im.fill_outside_set(True)
-      swallow_set("bg.swallow.backdrop1", backdrop_im)
+      swallow_set('bg.swallow.backdrop1', backdrop_im)
 
    backdrop_im.file_set(image)
 
@@ -237,7 +237,7 @@ class EmcRemoteImage(elementary.Image):
       elementary.Image.__init__(self, parent)
       self._parent = parent
       self._pb = elementary.Progressbar(parent)
-      self._pb.style_set("wheel")
+      self._pb.style_set('wheel')
       self.on_move_add(self._cb_move_resize)
       self.on_resize_add(self._cb_move_resize)
 
@@ -257,7 +257,7 @@ class EmcRemoteImage(elementary.Image):
          # else start spin & download
          self.file_set('')
          self.start_spin()
-         utils.download_url_async(url, dest if dest else "tmp",
+         utils.download_url_async(url, dest if dest else 'tmp',
                                   complete_cb = self._cb_download_complete)
 
    def start_spin(self):
@@ -284,7 +284,7 @@ class EmcRemoteImage(elementary.Image):
          self.file_set(dest)
          self.size_hint_min_set(100, 100) #TODO FIXME (needed by tmdb search results list)
       else:
-         self.file_set("")
+         self.file_set('')
          # TODO show a dummy image
 
    #TODO on image_set abort the download ? 
@@ -336,7 +336,7 @@ class EmcDialog(edje.Edje):
       self.part_swallow('emc.swallow.content', self._vbox)
 
       if title is not None:
-         self.part_text_set("emc.text.title", title)
+         self.part_text_set('emc.text.title', title)
          self.signal_emit('emc,dialog,title,show', 'emc')
          # TODO hide the title in None
       
@@ -353,7 +353,7 @@ class EmcDialog(edje.Edje):
          self._textentry.show()
       elif content is not None:
          frame = elementary.Frame(gui.win)
-         frame.style_set("pad_medium")
+         frame.style_set('pad_medium')
          frame.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
          frame.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
          frame.content_set(content)
@@ -569,7 +569,7 @@ class EmcDialog_OLD(elementary.InnerWindow):
       elementary.InnerWindow.content_set(self, self._vbox)
 
       if title is not None:
-         self.text_part_set("elm.text.title", title)
+         self.text_part_set('elm.text.title', title)
          # TODO hide the title in None
       
       if text is not None:
@@ -585,7 +585,7 @@ class EmcDialog_OLD(elementary.InnerWindow):
          self._textentry.show()
       elif content:
          frame = elementary.Frame(gui.win)
-         frame.style_set("pad_medium")
+         frame.style_set('pad_medium')
          frame.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
          frame.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
          frame.content_set(content)
@@ -648,10 +648,10 @@ class EmcDialog_OLD(elementary.InnerWindow):
       return b
 
    def title_set(self, text):
-      self.text_part_set("elm.text.title", text)
+      self.text_part_set('elm.text.title', text)
 
    def title_get(self):
-      return self.text_part_get("elm.text.title")
+      return self.text_part_get('elm.text.title')
 
    def text_set(self, text):
       self._textentry.entry_set(text)
@@ -729,18 +729,18 @@ class EmcSourceSelector(EmcDialog):
    """ TODO doc this
    """
 
-   def __init__(self, title = "Source Selector", done_cb = None):
+   def __init__(self, title = 'Source Selector', done_cb = None):
       self._selected_cb = done_cb
       self._glist = elementary.Genlist(gui.win)
-      self._glist.style_set("dialog")
+      self._glist.style_set('dialog')
       self._glist.homogeneous_set(True)
       self._glist.always_select_mode_set(True)
       self._glist.focus_allow_set(False)
       self._glist.callback_clicked_double_add(self._cb_item_selected)
-      self._glist_itc = elementary.GenlistItemClass(item_style="default",
+      self._glist_itc = elementary.GenlistItemClass(item_style = 'default',
                                  text_get_func = self._genlist_folder_label_get,
                                  content_get_func = self._genlist_folder_icon_get)
-      self._glist_itc_back = elementary.GenlistItemClass(item_style="default",
+      self._glist_itc_back = elementary.GenlistItemClass(item_style = 'default',
                                  text_get_func = self._genlist_back_label_get,
                                  content_get_func = self._genlist_back_icon_get)
       
@@ -755,7 +755,7 @@ class EmcSourceSelector(EmcDialog):
    def populate(self, folder):
       self._glist.clear()
 
-      parent_folder = os.path.normpath(os.path.join(folder, ".."))
+      parent_folder = os.path.normpath(os.path.join(folder, '..'))
       if folder != parent_folder:
          self._glist.item_append(self._glist_itc_back, parent_folder)
 
@@ -788,7 +788,7 @@ class EmcSourceSelector(EmcDialog):
       return None
    
    def _genlist_back_label_get(self, obj, part, item_data):
-      return "back"
+      return 'back'
 
    def _genlist_back_icon_get(self, obj, part, data):
       if part == 'elm.swallow.icon':
@@ -900,7 +900,7 @@ class EmcVKeyboard(EmcDialog):
       tb.show()
 
       # set dialog title
-      self.part_text_set("emc.text.title", title or 'Insert text')
+      self.part_text_set('emc.text.title', title or 'Insert text')
 
       # entry
       self.entry = elementary.Entry(gui.win) # TODO use scrolled_entry instead
@@ -940,7 +940,7 @@ class EmcVKeyboard(EmcDialog):
       EmcDialog.__init__(self, title = title, style = 'minimal', content = tb)
 
        # catch input events
-      input_events.listener_add("vkbd", self.input_event_cb)
+      input_events.listener_add('vkbd', self.input_event_cb)
 
    def _pack_btn(self, tb, x, y, w, h, label, icon = None, cb = None, focused = False):
       b = elementary.Button(gui.win)
@@ -956,7 +956,7 @@ class EmcVKeyboard(EmcDialog):
       return b
 
    def delete(self):
-      input_events.listener_del("vkbd")
+      input_events.listener_del('vkbd')
       self.efm.delete()
       EmcDialog.delete(self)
 
@@ -993,10 +993,10 @@ class EmcVKeyboard(EmcDialog):
          if len(c) == 1 and c.isalpha():
             if c.islower():
                btn.label = c.upper()
-               button.label = "LOWERCASE"
+               button.label = 'LOWERCASE'
             else:
                btn.label = c.lower()
-               button.label = "UPPERCASE"
+               button.label = 'UPPERCASE'
 
    def input_event_cb(self, event):
       if event == 'OK':

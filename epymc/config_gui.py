@@ -41,7 +41,7 @@ _root_items = [] # list of root items.  tuple:(name, label, weight, icon, cb)
 def init():
    global _browser
 
-   mainmenu.item_add("config", 100, "Config", None, _mainmenu_cb)
+   mainmenu.item_add('config', 100, 'Config', None, _mainmenu_cb)
 
    # create a browser instance
    _browser = EmcBrowser('Configuration', 'List', # TODO use a custom style for config ?
@@ -50,9 +50,9 @@ def init():
                                #~ poster_get_cb = self.cb_poster_get,
                                #~ info_get_cb = self.cb_info_get)
 
-   root_item_add("config://modules/", 1, "Modules", None, _modules_list)
-   root_item_add("config://scale/", 20, "Scale", None, _change_scale)
-   root_item_add("config://fs/", 30, "Toggle Fullscreen / Windowed mode",
+   root_item_add('config://modules/', 1, 'Modules', None, _modules_list)
+   root_item_add('config://scale/', 20, 'Scale', None, _change_scale)
+   root_item_add('config://fs/', 30, 'Toggle Fullscreen / Windowed mode',
                  None, _toggle_fullscreen)
 
 def shutdown():
@@ -123,9 +123,9 @@ def _change_scale():
 
    d = gui.EmcDialog(title = 'set scale', style = 'minimal',
                      text = 'Current Value: %s' % (gui.scale_get()))
-   d.button_add("Bigger", selected_cb = _bigger)
-   d.button_add("Smaller", selected_cb = _smaller)
-   d.button_add("Reset", selected_cb = _reset)
+   d.button_add('Bigger', selected_cb = _bigger)
+   d.button_add('Smaller', selected_cb = _smaller)
+   d.button_add('Reset', selected_cb = _reset)
    
 
 ##############  MODULES  ######################################################

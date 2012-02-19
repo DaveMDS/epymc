@@ -44,7 +44,7 @@ def DBG(msg):
    # print('FILM: %s' % (msg))
    pass
 
-TMDB_API_KEY = "19eef197b81231dff0fd1a14a8d5f863" # Key of the user DaveMDS
+TMDB_API_KEY = '19eef197b81231dff0fd1a14a8d5f863' # Key of the user DaveMDS
 
 
 class FilmsModule(EmcModule):
@@ -106,7 +106,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.__browser.show()
 
    def create_root_page(self):
-      self.__browser.page_add("film://root", "Films")
+      self.__browser.page_add('film://root', 'Films')
 
       for f in self.__folders:
          self.__browser.item_add(f, os.path.basename(f))
@@ -171,7 +171,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def cb_info_get(self, page_url, item_url):
       if self.__film_db.id_exists(item_url):
          e = self.__film_db.get_data(item_url)
-         country = ""
+         country = ''
          if len(e['countries']) > 0:
             country = e['countries'][0]['code']
          text = '<title>%s (%s %s)</><br>' \
@@ -193,7 +193,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       for person in e['cast']:
          if person['job'] == 'Director':
             return person['name']
-      return "Unknow"
+      return 'Unknow'
 
    def _get_cast(self, e, max_num = 99): # TODO make max_num works
       cast = ''
@@ -219,7 +219,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       box.pack_end(image)
 
       sentry = elementary.ScrolledEntry(gui.win)
-      sentry.style_set("dialog")
+      sentry.style_set('dialog')
       sentry.editable_set(False)
       sentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       sentry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
@@ -377,7 +377,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       del self.__poster_dialog
 
       # make a progress dialog
-      self.__poster_dialog = EmcDialog(title = "Downloading Poster",
+      self.__poster_dialog = EmcDialog(title = 'Downloading Poster',
                                        style = 'progress')
 
    def _cb_poster_progress(self, dest, tot, done):
@@ -442,7 +442,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       del self.__backdrop_dialog
 
       # make a spinner dialog
-      self.__backdrop_dialog = EmcDialog(title = "Downloading Fanart",
+      self.__backdrop_dialog = EmcDialog(title = 'Downloading Fanart',
                                          style = 'progress')
 
    def _cb_backdrop_progress(self, dest, tot, done):
@@ -456,7 +456,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       if status == 200:
           self.__browser.refresh()
       else:
-         EmcDialog(title = "Download error !!", style = 'error')
+         EmcDialog(title = 'Download error !!', style = 'error')
 
 ######## Get film info from themoviedb.org
    def _cb_panel_5(self, button):
@@ -536,7 +536,7 @@ class TMDB_WithGui(object):
          self.dialog.text_append('<b>ERROR</b><br>')
          return
 
-      f = open(dest, "r")
+      f = open(dest, 'r')
       data = json.loads(f.read())
       f.close()
       os.remove(dest)
@@ -603,7 +603,7 @@ class TMDB_WithGui(object):
       self.dialog.text_append('<b>Downloading movie data, </b>')
       url = '%s/Movie.getInfo/%s/json/%s/%s' % \
              (self.server, self.lang, self.key, tid)
-      self.dwl_handler = utils.download_url_async(url, "tmp",
+      self.dwl_handler = utils.download_url_async(url, 'tmp',
                            complete_cb = self._movie_getinfo_done_cb,
                            progress_cb = self._cb_downloads_progress)
 
@@ -614,7 +614,7 @@ class TMDB_WithGui(object):
          self.dialog.text_append('<b>ERROR</b><br>')
          return
    
-      f = open(dest, "r")
+      f = open(dest, 'r')
       data = json.loads(f.read())
       f.close()
       os.remove(dest)
@@ -627,7 +627,7 @@ class TMDB_WithGui(object):
       self.movie_info = data[0]
 
       # download the first poster image found
-      self.dialog.text_append("<b>poster, </b>")
+      self.dialog.text_append('<b>poster, </b>')
       for image in self.movie_info['posters']:
          if image['image']['size'] == 'mid': # TODO make default size configurable
             dest = get_poster_filename(self.movie_info['id'])
@@ -643,7 +643,7 @@ class TMDB_WithGui(object):
       DBG('Poster: ' + dest)
       self.dwl_handler = None
       # download the first backdrop image found
-      self.dialog.text_append("<b>fanart, </b>")
+      self.dialog.text_append('<b>fanart, </b>')
       for image in self.movie_info['backdrops']:
          if image['image']['size'] == 'original': # TODO make default size configurable
             dest = get_backdrop_filename(self.movie_info['id'])
@@ -704,7 +704,7 @@ class TMDB_Original(object):
 
    def method(self, look, term):
       ''' Methods => search, imdbLookup, getInfo, getImages'''
-      print "look: %s  term: %s" % (look, term)
+      print 'look: %s  term: %s' % (look, term)
       do = 'Movie.'+look
       term = str(term) # int conversion
       run = self.server+'/2.1/'+do+'/'+self.lang+'/'+self.view+'/'+self.key+'/'+term

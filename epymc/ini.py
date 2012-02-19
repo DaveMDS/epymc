@@ -23,13 +23,13 @@ _config = ConfigParser.ConfigParser()
 
 def read_from_files(files):
    readed = _config.read(files)
-   print "Readed config from files:"
-   for f in readed: print " * " + f
-   print ""
+   print 'Readed config from files:'
+   for f in readed: print ' * ' + f
+   print ''
    add_section('general')
 
 def write_to_file(file):
-   print("Writing config to file: " + file)
+   print('Writing config to file: ' + file)
    with open(file, 'wb') as configfile:
       _config.write(configfile)
 

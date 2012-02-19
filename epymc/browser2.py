@@ -57,7 +57,7 @@ class EmcBrowserITC():
       pass
 
    def label_get(self, url, browser, user_data):
-      return "Unknow"
+      return 'Unknow'
 
    def fanart_get(self, url, browser, user_data):
       return None
@@ -83,7 +83,7 @@ class EmcBrowser(object):
    a list. Usually you need a single instance of this class for all your needs.
    In order you have to: 
     1. create an instance of the EmcBrowser class
-         ex: my_browser = EmcBrowser("my_browser")
+         ex: my_browser = EmcBrowser('my_browser')
     2. add a page using the page_add() method
          ex: my_browser.page_add(url, title, populate_func)
     3. inside the populate_func you must add all the items using the
@@ -172,7 +172,7 @@ class EmcBrowser(object):
 
       # set topbar title
       full = '> ' + ''.join([page['title'] + ' > ' for page in self.pages])
-      gui.text_set("topbar.title", full[0:-3])
+      gui.text_set('topbar.title', full[0:-3])
 
       # same style for the 2 pages, ask the view to perform the correct animation
       if (view == self.current_view):
@@ -268,7 +268,7 @@ class EmcBrowser(object):
 
       # recreate the page
       self.is_refresh = True
-      DBG("RECREATE "+page_url)
+      DBG('RECREATE ' + page_url)
       page = self.pages[-1]
       self.page_add(page_url, page['title'], page['populate_func'])
 
@@ -278,25 +278,25 @@ class EmcBrowser(object):
 
    def show(self):
       """ TODO Function doc """
-      gui.signal_emit("topbar,show")
+      gui.signal_emit('topbar,show')
       self.current_view.show()
       input_events.listener_add('browser-' + self.name, self._input_event_cb)
 
    def hide(self):
       """ TODO Function doc """
-      gui.signal_emit("topbar,hide")
+      gui.signal_emit('topbar,hide')
       input_events.listener_del('browser-' + self.name)
       self.current_view.hide()
 
    # private stuff
    def _input_event_cb(self, event):
 
-      if event == "BACK":
+      if event == 'BACK':
          self.back()
       elif event == 'VIEW_LIST':
-         self.change_style("List")
+         self.change_style('List')
       elif event == 'VIEW_GRID':
-         self.change_style("Grid")
+         self.change_style('Grid')
       else:
          return self.current_view.input_event_cb(event)
 
@@ -340,7 +340,7 @@ class EmcBrowser(object):
       # else:
          # func = self.icon_get_cb
       # if not callable(func): return None
-      # icon = func(self.pages[-1]["url"], url)
+      # icon = func(self.pages[-1]['url'], url)
       # if not icon: return None
       # return gui.load_icon(icon)
       return None
@@ -353,10 +353,10 @@ class BackITC(EmcBrowserITC):
       EmcBrowserITC.__init__(self) # not really needed
    
    def label_get(self, url, browser, user_data):
-      return "back"
+      return 'back'
    
    def info_get(self, url, browser, user_data):
-      return "Back to previous page"
+      return 'Back to previous page'
       
    def icon_get(self, url, browser, user_data):
       return gui.load_icon('icon/back')
@@ -390,7 +390,7 @@ class ViewList(object):
 
       # EXTERNAL Genlist1
       self.gl1 = gui.part_get('browser.list.genlist1')
-      self.gl1.style_set("browser")
+      self.gl1.style_set('browser')
       self.gl1.homogeneous_set(True)
       self.gl1.always_select_mode_set(True)
       self.gl1.callback_clicked_add(self._cb_item_selected)
@@ -399,14 +399,14 @@ class ViewList(object):
 
       # EXTERNAL Genlist2
       self.gl2 = gui.part_get('browser.list.genlist2')
-      self.gl2.style_set("browser")
+      self.gl2.style_set('browser')
       self.gl2.homogeneous_set(True)
       self.gl2.always_select_mode_set(True)
       self.gl2.callback_clicked_add(self._cb_item_selected)
       self.gl2.callback_selected_add(self._cb_item_hilight)
 
       # genlist item class
-      self.itc = elementary.GenlistItemClass(item_style="default",
+      self.itc = elementary.GenlistItemClass(item_style='default',
                                  text_get_func = self.__genlist_label_get,
                                  icon_get_func = self.__genlist_icon_get,
                                  state_get_func = self.__genlist_state_get)
@@ -454,11 +454,11 @@ class ViewList(object):
 
    def show(self):
       """ Show the view """
-      gui.signal_emit("browser,list,show")
+      gui.signal_emit('browser,list,show')
 
    def hide(self):
       """ Hide the view """
-      gui.signal_emit("browser,list,hide")
+      gui.signal_emit('browser,list,hide')
 
    def clear(self):
       """ Clear the view """
@@ -477,21 +477,21 @@ class ViewList(object):
       item = self.current_list.selected_item_get()
       (url, browser, em_itc, user_data) = item.data_get() # WRN: ITEM_DATA keep consistent
 
-      if event == "DOWN":
+      if event == 'DOWN':
          next = item.next_get()
          if next:
             next.selected_set(1)
             next.show()
             return input_events.EVENT_BLOCK
 
-      elif event == "UP":
+      elif event == 'UP':
          prev = item.prev_get()
          if prev:
             prev.selected_set(1)
             prev.show()
             return input_events.EVENT_BLOCK
 
-      elif event == "OK":
+      elif event == 'OK':
          em_itc.item_selected(url, browser, user_data)
          return input_events.EVENT_BLOCK
 
@@ -536,20 +536,20 @@ class ViewList(object):
 
       # Ask for the item poster and show (or auto-download) it
       poster = em_itc.poster_get(url, browser, user_data)
-      if poster and poster.startswith("http://"):
+      if poster and poster.startswith('http://'):
          if poster.find(';') != -1:
             (url, dest) = poster.split(';')
             self.__im.url_set(url, dest)
          else:
             self.__im.url_set(poster)
-      elif poster and poster.startswith("icon/"):
+      elif poster and poster.startswith('icon/'):
          self.__im.file_set(gui.theme_file, poster)
       else:
-         self.__im.file_set(poster if poster else "")
+         self.__im.file_set(poster if poster else '')
 
       # Fill the textblock with item info info
       text = em_itc.info_get(url, browser, user_data)
-      gui.text_set('browser.list.info', text or "")
+      gui.text_set('browser.list.info', text or '')
 
       return False # don't repeat the timer
 
@@ -571,13 +571,13 @@ class ViewGrid(object):
       """ TODO Function doc """
       DBG('Init view: grid')
 
-      self.itc = elementary.GengridItemClass(item_style="default",
-                                       label_get_func=self.gg_label_get,
-                                       icon_get_func=self.gg_icon_get,
-                                       state_get_func=self.gg_state_get,
-                                       del_func=self.gg_del)
+      self.itc = elementary.GengridItemClass(item_style = 'default',
+                                       label_get_func = self.gg_label_get,
+                                       icon_get_func = self.gg_icon_get,
+                                       state_get_func = self.gg_state_get,
+                                       del_func = self.gg_del)
       gg = elementary.Gengrid(gui.win)
-      gg.style_set("browser")
+      gg.style_set('browser')
       gg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       gg.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       gg.horizontal_set(False)
@@ -591,7 +591,7 @@ class ViewGrid(object):
 
    def page_show(self, title, dir):
       self.gg.clear()
-      gui.text_set("browser.grid.title", title)
+      gui.text_set('browser.grid.title', title)
 
    def item_add(self, item_data):
       it = self.gg.item_append(self.itc, item_data)
@@ -599,10 +599,10 @@ class ViewGrid(object):
          it.selected_set(True)
 
    def show(self):
-      gui.signal_emit("browser,grid,show")
+      gui.signal_emit('browser,grid,show')
 
    def hide(self):
-      gui.signal_emit("browser,grid,hide")
+      gui.signal_emit('browser,grid,hide')
 
    def clear(self):
       self.gg.clear()
@@ -617,7 +617,7 @@ class ViewGrid(object):
       item = self.gg.selected_item_get()
       (url, browser, em_itc, user_data) = item.data_get() # WRN: ITEM_DATA keep consistent
 
-      if event == "RIGHT":
+      if event == 'RIGHT':
          # TODO FIX DOUBLE MOVE
          # elm_focus_highlight_enable_set(Eina_Bool enable); ????
          # elm_object_focus_allow_set
@@ -627,24 +627,24 @@ class ViewGrid(object):
             next.bring_in()
             return input_events.EVENT_BLOCK
 
-      elif event == "LEFT":
+      elif event == 'LEFT':
          prev = item.prev_get()
          if prev:
             prev.selected_set(1)
             prev.bring_in()
             return input_events.EVENT_BLOCK
 
-      elif event == "UP":
+      elif event == 'UP':
          (x, y) = item.pos_get()
          # TODO
          return input_events.EVENT_BLOCK
 
-      elif event == "DOWN":
+      elif event == 'DOWN':
          (x, y) = item.pos_get()
          # TODO
          return input_events.EVENT_BLOCK
 
-      elif event == "OK":
+      elif event == 'OK':
          em_itc.item_selected(url, browser, user_data)
          return input_events.EVENT_BLOCK
 

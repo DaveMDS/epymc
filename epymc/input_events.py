@@ -78,7 +78,7 @@ def listener_del(name):
 def event_emit(event):
    global _listeners
 
-   DBG("Emit Event: " + event + "  listeners: " + str(len(_listeners)))
+   DBG('Emit Event: ' + event + '  listeners: ' + str(len(_listeners)))
 
    gui.mouse_hide()
 

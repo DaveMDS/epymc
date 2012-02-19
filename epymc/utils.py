@@ -60,7 +60,7 @@ def get_resource_file(type, resource, default = None):
          return f
 
       # search relative to the script (epymc.py) dir
-      f = os.path.join(base_dir_get(), "data", type, res)
+      f = os.path.join(base_dir_get(), 'data', type, res)
       if os.path.exists(f):
          return f
 
@@ -82,10 +82,10 @@ def download_url_sync(url, dest, min_size = 0):
       os.makedirs(dir)
 
    (filename, headers) = urllib.urlretrieve(url, dest)
-   DBG("Filename: " + filename)
+   DBG('Filename: ' + filename)
    #~ print headers
    if os.path.getsize(filename) < min_size:
-      DBG("TOO SHORT " + str(os.path.getsize(filename)))
+      DBG('TOO SHORT ' + str(os.path.getsize(filename)))
       os.remove(filename)
       return None
 
@@ -122,12 +122,12 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
 
       # if file size < min_size: report as error
       if status == 200 and min_size > 0 and os.path.getsize(dest) < min_size:
-         DBG("MIN_SIZE not reached, discard download")
+         DBG('MIN_SIZE not reached, discard download')
          status = 404 # HTTP NotFound code
 
       # on errors delete the downloaded file
       if status != 200 and os.path.exists(dest):
-         DBG("download error, HTTP code: " + str(status))
+         DBG('download error, HTTP code: ' + str(status))
          os.remove(dest)
 
       # call the user complete_cb if available

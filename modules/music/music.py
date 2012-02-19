@@ -94,7 +94,7 @@ and what it need to work well, can also use markup like <title>this</> or
       # get music folders from config
       self.__folders = ini.get_string_list('music', 'sources', ';')
       if not self.__folders:
-         print "NO FOLDERS"
+         print 'NO FOLDERS'
          #TODO alert the user. and instruct how to add folders
          return
 
@@ -123,7 +123,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
 ### pages
    def make_root_page(self):
-      self._browser.page_add("music://root", "Music")
+      self._browser.page_add('music://root', 'Music')
 
       count = len(self._artists_db)
       self._browser.item_add('music://artists', 'Artists (%d)' % (count))
@@ -356,17 +356,17 @@ class UpdateDBThread(threading.Thread):
                   if not self.songs_db.id_exists(path):
                      self.read_metadata(path)
                   else:
-                     print "FOUND IN DB"
+                     print 'FOUND IN DB'
                   # TODO Check also file modification time
 
                   #~ count -= 1 # TODO REMOVE ME
                   #~ if count < 1:# TODO REMOVE ME
                         #~ return # TODO REMOVE ME
                else:
-                  print "Error: invalid file extension for file: " + file
+                  print 'Error: invalid file extension for file: ' + file
 
    def read_metadata(self, full_path):
-      print "GET METADATA FOR: " + full_path
+      print 'GET METADATA FOR: ' + full_path
 
       meta = EasyID3(full_path)
 

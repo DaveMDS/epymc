@@ -168,7 +168,7 @@ class EmcBrowser(object):
       # set topbar title
       full = '> ' + ''.join([page['title'] + ' > ' for page in self.pages])
       full = full[0:-3]
-      gui.text_set("topbar.title", full)
+      gui.text_set('topbar.title', full)
 
       # same style for the 2 pages, ask the view to perform the correct animation
       if (view == self.current_view):
@@ -273,25 +273,25 @@ class EmcBrowser(object):
 
    def show(self):
       """ TODO Function doc """
-      gui.signal_emit("topbar,show")
+      gui.signal_emit('topbar,show')
       self.current_view.show()
       input_events.listener_add('browser-' + self.name, self._input_event_cb)
 
    def hide(self):
       """ TODO Function doc """
-      gui.signal_emit("topbar,hide")
+      gui.signal_emit('topbar,hide')
       input_events.listener_del('browser-' + self.name)
       self.current_view.hide()
 
    # private stuff
    def _input_event_cb(self, event):
 
-      if event == "BACK":
+      if event == 'BACK':
          self.back()
       elif event == 'VIEW_LIST':
-         self.change_style("List")
+         self.change_style('List')
       elif event == 'VIEW_GRID':
-         self.change_style("Grid")
+         self.change_style('Grid')
       else:
          return self.current_view.input_event_cb(event)
 
@@ -309,15 +309,15 @@ class EmcBrowser(object):
    # Stuff for Views
    def _item_selected(self, url):
       """ TODO Function doc """
-      if url.startswith("emc://"):
-         if url.endswith("//back"):
+      if url.startswith('emc://'):
+         if url.endswith('//back'):
             self.back()
       else:
          if self.pages[-1]['item_selected_cb']:
             func = self.pages[-1]['item_selected_cb']
          else:
             func = self.item_selected_cb
-         if callable(func): func(self.pages[-1]["url"], url)
+         if callable(func): func(self.pages[-1]['url'], url)
 
    def _icon_get(self, url):
       """ TODO Function doc """
@@ -330,7 +330,7 @@ class EmcBrowser(object):
       else:
          func = self.icon_get_cb
       if not callable(func): return None
-      icon = func(self.pages[-1]["url"], url)
+      icon = func(self.pages[-1]['url'], url)
       if not icon: return None
       return gui.load_icon(icon)
 
@@ -343,7 +343,7 @@ class EmcBrowser(object):
       else:
          func = self.icon_end_get_cb
       if not callable(func): return None
-      icon = func(self.pages[-1]["url"], url)
+      icon = func(self.pages[-1]['url'], url)
       if not icon: return None
       return gui.load_icon(icon)
 
@@ -404,7 +404,7 @@ class ViewList(object):
 
       # EXTERNAL Genlist1
       self.gl1 = gui.part_get('browser.list.genlist1')
-      self.gl1.style_set("browser")
+      self.gl1.style_set('browser')
       self.gl1.homogeneous_set(True)
       self.gl1.always_select_mode_set(True)
       self.gl1.focus_allow_set(False)
@@ -414,7 +414,7 @@ class ViewList(object):
 
       # EXTERNAL Genlist2
       self.gl2 = gui.part_get('browser.list.genlist2')
-      self.gl2.style_set("browser")
+      self.gl2.style_set('browser')
       self.gl2.homogeneous_set(True)
       self.gl2.always_select_mode_set(True)
       self.gl2.focus_allow_set(False)
@@ -422,7 +422,7 @@ class ViewList(object):
       self.gl2.callback_selected_add(self._cb_item_hilight)
 
       # genlist item class
-      self.itc = elementary.GenlistItemClass(item_style="default",
+      self.itc = elementary.GenlistItemClass(item_style = 'default',
                                  text_get_func = self.__genlist_label_get,
                                  content_get_func = self.__genlist_icon_get,
                                  state_get_func = self.__genlist_state_get)
@@ -465,7 +465,7 @@ class ViewList(object):
       When an item will be selected you should call:
       parent_browser._item_selected(url) with the url of the selected item
       """
-      DBG("item_add( , %s, %s)" % (url, label))
+      DBG('item_add( , %s, %s)' % (url, label))
       item_data = (url, label, parent_browser)
       it = self.current_list.item_append(self.itc, item_data)
       if not self.current_list.selected_item_get():
@@ -477,13 +477,13 @@ class ViewList(object):
 
    def show(self):
       """ Show the view """
-      gui.signal_emit("browser,list,show")
+      gui.signal_emit('browser,list,show')
 
    def hide(self):
       """ Hide the view """
       if self.timer: self.timer.delete()
       if self.timer2: self.timer2.delete()
-      gui.signal_emit("browser,list,hide")
+      gui.signal_emit('browser,list,hide')
 
    def clear(self):
       """ Clear the view """
@@ -506,21 +506,21 @@ class ViewList(object):
       item = self.current_list.selected_item_get()
       (url, label, parent_browser) = item.data_get()
 
-      if event == "DOWN":
+      if event == 'DOWN':
          next = item.next_get()
          if next:
             next.selected_set(1)
             next.show()
             return input_events.EVENT_BLOCK
 
-      elif event == "UP":
+      elif event == 'UP':
          prev = item.prev_get()
          if prev:
             prev.selected_set(1)
             prev.show()
             return input_events.EVENT_BLOCK
 
-      elif event == "OK":
+      elif event == 'OK':
          parent_browser._item_selected(url)
          return input_events.EVENT_BLOCK
 
@@ -529,12 +529,12 @@ class ViewList(object):
    ### GenList Item Class
    def __genlist_label_get(self, obj, part, item_data):
       (url, label, parent_browser) = item_data
-      DBG("LABEL: " + label)
+      DBG('LABEL: ' + label)
       return label
 
    def __genlist_icon_get(self, obj, part, data):
       (url, label, parent_browser) = data
-      DBG("_content get(): " + label)
+      DBG('_content get(): ' + label)
       if part == 'elm.swallow.icon':
          return parent_browser._icon_get(url)
       elif part == 'elm.swallow.end':
@@ -560,20 +560,20 @@ class ViewList(object):
 
       # Fill the textblock with item info info
       text = parent_browser._info_get(url)
-      gui.text_set('browser.list.info', text or "")
+      gui.text_set('browser.list.info', text or '')
 
       # Ask for the item poster and show (or auto-download) it
       poster = parent_browser._poster_get(url)
-      if poster and poster.startswith("http://"):
+      if poster and poster.startswith('http://'):
          if poster.find(';') != -1:
             (url, dest) = poster.split(';')
             self.__im.url_set(url, dest)
          else:
             self.__im.url_set(poster)
-      elif poster and poster.startswith("icon/"):
+      elif poster and poster.startswith('icon/'):
          self.__im.file_set(gui.theme_file, poster)
       else:
-         self.__im.file_set(poster if poster else "")
+         self.__im.file_set(poster if poster else '')
 
       return False # don't repeat the timer
 

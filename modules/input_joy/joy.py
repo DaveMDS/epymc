@@ -48,7 +48,7 @@ and what it need to work well, can also use markup like <title>this</> or
    EVENT_BUTTON = 0x01 # button pressed/released 
    EVENT_AXIS = 0x02   # axis moved  
    EVENT_INIT = 0x80   # button/axis initialized  
-   EVENT_FORMAT = "IhBB" 
+   EVENT_FORMAT = 'IhBB'
    EVENT_SIZE = struct.calcsize(EVENT_FORMAT)
 
    def __init__(self):
@@ -72,11 +72,11 @@ and what it need to work well, can also use markup like <title>this</> or
          self.invert_h = ini.get_bool('joystick', 'invert_h');
          self.invert_v = ini.get_bool('joystick', 'invert_v');
       except:
-         print ("Error: Joystick configuration value missed")
+         print ('Error: Joystick configuration value missed')
          # TODO spawn the configurator
 
       # add an entry in the config gui
-      config_gui.root_item_add("joystick", 50, "Joystick", icon = None,
+      config_gui.root_item_add('joystick', 50, 'Joystick', icon = None,
                                callback = self.config_panel_cb)
 
       # open the joystick device
@@ -91,7 +91,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def __shutdown__(self):
       DBG('Shutdown module: Joystick')
-      config_gui.root_item_del("joystick")
+      config_gui.root_item_del('joystick')
       if self.fdh: self.fdh.delete()
       if self.dev: self.dev.close()
 

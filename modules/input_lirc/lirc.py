@@ -63,7 +63,7 @@ and what it need to work well, can also use markup like <title>this</> or
          #~ self.invert_h = ini.get_bool('joystick', 'invert_h');
          #~ self.invert_v = ini.get_bool('joystick', 'invert_v');
       #~ except:
-         #~ print "Error: Joystick configuration value missed"
+         #~ print 'Error: Joystick configuration value missed'
          # TODO spawn the configurator
          #~ return
 

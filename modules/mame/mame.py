@@ -67,7 +67,7 @@ and what it need to work well, can also use markup like <title>this</> or
                        info_get_cb = self.browser_info_get,
                        icon_get_cb = self.browser_icon_get)
 
-      mainmenu.item_add("mame", 50, "M.A.M.E", None, self.cb_mainmenu)
+      mainmenu.item_add('mame', 50, 'M.A.M.E', None, self.cb_mainmenu)
 
       # create config ini section if not exists
       ini.add_section('mame')
@@ -76,11 +76,11 @@ and what it need to work well, can also use markup like <title>this</> or
       DBG('Shutdown MAME')
 
       # save favorite games
-      ini.set_string_list("mame", "favorites", MameModule._favorites, ',')
+      ini.set_string_list('mame', 'favorites', MameModule._favorites, ',')
 
       # clear stuff
       self._browser.delete()
-      mainmenu.item_del("mame")
+      mainmenu.item_del('mame')
       del self._games
 
    def cb_mainmenu(self):
@@ -100,7 +100,7 @@ and what it need to work well, can also use markup like <title>this</> or
       # Aquire mame dirs from the command 'mame -showconfig'
       MameModule._rompaths = []
       MameModule._snapshoot_dir = None
-      exe = ecore.Exe(MAME_EXE + " -showconfig | grep -e snapshot_directory -e rompath",
+      exe = ecore.Exe(MAME_EXE + ' -showconfig | grep -e snapshot_directory -e rompath',
                      ecore.ECORE_EXE_PIPE_READ |
                      ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
       exe.on_data_event_add(self.cb_exe_event_showconfig)
@@ -144,7 +144,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
          if len(MameModule._rompaths) > 0:
             # get the list of games now
-            exe = ecore.Exe(MAME_EXE + " -listfull",
+            exe = ecore.Exe(MAME_EXE + ' -listfull',
                            ecore.ECORE_EXE_PIPE_READ |
                            ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
             exe.on_data_event_add(self.cb_exe_event_listfull)
@@ -181,7 +181,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
 ## browser pages
    def create_root_page(self):
-      self._browser.page_add('mame://root', "M.A.M.E")
+      self._browser.page_add('mame://root', 'M.A.M.E')
       self._browser.item_add('mame://mygames',
                              'My Games (%d)' % (self.count_roms()))
       self._browser.item_add('mame://allgames',
@@ -192,12 +192,12 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def my_games_list(self):
       """ Create the list of personal games """
-      self._browser.page_add('mame://mygames', "My Games")
+      self._browser.page_add('mame://mygames', 'My Games')
 
       L = list()
       for dir in MameModule._rompaths:
          for rom in os.listdir(dir):
-            id = rom.strip(".zip")
+            id = rom.strip('.zip')
             if id and self._games.has_key(id):
                L.append((id, self._games[id].name))
 
@@ -207,7 +207,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def all_games_list(self):
       """ Create the list of all know mame games """
-      self._browser.page_add('mame://allgames', "All Games")
+      self._browser.page_add('mame://allgames', 'All Games')
 
       L = list()
       for id, g in self._games.items():
@@ -219,7 +219,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def fav_games_list(self):
       """ Create the list of favorite games """
-      self._browser.page_add('mame://favgames', "Favorite Games")
+      self._browser.page_add('mame://favgames', 'Favorite Games')
 
       for gid in MameModule._favorites:
          if self._games.has_key(gid):
@@ -237,7 +237,7 @@ and what it need to work well, can also use markup like <title>this</> or
       # parse the cats list (if not yet done)
       if not self._parse_cats_file(): return
 
-      self._browser.page_add('mame://cats', "Categories")
+      self._browser.page_add('mame://cats', 'Categories')
 
       for cat_name in sorted(self._categories.keys()):
          self._browser.item_add('mame://cats/' + cat_name,
@@ -306,14 +306,14 @@ and what it need to work well, can also use markup like <title>this</> or
             return 'icon/star'
 
    def browser_item_selected(self, page_url, item_url):
-      DBG("PAGE: " + str(page_url))
-      DBG("ITEM: " + str(item_url))
-      if item_url == "mame://root": self.create_root_page()
-      elif item_url == "mame://mygames": self.my_games_list()
-      elif item_url == "mame://allgames": self.all_games_list()
-      elif item_url == "mame://favgames": self.fav_games_list()
-      elif item_url == "mame://cats": self.cats_list()
-      elif item_url.startswith("mame://cats/"):
+      DBG('PAGE: ' + str(page_url))
+      DBG('ITEM: ' + str(item_url))
+      if item_url == 'mame://root': self.create_root_page()
+      elif item_url == 'mame://mygames': self.my_games_list()
+      elif item_url == 'mame://allgames': self.all_games_list()
+      elif item_url == 'mame://favgames': self.fav_games_list()
+      elif item_url == 'mame://cats': self.cats_list()
+      elif item_url.startswith('mame://cats/'):
          self.game_by_cat_list(item_url[12:])
       elif self._games.has_key(item_url):
          self._games[item_url].dialog_show()
@@ -384,7 +384,7 @@ class MameGame(object):
       box.pack_end(image)
 
       sentry = elementary.ScrolledEntry(gui.win)
-      sentry.style_set("dialog")
+      sentry.style_set('dialog')
       sentry.editable_set(False)
       sentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       sentry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
@@ -541,12 +541,12 @@ class MameGame(object):
       # Try to download the game from various roms site
       sources = []
       # freeroms.com
-      title = "Trying at freeroms.org...<br>"
+      title = 'Trying at freeroms.org...<br>'
       prefix = 'NUM' if self.gid[0].isdigit() else self.gid[0]
       url = 'http://download.freeroms.com/mame_roms/%s/%s.zip' % (prefix, self.gid)
       sources.append((title, url))
        # try somewhere else (suggestions are welcome)
-      title = "Trying not_work.com...<br>"
+      title = 'Trying not_work.com...<br>'
       url = 'http://freeroms67.freeroms.com/mame_roms/%c/%s.zip' % (self.gid[0], self.gid)
       sources.append((title, url))
 

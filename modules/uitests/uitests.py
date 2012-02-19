@@ -108,7 +108,7 @@ class UiTestsModule(EmcModule):
       text  = '<title>System info:</><br>'
       text += '<b>base dir</b> %s<br>' % (utils.base_dir_get())
       text += '<b>config dir</b> %s<br>' % (utils.config_dir_get())
-      text += '<b>download available</b> %s<br>' % (ecore.file.download_protocol_available("http://"))
+      text += '<b>download available</b> %s<br>' % (ecore.file.download_protocol_available('http://'))
       text += '<b>theme</b> %s<br>' % (ini.get('general', 'theme'))
       text += '<b>theme file</b> %s<br>' % (gui.theme_file)
       return text
@@ -135,7 +135,7 @@ class UiTestsModule(EmcModule):
 
       # Source Selector
       elif item_url == 'uitests://sselector':
-         EmcSourceSelector(title = "Source Selector Test")
+         EmcSourceSelector(title = 'Source Selector Test')
 
       # Dialog - Info
       elif item_url == 'uitests://dlg-info':
@@ -188,9 +188,9 @@ class UiTestsModule(EmcModule):
          text = LOREM
          d = EmcDialog(title = 'Dialog - Panel full', text = text, style = 'panel',
                        spinner = True)
-         d.button_add("One")
-         d.button_add("Two")
-         d.button_add("Tree")
+         d.button_add('One')
+         d.button_add('Two')
+         d.button_add('Tree')
 
       # Dialog - Panel no buttons
       elif item_url == 'uitests://dlg-panel2':

@@ -115,7 +115,7 @@ def _toggle_fullscreen():
 
 def _change_scale():
    def _bigger(dialog): gui.scale_bigger(); _save()
-   def _smaller(dialog): gui.scale_bigger(); _save()
+   def _smaller(dialog): gui.scale_smaller(); _save()
    def _reset(dialog): gui.scale_set(1.0); _save()
    def _save():
       d.text_set('Current Value: %s' % (gui.scale_get()))

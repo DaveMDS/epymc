@@ -116,209 +116,6 @@ collections {
             }
          }
 
-/// browser view: list
-         part { name: "browser.list.clip";
-            type: RECT;
-            description { state: "default" 0.0;
-               color: 255 255 255 0;
-               visible: 0;
-            }
-            description { state: "visible" 0.0;
-               color: 255 255 255 255;
-               visible: 1;
-            }
-         }
-         part { name: "browser.list.list_frame";
-            type: IMAGE;
-            clip_to: "browser.list.clip";
-            description { state: "default" 0.0;
-               rel1.offset: 10 50;
-               rel2.relative: 0.5 1.0;
-               rel2.offset: -1 -10;
-               image.normal: "frame.png";
-               image.border: 0 0 92 78;
-            }
-         }
-         part { name: "browser.list.list_clip";
-            type: RECT;
-            description { state: "default" 0.0;
-               visible: 0;
-               color: 255 255 255 0;
-               rel1 {
-                  to: "browser.list.list_frame";
-                  offset: 14 20;
-               }
-               rel2 {
-                  to: "browser.list.list_frame";
-                  offset: -17 -75;
-               }
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               color: 255 255 255 255;
-               visible: 1;
-            }
-         }
-         part { name: "browser.list.genlist1"; /* API */
-            type: EXTERNAL;
-            source: "elm/genlist";
-            clip_to: "browser.list.list_clip";
-            description { state: "default" 0.0;
-               rel1.to: "browser.list.list_clip";
-               rel2.to: "browser.list.list_clip";
-            }
-            description { state: "center" 0.0;
-               inherit: "default" 0.0;
-            }
-            description { state: "left" 0.0;
-               inherit: "default" 0.0;
-               rel1.relative: -1.0 0.0;
-               rel2.relative: 0.0 1.0;
-            }
-            description { state: "right" 0.0;
-               inherit: "default" 0.0;
-               rel1.relative: 1.0 0.0;
-               rel2.relative: 2.0 1.0;
-            }
-         }
-         part { name: "browser.list.genlist2"; /* API */
-            type: EXTERNAL;
-            source: "elm/genlist";
-            clip_to: "browser.list.list_clip";
-            description { state: "default" 0.0;
-               rel1 {
-                  to: "browser.list.genlist1";
-                  relative: 1.0 0.0;
-               }
-               rel2 {
-                  to: "browser.list.genlist1";
-                  relative: 2.0 1.0;
-               }
-            }
-            description { state: "on_the_right" 0.0;
-               inherit: "default" 0.0;
-            }
-            description { state: "on_the_left" 0.0;
-               rel1 {
-                  to: "browser.list.genlist1";
-                  relative: -1.0 0.0;
-               }
-               rel2 {
-                  to: "browser.list.genlist1";
-                  relative: 0.0 1.0;
-               }
-            }
-         }
-         part { name: "browser.list.total"; /* API */
-            type: TEXT;
-            clip_to: "browser.list.clip";
-            effect: SHADOW;
-            description { state: "default" 0.0;
-               color: FONT_COLOR;
-               color3: 0 0 0 255;
-               rel1 {
-                  to: "browser.list.list_frame";
-                  relative: 1.0 1.0;
-                  offset: -185 -70;
-               }
-               rel2 {
-                  to: "browser.list.list_frame";
-                  relative: 1.0 1.0;
-                  offset: -27 -38;
-               }
-               text {
-                  text: "Total: 10";
-                  font: FONT;
-                  size: FONT_SIZE;
-               }
-            }
-         }
-         part { name: "browser.list.poster"; /* API */
-            type: SWALLOW;
-            clip_to: "browser.list.clip";
-            description { state: "default" 0.0;
-               rel1 {
-                  relative: 0.5 0.0;
-                  offset: 20 50;
-               }
-               rel2 {
-                  relative: 1.0 0.62;
-                  offset: -20 0;
-               }
-            }
-         }
-         part { name: "browser.list.info_bg";
-            type: IMAGE;
-            clip_to: "browser.list.clip";
-            description { state: "default" 0.0;
-               image.normal: "frame2.png";
-               image.border: 8 8 8 8;
-               rel1 {
-                  to: "browser.list.info";
-                  offset: -20 -15;
-               }
-               rel2 {
-                  to: "browser.list.info";
-                  offset: 8 8;
-               }
-            }
-         }
-         part { name: "browser.list.info"; /* API */
-            type: TEXTBLOCK;
-            clip_to: "browser.list.clip";
-            multiline: 1;
-            description { state: "default" 0.0;
-               rel1 {
-                  relative: 0.5 0.65;
-                  offset: 30 10;
-               }
-               rel2 {
-                  offset: -20 -30;
-               }
-               text {
-                  style: "epymc_default_style";
-                  align: 0.0 0.0;
-               }
-            }
-         }
-
-/// browser view: grid
-         part { name: "browser.grid.gengrid"; /* API */
-            type: SWALLOW;
-            clip_to: "browser.grid.clip";
-            description { state: "default" 0.0;
-               color: 255 255 255 100;
-               rel1.offset: 0 100;
-            }
-         }
-         part { name: "browser.grid.title"; /* API */
-            type: TEXT;
-            clip_to: "browser.grid.clip";
-            effect: FAR_SOFT_SHADOW;
-            description { state: "default" 0.0;
-               color: 200 200 200 255;
-               color3: 50 50 50 100;
-               rel1.offset: 0 40;
-               rel2.relative: 1.0 0.0;
-               rel2.offset: 0 100;
-               text {
-                  font: FONT_BOLD;
-                  size: 40;
-               }
-            }
-         }
-         part { name: "browser.grid.clip";
-            type: RECT;
-            description { state: "default" 0.0;
-               color: 255 255 255 0;
-               visible: 0;
-            }
-            description { state: "visible" 0.0;
-               color: 255 255 255 255;
-               visible: 1;
-            }
-         }
-
 /// browser top bar
          part { name: "topbar.clip";
             type: RECT;
@@ -425,6 +222,223 @@ collections {
                   size: FONT_SIZE_BIG;
                   align: 1.0 0.7;
                }
+            }
+         }
+         part { name: "topbar.list.spacer";
+            type: RECT;
+            scale: 1;
+            description { state: "default" 0.0;
+               max: 9999 40;
+               visible: 0;
+               align: 0.5 0.0;
+            }
+         }
+
+/// browser view: list
+         part { name: "browser.list.clip";
+            type: RECT;
+            description { state: "default" 0.0;
+               color: 255 255 255 0;
+               visible: 0;
+            }
+            description { state: "visible" 0.0;
+               color: 255 255 255 255;
+               visible: 1;
+            }
+         }
+         part { name: "browser.list.list_frame";
+            type: IMAGE;
+            clip_to: "browser.list.clip";
+            description { state: "default" 0.0;
+               rel1.offset: 5 10;
+               rel1.to: "topbar.list.spacer";
+               rel1.relative: 0.0 1.0;
+               rel2.relative: 0.5 1.0;
+               rel2.offset: -1 -10;
+               image.normal: "frame.png";
+               image.border: 0 0 92 78;
+            }
+         }
+         part { name: "browser.list.list_clip";
+            type: RECT;
+            description { state: "default" 0.0;
+               visible: 0;
+               color: 255 255 255 0;
+               rel1 {
+                  to: "browser.list.list_frame";
+                  offset: 14 20;
+               }
+               rel2 {
+                  to: "browser.list.list_frame";
+                  offset: -17 -75;
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               color: 255 255 255 255;
+               visible: 1;
+            }
+         }
+         part { name: "browser.list.genlist1"; /* API */
+            type: EXTERNAL;
+            source: "elm/genlist";
+            clip_to: "browser.list.list_clip";
+            description { state: "default" 0.0;
+               rel1.to: "browser.list.list_clip";
+               rel2.to: "browser.list.list_clip";
+            }
+            description { state: "center" 0.0;
+               inherit: "default" 0.0;
+            }
+            description { state: "left" 0.0;
+               inherit: "default" 0.0;
+               rel1.relative: -1.0 0.0;
+               rel2.relative: 0.0 1.0;
+            }
+            description { state: "right" 0.0;
+               inherit: "default" 0.0;
+               rel1.relative: 1.0 0.0;
+               rel2.relative: 2.0 1.0;
+            }
+         }
+         part { name: "browser.list.genlist2"; /* API */
+            type: EXTERNAL;
+            source: "elm/genlist";
+            clip_to: "browser.list.list_clip";
+            description { state: "default" 0.0;
+               rel1 {
+                  to: "browser.list.genlist1";
+                  relative: 1.0 0.0;
+               }
+               rel2 {
+                  to: "browser.list.genlist1";
+                  relative: 2.0 1.0;
+               }
+            }
+            description { state: "on_the_right" 0.0;
+               inherit: "default" 0.0;
+            }
+            description { state: "on_the_left" 0.0;
+               rel1 {
+                  to: "browser.list.genlist1";
+                  relative: -1.0 0.0;
+               }
+               rel2 {
+                  to: "browser.list.genlist1";
+                  relative: 0.0 1.0;
+               }
+            }
+         }
+         part { name: "browser.list.total"; /* API */
+            type: TEXT;
+            clip_to: "browser.list.clip";
+            effect: SHADOW;
+            scale: 1;
+            description { state: "default" 0.0;
+               color: FONT_COLOR;
+               color3: 0 0 0 255;
+               rel1 {
+                  to: "browser.list.list_frame";
+                  relative: 1.0 1.0;
+                  offset: -185 -70;
+               }
+               rel2 {
+                  to: "browser.list.list_frame";
+                  relative: 1.0 1.0;
+                  offset: -27 -38;
+               }
+               text {
+                  text: "Total: 10";
+                  font: FONT;
+                  size: FONT_SIZE_BIG-4;
+               }
+            }
+         }
+         part { name: "browser.list.poster"; /* API */
+            type: SWALLOW;
+            clip_to: "browser.list.clip";
+            description { state: "default" 0.0;
+               rel1 {
+                  to_y: "topbar.list.spacer";
+                  relative: 0.5 1.0;
+                  offset: 20 20;
+               }
+               rel2 {
+                  relative: 1.0 0.62;
+                  offset: -20 0;
+               }
+            }
+         }
+         part { name: "browser.list.info_bg";
+            type: IMAGE;
+            clip_to: "browser.list.clip";
+            description { state: "default" 0.0;
+               image.normal: "frame2.png";
+               image.border: 8 8 8 8;
+               rel1 {
+                  to: "browser.list.info";
+                  offset: -20 -15;
+               }
+               rel2 {
+                  to: "browser.list.info";
+                  offset: 8 8;
+               }
+            }
+         }
+         part { name: "browser.list.info"; /* API */
+            type: TEXTBLOCK;
+            clip_to: "browser.list.clip";
+            multiline: 1;
+            scale: 1;
+            description { state: "default" 0.0;
+               rel1 {
+                  relative: 0.5 0.65;
+                  offset: 30 10;
+               }
+               rel2 {
+                  offset: -20 -30;
+               }
+               text {
+                  style: "epymc_default_style";
+                  align: 0.0 0.0;
+               }
+            }
+         }
+
+/// browser view: grid
+         part { name: "browser.grid.gengrid"; /* API */
+            type: SWALLOW;
+            clip_to: "browser.grid.clip";
+            description { state: "default" 0.0;
+               color: 255 255 255 100;
+               rel1.offset: 0 100;
+            }
+         }
+         part { name: "browser.grid.title"; /* API */
+            type: TEXT;
+            clip_to: "browser.grid.clip";
+            effect: FAR_SOFT_SHADOW;
+            description { state: "default" 0.0;
+               color: 200 200 200 255;
+               color3: 50 50 50 100;
+               rel1.offset: 0 40;
+               rel2.relative: 1.0 0.0;
+               rel2.offset: 0 100;
+               text {
+                  font: FONT_BOLD;
+                  size: 40;
+               }
+            }
+         }
+         part { name: "browser.grid.clip";
+            type: RECT;
+            description { state: "default" 0.0;
+               color: 255 255 255 0;
+               visible: 0;
+            }
+            description { state: "visible" 0.0;
+               color: 255 255 255 255;
+               visible: 1;
             }
          }
 

@@ -51,6 +51,7 @@ def init():
                                #~ info_get_cb = self.cb_info_get)
 
    root_item_add("config://modules/", 1, "Modules", None, _modules_list)
+   root_item_add("config://scale/", 20, "Scale", None, _change_scale)
    root_item_add("config://fs/", 30, "Toggle Fullscreen / Windowed mode",
                  None, _toggle_fullscreen)
 
@@ -105,12 +106,27 @@ def _item_selected_cb(page, item):
                cb()
             break
 
-##############  FULLSCREEN  ###################################################
+##############  GUI  #########################################################
 import ini
 
 def _toggle_fullscreen():
    ini.set('general', 'fullscreen', not gui.win.fullscreen)
    input_events.event_emit('TOGGLE_FULLSCREEN')
+
+def _change_scale():
+   def _bigger(dialog): gui.scale_bigger(); _save()
+   def _smaller(dialog): gui.scale_bigger(); _save()
+   def _reset(dialog): gui.scale_set(1.0); _save()
+   def _save():
+      d.text_set('Current Value: %s' % (gui.scale_get()))
+      ini.set('general', 'scale', str(gui.scale_get()))
+
+   d = gui.EmcDialog(title = 'set scale', style = 'minimal',
+                     text = 'Current Value: %s' % (gui.scale_get()))
+   d.button_add("Bigger", selected_cb = _bigger)
+   d.button_add("Smaller", selected_cb = _smaller)
+   d.button_add("Reset", selected_cb = _reset)
+   
 
 ##############  MODULES  ######################################################
 import modules

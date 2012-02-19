@@ -41,6 +41,9 @@ class EmcDatabase(object):
    def __del__(self):
       self.__sh.close()
 
+   def __len__(self):
+      return len(self.__sh or '')
+
    def get_data(self, id):
       DBG('Get Data on db ' + self.__name + ', id: ' + id)
       return self.__sh[id]

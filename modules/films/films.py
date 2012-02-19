@@ -41,7 +41,7 @@ import epymc.gui as gui
 from pprint import pprint
 import pdb
 def DBG(msg):
-   print('FILM: %s' % (msg))
+   # print('FILM: %s' % (msg))
    pass
 
 TMDB_API_KEY = "19eef197b81231dff0fd1a14a8d5f863" # Key of the user DaveMDS

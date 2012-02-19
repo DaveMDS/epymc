@@ -39,6 +39,7 @@ _mapping = { 'Up': 'UP',
              'Escape': 'EXIT',
              'BackSpace': 'BACK',
              'space': 'TOGGLE_PAUSE',
+             'Pause': 'TOGGLE_PAUSE',
              'plus': 'VOLUME_UP',
              'minus': 'VOLUME_DOWN',
              'KP_Add': 'VOLUME_UP',
@@ -46,6 +47,8 @@ _mapping = { 'Up': 'UP',
              'm': 'VOLUME_MUTE',
              'p': 'TOGGLE_PAUSE',
              'f': 'TOGGLE_FULLSCREEN',
+             'F6': 'BIGGER',
+             'F5': 'SMALLER',
            }
 
 class KeyboardModule(EmcModule):

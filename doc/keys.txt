@@ -11,9 +11,10 @@ Arrows                           UP,DOWN,LEFT,RIGHT
 Enter or KP_Enter                OK
 BackSpace                        BACK
 Esc                              EXIT
-Space or P                       TOGGLE_PAUSE
+Space, P or Pause                TOGGLE_PAUSE
 F                                TOGGLE_FULLSCREEN
 + or KP_+                        VOLUME_UP
 - or KP_-                        VOLUME_DOWN
 M                                VOLUME_MUTE
-
+F5                               SMALLER
+F6                               BIGGER

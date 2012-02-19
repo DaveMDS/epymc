@@ -29,6 +29,7 @@ import epymc.utils as utils
 import epymc.ini as ini
 import epymc.gui as gui
 import epymc.browser as browser
+import epymc.mediaplayer as mediaplayer
 
 from films import TMDB_WithGui
 
@@ -85,6 +86,7 @@ class UiTestsModule(EmcModule):
    def make_root_page(self):
       self._browser.page_add('uitests://root', 'UI tests')
 
+      self._browser.item_add('uitests://mpv', 'Mediaplayer Video')
       self._browser.item_add('uitests://tmdb', 'Themoviedb.org query with gui (need fix for non ascii)')
       self._browser.item_add('uitests://vkbd', 'Virtual Keyboard (need some fixes)')
       self._browser.item_add('uitests://sselector', 'Source Selector')
@@ -120,6 +122,12 @@ class UiTestsModule(EmcModule):
       elif item_url == 'uitests://tmdb':
          s = TMDB_WithGui()
          s.movie_search('alien')
+
+      # Mediaplayer Video
+      elif item_url == 'uitests://mpv':
+         mediaplayer.play_video('/home/dave/Video/test.avi')
+         # mediaplayer.video_player_show()
+         # mediaplayer.video_controls_show()
 
       # VKeyboard
       elif item_url == 'uitests://vkbd':

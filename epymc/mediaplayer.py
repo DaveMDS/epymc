@@ -110,7 +110,7 @@ def fbackward():
 def volume_set(vol):
    global _volume
 
-   _volume = max(0, min(vol, 100))
+   _volume = max(0, min(int(vol), 100))
    ini.set('mediaplayer', 'volume', _volume)
    gui.part_get('volume/slider').value = _volume
    if _emotion:
@@ -147,8 +147,10 @@ def video_controls_hide():
 def video_controls_toggle():
    if _controls_visible:
       video_controls_hide()
+      volume_hide()
    else:
       video_controls_show()
+      volume_show()
 
 def volume_show(hidein = 0):
    global _volume_visible
@@ -184,11 +186,6 @@ def _init_emotion():
    #~ _emotion.on_audio_level_change_add(_cb_volume_change)
 
 
-   # buttons box
-   box = elementary.Box(gui.win)
-   box.horizontal_set(1)
-   gui.swallow_set("videoplayer/controls/btn_swallow", box)
-   
    #  <<  fast backward
    bt = elementary.Button(gui.win);
    bt.icon_set(gui.load_icon("icon/fbwd"))
@@ -197,7 +194,7 @@ def _init_emotion():
    bt.on_mouse_in_add(_cb_btns_mouse_in)
    bt.disabled_set(1)
    bt.show()
-   box.pack_end(bt)
+   gui.box_append('videoplayer/controls/btn_box', bt)
    _buttons.append(bt)
 
    #  <   backward
@@ -208,7 +205,7 @@ def _init_emotion():
    bt.on_mouse_in_add(_cb_btns_mouse_in)
    bt.disabled_set(1)
    bt.show()
-   box.pack_end(bt)
+   gui.box_append('videoplayer/controls/btn_box', bt)
    _buttons.append(bt)
 
    #  stop
@@ -217,10 +214,9 @@ def _init_emotion():
    bt.callback_clicked_add(_cb_btn_stop)
    bt.data['cb'] = _cb_btn_stop
    bt.on_mouse_in_add(_cb_btns_mouse_in)
-   bt.text_set("Stop")
    bt.disabled_set(1)
    bt.show()
-   box.pack_end(bt)
+   gui.box_append('videoplayer/controls/btn_box', bt)
    _buttons.append(bt)
 
    #  play/pause
@@ -229,10 +225,9 @@ def _init_emotion():
    bt.callback_clicked_add(_cb_btn_play)
    bt.data['cb'] = _cb_btn_play
    bt.on_mouse_in_add(_cb_btns_mouse_in)
-   bt.text_set("Pause")
    bt.disabled_set(0)
    bt.show()
-   box.pack_end(bt)
+   gui.box_append('videoplayer/controls/btn_box', bt)
    _buttons.append(bt)
 
    #  >   forward
@@ -243,7 +238,7 @@ def _init_emotion():
    bt.on_mouse_in_add(_cb_btns_mouse_in)
    bt.disabled_set(1)
    bt.show()
-   box.pack_end(bt)
+   gui.box_append('videoplayer/controls/btn_box', bt)
    _buttons.append(bt)
    
    #  >>  fast forward
@@ -254,7 +249,7 @@ def _init_emotion():
    bt.on_mouse_in_add(_cb_btns_mouse_in)
    bt.disabled_set(1)
    bt.show()
-   box.pack_end(bt)
+   gui.box_append('videoplayer/controls/btn_box', bt)
    _buttons.append(bt)
 
 
@@ -282,16 +277,12 @@ def _cb_btns_mouse_in(button, event):
 
 def _cb_btn_play(btn):
    DBG("Play cb")
-   if _emotion.play:
-      _emotion.play = False
-      btn.text_set('Play')
-   else:
-      _emotion.play = True
-      btn.text_set('Pause')
+   _emotion.play = not _emotion.play
 
 def _cb_btn_stop(btn):
    stop()
    video_player_hide()
+   volume_hide()
 
 def _cb_btn_forward(btn):
    forward()
@@ -329,9 +320,16 @@ def _update_slider():
 def input_event_cb(event):
    global _current_button_num
 
+   if event == 'EXIT':
+         stop()
+         video_player_hide()
+         volume_hide()
+         return input_events.EVENT_BLOCK
+
    if _controls_visible:
       if event == 'BACK':
          video_controls_hide()
+         volume_hide()
          return input_events.EVENT_BLOCK
       if event == 'OK':
          button = _buttons[_current_button_num]
@@ -356,9 +354,11 @@ def input_event_cb(event):
       if event == 'BACK':
          stop()
          video_player_hide()
+         volume_hide()
          return input_events.EVENT_BLOCK
       elif event == 'OK':
          video_controls_show()
+         volume_show()
          return input_events.EVENT_BLOCK
       elif event == 'RIGHT':
          forward()

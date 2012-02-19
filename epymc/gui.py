@@ -49,6 +49,10 @@ def init():
       ini.set('general', 'theme', 'default')
    name = ini.get('general', 'theme')
 
+   # set default scale
+   if not ini.has_option('general', 'scale'):
+      ini.set('general', 'scale', '1.0')
+
    # search the theme file, or use the default one
    theme_file = utils.get_resource_file('themes', name + '.edj', 'default.edj')
    if not theme_file:
@@ -76,6 +80,7 @@ def init():
    layout.show()
 
    win.show()
+   win.scale_set(ini.get_float('general', 'scale'))
 
 
    # fill view buttons box in topbar
@@ -116,16 +121,22 @@ def input_event_cb(event):
       win.fullscreen = not win.fullscreen
       return input_events.EVENT_BLOCK
    elif event == 'VOLUME_UP':
-      mediaplayer.volume_set(mediaplayer.volume_get() + 10)
+      mediaplayer.volume_set(mediaplayer.volume_get() + 5)
       mediaplayer.volume_show(hidein=3)
       return input_events.EVENT_BLOCK
    elif event == 'VOLUME_DOWN':
-      mediaplayer.volume_set(mediaplayer.volume_get() - 10)
+      mediaplayer.volume_set(mediaplayer.volume_get() - 5)
       mediaplayer.volume_show(hidein=3)
       return input_events.EVENT_BLOCK
    elif event == 'VOLUME_MUTE':
       mediaplayer.volume_mute()
       mediaplayer.volume_show(hidein=3)
+      return input_events.EVENT_BLOCK
+   elif event == 'BIGGER':
+      scale_bigger()
+      return input_events.EVENT_BLOCK
+   elif event == 'SMALLER':
+      scale_smaller()
       return input_events.EVENT_BLOCK
 
    input_events.EVENT_CONTINUE
@@ -191,6 +202,21 @@ def swallow_set(part, obj):
    old = layout.edje_get().part_swallow_get(part)
    if old: old.delete()
    layout.edje_get().part_swallow(part, obj)
+
+def box_append(part, obj):
+   layout.edje_get().part_box_append(part, obj)
+
+def scale_set(scale):
+   win.scale_set(scale)
+
+def scale_get():
+   return win.scale_get()
+
+def scale_bigger():
+   win.scale_set(win.scale_get() + 0.1)
+
+def scale_smaller():
+   win.scale_set(win.scale_get() - 0.1)
 
 ################################################################################
 def background_set(image):

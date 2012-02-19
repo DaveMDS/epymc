@@ -17,6 +17,8 @@
 #define FONT_COLOR 255 255 255 255
 #define FONT_COLOR3 0 0 0 64
 
+#define COLOR_BLUE 63 108 168
+
 images {
    image: "background.jpg" COMP;
    image: "frame.png" COMP;
@@ -320,70 +322,67 @@ collections {
 /// browser top bar
          part { name: "topbar.clip";
             type: RECT;
+            scale: 1;
             description { state: "default" 0.0;
-               color: 255 255 255 255;
-               rel1.offset: 0 -60;
-               rel2.relative: 1.0 0.0;
+               max: 9999 40;
+               align: 0.5 0.0;
+               rel1.relative: 0.0 -0.3;
             }
             description { state: "visible" 0.0;
-               color: 255 255 255 255;
-               rel2 {
-                  relative: 1.0 0.0;
-                  offset: -1 59;
-               }
+               inherit: "default" 0.0;
+               rel1.relative: 0.0 0.0;
             }
          }
          part { name: "topbar.bg";
             type: IMAGE;
-            clip_to: "topbar.clip";
             description { state: "default" 0.0;
                rel1.to: "topbar.clip";
                rel2.to: "topbar.clip";
+               rel2.offset: 0 28;
                image.normal: "header.png";
-               image.border: 40 40 0 40;
+               image.border: 31 39 2 39;
             }
          }
          part { name: "topbar.home_icon";
             type: IMAGE;
-            clip_to: "topbar.clip";
             description { state: "default" 0.0;
-               color: 255 255 255 200;
+               image.normal: "icon_home.png";
+               color: 255 255 255 170;
+               aspect: 1 1;
+               aspect_preference: BOTH;
+               align: 0.0 0.5;
                rel1 {
                   to: "topbar.clip";
-                  offset: 20 10;
+                  offset: 20 0;
                }
                rel2 {
                   to: "topbar.clip";
-                  relative: 0.0 1.0;
-                  offset: 55 -40;
                }
-               image {
-                  normal: "icon_home.png";
-               }
-               aspect: 1 1;
-               
             }
          }
          part { name: "topbar.title"; /* API */
             type: TEXT;
-            clip_to: "topbar.clip";
+            scale: 1;
             description { state: "default" 0.0;
-               color: FONT_COLOR;
+               color: 200 200 200 200;
                rel1 {
                   to: "topbar.clip";
-                  offset: 60 0;
+                  to_x: "topbar.home_icon";
+                  relative: 1.0 0.0;
                }
                rel2 {
                   to: "topbar.clip";
-                  relative: 0.7 1.0;
-                  offset: -1 -30;
                }
                text {
-                  text: "asd";
                   font: FONT;
-                  size: FONT_SIZE;
+                  size: FONT_SIZE_BIG;
                   align: 0.0 0.7;
                }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               rel1.offset: 60 0;
+               rel2.offset: -1 0;
             }
          }
          part { name: "topbar.box"; /* API */
@@ -391,38 +390,40 @@ collections {
             mouse_events: 1;
             repeat_events: 1;
             description { state: "default" 0.0;
+               max: 200 -1;
+               align: 0.8 0.5;
                rel1 {
                   to: "topbar.title";
-                  relative: 1.0 0.0;
+                  offset: 0 4;
                }
                rel2 {
                   to: "topbar.clock";
-                  relative: 0.0 1.0;
+                  offset: -1 -4;
                }
                box {
                   layout: "horizontal";
-                }
+                  padding: 4 4;
+               }
             }
          }
          part { name: "topbar.clock";
             type: TEXT;
             clip_to: "topbar.clip";
+            scale: 1;
             description { state: "default" 0.0;
                color: FONT_COLOR;
+               color: COLOR_BLUE 200;
                rel1 {
                   to: "topbar.clip";
-                  relative: 1.0 0.0;
-                  offset: -120 0;
                }
                rel2 {
                   to: "topbar.clip";
-                  offset: -45 -30;
+                  offset: -40 0;
                }
                text {
-                  text: "12:24";
                   font: FONT;
-                  size: FONT_SIZE;
-                  align: 1.0 0.5;
+                  size: FONT_SIZE_BIG;
+                  align: 1.0 0.7;
                }
             }
          }

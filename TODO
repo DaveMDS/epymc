@@ -2,7 +2,6 @@
 
 BUGS
 =====
- * double click in list (usually the back item) will segfault
  * utf-8 -> ascii problem in some moviedb query (try searching for alien...)
  * downloading a poster 2 times (the same image) will segfault
 
@@ -10,7 +9,6 @@ MAIN
 =====
  * Use setuptools ?
  * lirc module + lirc configuration gui
-
 
 CORE
 =====

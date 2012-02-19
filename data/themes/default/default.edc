@@ -11,8 +11,8 @@
 
 #define FONT "Cuprum"
 #define FONT_BOLD "Cuprum:style=Bold"
-#define FONT_SIZE 16
-#define FONT_SIZE_BIG 24
+#define FONT_SIZE 20
+#define FONT_SIZE_BIG 26
 #define FONT_SIZE_BIGGER 48
 #define FONT_COLOR 255 255 255 255
 #define FONT_COLOR3 0 0 0 64

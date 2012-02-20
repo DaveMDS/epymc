@@ -28,6 +28,7 @@ import elementary
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser
 from epymc.gui import EmcDialog
+from epymc.utils import EmcExec
 import epymc.mainmenu as mainmenu
 import epymc.browser as browser
 import epymc.utils as utils
@@ -352,14 +353,18 @@ class MameGame(object):
          return (snap_file, snap_url)
 
    def short_info_get(self):
-      self._more_game_info()
-      return '<title>%s</><br>' \
-             '<hilight>Year:</> %s<br>' \
-             '<hilight>Manufacturer:</> %s<br>' \
-             '<hilight>Players:</> %s<br>' \
-             '<hilight>Buttons:</> %s<br>' % \
-             (self.name, self.year, self.manufacturer, self.players,
-              self.buttons)
+      if self.parsed:
+         return '<title>%s</><br>' \
+               '<hilight>Year:</> %s<br>' \
+               '<hilight>Manufacturer:</> %s<br>' \
+               '<hilight>Players:</> %s<br>' \
+               '<hilight>Buttons:</> %s<br>' % \
+               (self.name, self.year, self.manufacturer, self.players,
+               self.buttons)
+      else:
+         # update of the browser postponed... when_finished...quite an hack :/
+         self._more_game_info(when_finished = (lambda: _instance._browser.refresh()))
+         return ''
 
    def file_name_get(self):
       for dir in MameModule._rompaths:
@@ -370,6 +375,11 @@ class MameGame(object):
 
 ## game dialog stuff
    def dialog_show(self):
+      if not self.parsed:
+         # postpone the action until info parsed
+         self._more_game_info(when_finished = (lambda: self.dialog_show()))
+         return
+
       box = elementary.Box(gui.win)
       box.horizontal_set(True)
       box.homogenous_set(True)
@@ -584,17 +594,16 @@ class MameGame(object):
       pass
 
 ## game info (from mame -listxml <rom>)
-   def _more_game_info(self):
+   def _more_game_info(self, when_finished = None):
       # do this only once
       if self.parsed: return
-
       # get game info from the command: mame -listxml <id>
-      # TODO use a better/portable way (but not async)
-      os.system(MAME_EXE + ' -listxml ' + self.gid + ' > /tmp/PyEmc__MAME_tmp')
-      #ecore.exe_run('%s -listxml %s > /tmp/PyEmc__MAME_tmp' % (MAME_EXE, self.gid))
+      cmd = '%s -listxml %s' % (MAME_EXE, self.gid)
+      EmcExec(cmd, True, self._more_game_info_done, when_finished)
 
-      # parse the xml file
-      doc = xml.dom.minidom.parse('/tmp/PyEmc__MAME_tmp')
+   def _more_game_info_done(self, output, when_finished):
+      # parse the buffered xml data
+      doc = xml.dom.minidom.parseString(output)
       game_node = doc.getElementsByTagName('game')[0]
       if game_node.getAttribute('name') != self.gid: return
 
@@ -616,6 +625,8 @@ class MameGame(object):
       doc.unlink()
 
       self.parsed = True
+      if callable(when_finished):
+         when_finished()
 
    def _get_text_from_xml(self, nodelist):
       rc = []

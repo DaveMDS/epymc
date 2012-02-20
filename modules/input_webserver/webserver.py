@@ -89,6 +89,9 @@ class WebserverModule(EmcModule):
 
 class RequestHandler(BaseHTTPRequestHandler):
 
+   def log_message(self, format, *args):
+      pass
+
    def do_GET(self):
       (host, port) = self.client_address
       DBG('GET from client: %s:%d [%s]' % (host, port, self.path))

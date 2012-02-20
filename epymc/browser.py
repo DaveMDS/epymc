@@ -494,11 +494,13 @@ class ViewList(object):
       self.items_count = 0
 
    def refresh(self):
+      # update visible items
       for item in self.current_list.realized_items_get():
          item.update()
-      # fake an item-hilight to refresh info, poster and fanart
-      self._cb_item_hilight(self.current_list, self.current_list.selected_item)
-      
+      # also request new poster & new info
+      item =  self.current_list.selected_item
+      self._cb_timer(item.data_get())
+      self._cb_timer2(item.data_get())
 
    def input_event_cb(self, event):
       """ Here you can manage input events for the view """

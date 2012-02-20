@@ -71,6 +71,7 @@ def url2path(url):
    # TODO ... convert the url to a local path !!
    return url[7:]
 
+
 def download_url_sync(url, dest, min_size = 0):
    """
    Copy the contents of a file from a given URL to a local file, blocking
@@ -166,3 +167,37 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
 
 def download_abort(dwl_handler):
    ecore.file.download_abort(dwl_handler)
+
+
+class EmcExec(object):
+   """
+   Just a tiny wrapper around ecore.Exe to execute shell command async
+   cmd: the command to execute
+   grab_output: whenever to collect the stdoutput
+   done_cb: function to call when the program ends. Will receive one argument:
+            the standard output of the command or an empty string if
+            grab_input is False (the default)
+            done_cb will also receive any other params you pass to the costructor
+   """
+   def __init__(self, cmd, grab_output = False, done_cb = None, *args, **kargs):
+      self.done_cb = done_cb
+      self.args = args
+      self.kargs = kargs
+      self.grab_output = grab_output
+      self.outbuffer = ''
+      if grab_output:
+         self.exe = ecore.Exe(cmd, ecore.ECORE_EXE_PIPE_READ |
+                                   ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
+         self.exe.on_data_event_add(self.data_cb)
+      else:
+         self.exe = ecore.Exe(cmd)
+      if done_cb:
+         self.exe.on_del_event_add(self.del_cb)
+
+   def data_cb(self, exe, event):
+      for l in event.lines:
+         self.outbuffer += l
+
+   def del_cb(self, exe, event):
+      if callable(self.done_cb):
+         self.done_cb(self.outbuffer, *self.args, **self.kargs)

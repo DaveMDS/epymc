@@ -677,6 +677,15 @@ collections {
             }
          }
 
+         part { name: "dialogs.box.stack"; /* API */
+            type: BOX;
+            description { state: "default" 0.0;
+               box {
+                  layout: "stack";
+                  // layout: "horizontal"; # funny...with more than one dialog
+               }
+            }
+         }
 /// debug label for embryo scripting
          #if DEBUG_ENABLE
          part { name: "embryo_dbg";

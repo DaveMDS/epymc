@@ -21,6 +21,7 @@ import os
 
 import evas
 import ecore
+import ecore.x #used only to show/hide the cursor
 import edje
 import elementary
 
@@ -31,9 +32,11 @@ import gui
 import input_events
 
 win = None
+xwin = None
 layout = None
 theme_file = None
 backdrop_im = None
+
 
 def DBG(msg):
    print ('GUI: ' + msg)
@@ -41,6 +44,7 @@ def DBG(msg):
 
 def init():
    global win
+   global xwin
    global layout
    global theme_file
 
@@ -72,12 +76,20 @@ def init():
    else:
       ini.set('general', 'fullscreen', False)
 
+   # get the X window object, we need it to show/hide the mouse cursor
+   xwin = ecore.x.Window_from_xid(win.xwindow_xid_get())
+
+
    # main layout (main theme)
    layout = elementary.Layout(win)
    layout.file_set(theme_file, 'emc/main/layout')
    layout.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
    win.resize_object_add(layout)
    layout.show()
+
+   # show the mouse when moved
+   layout.edje.signal_callback_add("mouse,move", "*", (lambda o,e,s: mouse_show()))
+
 
    win.show()
    win.scale_set(ini.get_float('general', 'scale'))
@@ -172,19 +184,37 @@ def _cb_exit_yes(button):
 def toggle_fullscreen():
    pass
 
-def mouse_hide():
-   pass
-   # print 'MOUSE HIDE'
-   # elm coursor
-   # from elementary import cursors
-   # layout.cursor_set(cursors.ELM_CURSOR_CLOCK)
+# mouse hide/show stuff
+last_mouse_pos = (0, 0)
+mouse_visible = True
+mouse_skip_next = False
 
-   #ecore win cursor
-   # import ecore
-   # ecore.x.Window.cursor_hide()
+def mouse_hide():
+   global last_mouse_pos
+   global mouse_visible
+   global mouse_skip_next
+   
+   if not mouse_visible: return
+
+   xwin.cursor_hide()
+   last_mouse_pos = xwin.pointer_xy_get()
+   xwin.pointer_warp(2, 2)
+   mouse_visible = False
+   mouse_skip_next = True
 
 def mouse_show():
-   print 'MOUSE SHOW'
+   global last_mouse_pos
+   global mouse_visible
+   global mouse_skip_next
+
+   if mouse_visible: return
+   if mouse_skip_next:
+      mouse_skip_next = False
+      return
+
+   xwin.pointer_warp(*last_mouse_pos)
+   xwin.cursor_show()
+   mouse_visible = True
 
 def part_get(name):
    global layout
@@ -205,6 +235,12 @@ def swallow_set(part, obj):
 
 def box_append(part, obj):
    layout.edje_get().part_box_append(part, obj)
+
+def box_prepend(part, obj):
+   layout.edje_get().part_box_prepend(part, obj)
+
+def box_remove(part, obj):
+   layout.edje_get().part_box_remove(part, obj)
 
 def scale_set(scale):
    win.scale_set(scale)
@@ -311,13 +347,19 @@ class EmcDialog(edje.Edje):
          group = 'emc/dialog/minimal'
       else:
          group = 'emc/dialog/panel'
-      edje.Edje.__init__(self, gui.win.evas, file = theme_file, group = group)
+      edje.Edje.__init__(self, gui.layout.evas, file = theme_file, group = group)
       self.signal_callback_add('emc,dialog,close', '', self._close_pressed)
       self.signal_callback_add('emc,dialog,hide,done', '',
                                (lambda a,S,d: self._delete_real()))
       self.signal_callback_add('emc,dialog,show,done', '',
                                (lambda a,s,D: None))
-      win.resize_object_add(self)
+
+      # put the dialog in the dialogs box of the main edje obj,
+      # this way we only manage one edje and don't have stacking problems.
+      # otherwise dialogs will stole the mouse events.
+      self.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+      self.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      box_append('dialogs.box.stack', self)
 
       EmcDialog.dialogs_counter += 1
       self._name = 'Dialog-' + str(EmcDialog.dialogs_counter)
@@ -402,7 +444,7 @@ class EmcDialog(edje.Edje):
          self.part_swallow_get('emc.swallow.content').delete()
       for b in self._buttons:
          b.delete()
-      win.resize_object_del(self)
+      box_remove('dialogs.box.stack', self)
       edje.Edje.delete(self)
       del self
 

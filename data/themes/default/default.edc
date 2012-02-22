@@ -503,9 +503,22 @@ collections {
                visible: 1;
             }
          }
+         part { name: "videoplayer.events"; /* API */
+            type: RECT;
+            mouse_events: 1;
+            description { state: "default" 0.0;
+               color: 0 0 0 0;
+               visible: 0;
+            }
+            description { state: "visible" 0.0;
+               color: 0 0 0 0;
+               visible: 1;
+            }
+         }
          part { name: "videoplayer.controls.bg";
             type: IMAGE;
-            mouse_events: 0;
+            mouse_events: 1;
+            repeat_events: 0;
             clip_to: "videoplayer.clip";
             description { state: "default" 0.0;
                color: 255 255 255 255;
@@ -521,7 +534,7 @@ collections {
                rel2.offset: 0.0 0.0;
             }
          }
-         part { name: "videoplayer.controls.btn_box"; /* API   todoc*/ 
+         part { name: "videoplayer.controls.btn_box"; /* API */ 
             type: BOX;
             description { state: "default" 0.0;
                rel1.to: "videoplayer.controls.bg";
@@ -611,7 +624,8 @@ collections {
 /// volume
          part { name: "volume.bg";
             type: IMAGE;
-            mouse_events: 0;
+            mouse_events: 1;
+            repeat_events: 0;
             description { state: "default" 0.0;
                visible: 0;
                color: 255 255 255 180;
@@ -844,6 +858,7 @@ collections {
             action: STATE_SET "visible" 0.00;
             transition: LINEAR 0.5;
             target: "videoplayer.clip";
+            target: "videoplayer.events";
             
          }
          program { name: "videoplayer_hide"; /* API */
@@ -852,6 +867,7 @@ collections {
             action: STATE_SET "default" 0.00;
             transition: LINEAR 0.5;
             target: "videoplayer.clip";
+            target: "videoplayer.events";
          }
          program { name: "videoplayer_controls_show"; /* API */
             signal: "videoplayer,controls,show";

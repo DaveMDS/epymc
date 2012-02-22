@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
+import os
+
 import evas
 import ecore
 import edje
@@ -28,10 +30,12 @@ import ini
 import input_events
 
 
-def DBG(msg):
-   print ('MEDIAPLAYER: ' + msg)
-   pass
-
+DEBUG = True
+DEBUGN = 'MEDIAPLAYER'
+def LOG(sev, msg):
+   if   sev == 'err': print('%s ERROR: %s' % (DEBUGN, msg))
+   elif sev == 'inf': print('%s: %s' % (DEBUGN, msg))
+   elif sev == 'dbg' and DEBUG: print('%s: %s' % (DEBUGN, msg))
 
 _volume = 0
 _emotion = None
@@ -62,27 +66,31 @@ def shutdown():
 
 ### mediaplyer API ###
 def play_video(url):
-   DBG('Play ' + url)  # TODO handle real url
+   LOG('dbg', 'Play ' + url)  # TODO handle real url
    if not _emotion: _init_emotion()
-   _emotion.file_set(url)
-   volume_set(_volume)
 
-   # set aspect according to video size
-   def _cb_frame_resize(obj):
-      (w, h) = _emotion.image_size
-      edje.extern_object_aspect_set(_emotion, edje.EDJE_ASPECT_CONTROL_BOTH, w, h)
-   _emotion.on_frame_resize_add(_cb_frame_resize)
+   if url.startswith('file://'):
+      if not os.path.exists(url[7:]):
+         LOG('err', 'file not exists: ' + str(url))
+         return
+      _emotion.file_set(url)
+      volume_set(_volume)
+   elif url.startswith('http://'):
+      # TODO download and play
+      pass
+   else:
+      LOG('err', 'unsupported url: ' + str(url))
 
    ## TEST VARIOUS INFO
-   DBG('TITLE: ' + str(_emotion.title_get()))
-   DBG('VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
-   DBG('AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
-   DBG('VIDEO CHANS GET: ' + str(_emotion.video_channel_get()))
-   DBG('AUDIO CHANS GET: ' + str(_emotion.audio_channel_get()))
-   DBG('INFO DICT: ' + str(_emotion.meta_info_dict_get()))
-   DBG('SIZE: ' + str(_emotion.size))
-   DBG('IMAGE_SIZE: ' + str(_emotion.image_size))
-   DBG('RATIO: ' + str(_emotion.ratio_get()))
+   LOG('inf', 'TITLE: ' + str(_emotion.title_get()))
+   LOG('inf', 'VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
+   LOG('inf', 'AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
+   LOG('inf', 'VIDEO CHANS GET: ' + str(_emotion.video_channel_get()))
+   LOG('inf', 'AUDIO CHANS GET: ' + str(_emotion.audio_channel_get()))
+   LOG('inf', 'INFO DICT: ' + str(_emotion.meta_info_dict_get()))
+   LOG('inf', 'SIZE: ' + str(_emotion.size))
+   LOG('inf', 'IMAGE_SIZE: ' + str(_emotion.image_size))
+   LOG('inf', 'RATIO: ' + str(_emotion.ratio_get()))
    ##
 
    _emotion.play = True
@@ -92,19 +100,19 @@ def stop():
    _emotion.play = False
 
 def forward():
-   DBG('Forward cb' + str(_emotion.position))
+   LOG('dbg', 'Forward cb' + str(_emotion.position))
    _emotion.position += 10 #TODO make this configurable
 
 def backward():
-   DBG('Backward cb' + str(_emotion.position))
+   LOG('dbg', 'Backward cb' + str(_emotion.position))
    _emotion.position -= 10 #TODO make this configurable
 
 def fforward():
-   DBG('FastForward cb' + str(_emotion.position))
+   LOG('dbg', 'FastForward cb' + str(_emotion.position))
    _emotion.position += 60 #TODO make this configurable
 
 def fbackward():
-   DBG('FastBackward cb' + str(_emotion.position))
+   LOG('dbg', 'FastBackward cb' + str(_emotion.position))
    _emotion.position -= 60 #TODO make this configurable
 
 def volume_set(vol):
@@ -178,12 +186,17 @@ def _init_emotion():
    backend = ini.get('mediaplayer', 'backend')
    _emotion = emotion.Emotion(gui.win.evas_get(), module_filename=backend)
    gui.swallow_set('videoplayer.video', _emotion)
-   _emotion.smooth_scale = True # TODO Needed? make it configurable?
+   _emotion.smooth_scale = True
 
-   #~ _emotion.on_key_down_add(_cb)
-   _emotion.on_mouse_down_add(_cb_video_mouse_down)
-   _emotion.on_frame_decode_add(_cb_frame_decode) # TODO too often?
-   #~ _emotion.on_audio_level_change_add(_cb_volume_change)
+   gui.layout.edje.signal_callback_add("mouse,down,1", "videoplayer.events",
+                                 (lambda a,s,d: video_controls_toggle()))
+   # _emotion.on_key_down_add(_cb)
+   # _emotion.on_audio_level_change_add(_cb_volume_change)
+   _emotion.on_frame_resize_add(_cb_frame_resize)
+   _emotion.on_playback_finished_add(cb_playback_finished)
+   # progress doesn't work, use frame_decode instead...but it's too often
+   # _emotion.on_progress_change_add((lambda v: _update_slider()))
+   _emotion.on_frame_decode_add((lambda v: _update_slider()))
 
 
    #  <<  fast backward
@@ -263,11 +276,15 @@ def _init_emotion():
 def _cb_volume_slider_changed(slider):
    volume_set(slider.value)
 
-def _cb_video_mouse_down(vid, ev):
-   video_controls_toggle()
+def cb_playback_finished(vid):
+   stop()
+   video_player_hide()
+   volume_hide()
 
-def _cb_frame_decode(vid):
-   _update_slider()
+def _cb_frame_resize(vid):
+   print vid
+   (w, h) = vid.image_size
+   edje.extern_object_aspect_set(vid, edje.EDJE_ASPECT_CONTROL_BOTH, w, h)
 
 def _cb_btns_mouse_in(button, event):
    if button != _buttons[_current_button_num]:
@@ -276,7 +293,7 @@ def _cb_btns_mouse_in(button, event):
       _buttons[_current_button_num].disabled_set(0)
 
 def _cb_btn_play(btn):
-   DBG('Play cb')
+   LOG('dbg', 'Play cb')
    _emotion.play = not _emotion.play
 
 def _cb_btn_stop(btn):

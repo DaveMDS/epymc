@@ -4,16 +4,18 @@ BUGS
 =====
  * utf-8 -> ascii problem in some moviedb query (try searching for alien...)
  * downloading a poster 2 times (the same image) will segfault
+ * playing 2 times the same movie will segfault
 
 MAIN
 =====
  * Use setuptools ?
  * lirc module + lirc configuration gui
+ * joy/webserver need a key-repetition handling
+ * i18n...will do on request
 
 CORE
 =====
  * Browser: label must go in 'item_class' or refresh will not work :(
- * Gui: hide (& move to 0,0) the mouse pointer on input events
  * VKeyboard resolv left/right conflict  !!!!!!!
  * Make elementary engine configurable, or at least tell what engine is active
 

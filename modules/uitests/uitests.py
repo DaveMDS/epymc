@@ -125,7 +125,7 @@ class UiTestsModule(EmcModule):
 
       # Mediaplayer Video
       elif item_url == 'uitests://mpv':
-         mediaplayer.play_video('/home/dave/Video/test.avi')
+         mediaplayer.play_video('file:///home/dave/Video/test.avi')#TODO FIXME
          # mediaplayer.video_player_show()
          # mediaplayer.video_controls_show()
 

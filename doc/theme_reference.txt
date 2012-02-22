@@ -58,7 +58,8 @@ All the icons in icons.edc must be implemented
 ### Video Player ###
    * Required parts:
       "videoplayer.video" -> edje swallow
-      "videoplayer/controls/btn_swallow" -> edje swallow
+      "videoplayer.events" -> edje part with mouse_events = 1
+      "videoplayer.controls.btn_box" -> edje box
       "videoplayer.controls.slider" -> elm_slider
       "videoplayer.controls.position" -> edje text
       "videoplayer.controls.length" -> edje text
@@ -78,6 +79,12 @@ All the icons in icons.edc must be implemented
    * Signals received from the application:
       "volume,show" "emc"
       "volume,hide" "emc"
+
+
+### Dialogs box ###
+
+   * Required parts:
+      "dialogs.box.stack" -> edje box
 
 
 ### Dialog (panel) ###

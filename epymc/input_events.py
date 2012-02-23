@@ -60,7 +60,7 @@ def listener_add(name, event_cb, cb_data = None):
 
    _listeners.append((name, event_cb, cb_data))
 
-   DBG('Add Listener: ' + name)
+   DBG('Listener Add: ' + name)
    for lis in _listeners:
       (name, cb, data) = lis
       DBG('  * ' + name)
@@ -73,6 +73,17 @@ def listener_del(name):
       (n, cb, data) = lis
       if n == name:
          _listeners.remove(lis)
+         return
+
+def listener_promote(name):
+   global _listeners
+
+   DBG('Listener Promote: ' + name)
+   for lis in _listeners:
+      (n, cb, data) = lis
+      if n == name:
+         _listeners.remove(lis)
+         _listeners.append(lis)
          return
 
 def event_emit(event):

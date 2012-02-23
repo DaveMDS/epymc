@@ -27,6 +27,7 @@ images {
    image: "separator.png" COMP;
    image: "header.png" COMP;
    image: "volume.png" COMP;
+   image: "volume_muted.png" COMP;
 }
 
 fonts {
@@ -689,6 +690,10 @@ collections {
                   offset: -1 -3;
                }
             }
+            description { state: "muted" 0.0;
+               inherit: "default" 0.0;
+               image.normal: "volume_muted.png";
+            }
          }
 
          part { name: "dialogs.box.stack"; /* API */
@@ -897,6 +902,18 @@ collections {
             action: STATE_SET "default" 0.0;
             transition: ACCELERATE 0.5;
             target: "volume.bg";
+         }
+         program { name: "volume_mute_on"; /* API */
+            signal: "volume,mute,on";
+            source: "emc";
+            action: STATE_SET "muted" 0.0;
+            target: "volume.icon";
+         }
+         program { name: "volume_mute_off"; /* API */
+            signal: "volume,mute,off";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            target: "volume.icon";
          }
       }
    }

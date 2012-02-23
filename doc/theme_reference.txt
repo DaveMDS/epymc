@@ -79,6 +79,8 @@ All the icons in icons.edc must be implemented
    * Signals received from the application:
       "volume,show" "emc"
       "volume,hide" "emc"
+      "volume,mute,on" "emc"
+      "volume,mute,off" "emc"
 
 
 ### Dialogs box ###

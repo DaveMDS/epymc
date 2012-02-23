@@ -25,9 +25,13 @@ import edje
 import elementary
 import emotion
 
+
 import gui
 import ini
 import input_events
+
+from gui import EmcFocusManager
+
 
 
 DEBUG = True
@@ -38,12 +42,14 @@ def LOG(sev, msg):
    elif sev == 'dbg' and DEBUG: print('%s: %s' % (DEBUGN, msg))
 
 _volume = 0
+_volume_muted = False
 _emotion = None
 _controls_visible = False
 _volume_visible = False
 _volume_hide_timer = None
 _buttons = list()
-_current_button_num = 3
+_fman = None
+_video_visible = False
 
 ### API ###
 def init():
@@ -57,12 +63,15 @@ def init():
       ini.set('mediaplayer', 'backend', 'gstremer')
    _volume = ini.get_int('mediaplayer', 'volume')
 
+   # input events
+   input_events.listener_add("videoplayer", input_event_cb)
+
    # emotion init delayed to play_video() for faster startup
    # _init_emotion()
 
 def shutdown():
-    # TODO Shutdown all emotion stuff & the buttons list
-   pass
+   input_events.listener_del("videoplayer")
+   # TODO Shutdown all emotion stuff & the buttons list
 
 ### mediaplyer API ###
 def play_video(url):
@@ -75,9 +84,11 @@ def play_video(url):
          return
       _emotion.file_set(url)
       volume_set(_volume)
+      volume_mute_set(_volume_muted)
+      _emotion.audio_mute = _volume_muted
    elif url.startswith('http://'):
       # TODO download and play
-      pass
+      print 'ok, fun start here...'
    else:
       LOG('err', 'unsupported url: ' + str(url))
 
@@ -98,6 +109,7 @@ def play_video(url):
 
 def stop():
    _emotion.play = False
+   _emotion.position = 0
 
 def forward():
    LOG('dbg', 'Forward cb' + str(_emotion.position))
@@ -127,17 +139,29 @@ def volume_set(vol):
 def volume_get():
    return _volume
 
-def volume_mute():
-   _emotion.audio_mute = not _emotion.audio_mute
+def volume_mute_set(mute):
+   global _volume_muted
+
+   _volume_muted = bool(mute)
+   gui.signal_emit('volume,mute,' + ('on' if mute else 'off'))
+
+   if _emotion:
+      _emotion.audio_mute = _volume_muted
+
+def volume_mute_toggle():
+   volume_mute_set(not _volume_muted)
 
 ### gui API ###
 def video_player_show():
+   global _video_visible
    gui.signal_emit('videoplayer,show')
-   input_events.listener_add("videoplayer", input_event_cb)
+   _video_visible = True
+   input_events.listener_promote('videoplayer')
 
 def video_player_hide():
+   global _video_visible
    video_controls_hide()
-   input_events.listener_del("videoplayer")
+   _video_visible = False
    gui.signal_emit('videoplayer,hide')
 
 def video_controls_show():
@@ -151,6 +175,7 @@ def video_controls_hide():
 
    gui.signal_emit('videoplayer,controls,hide')
    _controls_visible = False
+   volume_hide()
 
 def video_controls_toggle():
    if _controls_visible:
@@ -182,6 +207,7 @@ def volume_hide():
 ### internals ###
 def _init_emotion():
    global _emotion
+   global _fman
 
    backend = ini.get('mediaplayer', 'backend')
    _emotion = emotion.Emotion(gui.win.evas_get(), module_filename=backend)
@@ -198,14 +224,15 @@ def _init_emotion():
    # _emotion.on_progress_change_add((lambda v: _update_slider()))
    _emotion.on_frame_decode_add((lambda v: _update_slider()))
 
+   # focus manager for play/stop/etc.. buttons
+   _fman = EmcFocusManager()
 
    #  <<  fast backward
    bt = elementary.Button(gui.win);
    bt.icon_set(gui.load_icon('icon/fbwd'))
    bt.callback_clicked_add(_cb_btn_fbackward)
    bt.data['cb'] = _cb_btn_fbackward
-   bt.on_mouse_in_add(_cb_btns_mouse_in)
-   bt.disabled_set(1)
+   _fman.obj_add(bt)
    bt.show()
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
@@ -215,8 +242,7 @@ def _init_emotion():
    bt.icon_set(gui.load_icon('icon/bwd'))
    bt.callback_clicked_add(_cb_btn_backward)
    bt.data['cb'] = _cb_btn_backward
-   bt.on_mouse_in_add(_cb_btns_mouse_in)
-   bt.disabled_set(1)
+   _fman.obj_add(bt)
    bt.show()
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
@@ -226,8 +252,7 @@ def _init_emotion():
    bt.icon_set(gui.load_icon('icon/stop'))
    bt.callback_clicked_add(_cb_btn_stop)
    bt.data['cb'] = _cb_btn_stop
-   bt.on_mouse_in_add(_cb_btns_mouse_in)
-   bt.disabled_set(1)
+   _fman.obj_add(bt)
    bt.show()
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
@@ -237,19 +262,21 @@ def _init_emotion():
    bt.icon_set(gui.load_icon('icon/play'))
    bt.callback_clicked_add(_cb_btn_play)
    bt.data['cb'] = _cb_btn_play
-   bt.on_mouse_in_add(_cb_btns_mouse_in)
-   bt.disabled_set(0)
+   _fman.obj_add(bt)
    bt.show()
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
+   # ARGH this does'n work
+   # for some reason in fman mouse_in callback is called once (wrong) on
+   # the creation of the obj ...dunno why
+   _fman.focused_set(bt)
 
    #  >   forward
    bt = elementary.Button(gui.win);
    bt.icon_set(gui.load_icon('icon/fwd'))
    bt.callback_clicked_add(_cb_btn_forward)
    bt.data['cb'] = _cb_btn_forward
-   bt.on_mouse_in_add(_cb_btns_mouse_in)
-   bt.disabled_set(1)
+   _fman.obj_add(bt)
    bt.show()
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
@@ -259,8 +286,7 @@ def _init_emotion():
    bt.icon_set(gui.load_icon('icon/ffwd'))
    bt.callback_clicked_add(_cb_btn_fforward)
    bt.data['cb'] = _cb_btn_fforward
-   bt.on_mouse_in_add(_cb_btns_mouse_in)
-   bt.disabled_set(1)
+   _fman.obj_add(bt)
    bt.show()
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
@@ -286,12 +312,6 @@ def _cb_frame_resize(vid):
    (w, h) = vid.image_size
    edje.extern_object_aspect_set(vid, edje.EDJE_ASPECT_CONTROL_BOTH, w, h)
 
-def _cb_btns_mouse_in(button, event):
-   if button != _buttons[_current_button_num]:
-      _buttons[_current_button_num].disabled_set(1)
-      _current_button_num = _buttons.index(button)
-      _buttons[_current_button_num].disabled_set(0)
-
 def _cb_btn_play(btn):
    LOG('dbg', 'Play cb')
    _emotion.play = not _emotion.play
@@ -299,7 +319,6 @@ def _cb_btn_play(btn):
 def _cb_btn_stop(btn):
    stop()
    video_player_hide()
-   volume_hide()
 
 def _cb_btn_forward(btn):
    forward()
@@ -335,7 +354,22 @@ def _update_slider():
 
 ### input events ###
 def input_event_cb(event):
-   global _current_button_num
+
+   if event == 'VOLUME_UP':
+      volume_set(_volume + 5)
+      volume_show(hidein = 3)
+      return input_events.EVENT_BLOCK
+   elif event == 'VOLUME_DOWN':
+      volume_set(_volume - 5)
+      volume_show(hidein = 3)
+      return input_events.EVENT_BLOCK
+   elif event == 'VOLUME_MUTE':
+      volume_mute_toggle()
+      volume_show(hidein = 3)
+      return input_events.EVENT_BLOCK
+
+   if not _video_visible:
+      return input_events.EVENT_CONTINUE
 
    if event == 'EXIT':
          stop()
@@ -349,23 +383,17 @@ def input_event_cb(event):
          volume_hide()
          return input_events.EVENT_BLOCK
       if event == 'OK':
-         button = _buttons[_current_button_num]
+         button = _fman.focused_get()
          cb = button.data['cb']
          cb(button)
          # TODO TRY THIS INSTEAD:
-         # evas_object_smart_callback_call(obj, 'sig', NULL);
+         ## evas_object_smart_callback_call(obj, 'sig', NULL);
          return input_events.EVENT_BLOCK
-      elif event == 'RIGHT':
-         if _current_button_num < len(_buttons) - 1:
-            _buttons[_current_button_num].disabled_set(1)
-            _current_button_num += 1
-            _buttons[_current_button_num].disabled_set(0)
+      if event == 'RIGHT':
+         _fman.focus_move('r')
          return input_events.EVENT_BLOCK
       elif event == 'LEFT':
-         if _current_button_num > 0:
-            _buttons[_current_button_num].disabled_set(1)
-            _current_button_num -= 1
-            _buttons[_current_button_num].disabled_set(0)
+         _fman.focus_move('l')
          return input_events.EVENT_BLOCK
    else:
       if event == 'BACK':

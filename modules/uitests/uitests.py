@@ -126,9 +126,9 @@ class UiTestsModule(EmcModule):
       # Mediaplayer Video
       elif item_url == 'uitests://mpv':
          mediaplayer.play_video('file:///home/dave/Video/test.avi')#TODO FIXME
-         # mediaplayer.video_player_show()
-         # mediaplayer.video_controls_show()
-
+         # mediaplayer.play_video('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4')
+         # http://trailers.apple.com/movies/independent/airracers/airracers-tlr1_h480p.mov
+         
       # VKeyboard
       elif item_url == 'uitests://vkbd':
          EmcVKeyboard(title = 'Virtual Keyboard', text = 'This is the keyboard test!')

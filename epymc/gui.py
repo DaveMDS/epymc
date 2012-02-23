@@ -27,7 +27,6 @@ import elementary
 
 import utils
 import ini
-import mediaplayer
 import gui
 import input_events
 
@@ -131,18 +130,6 @@ def shoutdown():
 def input_event_cb(event):
    if event == 'TOGGLE_FULLSCREEN':
       win.fullscreen = not win.fullscreen
-      return input_events.EVENT_BLOCK
-   elif event == 'VOLUME_UP':
-      mediaplayer.volume_set(mediaplayer.volume_get() + 5)
-      mediaplayer.volume_show(hidein=3)
-      return input_events.EVENT_BLOCK
-   elif event == 'VOLUME_DOWN':
-      mediaplayer.volume_set(mediaplayer.volume_get() - 5)
-      mediaplayer.volume_show(hidein=3)
-      return input_events.EVENT_BLOCK
-   elif event == 'VOLUME_MUTE':
-      mediaplayer.volume_mute()
-      mediaplayer.volume_show(hidein=3)
       return input_events.EVENT_BLOCK
    elif event == 'BIGGER':
       scale_bigger()
@@ -652,6 +639,13 @@ class EmcFocusManager(object):
    You provide all the objects that can receive focus and the class
    will take care of selecting the right object when you move the selection
    """
+   # this is here to hide another bug somewhere, seems __init__ is
+   # not executed as I get:
+   #   'EmcFocusManager' object has no attribute 'objs'
+   # happend when the delete() method is executed...
+   # ...obj should always exists, also without this line.  :/
+   objs = []
+
    def __init__(self):
       self.objs = []
       self.focused = None
@@ -661,15 +655,19 @@ class EmcFocusManager(object):
       Delete the FocusManager instance and free all the resources used
       """
       if self.objs:
+         for o in self.objs:
+            o.on_mouse_in_del(self._mouse_in_cb)
          del self.objs
+      del self
 
    def obj_add(self, obj):
       """
       Add an object to the chain, obj must be an evas object that support
       disabled_set() 'interface', usually an elementary obj will do the work.
       """
-      if len(self.objs) == 0:
+      if not self.focused:
          self.focused = obj
+         obj.disabled_set(False)
       else:
          obj.disabled_set(True)
       obj.on_mouse_in_add(self._mouse_in_cb)

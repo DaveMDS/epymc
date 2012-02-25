@@ -132,7 +132,7 @@ def volume_set(vol):
 
    _volume = max(0, min(int(vol), 100))
    ini.set('mediaplayer', 'volume', _volume)
-   gui.part_get('volume.slider').value = _volume
+   gui.slider_val_set('volume.slider:dragable1', _volume / 100.0)
    if _emotion:
       _emotion.audio_volume_set(_volume / 100.0)
 
@@ -292,15 +292,18 @@ def _init_emotion():
    _buttons.append(bt)
 
 
-   gui.part_get('videoplayer.controls.slider').callback_changed_add(_cb_slider_changed)
-   #~ gui.part_get('videoplayer.controls.slider').callback_delay_changed_add(_cb_slider_changed)
-   gui.part_get('videoplayer.controls.slider').focus_allow_set(False)
+   # update emotion position when mouse drag the progress slider
+   def _drag_prog(obj, emission, source):
+      (val,val2) = gui.slider_val_get('videoplayer.controls.slider:dragable1')
+      _emotion.position_set(_emotion.play_length * val)
+   gui.signal_cb_add('drag', 'videoplayer.controls.slider:dragable1', _drag_prog)
 
-   gui.part_get('volume.slider').callback_changed_add(_cb_volume_slider_changed)
-   gui.part_get('volume.slider').focus_allow_set(False)
+   # update volume when mouse drag the volume slider
+   def _drag_vol(obj, emission, source):
+      (val,val2) = gui.slider_val_get('volume.slider:dragable1')
+      volume_set(val * 100.0)
+   gui.signal_cb_add('drag', 'volume.slider:dragable1', _drag_vol)
 
-def _cb_volume_slider_changed(slider):
-   volume_set(slider.value)
 
 def cb_playback_finished(vid):
    stop()
@@ -332,9 +335,6 @@ def _cb_btn_fforward(btn):
 def _cb_btn_fbackward(btn):
    fbackward()
 
-def _cb_slider_changed(slider):
-   _emotion.position_set(_emotion.play_length * slider.value)
-
 def _update_slider():
    if _controls_visible:
       pos = _emotion.position
@@ -348,7 +348,8 @@ def _update_slider():
       pm = int((pos / 60) - (ph * 60))
       ps = int(pos - (pm * 60) - (ph * 3600))
 
-      gui.part_get('videoplayer.controls.slider').value = pos / len
+      gui.slider_val_set('videoplayer.controls.slider:dragable1', pos / len)
+      gui.slider_val_set('videoplayer.controls.slider:dragable2', pos / len + 0.1)
       gui.text_set('videoplayer.controls.position', '%i:%02i:%02i' % (ph,pm,ps))
       gui.text_set('videoplayer.controls.length', '%i:%02i:%02i' % (lh,lm,ls))
 

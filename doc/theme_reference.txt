@@ -60,7 +60,7 @@ All the icons in icons.edc must be implemented
       "videoplayer.video" -> edje swallow
       "videoplayer.events" -> edje part with mouse_events = 1
       "videoplayer.controls.btn_box" -> edje box
-      "videoplayer.controls.slider" -> elm_slider
+      "videoplayer.controls.slider" -> edje group -> "emc/slider/default"
       "videoplayer.controls.position" -> edje text
       "videoplayer.controls.length" -> edje text
 
@@ -74,7 +74,7 @@ All the icons in icons.edc must be implemented
 ### Volume ###
 
    * Required parts:
-      "volume.slider" -> elm_slider
+      "volume.slider" -> edje group -> "emc/slider/default"
 
    * Signals received from the application:
       "volume,show" "emc"
@@ -129,3 +129,12 @@ All the icons in icons.edc must be implemented
 
    * Signal that should/must be sent to the app
       ...the same as panel dialog
+
+
+### Slider ###
+
+   * Group: "emc/slider/default"
+
+   * Required parts:
+      "dragable1" -> edge dragable
+      "dragable2" -> edge dragable

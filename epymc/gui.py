@@ -211,6 +211,9 @@ def signal_emit(sig, src = 'emc'):
    global layout
    layout.edje_get().signal_emit(sig, src)
 
+def signal_cb_add(emission, source, cb):
+   layout.edje_get().signal_callback_add(emission, source, cb)
+
 def text_set(part, text):
    global layout
    layout.edje_get().part_text_set(part, text)
@@ -219,6 +222,12 @@ def swallow_set(part, obj):
    old = layout.edje_get().part_swallow_get(part)
    if old: old.delete()
    layout.edje_get().part_swallow(part, obj)
+
+def slider_val_set(part, value):
+   layout.edje_get().part_drag_value_set(part, value, value)
+
+def slider_val_get(part):
+   return layout.edje_get().part_drag_value_get(part)
 
 def box_append(part, obj):
    layout.edje_get().part_box_append(part, obj)

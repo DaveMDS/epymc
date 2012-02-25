@@ -407,6 +407,9 @@ class EmcDialog(edje.Edje):
 
       if style in EmcDialog.special_styles:
          self.signal_emit('emc,dialog,%s,set' % (style), 'emc')
+         if title is None:
+            self.part_text_set('emc.text.title', style)
+            self.signal_emit('emc,dialog,title,show', 'emc')
 
       if style in ('info', 'error', 'warning'):
          self.button_add('Ok', (lambda btn: self.delete()))

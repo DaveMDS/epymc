@@ -86,7 +86,8 @@ class UiTestsModule(EmcModule):
    def make_root_page(self):
       self._browser.page_add('uitests://root', 'UI tests')
 
-      self._browser.item_add('uitests://mpv', 'Mediaplayer Video')
+      self._browser.item_add('uitests://mpv', 'Mediaplayer - Local Video')
+      self._browser.item_add('uitests://mpvo', 'Mediaplayer - Online Video')
       self._browser.item_add('uitests://tmdb', 'Themoviedb.org query with gui (need fix for non ascii)')
       self._browser.item_add('uitests://vkbd', 'Virtual Keyboard (need some fixes)')
       self._browser.item_add('uitests://sselector', 'Source Selector')
@@ -123,10 +124,14 @@ class UiTestsModule(EmcModule):
          s = TMDB_WithGui()
          s.movie_search('alien')
 
-      # Mediaplayer Video
+      # Mediaplayer Local Video
       elif item_url == 'uitests://mpv':
-         mediaplayer.play_video('file:///home/dave/Video/test.avi')#TODO FIXME
-         # mediaplayer.play_video('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4')
+         f = os.path.expanduser('~/Video/testvideo.avi')
+         mediaplayer.play_video(f)
+
+      # Mediaplayer Online Video
+      elif item_url == 'uitests://mpvo':
+         mediaplayer.play_video('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4')
          # http://trailers.apple.com/movies/independent/airracers/airracers-tlr1_h480p.mov
          
       # VKeyboard

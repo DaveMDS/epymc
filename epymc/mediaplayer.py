@@ -40,10 +40,6 @@ _volume_hide_timer = None
 _buttons = list()
 _fman = None
 _video_visible = False
-_buffer_dialog = None
-_buffer_min_size = 1024 * 100
-_buffer_full_size = 1024 * 512
-
 
 ### API ###
 def init():
@@ -67,116 +63,37 @@ def shutdown():
 ### mediaplyer API ###
 def play_video(url):
 
-   if not _emotion: _init_emotion()
+   if not _emotion:
+      _init_emotion()
 
-   if url.startswith('http://'):
-      _download_and_play(url)
+   if url.find('://', 2, 15) is -1:
+      url = 'file://' + url
+
+   LOG('dbg', 'play_video: ' + str(url))
+
+   if url.startswith('file://') and not os.path.exists(url[7:]):
+      text = '<b>File not found:</b><br>' + str(url)
+      EmcDialog(text = text, style = 'error')
       return
 
-   elif url.startswith('file://') and os.path.exists(url[7:]):
-      _emotion.file_set(url)
-      volume_set(_volume)
-      volume_mute_set(_volume_muted)
-      _emotion.audio_mute = _volume_muted
-      _emotion.play = True
-      video_player_show()
-      ## TEST VARIOUS INFO
-      # LOG('inf', 'TITLE: ' + str(_emotion.title_get()))
-      # LOG('inf', 'VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
-      # LOG('inf', 'AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
-      # LOG('inf', 'VIDEO CHANS GET: ' + str(_emotion.video_channel_get()))
-      # LOG('inf', 'AUDIO CHANS GET: ' + str(_emotion.audio_channel_get()))
-      # LOG('inf', 'INFO DICT: ' + str(_emotion.meta_info_dict_get()))
-      # LOG('inf', 'SIZE: ' + str(_emotion.size))
-      # LOG('inf', 'IMAGE_SIZE: ' + str(_emotion.image_size))
-      # LOG('inf', 'RATIO: ' + str(_emotion.ratio_get()))
-      ##
-      return
-
-   elif os.path.exists(url):
-      play_video('file://' + url)
-      return
-
-   LOG('err', 'unsupported url: ' + str(url))
-   text = 'Cannot play:<br>' + str(url)
-   EmcDialog(text = text, style = 'error')
-
-
-def _download_and_play(url):
-
-   def _complete_cb(fname, status):
-      global _buffer_dialog
-
-      if _buffer_dialog:
-         _buffer_dialog.delete()
-         _buffer_dialog = None
-      if status != 200:
-         text = 'Something goes wrong with the download<br>' + \
-                'Returned code: ' + str(status)
-         EmcDialog(text = text, style = 'error')
-
-   def _progress_cb(fname, tot, done):
-      global _buffer_dialog
-
-      # calc download position (percent)
-      if tot:
-         dwl_pos = float(done) / float(tot)
-      else:
-         dwl_pos = 0
-
-      # calc play position (percent)
-      if _emotion.position and _emotion.play_length:
-         play_pos = _emotion.position / _emotion.play_length
-      else:
-         play_pos = 0.0
-
-      # calc the byte we are playing at and the buffer size
-      if play_pos > 0.0:
-         play_byte = int(tot * play_pos)
-      else:
-         play_byte = 0
-      buffer_size = done - play_byte
-
-      # print fname, tot, done, '-', play_pos, dwl_pos, '-', play_byte, buffer_size
-
-      # update secondary indicator in position slider
-      gui.slider_val_set('videoplayer.controls.slider:dragable2', dwl_pos)
-
-      # if we are paused for buffering:
-      if _buffer_dialog:
-         # update buffering dialog
-         text = 'please wait<br>%s / %s' % (done, tot)
-         _buffer_dialog.text_set(text)
-         buffer_perc = float(buffer_size) / float(_buffer_full_size)
-         _buffer_dialog.progress_set(buffer_perc)
-
-         # when buffer is full delete the dialog and play the movie
-         if buffer_perc >= 1.0:
-            _buffer_dialog.delete()
-            _buffer_dialog = None
-            if play_pos == 0.0:
-               _emotion.file_set(fname)
-               volume_set(_volume)
-               volume_mute_set(_volume_muted)
-               _emotion.audio_mute = _volume_muted
-            _emotion.play = True
-
-      # otherwise check that the buffer will not go under min_size
-      else: 
-         if buffer_size < _buffer_min_size:
-            _emotion.play = False
-            _buffer_dialog = EmcDialog('buffering...', style='progress',
-                                       text='please wait')
-
-   global _buffer_dialog
+   _emotion.file_set(url)
+   volume_set(_volume)
+   volume_mute_set(_volume_muted)
+   _emotion.audio_mute = _volume_muted
+   _emotion.play = True
    video_player_show()
-   video_controls_show()
-   utils.download_url_async(url, dest = 'tmp',
-                            complete_cb = _complete_cb,
-                            progress_cb = _progress_cb)
-   _buffer_dialog = EmcDialog('buffering...', style='progress',
-                              text='please wait')
    
+   ## TEST VARIOUS INFO
+   # LOG('inf', 'TITLE: ' + str(_emotion.title_get()))
+   # LOG('inf', 'VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
+   # LOG('inf', 'AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
+   # LOG('inf', 'VIDEO CHANS GET: ' + str(_emotion.video_channel_get()))
+   # LOG('inf', 'AUDIO CHANS GET: ' + str(_emotion.audio_channel_get()))
+   # LOG('inf', 'INFO DICT: ' + str(_emotion.meta_info_dict_get()))
+   # LOG('inf', 'SIZE: ' + str(_emotion.size))
+   # LOG('inf', 'IMAGE_SIZE: ' + str(_emotion.image_size))
+   # LOG('inf', 'RATIO: ' + str(_emotion.ratio_get()))
+   ##
 
 def stop():
    _emotion.play = False
@@ -184,18 +101,22 @@ def stop():
 
 def forward():
    LOG('dbg', 'Forward cb' + str(_emotion.position))
+   LOG('dbg', 'Seekable: ' + str(_emotion.seekable))
    _emotion.position += 10 #TODO make this configurable
 
 def backward():
    LOG('dbg', 'Backward cb' + str(_emotion.position))
+   LOG('dbg', 'Seekable: ' + str(_emotion.seekable))
    _emotion.position -= 10 #TODO make this configurable
 
 def fforward():
    LOG('dbg', 'FastForward cb' + str(_emotion.position))
+   LOG('dbg', 'Seekable: ' + str(_emotion.seekable))
    _emotion.position += 60 #TODO make this configurable
 
 def fbackward():
    LOG('dbg', 'FastBackward cb' + str(_emotion.position))
+   LOG('dbg', 'Seekable: ' + str(_emotion.seekable))
    _emotion.position -= 60 #TODO make this configurable
 
 def volume_set(vol):
@@ -291,7 +212,7 @@ def _init_emotion():
    # _emotion.on_audio_level_change_add(_cb_volume_change)
    _emotion.on_frame_resize_add(_cb_frame_resize)
    _emotion.on_playback_finished_add(cb_playback_finished)
-   # progress doesn't work, use frame_decode instead...but it's too often
+   # progress doesn't work, use frame_decode instead...but it's TOOO often
    # _emotion.on_progress_change_add((lambda v: _update_slider()))
    _emotion.on_frame_decode_add((lambda v: _update_slider()))
 
@@ -381,12 +302,10 @@ def cb_playback_finished(vid):
    volume_hide()
 
 def _cb_frame_resize(vid):
-   print vid
    (w, h) = vid.image_size
    edje.extern_object_aspect_set(vid, edje.EDJE_ASPECT_CONTROL_BOTH, w, h)
 
 def _cb_btn_play(btn):
-   LOG('dbg', 'Play cb')
    _emotion.play = not _emotion.play
 
 def _cb_btn_stop(btn):
@@ -464,6 +383,12 @@ def input_event_cb(event):
          return input_events.EVENT_BLOCK
       elif event == 'LEFT':
          _fman.focus_move('l')
+         return input_events.EVENT_BLOCK
+      if event == 'UP':
+         _fman.focus_move('u')
+         return input_events.EVENT_BLOCK
+      elif event == 'DOWN':
+         _fman.focus_move('d')
          return input_events.EVENT_BLOCK
    else:
       if event == 'BACK':

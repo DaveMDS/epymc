@@ -132,8 +132,8 @@ class EmcBrowser(object):
       return None
       
    def page_add(self, url, title, style = None, item_selected_cb = None,
-                 icon_get_cb = None, icon_end_get_cb = None,
-                 info_get_cb = None, poster_get_cb = None, fanart_get_cb = None):
+                 icon_get_cb = None, icon_end_get_cb = None, info_get_cb = None,
+                 poster_get_cb = None, fanart_get_cb = None, *args, **kargs):
       """
       When you create a page you need to give at least the url and the title
       """
@@ -159,7 +159,9 @@ class EmcBrowser(object):
                             'icon_end_get_cb': icon_end_get_cb,
                             'info_get_cb': info_get_cb,
                             'poster_get_cb': poster_get_cb,
-                            'fanart_get_cb': fanart_get_cb})
+                            'fanart_get_cb': fanart_get_cb,
+                            'args': args,
+                            'kargs': kargs})
 
       # first time, we don't have a current_view, set it
       if not self.current_view:
@@ -230,8 +232,14 @@ class EmcBrowser(object):
       # recreate the page
       self.is_back = True
       parent_url = self.pages[-1]['url'] if len(self.pages) > 1 else None
-      func = self.item_selected_cb
-      if func: func(parent_url, page_data['url'])
+      args = page_data['args']
+      kargs = page_data['kargs']
+      if callable(page_data['item_selected_cb']):
+         func = page_data['item_selected_cb']
+      else:
+         func = self.item_selected_cb
+      if callable(func):
+         func(parent_url, page_data['url'], *args, **kargs)
 
    def refresh(self, recreate=False):
       if recreate:
@@ -313,11 +321,13 @@ class EmcBrowser(object):
          if url.endswith('//back'):
             self.back()
       else:
-         if self.pages[-1]['item_selected_cb']:
+         if callable(self.pages[-1]['item_selected_cb']):
             func = self.pages[-1]['item_selected_cb']
          else:
             func = self.item_selected_cb
-         if callable(func): func(self.pages[-1]['url'], url)
+         args = self.pages[-1]['args']
+         kargs = self.pages[-1]['kargs']
+         if callable(func): func(self.pages[-1]['url'], url, *args, **kargs)
 
    def _icon_get(self, url):
       """ TODO Function doc """

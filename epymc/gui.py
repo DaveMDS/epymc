@@ -56,14 +56,26 @@ def init():
    if not ini.has_option('general', 'scale'):
       ini.set('general', 'scale', '1.0')
 
+   # set default elm engine
+   if not ini.has_option('general', 'evas_engine'):
+      ini.set('general', 'elm_engine', 'opengl_x11')
+
    # search the theme file, or use the default one
    theme_file = utils.get_resource_file('themes', name + '.edj', 'default.edj')
    if not theme_file:
       print 'ERROR: can\'t find a working theme file, exiting...'
       return False
-   
+
+   # custom elementary theme
    elementary.theme_overlay_add(theme_file) # TODO REMOVE ME!!! is here for buttons
    elementary.theme_extension_add(theme_file)
+
+   # preferred evas engine
+   # this seems totally buggy in elm, I should just do the preferred one
+   elementary.preferred_engine_set(ini.get('general', 'elm_engine'))
+   elementary.engine_set(ini.get('general', 'elm_engine'))
+
+
 
    # window
    win = elementary.Window('epymc', elementary.ELM_WIN_BASIC)

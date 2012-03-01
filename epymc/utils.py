@@ -39,13 +39,11 @@ def base_dir_set(d):
 def base_dir_get():
    return _base_dir
 
-
 def config_dir_get():
    global _config_dir
    if not _config_dir:
       _config_dir = os.path.expanduser('~/.config/epymc')
    return _config_dir
-
 
 def get_resource_file(type, resource, default = None):
    """
@@ -71,6 +69,23 @@ def url2path(url):
    # TODO ... convert the url to a local path !!
    return url[7:]
 
+def hum_size(bytes):
+   bytes = float(bytes)
+   if bytes >= 1099511627776:
+      terabytes = bytes / 1099511627776
+      size = '%.2fT' % terabytes
+   elif bytes >= 1073741824:
+      gigabytes = bytes / 1073741824
+      size = '%.2fG' % gigabytes
+   elif bytes >= 1048576:
+      megabytes = bytes / 1048576
+      size = '%.2fM' % megabytes
+   elif bytes >= 1024:
+      kilobytes = bytes / 1024
+      size = '%.2fK' % kilobytes
+   else:
+      size = '%.2fb' % bytes
+   return size
 
 def download_url_sync(url, dest, min_size = 0):
    """
@@ -94,7 +109,7 @@ def download_url_sync(url, dest, min_size = 0):
 
 def download_url_async(url, dest = 'tmp', min_size = 0,
                        complete_cb = None, progress_cb = None,
-                       *args, **kargs):
+                       urlencode = True, *args, **kargs):
    """
    Download the given url in async way.
    url must be a valid url to download
@@ -143,9 +158,12 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
       return 0 # always continue the download
 
    # urlencode the url (but not the http:// part, or ':' will be converted)
-   (_prot, _url) = url.split('://', 1)
-   encoded = '://'.join((_prot, urllib.quote(_url)))
-   
+   if urlencode:
+      (_prot, _url) = url.split('://', 1)
+      encoded = '://'.join((_prot, urllib.quote(_url)))
+   else:
+      encoded = url
+
    # use a random temp file
    if dest == 'tmp':
       dest = tempfile.mktemp()
@@ -196,7 +214,7 @@ class EmcExec(object):
 
    def data_cb(self, exe, event):
       for l in event.lines:
-         self.outbuffer += l
+         self.outbuffer += (l + '\n')
 
    def del_cb(self, exe, event):
       if callable(self.done_cb):

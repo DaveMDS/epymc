@@ -776,9 +776,11 @@ class EmcVKeyboard(EmcDialog):
 
       # entry
       self.entry = elementary.Entry(gui.win) # TODO use scrolled_entry instead
+      self.entry.style_set('vkeyboard')
+      self.entry.editable_set(False)
+      self.entry.single_line_set(True)
       self.entry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       self.entry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      self.entry.single_line_set(True)
       if text: self.text_set(text)
       tb.pack(self.entry, 0, 0, 10, 1)
       self.entry.show()
@@ -790,8 +792,7 @@ class EmcVKeyboard(EmcDialog):
       for i, c in enumerate(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']):
          self._pack_btn(tb, i, 1, 1, 1, c, cb = self._default_btn_cb)
       for i, c in enumerate(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']):
-         if c == 'a': b = self._pack_btn(tb, i, 2, 1, 1, c, cb = self._default_btn_cb, focused = True)
-         else:        b = self._pack_btn(tb, i, 2, 1, 1, c, cb = self._default_btn_cb)
+         self._pack_btn(tb, i, 2, 1, 1, c, cb = self._default_btn_cb)
       for i, c in enumerate(['k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't']):
          self._pack_btn(tb, i, 3, 1, 1, c, cb = self._default_btn_cb)
       for i, c in enumerate(['u', 'v', 'w', 'x', 'y', 'z', '.', '@', '-', '_']):
@@ -805,7 +806,6 @@ class EmcVKeyboard(EmcDialog):
       self._pack_btn(tb, 6, 6, 4, 1, 'Accept',  'icon/ok',     self._accept_cb)
 
       # activate the inwin
-      # self.entry.focus_set(True)  #  :(  ARGGG
       self.entry.focus_allow_set(False)
 
       # elementary.InnerWindow.__init__(self, gui.win)
@@ -814,15 +814,15 @@ class EmcVKeyboard(EmcDialog):
        # catch input events
       input_events.listener_add('vkbd', self.input_event_cb)
 
-   def _pack_btn(self, tb, x, y, w, h, label, icon = None, cb = None, focused = False):
+   def _pack_btn(self, tb, x, y, w, h, label, icon = None, cb = None):
       b = elementary.Button(gui.win)
       b.size_hint_weight_set(evas.EVAS_HINT_EXPAND, 0.0)
       b.size_hint_align_set(evas.EVAS_HINT_FILL, 0.0)
       if icon: b.icon_set(gui.load_icon(icon))
       if cb: b.callback_clicked_add(cb)
+      b.data['cb'] = cb
       b.text_set(label)
       self.efm.obj_add(b)
-      if focused: self.efm.focused_set(b)
       tb.pack(b, x, y, w, h)
       b.show()
       return b
@@ -833,9 +833,8 @@ class EmcVKeyboard(EmcDialog):
       EmcDialog.delete(self)
 
    def text_set(self, text):
-      self.entry.entry_set(text)
+      self.entry.text = text
       self.entry.cursor_end_set()
-      self.entry.focus_set(True)
 
    def _dismiss_cb(self, button):
       if self.dismiss_cb and callable(self.dismiss_cb):
@@ -848,15 +847,14 @@ class EmcVKeyboard(EmcDialog):
       self.delete()
 
    def _default_btn_cb(self, button):
-      self.entry.focus_set(True)
+      self.entry.cursor_end_set()
       self.entry.entry_insert(button.text)
 
    def _erase_cb(self, button):
-      self.entry.focus()
-      gui.win.evas_get().feed_key_down('BackSpace', 'BackSpace', '\b', '\b', 0)
+      if len(self.entry.text) > 0:
+         self.entry.text = self.entry.text[0:-1]
 
    def _space_cb(self, button):
-      self.entry.focus()
       self.entry.entry_insert(' ')
 
    def _uppercase_cb(self, button):
@@ -869,11 +867,13 @@ class EmcVKeyboard(EmcDialog):
             else:
                btn.label = c.lower()
                button.label = 'UPPERCASE'
+      self.entry.cursor_end_set()
 
    def input_event_cb(self, event):
       if event == 'OK':
          btn = self.efm.focused_get()
-         btn.callback_call('clicked') # TODO COMMIT THIS
+         if callable(btn.data['cb']):
+            btn.data['cb'](btn)
       elif event == 'EXIT':
          self._dismiss_cb(None)
       elif event == 'LEFT':  self.efm.focus_move('l')

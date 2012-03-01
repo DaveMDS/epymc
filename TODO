@@ -20,7 +20,6 @@ MEDIAPLAYER
 CORE
 =====
  * Browser: label must go in 'item_class' or refresh will not work :(
- * VKeyboard resolv left/right conflict  !!!!!!!
  * Make elementary engine configurable, or at least tell what engine is active
 
 MAME

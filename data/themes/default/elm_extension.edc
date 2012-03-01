@@ -1514,6 +1514,34 @@ group { name: "elm/entry/anchor/default";
    }
 }
 
+//// VKEYBOARD ENTRY (elm/entry/base-single-noedit/default) ///////////////////
+group { name: "elm/entry/base-single-noedit/vkeyboard";
+   parts {
+      part { name: "elm.text";
+         type: TEXTBLOCK;
+         entry_mode: PLAIN;
+         multiline: 0;
+         source: "elm/entry/selection/default"; // selection under
+         source4: ""; // cursorover
+         source5: "elm/entry/anchor/default"; // anchor under
+         description { state: "default" 0.0;
+            text {
+               style: "epymc_dialog_style";
+               min: 1 1;
+               max: 0 0;
+               align: 0.0 0.5;
+            }
+         }
+         description { state: "disabled" 0.0;
+            inherit: "default" 0.0;
+            text {
+               style: "epymc_dialog_style";
+            }
+         }
+      }
+   }
+}
+
 //// BUTTONS (elm/button/base/default) ////////////////////////////////////////
 group { name: "elm/button/base/default";
    images {

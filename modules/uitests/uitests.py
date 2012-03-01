@@ -19,7 +19,7 @@
 
 import os
 
-import ecore
+import ecore, elementary
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser
@@ -87,7 +87,8 @@ class UiTestsModule(EmcModule):
       self._browser.page_add('uitests://root', 'UI tests')
 
       self._browser.item_add('uitests://mpv', 'Mediaplayer - Local Video')
-      self._browser.item_add('uitests://mpvo', 'Mediaplayer - Online Video')
+      self._browser.item_add('uitests://mpvo', 'Mediaplayer - Online Video (good)')
+      self._browser.item_add('uitests://mpvob', 'Mediaplayer - Online Video (bad)')
       self._browser.item_add('uitests://tmdb', 'Themoviedb.org query with gui (need fix for non ascii)')
       self._browser.item_add('uitests://vkbd', 'Virtual Keyboard (need some fixes)')
       self._browser.item_add('uitests://sselector', 'Source Selector')
@@ -107,6 +108,7 @@ class UiTestsModule(EmcModule):
 
    def cb_info_get(self, page_url, item_url):
       text  = '<title>System info:</><br>'
+      text += '<b>Graphic engine</b> %s (%s)<br>' % (elementary.engine_get(), elementary.preferred_engine_get())
       text += '<b>base dir</b> %s<br>' % (utils.base_dir_get())
       text += '<b>config dir</b> %s<br>' % (utils.config_dir_get())
       text += '<b>download available</b> %s<br>' % (ecore.file.download_protocol_available('http://'))
@@ -129,11 +131,15 @@ class UiTestsModule(EmcModule):
          f = os.path.expanduser('~/Video/testvideo.avi')
          mediaplayer.play_video(f)
 
-      # Mediaplayer Online Video
+      # Mediaplayer Online Video (good)
       elif item_url == 'uitests://mpvo':
-         mediaplayer.play_video('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4')
+         mediaplayer.play_video('http://v2.zpks.com/flv/7466bc3847d774d8e58cfaab5e903500/4f4f892f/7/0/70383/52372.mp4')
          # http://trailers.apple.com/movies/independent/airracers/airracers-tlr1_h480p.mov
-         
+
+      # Mediaplayer Online Video (bad)
+      elif item_url == 'uitests://mpvob':
+         mediaplayer.play_video('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4')
+
       # VKeyboard
       elif item_url == 'uitests://vkbd':
          EmcVKeyboard(title = 'Virtual Keyboard', text = 'This is the keyboard test!')

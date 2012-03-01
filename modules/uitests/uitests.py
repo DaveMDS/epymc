@@ -87,8 +87,8 @@ class UiTestsModule(EmcModule):
       self._browser.page_add('uitests://root', 'UI tests')
 
       self._browser.item_add('uitests://mpv', 'Mediaplayer - Local Video')
-      self._browser.item_add('uitests://mpvo', 'Mediaplayer - Online Video (good)')
-      self._browser.item_add('uitests://mpvob', 'Mediaplayer - Online Video (bad)')
+      # self._browser.item_add('uitests://mpvo', 'Mediaplayer - Online Video (good)')
+      self._browser.item_add('uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
       self._browser.item_add('uitests://tmdb', 'Themoviedb.org query with gui (need fix for non ascii)')
       self._browser.item_add('uitests://vkbd', 'Virtual Keyboard (need some fixes)')
       self._browser.item_add('uitests://sselector', 'Source Selector')
@@ -132,9 +132,8 @@ class UiTestsModule(EmcModule):
          mediaplayer.play_video(f)
 
       # Mediaplayer Online Video (good)
-      elif item_url == 'uitests://mpvo':
-         mediaplayer.play_video('http://v2.zpks.com/flv/7466bc3847d774d8e58cfaab5e903500/4f4f892f/7/0/70383/52372.mp4')
-         # http://trailers.apple.com/movies/independent/airracers/airracers-tlr1_h480p.mov
+      # elif item_url == 'uitests://mpvo':
+         # mediaplayer.play_video('http://trailers.apple.com/movies/independent/airracers/airracers-tlr1_h480p.mov')
 
       # Mediaplayer Online Video (bad)
       elif item_url == 'uitests://mpvob':

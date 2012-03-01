@@ -13,6 +13,10 @@ MAIN
  * joy/webserver need a key-repetition handling
  * i18n...will do on request
 
+MEDIAPLAYER
+============
+ * need to request cache status to emotion, for online video.
+
 CORE
 =====
  * Browser: label must go in 'item_class' or refresh will not work :(

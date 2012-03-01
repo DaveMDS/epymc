@@ -43,14 +43,14 @@ def addItem(label, url, state, icon, is_folder=False):
 def playUrl(url):
    print 'PLAY!' + url
 
-def open_url( url ):
-   req = urllib2.Request( url )
-   content = urllib2.urlopen( req )
+def open_url(url):
+   req = urllib2.Request(url)
+   content = urllib2.urlopen(req)
    data = content.read()
    content.close()
    return data
 
-def clean( name ):
+def clean(name):
    list = [( '&amp;', '&' ), ( '&quot;', '"' ), ( '<em>', '' ), ( '</em>', '' ), ( '&#39;', '\'' )]
    for search, replace in list:
       name = name.replace(search, replace)
@@ -58,8 +58,9 @@ def clean( name ):
 
 # this is the first page, show fixed categories and film in main page
 if STATUS == 0:
-   d = os.path.dirname(__file__)
-   addItem('Coming soon','url', 2, os.path.join(d,'surf.png'), True) # FIXME surf
+   addItem('Coming soon','http://www.traileraddict.com/comingsoon', 2, None, True)
+   addItem('Top Films','http://www.traileraddict.com/top150', 2, None, True)
+   addItem('Top Trailers','http://www.traileraddict.com/attraction/1', 6, None, True)
 
    data = open_url('http://www.traileraddict.com/')
    regexp = '<a href="/trailer/(.+?)"><img src="(.+?)" border="0" alt="(.+?)"' + \
@@ -74,46 +75,46 @@ if STATUS == 0:
          name2 = clean(title[0])
       url = 'http://www.traileraddict.com/trailer/' + url
       thumb = 'http://www.traileraddict.com' + thumb
-      addItem(name1, url, 5, thumb)
+      addItem(name1, url.encode('ascii'), 5, thumb)
 
-# Coming soon page
+# ComingSoon/Top150 pages
 elif STATUS == 2:
-   data = open_url( 'http://www.traileraddict.com/comingsoon' )
+   data = open_url(URL)
+   soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
-   urls = []
-   margin_right = re.compile( '<div style=\"float:right(.*?)<div style="float:left; width:300px;', re.DOTALL ).findall( data )[0]
-   margin_left = re.compile( '<div style=\"float:left; width:300px;(.*?)<div style="clear:both;">', re.DOTALL ).findall( data )[0]
-   link_title = re.compile( '<img src="/images/arrow2.png" class="arrow"> <a href="(.+?)">(.+?)</a>' ).findall( margin_left )
-   
-   
-   for url, title in link_title:
-      url = 'http://www.traileraddict.com/' + url
-      urls.append(url)
-      # addItem(clean(title), urllib.quote_plus(url), 4, thumb)
-      # listitem = xbmcgui.ListItem( label = clean( title ), iconImage = "DefaultFolder.png", thumbnailImage = "DefaultFolder.png" )
-		# u = sys.argv[0] + "?mode=4&name=" + urllib.quote_plus( clean( title ) ) + "&url=" + urllib.quote_plus( url )
-		# ok = xbmcplugin.addDirectoryItem( handle = int( sys.argv[1] ), url = u, listitem = listitem, isFolder = True )
+   arrows = soup.findAll('img', attrs = {'class' : 'arrow'})
+   for arrow in arrows:
+      title = arrow.nextSibling.nextSibling.contents[0]
+      url = arrow.nextSibling.nextSibling['href']
+      url = 'http://www.traileraddict.com' + url
+      # print title, url
+      addItem(title, url.encode('ascii'), 4, None)
 
-   
-
-   link_title = re.compile( '<img src="/images/arrow2.png" class="arrow"> <a href="(.+?)">(.+?)</a>' ).findall( margin_right )
-   
-   for url, title in link_title:
-      url = 'http://www.traileraddict.com/' + url
-      urls.append(url)
-      # listitem = xbmcgui.ListItem( label = clean( title ), iconImage = "DefaultFolder.png", thumbnailImage = "DefaultFolder.png" )
-		# u = sys.argv[0] + "?mode=4&name=" + urllib.quote_plus( clean( title ) ) + "&url=" + urllib.quote_plus( url )
-		# ok = xbmcplugin.addDirectoryItem( handle = int( sys.argv[1] ), url = u, listitem = listitem, isFolder = True )
-
-   for url in urls:
-      find_trailers()
-
-   # xbmcplugin.addSortMethod( handle = int( sys.argv[1] ), sortMethod = xbmcplugin.SORT_METHOD_NONE )
-	# xbmcplugin.endOfDirectory( int( sys.argv[1] ) )
-
-# find trailer
+# find trailers in film page
 elif STATUS == 4:
-   pass
+   data = open_url(URL)
+   soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
+
+   for div in soup.findAll('div', attrs = {'class' : 'info'}):
+      a = div.find('h2').contents[0]
+      title = a.contents[0]
+      url = 'http://www.traileraddict.com' + a['href']
+      # print title, url
+      addItem(title, url.encode('ascii'), 5, 'icon/play')
+
+
+# top trailers page
+elif STATUS == 6:
+   data = open_url(URL)
+   soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
+
+   leftcolumn = soup.find('div', attrs = {'class' : 'leftcolumn'})
+   for a in leftcolumn.findAll('a'):
+      if a['href'].startswith('/trailer/'):
+         title = a.find('img')['title']
+         url = 'http://www.traileraddict.com' + a['href']
+         # print title, url
+         addItem(title, url.encode('ascii'), 5, 'icon/play')
 
 # play video
 elif STATUS == 5:
@@ -134,51 +135,3 @@ elif STATUS == 5:
    url = content.geturl()
    content.close()
    playUrl(str(url))
-   # addItem(url, url, 5, '')
-
-def find_trailers( url, name ):
-	save_name = name
-	data = open_url( url )
-	link_thumb = re.compile( '<a href="(.+?)"><img src="(.+?)" name="thumb' ).findall( data )
-	thumbs = re.compile( 'img src="/psize\.php\?dir=(.+?)" style' ).findall( data )
-	if len( thumbs ) == 0:
-		thumb = "DefaultVideo.png"
-	else:
-		thumb = 'http://www.traileraddict.com/' + thumbs[0]
-	title = re.compile( '<div class="abstract"><h2><a href="(.+?)">(.+?)</a></h2><br />', re.DOTALL ).findall( data )
-	trailers = re.compile( '<dl class="dropdown">(.+?)</dl>', re.DOTALL ).findall( data )
-	item_count = 0
-	if len( trailers ) > 0:
-		check1 = re.compile( '<a href="(.+?)"><img src="\/images\/usr\/arrow\.png" border="0" style="float:right;" \/>(.+?)</a>' ).findall( trailers[0] )
-		check2 = re.compile( '<a href="(.+?)"( style="(.*?)")?>(.+?)<br />' ).findall( trailers[0] )
-		if len( check1 ) > 0:
-			url_title = check1
-			for url, title in url_title:
-				url = 'http://www.traileraddict.com' + url
-				listitem = xbmcgui.ListItem( label = clean( title ), iconImage = thumb, thumbnailImage = thumb )
-				u = sys.argv[0] + "?mode=5&name=" + urllib.quote_plus( save_name + ' (' + clean( title ) + ')' ) + "&url=" + urllib.quote_plus( url )
-				ok = xbmcplugin.addDirectoryItem( handle = int( sys.argv[1] ), url = u, listitem = listitem, isFolder = False )
-			xbmcplugin.addSortMethod( handle = int(sys.argv[1]), sortMethod = xbmcplugin.SORT_METHOD_NONE )
-			xbmcplugin.endOfDirectory( int( sys.argv[1] ) )
-		elif len( check2 ) > 0:
-			url_title = check2
-			for url, trash1, trash2, title in url_title:
-				url = 'http://www.traileraddict.com' + url
-				listitem = xbmcgui.ListItem( label = clean( title ), iconImage = thumb, thumbnailImage = thumb )
-				u = sys.argv[0] + "?mode=5&name=" + urllib.quote_plus( save_name + ' (' + clean( title ) + ')' ) + "&url=" + urllib.quote_plus( url )
-				ok = xbmcplugin.addDirectoryItem( handle = int( sys.argv[1] ), url = u, listitem = listitem, isFolder = False )
-			xbmcplugin.addSortMethod( handle = int(sys.argv[1]), sortMethod = xbmcplugin.SORT_METHOD_NONE )
-			xbmcplugin.endOfDirectory( int( sys.argv[1] ) )
-		else:
-			dia = xbmcgui.Dialog()
-			ok = dia.ok( __settings__.getLocalizedString(30005), __settings__.getLocalizedString(30006) )
-	else:
-		for url, thumb2 in link_thumb:
-			if clean( title[item_count][1] ).find( 'Trailer' ) > 0: 
-				url = 'http://www.traileraddict.com' + url
-				listitem = xbmcgui.ListItem( label = clean( title[item_count][1] ), iconImage = thumb, thumbnailImage = thumb )
-				u = sys.argv[0] + "?mode=5&name=" + urllib.quote_plus( save_name + ' (' + clean( title[item_count][1] ) + ')' ) + "&url=" + urllib.quote_plus( url )
-				ok = xbmcplugin.addDirectoryItem( handle = int( sys.argv[1] ),url = u, listitem = item, isFolder = False )
-			item_count = item_count + 1
-		xbmcplugin.addSortMethod( handle = int( sys.argv[1] ), sortMethod = xbmcplugin.SORT_METHOD_NONE )
-		xbmcplugin.endOfDirectory( int( sys.argv[1] ) )

@@ -96,8 +96,9 @@ def play_video(url):
    ##
 
 def stop():
-   _emotion.play = False
+   LOG('dbg', 'Stop()')
    _emotion.position = 0
+   _emotion.play = False
 
 def forward():
    LOG('dbg', 'Forward cb' + str(_emotion.position))

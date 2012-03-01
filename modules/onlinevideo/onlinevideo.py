@@ -28,7 +28,7 @@ import evas, elementary
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser
 from epymc.utils import EmcExec
-#from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourceSelector, EmcVKeyboard
+from epymc.gui import EmcDialog
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
@@ -61,6 +61,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    _sources = []
    _current_src = None
    _item_data = {}
+   _run_dialog = None
 
    _search_folders = [
       os.path.dirname(__file__),
@@ -205,23 +206,27 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       src = self._current_src
       cmd = '%s %d %s' % (src['exec'], 0, 'url')
       item_data = (src['label'],'index',0,'',False)
-      EmcExec(cmd, True, self._request_page_done, item_data)
+      self._request_page(item_data)
+      # EmcExec(cmd, True, self._request_page_done, item_data)
 
    def _request_page(self, item_data):
       (label,url,state,icon,sub) = item_data
       src = self._current_src
       cmd = '%s %d %s' % (src['exec'], state, url)
       EmcExec(cmd, True, self._request_page_done, item_data)
+      self._run_dialog = EmcDialog(title = 'please wait', style = 'cancel',
+                                   text = 'Scraping site...', )
 
    def _request_page_done(self, output, page_data):
+      self._run_dialog.delete()
       # get all the valid items from the output of the command
       lines = output.split('\n')
       items = []
       for line in lines:
          # LOG('dbg', ' ---' + line)
          if line.startswith('PLAY!http://'):
-            mediaplayer.play_video(line[5:])
             LOG('inf', 'yes sir..' + line)
+            mediaplayer.play_video(line[5:])
             return
          else:
             try:
@@ -242,7 +247,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self._item_data = {}
 
       # populate the browser
-      # print page_data
       (label,url,state,icon,sub) = page_data
       self._browser.page_add(url, label,
                              item_selected_cb = self._item_selected_cb,
@@ -252,9 +256,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                              info_get_cb = None,
                              page_data = page_data)
       for item_data in items:
-         (label,url,state,icon,sub) = item_data
+         (label, url, state, icon, sub) = item_data
+         if not icon and (sub):
+            icon = 'icon/folder'
          self._browser.item_add(url, label)
-         self._item_data[url] = item_data
+         self._item_data[url] = (label, url, state, icon, sub)
 
    def _item_selected_cb(self, page_url, item_url, page_data):
       if self._item_data.has_key(item_url):

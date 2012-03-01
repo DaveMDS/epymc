@@ -58,7 +58,7 @@ def init():
 
    # set default elm engine
    if not ini.has_option('general', 'evas_engine'):
-      ini.set('general', 'elm_engine', 'opengl_x11')
+      ini.set('general', 'evas_engine', 'opengl_x11')
 
    # search the theme file, or use the default one
    theme_file = utils.get_resource_file('themes', name + '.edj', 'default.edj')
@@ -72,8 +72,8 @@ def init():
 
    # preferred evas engine
    # this seems totally buggy in elm, I should just do the preferred one
-   elementary.preferred_engine_set(ini.get('general', 'elm_engine'))
-   elementary.engine_set(ini.get('general', 'elm_engine'))
+   elementary.preferred_engine_set(ini.get('general', 'evas_engine'))
+   elementary.engine_set(ini.get('general', 'evas_engine'))
 
 
 

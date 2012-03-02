@@ -33,7 +33,8 @@ images {
 
 fonts {
    font: "Cuprum.ttf" "Cuprum";
-   font: "Lobster.ttf" "Lobster";
+   font: "CinemaRegular.ttf" "Cinema";
+   font: "Aclonica.ttf" "Aclonica";
 }
 
 styles {
@@ -60,7 +61,7 @@ styles {
    }
 
    style { name: "epymc_dialog_title_style";
-      base: "font=Cuprum align=center font_size="FONT_SIZE_BIGGER" color=#B00 wrap=none";
+      base: "font=Aclonica align=center font_size="FONT_SIZE_BIG" color=#B00 wrap=none";
    }
    // font=Sans font_size=10 align=center color=#fff wrap=mixed ellipsis=1.0
    // font=Sans text_class=fileman_icon wrap=[word,mixed,none] style=soft_shadow shadow_color=#0002
@@ -162,8 +163,9 @@ collections {
          part { name: "topbar.title"; /* API */
             type: TEXT;
             scale: 1;
+            effect: GLOW;
             description { state: "default" 0.0;
-               color: 200 200 200 200;
+               color: 255 255 255 200;
                rel1 {
                   to: "topbar.clip";
                   to_x: "topbar.home_icon";
@@ -173,9 +175,9 @@ collections {
                   to: "topbar.clip";
                }
                text {
-                  font: FONT;
-                  size: FONT_SIZE_BIG;
-                  align: 0.0 0.7;
+                  font: "Aclonica";
+                  size: FONT_SIZE;
+                  align: 0.0 1.0;
                }
             }
             description { state: "visible" 0.0;
@@ -220,7 +222,7 @@ collections {
                   offset: -40 0;
                }
                text {
-                  font: FONT;
+                  font: "Aclonica";
                   size: FONT_SIZE_BIG;
                   align: 1.0 0.7;
                }
@@ -955,7 +957,7 @@ collections {
                visible: 0;
                text {
                   text:"missing title...";
-                  align: 0.5 1.0;
+                  align: 0.5 0.5;
                   style: "epymc_dialog_title_style";
                }
             }
@@ -1206,7 +1208,7 @@ collections {
                text {
                   text:"missing title...";
                   min: 1 1;
-                  align: 0.5 0.25;
+                  align: 0.5 0.35;
                   style: "epymc_dialog_title_style";
                }
             }

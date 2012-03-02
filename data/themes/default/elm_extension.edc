@@ -576,7 +576,7 @@ group { name: "elm/list/item/mainmenu";
             color: 255 255 255 255;
             color3: 0 0 0 255;
             text {
-               font: "Lobster";
+               font: "Aclonica";
                size: 35;
                min: 1 1;
 //                  min: 0 1;

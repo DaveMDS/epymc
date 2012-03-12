@@ -19,6 +19,7 @@
 
 #define COLOR_BLUE 63 108 168
 #define COLOR_GREEN 63 168 108
+#define COLOR_ORANGE 240 164 10
 
 images {
    image: "background.jpg" COMP;
@@ -451,14 +452,9 @@ collections {
             type: EXTERNAL;
             source: "elm/list";
             description { state: "default" 0.0;
-               rel1 {
-                  relative: 0.3 -0.9;
-                  offset: 0 0;
-               }
-               rel2 {
-                  relative: 0.7 -0.1;
-                  offset: 0 0;
-               }
+               rel1.relative: 0.0 -1.0;
+               rel2.relative: 1.0 0.0;
+               align: 1.0 1.0;
                params {
                   choice: "horizontal mode" "scroll";
                   choice: "scroll horizontal" "off";
@@ -469,14 +465,8 @@ collections {
             }
             description { state: "visible" 0;
                inherit: "default" 0.0;
-               rel1 {
-                  relative: 0.3 0.1;
-                  offset: 0 0;
-               }
-               rel2 {
-                  relative: 0.7 0.9;
-                  offset: 0 0;
-               }
+               rel1.relative: 0.0 0.0;
+               rel2.relative: 1.0 1.0;
             }
          }
 

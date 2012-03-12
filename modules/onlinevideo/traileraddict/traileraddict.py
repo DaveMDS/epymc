@@ -33,15 +33,18 @@ import os, sys, urllib2, re
 from BeautifulSoup import BeautifulSoup
 
 AGENT='Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'
+
+### API V.2  ###################################################################
 STATUS = int(sys.argv[1])
 URL = sys.argv[2]
 
-
-def addItem(label, url, state, icon, is_folder=False):
-   print((label, url, state, icon, is_folder))
+def addItem(label, url, state, icon, action = 0):
+   # actions: 0=none, 1=folder, 2=moreitems
+   print((label, url, state, icon, action))
 
 def playUrl(url):
    print 'PLAY!' + url
+### API END  ###################################################################
 
 def open_url(url):
    req = urllib2.Request(url)

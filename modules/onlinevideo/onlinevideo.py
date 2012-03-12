@@ -39,7 +39,7 @@ import epymc.gui as gui
 
 
 
-DEBUG = False
+DEBUG = True
 DEBUGN = 'ONLINEVID'
 def LOG(sev, msg):
    if   sev == 'err': print('%s ERROR: %s' % (DEBUGN, msg))
@@ -79,8 +79,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # self.__film_db = EmcDatabase('film')
       # self.__person_db = EmcDatabase('person')
       self._item_data = {}
+
       # add an item in the mainmenu
-      mainmenu.item_add('onlinevideo', 10, 'Online Videos', None, self.cb_mainmenu)
+      img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
+      mainmenu.item_add('onlinevideo', 10, 'Online Videos',
+                        img, self.cb_mainmenu)
 
       # create a browser instance
       self._browser = EmcBrowser('OnlineVideos', 'List',
@@ -205,12 +208,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def _request_index(self):
       src = self._current_src
       cmd = '%s %d %s' % (src['exec'], 0, 'url')
-      item_data = (src['label'],'index',0,'',False)
+      item_data = (src['label'],'index',0,'',0)
       self._request_page(item_data)
-      # EmcExec(cmd, True, self._request_page_done, item_data)
 
    def _request_page(self, item_data):
-      (label,url,state,icon,sub) = item_data
+      (label,url,state,icon,action) = item_data
       src = self._current_src
       cmd = '%s %d %s' % (src['exec'], state, url)
       EmcExec(cmd, True, self._request_page_done, item_data)
@@ -231,8 +233,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          else:
             try:
                # WARNING keep item_data consistent !
-               (label, url, state, icon, sub) = ast.literal_eval(line)
-               item_data = (label,url,state,icon,sub)
+               (label, url, state, icon, action) = ast.literal_eval(line)
+               item_data = (label,url,state,icon,action)
                items.append(item_data)
                LOG('dbg', str(item_data))
             except:
@@ -242,25 +244,26 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          EmcDialog(text = 'Error executing script', style = 'error')
          return
 
-      # store the items data in the dictiornary (key=url)
-      del self._item_data # TODO need to del all the item_data inside?? !!!!!!!!!!!!!!!!!!!!!!
-      self._item_data = {}
+      (label,url,state,icon,action) = page_data
+      if action != 2:
+         # store the items data in the dictiornary (key=url)
+         del self._item_data # TODO need to del all the item_data inside?? !!!!!!!!!!!!!!!!!!!!!!
+         self._item_data = {}
 
-      # populate the browser
-      (label,url,state,icon,sub) = page_data
-      self._browser.page_add(url, label,
-                             item_selected_cb = self._item_selected_cb,
-                             icon_get_cb = self._item_image_cb,
-                             poster_get_cb = self._item_image_cb,
-                             fanart_get_cb = None,
-                             info_get_cb = None,
-                             page_data = page_data)
+         # new browser page
+         self._browser.page_add(url.encode('ascii'), label,
+                                item_selected_cb = self._item_selected_cb,
+                                icon_get_cb = self._item_image_cb,
+                                poster_get_cb = self._item_image_cb,
+                                fanart_get_cb = None,
+                                info_get_cb = None,
+                                page_data = page_data)
       for item_data in items:
-         (label, url, state, icon, sub) = item_data
-         if not icon and (sub):
+         (label, url, state, icon, action) = item_data
+         if not icon and action == 1:
             icon = 'icon/folder'
          self._browser.item_add(url, label)
-         self._item_data[url] = (label, url, state, icon, sub)
+         self._item_data[url] = (label, url, state, icon, action)
 
    def _item_selected_cb(self, page_url, item_url, page_data):
       if self._item_data.has_key(item_url):

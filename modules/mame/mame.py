@@ -68,7 +68,8 @@ and what it need to work well, can also use markup like <title>this</> or
                        info_get_cb = self.browser_info_get,
                        icon_get_cb = self.browser_icon_get)
 
-      mainmenu.item_add('mame', 50, 'M.A.M.E', None, self.cb_mainmenu)
+      img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
+      mainmenu.item_add('mame', 50, 'M.A.M.E', img, self.cb_mainmenu)
 
       # create config ini section if not exists
       ini.add_section('mame')

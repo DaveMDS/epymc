@@ -40,6 +40,8 @@ _volume_hide_timer = None
 _buttons = list()
 _fman = None
 _video_visible = False
+_buffer_dialog = None
+_update_timer = None
 
 ### API ###
 def init():
@@ -147,14 +149,24 @@ def volume_mute_toggle():
 ### gui API ###
 def video_player_show():
    global _video_visible
+   global _update_timer
+
    gui.signal_emit('videoplayer,show')
    _video_visible = True
    input_events.listener_promote('videoplayer')
+   if _update_timer is not None:
+      update_timer.delete()
+   _update_timer = ecore.Timer(0.2, _update_timer_cb)
 
 def video_player_hide():
    global _video_visible
+   global _update_timer
+
    video_controls_hide()
    _video_visible = False
+   if _update_timer is not None:
+      _update_timer.delete()
+      _update_timer = None
    gui.signal_emit('videoplayer,hide')
 
 def video_controls_show():
@@ -198,6 +210,28 @@ def volume_hide():
 
 
 ### internals ###
+def _update_timer_cb():
+   global _buffer_dialog
+
+   def _dialog_canc_cb(dia):
+      _buffer_dialog = None
+
+   if _buffer_dialog is not None:
+      _buffer_dialog.progress_set(_emotion.buffer_size)
+      if _emotion.buffer_size >= 1.0:
+         _emotion.play = _buffer_dialog.data['playing_state']
+         _buffer_dialog.delete()
+         _buffer_dialog = None
+
+   elif _emotion.buffer_size < 1.0:
+      _buffer_dialog = EmcDialog(title='buffering', style = 'progress',
+                                 canc_cb = _dialog_canc_cb)
+      _buffer_dialog.data['playing_state'] = _emotion.play
+      _emotion.play = False
+
+   _update_slider()
+   return True # timer renew
+
 def _init_emotion():
    global _emotion
    global _fman
@@ -212,10 +246,12 @@ def _init_emotion():
    # _emotion.on_key_down_add(_cb)
    # _emotion.on_audio_level_change_add(_cb_volume_change)
    _emotion.on_frame_resize_add(_cb_frame_resize)
-   _emotion.on_playback_finished_add(cb_playback_finished)
-   # progress doesn't work, use frame_decode instead...but it's TOOO often
+   _emotion.on_playback_finished_add(_cb_playback_finished)
+
+   # Progress doesn't work, use frame_decode instead...but it's TOOO often
+   #  yes, too often and not firing while buffering...Used a timer instead
    # _emotion.on_progress_change_add((lambda v: _update_slider()))
-   _emotion.on_frame_decode_add((lambda v: _update_slider()))
+   # _emotion.on_frame_decode_add((lambda v: _update_slider()))
 
    # focus manager for play/stop/etc.. buttons
    _fman = EmcFocusManager()
@@ -297,7 +333,7 @@ def _init_emotion():
       volume_set(val * 100.0)
    gui.signal_cb_add('drag', 'volume.slider:dragable1', _drag_vol)
 
-def cb_playback_finished(vid):
+def _cb_playback_finished(vid):
    stop()
    video_player_hide()
    volume_hide()
@@ -338,9 +374,11 @@ def _update_slider():
       pm = int((pos / 60) - (ph * 60))
       ps = int(pos - (pm * 60) - (ph * 3600))
 
-      gui.slider_val_set('videoplayer.controls.slider:dragable1', pos / len)
+      if len > 0:
+         gui.slider_val_set('videoplayer.controls.slider:dragable1', pos / len)
       gui.text_set('videoplayer.controls.position', '%i:%02i:%02i' % (ph,pm,ps))
       gui.text_set('videoplayer.controls.length', '%i:%02i:%02i' % (lh,lm,ls))
+
 
 ### input events ###
 def input_event_cb(event):
@@ -406,6 +444,17 @@ def input_event_cb(event):
          return input_events.EVENT_BLOCK
       elif event == 'LEFT':
          backward()
+         return input_events.EVENT_BLOCK
+      elif event == 'UP':
+         # fforward()
+         volume_set(_volume + 5)
+         volume_show(hidein = 3)
+         
+         return input_events.EVENT_BLOCK
+      elif event == 'DOWN':
+         # fbackward()
+         volume_set(_volume - 5)
+         volume_show(hidein = 3)
          return input_events.EVENT_BLOCK
 
    if event == 'TOGGLE_PAUSE':

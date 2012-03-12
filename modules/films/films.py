@@ -70,7 +70,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.__person_db = EmcDatabase('person')
 
       # add an item in the mainmenu
-      mainmenu.item_add('film', 10, 'Films', None, self.cb_mainmenu)
+      img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
+      mainmenu.item_add('film', 10, 'Movies', img, self.cb_mainmenu)
 
       # create a browser instance
       self.__browser = EmcBrowser('Films', 'List',

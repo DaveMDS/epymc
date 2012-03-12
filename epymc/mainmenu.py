@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
+import evas, elementary
+
 import gui
 import mainmenu
 import config_gui
@@ -62,11 +64,22 @@ def item_add(name, weight, label, icon = None, callback = None):
          before = it
          break
 
+   def _on_resize_cb(img):
+      (w, h) = img.image_size_get()
+      aspect = float(w) / float(h)
+      (w, h) = img.size_get()
+      img.fill_set(0, 0, h * aspect, h)
+
    #~ print 'ADD ' + name + ' W ' + str(weight) + ' before ' + str(before)
+   img = None
+   if icon:
+      img = evas.Image(gui.win.evas)
+      img.on_resize_add(_on_resize_cb)
+      img.file_set(icon)
    if before:
-      item = list.item_insert_before(before, label, icon, None, None, callback)
+      item = list.item_insert_before(before, label, img, None, None, callback)
    else:
-      item = list.item_append(label, icon, None, None, callback)
+      item = list.item_append(label, img, None, None, callback)
 
    _items[name] = item
    _items_weight[item] = weight

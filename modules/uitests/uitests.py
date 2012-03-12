@@ -68,7 +68,8 @@ class UiTestsModule(EmcModule):
    _browser = None
 
    def __init__(self):
-      mainmenu.item_add('uitests', 5, 'UI tests', None, self.cb_mainmenu)
+      img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
+      mainmenu.item_add('uitests', 5, 'UI tests', img, self.cb_mainmenu)
       self._browser = EmcBrowser('UI tests', 'List',
                            item_selected_cb = self.cb_item_selected,
                            poster_get_cb = self.cb_poster_get,
@@ -90,7 +91,7 @@ class UiTestsModule(EmcModule):
       # self._browser.item_add('uitests://mpvo', 'Mediaplayer - Online Video (good)')
       self._browser.item_add('uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
       self._browser.item_add('uitests://tmdb', 'Themoviedb.org query with gui (need fix for non ascii)')
-      self._browser.item_add('uitests://vkbd', 'Virtual Keyboard (need some fixes)')
+      self._browser.item_add('uitests://vkbd', 'Virtual Keyboard')
       self._browser.item_add('uitests://sselector', 'Source Selector')
       self._browser.item_add('uitests://dlg-info', 'Dialog - Info')
       self._browser.item_add('uitests://dlg-warning', 'Dialog - Warning')

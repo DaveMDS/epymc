@@ -237,7 +237,7 @@ def _init_emotion():
    global _fman
 
    backend = ini.get('mediaplayer', 'backend')
-   _emotion = emotion.Emotion(gui.win.evas_get(), module_filename=backend)
+   _emotion = emotion.Emotion(gui.layout.evas, module_filename=backend)
    gui.swallow_set('videoplayer.video', _emotion)
    _emotion.smooth_scale = True
 

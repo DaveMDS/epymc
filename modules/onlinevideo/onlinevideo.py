@@ -214,7 +214,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def _request_page(self, item_data):
       (label,url,state,icon,action) = item_data
       src = self._current_src
-      cmd = '%s %d %s' % (src['exec'], state, url)
+      cmd = '%s %d "%s"' % (src['exec'], state, url)
+      LOG('dbg', 'Executing: ' + cmd)
       EmcExec(cmd, True, self._request_page_done, item_data)
       self._run_dialog = EmcDialog(title = 'please wait', style = 'cancel',
                                    text = 'Scraping site...', )

@@ -26,12 +26,17 @@ def read_from_files(files):
    print 'Readed config from files:'
    for f in readed: print ' * ' + f
    print ''
-   add_section('general')
 
 def write_to_file(file):
    print('Writing config to file: ' + file)
    with open(file, 'wb') as configfile:
       _config.write(configfile)
+
+def setup_defaults():
+   s = 'general'
+   add_section(s)
+   if not _config.has_option(s, 'show_mature_contents'):
+      _config.set(s, 'show_mature_contents', False)
 
 def add_section(section):
    if not _config.has_section(section):
@@ -42,6 +47,12 @@ def has_section(section):
 
 def has_option(section, option):
    return _config.has_option(section, option)
+
+def has_options(options):
+   for option in options:
+      if not _config.has_option(option):
+         return False
+   return True
 
 def get(section, option):
    if not _config.has_option(section, option):

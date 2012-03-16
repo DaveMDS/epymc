@@ -32,9 +32,9 @@ from epymc.gui import EmcDialog
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
-# import epymc.ini as ini
 import epymc.utils as utils
 import epymc.gui as gui
+import epymc.ini as ini
 
 
 
@@ -49,6 +49,17 @@ if DEBUG:
    from pprint import pprint
    import pdb
 
+ACT_NONE = 0
+ACT_FOLDER = 1
+ACT_MORE = 2
+
+F_STATE = 0
+F_LABEL = 1
+F_URL = 2
+F_INFO = 3
+F_ICON = 4
+F_POSTER = 5
+F_ACTION = 6
 
 class OnlinevideoModule(EmcModule):
    name = 'onlinevideo'
@@ -95,35 +106,36 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    def __shutdown__(self):
       LOG('dbg', 'Shutdown module')
-      # delete mainmenu item
       mainmenu.item_del('onlinevideo')
-      # delete browser
       self._browser.delete()
 
    def parse_source_ini_file(self, path):
-      section = 'EmcVideoSource'
+      section = 'EmcVideoSourceV3'
+      options = ['name','label','info','icon','poster','banner',
+                 'backdrop', 'mature', 'version', 'exec', 'author']
       source = {}
       parser = ConfigParser.ConfigParser()
       parser.read(path)
+
       if parser.has_section(section):
-         if not parser.has_option(section, 'name') or \
-            not parser.has_option(section, 'label') or \
-            not parser.has_option(section, 'info') or \
-            not parser.has_option(section, 'icon') or \
-            not parser.has_option(section, 'poster') or \
-            not parser.has_option(section, 'fanart') or \
-            not parser.has_option(section, 'version') or \
-            not parser.has_option(section, 'exec'):
-            return
+         # check required options
+         for opt in options:
+            if not parser.has_option(section, opt):
+               del parser
+               return None
+
+         # check mature
+         if ini.get_bool('general', 'show_mature_contents') != True and \
+            parser.get(section, 'mature').lower() == 'yes':
+            del parser
+            return None
+
+         # populate channel dict
+         for opt in options:
+            source[opt] = parser.get(section, opt)
          dirname = os.path.dirname(path)
-         source['name'] = parser.get(section, 'name')
-         source['label'] = parser.get(section, 'label')
-         source['info'] = parser.get(section, 'info')
-         source['icon'] = os.path.join(dirname, parser.get(section, 'icon'))
-         source['exec'] = os.path.join(dirname, parser.get(section, 'exec'))
-         source['poster'] = os.path.join(dirname, parser.get(section, 'poster'))
-         source['fanart'] = os.path.join(dirname, parser.get(section, 'fanart'))
-         source['version'] = os.path.join(dirname, parser.get(section, 'version'))
+         for opt in ['exec', 'icon', 'poster', 'banner', 'backdrop']:
+            source[opt] = os.path.join(dirname, source[opt])
       del parser
       return source
 
@@ -173,14 +185,18 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def cb_fanart_get(self, page_url, item_url):
       if page_url == 'olvid://root':
          source = self.get_source_by_name(item_url)
-         return source['fanart']
+         return source['backdrop']
       return None
 
    def cb_info_get(self, page_url, item_url):
       if page_url == 'olvid://root':
          source = self.get_source_by_name(item_url)
-         return source['info']
-      return 'Not found'
+         text  = '<title>%s</><br>' \
+                 '<hilight>version:</> %s<br>' \
+                 '<hilight>author:</> %s<br>' \
+                 '<br>%s<br>' % \
+                 (source['label'], source['version'], source['author'], source['info'])
+         return text
 
 
 ###### SOURCES STUFF
@@ -208,13 +224,13 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def _request_index(self):
       src = self._current_src
       cmd = '%s %d %s' % (src['exec'], 0, 'url')
-      item_data = (src['label'],'index',0,'',0)
+      item_data = (0,src['label'],'index',None,None,None,0)
       self._request_page(item_data)
 
    def _request_page(self, item_data):
-      (label,url,state,icon,action) = item_data
+      (next_state, label, url, info, icon, poster, action) = item_data
       src = self._current_src
-      cmd = '%s %d "%s"' % (src['exec'], state, url)
+      cmd = '%s %d "%s"' % (src['exec'], next_state, url)
       LOG('dbg', 'Executing: ' + cmd)
       EmcExec(cmd, True, self._request_page_done, item_data)
       self._run_dialog = EmcDialog(title = 'please wait', style = 'cancel',
@@ -234,19 +250,20 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          else:
             try:
                # WARNING keep item_data consistent !
-               (label, url, state, icon, action) = ast.literal_eval(line)
-               item_data = (label,url,state,icon,action)
+               (next_state, label, url, info, icon, poster, action) = \
+                     ast.literal_eval(line)
+               item_data = (next_state, label, url, info, icon, poster, action)
                items.append(item_data)
                LOG('dbg', str(item_data))
             except:
                continue
       
-      if len(lines) < 1:
+      if len(items) < 1:
          EmcDialog(text = 'Error executing script', style = 'error')
          return
 
-      (label,url,state,icon,action) = page_data
-      if action != 2:
+      (next_state, label, url, info, icon, poster, action) = page_data
+      if action != ACT_MORE:
          # store the items data in the dictiornary (key=url)
          del self._item_data # TODO need to del all the item_data inside?? !!!!!!!!!!!!!!!!!!!!!!
          self._item_data = {}
@@ -254,17 +271,15 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # new browser page
          self._browser.page_add(url.encode('ascii'), label,
                                 item_selected_cb = self._item_selected_cb,
-                                icon_get_cb = self._item_image_cb,
-                                poster_get_cb = self._item_image_cb,
+                                icon_get_cb = self._item_icon_cb,
+                                poster_get_cb = self._item_poster_cb,
                                 fanart_get_cb = None,
-                                info_get_cb = None,
+                                info_get_cb = self._item_info_cb,
                                 page_data = page_data)
       for item_data in items:
-         (label, url, state, icon, action) = item_data
-         if not icon and action == 1:
-            icon = 'icon/folder'
-         self._browser.item_add(url, label)
-         self._item_data[url] = (label, url, state, icon, action)
+         (next_state, label, url, info, icon, poster, action) = item_data
+         self._browser.item_add(url, item_data[F_LABEL])
+         self._item_data[url] = item_data
 
    def _item_selected_cb(self, page_url, item_url, page_data):
       if self._item_data.has_key(item_url):
@@ -273,7 +288,19 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       elif page_data:
          self._request_page(page_data)
 
-   def _item_image_cb(self, page_url, item_url):
+   def _item_icon_cb(self, page_url, item_url):
       if self._item_data.has_key(item_url):
          item_data = self._item_data[item_url]
-         return item_data[3]
+         if not item_data[F_ICON] and item_data[F_ACTION] == ACT_FOLDER:
+            return 'icon/folder'
+         return item_data[F_ICON]
+
+   def _item_poster_cb(self, page_url, item_url):
+      if self._item_data.has_key(item_url):
+         item_data = self._item_data[item_url]
+         return item_data[F_POSTER] or self._current_src['poster']
+
+   def _item_info_cb(self, page_url, item_url):
+      if self._item_data.has_key(item_url):
+         item_data = self._item_data[item_url]
+         return item_data[F_INFO]

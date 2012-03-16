@@ -6,6 +6,8 @@ BUGS
  * downloading a poster 2 times (the same image) will segfault
  * playing 2 times the same video will segfault
  * mame's favorites got lost from config sometimes
+ * video don't keep the right aspect, usually subs get cutted out
+ * mediaplayer: when an online video end it will "restart in backgroud"
 
 MAIN
 =====

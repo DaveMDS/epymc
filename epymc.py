@@ -17,15 +17,9 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-import sys
-import os
+import sys, os
 
-import evas
-import ecore
-import ecore.file
-import edje
-import elementary
-import emotion
+import evas, ecore, ecore.file, edje, elementary, emotion
 
 import epymc.modules as modules
 import epymc.utils as utils
@@ -56,6 +50,7 @@ def main():
    #TODO add a system dir...but where??
    ini.read_from_files(['epymc.conf',
                         os.path.join(user_config_dir, 'epymc.conf')])
+   ini.setup_defaults()
 
    # alert if CURL support not available (no download ability)
    if not ecore.file.download_protocol_available('http://'):

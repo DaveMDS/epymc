@@ -44,7 +44,7 @@ styles {
       tag:  "br" "\n";
       tag:  "tab" "\t";
       tag:  "em" "+ font=Sans:style=Oblique";
-      tag:  "b" "+ font=Sans:style=Bold";
+      tag:  "b" "+ font=Sans:style=Bold color=#F00";
       tag:  "title" "+ font=Sans:style=Bold font_size="FONT_SIZE_BIG;
       tag:  "hilight" "+ font=Sans:style=Bold";
       //~ tag:  "link" "+ color=#800 underline=on underline_color=#8008";
@@ -55,7 +55,7 @@ styles {
       tag:  "br" "\n";
       tag:  "tab" "\t";
       tag:  "em" "+ font=Sans:style=Oblique";
-      tag:  "b" "+ font=Sans:style=Bold";
+      tag:  "b" "+ font=Sans:style=Bold  color=#0F0";
       tag:  "title" "+ font=Sans:style=Bold color=#b00 font_size="FONT_SIZE_BIG;
       tag:  "hilight" "+ font=Sans:style=Bold";
       //~ tag:  "link" "+ color=#800 underline=on underline_color=#8008";
@@ -105,7 +105,7 @@ collections {
          part { name: "bg.bg";
             type: IMAGE;
             description { state: "default" 0.0;
-               min: 1280 720;
+               // min: 1280 720;
                image.normal: "background.jpg";
             }
          }
@@ -795,17 +795,17 @@ collections {
          }
          program { name: "gl1_to_left";
             action: STATE_SET "left" 0.0;
-            transition: LINEAR 0.4;
+            transition: DECELERATE 0.25;
             target: "browser.list.genlist1";
          }
          program { name: "gl1_to_right";
             action: STATE_SET "right" 0.0;
-            transition: LINEAR 0.4;
+            transition: DECELERATE 0.25;
             target: "browser.list.genlist1";
          }
          program { name: "gl1_to_center";
             action: STATE_SET "center" 0.0;
-            transition: LINEAR 0.4;
+            transition: DECELERATE 0.25;
             target: "browser.list.genlist1";
          }
 ///

@@ -23,31 +23,29 @@
 #      stacked <stacked.xbmc@gmail.com>
 #  all the credits goes to him...thanks!
 
-# REFERENCE:
-# From app: "cmd STATE URL"
-# To app: (label,url,state,icon,is_folder)  one item per line
-#  or
-# To app: PLAY!http://bla.bla.bla/coolvideo.ext
 
 import os, sys, urllib2, re
 from BeautifulSoup import BeautifulSoup
 
 AGENT='Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'
 
-### API V.2  ###################################################################
-STATUS = int(sys.argv[1])
+### API V.3  ###################################################################
+STATE = int(sys.argv[1])
 URL = sys.argv[2]
 
-def addItem(label, url, state, icon, action = 0):
-   # actions: 0=none, 1=folder, 2=moreitems
-   print((label, url, state, icon, action))
+ACT_NONE = 0; ACT_FOLDER = 1; ACT_MORE = 2
+
+def addItem(next_state, label, url, info = None, icon = None, poster = None, action = ACT_NONE):
+   print((next_state, label, url, info, icon, poster, action))
 
 def playUrl(url):
-   print 'PLAY!' + url
+   print('PLAY!' + url)
+
 ### API END  ###################################################################
 
 def open_url(url):
    req = urllib2.Request(url)
+   req.addheaders = [(AGENT)]
    content = urllib2.urlopen(req)
    data = content.read()
    content.close()
@@ -60,10 +58,10 @@ def clean(name):
    return name
 
 # this is the first page, show fixed categories and film in main page
-if STATUS == 0:
-   addItem('Coming soon','http://www.traileraddict.com/comingsoon', 2, None, True)
-   addItem('Top Films','http://www.traileraddict.com/top150', 2, None, True)
-   addItem('Top Trailers','http://www.traileraddict.com/attraction/1', 6, None, True)
+if STATE == 0:
+   addItem(2, 'Coming soon','http://www.traileraddict.com/comingsoon', action=ACT_FOLDER)
+   addItem(2, 'Top Films','http://www.traileraddict.com/top150', action=ACT_FOLDER)
+   addItem(6, 'Top Trailers','http://www.traileraddict.com/attraction/1', action=ACT_FOLDER)
 
    data = open_url('http://www.traileraddict.com/')
    regexp = '<a href="/trailer/(.+?)"><img src="(.+?)" border="0" alt="(.+?)"' + \
@@ -78,10 +76,10 @@ if STATUS == 0:
          name2 = clean(title[0])
       url = 'http://www.traileraddict.com/trailer/' + url
       thumb = 'http://www.traileraddict.com' + thumb
-      addItem(name1, url.encode('ascii'), 5, thumb)
+      addItem(5, name1, url.encode('ascii'), poster=thumb)
 
 # ComingSoon/Top150 pages
-elif STATUS == 2:
+elif STATE == 2:
    data = open_url(URL)
    soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
@@ -91,10 +89,10 @@ elif STATUS == 2:
       url = arrow.nextSibling.nextSibling['href']
       url = 'http://www.traileraddict.com' + url
       # print title, url
-      addItem(title, url.encode('ascii'), 4, None)
+      addItem(4, title, url.encode('ascii'))
 
 # find trailers in film page
-elif STATUS == 4:
+elif STATE == 4:
    data = open_url(URL)
    soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
@@ -103,11 +101,11 @@ elif STATUS == 4:
       title = a.contents[0]
       url = 'http://www.traileraddict.com' + a['href']
       # print title, url
-      addItem(title, url.encode('ascii'), 5, 'icon/play')
+      addItem(5, title, url.encode('ascii'), icon='icon/play')
 
 
 # top trailers page
-elif STATUS == 6:
+elif STATE == 6:
    data = open_url(URL)
    soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
@@ -117,10 +115,10 @@ elif STATUS == 6:
          title = a.find('img')['title']
          url = 'http://www.traileraddict.com' + a['href']
          # print title, url
-         addItem(title, url.encode('ascii'), 5, 'icon/play')
+         addItem(5, title, url.encode('ascii'), icon='icon/play')
 
 # play video
-elif STATUS == 5:
+elif STATE == 5:
    data = open_url(URL)
    url = re.compile('<param name="movie" value="http://www.traileraddict.com/emb/(.+?)">').findall(data)[0]
    if data.find('black-tab-hd.png') > 0:

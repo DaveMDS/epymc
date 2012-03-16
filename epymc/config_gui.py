@@ -34,7 +34,8 @@ def DBG(msg):
 
 ### private globals
 _browser = None # EmcBrowser instance
-_root_items = [] # list of root items.  tuple:(name, label, weight, icon, cb)
+_root_items = [] # ordered list of root items.  tuple:(name, label, weight, icon, cb)
+_root_items_dict = {} # also keep a dict of items, key = name, val = tuple (name,...,cb)
 
 
 ### public functions
@@ -45,14 +46,14 @@ def init():
 
    # create a browser instance
    _browser = EmcBrowser('Configuration', 'List', # TODO use a custom style for config ?
-                               item_selected_cb = _item_selected_cb)
-                               #~ icon_get_cb = self.cb_icon_get,
+                               item_selected_cb = _item_selected_cb,
+                               icon_get_cb = _item_icon_get_cb)
                                #~ poster_get_cb = self.cb_poster_get,
                                #~ info_get_cb = self.cb_info_get)
 
-   root_item_add('config://modules/', 1, 'Modules', None, _modules_list)
-   root_item_add('config://scale/', 20, 'Scale', None, _change_scale)
-   root_item_add('config://fs/', 30, 'Toggle Fullscreen / Windowed mode',
+   root_item_add('config://modules/', 1, 'Modules', 'icon/module', _modules_list)
+   root_item_add('config://scale/', 20, 'Scale', 'icon/scale', _change_scale)
+   root_item_add('config://fs/', 30, 'Fullscreen',
                  None, _toggle_fullscreen)
 
 def shutdown():
@@ -75,11 +76,15 @@ def root_item_add(name, weight, label, icon = None, callback = None):
 
    # place in the correct position
    _root_items.insert(pos, (name, label, weight, icon, callback))
+   _root_items_dict[name] = (name, label, weight, icon, callback)
 
 def root_item_del(name):
    for (_name, _label, _weight, _ic, _cb) in _root_items:
       if _name == name:
          _root_items.remove((_name, _label, _weight, _ic, _cb))
+      if _root_items_dict.has_key(_name):
+         del _root_items_dict[_name]
+   
    # TODO TEST THIS
 
 def make_root():
@@ -95,16 +100,23 @@ def _mainmenu_cb():
    make_root()
    show()
 
+def _item_icon_get_cb(page, item):
+   if _root_items_dict.has_key(item):
+      return _root_items_dict[item][3]
+
 def _item_selected_cb(page, item):
    if item == 'config://root':
       make_root()
 
    elif page == 'config://root':
-      for (name, label, weight, icon, cb) in _root_items:
-         if item == name:
-            if callable(cb):
-               cb()
-            break
+      cb = _root_items_dict[item][4]
+      if callable(cb):
+         cb()
+         # for (name, label, weight, icon, cb) in _root_items:
+            # if item == name:
+               # if callable(cb):
+               # 
+            # break
 
 ##############  GUI  #########################################################
 import ini

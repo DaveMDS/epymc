@@ -974,8 +974,8 @@ group { name: "elm/genlist/item_compress/default/browser";
    data.item: "selectraise" "on";
    data.item: "texts" "elm.text";
    data.item: "contents" "elm.swallow.icon elm.swallow.end";
-   data.item: "treesize" "20";
-// data.item: "states" "";
+   // data.item: "treesize" "20";
+   // data.item: "states" "";
    images {
       image: "bt_sm_base1.png" COMP;
       image: "bt_sm_shine.png" COMP;
@@ -993,7 +993,7 @@ group { name: "elm/genlist/item_compress/default/browser";
             color: 0 0 0 0;
          }
       }
-      part { name : "sep";
+      part { name: "sep";
          type: IMAGE;
          description { state: "default" 0.0;
             max: 99999 2;
@@ -1174,8 +1174,7 @@ group { name: "elm/genlist/item_compress/default/browser";
       // signal: elm,state,%s,passive
       //   a "check" item named %s went passive
       // default is passive
-      program {
-         name:    "go_active";
+      program { name:"go_active";
          signal:  "elm,state,selected";
          source:  "elm";
          action:  STATE_SET "selected" 0.0;
@@ -1184,8 +1183,7 @@ group { name: "elm/genlist/item_compress/default/browser";
          target:  "fg2";
          target:  "elm.text";
       }
-      program {
-         name:    "go_passive";
+      program { name:"go_passive";
          signal:  "elm,state,unselected";
          source:  "elm";
          action:  STATE_SET "default" 0.0;
@@ -1195,15 +1193,13 @@ group { name: "elm/genlist/item_compress/default/browser";
          target:  "elm.text";
          transition: LINEAR 0.1;
       }
-      program {
-         name:    "go_disabled";
+      program { name:"go_disabled";
          signal:  "elm,state,disabled";
          source:  "elm";
          action:  STATE_SET "disabled" 0.0;
          target:  "disclip";
       }
-      program {
-         name:    "go_enabled";
+      program { name:"go_enabled";
          signal:  "elm,state,enabled";
          source:  "elm";
          action:  STATE_SET "default" 0.0;

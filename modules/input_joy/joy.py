@@ -76,7 +76,7 @@ and what it need to work well, can also use markup like <title>this</> or
          # TODO spawn the configurator
 
       # add an entry in the config gui
-      config_gui.root_item_add('joystick', 50, 'Joystick', icon = None,
+      config_gui.root_item_add('joystick', 50, 'Joystick', icon = 'icon/joystick',
                                callback = self.config_panel_cb)
 
       # open the joystick device

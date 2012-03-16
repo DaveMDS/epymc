@@ -336,6 +336,7 @@ collections {
          }
          part { name: "browser.list.total"; /* API */
             type: TEXT;
+            // type: RECT;
             clip_to: "browser.list.clip";
             effect: SHADOW;
             scale: 1;
@@ -344,13 +345,13 @@ collections {
                color3: 0 0 0 255;
                rel1 {
                   to: "browser.list.list_frame";
-                  relative: 1.0 1.0;
-                  offset: -185 -70;
+                  relative: 0.70 1.0;
+                  offset: 0 -70;
                }
                rel2 {
                   to: "browser.list.list_frame";
-                  relative: 1.0 1.0;
-                  offset: -27 -38;
+                  relative: 0.96 1.0;
+                  offset: 0 -38;
                }
                text {
                   text: "Total: 10";

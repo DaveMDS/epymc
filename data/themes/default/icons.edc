@@ -24,6 +24,8 @@ ICON("star")
 ICON("star_off")
 
 ICON("module")
+ICON("scale")
+ICON("config")
 
 ICON("play")
 ICON("stop")

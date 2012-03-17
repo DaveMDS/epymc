@@ -187,8 +187,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # text = 'àèé'
          return text.encode('utf-8','replace')
          # return text
-      else:
-         return 'Not found'
 
    def _get_director(self,e):
       for person in e['cast']:

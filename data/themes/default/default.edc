@@ -337,7 +337,6 @@ collections {
          }
          part { name: "browser.list.total"; /* API */
             type: TEXT;
-            // type: RECT;
             clip_to: "browser.list.clip";
             effect: SHADOW;
             scale: 1;
@@ -371,7 +370,8 @@ collections {
                   offset: 20 20;
                }
                rel2 {
-                  relative: 1.0 0.62;
+                  to_y: "browser.list.info_bg";
+                  relative: 1.0 0.0;
                   offset: -20 0;
                }
             }
@@ -385,22 +385,22 @@ collections {
                   border: 8 8 8 8;
                }
                rel1 {
-                  relative: 0.5 (0.65 + 0.5);
+                  relative: 0.5 (1.0 + 0.0);
                   offset: 10 -5;
                }
                rel2 {
-                  relative: 1.0 (1.0 + 0.5);
+                  relative: 1.0 (1.0 + 0.35);
                   offset: -12 -22;
                }
             }
             description { state: "visible" 0.0;
                inherit: "default" 0.0;
                rel1 {
-                  relative: 0.5 0.65;
+                  relative: 0.5 (1.0 - 0.35);
                   offset: 10 -5;
                }
                rel2 {
-                  relative: 1.0 1.0;
+                  relative: 1.0 (1.0 + 0.0);
                   offset: -12 -22;
                }
             }

@@ -106,6 +106,7 @@ collections {
             type: IMAGE;
             description { state: "default" 0.0;
                // min: 1280 720;
+               min: 800 600;
                image.normal: "background.jpg";
             }
          }
@@ -379,15 +380,28 @@ collections {
             type: IMAGE;
             clip_to: "browser.list.clip";
             description { state: "default" 0.0;
-               image.normal: "frame2.png";
-               image.border: 8 8 8 8;
+               image {
+                  normal: "frame2.png";
+                  border: 8 8 8 8;
+               }
                rel1 {
-                  to: "browser.list.info";
-                  offset: -20 -15;
+                  relative: 0.5 (0.65 + 0.5);
+                  offset: 10 -5;
                }
                rel2 {
-                  to: "browser.list.info";
-                  offset: 8 8;
+                  relative: 1.0 (1.0 + 0.5);
+                  offset: -12 -22;
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               rel1 {
+                  relative: 0.5 0.65;
+                  offset: 10 -5;
+               }
+               rel2 {
+                  relative: 1.0 1.0;
+                  offset: -12 -22;
                }
             }
          }
@@ -398,11 +412,12 @@ collections {
             scale: 1;
             description { state: "default" 0.0;
                rel1 {
-                  relative: 0.5 0.65;
-                  offset: 30 10;
+                  to: "browser.list.info_bg";
+                  offset: 15 15;
                }
                rel2 {
-                  offset: -20 -30;
+                  to: "browser.list.info_bg";
+                  offset: -15 -10;
                }
                text {
                   style: "epymc_default_style";
@@ -743,6 +758,20 @@ collections {
             transition: LINEAR 1.0;
             target: "browser.list.clip";
             target: "browser.list.list_clip";
+         }
+         program { name: "browser_list_info_show"; /* API */
+            signal: "browser,list,info,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.35;
+            target: "browser.list.info_bg";
+         }
+         program { name: "browser_list_info_hide"; /* API */
+            signal: "browser,list,info,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: DECELERATE 0.35;
+            target: "browser.list.info_bg";
          }
          program { name: "browser_list_flip_left"; /* API */
             signal: "browser,list,flip_left";

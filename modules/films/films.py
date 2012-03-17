@@ -50,7 +50,7 @@ TMDB_API_KEY = '19eef197b81231dff0fd1a14a8d5f863' # Key of the user DaveMDS
 class FilmsModule(EmcModule):
    name = 'film'
    label = 'Films'
-   icon = 'icon/module'
+   icon = 'icon/film'
    info = """Long info for the film module, explain what it does and what it 
 need to work well, can also use markup like <title>this</> or <b>this</>"""
 

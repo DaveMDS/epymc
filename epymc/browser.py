@@ -572,7 +572,11 @@ class ViewList(object):
 
       # Fill the textblock with item info info
       text = parent_browser._info_get(url)
-      gui.text_set('browser.list.info', text or '')
+      if text:
+         gui.text_set('browser.list.info', text)
+         gui.signal_emit('browser,list,info,show')
+      else:
+         gui.signal_emit('browser,list,info,hide')
 
       # Ask for the item poster and show (or auto-download) it
       poster = parent_browser._poster_get(url)

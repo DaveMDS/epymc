@@ -45,7 +45,7 @@ def main():
       os.makedirs(user_config_dir)
       os.mkdir(os.path.join(user_config_dir, 'modules'))
       os.mkdir(os.path.join(user_config_dir, 'themes'))
-      os.mkdir(os.path.join(user_config_dir, 'video_sources'))
+      os.mkdir(os.path.join(user_config_dir, 'channels'))
 
    #TODO add a system dir...but where??
    ini.read_from_files(['epymc.conf',

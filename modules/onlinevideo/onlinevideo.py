@@ -63,7 +63,7 @@ F_ACTION = 6
 
 class OnlinevideoModule(EmcModule):
    name = 'onlinevideo'
-   label = 'Online Videos'
+   label = 'Online Channels'
    icon = 'icon/module'
    info = """Long info for the film module, explain what it does and what it 
 need to work well, can also use markup like <title>this</> or <b>this</>"""
@@ -76,7 +76,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    _search_folders = [
       os.path.dirname(__file__),
-      os.path.join(utils.config_dir_get(), 'video_sources')
+      os.path.join(utils.config_dir_get(), 'channels')
       # TODO add a system dir....but where?
       ]
 
@@ -93,11 +93,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       # add an item in the mainmenu
       img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
-      mainmenu.item_add('onlinevideo', 10, 'Online Videos',
+      mainmenu.item_add('onlinechannels', 10, 'Online Channels',
                         img, self.cb_mainmenu)
 
       # create a browser instance
-      self._browser = EmcBrowser('OnlineVideos', 'List',
+      self._browser = EmcBrowser('OnlineChannels', 'List',
                               item_selected_cb = self.cb_url_selected,
                               icon_get_cb = self.cb_icon_get,
                               poster_get_cb = self.cb_poster_get,
@@ -106,11 +106,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    def __shutdown__(self):
       LOG('dbg', 'Shutdown module')
-      mainmenu.item_del('onlinevideo')
+      mainmenu.item_del('onlinechannels')
       self._browser.delete()
 
    def parse_source_ini_file(self, path):
-      section = 'EmcVideoSourceV3'
+      section = 'EmcChannelV3'
       options = ['name','label','info','icon','poster','banner',
                  'backdrop', 'mature', 'version', 'exec', 'author']
       source = {}
@@ -147,7 +147,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self._browser.show()
 
    def create_root_page(self):
-      self._browser.page_add('olvid://root', 'Online Videos')
+      self._browser.page_add('olvid://root', 'Channels')
       if not self._sources: self.build_sources_list()
       for source in self._sources:
          self._browser.item_add(source['name'], source['label'])
@@ -161,17 +161,15 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       else:
          self._request_index()
 
-   def cb_source_selected(self, fullpath):
-      self.__folders.append(fullpath)
-      ini.set_string_list('film', 'folders', self.__folders, ';')
-      self.__browser.refresh(recreate=True)
+   # def cb_source_selected(self, fullpath):
+      # self.__folders.append(fullpath)
+      # ini.set_string_list('film', 'folders', self.__folders, ';')
+      # self.__browser.refresh(recreate=True)
 
    def cb_icon_get(self, page_url, item_url):
       if page_url == 'olvid://root':
          source = self.get_source_by_name(item_url)
-         # return 'icon/plus'
          return source['icon']
-      # print page_url, item_url
       return None
 
    def cb_poster_get(self, page_url, item_url):
@@ -205,7 +203,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       for folder in self._search_folders:
          for top, dirs, files in os.walk(folder):
             for f in files:
-               if f == 'source.ini':
+               if f == 'channel.ini':
                   source = self.parse_source_ini_file(os.path.join(top, f))
                   if source:
                      self._sources.append(source)

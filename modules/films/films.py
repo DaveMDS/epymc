@@ -93,6 +93,14 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       del self.__film_db
       del self.__person_db
 
+   def play_film(self, url):
+      mediaplayer.play_video(url)
+      try:
+         e = self.__film_db.get_data(url)
+         mediaplayer.title_set(e['name'])
+         mediaplayer.poster_set(get_poster_filename(e['id']))
+      except:
+         pass
 
 ###### BROWSER STUFF
    def cb_mainmenu(self):
@@ -299,7 +307,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       return film
 
    def _cb_panel_1(self, button):
-      mediaplayer.play_video(self.__current_url)
+      self.play_film(self.__current_url)
       self.hide_film_info()
 
    def _cb_panel_2(self, button):
@@ -483,7 +491,7 @@ def get_poster_filename(tmdb_id):
 def get_backdrop_filename(tmdb_id):
    return os.path.join(utils.config_dir_get(), 'film',
                        str(tmdb_id), 'backdrop.jpg')
-
+   
 
 ###############################################################################
 import urllib

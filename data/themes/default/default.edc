@@ -624,6 +624,53 @@ collections {
                }
             }
          }
+         part { name: "videoplayer.controls.poster"; /* API todoc (anche brow,list,info,show/hide)*/
+            type: SWALLOW;
+            mouse_events: 0;
+            clip_to: "videoplayer.clip";
+            description { state: "default" 0.0;
+               visible: 0;
+               rel1.relative: (0.0-0.3) 0.5;
+               rel2.relative: (0.25-0.3) 0.84;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               rel1.relative: 0.0 0.5;
+               rel2.relative: 0.25 0.84;
+            }
+         }
+         part { name: "videoplayer.controls.title"; /* API todoc (anche brow,list,info,show/hide)*/
+            type: TEXT;
+            mouse_events: 0;
+            clip_to: "videoplayer.clip";
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               color: 0 0 0 0;
+               color3: 0 0 0 0;
+               rel1 {
+                  to_y: "videoplayer.controls.bg";
+                  relative: 0.26 -0.5;
+               }
+               rel2 {
+                  to: "videoplayer.controls.bg";
+                  relative: 1.0 0.0;
+                  offset: -10 0;
+               }
+               text {
+                  text: "Title";
+                  font: FONT_BOLD;
+                  size: FONT_SIZE_BIG;
+                  align: 0.0 1.0;
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               // color: 255 255 255 255;
+               color: FONT_COLOR;
+               color3: FONT_COLOR3;
+            }
+         }
 
 /// volume
          part { name: "volume.bg";
@@ -892,6 +939,8 @@ collections {
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.5;
             target: "videoplayer.controls.bg";
+            target: "videoplayer.controls.title";
+            target: "videoplayer.controls.poster";
          }
          program { name: "videoplayer_controls_hide"; /* API */
             signal: "videoplayer,controls,hide";
@@ -899,6 +948,8 @@ collections {
             action: STATE_SET "default" 0.0;
             transition: DECELERATE 0.5;
             target: "videoplayer.controls.bg";
+            target: "videoplayer.controls.title";
+            target: "videoplayer.controls.poster";
          }
 ///
          program { name: "volume_show"; /* API */

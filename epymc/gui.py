@@ -37,9 +37,12 @@ theme_file = None
 backdrop_im = None
 
 
-def DBG(msg):
-   print ('GUI: ' + msg)
-   pass
+DEBUG = True
+DEBUGN = 'GUI'
+def LOG(sev, msg):
+   if   sev == 'err': print('%s ERROR: %s' % (DEBUGN, msg))
+   elif sev == 'inf': print('%s: %s' % (DEBUGN, msg))
+   elif sev == 'dbg' and DEBUG: print('%s: %s' % (DEBUGN, msg))
 
 def init():
    global win
@@ -172,7 +175,45 @@ def load_icon(icon):
       ic.file_set(theme_file, icon)
    ic.size_hint_aspect_set(evas.EVAS_ASPECT_CONTROL_VERTICAL, 1, 1)
    return ic
-    
+
+def load_image(name, path = None):
+   """
+   @name include the ext but not the path (es 'my_image.png')
+   @name can also be a full_path
+   @path is searched if the image is not found in the theme
+   @return ElmImage
+   @example: load_image('my_image.png', os.path.dirname(__file__))
+   """
+   LOG('dbg', 'Requested image: ' + str(name))
+   LOG('dbg', 'Estra path: ' + str(path))
+
+   im = elementary.Image(gui.win)
+
+   # if it's a full path load load it
+   if os.path.exists(name):
+      LOG('dbg', 'Found image:' + name)
+      im.file_set(name)
+      return im
+
+   # try in main theme file (as group: image/$name)
+   if edje.file_group_exists(theme_file, 'image/' + name):
+      LOG('dbg', 'Found image in theme group: image/' + name)
+      im.file_set(theme_file, 'image/' + name)
+      return im
+
+   # TODO search in some system dirs
+   
+   # try in caller path
+   if path:
+      full = os.path.join(path, name)
+      if os.path.exists(full):
+         LOG('dbg', 'Found image in extra path: image/' + name)
+         im.file_set(full)
+         return im
+
+   LOG('err', 'Cannot load image: ' + str(name))
+   return im
+
 def ask_to_exit():
    d = EmcDialog(title = 'Exit MediaCenter ?', style = 'yesno',
                  done_cb = _cb_exit_yes)

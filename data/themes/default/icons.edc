@@ -3,8 +3,19 @@
    group { name: "icon/"NAME; \
       images { image: "icon_"NAME".png" COMP; } \
       parts { part { name: "main_bg"; \
-         description { state: "default" 0; \
+         description { state: "default" 0.0; \
             image.normal: "icon_"NAME".png"; }}}}
+
+#define IMAGE(NAME, W, H) \
+   group { name: "image/"NAME; \
+      images { image: "image_"NAME COMP; } \
+      parts { part { name: "main_bg"; \
+         description { state: "default" 0.0; \
+            image.normal: "image_"NAME; \
+            aspect: (W/H) (W/H); \
+            aspect_preference: BOTH; }}}}
+
+IMAGE("dvd_cover_blank.png", 730, 890)
 
 ICON("home")
 ICON("folder")

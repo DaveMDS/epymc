@@ -64,11 +64,12 @@ class UiTestsModule(EmcModule):
    label = 'UI tests'
    icon = 'icon/module'
    info = """This module serve as test for the various epymc components."""
+   path = os.path.dirname(__file__)
 
    _browser = None
 
    def __init__(self):
-      img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
+      img = os.path.join(self.path, 'menu_bg.png')
       mainmenu.item_add('uitests', 5, 'UI tests', img, self.cb_mainmenu)
       self._browser = EmcBrowser('UI tests', 'List',
                            item_selected_cb = self.cb_item_selected,
@@ -131,6 +132,8 @@ class UiTestsModule(EmcModule):
       elif item_url == 'uitests://mpv':
          f = os.path.expanduser('~/Video/testvideo.avi')
          mediaplayer.play_video(f)
+         mediaplayer.title_set('Testing title')
+         mediaplayer.poster_set('dvd_cover_blank.png', self.path)
 
       # Mediaplayer Online Video (good)
       # elif item_url == 'uitests://mpvo':

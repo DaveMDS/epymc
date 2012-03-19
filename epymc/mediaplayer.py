@@ -208,6 +208,11 @@ def volume_hide():
    _volume_visible = False
    _volume_hide_timer = None
 
+def poster_set(poster, extra_path = None):
+   gui.swallow_set("videoplayer.controls.poster", gui.load_image(poster, extra_path))
+
+def title_set(title):
+   gui.text_set("videoplayer.controls.title", title)
 
 ### internals ###
 def _update_timer_cb():

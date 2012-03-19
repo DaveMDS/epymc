@@ -221,8 +221,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    def _request_index(self):
       src = self._current_src
-      cmd = '%s %d %s' % (src['exec'], 0, 'url')
-      item_data = (0,src['label'],'index',None,None,None,0)
+      item_data = (0, src['label'], 'index', None, None, None, 0)
       self._request_page(item_data)
 
    def _request_page(self, item_data):
@@ -243,7 +242,15 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # LOG('dbg', ' ---' + line)
          if line.startswith('PLAY!http://'):
             LOG('inf', 'yes sir..' + line)
-            mediaplayer.play_video(line[5:])
+            url = line[5:]
+            mediaplayer.play_video(url)
+
+            # if self._item_data.has_key(url):
+               # item_data = self._item_data[url]
+               # mediaplayer.poster_set(item_data[F_POSTER])
+               # mediaplayer.title_set(item_data[F_TITLE])
+               # return item_data[F_POSTER] or self._current_src['poster']
+
             return
          else:
             try:

@@ -24,6 +24,7 @@ import ecore, elementary
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser
 from epymc.gui import EmcDialog, EmcVKeyboard, EmcSourceSelector
+from epymc.gui import EmcButton, EmcFocusManager2
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
 import epymc.ini as ini
@@ -67,6 +68,7 @@ class UiTestsModule(EmcModule):
    path = os.path.dirname(__file__)
 
    _browser = None
+   _fman = None
 
    def __init__(self):
       img = os.path.join(self.path, 'menu_bg.png')
@@ -88,6 +90,7 @@ class UiTestsModule(EmcModule):
    def make_root_page(self):
       self._browser.page_add('uitests://root', 'UI tests')
 
+      self._browser.item_add('uitests://buttons', 'Buttons + FocusManager')
       self._browser.item_add('uitests://mpv', 'Mediaplayer - Local Video')
       # self._browser.item_add('uitests://mpvo', 'Mediaplayer - Online Video (good)')
       self._browser.item_add('uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
@@ -222,4 +225,94 @@ class UiTestsModule(EmcModule):
       elif item_url == 'uitests://brdump':
          DBG('Dumping Browser')
          browser.dump_everythings()
+
+      # Buttons Theme
+      elif item_url == 'uitests://buttons':
+         
+         vbox0 = elementary.Box(gui.win)
+         vbox0.show()
+
+         hbox = elementary.Box(gui.win)
+         hbox.horizontal_set(True)
+         hbox.show()
+         vbox0.pack_end(hbox)
+
+         def _dialog_close_cb(dialog):
+            fman.delete()
+            dialog.delete()
+         d = EmcDialog(title='button test', content=vbox0,
+                       style='panel', canc_cb=_dialog_close_cb)
+         fman = EmcFocusManager2('uitest-buttons')
+
+         ### Active buttons
+         vbox = elementary.Box(gui.win)
+         vbox.show()
+         # label
+         b = EmcButton('only label')
+         fman.obj_add(b)
+         vbox.pack_end(b)
+         # icon
+         b = EmcButton(None, 'icon/star')
+         fman.obj_add(b)
+         vbox.pack_end(b)
+         # label + icon
+         b = EmcButton('label + icon', 'icon/star')
+         fman.obj_add(b)
+         vbox.pack_end(b)
+         hbox.pack_end(vbox)
+
+         ### Disabled buttons
+         vbox = elementary.Box(gui.win)
+         vbox.show()
+         # label
+         b = EmcButton('only label disabled')
+         b.disabled_set(True)
+         fman.obj_add(b)
+         vbox.pack_end(b)
+         # icon
+         b = EmcButton(None, 'icon/mame')
+         b.disabled_set(True)
+         fman.obj_add(b)
+         vbox.pack_end(b)
+         # label + icon
+         b = EmcButton('label + icon disabled', 'icon/back')
+         b.disabled_set(True)
+         fman.obj_add(b)
+         vbox.pack_end(b)
+         hbox.pack_end(vbox)
+
+         # 7 butttons in a row (labels)
+         hbox2 = elementary.Box(gui.win)
+         hbox2.horizontal_set(True)
+         hbox2.show()
+         for i in xrange(0,8):
+            b = EmcButton(str(i))
+            fman.obj_add(b)
+            b.show()
+            hbox2.pack_end(b)
+         vbox0.pack_end(hbox2)
+
+         # 7 butttons in a row (icons)
+         hbox2 = elementary.Box(gui.win)
+         hbox2.horizontal_set(True)
+         hbox2.show()
+         icons = ['icon/star','icon/home','icon/folder']
+         for i in xrange(0,8):
+            b = EmcButton(None, icons[i % len(icons)])
+            fman.obj_add(b)
+            hbox2.pack_end(b)
+         vbox0.pack_end(hbox2)
+
+         # mediaplayer buttons
+         hbox2 = elementary.Box(gui.win)
+         hbox2.horizontal_set(True)
+         hbox2.show()
+         icons = ['icon/fbwd','icon/bwd','icon/stop','icon/play','icon/fwd','icon/ffwd']
+         for i in icons:
+            b = EmcButton(None, i)
+            fman.obj_add(b)
+            hbox2.pack_end(b)
+         vbox0.pack_end(hbox2)
+         
+         
 

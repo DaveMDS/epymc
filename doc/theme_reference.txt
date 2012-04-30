@@ -43,6 +43,8 @@ All the icons in icons.edc must be implemented
       "browser,list,hide" "emc"
       "browser_list_flip_left" "emc"
       "browser_list_flip_right" "emc"
+      "browser,list,info,show" "emc"
+      "browser,list,info,hide" "emc"
 
 
 ### Browser: Grid View ###
@@ -59,10 +61,13 @@ All the icons in icons.edc must be implemented
    * Required parts:
       "videoplayer.video" -> edje swallow
       "videoplayer.events" -> edje part with mouse_events = 1
-      "videoplayer.controls.btn_box" -> edje box
+      "videoplayer.controls.btn_box" -> edje box (will contain play,stop,etc buttons)
+      "videoplayer.controls.btn_box2" -> edje box (will contain Video,Audio,etc buttons)
       "videoplayer.controls.slider" -> edje group -> "emc/slider/default"
       "videoplayer.controls.position" -> edje text
       "videoplayer.controls.length" -> edje text
+      "videoplayer.controls.poster" -> edje swallow
+      "videoplayer.controls.title" -> edje TEXT
 
    * Signals received from the application:
       "videoplayer,show" "emc"
@@ -86,7 +91,7 @@ All the icons in icons.edc must be implemented
 ### Dialogs box ###
 
    * Required parts:
-      "dialogs.box.stack" -> edje box
+      "dialogs.box.stack" -> edje box (usually with "stack" as layout)
 
 
 ### Dialog (panel) ###

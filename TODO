@@ -16,6 +16,8 @@ MAIN
  * lirc module + lirc configuration gui
  * joy/webserver need a key-repetition handling
  * i18n...will do on request
+ * use everywhere the new EmcFocusManager2
+ * use everywhere EmcButton instead of elementary.Button
 
 MEDIAPLAYER
 ============

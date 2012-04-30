@@ -20,7 +20,7 @@
 import os
 import evas, ecore, edje, elementary, emotion
 import utils, ini, gui, input_events
-from gui import EmcFocusManager, EmcDialog
+from gui import EmcFocusManager2, EmcDialog, EmcButton
 
 
 DEBUG = True
@@ -174,6 +174,7 @@ def video_controls_show():
 
    gui.signal_emit('videoplayer,controls,show')
    _controls_visible = True
+   volume_show()
 
 def video_controls_hide():
    global _controls_visible
@@ -185,10 +186,8 @@ def video_controls_hide():
 def video_controls_toggle():
    if _controls_visible:
       video_controls_hide()
-      volume_hide()
    else:
       video_controls_show()
-      volume_show()
 
 def volume_show(hidein = 0):
    global _volume_visible
@@ -259,45 +258,37 @@ def _init_emotion():
    # _emotion.on_frame_decode_add((lambda v: _update_slider()))
 
    # focus manager for play/stop/etc.. buttons
-   _fman = EmcFocusManager()
+   _fman = EmcFocusManager2()
 
    #  <<  fast backward
-   bt = elementary.Button(gui.win);
-   bt.icon_set(gui.load_icon('icon/fbwd'))
+   bt = EmcButton(icon='icon/fbwd')
    bt.callback_clicked_add(_cb_btn_fbackward)
    bt.data['cb'] = _cb_btn_fbackward
    _fman.obj_add(bt)
-   bt.show()
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
    #  <   backward
-   bt = elementary.Button(gui.win);
-   bt.icon_set(gui.load_icon('icon/bwd'))
+   bt = EmcButton(icon='icon/bwd')
    bt.callback_clicked_add(_cb_btn_backward)
    bt.data['cb'] = _cb_btn_backward
    _fman.obj_add(bt)
-   bt.show()
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
    #  stop
-   bt = elementary.Button(gui.win);
-   bt.icon_set(gui.load_icon('icon/stop'))
+   bt = EmcButton(icon='icon/stop')
    bt.callback_clicked_add(_cb_btn_stop)
    bt.data['cb'] = _cb_btn_stop
    _fman.obj_add(bt)
-   bt.show()
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
    #  play/pause
-   bt = elementary.Button(gui.win);
-   bt.icon_set(gui.load_icon('icon/play'))
+   bt = EmcButton(icon='icon/play')
    bt.callback_clicked_add(_cb_btn_play)
    bt.data['cb'] = _cb_btn_play
    _fman.obj_add(bt)
-   bt.show()
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
    # ARGH this does'n work
@@ -306,23 +297,36 @@ def _init_emotion():
    _fman.focused_set(bt)
 
    #  >   forward
-   bt = elementary.Button(gui.win);
-   bt.icon_set(gui.load_icon('icon/fwd'))
+   bt = EmcButton(icon='icon/fwd')
    bt.callback_clicked_add(_cb_btn_forward)
    bt.data['cb'] = _cb_btn_forward
    _fman.obj_add(bt)
-   bt.show()
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
    
    #  >>  fast forward
-   bt = elementary.Button(gui.win);
-   bt.icon_set(gui.load_icon('icon/ffwd'))
+   bt = EmcButton(icon='icon/ffwd')
    bt.callback_clicked_add(_cb_btn_fforward)
    bt.data['cb'] = _cb_btn_fforward
    _fman.obj_add(bt)
-   bt.show()
    gui.box_append('videoplayer.controls.btn_box', bt)
+   _buttons.append(bt)
+
+
+   #  submenu audio
+   bt = EmcButton('Audio')
+   # bt.callback_clicked_add(_cb_btn_fforward)
+   bt.data['cb'] = None
+   _fman.obj_add(bt)
+   gui.box_append('videoplayer.controls.btn_box2', bt)
+   _buttons.append(bt)
+
+   #  submenu video
+   bt = EmcButton('Video')
+   # bt.callback_clicked_add(_cb_btn_fforward)
+   bt.data['cb'] = None
+   _fman.obj_add(bt)
+   gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
 
 
@@ -413,12 +417,12 @@ def input_event_cb(event):
    if _controls_visible:
       if event == 'BACK':
          video_controls_hide()
-         volume_hide()
          return input_events.EVENT_BLOCK
       if event == 'OK':
          button = _fman.focused_get()
          cb = button.data['cb']
-         cb(button)
+         if callable(cb):
+            cb(button)
          # TODO TRY THIS INSTEAD:
          ## evas_object_smart_callback_call(obj, 'sig', NULL);
          return input_events.EVENT_BLOCK
@@ -438,11 +442,9 @@ def input_event_cb(event):
       if event == 'BACK':
          stop()
          video_player_hide()
-         volume_hide()
          return input_events.EVENT_BLOCK
       elif event == 'OK':
          video_controls_show()
-         volume_show()
          return input_events.EVENT_BLOCK
       elif event == 'RIGHT':
          forward()

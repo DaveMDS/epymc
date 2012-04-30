@@ -26,6 +26,8 @@ images {
    image: "frame.png" COMP;
    image: "frame2.png" COMP;
    image: "frame3.png" COMP;
+   image: "frame4.png" COMP;
+   image: "button_bar.png" COMP;
    image: "separator.png" COMP;
    image: "header.png" COMP;
    image: "volume.png" COMP;
@@ -69,6 +71,20 @@ styles {
    // left_margin=4 right_margin=4
 }
 
+color_classes {
+   color_class {
+      name:  "button_color";
+      color: 56 171 80 255; //green
+      // color: 240 240 240 255; //white
+      // color: 16 16 16 255; //black
+      // color: 128 62 142 255; //purple
+      // color: 26 143 178 255; //cyan
+      // color: 155 20 29 255; //red
+      color2:  0 0 0 0;
+      color3:  0 0 0 0;
+   }
+}
+
 externals {
    external: "elm";
 }
@@ -77,7 +93,8 @@ collections {
 
    #include "elm_extension.edc"
    #include "icons.edc"
-   
+
+/// main UI
    group { name: "emc/main/layout"; /* API */
 
 /// clock embryo script
@@ -530,78 +547,77 @@ collections {
             mouse_events: 1;
             repeat_events: 0;
             clip_to: "videoplayer.clip";
+            scale: 1;
             description { state: "default" 0.0;
-               color: 255 255 255 255;
-               rel1.relative: 0.0 1.0;
-               rel2.relative: 1.0 1.0;
-               rel2.offset: 0 100;
-               image.normal: "frame3.png";
-               image.border: 2 2 2 2;
+               min: 9999 100;
+               max: 9999 100;
+               fixed: 1 1;
+               align: 0.5 0.0;
+               rel1.relative: 0 -0.5;
+               image {
+                  normal: "frame4.png";
+                  border: 2 2 2 2;
+               }
+               visible: 0;
             }
             description { state: "visible" 0.0;
                inherit: "default" 0.0;
-               rel1.offset: 0 -100;
-               rel2.offset: 0.0 0.0;
+               rel1.relative: 0.0 0.0;
+               visible: 1;
+            }
+         }
+         part { name: "videoplayer.controls.btn_box.bg";
+            type: IMAGE;
+            mouse_events: 1;
+            repeat_events: 0;
+            clip_to: "videoplayer.clip";
+            scale: 1;
+            description { state: "default" 0.0;
+               min: 9999 45;
+               max: 9999 45;
+               fixed: 1 1;
+               align: 0.5 0.08;
+               rel1.to: "videoplayer.controls.bg";
+               rel2.to: "videoplayer.controls.bg";
+               image {
+                  normal: "button_bar.png";
+                  border: 2 2 2 2;
+               }
             }
          }
          part { name: "videoplayer.controls.btn_box"; /* API */ 
             type: BOX;
             description { state: "default" 0.0;
-               rel1.to: "videoplayer.controls.bg";
-               rel1.offset: 0 15;
-               rel2.relative: 1.0 0.0;
-               rel2.to: "videoplayer.controls.bg";
-               rel2.offset: 0 50;
+               rel1 {
+                  to: "videoplayer.controls.btn_box.bg";
+                  to_x: "videoplayer.controls.poster";
+                  offset: 5 2;
+                  relative: 1.0 0.0;
+               }
+               rel2.to: "videoplayer.controls.btn_box.bg";
                box {
                   layout: "horizontal";
-                  padding: 5 0;
+                  padding: 2 0;
+                  align: 0.0 0.5;
                }
             }
          }
-         part { name: "videoplayer.controls.length"; /* API */
-            type: TEXT;
-            mouse_events: 0;
-            clip_to: "videoplayer.clip";
-            effect: FAR_SHADOW;
+         part { name: "videoplayer.controls.btn_box2"; /* API */ 
+            type: BOX;
             description { state: "default" 0.0;
-               color: FONT_COLOR;
-               color3: FONT_COLOR3;
                rel1 {
-                  to: "videoplayer.controls.bg";
-                  offset: 10 0;
+                  to_y: "videoplayer.controls.btn_box.bg";
+                  to_x: "videoplayer.controls.poster";
+                  offset: 5 2;
+                  relative: 1.0 0.0;
                }
                rel2 {
-                  to: "videoplayer.controls.bg";
-                  offset: -11 0;
+                  to_y: "videoplayer.controls.btn_box.bg";
                }
-               text {
-                  text: "0:00:00";
-                  font: FONT_BOLD;
-                  size: FONT_SIZE_BIGGER;
-                  align: 1.0 0.0;
-               }
-            }
-         }
-         part { name: "videoplayer.controls.position"; /* API */
-            type: TEXT;
-            mouse_events: 0;
-            clip_to: "videoplayer.clip";
-            effect: FAR_SHADOW;
-            description { state: "default" 0.0;
-               color: FONT_COLOR;
-               color3: FONT_COLOR3;
-               rel1 {
-                  to: "videoplayer.controls.bg";
-                  offset: 10 0;
-               }
-               rel2 {
-                  to: "videoplayer.controls.bg";
-               }
-               text {
-                  text: "0:00:00";
-                  font: FONT_BOLD;
-                  size: FONT_SIZE_BIGGER;
-                  align: 0.0 0.0;
+               box {
+                  layout: "horizontal";
+                  padding: 2 0;
+                  align: 1.0 0.5;
                }
             }
          }
@@ -614,35 +630,95 @@ collections {
             description { state: "default" 0.0;
                fixed: 1 1;
                rel1 {
-                  to: "videoplayer.controls.bg";
-                  relative: 0.0 0.5;
-                  offset: 10 0;
+                  to_y: "videoplayer.controls.bg";
+                  to_x: "videoplayer.controls.poster";
+                  relative: 1.0 0.6;
+                  offset: 5 0;
                }
                rel2 {
                   to: "videoplayer.controls.bg";
-                  offset: -10 0;
+                  to_x: "videoplayer.controls.length";
+                  relative: 0.0 1.0;
+                  // offset: -10 0;
                }
             }
          }
-         part { name: "videoplayer.controls.poster"; /* API todoc (anche brow,list,info,show/hide)*/
+         part { name: "videoplayer.controls.position"; /* API */
+            type: TEXT;
+            mouse_events: 0;
+            scale: 1;
+            clip_to: "videoplayer.clip";
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               color: FONT_COLOR;
+               color3: FONT_COLOR3;
+               rel1 {
+                  to_y: "videoplayer.controls.bg";
+                  relative: 0.7 0.5;
+                  // offset: 10 0;
+               }
+               rel2 {
+                  to_y: "videoplayer.controls.bg";
+                  to_x: "videoplayer.controls.length";
+                  relative: 0.0 1.0;
+               }
+               text {
+                  text: "0:00:00";
+                  font: FONT_BOLD;
+                  size: (FONT_SIZE + 2);
+                  // fit: 1 0;
+                  align: 0.5 1.0;
+               }
+            }
+         }
+         part { name: "videoplayer.controls.length"; /* API */
+            type: TEXT;
+            mouse_events: 0;
+            scale: 1;
+            clip_to: "videoplayer.clip";
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               color: FONT_COLOR;
+               color3: FONT_COLOR3;
+               rel1 {
+                  to_y: "videoplayer.controls.bg";
+                  relative: 0.90 0.5;
+               }
+               rel2 {
+                  to_y: "videoplayer.controls.bg";
+               }
+               text {
+                  text: "0:00:00";
+                  font: "Sans:style=Bold";
+                  size: (FONT_SIZE + 2);
+                  // fit: 1 0;
+                  align: 0.5 1.0;
+               }
+            }
+         }
+         part { name: "videoplayer.controls.poster"; /* API */
             type: SWALLOW;
             mouse_events: 0;
+            //scale: 1; not work :/
             clip_to: "videoplayer.clip";
             description { state: "default" 0.0;
                visible: 0;
-               rel1.relative: (0.0-0.3) 0.5;
-               rel2.relative: (0.25-0.3) 0.84;
+               rel1.relative: 0.0 (0.0 - 0.9);
+               rel2.relative: 0.2 (0.45 - 0.9);
+               rel1.offset: 5 5;
+               align: 0.0 0.0;  // not work :/
             }
             description { state: "visible" 0.0;
                inherit: "default" 0.0;
                visible: 1;
-               rel1.relative: 0.0 0.5;
-               rel2.relative: 0.25 0.84;
+               rel1.relative: 0.0 0.0;
+               rel2.relative: 0.2 0.45;
             }
          }
-         part { name: "videoplayer.controls.title"; /* API todoc (anche brow,list,info,show/hide)*/
+         part { name: "videoplayer.controls.title"; /* API */
             type: TEXT;
             mouse_events: 0;
+            scale: 1;
             clip_to: "videoplayer.clip";
             effect: FAR_SHADOW;
             description { state: "default" 0.0;
@@ -650,23 +726,24 @@ collections {
                color3: 0 0 0 0;
                rel1 {
                   to_y: "videoplayer.controls.bg";
-                  relative: 0.26 -0.5;
+                  to_x: "videoplayer.controls.poster";
+                  relative: 1.0 1.0;
+                  offset: 5 0;
                }
                rel2 {
                   to: "videoplayer.controls.bg";
-                  relative: 1.0 0.0;
-                  offset: -10 0;
+                  relative: 1.0 1.5;
+                  offset: 0 0;
                }
                text {
                   text: "Title";
-                  font: FONT_BOLD;
-                  size: FONT_SIZE_BIG;
-                  align: 0.0 1.0;
+                  font: FONT;
+                  size: FONT_SIZE_BIGGER;
+                  align: 0.0 0.0;
                }
             }
             description { state: "visible" 0.0;
                inherit: "default" 0.0;
-               // color: 255 255 255 255;
                color: FONT_COLOR;
                color3: FONT_COLOR3;
             }
@@ -677,17 +754,15 @@ collections {
             type: IMAGE;
             mouse_events: 1;
             repeat_events: 0;
+            scale: 1;
             description { state: "default" 0.0;
                visible: 0;
+               min: 400 40;
+               max: 400 40;
                color: 255 255 255 180;
-               rel1 {
-                  relative: 0.3 0.0;
-                  offset: 0 -50;
-               }
-               rel2 {
-                  relative: 0.7 0.05;
-                  offset: -1 -50;
-               }
+               align: 0.5 1.0;
+               rel1.offset: 0 40;
+               rel2.offset: -1 40;
                image.normal: "bt_dis_base.png";
                image.border: 5 5 5 5;
             }
@@ -695,7 +770,7 @@ collections {
                inherit: "default" 0.0;
                visible: 1;
                rel1.offset: 0 0;
-               rel2.offset: 0 0;
+               rel2.offset: -1 -1;
             }
          }
          part { name: "volume.slider"; /* API */
@@ -707,12 +782,14 @@ collections {
             description { state: "default" 0.0;
                fixed: 1 1;
                rel1 {
-                  to: "volume.bg";
-                  relative: 0.1 0.0;
+                  to_y: "volume.bg";
+                  to_x: "volume.icon";
+                  relative: 1.0 0.0;
+                  offset: 8 0;
                }
                rel2 {
                   to: "volume.bg";
-                  offset: -10 0;
+                  offset: -8 0;
                }
             }
          }
@@ -725,13 +802,13 @@ collections {
                aspect_preference: VERTICAL;
                rel1 {
                   to: "volume.bg";
-                  relative: 0.0 0.0;
-                  offset: 8 2;
+                  // relative: 0.0 0.0;
+                  offset: 8 0;
                }
                rel2 {
                   to: "volume.bg";
-                  relative: 1.0 1.0;
-                  offset: -1 -3;
+                  // relative: 1.0 1.0;
+                  // offset: -1 -3;
                }
             }
             description { state: "muted" 0.0;
@@ -739,6 +816,7 @@ collections {
                image.normal: "volume_muted.png";
             }
          }
+
 
          part { name: "dialogs.box.stack"; /* API */
             type: BOX;
@@ -920,7 +998,7 @@ collections {
             signal: "videoplayer,show";
             source: "emc";
             action: STATE_SET "visible" 0.00;
-            transition: LINEAR 0.5;
+            transition: LINEAR 0.4;
             target: "videoplayer.clip";
             target: "videoplayer.events";
             
@@ -929,7 +1007,7 @@ collections {
             signal: "videoplayer,hide";
             source: "emc";
             action: STATE_SET "default" 0.00;
-            transition: LINEAR 0.5;
+            transition: LINEAR 0.4;
             target: "videoplayer.clip";
             target: "videoplayer.events";
          }
@@ -937,7 +1015,7 @@ collections {
             signal: "videoplayer,controls,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
-            transition: DECELERATE 0.5;
+            transition: DECELERATE 0.4;
             target: "videoplayer.controls.bg";
             target: "videoplayer.controls.title";
             target: "videoplayer.controls.poster";
@@ -946,7 +1024,7 @@ collections {
             signal: "videoplayer,controls,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
-            transition: DECELERATE 0.5;
+            transition: ACCELERATE 0.4;
             target: "videoplayer.controls.bg";
             target: "videoplayer.controls.title";
             target: "videoplayer.controls.poster";
@@ -956,14 +1034,14 @@ collections {
             signal: "volume,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
-            transition: DECELERATE 0.5;
+            transition: DECELERATE 0.3;
             target: "volume.bg";
          }
          program { name: "volume_hide"; /* API */
             signal: "volume,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
-            transition: ACCELERATE 0.5;
+            transition: ACCELERATE 0.3;
             target: "volume.bg";
          }
          program { name: "volume_mute_on"; /* API */

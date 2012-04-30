@@ -61,7 +61,7 @@ def init():
 
    # set default elm engine
    if not ini.has_option('general', 'evas_engine'):
-      ini.set('general', 'evas_engine', 'opengl_x11')
+      ini.set('general', 'evas_engine', 'software_x11')
 
    # search the theme file, or use the default one
    theme_file = utils.get_resource_file('themes', name + '.edj', 'default.edj')
@@ -315,6 +315,22 @@ def background_set(image):
    backdrop_im.file_set(image)
 
 ################################################################################
+class EmcButton(elementary.Button):
+   """ TODO doc this """
+   def __init__(self, label=None, icon = None):
+      elementary.Button.__init__(self, layout)
+      self.style_set('emc')
+      # selff.focus_allow_set(False)
+      if label:
+         self.text_set(label)
+      if icon:
+         self.icon_set(load_icon(icon))
+      self.show()
+
+   # def color_set(self, r, g, b):
+      # self.ARGHHH
+
+################################################################################
 class EmcRemoteImage(elementary.Image):
    """ TODO doc this """
 
@@ -392,7 +408,7 @@ class EmcDialog(edje.Edje):
                 spinner = False, style = 'panel',
                 done_cb = None, canc_cb = None):
       # load the right edje object
-      if style == 'minimal' or style in EmcDialog.special_styles:
+      if style in EmcDialog.special_styles or style == 'minimal':
          group = 'emc/dialog/minimal'
       else:
          group = 'emc/dialog/panel'
@@ -416,7 +432,7 @@ class EmcDialog(edje.Edje):
       self._done_cb = done_cb
       self._canc_cb = canc_cb
       self._buttons = []
-      self.fman = EmcFocusManager()
+      self.fman = EmcFocusManager2()
 
       # vbox
       self._vbox = elementary.Box(gui.win)
@@ -512,16 +528,13 @@ class EmcDialog(edje.Edje):
    def button_add(self, label, selected_cb = None, cb_data = None, icon = None):
       if not self._buttons:
          self.signal_emit('emc,dialog,buttons,show', 'emc')
-      b = elementary.Button(gui.win)
-      b.text_set(label)
-      if icon: b.icon_set(load_icon(icon))
+
+      b = EmcButton(label, icon)
       b.data['cb'] = selected_cb
       b.data['cb_data'] = cb_data
       b.callback_clicked_add(self._cb_buttons)
-      b.focus_allow_set(False)
       self.fman.obj_add(b)
       self.part_box_prepend('emc.box.buttons', b)
-      b.show()
       self._buttons.append(b)
       return b
 
@@ -636,7 +649,7 @@ class EmcSourceSelector(EmcDialog):
       self._glist = elementary.Genlist(gui.win)
       self._glist.style_set('dialog')
       self._glist.homogeneous_set(True)
-      self._glist.always_select_mode_set(True)
+      self._glist.select_mode_set(elementary.ELM_OBJECT_SELECT_MODE_ALWAYS)
       self._glist.focus_allow_set(False)
       self._glist.callback_clicked_double_add(self._cb_item_selected)
       self._glist_itc = elementary.GenlistItemClass(item_style = 'default',
@@ -794,7 +807,119 @@ class EmcFocusManager(object):
    def _mouse_in_cb(self, obj, event):
       if self.focused != obj:
          self.focused_set(obj)
-   
+
+
+###############################################################################
+class EmcFocusManager2(object):
+   """
+   This class manage a list of elementary objects, usually buttons.
+   You provide all the objects that can receive focus and the class
+   will take care of selecting the right object when you move the selection
+   Dont forget to call the delete() method when not needed anymore!!
+   If you want the class to automanage input events just pass an unique name
+   as the autoeventsname param. 
+   """
+
+   def __init__(self, autoeventsname=None):
+      self.objs = []
+      self.focused = None
+      self.autoeventsname = autoeventsname
+      if autoeventsname is not None:
+         input_events.listener_add(autoeventsname, self._input_event_cb)
+
+   def delete(self):
+      """ Delete the FocusManager instance and free all the used resources """
+      if self.autoeventsname is not None:
+         input_events.listener_del(self.autoeventsname)
+
+      if self.objs:
+         for o in self.objs:
+            o.on_mouse_in_del(self._mouse_in_cb)
+         del self.objs
+      del self
+
+   def obj_add(self, obj):
+      """
+      Add an object to the chain, obj must be an evas object that support
+      the focus_set() 'interface', usually an elementary obj will do the work.
+      """
+      if not self.focused:
+         self.focused = obj
+         # obj.focus_set(True)
+         obj.disabled_set(False)
+      else:
+         # obj.focus_set(False)
+         obj.disabled_set(True)
+      obj.on_mouse_in_add(self._mouse_in_cb)
+      self.objs.append(obj)
+
+   def focused_set(self, obj):
+      """ Give focus to the given obj """
+      # obj.focus_set(True)
+      if self.focused:
+         self.focused.disabled_set(True)
+      obj.disabled_set(False)
+      self.focused = obj
+
+   def focused_get(self):
+      """ Get the object that has focus """
+      return self.focused
+
+   def focus_move(self, direction):
+      """
+      Try to move the selection in th given direction.
+      direction can be: 'l'eft, 'r'ight, 'u'p or 'd'own
+      """
+      x, y = self.focused.center
+      nearest = None
+      distance = 99999
+      for obj in self.objs:
+         if obj != self.focused:
+            ox, oy = obj.center
+            # discard objects in the wrong direction
+            if   direction == 'l' and ox >= x: continue
+            elif direction == 'r' and ox <= x: continue
+            elif direction == 'u' and oy >= y: continue
+            elif direction == 'd' and oy <= y: continue
+
+            # simple calc distance (with priority in the current direction)
+            if direction in ['l', 'r']:
+               dis = abs(x - ox) + (abs(y - oy) * 10)
+            else:
+               dis = (abs(x - ox) * 10) + abs(y - oy)
+
+            # remember the nearest object
+            if dis < distance:
+               distance = dis
+               nearest = obj
+
+      # select the new object if found
+      if nearest:
+         self.focused_set(nearest)
+
+   def all_get(self):
+      """ Get the list of all the objects that was previously added """
+      return self.objs
+
+   def _mouse_in_cb(self, obj, event):
+      if self.focused != obj:
+         self.focused_set(obj)
+
+   def _input_event_cb(self, event):
+      if event == 'LEFT':
+         self.focus_move('l')
+         return input_events.EVENT_BLOCK
+      if event == 'RIGHT':
+         self.focus_move('r')
+         return input_events.EVENT_BLOCK
+      if event == 'UP':
+         self.focus_move('u')
+         return input_events.EVENT_BLOCK
+      if event == 'DOWN':
+         self.focus_move('d')
+         return input_events.EVENT_BLOCK
+      return input_events.EVENT_CONTINUE
+
 ###############################################################################
 # class EmcVKeyboard(elementary.InnerWindow):
 class EmcVKeyboard(EmcDialog):

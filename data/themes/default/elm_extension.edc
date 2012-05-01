@@ -2217,9 +2217,8 @@ group { name: "elm/button/base/emc";
             rel2.relative: 1.0 1.0;
          }
       }
-      part { name: "elm.text";
+      part { name: "elm.text"; /* API */
          type:          TEXT;
-         effect:        SOFT_SHADOW;
          mouse_events:  0;
          scale: 1;
          description { state: "default" 0.0;
@@ -2229,7 +2228,6 @@ group { name: "elm/button/base/emc";
             rel1.offset: 0 0;
             rel2.offset: -8 0;
             color: FONT_COLOR;
-            color3: FONT_COLOR3;
             text {
                font:     "Sans,Edje-Vera";
                size:     FONT_SIZE;
@@ -2245,11 +2243,11 @@ group { name: "elm/button/base/emc";
          }
          description { state: "disabled" 0.0;
             inherit: "default" 0.0;
+            color: 150 150 150 255;
          }
          description { state: "disabled_visible" 0.0;
             inherit: "default" 0.0;
-            // color: 180 180 180 200;
-            // color3: 0 0 0 0;
+            color: 180 180 180 255;
             visible: 1;
             text.min: 1 1;
          }

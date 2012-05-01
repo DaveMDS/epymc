@@ -99,8 +99,14 @@ def play_video(url):
 
 def stop():
    LOG('dbg', 'Stop()')
-   _emotion.position = 0
    _emotion.play = False
+   _emotion.position = 0.0
+
+   # this cause a random color to be shown for an instant, but it is
+   # necessary to hide a bug somewhere else:
+   # without this the video restart to play when I set position to 0.0 :/
+   _emotion.file_set('')
+   
 
 def forward():
    LOG('dbg', 'Forward cb' + str(_emotion.position))

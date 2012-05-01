@@ -129,10 +129,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
             self.__browser.page_add(item_url, os.path.basename(path))
             dirs, files = [], []
             for fname in sorted(os.listdir(path), key=str.lower):
-               if os.path.isdir(os.path.join(path, fname)):
-                  dirs.append(fname)
-               else:
-                  files.append(fname)
+               if fname[0] != '.':
+                  if os.path.isdir(os.path.join(path, fname)):
+                     dirs.append(fname)
+                  else:
+                     files.append(fname)
                
             for fname in dirs + files:
                self.__browser.item_add('file://' + path + '/' + fname, fname)

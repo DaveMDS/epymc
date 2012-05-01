@@ -945,6 +945,7 @@ class EmcVKeyboard(EmcDialog):
       self.entry.style_set('vkeyboard')
       self.entry.editable_set(False)
       self.entry.single_line_set(True)
+      self.entry.focus_allow_set(False)
       self.entry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       self.entry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       if text: self.text_set(text)
@@ -952,7 +953,7 @@ class EmcVKeyboard(EmcDialog):
       self.entry.show()
 
       # focus manager
-      self.efm = EmcFocusManager()
+      self.efm = EmcFocusManager2()
 
       # standard keyb
       for i, c in enumerate(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']):
@@ -971,26 +972,20 @@ class EmcVKeyboard(EmcDialog):
       self._pack_btn(tb, 0, 6, 4, 1, 'Dismiss', 'icon/cancel', self._dismiss_cb)
       self._pack_btn(tb, 6, 6, 4, 1, 'Accept',  'icon/ok',     self._accept_cb)
 
-      # activate the inwin
-      self.entry.focus_allow_set(False)
-
-      # elementary.InnerWindow.__init__(self, gui.win)
+      # init the parent EmcDialog class
       EmcDialog.__init__(self, title = title, style = 'minimal', content = tb)
 
        # catch input events
       input_events.listener_add('vkbd', self.input_event_cb)
 
    def _pack_btn(self, tb, x, y, w, h, label, icon = None, cb = None):
-      b = elementary.Button(gui.win)
+      b = EmcButton(label=label, icon=icon)
       b.size_hint_weight_set(evas.EVAS_HINT_EXPAND, 0.0)
       b.size_hint_align_set(evas.EVAS_HINT_FILL, 0.0)
-      if icon: b.icon_set(gui.load_icon(icon))
       if cb: b.callback_clicked_add(cb)
       b.data['cb'] = cb
-      b.text_set(label)
       self.efm.obj_add(b)
       tb.pack(b, x, y, w, h)
-      b.show()
       return b
 
    def delete(self):

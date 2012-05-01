@@ -366,6 +366,7 @@ class EmcBrowser(object):
       else:
          func = self.poster_get_cb
       return func(self.pages[-1]["url"], url) if callable(func) else None
+      
 
    def _fanart_get(self, url):
       """ TODO Function doc """
@@ -620,12 +621,13 @@ class ViewGrid(object):
       gg.style_set('browser')
       gg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       gg.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+      gg.focus_allow_set(False)
       gg.horizontal_set(False)
       gg.bounce_set(False, True)
       gg.item_size_set(150, 150)
       gg.align_set(0.5, 0.0)
       gg.callback_selected_add(self.gg_higlight)
-      gg.callback_clicked_add(self.gg_selected)
+      gg.callback_clicked_double_add(self.gg_selected)
       gui.swallow_set('browser.grid.gengrid', gg)
       self.gg = gg
 
@@ -659,30 +661,45 @@ class ViewGrid(object):
       (url, label, parent_browser) = item.data_get()
 
       if event == 'RIGHT':
-         # TODO FIX DOUBLE MOVE
-         # elm_focus_highlight_enable_set(Eina_Bool enable); ????
-         # elm_object_focus_allow_set
          next = item.next_get()
          if next:
             next.selected_set(1)
             next.bring_in()
-            return input_events.EVENT_BLOCK
+         return input_events.EVENT_BLOCK
 
       elif event == 'LEFT':
          prev = item.prev_get()
          if prev:
             prev.selected_set(1)
             prev.bring_in()
-            return input_events.EVENT_BLOCK
+         return input_events.EVENT_BLOCK
 
       elif event == 'UP':
-         (x, y) = item.pos_get()
-         # TODO
+         try:
+            prev = item.prev_get()
+            (x1, y1) = item.pos_get()
+            (x2, y2) = prev.pos_get()
+            while x2 != x1:
+               prev = prev.prev_get()
+               (x2, y2) = prev.pos_get()
+            prev.selected_set(1)
+            prev.bring_in()
+         except:
+            pass
          return input_events.EVENT_BLOCK
 
       elif event == 'DOWN':
-         (x, y) = item.pos_get()
-         # TODO
+         try:
+            next = item.next_get()
+            (x1, y1) = item.pos_get()
+            (x2, y2) = next.pos_get()
+            while x2 != x1:
+               next = next.next_get()
+               (x2, y2) = next.pos_get()
+            next.selected_set(1)
+            next.bring_in()
+         except:
+            pass
          return input_events.EVENT_BLOCK
 
       elif event == 'OK':
@@ -699,7 +716,10 @@ class ViewGrid(object):
    def gg_icon_get(self, obj, part, data):
       (url, label, parent_browser) = data
       if part == 'elm.swallow.icon':
-         return parent_browser._icon_get(url)
+         icon = parent_browser._icon_get(url)
+         if icon: return icon
+         poster = parent_browser._poster_get(url)
+         if poster: return gui.load_image(poster)
       elif part == 'elm.swallow.end':
          return parent_browser._icon_end_get(url)
       return None

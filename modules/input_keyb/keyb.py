@@ -48,10 +48,11 @@ _mapping = { 'Up': 'UP',
              'm': 'VOLUME_MUTE',
              'p': 'TOGGLE_PAUSE',
              'f': 'TOGGLE_FULLSCREEN',
-             'F6': 'BIGGER',
-             'F5': 'SMALLER',
              'F1': 'VIEW_LIST',
              'F2': 'VIEW_GRID',
+             'F5': 'SCALE_SMALLER',
+             'F6': 'SCALE_BIGGER',
+             'F7': 'SCALE_RESET',
            }
 
 class KeyboardModule(EmcModule):

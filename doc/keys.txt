@@ -16,7 +16,10 @@ F                                TOGGLE_FULLSCREEN
 + or KP_+                        VOLUME_UP
 - or KP_-                        VOLUME_DOWN
 M                                VOLUME_MUTE
+
 F1                               VIEW_LIST
 F2                               VIEW_GRID
-F5                               SMALLER
-F6                               BIGGER
+
+F5                               SMALLER SCALE
+F6                               BIGGER SCALE
+F7                               RESET SCALE

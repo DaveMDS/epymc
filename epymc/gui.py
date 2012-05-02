@@ -146,11 +146,14 @@ def input_event_cb(event):
    if event == 'TOGGLE_FULLSCREEN':
       win.fullscreen = not win.fullscreen
       return input_events.EVENT_BLOCK
-   elif event == 'BIGGER':
+   elif event == 'SCALE_BIGGER':
       scale_bigger()
       return input_events.EVENT_BLOCK
-   elif event == 'SMALLER':
+   elif event == 'SCALE_SMALLER':
       scale_smaller()
+      return input_events.EVENT_BLOCK
+   elif event == 'SCALE_RESET':
+      scale_reset()
       return input_events.EVENT_BLOCK
 
    input_events.EVENT_CONTINUE
@@ -302,6 +305,9 @@ def scale_bigger():
 
 def scale_smaller():
    win.scale_set(win.scale_get() - 0.1)
+
+def scale_reset():
+   win.scale_set(1.0)
 
 ################################################################################
 def background_set(image):

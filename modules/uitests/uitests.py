@@ -24,7 +24,7 @@ import ecore, elementary
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser
 from epymc.gui import EmcDialog, EmcVKeyboard, EmcSourceSelector
-from epymc.gui import EmcButton, EmcFocusManager2
+from epymc.gui import EmcButton, EmcFocusManager2, EmcNotify
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
 import epymc.ini as ini
@@ -90,6 +90,7 @@ class UiTestsModule(EmcModule):
    def make_root_page(self):
       self._browser.page_add('uitests://root', 'UI tests')
 
+      self._browser.item_add('uitests://notify', 'Notify stack')
       self._browser.item_add('uitests://buttons', 'Buttons + FocusManager')
       self._browser.item_add('uitests://mpv', 'Mediaplayer - Local Video')
       # self._browser.item_add('uitests://mpvo', 'Mediaplayer - Online Video (good)')
@@ -126,6 +127,10 @@ class UiTestsModule(EmcModule):
       if item_url == 'uitests://root':
          self.make_root_page()
 
+      # Notify
+      elif item_url == 'uitests://notify':
+         n = EmcNotify('<b>TITLE</b><br>maybe some other texts..')
+         
       # TMDB
       elif item_url == 'uitests://tmdb':
          s = TMDB_WithGui()

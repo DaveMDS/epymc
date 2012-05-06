@@ -645,6 +645,32 @@ class EmcDialog(edje.Edje):
       else:
          return input_events.EVENT_CONTINUE
 
+################################################################################
+class EmcNotify(edje.Edje):
+   """ TODO doc this"""
+
+   def __init__(self, text, hidein=3.0):
+      group = 'emc/notify/default'
+      edje.Edje.__init__(self, gui.layout.evas, file = theme_file, group = group)
+      self.part_text_set('emc.text.caption', text)
+      gui.box_append('notify.box.stack', self)
+      if hidein > 0.0:
+         self.timer = ecore.Timer(hidein, self.hide_timer_cb)
+      else:
+         self.timer = None
+      self.show()
+
+   def hide_timer_cb(self):
+      box_remove('notify.box.stack', self)
+      self.delete()
+      return ecore.ECORE_CALLBACK_CANCEL
+
+   def close(self):
+      if self.timer:
+         self.timer.delete()
+      self.hide_timer_cb()
+
+
 ###############################################################################
 class EmcSourceSelector(EmcDialog):
    """ TODO doc this

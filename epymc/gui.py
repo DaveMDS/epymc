@@ -649,7 +649,7 @@ class EmcDialog(edje.Edje):
 class EmcNotify(edje.Edje):
    """ TODO doc this"""
 
-   def __init__(self, text, hidein=3.0):
+   def __init__(self, text, hidein=5.0):
       group = 'emc/notify/default'
       edje.Edje.__init__(self, gui.layout.evas, file = theme_file, group = group)
       self.part_text_set('emc.text.caption', text)

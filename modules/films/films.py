@@ -19,16 +19,16 @@
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
 
-import os
-import re
+import os, re, time
+import threading, Queue
 
-import evas
-import elementary
+import ecore, evas, elementary
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser
 from epymc.sdb import EmcDatabase
-from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourceSelector, EmcVKeyboard
+from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourceSelector
+from epymc.gui import EmcVKeyboard, EmcNotify
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
@@ -41,10 +41,12 @@ import epymc.gui as gui
 from pprint import pprint
 import pdb
 def DBG(msg):
-   # print('FILM: %s' % (msg))
-   pass
+   print('FILM: %s' % (msg))
+   # pass
+
 
 TMDB_API_KEY = '19eef197b81231dff0fd1a14a8d5f863' # Key of the user DaveMDS
+DEFAULT_EXTENSIONS = 'avi mpg mpeg ogv mkv' #TODO fill better (uppercase ??)
 
 
 class FilmsModule(EmcModule):
@@ -55,19 +57,37 @@ class FilmsModule(EmcModule):
 need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    __browser = None
-   __exts = ['.avi', '.mpg', '.mpeg'] #TODO needed? fill!!
-   __film_db = None
-   __person_db = None
+   __exts = None        # list of allowed extensions
+   __film_db = None     # key: film_url  data: dictionary as of the tmdb api
+   __person_db = None   # key: ?????     data: dictionary as of the tmdb api
+
+   __generator = None
+   __idler = None      # EcoreIdler
+   __idler_url = None  # also used as a semaphore
+   __idler_db = None   # key: file_url  data: timestamp of the last unsuccessfull tmdb query
+   __idler_retry_after = 7 * 24 * 60 * 60
 
    def __init__(self):
       DBG('Init module')
 
-      # create config ini section if not exists
+      # create config ini section if not exists, with defaults
       ini.add_section('film')
+      if not ini.has_option('film', 'enable_scanner'):
+         ini.set('film', 'enable_scanner', 'False')
+      if not ini.has_option('film', 'extensions'):
+         ini.set('film', 'extensions', DEFAULT_EXTENSIONS)
+      if not ini.has_option('film', 'tmdb_retry_days'):
+         ini.set('film', 'tmdb_retry_days', '7')
+
+      # get allowed exensions from config
+      self.__exts = ini.get_string_list('film', 'extensions')
+      self.__idler_retry_after = ini.get_int('film', 'tmdb_retry_days')
+      self.__idler_retry_after *= 24 * 60 * 60
 
       # open film/person database (they are created if not exists)
       self.__film_db = EmcDatabase('film')
       self.__person_db = EmcDatabase('person')
+      self.__idler_db = EmcDatabase('filmidlercache')
 
       # add an item in the mainmenu
       img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
@@ -81,8 +101,20 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                               fanart_get_cb = self.cb_fanart_get,
                               info_get_cb = self.cb_info_get)
 
+      # on idle scan all files (one shoot)
+      if (ini.get_bool('film', 'enable_scanner')):
+         self.__idler = ecore.Idler(self.idle_cb)
+
    def __shutdown__(self):
       DBG('Shutdown module')
+
+      # kill the idler
+      if self.__idler:
+         self.__idler.delete()
+         self.__idler = None
+         self.__idler_url = None
+      # TODO clean better the idler? abort if a download in process?
+
       # delete mainmenu item
       mainmenu.item_del('film')
 
@@ -92,6 +124,73 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       ## close databases
       del self.__film_db
       del self.__person_db
+      del self.__idler_db
+
+   def idle_cb(self):
+      # DBG('Mainloop idle')
+      
+      if self.__idler_url is not None:
+         # DBG('im busy')
+         return ecore.ECORE_CALLBACK_RENEW
+         
+      # the first time build the generator object 
+      if self.__generator is None:
+         folders = ini.get_string_list('film', 'folders', ';')
+         self.__generator = utils.grab_files(folders)
+         EmcNotify("Film scanner started")
+
+      # get the next file from the generator
+      try:
+         filename = self.__generator.next()
+      except StopIteration:
+         EmcNotify("Film scanner done")
+         DBG("Film scanner done")
+         self.__generator = None
+         return ecore.ECORE_CALLBACK_CANCEL
+
+      url = 'file://' + filename
+
+      if self.__film_db.id_exists(url):
+         DBG('I know this film (skipping):' + url)
+         return ecore.ECORE_CALLBACK_RENEW
+
+      if self.__idler_db.id_exists(url):
+         elapsed = time.time() - self.__idler_db.get_data(url)
+         if elapsed < self.__idler_retry_after:
+            DBG('I scanned this %d seconds ago (skipping): %s' % (elapsed, url))
+            return ecore.ECORE_CALLBACK_RENEW
+         self.__idler_db.del_data(url)
+
+      ext = os.path.splitext(filename)[1]
+      if ext[1:] in self.__exts:
+         tmdb = TMDB()
+         tmdb.movie_search(get_film_name_from_url(url), self.idle_tmdb_complete)
+         self.__idler_url = url
+      
+      return ecore.ECORE_CALLBACK_RENEW
+
+   def idle_tmdb_complete(self, tmdb, movie_info):
+      if movie_info is None:
+         # store the current time in the cache db
+         self.__idler_db.set_data(self.__idler_url, time.time())
+      else:
+         # store the result in film db
+         try:
+            url = self.__idler_url
+            self.__film_db.set_data(url, movie_info)
+            text = 'Found film:<br>%s (%s)' % (movie_info['name'], movie_info['released'][:4])
+            EmcNotify(text)
+         except:
+            pass
+
+      # clear the 'semaphore', now another file can be processed
+      self.__idler_url = None
+
+      # update browser
+      # self.__browser.refresh()   # TODO check if visible and update if necessary  :/
+
+      # delete TMDB2 object
+      del tmdb
 
    def play_film(self, url):
       mediaplayer.play_video(url)
@@ -293,19 +392,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # TODO make thumbnail
          o_image.file_set('')
 
-   def get_film_name_from_url(self, url):
-      # remove path & extension
-      film = os.path.basename(url)
-      (film, ext) = os.path.splitext(film)
-      # remove stuff between '<[{' and '}]>' 
-      film = re.sub(r'<.*?>', '', film)
-      film = re.sub(r'\[.*?\]', '', film)
-      film = re.sub(r'\{.*?\}', '', film)
-      # remove blacklisted words
-      blacklist = ['dvdrip', 'ITA', 'ENG', 'sub', 'AAC', 'x264']# TODO make this configurable
-      for word in blacklist:
-         film = re.sub('(?i)'+word, '', film)
-      return film
+
 
    def _cb_panel_1(self, button):
       self.play_film(self.__current_url)
@@ -468,9 +555,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
 ######## Get film info from themoviedb.org
    def _cb_panel_5(self, button):
-      # tmdb = TMDB2(TMDB_API_KEY)
       tmdb = TMDB_WithGui()
-      film = self.get_film_name_from_url(self.__current_url)
+      film = get_film_name_from_url(self.__current_url)
       tmdb.movie_search(film, self._cb_search_complete)
 
    def _cb_search_complete(self, tmdb, movie_info):
@@ -480,7 +566,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.__browser.refresh()
       # update info panel
       self.update_film_info(self.__current_url)
-      # delete TMDB2 object
+      # delete TMDB object
       del tmdb
 
 
@@ -492,14 +578,137 @@ def get_poster_filename(tmdb_id):
 def get_backdrop_filename(tmdb_id):
    return os.path.join(utils.config_dir_get(), 'film',
                        str(tmdb_id), 'backdrop.jpg')
-   
+
+def get_film_name_from_url(url):
+   # remove path & extension
+   film = os.path.basename(url)
+   (film, ext) = os.path.splitext(film)
+   # remove stuff between '<[{' and '}]>' 
+   film = re.sub(r'<.*?>', '', film)
+   film = re.sub(r'\[.*?\]', '', film)
+   film = re.sub(r'\{.*?\}', '', film)
+   # remove blacklisted words
+   blacklist = ['dvdrip', 'ITA', 'ENG', 'sub', 'AAC', 'x264']# TODO make this configurable
+   for word in blacklist:
+      film = re.sub('(?i)'+word, '', film)
+   return film
+
+
 
 ###############################################################################
-import urllib
 import json
 
+class TMDB():
+   """ TMDB async client """
+   def __init__(self, api_key=TMDB_API_KEY, lang='en'):
+      self.key = api_key
+      self.lang = lang
+      self.server = 'http://api.themoviedb.org/2.1'
+      self.dwl_handler = None
+      self.complete_cb = None
 
-class TMDB_WithGui(object):
+   def movie_search(self, query, complete_cb):
+      DBG('TMDB  ===== Movie search: ' + query)
+      self.complete_cb = complete_cb
+      url = '%s/Movie.search/%s/json/%s/%s' % \
+            (self.server, self.lang, self.key, query)
+      self.dwl_handler = utils.download_url_async(url, 'tmp',
+                              complete_cb = self._movie_search_done_cb,
+                              progress_cb = None)
+
+   def _movie_search_done_cb(self, dest, status):
+      self.dwl_handler = None
+
+      if status != 200:
+         DBG('TMDB  download error(status: %d) aborting...' % (status))
+         self.complete_cb(self,None)
+         return
+
+      f = open(dest, 'r')
+      data = json.loads(f.read())
+      f.close()
+      os.remove(dest)
+
+      # no result found :(
+      if len(data) == 0 or data[0] == 'Nothing found.':
+         DBG('TMDB  No results found ')
+         self.complete_cb(self, None)
+
+      # found, yhea! get the full movie data
+      elif len(data) >= 1:
+         DBG('TMDB  Found one: %s (%s)' % (data[0]['name'], data[0]['released'][:4]))
+         # text = 'Found film:<br>%s (%s)' % (data[0]['name'], data[0]['released'][:4])
+         # EmcNotify(text)
+         self._do_movie_getinfo_query(data[0]['id'])
+
+   def _do_movie_getinfo_query(self, tid):
+      DBG('TMDB  Downloading movie info for id: ' + str(tid))
+      url = '%s/Movie.getInfo/%s/json/%s/%s' % \
+            (self.server, self.lang, self.key, tid)
+      self.dwl_handler = utils.download_url_async(url, 'tmp',
+                           complete_cb = self._movie_getinfo_done_cb,
+                           progress_cb = None)
+
+   def _movie_getinfo_done_cb(self, dest, status):
+      self.dwl_handler = None
+
+      if status != 200:
+         DBG('TMDB  download error(status: %d) aborting...' % (status))
+         self.complete_cb(self, None)
+         return
+   
+      f = open(dest, 'r')
+      data = json.loads(f.read())
+      f.close()
+      os.remove(dest)
+
+      if len(data) < 1:
+         # TODO here ??
+         DBG('TMDB  Zero length result.. :/')
+         self.complete_cb(self, None)
+         return
+
+      # store the movie data
+      self.movie_info = data[0]
+
+      # download the first poster image found
+      for image in self.movie_info['posters']:
+         if image['image']['size'] == 'mid': # TODO make default size configurable
+            dest = get_poster_filename(self.movie_info['id'])
+            DBG('TMDB  Downloading poster url: ' + str(image['image']['url']))
+            self.dwl_handler = utils.download_url_async(image['image']['url'],
+                               dest, complete_cb = self._movie_poster_done_cb,
+                               progress_cb = None)
+            return
+
+      # if no poster found go to next step
+      self._movie_poster_done_cb(dest, 200)
+
+   def _movie_poster_done_cb(self, dest, status):
+      DBG('TMDB  poster done: ' + str(dest))
+      self.dwl_handler = None
+      # download the first backdrop image found
+      for image in self.movie_info['backdrops']:
+         if image['image']['size'] == 'original': # TODO make default size configurable
+            dest = get_backdrop_filename(self.movie_info['id'])
+            DBG('TMDB  Downloading fanart url: ' + str(image['image']['url']))
+            self.dwl_handler = utils.download_url_async(image['image']['url'],
+                              dest, complete_cb = self._movie_backdrop_done_cb,
+                              progress_cb = None)
+            return
+
+      # if no backdrop found go to next step
+      self._movie_backdrop_done_cb(dest, 200)
+
+   def _movie_backdrop_done_cb(self, dest, status):
+      DBG('TMDB  fanart done: ' + str(dest))
+      self.dwl_handler = None
+
+      # call the complete callback
+      DBG('TMDB  done!')
+      self.complete_cb(self, self.movie_info)
+
+class TMDB_WithGui():
    """ Another try """
    def __init__(self, api_key=TMDB_API_KEY, lang='en'):
       self.key = api_key
@@ -674,7 +883,7 @@ class TMDB_WithGui(object):
          self.complete_cb(self, self.movie_info)
 
 
-
+"""
 ###############################################################################
 #  Original  themoviedb.org  client implementation taken from:
 #  http://forums.themoviedb.org/topic/1092/my-contribution-tmdb-api-wrapper-python/
@@ -684,6 +893,7 @@ class TMDB_WithGui(object):
 #
 #  Unused atm (in favor of the async one)
 ###############################################################################
+import urllib
 class TMDB_Original(object):
 
    def __init__(self, api_key, view='xml', lang='en', decode = False):
@@ -754,3 +964,4 @@ class TMDB_Original(object):
    def tmdbImages(self, tmdb_Id):
       ''' GetInfo Wrapper '''
       return self.socket(self.method('getImages',tmdb_Id))
+"""

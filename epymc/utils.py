@@ -87,6 +87,42 @@ def hum_size(bytes):
       size = '%.2fb' % bytes
    return size
 
+def grab_files(folders, show_hidden=False):
+   """
+   This is a generator function, you give a list of directories to
+   scan (recursively) and the generator will return all the files
+   path, one file on each next() call.
+
+   Usage:
+
+   # in a for loop
+   for filename in self.grab_files(['/path/1', '/path/2/other']):
+      print filename
+
+   # or asycrony ;)
+   generator = self.grab_files(['/path/1', '/path/2/other'])
+      ...
+   try:
+      filename = generator.next()
+      print filename
+   except StopIteration:
+      print 'file list done'
+   """
+   for folder in folders:
+      if folder.startswith('file://'): # mhhhh...
+         folder = folder[7:]
+      for name in os.listdir(folder):
+         if show_hidden or name[0] != '.':
+            full_path = os.path.join(folder, name)
+            if os.access(full_path, os.R_OK):
+               if os.path.isdir(full_path):
+                  for entry in grab_files([full_path]):
+                     yield entry
+               elif os.path.isfile(full_path):
+                  yield full_path
+               else:
+                  print('Unidentified name %s. It could be a symbolic link' % full_path)
+
 def download_url_sync(url, dest, min_size = 0):
    """
    Copy the contents of a file from a given URL to a local file, blocking

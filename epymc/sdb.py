@@ -57,7 +57,7 @@ class EmcDatabase(object):
          self.__sh[id] = data
          self.__sh.sync() # TODO really sync at every vrite ??
 
-   def del_data(self, db, id):
+   def del_data(self, id):
       if self.__sh.has_key(id):
          del self.__sh[id]
 

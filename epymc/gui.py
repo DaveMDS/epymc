@@ -83,7 +83,7 @@ def init():
    # window
    win = elementary.Window('epymc', elementary.ELM_WIN_BASIC)
    win.title_set('Enlightenment Media Center')
-   win.callback_destroy_add(_cb_win_del)
+   win.callback_delete_request_add(_cb_win_del)
    if ini.has_option('general', 'fullscreen'):
       if ini.get_bool('general', 'fullscreen') == True:
          win.fullscreen_set(1)
@@ -113,7 +113,7 @@ def init():
    bt = elementary.Button(win)
    bt.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
    bt.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-   bt.icon_set(load_icon('icon/list'))
+   bt.content_set(load_icon('icon/list'))
    bt.callback_clicked_add(_cb_btn_change_view, 'VIEW_LIST')
    layout.edje_get().part_box_append('topbar.box', bt)
    bt.show()
@@ -121,7 +121,7 @@ def init():
    bt = elementary.Button(win)
    bt.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
    bt.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-   bt.icon_set(load_icon('icon/grid'))
+   bt.content_set(load_icon('icon/grid'))
    bt.callback_clicked_add(_cb_btn_change_view, 'VIEW_GRID')
    layout.edje_get().part_box_append('topbar.box', bt)
    bt.show()
@@ -330,7 +330,7 @@ class EmcButton(elementary.Button):
       if label:
          self.text_set(label)
       if icon:
-         self.icon_set(load_icon(icon))
+         self.content_set(load_icon(icon))
       self.show()
 
    # def color_set(self, r, g, b):
@@ -580,8 +580,7 @@ class EmcDialog(edje.Edje):
       self._spinner.hide()
 
    def progress_set(self, val):
-      self.part_external_object_get('emc.dialog.progress').value_set(val)
-      
+      gui.part_get('emc.dialog.progress').value_set(val)
 
    def _cb_buttons(self, button):
       selected_cb = button.data['cb']
@@ -966,7 +965,7 @@ class EmcVKeyboard(EmcDialog):
 
       # table
       tb = elementary.Table(gui.win)
-      tb.homogenous_set(True)
+      tb.homogeneous_set(True)
       tb.show()
 
       # set dialog title

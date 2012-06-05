@@ -383,7 +383,7 @@ class MameGame(object):
 
       box = elementary.Box(gui.win)
       box.horizontal_set(True)
-      box.homogenous_set(True)
+      box.homogeneous_set(True)
       box.show()
 
       image = gui.EmcRemoteImage(gui.win)
@@ -436,11 +436,11 @@ class MameGame(object):
 
    def _cb_favorite_button(self, btn):
       if self.gid in MameModule._favorites:
-         btn.icon_set(gui.load_icon('icon/star_off'))
+         btn.content_set(gui.load_icon('icon/star_off'))
          MameModule._favorites.remove(self.gid)
       else:
          MameModule._favorites.append(self.gid)
-         btn.icon_set(gui.load_icon('icon/star'))
+         btn.content_set(gui.load_icon('icon/star'))
       _instance._browser.refresh()
 
    def history_show(self):

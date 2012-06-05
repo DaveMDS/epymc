@@ -316,7 +316,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       box = elementary.Box(gui.win)
       box.horizontal_set(1)
-      box.homogenous_set(1)
+      box.homogeneous_set(1)
       box.show()
 
       image = elementary.Image(gui.win)
@@ -325,7 +325,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       image.show()
       box.pack_end(image)
 
-      sentry = elementary.ScrolledEntry(gui.win)
+      sentry = elementary.Entry(gui.win)
+      sentry.scrollable_set(True)
       sentry.style_set('dialog')
       sentry.editable_set(False)
       sentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)

@@ -52,7 +52,7 @@ def init():
    if not ini.has_option('mediaplayer', 'volume'):
       ini.set('mediaplayer', 'volume', '75')
    if not ini.has_option('mediaplayer', 'backend'):
-      ini.set('mediaplayer', 'backend', 'gstremer')
+      ini.set('mediaplayer', 'backend', 'gstreamer')
    _volume = ini.get_int('mediaplayer', 'volume')
 
    # input events

@@ -30,6 +30,7 @@ import epymc.mediaplayer as mediaplayer
 import epymc.ini as ini
 import epymc.sdb as sdb
 import epymc.browser as browser
+import epymc.browser3 as browser3
 
 
 def main():
@@ -60,6 +61,7 @@ def main():
    # init stuff
    sdb.init()
    browser.init()
+   browser3.init()
    if not gui.init(): return 2
    config_gui.init()
    mainmenu.init()

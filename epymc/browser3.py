@@ -1,0 +1,707 @@
+#!/usr/bin/env python
+#
+# Copyright (C) 2010-2012 Davide Andreoli <dave@gurumeditation.it>
+#
+# This file is part of EpyMC.
+#
+# EpyMC is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# EpyMC is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
+
+import evas
+import ecore
+import elementary
+
+import gui
+import mainmenu
+import input_events
+import ini
+from sdb import EmcDatabase
+from utils import Singleton
+
+def DBG(msg):
+   print ('BROWSER3: ' + msg)
+   # pass
+
+
+_views = {}       # key=>view_name  value=>view class instance
+_memorydb = None  # EmcDatabase  key=>page_url  value=style_name
+_instances = []   # keep track of EmcBrowser instances. just for dump_all()
+
+ANIM_NONE = 0
+ANIM_BACK = -1
+ANIM_FORWARD = 1
+
+def init():
+   global _memorydb
+
+   _memorydb = EmcDatabase('broser3_view_memory')
+   if not ini.has_option('general', 'back_in_lists'):
+      ini.set('general', 'back_in_lists', 'True')
+
+def shutdown():
+   global _memorydb
+   del _memorydb
+
+def dump_everythings():
+   print('*' * 70)
+   for v in _views:
+      print ('loaded view: ' + str(v))
+   for b in _instances:
+      print b
+
+
+class EmcItemClass(Singleton):
+   """ TODO Class doc """
+
+   def item_selected(self, url, user_data):
+      """ Called when an item is selected """
+      DBG(('item_selected(%s)' % url))
+
+   def label_get(self, url, user_data):
+      """ Called when a view need to show the label of your item.
+          Must return the string to show. """
+      DBG(('label_get(%s)' % url))
+      return 'Unknow'
+
+   def icon_get(self, url, user_data):
+      """ Called when a view need to show the icon of your item.
+          Must return the name of the icon to use for the given url
+          see gui.load_icon() for detail on what you can pass as the name"""
+      DBG(('icon_get(%s)' % url))
+      return None
+
+   def icon_end_get(self, url, user_data):
+      DBG(('icon_end_get(%s)' % url))
+      return None
+
+   def info_get(self, url, user_data):
+      """ Called when a view need to show the info of your item.
+          Must return a string with the murkupped text that describe the item """
+      DBG(('info_get(%s)' % url))
+      return None
+
+   def poster_get(self, url, user_data):
+      """ Called when a view need to show the poster/cover/big_image of your
+          item, must return the full path of a valid image file.
+          You can also return a valid url (http://) to automatically
+          download the image to a random temp file. In addition you can also
+          set the destinatioon path for the given url, just use ';'.
+          ex: 'http://my.url/of/the/image;/my/local/dest/path' """
+      DBG(('poster_get(%s)' % url))
+      return None
+
+   def fanart_get(self, url, user_data):
+      """ Called when a view need to show the fanart of your item.
+          Must return the full path of a valid image file """
+      DBG(('fanart_get(%s)' % url))
+      return None
+
+
+class BackItemClass(EmcItemClass):
+   def item_selected(self, url, user_data):
+      user_data.back()
+
+   def label_get(self, url, user_data):
+      return 'Back'
+
+   def icon_get(self, url, user_data):
+      return 'icon/back'
+
+
+class EmcBrowser3(object):
+   """
+   This is the browser object, it is used to show various page each containing
+   a list. Usually you need a single instance of this class for all your needs.
+   In order you have to:
+    1. implement at least one class that inherit from EmcItemClass
+    2. create an instance of EmcBrowser
+    3. add a page to the browser using the page_add() method
+    4. add items to the current page using item_add(MyItemClass(), url, user_data)
+   Later you can create new pages or use back(), clear(), show(), hide()
+
+   TODO doc default_style and style in general
+   """
+
+   def __init__(self, name, default_style = 'List'):
+
+      DBG('EmcBrowser3 __init__')
+      _instances.append(self)
+      self.name = name
+      self.default_style = default_style
+
+      self.pages = []
+      self.current_view = None
+      self.is_back = False
+      self.is_refresh = False
+
+   def __str__(self):
+      text  = '=' * 70 + '\n'
+      text += '===  %s  %s\n' % (self.name, '=' * (63-len(self.name)))
+      text += '== name: %s  pages: %d curview: %s\n' % \
+              (self.name, len(self.pages), self.current_view)
+      for p in self.pages:
+         text += '== page: ' + str(p) + '\n'
+      text += '=' * 70 + '\n'
+      # for s in _style_memory:
+         # text += 'style mem: %s  style: %s\n' % (s, _style_memory[s])
+      # text += '*' * 70 + '\n'
+      return text
+
+   def delete(self):
+      _instances.remove(self)
+      del self
+
+   def _search_style_in_parent(self):
+      for p in reversed(self.pages):
+         if _memorydb.id_exists(p['url']):
+            return _memorydb.get_data(p['url'])
+      return None
+      
+   def page_add(self, url, title, style = None, *args, **kargs):
+      """
+      When you create a page you need to give at least the url and the title
+      """
+      # create a new page data (if not a refresh operation)
+      if self.is_refresh:
+         view = self.pages[-1]['view']
+      else:
+         # choose the style of the new page
+         if _memorydb.id_exists(url):
+            style = _memorydb.get_data(url)
+         else:
+            style = self._search_style_in_parent()
+         if not style:
+            style = self.default_style
+
+         # get the correct view instance
+         view = self._create_or_get_view(style)
+         
+         # append the new page info in the pages list
+         self.pages.append({'view': view, 'url': url, 'title': title,
+                            'args': args, 'kargs': kargs})
+
+      # first time, we don't have a current_view, set it
+      if not self.current_view:
+         self.current_view = view
+
+      # set topbar title
+      full = '> ' + ''.join([page['title'] + ' > ' for page in self.pages])
+      gui.text_set('topbar.title', full[0:-3])
+
+      # same style for the 2 pages, ask the view to perform the correct animation
+      if (view == self.current_view):
+         if self.is_refresh:
+            view.page_show(page['title'], ANIM_NONE)
+         elif self.is_back:
+            view.page_show(page['title'], ANIM_BACK)
+         elif len(self.pages) < 2:
+            view.page_show(page['title'], ANIM_NONE)
+         else:
+            view.page_show(page['title'], ANIM_FORWARD)
+      else:
+         # different style...hide one view and show the other
+         self.current_view.clear()
+         self.current_view.hide()
+         view.page_show(page['title'], 0)
+         view.show()
+
+      # update state
+      self.current_view = view
+      self.is_refresh = False
+      self.is_back = False
+
+      # back item (optional)
+      if ini.get_bool('general', 'back_in_lists') == True:
+         self.item_add(BackItemClass(), 'emc://back', self)
+         view.items_count -= 1
+
+      # use this for extra debug
+      # print self
+
+   def item_add(self, item_class, url, user_data=None):
+      """
+      Use this method to add an item in the current (last added) page
+      Url should be (but its not mandatory) a full correct url in the form:
+      file:///home/user/some/dir, it MUST be unique in all the browser
+      and MUST not contain any strange chars.
+      """
+      self.current_view.item_add(item_class, url, user_data)                    # ok #
+
+   def back(self):
+      """ TODO Function doc """
+      # discard current page
+      self.pages.pop()
+
+      # no more page to go back, hide view and return to main menu
+      if len(self.pages) == 0:
+         self.hide()
+         # self.current_view.clear() # this fix the double click-in-back segfault :)
+         mainmenu.show()
+         return
+
+      # discard previous also, will recreate...
+      page_data = self.pages.pop()
+
+      # recreate the page
+      self.is_back = True
+      parent_url = self.pages[-1]['url'] if len(self.pages) > 1 else None
+      args = page_data['args']
+      kargs = page_data['kargs']
+      if callable(page_data['item_selected_cb']):
+         func = page_data['item_selected_cb']
+      else:
+         func = self.item_selected_cb
+      if callable(func):
+         func(parent_url, page_data['url'], *args, **kargs)
+
+   def refresh(self, recreate=False):
+      if recreate:
+         # recreate the page calling the selected_cb on the parent-page
+         self.is_refresh = True
+         page_url = self.pages[-1]['url'] if len(self.pages) > 0 else None
+         parent_url = self.pages[-2]['url'] if len(self.pages) > 1 else None
+         func = self.item_selected_cb
+         if func: func(parent_url, page_url)
+      else:
+         self.current_view.refresh()
+
+   def change_style(self, style):
+
+      view = self._create_or_get_view(style)
+      
+      # change only if needed
+      if view == self.current_view:
+         return
+
+      # clear & hide the current view
+      self.current_view.clear()
+      self.current_view.hide()
+
+      # set the new view in the current (always the last) page
+      self.pages[-1]['view'] = view
+
+      # remember the user choice
+      global _memorydb
+      page_url = self.pages[-1]['url']
+      _memorydb.set_data(page_url, style)
+
+      # recreate the page
+      self.refresh(recreate=True)
+
+   def clear(self):
+      """ TODO Function doc """
+      pass #TODO implement
+
+   def show(self):
+      """ TODO Function doc """
+      gui.signal_emit('topbar,show')
+      self.current_view.show()
+      input_events.listener_add('browser-' + self.name, self._input_event_cb)
+
+   def hide(self):
+      """ TODO Function doc """
+      gui.signal_emit('topbar,hide')
+      input_events.listener_del('browser-' + self.name)
+      self.current_view.hide()
+
+   # private stuff
+   def _input_event_cb(self, event):
+
+      if event == 'BACK':
+         self.back()
+      elif event == 'VIEW_LIST':
+         self.change_style('List')
+      elif event == 'VIEW_GRID':
+         self.change_style('Grid')
+      else:
+         return self.current_view.input_event_cb(event)
+
+      return input_events.EVENT_BLOCK
+
+   def _create_or_get_view(self, view_name):
+      if _views.has_key(view_name):
+         DBG('View exists: ' + view_name)
+         return _views[view_name]
+      # call the constructor of the given class style ex: ViewList()
+      DBG('Create view: ' + view_name)
+      _views[view_name] = eval('View' + view_name + '()')
+      return _views[view_name]
+
+   # Stuff for Views
+   def _item_selected(self, url):
+      """ TODO Function doc """
+      if url.startswith('emc://'):
+         if url.endswith('//back'):
+            self.back()
+      else:
+         if callable(self.pages[-1]['item_selected_cb']):
+            func = self.pages[-1]['item_selected_cb']
+         else:
+            func = self.item_selected_cb
+         args = self.pages[-1]['args']
+         kargs = self.pages[-1]['kargs']
+         if callable(func): func(self.pages[-1]['url'], url, *args, **kargs)
+
+
+################################################################################
+#### List View      ############################################################
+################################################################################
+class ViewList(object):
+   """
+   This is the basic view, it use a genlist to show items and have a
+   poster and a short info on the right. 2 genlist are used to perform
+   animation between the page.
+   This view is the reference one with all the documentation, can be also
+   used as a starting base for new views.
+   """
+
+   ### Mandatory methods, all the views must implement those functions
+   def __init__(self):
+      """
+      This is the init founction for the view, it is called one time only
+      when the view is needed for the first time. Here you must do your
+      initialization stuff.
+      """
+      DBG('Init view: plain list')
+
+      self.timer = self.timer2 = None
+      self.items_count = 0;            # This is accessed from the browser
+
+      # EXTERNAL Genlist1
+      self.gl1 = gui.part_get('browser.list.genlist1')
+      self.gl1.style_set('browser')
+      self.gl1.homogeneous_set(True)
+      self.gl1.select_mode_set(elementary.ELM_OBJECT_SELECT_MODE_ALWAYS)
+      self.gl1.focus_allow_set(False)
+      self.gl1.callback_clicked_double_add(self._cb_item_selected)
+      self.gl1.callback_selected_add(self._cb_item_hilight)
+      self.current_list = self.gl1
+
+      # EXTERNAL Genlist2
+      self.gl2 = gui.part_get('browser.list.genlist2')
+      self.gl2.style_set('browser')
+      self.gl2.homogeneous_set(True)
+      self.gl1.select_mode_set(elementary.ELM_OBJECT_SELECT_MODE_ALWAYS)
+      self.gl2.focus_allow_set(False)
+      self.gl2.callback_clicked_double_add(self._cb_item_selected)
+      self.gl2.callback_selected_add(self._cb_item_hilight)
+
+      # genlist item class
+      self.itc = elementary.GenlistItemClass(item_style = 'default',
+                                 text_get_func = self.__genlist_label_get,
+                                 content_get_func = self.__genlist_icon_get,
+                                 state_get_func = self.__genlist_state_get)
+
+      # RemoteImage (poster)
+      self.__im = gui.EmcRemoteImage(gui.win)
+      gui.swallow_set('browser.list.poster', self.__im)
+
+   def page_show(self, title, anim):
+      """
+      This function is called everytime a new page need to be showed.
+      The 'dir' param tell you direction of the browse:
+         can be: ANIM_NONE, ANIM_BACK or ANIM_FORWARD
+        -1 means we are going back (
+         1 means forward
+         0 means no previous page
+      You can use the 'dir' param to perform the correct animation if needed
+      """
+      DBG('page show ' + str(anim))
+
+      if (anim != ANIM_NONE):
+         if self.current_list == self.gl1:
+            self.current_list = self.gl2
+         else:
+            self.current_list = self.gl1
+
+      if anim == ANIM_FORWARD:
+         gui.signal_emit('browser,list,flip_left')
+      elif anim == ANIM_BACK:
+         gui.signal_emit('browser,list,flip_right')
+
+      self.current_list.clear()
+      self.items_count = 0
+
+   def item_add(self, item_class, url, user_data):                               # ok #
+      """
+      Here you must add the item to the current visible page.
+      You can use the 'item_class' object to query more info about
+      the item using: item_class.icon_get() .poster_get() etc..
+
+      When an item will be selected you MUST call:
+         item_class.item_selected(url, user_data)
+      with the url and the data of the selected item.
+      """
+      DBG('item_add(%s)' % (url))
+      item_data = (item_class, url, user_data)                                  # Master3 #
+      it = self.current_list.item_append(self.itc, item_data)
+      if not self.current_list.selected_item_get():
+         it.selected_set(1)
+
+      self.items_count += 1
+      gui.text_set('browser.list.total', '%d items' % (self.items_count))
+
+   def show(self):
+      """ Show the view """
+      gui.signal_emit('browser,list,show')
+
+   def hide(self):
+      """ Hide the view """
+      if self.timer: self.timer.delete()
+      if self.timer2: self.timer2.delete()
+      gui.signal_emit('browser,list,hide')
+
+   def clear(self):
+      """ Clear the view """
+      if self.timer: self.timer.delete()
+      if self.timer2: self.timer2.delete()
+      self.gl1.clear()
+      self.gl2.clear()
+      self.items_count = 0
+
+   def refresh(self):
+      """ Refresh the view """
+      # update visible items
+      for item in self.current_list.realized_items_get():
+         item.update()
+      # also request new poster & new info
+      item =  self.current_list.selected_item
+      self._cb_timer(item.data_get())
+      self._cb_timer2(item.data_get())
+
+   def input_event_cb(self, event):
+      """ Here you can manage input events for the view """
+
+      item = self.current_list.selected_item_get()
+      (item_class, url, user_data) = item.data_get()                            # 3 #
+
+      if event == 'DOWN':
+         next = item.next_get()
+         if next:
+            next.selected_set(1)
+            next.show()
+            return input_events.EVENT_BLOCK
+
+      elif event == 'UP':
+         prev = item.prev_get()
+         if prev:
+            prev.selected_set(1)
+            prev.show()
+            return input_events.EVENT_BLOCK
+
+      elif event == 'OK':
+         item_class.item_selected(url, user_data)
+         return input_events.EVENT_BLOCK
+
+      return input_events.EVENT_CONTINUE
+
+   ### GenList Item Class
+   def __genlist_label_get(self, obj, part, item_data):
+      (item_class, url, user_data) = item_data                                  # 3 #
+      DBG(('_label get(%s)' % url))
+      return item_class.label_get(url, user_data)
+
+   def __genlist_icon_get(self, obj, part, item_data):
+      (item_class, url, user_data) = item_data                                  # 3 #
+      DBG(('_content get(%s)' % url))
+      icon = None
+      if part == 'elm.swallow.icon':
+         icon = item_class.icon_get(url, user_data)
+      elif part == 'elm.swallow.end':
+         icon = item_class.icon_end_get(url, user_data)
+      if icon:
+         return gui.load_icon(icon)
+
+   def __genlist_state_get(self, obj, part, item_data):
+      return False
+
+   ### GenList Callbacks
+   def _cb_item_selected(self, list, item):
+      (item_class, url, user_data) = item.data_get()                            # 3 #
+      item_class.item_selected(url, user_data)
+
+   def _cb_item_hilight(self, list, item):
+      if self.timer: self.timer.delete()
+      if self.timer2: self.timer2.delete()
+      self.timer = ecore.timer_add(0.5, self._cb_timer, item.data_get())
+      self.timer2 = ecore.timer_add(1.0, self._cb_timer2, item.data_get())
+
+   def _cb_timer(self, item_data):
+      (item_class, url, user_data) = item_data                                  # 3 #
+
+      # Fill the textblock with item info info
+      text = item_class.info_get(url, user_data)
+      if text:
+         gui.text_set('browser.list.info', text)
+         gui.signal_emit('browser,list,info,show')
+      else:
+         gui.signal_emit('browser,list,info,hide')
+
+      # Ask for the item poster and show (or auto-download) it
+      poster = item_class.poster_get(url, user_data)
+      if poster and poster.startswith('http://'):
+         if poster.find(';') != -1:
+            (url, dest) = poster.split(';')
+            self.__im.url_set(url, dest)
+         else:
+            self.__im.url_set(poster)
+      elif poster and poster.startswith('icon/'):
+         self.__im.file_set(gui.theme_file, poster)
+      else:
+         self.__im.file_set(poster if poster else '')
+
+      return False # don't repeat the timer
+
+   def _cb_timer2(self, item_data):
+      (item_class, url, user_data) = item_data                                  # 3 #
+
+      # Ask for the item fanart
+      fanart = item_class.fanart_get(url, user_data)
+      if fanart: gui.background_set(fanart)
+
+      return False # don't repeat the timer
+
+
+################################################################################
+#### Grid View  ################################################################
+################################################################################
+class ViewGrid(object):
+   def __init__(self):
+      """ TODO Function doc """
+      DBG('Init view: grid')
+
+      self.itc = elementary.GengridItemClass(item_style='default',
+                                       text_get_func=self.gg_label_get,
+                                       content_get_func=self.gg_icon_get,
+                                       state_get_func=self.gg_state_get,
+                                       del_func=self.gg_del)
+      gg = elementary.Gengrid(gui.win)
+      gg.style_set('browser')
+      gg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      gg.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+      gg.focus_allow_set(False)
+      gg.horizontal_set(False)
+      gg.bounce_set(False, True)
+      gg.item_size_set(150, 150)
+      gg.align_set(0.5, 0.0)
+      gg.callback_selected_add(self.gg_higlight)
+      gg.callback_clicked_double_add(self.gg_selected)
+      gui.swallow_set('browser.grid.gengrid', gg)
+      self.gg = gg
+
+   def page_show(self, title, dir):
+      self.gg.clear()
+      gui.text_set('browser.grid.title', title)
+
+   def item_add(self, url, label, parent_browser, dont_count = False):          # FIXME #
+      item_data = (url, label, parent_browser)                                  # FIXME #
+      it = self.gg.item_append(self.itc, item_data)
+      if not self.gg.selected_item_get():
+         it.selected_set(True)
+
+   def show(self):
+      gui.signal_emit('browser,grid,show')
+
+   def hide(self):
+      gui.signal_emit('browser,grid,hide')
+
+   def clear(self):
+      self.gg.clear()
+
+   def refresh(self):
+      item = self.gg.first_item_get()
+      while item:
+         item.update()
+         item = item.next_get()
+
+   def input_event_cb(self, event):
+      item = self.gg.selected_item_get()
+      (url, label, parent_browser) = item.data_get()                            # FIXME #
+
+      if event == 'RIGHT':
+         next = item.next_get()
+         if next:
+            next.selected_set(1)
+            next.bring_in()
+         return input_events.EVENT_BLOCK
+
+      elif event == 'LEFT':
+         prev = item.prev_get()
+         if prev:
+            prev.selected_set(1)
+            prev.bring_in()
+         return input_events.EVENT_BLOCK
+
+      elif event == 'UP':
+         try:
+            prev = item.prev_get()
+            (x1, y1) = item.pos_get()
+            (x2, y2) = prev.pos_get()
+            while x2 != x1:
+               prev = prev.prev_get()
+               (x2, y2) = prev.pos_get()
+            prev.selected_set(1)
+            prev.bring_in()
+         except:
+            pass
+         return input_events.EVENT_BLOCK
+
+      elif event == 'DOWN':
+         try:
+            next = item.next_get()
+            (x1, y1) = item.pos_get()
+            (x2, y2) = next.pos_get()
+            while x2 != x1:
+               next = next.next_get()
+               (x2, y2) = next.pos_get()
+            next.selected_set(1)
+            next.bring_in()
+         except:
+            pass
+         return input_events.EVENT_BLOCK
+
+      elif event == 'OK':
+         parent_browser._item_selected(url)
+         return input_events.EVENT_BLOCK
+
+      return input_events.EVENT_CONTINUE
+
+   # gengrid model
+   def gg_label_get(self, obj, part, item_data):
+      (url, label, parent_browser) = item_data                                  # FIXME #
+      return label
+
+   def gg_icon_get(self, obj, part, data):
+      (url, label, parent_browser) = data                                       # FIXME #
+      if part == 'elm.swallow.icon':
+         icon = parent_browser._icon_get(url)
+         if icon: return icon
+         poster = parent_browser._poster_get(url)
+         if poster: return gui.load_image(poster)
+      elif part == 'elm.swallow.end':
+         return parent_browser._icon_end_get(url)
+      return None
+
+   def gg_state_get(self, obj, part, item_data):
+      return False
+
+   def gg_del(self, obj, item_data):
+      pass
+
+   # gengrid callbacks
+   def gg_higlight(self, gg, item, *args, **kwargs):
+      pass
+
+   def gg_selected(self, gg, item, *args, **kwargs):
+      (url, label, parent_browser) = item.data_get()                            # FIXME #
+      parent_browser._item_selected(url)

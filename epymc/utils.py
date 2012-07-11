@@ -223,6 +223,15 @@ def download_abort(dwl_handler):
    ecore.file.download_abort(dwl_handler)
 
 
+class Singleton(object):
+   __single = None
+
+   def __new__(classtype, *args, **kwargs):
+      if classtype != type(classtype.__single):
+         classtype.__single = object.__new__(classtype, *args, **kwargs)
+      return classtype.__single
+
+
 class EmcExec(object):
    """
    Just a tiny wrapper around ecore.Exe to execute shell command async
@@ -255,3 +264,4 @@ class EmcExec(object):
    def del_cb(self, exe, event):
       if callable(self.done_cb):
          self.done_cb(self.outbuffer, *self.args, **self.kargs)
+

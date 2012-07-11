@@ -22,7 +22,7 @@ import os
 import ecore, elementary
 
 from epymc.modules import EmcModule
-from epymc.browser import EmcBrowser
+from epymc.browser3 import EmcBrowser3, EmcItemClass
 from epymc.gui import EmcDialog, EmcVKeyboard, EmcSourceSelector
 from epymc.gui import EmcButton, EmcFocusManager2, EmcNotify
 import epymc.mainmenu as mainmenu
@@ -31,7 +31,6 @@ import epymc.ini as ini
 import epymc.gui as gui
 import epymc.browser as browser
 import epymc.mediaplayer as mediaplayer
-
 from films import TMDB_WithGui
 
 
@@ -60,59 +59,13 @@ vulputate.
 """
 
 
-class UiTestsModule(EmcModule):
-   name = 'uitests'
-   label = 'UI tests'
-   icon = 'icon/module'
-   info = """This module serve as test for the various epymc components."""
-   path = os.path.dirname(__file__)
+class MyItemClass(EmcItemClass):
 
-   _browser = None
-   _fman = None
+   def label_get(self, url, user_data):
+      return user_data
 
-   def __init__(self):
-      img = os.path.join(self.path, 'menu_bg.png')
-      mainmenu.item_add('uitests', 5, 'UI tests', img, self.cb_mainmenu)
-      self._browser = EmcBrowser('UI tests', 'List',
-                           item_selected_cb = self.cb_item_selected,
-                           poster_get_cb = self.cb_poster_get,
-                           info_get_cb = self.cb_info_get)
-
-   def __shutdown__(self):
-      mainmenu.item_del('uitests')
-      self._browser.delete()
-
-   def cb_mainmenu(self):
-      self.make_root_page()
-      mainmenu.hide()
-      self._browser.show()
-
-   def make_root_page(self):
-      self._browser.page_add('uitests://root', 'UI tests')
-
-      self._browser.item_add('uitests://notify', 'Notify stack')
-      self._browser.item_add('uitests://buttons', 'Buttons + FocusManager')
-      self._browser.item_add('uitests://mpv', 'Mediaplayer - Local Video')
-      # self._browser.item_add('uitests://mpvo', 'Mediaplayer - Online Video (good)')
-      self._browser.item_add('uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
-      self._browser.item_add('uitests://tmdb', 'Themoviedb.org query with gui (need fix for non ascii)')
-      self._browser.item_add('uitests://vkbd', 'Virtual Keyboard')
-      self._browser.item_add('uitests://sselector', 'Source Selector')
-      self._browser.item_add('uitests://dlg-info', 'Dialog - Info')
-      self._browser.item_add('uitests://dlg-warning', 'Dialog - Warning')
-      self._browser.item_add('uitests://dlg-error', 'Dialog - Error')
-      self._browser.item_add('uitests://dlg-yesno', 'Dialog - YesNo')
-      self._browser.item_add('uitests://dlg-cancel', 'Dialog - Cancel')
-      self._browser.item_add('uitests://dlg-progress', 'Dialog - Progress')
-      self._browser.item_add('uitests://dlg-panel1', 'Dialog - Panel full')
-      self._browser.item_add('uitests://dlg-panel2', 'Dialog - Panel no buttons')
-      self._browser.item_add('uitests://dlg-panel3', 'Dialog - Panel no title')
-      self._browser.item_add('uitests://brdump', 'Dump Browser pages')
-
-   def cb_poster_get(self, page_url, item_url):
-      return None
-
-   def cb_info_get(self, page_url, item_url):
+   # def info_get(self, page_url, item_url, title):
+   def info_get(self, url, user_data):
       text  = '<title>System info:</><br>'
       text += '<b>Graphic engine</b> %s (%s)<br>' % (elementary.engine_get(), elementary.preferred_engine_get())
       text += '<b>base dir</b> %s<br>' % (utils.base_dir_get())
@@ -121,73 +74,74 @@ class UiTestsModule(EmcModule):
       text += '<b>theme</b> %s<br>' % (ini.get('general', 'theme'))
       text += '<b>theme file</b> %s<br>' % (gui.theme_file)
       return text
-      
-   def cb_item_selected(self, page_url, item_url):
 
-      if item_url == 'uitests://root':
+   def item_selected(self, url, user_data):
+   # def cb_item_selected(self, page_url, item_url, title):
+
+      if url == 'uitests://root':
          self.make_root_page()
 
       # Notify
-      elif item_url == 'uitests://notify':
+      elif url == 'uitests://notify':
          n = EmcNotify('<b>TITLE</b><br>maybe some other texts..')
          
       # TMDB
-      elif item_url == 'uitests://tmdb':
+      elif url == 'uitests://tmdb':
          s = TMDB_WithGui()
          s.movie_search('alien')
 
       # Mediaplayer Local Video
-      elif item_url == 'uitests://mpv':
+      elif url == 'uitests://mpv':
          f = os.path.expanduser('~/Video/testvideo.avi')
          mediaplayer.play_video(f)
          mediaplayer.title_set('Testing title')
          mediaplayer.poster_set('dvd_cover_blank.png', self.path)
 
       # Mediaplayer Online Video (good)
-      # elif item_url == 'uitests://mpvo':
+      # elif url == 'uitests://mpvo':
          # mediaplayer.play_video('http://trailers.apple.com/movies/independent/airracers/airracers-tlr1_h480p.mov')
 
       # Mediaplayer Online Video (bad)
-      elif item_url == 'uitests://mpvob':
+      elif url == 'uitests://mpvob':
          mediaplayer.play_video('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4')
 
       # VKeyboard
-      elif item_url == 'uitests://vkbd':
+      elif url == 'uitests://vkbd':
          EmcVKeyboard(title = 'Virtual Keyboard', text = 'This is the keyboard test!')
 
       # Source Selector
-      elif item_url == 'uitests://sselector':
+      elif url == 'uitests://sselector':
          EmcSourceSelector(title = 'Source Selector Test')
 
       # Dialog - Info
-      elif item_url == 'uitests://dlg-info':
+      elif url == 'uitests://dlg-info':
          text = 'This is an <br><br><b>Info</><br>dialog<br>'
          EmcDialog(title = 'Dialog - Info', text = text, style = 'info')
 
       # Dialog - Warning
-      elif item_url == 'uitests://dlg-warning':
+      elif url == 'uitests://dlg-warning':
          text = 'This is an <br><br><b>Warning</><br>dialog<br>'
          EmcDialog(title = 'Dialog - Warning', text = text, style = 'warning')
 
       # Dialog - Error
-      elif item_url == 'uitests://dlg-error':
+      elif url == 'uitests://dlg-error':
          text = 'This is an <br><br><b>Error</><br>dialog<br>'
          EmcDialog(title = 'Dialog - Error', text = text, style = 'error')
 
       # Dialog - YesNo
-      elif item_url == 'uitests://dlg-yesno':
+      elif url == 'uitests://dlg-yesno':
          text = 'This is an <br><br><b>Yes/No</><br>dialog<br>'
          EmcDialog(title = 'Dialog - YesNo', text = text, style = 'yesno',
                    done_cb =  (lambda btn: DBG('done')))
 
       # Dialog - Cancel
-      elif item_url == 'uitests://dlg-cancel':
+      elif url == 'uitests://dlg-cancel':
          text = 'This is an <br><br><b>Cancel operation</><br>dialog<br>'
          EmcDialog(title = 'Dialog - Cancel', text = text, style = 'cancel',
                    spinner = True)
 
       # Dialog - Progress
-      elif item_url == 'uitests://dlg-progress':
+      elif url == 'uitests://dlg-progress':
          def _canc_cb(dialog):
             t.delete()
             d.delete()
@@ -206,7 +160,7 @@ class UiTestsModule(EmcModule):
          t = ecore.Timer(0.2, _progress_timer)
 
       # Dialog - Panel full
-      elif item_url == 'uitests://dlg-panel1':
+      elif url == 'uitests://dlg-panel1':
          text = LOREM
          d = EmcDialog(title = 'Dialog - Panel full', text = text, style = 'panel',
                        spinner = True)
@@ -215,24 +169,24 @@ class UiTestsModule(EmcModule):
          d.button_add('Tree')
 
       # Dialog - Panel no buttons
-      elif item_url == 'uitests://dlg-panel2':
+      elif url == 'uitests://dlg-panel2':
          text = LOREM
          d = EmcDialog(title = 'Dialog - Panel full', text = text, style = 'panel',
                        spinner = True)
 
       # Dialog - Panel no title
-      elif item_url == 'uitests://dlg-panel3':
+      elif url == 'uitests://dlg-panel3':
          text = LOREM
          d = EmcDialog(text = text, style = 'panel',
                        spinner = True)
 
       # Browser Dump
-      elif item_url == 'uitests://brdump':
+      elif url == 'uitests://brdump':
          DBG('Dumping Browser')
          browser.dump_everythings()
 
       # Buttons Theme
-      elif item_url == 'uitests://buttons':
+      elif url == 'uitests://buttons':
          
          vbox0 = elementary.Box(gui.win)
          vbox0.show()
@@ -318,6 +272,49 @@ class UiTestsModule(EmcModule):
             fman.obj_add(b)
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
-         
-         
 
+
+class UiTestsModule(EmcModule):
+   name = 'uitests'
+   label = 'UI tests'
+   icon = 'icon/module'
+   info = """This module serve as test for the various epymc components."""
+   path = os.path.dirname(__file__)
+
+   _browser = None
+
+   def __init__(self):
+      img = os.path.join(self.path, 'menu_bg.png')
+      mainmenu.item_add('uitests', 5, 'UI tests', img, self.cb_mainmenu)
+      self._browser = EmcBrowser3('UI tests', 'List')
+
+   def __shutdown__(self):
+      mainmenu.item_del('uitests')
+      self._browser.delete()
+
+   def cb_mainmenu(self):
+      self.make_root_page()
+      mainmenu.hide()
+      self._browser.show()
+
+   def make_root_page(self):
+      self._browser.page_add('uitests://root', 'UI tests')
+
+      self._browser.item_add(MyItemClass(), 'uitests://notify', 'Notify Stack')
+      self._browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + FocusManager')
+      self._browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')
+      ## self._browser.item_add(MyItemClass(), 'uitests://mpvo', 'Mediaplayer - Online Video (good)')
+      self._browser.item_add(MyItemClass(), 'uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
+      self._browser.item_add(MyItemClass(), 'uitests://tmdb', 'Themoviedb.org query with gui (need fix for non ascii)')
+      self._browser.item_add(MyItemClass(), 'uitests://vkbd', 'Virtual Keyboard')
+      self._browser.item_add(MyItemClass(), 'uitests://sselector', 'Source Selector')
+      self._browser.item_add(MyItemClass(), 'uitests://dlg-info', 'Dialog - Info')
+      self._browser.item_add(MyItemClass(), 'uitests://dlg-warning', 'Dialog - Warning')
+      self._browser.item_add(MyItemClass(), 'uitests://dlg-error', 'Dialog - Error')
+      self._browser.item_add(MyItemClass(), 'uitests://dlg-yesno', 'Dialog - YesNo')
+      self._browser.item_add(MyItemClass(), 'uitests://dlg-cancel', 'Dialog - Cancel')
+      self._browser.item_add(MyItemClass(), 'uitests://dlg-progress', 'Dialog - Progress')
+      self._browser.item_add(MyItemClass(), 'uitests://dlg-panel1', 'Dialog - Panel full')
+      self._browser.item_add(MyItemClass(), 'uitests://dlg-panel2', 'Dialog - Panel no buttons')
+      self._browser.item_add(MyItemClass(), 'uitests://dlg-panel3', 'Dialog - Panel no title')
+      self._browser.item_add(MyItemClass(), 'uitests://brdump', 'Dump Browser pages')

@@ -56,16 +56,16 @@ class FilmsModule(EmcModule):
    info = """Long info for the film module, explain what it does and what it 
 need to work well, can also use markup like <title>this</> or <b>this</>"""
 
-   __browser = None
-   __exts = None        # list of allowed extensions
-   __film_db = None     # key: film_url  data: dictionary as of the tmdb api
-   __person_db = None   # key: ?????     data: dictionary as of the tmdb api
+   _browser = None
+   _exts = None        # list of allowed extensions
+   _film_db = None     # key: film_url  data: dictionary as of the tmdb api
+   _person_db = None   # key: ?????     data: dictionary as of the tmdb api
 
-   __generator = None
-   __idler = None      # EcoreIdler
-   __idler_url = None  # also used as a semaphore
-   __idler_db = None   # key: file_url  data: timestamp of the last unsuccessfull tmdb query
-   __idler_retry_after = 7 * 24 * 60 * 60
+   _generator = None
+   _idler = None      # EcoreIdler
+   _idler_url = None  # also used as a semaphore
+   _idler_db = None   # key: file_url  data: timestamp of the last unsuccessfull tmdb query
+   _idler_retry_after = 7 * 24 * 60 * 60
 
    def __init__(self):
       DBG('Init module')
@@ -80,21 +80,21 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          ini.set('film', 'tmdb_retry_days', '7')
 
       # get allowed exensions from config
-      self.__exts = ini.get_string_list('film', 'extensions')
-      self.__idler_retry_after = ini.get_int('film', 'tmdb_retry_days')
-      self.__idler_retry_after *= 24 * 60 * 60
+      self._exts = ini.get_string_list('film', 'extensions')
+      self._idler_retry_after = ini.get_int('film', 'tmdb_retry_days')
+      self._idler_retry_after *= 24 * 60 * 60
 
       # open film/person database (they are created if not exists)
-      self.__film_db = EmcDatabase('film')
-      self.__person_db = EmcDatabase('person')
-      self.__idler_db = EmcDatabase('filmidlercache')
+      self._film_db = EmcDatabase('film')
+      self._person_db = EmcDatabase('person')
+      self._idler_db = EmcDatabase('filmidlercache')
 
       # add an item in the mainmenu
       img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
       mainmenu.item_add('film', 10, 'Movies', img, self.cb_mainmenu)
 
       # create a browser instance
-      self.__browser = EmcBrowser('Films', 'List',
+      self._browser = EmcBrowser('Films', 'List',
                               item_selected_cb = self.cb_url_selected,
                               icon_get_cb = self.cb_icon_get,
                               poster_get_cb = self.cb_poster_get,
@@ -103,91 +103,91 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       # on idle scan all files (one shoot)
       if (ini.get_bool('film', 'enable_scanner')):
-         self.__idler = ecore.Idler(self.idle_cb)
+         self._idler = ecore.Idler(self.idle_cb)
 
    def __shutdown__(self):
       DBG('Shutdown module')
 
       # kill the idler
-      if self.__idler:
-         self.__idler.delete()
-         self.__idler = None
-         self.__idler_url = None
+      if self._idler:
+         self._idler.delete()
+         self._idler = None
+         self._idler_url = None
       # TODO clean better the idler? abort if a download in process?
 
       # delete mainmenu item
       mainmenu.item_del('film')
 
       # delete browser
-      self.__browser.delete()
+      self._browser.delete()
 
       ## close databases
-      del self.__film_db
-      del self.__person_db
-      del self.__idler_db
+      del self._film_db
+      del self._person_db
+      del self._idler_db
 
    def idle_cb(self):
       # DBG('Mainloop idle')
       
-      if self.__idler_url is not None:
+      if self._idler_url is not None:
          # DBG('im busy')
          return ecore.ECORE_CALLBACK_RENEW
          
       # the first time build the generator object 
-      if self.__generator is None:
+      if self._generator is None:
          folders = ini.get_string_list('film', 'folders', ';')
-         self.__generator = utils.grab_files(folders)
+         self._generator = utils.grab_files(folders)
          EmcNotify("Film scanner started")
 
       # get the next file from the generator
       try:
-         filename = self.__generator.next()
+         filename = self._generator.next()
       except StopIteration:
          EmcNotify("Film scanner done")
          DBG("Film scanner done")
-         self.__generator = None
+         self._generator = None
          return ecore.ECORE_CALLBACK_CANCEL
 
       url = 'file://' + filename
 
-      if self.__film_db.id_exists(url):
+      if self._film_db.id_exists(url):
          DBG('I know this film (skipping):' + url)
          return ecore.ECORE_CALLBACK_RENEW
 
-      if self.__idler_db.id_exists(url):
-         elapsed = time.time() - self.__idler_db.get_data(url)
-         if elapsed < self.__idler_retry_after:
+      if self._idler_db.id_exists(url):
+         elapsed = time.time() - self._idler_db.get_data(url)
+         if elapsed < self._idler_retry_after:
             DBG('I scanned this %d seconds ago (skipping): %s' % (elapsed, url))
             return ecore.ECORE_CALLBACK_RENEW
-         self.__idler_db.del_data(url)
+         self._idler_db.del_data(url)
 
       ext = os.path.splitext(filename)[1]
-      if ext[1:] in self.__exts:
+      if ext[1:] in self._exts:
          tmdb = TMDB()
          tmdb.movie_search(get_film_name_from_url(url), self.idle_tmdb_complete)
-         self.__idler_url = url
+         self._idler_url = url
       
       return ecore.ECORE_CALLBACK_RENEW
 
    def idle_tmdb_complete(self, tmdb, movie_info):
       if movie_info is None:
          # store the current time in the cache db
-         self.__idler_db.set_data(self.__idler_url, time.time())
+         self._idler_db.set_data(self._idler_url, time.time())
       else:
          # store the result in film db
          try:
-            url = self.__idler_url
-            self.__film_db.set_data(url, movie_info)
+            url = self._idler_url
+            self._film_db.set_data(url, movie_info)
             text = 'Found film:<br>%s (%s)' % (movie_info['name'], movie_info['released'][:4])
             EmcNotify(text)
          except:
             pass
 
       # clear the 'semaphore', now another file can be processed
-      self.__idler_url = None
+      self._idler_url = None
 
       # update browser
-      # self.__browser.refresh()   # TODO check if visible and update if necessary  :/
+      # self._browser.refresh()   # TODO check if visible and update if necessary  :/
 
       # delete TMDB2 object
       del tmdb
@@ -195,7 +195,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def play_film(self, url):
       mediaplayer.play_video(url)
       try:
-         e = self.__film_db.get_data(url)
+         e = self._film_db.get_data(url)
          mediaplayer.title_set(e['name'])
          mediaplayer.poster_set(get_poster_filename(e['id']))
       except:
@@ -204,28 +204,28 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 ###### BROWSER STUFF
    def cb_mainmenu(self):
       # get film folders from config
-      self.__folders = ini.get_string_list('film', 'folders', ';')
+      self._folders = ini.get_string_list('film', 'folders', ';')
 
-      # if not self.__folders:
+      # if not self._folders:
          #TODO alert the user. and instruct how to add folders
 
       self.create_root_page()
       mainmenu.hide()
-      self.__browser.show()
+      self._browser.show()
 
    def create_root_page(self):
-      self.__browser.page_add('film://root', 'Films')
+      self._browser.page_add('film://root', 'Films')
 
-      for f in self.__folders:
-         self.__browser.item_add(f, os.path.basename(f))
+      for f in self._folders:
+         self._browser.item_add(f, os.path.basename(f))
       
-      self.__browser.item_add('film://add_source', 'Add source');
+      self._browser.item_add('film://add_source', 'Add source');
 
    def cb_url_selected(self, page_url, item_url):
       if item_url.startswith('file://'):
          path = item_url[7:]
          if os.path.isdir(path):
-            self.__browser.page_add(item_url, os.path.basename(path))
+            self._browser.page_add(item_url, os.path.basename(path))
             dirs, files = [], []
             for fname in sorted(os.listdir(path), key=str.lower):
                if fname[0] != '.':
@@ -235,7 +235,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                      files.append(fname)
                
             for fname in dirs + files:
-               self.__browser.item_add('file://' + path + '/' + fname, fname)
+               self._browser.item_add('file://' + path + '/' + fname, fname)
          else:
             self.show_film_info(item_url)
 
@@ -245,23 +245,23 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          EmcSourceSelector(done_cb = self.cb_source_selected)
 
    def cb_source_selected(self, fullpath):
-      self.__folders.append(fullpath)
-      ini.set_string_list('film', 'folders', self.__folders, ';')
-      self.__browser.refresh(recreate=True)
+      self._folders.append(fullpath)
+      ini.set_string_list('film', 'folders', self._folders, ';')
+      self._browser.refresh(recreate=True)
 
    def cb_icon_get(self, page_url, item_url):
       if item_url.startswith('file://'):
          if os.path.isdir(item_url[7:]):
             return 'icon/folder'
-         if self.__film_db.id_exists(item_url):
+         if self._film_db.id_exists(item_url):
             return None
       elif (item_url == 'film://add_source'):
          return 'icon/plus'
       return None
 
    def cb_poster_get(self, page_url, item_url):
-      if self.__film_db.id_exists(item_url):
-         e = self.__film_db.get_data(item_url)
+      if self._film_db.id_exists(item_url):
+         e = self._film_db.get_data(item_url)
          poster = get_poster_filename(e['id'])
          if os.path.exists(poster):
             return poster
@@ -269,8 +269,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          return None
 
    def cb_fanart_get(self, page_url, item_url):
-      if self.__film_db.id_exists(item_url):
-         e = self.__film_db.get_data(item_url)
+      if self._film_db.id_exists(item_url):
+         e = self._film_db.get_data(item_url)
          fanart = get_backdrop_filename(e['id'])
          if os.path.exists(fanart):
             return fanart
@@ -278,8 +278,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          return None
 
    def cb_info_get(self, page_url, item_url):
-      if self.__film_db.id_exists(item_url):
-         e = self.__film_db.get_data(item_url)
+      if self._film_db.id_exists(item_url):
+         e = self._film_db.get_data(item_url)
          country = ''
          if len(e['countries']) > 0:
             country = e['countries'][0]['code']
@@ -312,7 +312,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
 ###### INFO PANEL STUFF
    def show_film_info(self, url):
-      self.__current_url = url
+      self._current_url = url
 
       box = elementary.Box(gui.win)
       box.horizontal_set(1)
@@ -352,15 +352,15 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       self._dialog.buttons_clear()
       self._dialog.button_add('Play', self._cb_panel_1)
-      if self.__film_db.id_exists(url):
+      if self._film_db.id_exists(url):
          self._dialog.button_add('Cast', self._cb_panel_2)
          self._dialog.button_add('Poster', self._cb_panel_3)
          self._dialog.button_add('Fanart', self._cb_panel_4)
       self._dialog.button_add('Search Info', self._cb_panel_5)
       
-      if self.__film_db.id_exists(url):
+      if self._film_db.id_exists(url):
          print 'Found: ' + url
-         e = self.__film_db.get_data(url)
+         e = self._film_db.get_data(url)
 
          # update text info
          self._dialog.title_set(e['name'])
@@ -396,12 +396,12 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
 
    def _cb_panel_1(self, button):
-      self.play_film(self.__current_url)
+      self.play_film(self._current_url)
       self.hide_film_info()
 
    def _cb_panel_2(self, button):
-      if self.__film_db.id_exists(self.__current_url):
-         film_info = self.__film_db.get_data(self.__current_url)
+      if self._film_db.id_exists(self._current_url):
+         film_info = self._film_db.get_data(self._current_url)
 
          # create the cast list
          li = elementary.List(gui.win)
@@ -422,8 +422,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
 ######## Choose poster
    def _cb_panel_3(self, button):
-      if self.__film_db.id_exists(self.__current_url):
-         film_info = self.__film_db.get_data(self.__current_url)
+      if self._film_db.id_exists(self._current_url):
+         film_info = self._film_db.get_data(self._current_url)
 
          # create a list of posters
          images_thumb = []
@@ -462,35 +462,35 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       item = li.selected_item_get()
       if not item: return
 
-      self.__poster_dialog = dialog
+      self._poster_dialog = dialog
       (url, id) = item.data_get()[0][0]
       dest = get_poster_filename(id)
       utils.download_url_async(url, dest, complete_cb = self._cb_poster_done,
                                           progress_cb = self._cb_poster_progress)
 
       # kill the dialog
-      self.__poster_dialog.delete()
-      del self.__poster_dialog
+      self._poster_dialog.delete()
+      del self._poster_dialog
 
       # make a progress dialog
-      self.__poster_dialog = EmcDialog(title = 'Downloading Poster',
+      self._poster_dialog = EmcDialog(title = 'Downloading Poster',
                                        style = 'progress')
 
    def _cb_poster_progress(self, dest, tot, done):
-      if tot > 0: self.__poster_dialog.progress_set(float(done) / float(tot))
+      if tot > 0: self._poster_dialog.progress_set(float(done) / float(tot))
 
    def _cb_poster_done(self, dest, status):
       # kill the dialog
-      self.__poster_dialog.delete()
-      del self.__poster_dialog
+      self._poster_dialog.delete()
+      del self._poster_dialog
 
-      self.update_film_info(self.__current_url)
-      self.__browser.refresh()
+      self.update_film_info(self._current_url)
+      self._browser.refresh()
 
 ######## Choose fanart
    def _cb_panel_4(self, button):
-      if self.__film_db.id_exists(self.__current_url):
-         film_info = self.__film_db.get_data(self.__current_url)
+      if self._film_db.id_exists(self._current_url):
+         film_info = self._film_db.get_data(self._current_url)
 
          # create a list of backdrops
          images_thumb = []
@@ -527,46 +527,46 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       item = li.selected_item_get()
       if not item: return
 
-      self.__backdrop_dialog = dialog
+      self._backdrop_dialog = dialog
       (url, id) = item.data_get()[0][0]
       dest = get_backdrop_filename(id)
       utils.download_url_async(url, dest, complete_cb = self._cb_backdrop_done,
                                           progress_cb = self._cb_backdrop_progress)
 
       # kill the dialog
-      self.__backdrop_dialog.delete()
-      del self.__backdrop_dialog
+      self._backdrop_dialog.delete()
+      del self._backdrop_dialog
 
       # make a spinner dialog
-      self.__backdrop_dialog = EmcDialog(title = 'Downloading Fanart',
+      self._backdrop_dialog = EmcDialog(title = 'Downloading Fanart',
                                          style = 'progress')
 
    def _cb_backdrop_progress(self, dest, tot, done):
-      if tot > 0: self.__backdrop_dialog.progress_set(float(done) / float(tot))
+      if tot > 0: self._backdrop_dialog.progress_set(float(done) / float(tot))
 
    def _cb_backdrop_done(self, dest, status):
       # kill the dialog
-      self.__backdrop_dialog.delete()
-      del self.__backdrop_dialog
+      self._backdrop_dialog.delete()
+      del self._backdrop_dialog
       print status
       if status == 200:
-          self.__browser.refresh()
+          self._browser.refresh()
       else:
          EmcDialog(title = 'Download error !!', style = 'error')
 
 ######## Get film info from themoviedb.org
    def _cb_panel_5(self, button):
       tmdb = TMDB_WithGui()
-      film = get_film_name_from_url(self.__current_url)
+      film = get_film_name_from_url(self._current_url)
       tmdb.movie_search(film, self._cb_search_complete)
 
    def _cb_search_complete(self, tmdb, movie_info):
       # store the result in db
-      self.__film_db.set_data(self.__current_url, movie_info)
+      self._film_db.set_data(self._current_url, movie_info)
       # update browser
-      self.__browser.refresh()
+      self._browser.refresh()
       # update info panel
-      self.update_film_info(self.__current_url)
+      self.update_film_info(self._current_url)
       # delete TMDB object
       del tmdb
 

@@ -25,7 +25,7 @@ import threading, Queue
 import ecore, evas, elementary
 
 from epymc.modules import EmcModule
-from epymc.browser import EmcBrowser
+from epymc.browser3 import EmcBrowser3, EmcItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourceSelector
 from epymc.gui import EmcVKeyboard, EmcNotify
@@ -47,6 +47,73 @@ def DBG(msg):
 
 TMDB_API_KEY = '19eef197b81231dff0fd1a14a8d5f863' # Key of the user DaveMDS
 DEFAULT_EXTENSIONS = 'avi mpg mpeg ogv mkv' #TODO fill better (uppercase ??)
+
+
+class AddSourceItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      EmcSourceSelector(done_cb=self.selector_cb, cb_data=mod)
+
+   def selector_cb(self, fullpath, mod):
+      mod._folders.append(fullpath)
+      ini.set_string_list('film', 'folders', mod._folders, ';')
+      mod._browser.refresh(recreate=True)
+
+   def label_get(self, url, mod):
+      return 'Add source'
+
+   def icon_get(self, url, mod):
+      return 'icon/plus'
+
+
+class FilmItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      mod.show_film_info(url)
+
+   def label_get(self, url, mod):
+      return os.path.basename(url)
+
+   def poster_get(self, url, mod):
+      if mod._film_db.id_exists(url):
+         e = mod._film_db.get_data(url)
+         poster = get_poster_filename(e['id'])
+         if os.path.exists(poster):
+            return poster
+
+   def fanart_get(self, url, mod):
+      if mod._film_db.id_exists(url):
+         e = mod._film_db.get_data(url)
+         fanart = get_backdrop_filename(e['id'])
+         if os.path.exists(fanart):
+            return fanart
+
+   def info_get(self, url, mod):
+      if mod._film_db.id_exists(url):
+         e = mod._film_db.get_data(url)
+         country = ''
+         if len(e['countries']) > 0:
+            country = e['countries'][0]['code']
+         text = '<title>%s (%s %s)</><br>' \
+                '<hilight>Rating:</> %.0f/10<br>' \
+                '<hilight>Director:</> %s<br>' \
+                '<hilight>Cast:</> %s<br>%s' % \
+                (e['name'], country, e['released'][:4],
+                e['rating'], mod._get_director(e),
+                mod._get_cast(e, 3), e['overview'])
+                # TODO genres
+         # ARGHHHHH the encode doesn't work :(
+         # text = 'àèé'
+         return text.encode('utf-8','replace')
+
+
+class FolderItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      mod._browser.page_add(url, os.path.basename(url), None, mod.populate_url)
+
+   def label_get(self, url, mod):
+      return os.path.basename(url)
+
+   def icon_get(self, url, mod):
+      return 'icon/folder'
 
 
 class FilmsModule(EmcModule):
@@ -94,12 +161,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       mainmenu.item_add('film', 10, 'Movies', img, self.cb_mainmenu)
 
       # create a browser instance
-      self._browser = EmcBrowser('Films', 'List',
-                              item_selected_cb = self.cb_url_selected,
-                              icon_get_cb = self.cb_icon_get,
-                              poster_get_cb = self.cb_poster_get,
-                              fanart_get_cb = self.cb_fanart_get,
-                              info_get_cb = self.cb_info_get)
+      self._browser = EmcBrowser3('Films', 'List')
 
       # on idle scan all files (one shoot)
       if (ini.get_bool('film', 'enable_scanner')):
@@ -209,92 +271,29 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # if not self._folders:
          #TODO alert the user. and instruct how to add folders
 
-      self.create_root_page()
-      mainmenu.hide()
+      self._browser.page_add('film://root', 'Films', None, self.populate_root_page)
       self._browser.show()
+      mainmenu.hide()
 
-   def create_root_page(self):
-      self._browser.page_add('film://root', 'Films')
-
+   def populate_root_page(self, browser, page_url):
       for f in self._folders:
-         self._browser.item_add(f, os.path.basename(f))
-      
-      self._browser.item_add('film://add_source', 'Add source');
+         self._browser.item_add(FolderItemClass(), f, self)
 
-   def cb_url_selected(self, page_url, item_url):
-      if item_url.startswith('file://'):
-         path = item_url[7:]
-         if os.path.isdir(path):
-            self._browser.page_add(item_url, os.path.basename(path))
-            dirs, files = [], []
-            for fname in sorted(os.listdir(path), key=str.lower):
-               if fname[0] != '.':
-                  if os.path.isdir(os.path.join(path, fname)):
-                     dirs.append(fname)
-                  else:
-                     files.append(fname)
-               
-            for fname in dirs + files:
-               self._browser.item_add('file://' + path + '/' + fname, fname)
-         else:
-            self.show_film_info(item_url)
+      self._browser.item_add(AddSourceItemClass(), 'film://add_source', self);
 
-      elif item_url == 'film://root':
-         self.create_root_page()
-      elif item_url == 'film://add_source':
-         EmcSourceSelector(done_cb = self.cb_source_selected)
+   def populate_url(self, browser, url):
+      dirs, files = [], []
+      for fname in sorted(os.listdir(url[7:]), key=str.lower):
+         if fname[0] != '.':
+            if os.path.isdir(os.path.join(url[7:], fname)):
+               dirs.append(fname)
+            else:
+               files.append(fname)
 
-   def cb_source_selected(self, fullpath):
-      self._folders.append(fullpath)
-      ini.set_string_list('film', 'folders', self._folders, ';')
-      self._browser.refresh(recreate=True)
-
-   def cb_icon_get(self, page_url, item_url):
-      if item_url.startswith('file://'):
-         if os.path.isdir(item_url[7:]):
-            return 'icon/folder'
-         if self._film_db.id_exists(item_url):
-            return None
-      elif (item_url == 'film://add_source'):
-         return 'icon/plus'
-      return None
-
-   def cb_poster_get(self, page_url, item_url):
-      if self._film_db.id_exists(item_url):
-         e = self._film_db.get_data(item_url)
-         poster = get_poster_filename(e['id'])
-         if os.path.exists(poster):
-            return poster
-      else:
-         return None
-
-   def cb_fanart_get(self, page_url, item_url):
-      if self._film_db.id_exists(item_url):
-         e = self._film_db.get_data(item_url)
-         fanart = get_backdrop_filename(e['id'])
-         if os.path.exists(fanart):
-            return fanart
-      else:
-         return None
-
-   def cb_info_get(self, page_url, item_url):
-      if self._film_db.id_exists(item_url):
-         e = self._film_db.get_data(item_url)
-         country = ''
-         if len(e['countries']) > 0:
-            country = e['countries'][0]['code']
-         text = '<title>%s (%s %s)</><br>' \
-                '<hilight>Rating:</> %.0f/10<br>' \
-                '<hilight>Director:</> %s<br>' \
-                '<hilight>Cast:</> %s<br>%s' % \
-                (e['name'], country, e['released'][:4],
-                e['rating'], self._get_director(e),
-                self._get_cast(e, 3), e['overview'])
-                # TODO genres
-         # ARGHHHHH the encode doesn't work :(
-         # text = 'àèé'
-         return text.encode('utf-8','replace')
-         # return text
+      for fname in dirs:
+         self._browser.item_add(FolderItemClass(), url + '/' + fname, self)
+      for fname in files:
+         self._browser.item_add(FilmItemClass(), url + '/' + fname, self)
 
    def _get_director(self,e):
       for person in e['cast']:
@@ -363,7 +362,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          e = self._film_db.get_data(url)
 
          # update text info
-         self._dialog.title_set(e['name'])
+         self._dialog.title_set(e['name'].encode('utf-8'))
          info = '<hilight>Director: </hilight> %s <br>' \
                 '<hilight>Cast: </hilight> %s <br>' \
                 '<hilight>Released: </hilight> %s <br>' \

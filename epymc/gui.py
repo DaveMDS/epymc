@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# This Python file uses the following encoding: utf-8
 #
 # Copyright (C) 2010-2012 Davide Andreoli <dave@gurumeditation.it>
 #
@@ -675,8 +676,9 @@ class EmcSourceSelector(EmcDialog):
    """ TODO doc this
    """
 
-   def __init__(self, title = 'Source Selector', done_cb = None):
+   def __init__(self, title = 'Source Selector', done_cb=None, cb_data=None):
       self._selected_cb = done_cb
+      self._selected_cb_data = cb_data
       self._glist = elementary.Genlist(gui.win)
       self._glist.style_set('dialog')
       self._glist.homogeneous_set(True)
@@ -718,7 +720,10 @@ class EmcSourceSelector(EmcDialog):
    def _cb_done_selected(self, button):
       item = self._glist.selected_item_get()
       if item and callable(self._selected_cb):
-         self._selected_cb('file://' + item.data_get())
+         if self._selected_cb_data:
+            self._selected_cb('file://' + item.data_get(), self._selected_cb_data)
+         else:
+            self._selected_cb('file://' + item.data_get())
       self.delete()
 
    def _cb_browse_selected(self, button):

@@ -20,13 +20,12 @@
 from operator import itemgetter, attrgetter
 
 import evas
-import elementary #REMOVEME
 
 import gui
 import mainmenu
 import input_events
 
-from browser import EmcBrowser
+from browser3 import EmcBrowser3, EmcItemClass
 
 def DBG(msg):
    print('CONFIG_GUI: ' + msg)
@@ -38,6 +37,21 @@ _root_items = [] # ordered list of root items.  tuple:(name, label, weight, icon
 _root_items_dict = {} # also keep a dict of items, key = name, val = tuple (name,...,cb)
 
 
+class RootItemClass(EmcItemClass):
+   def item_selected(self, url, user_data):
+      (name, label, weight, icon, callback) = user_data
+      if callable(callback):
+         callback()
+
+   def label_get(self, url, user_data):
+      (name, label, weight, icon, callback) = user_data
+      return label
+
+   def icon_get(self, url, user_data):
+      (name, label, weight, icon, callback) = user_data
+      return icon
+
+
 ### public functions
 def init():
    global _browser
@@ -45,11 +59,7 @@ def init():
    mainmenu.item_add('config', 100, 'Config', None, _mainmenu_cb)
 
    # create a browser instance
-   _browser = EmcBrowser('Configuration', 'List', # TODO use a custom style for config ?
-                               item_selected_cb = _item_selected_cb,
-                               icon_get_cb = _item_icon_get_cb)
-                               #~ poster_get_cb = self.cb_poster_get,
-                               #~ info_get_cb = self.cb_info_get)
+   _browser = EmcBrowser3('Configuration', 'List') # TODO use a custom style for config ?
 
    root_item_add('config://modules/', 1, 'Modules', 'icon/module', _modules_list)
    root_item_add('config://scale/', 20, 'Scale', 'icon/scale', _change_scale)
@@ -58,14 +68,6 @@ def init():
 
 def shutdown():
    _browser.delete()
-
-def show():
-   _browser.show()
-   mainmenu.hide()
-
-#~ def hide():
-   #~ _browser.hide()
-   #~ mainmenu.show()
 
 def root_item_add(name, weight, label, icon = None, callback = None):
    # search an item with an higer weight
@@ -79,44 +81,25 @@ def root_item_add(name, weight, label, icon = None, callback = None):
    _root_items_dict[name] = (name, label, weight, icon, callback)
 
 def root_item_del(name):
+   # TODO TEST THIS
    for (_name, _label, _weight, _ic, _cb) in _root_items:
       if _name == name:
          _root_items.remove((_name, _label, _weight, _ic, _cb))
       if _root_items_dict.has_key(_name):
          del _root_items_dict[_name]
-   
-   # TODO TEST THIS
-
-def make_root():
-   _browser.page_add('config://root', 'Configuration')
-   for (name, label, weight, icon, cb) in _root_items:
-      _browser.item_add(name, label)
 
 def browser_get():
    return _browser
 
 ### private stuff
 def _mainmenu_cb():
-   make_root()
-   show()
+   _browser.page_add('config://root', 'Configuration', None, _populate_root)
+   _browser.show()
+   mainmenu.hide()
 
-def _item_icon_get_cb(page, item):
-   if _root_items_dict.has_key(item):
-      return _root_items_dict[item][3]
-
-def _item_selected_cb(page, item):
-   if item == 'config://root':
-      make_root()
-
-   elif page == 'config://root':
-      cb = _root_items_dict[item][4]
-      if callable(cb):
-         cb()
-         # for (name, label, weight, icon, cb) in _root_items:
-            # if item == name:
-               # if callable(cb):
-               # 
-            # break
+def _populate_root(browser, url):
+   for item in _root_items:
+      browser.item_add(RootItemClass(), item[0], item)
 
 ##############  GUI  #########################################################
 import ini
@@ -143,34 +126,35 @@ def _change_scale():
 ##############  MODULES  ######################################################
 import modules
 
+class ModulesItemClass(EmcItemClass):
+   def item_selected(self, url, module):
+      if modules.is_enabled(url):
+         modules.shutdown_by_name(url)
+      else:
+         modules.init_by_name(url)
+      _browser.refresh()
+
+
+   def label_get(self, url, module):
+      return module.label
+
+   def icon_get(self, url, module):
+      return module.icon
+
+   def icon_end_get(self, url, module):
+      if modules.is_enabled(url):
+         return 'icon/check_on'
+      else:
+         return 'icon/check_off'
+
+   def info_get(self, url, module):
+      return module.info
+
 def _modules_list():
-   _browser.page_add('config://modules/', 'Modules',
-                     item_selected_cb = _module_selected_cb,
-                     icon_get_cb = _module_icon_get,
-                     icon_end_get_cb = _module_icon_end_get,
-                     info_get_cb = _module_info_get,
-                     poster_get_cb = _module_icon_get)
+   _browser.page_add('config://modules/', 'Modules', None, _modules_populate)
 
+def _modules_populate(browser, url):
    for mod in sorted(modules.list_get(), key=attrgetter('name')):
-      _browser.item_add(mod.name, mod.label)
+      browser.item_add(ModulesItemClass(), mod.name, mod)
 
-def _module_icon_get(page, item):
-   mod = modules.get_module_by_name(item)
-   return mod.icon if mod else None
 
-def _module_icon_end_get(page, item):
-   if modules.is_enabled(item):
-      return 'icon/check_on'
-   else:
-      return 'icon/check_off'
-
-def _module_info_get(page, item):
-   mod = modules.get_module_by_name(item)
-   return mod.info if mod else None
-
-def _module_selected_cb(page, item):
-   if modules.is_enabled(item):
-      modules.shutdown_by_name(item)
-   else:
-      modules.init_by_name(item)
-   _browser.refresh()

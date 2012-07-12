@@ -141,8 +141,6 @@ class EmcBrowser3(object):
 
       self.pages = []
       self.current_view = None
-      self.is_back = False
-      self.is_refresh = False
 
    def __str__(self):
       text  = '=' * 70 + '\n'
@@ -166,67 +164,37 @@ class EmcBrowser3(object):
          if _memorydb.id_exists(p['url']):
             return _memorydb.get_data(p['url'])
       return None
-      
-   def page_add(self, url, title, style = None, *args, **kargs):
-      """
-      When you create a page you need to give at least the url and the title
-      """
-      # create a new page data (if not a refresh operation)
-      if self.is_refresh:
-         view = self.pages[-1]['view']
-      else:
-         # choose the style of the new page
-         if _memorydb.id_exists(url):
-            style = _memorydb.get_data(url)
-         else:
-            style = self._search_style_in_parent()
-         if not style:
-            style = self.default_style
 
-         # get the correct view instance
-         view = self._create_or_get_view(style)
-         
-         # append the new page info in the pages list
-         self.pages.append({'view': view, 'url': url, 'title': title,
-                            'args': args, 'kargs': kargs})
+   def page_add(self, url, title, style, populate_cb, *args, **kwargs):
+      """
+      When you create a page you need to give at least the url, the title
+      and the populate callback. Every other arguments will be passed back
+      to the callback. style can be None to use the default page style,
+      usually the plain list.
+      """
+      # choose the style of the new page
+      if _memorydb.id_exists(url):
+         style = _memorydb.get_data(url)
+      else:
+         style = self._search_style_in_parent()
+      if not style:
+         style = self.default_style
+
+      # get the correct view instance
+      view = self._create_or_get_view(style)
+
+      # append the new page in the pages list
+      page = {'view': view, 'url': url, 'title': title,
+              'cb': populate_cb, 'args': args, 'kwargs': kwargs}
+      self.pages.append(page)
 
       # first time, we don't have a current_view, set it
       if not self.current_view:
          self.current_view = view
 
-      # set topbar title
-      full = '> ' + ''.join([page['title'] + ' > ' for page in self.pages])
-      gui.text_set('topbar.title', full[0:-3])
+      # switch to the new page
+      self._populate_page(page)
 
-      # same style for the 2 pages, ask the view to perform the correct animation
-      if (view == self.current_view):
-         if self.is_refresh:
-            view.page_show(page['title'], ANIM_NONE)
-         elif self.is_back:
-            view.page_show(page['title'], ANIM_BACK)
-         elif len(self.pages) < 2:
-            view.page_show(page['title'], ANIM_NONE)
-         else:
-            view.page_show(page['title'], ANIM_FORWARD)
-      else:
-         # different style...hide one view and show the other
-         self.current_view.clear()
-         self.current_view.hide()
-         view.page_show(page['title'], 0)
-         view.show()
-
-      # update state
-      self.current_view = view
-      self.is_refresh = False
-      self.is_back = False
-
-      # back item (optional)
-      if ini.get_bool('general', 'back_in_lists') == True:
-         self.item_add(BackItemClass(), 'emc://back', self)
-         view.items_count -= 1
-
-      # use this for extra debug
-      # print self
 
    def item_add(self, item_class, url, user_data=None):
       """
@@ -235,51 +203,36 @@ class EmcBrowser3(object):
       file:///home/user/some/dir, it MUST be unique in all the browser
       and MUST not contain any strange chars.
       """
-      self.current_view.item_add(item_class, url, user_data)                    # ok #
+      self.current_view.item_add(item_class, url, user_data)
 
    def back(self):
       """ TODO Function doc """
       # discard current page
       self.pages.pop()
 
-      # no more page to go back, hide view and return to main menu
+      # no more page to go back, hide the view and return to main menu
       if len(self.pages) == 0:
          self.hide()
          # self.current_view.clear() # this fix the double click-in-back segfault :)
          mainmenu.show()
          return
 
-      # discard previous also, will recreate...
-      page_data = self.pages.pop()
+      # switch to the previous page
+      page_data = self.pages[-1]
+      self._populate_page(page_data, is_back=True)
 
-      # recreate the page
-      self.is_back = True
-      parent_url = self.pages[-1]['url'] if len(self.pages) > 1 else None
-      args = page_data['args']
-      kargs = page_data['kargs']
-      if callable(page_data['item_selected_cb']):
-         func = page_data['item_selected_cb']
-      else:
-         func = self.item_selected_cb
-      if callable(func):
-         func(parent_url, page_data['url'], *args, **kargs)
+   def refresh(self, hard=False):
+      if hard:
+         # create the page
+         page = self.pages[-1]
+         self._populate_page(page, is_refresh=True)
 
-   def refresh(self, recreate=False):
-      if recreate:
-         # recreate the page calling the selected_cb on the parent-page
-         self.is_refresh = True
-         page_url = self.pages[-1]['url'] if len(self.pages) > 0 else None
-         parent_url = self.pages[-2]['url'] if len(self.pages) > 1 else None
-         func = self.item_selected_cb
-         if func: func(parent_url, page_url)
       else:
          self.current_view.refresh()
 
    def change_style(self, style):
-
-      view = self._create_or_get_view(style)
-      
       # change only if needed
+      view = self._create_or_get_view(style)
       if view == self.current_view:
          return
 
@@ -296,7 +249,7 @@ class EmcBrowser3(object):
       _memorydb.set_data(page_url, style)
 
       # recreate the page
-      self.refresh(recreate=True)
+      self.refresh(hard=True)
 
    def clear(self):
       """ TODO Function doc """
@@ -315,8 +268,49 @@ class EmcBrowser3(object):
       self.current_view.hide()
 
    # private stuff
-   def _input_event_cb(self, event):
+   def _populate_page(self, page, is_back=False, is_refresh=False):
+      # set topbar title
+      full = '> ' + ''.join([p['title'] + ' > ' for p in self.pages])
+      gui.text_set('topbar.title', full[0:-3])
 
+      
+      view = page['view']
+      if (view == self.current_view):
+         # same style for the 2 pages, ask the view to perform the correct anim
+         if is_refresh:
+            view.page_show(page['title'], ANIM_NONE)
+         elif is_back:
+            view.page_show(page['title'], ANIM_BACK)
+         elif len(self.pages) < 2:
+            view.page_show(page['title'], ANIM_NONE)
+         else:
+            view.page_show(page['title'], ANIM_FORWARD)
+      else:
+         # different style...hide one view and show the other
+         self.current_view.clear()
+         self.current_view.hide()
+         view.page_show(page['title'], ANIM_NONE)
+         view.show()
+
+      # update state
+      self.current_view = view
+
+      # back item (optional)
+      if ini.get_bool('general', 'back_in_lists') == True:
+         self.item_add(BackItemClass(), 'emc://back', self)
+         view.items_count -= 1
+
+      # use this for extra debug
+      # print self
+
+      # and finally populate the page
+      url = page['url']
+      cb = page['cb']
+      args = page['args']
+      kwargs = page['kwargs']
+      cb(self, url, *args, **kwargs)
+
+   def _input_event_cb(self, event):
       if event == 'BACK':
          self.back()
       elif event == 'VIEW_LIST':
@@ -432,7 +426,7 @@ class ViewList(object):
       self.current_list.clear()
       self.items_count = 0
 
-   def item_add(self, item_class, url, user_data):                               # ok #
+   def item_add(self, item_class, url, user_data):
       """
       Here you must add the item to the current visible page.
       You can use the 'item_class' object to query more info about

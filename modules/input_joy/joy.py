@@ -27,6 +27,7 @@ import ecore
 from epymc.modules import EmcModule
 from epymc.gui import EmcDialog
 from epymc.gui import EmcVKeyboard
+from epymc.browser3 import EmcItemClass
 import epymc.input_events as input_events
 import epymc.ini as ini
 import epymc.config_gui as config_gui
@@ -153,23 +154,34 @@ and what it need to work well, can also use markup like <title>this</> or
       return True # keep tha handler alive
 
 ### config panel stuff
+   class DeviceItemClass(EmcItemClass):
+      def label_get(self, url, mod):
+         return 'Device (%s)' % (mod.device)
+
+      def item_selected(self, url, mod):
+         EmcVKeyboard(accept_cb = mod.device_changed_cb,
+                      title = 'Insert joystick device', text = mod.device)
+
+   class WizardItemClass(EmcItemClass):
+      def label_get(self, url, mod):
+         return 'Configure buttons'
+
+      def item_selected(self, url, mod):
+         mod.start_configurator()
+
    def config_panel_cb(self):
       bro = config_gui.browser_get()
-      bro.page_add('config://joystick/', 'Joystick',
-                   item_selected_cb = self.config_selected_cb)
-      bro.item_add('config://joystick/device', 'Device (%s)' % (self.device))
-      bro.item_add('config://joystick/configurator', 'Configure buttons')
-      
-   def config_selected_cb(self, page, item):
-      if item.endswith('/device'):
-         EmcVKeyboard(accept_cb = self.device_changed_cb,
-                      title = 'Insert joystick device', text = self.device)
-      elif item.endswith('/configurator'):
-         self.start_configurator()
+      bro.page_add('config://joystick/', 'Joystick', None, self.populate_joy)
+
+   def populate_joy(self, browser, url):
+      browser.item_add(self.DeviceItemClass(), 'config://joystick/device', self)
+      browser.item_add(self.WizardItemClass(), 'config://joystick/configurator', self)
 
    def device_changed_cb(self, vkbd, new_device):
       ini.set('joystick', 'device', new_device)
       self.restart()
+      bro = config_gui.browser_get()
+      bro.refresh()
 
    def start_configurator(self):
       # recheck device

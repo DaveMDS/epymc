@@ -30,8 +30,8 @@ from sdb import EmcDatabase
 from utils import Singleton
 
 def DBG(msg):
-   print ('BROWSER3: ' + msg)
-   # pass
+   # print ('BROWSER3: ' + msg)
+   pass
 
 
 _views = {}       # key=>view_name  value=>view class instance
@@ -66,29 +66,30 @@ class EmcItemClass(Singleton):
 
    def item_selected(self, url, user_data):
       """ Called when an item is selected """
-      DBG(('item_selected(%s)' % url))
+      # DBG(('item_selected(%s)' % url))
+      pass
 
    def label_get(self, url, user_data):
       """ Called when a view need to show the label of your item.
           Must return the string to show. """
-      DBG(('label_get(%s)' % url))
+      # DBG(('label_get(%s)' % url))
       return 'Unknow'
 
    def icon_get(self, url, user_data):
       """ Called when a view need to show the icon of your item.
           Must return the name of the icon to use for the given url
           see gui.load_icon() for detail on what you can pass as the name"""
-      DBG(('icon_get(%s)' % url))
+      # DBG(('icon_get(%s)' % url))
       return None
 
    def icon_end_get(self, url, user_data):
-      DBG(('icon_end_get(%s)' % url))
+      # DBG(('icon_end_get(%s)' % url))
       return None
 
    def info_get(self, url, user_data):
       """ Called when a view need to show the info of your item.
           Must return a string with the murkupped text that describe the item """
-      DBG(('info_get(%s)' % url))
+      # DBG(('info_get(%s)' % url))
       return None
 
    def poster_get(self, url, user_data):
@@ -98,13 +99,13 @@ class EmcItemClass(Singleton):
           download the image to a random temp file. In addition you can also
           set the destinatioon path for the given url, just use ';'.
           ex: 'http://my.url/of/the/image;/my/local/dest/path' """
-      DBG(('poster_get(%s)' % url))
+      # DBG(('poster_get(%s)' % url))
       return None
 
    def fanart_get(self, url, user_data):
       """ Called when a view need to show the fanart of your item.
           Must return the full path of a valid image file """
-      DBG(('fanart_get(%s)' % url))
+      # DBG(('fanart_get(%s)' % url))
       return None
 
 

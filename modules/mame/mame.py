@@ -27,7 +27,7 @@ import ecore
 import elementary
 
 from epymc.modules import EmcModule
-from epymc.browser import EmcBrowser
+from epymc.browser3 import EmcBrowser3, EmcItemClass
 from epymc.gui import EmcDialog
 from epymc.utils import EmcExec
 import epymc.mainmenu as mainmenu
@@ -43,6 +43,70 @@ def DBG(msg):
 
 MAME_EXE = 'mame'
 _instance = None
+
+
+class MyGamesItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      mod._browser.page_add('mame://mygames', 'My Games', None,
+                            mod.populate_mygames_page)
+
+   def label_get(self, url, mod):
+      return 'My Games (%d)' % (mod.count_roms())
+
+
+class AllGamesItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      mod._browser.page_add('mame://allgames', 'All Games', None,
+                            mod.populate_allgames_page)
+
+   def label_get(self, url, mod):
+      return 'All Games (%d)' % (len(mod._games))
+
+
+class FavoriteGamesItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      mod._browser.page_add('mame://favgames', 'Favorite Games', None,
+                            mod.populate_favgames_page)
+
+   def label_get(self, url, mod):
+      return 'Favorite Games (%d)' % (len(mod._favorites))
+
+
+class CategoriesItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      mod._browser.page_add('mame://cats', 'Categories', None,
+                            mod.populate_categories_page)
+
+   def label_get(self, url, mod):
+      return 'Categories'
+
+
+class GameItemClass(EmcItemClass):
+   def item_selected(self, url, game):
+     game.dialog_show()
+
+   def label_get(self, url, game):
+      return game.name
+
+   def info_get(self, url, game):
+      return game.short_info_get()
+
+   def icon_get(self, url, game):
+      if url in MameModule._favorites:
+         return 'icon/star'
+
+   def poster_get(self, url, game):
+      (local, url) = game.poster_get()
+      return local if not url else url + ';' + local
+
+
+class CatItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      mod._browser.page_add(url, url[12:], None, mod.populate_categorie_page)
+
+   def label_get(self, url, mod):
+      return url[12:]
+
 
 class MameModule(EmcModule):
    name = 'mame'
@@ -60,19 +124,16 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def __init__(self):
       global _instance
+
       DBG('Init MAME')
+
       _instance = self
       self._games = {} # key = game_id<str>  value = <MameGame> instance
-      self._browser = EmcBrowser('MAME',
-                       item_selected_cb = self.browser_item_selected,
-                       poster_get_cb = self.browser_poster_get,
-                       info_get_cb = self.browser_info_get,
-                       icon_get_cb = self.browser_icon_get)
+      self._browser = EmcBrowser3('MAME')
 
       img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
       mainmenu.item_add('mame', 50, 'M.A.M.E', img, self.cb_mainmenu)
 
-      # create config ini section if not exists
       ini.add_section('mame')
 
    def __shutdown__(self):
@@ -176,60 +237,46 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def cb_exe_end_listfull(self, exe, event):
       """ The command 'mame -listfull' is done, create the root page """
-      self.create_root_page()
+      self._browser.page_add('mame://root', 'M.A.M.E', None, self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
       self.dialog.delete()
 
 
 ## browser pages
-   def create_root_page(self):
-      self._browser.page_add('mame://root', 'M.A.M.E')
-      self._browser.item_add('mame://mygames',
-                             'My Games (%d)' % (self.count_roms()))
-      self._browser.item_add('mame://allgames',
-                             'All Games (%d)' % (len(self._games)))
-      self._browser.item_add('mame://favgames',
-                             'Favorite Games (%d)' % (len(MameModule._favorites)))
-      self._browser.item_add('mame://cats', 'Categories')
+   def populate_root_page(self, browser, url):
+      """ Create the first list, the root one """
+      self._browser.item_add(MyGamesItemClass(), 'mame://mygames', self)
+      self._browser.item_add(AllGamesItemClass(), 'mame://allgames', self)
+      self._browser.item_add(FavoriteGamesItemClass(), 'mame://favgames', self)
+      self._browser.item_add(CategoriesItemClass(), 'mame://cats', self)
 
-   def my_games_list(self):
+   def populate_mygames_page(self, browser, page_url):
       """ Create the list of personal games """
-      self._browser.page_add('mame://mygames', 'My Games')
-
       L = list()
       for dir in MameModule._rompaths:
          for rom in os.listdir(dir):
             id = rom.strip('.zip')
             if id and self._games.has_key(id):
-               L.append((id, self._games[id].name))
+               L.append(self._games[id])
 
-      L.sort(key = operator.itemgetter(1))
-      for k, l in L:
-         self._browser.item_add(k, l)
+      for game in sorted(L, key=operator.attrgetter('name')):
+         self._browser.item_add(GameItemClass(), game.gid, game)
 
-   def all_games_list(self):
+   def populate_allgames_page(self, browser, page_url):
       """ Create the list of all know mame games """
-      self._browser.page_add('mame://allgames', 'All Games')
+      itc = GameItemClass()
+      for game in sorted(self._games.values(), key=operator.attrgetter('name')):
+         self._browser.item_add(itc, game.gid, game)
 
-      L = list()
-      for id, g in self._games.items():
-         L.append((id, g.name))
-
-      L.sort(key = operator.itemgetter(1))
-      for k, l in L:
-         self._browser.item_add(k, l)
-
-   def fav_games_list(self):
+   def populate_favgames_page(self, browser, page_url):
       """ Create the list of favorite games """
-      self._browser.page_add('mame://favgames', 'Favorite Games')
-
       for gid in MameModule._favorites:
          if self._games.has_key(gid):
-            g = self._games[gid]
-            self._browser.item_add(gid, g.name)
+            game = self._games[gid]
+            self._browser.item_add(GameItemClass(), gid, game)
 
-   def cats_list(self):
+   def populate_categories_page(self, browser, url):
       """ Create the list of categories """
       # get catver file from config (or set the default one)
       catver_file = ini.get('mame', 'catver_file')
@@ -240,19 +287,15 @@ and what it need to work well, can also use markup like <title>this</> or
       # parse the cats list (if not yet done)
       if not self._parse_cats_file(): return
 
-      self._browser.page_add('mame://cats', 'Categories')
-
       for cat_name in sorted(self._categories.keys()):
-         self._browser.item_add('mame://cats/' + cat_name,
-                  cat_name + ' (' + str(len(self._categories[cat_name])) + ')')
+         self._browser.item_add(CatItemClass(), 'mame://cats/' + cat_name, self)
 
-   def game_by_cat_list(self, cat_name):
-      """ Create the list of games in the given cat """
-      self._browser.page_add('mame://cats/' + cat_name, cat_name)
-
+   def populate_categorie_page(self, browser, url):
+      """ Create the list of games in a given cat """
+      cat_name = url[12:]
       for gid in MameModule._categories[cat_name]:
          if self._games.has_key(gid):
-            self._browser.item_add(gid, self._games[gid].name)
+            self._browser.item_add(GameItemClass(), gid, self._games[gid])
 
    def _parse_cats_file(self):
       # just the first time
@@ -289,37 +332,6 @@ and what it need to work well, can also use markup like <title>this</> or
             break
       f.close()
       return True
-
-## browser model functions
-   def browser_info_get(self, page_url, item_url):
-      if self._games.has_key(item_url):
-         return self._games[item_url].short_info_get()
-      return None
-
-   def browser_poster_get(self, page_url, item_url):
-      if self._games.has_key(item_url):
-         g = self._games[item_url]
-         (local, url) = g.poster_get()
-         return local if not url else url + ';' + local
-      return None
-
-   def browser_icon_get(self, page_url, item_url):
-      if not item_url.startswith('mame://'):
-         if item_url in MameModule._favorites:
-            return 'icon/star'
-
-   def browser_item_selected(self, page_url, item_url):
-      DBG('PAGE: ' + str(page_url))
-      DBG('ITEM: ' + str(item_url))
-      if item_url == 'mame://root': self.create_root_page()
-      elif item_url == 'mame://mygames': self.my_games_list()
-      elif item_url == 'mame://allgames': self.all_games_list()
-      elif item_url == 'mame://favgames': self.fav_games_list()
-      elif item_url == 'mame://cats': self.cats_list()
-      elif item_url.startswith('mame://cats/'):
-         self.game_by_cat_list(item_url[12:])
-      elif self._games.has_key(item_url):
-         self._games[item_url].dialog_show()
 
 
 class MameGame(object):
@@ -395,7 +407,8 @@ class MameGame(object):
       image.show()
       box.pack_end(image)
 
-      sentry = elementary.ScrolledEntry(gui.win)
+      sentry = elementary.Entry(gui.win)
+      sentry.scrollable = True
       sentry.style_set('dialog')
       sentry.editable_set(False)
       sentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)

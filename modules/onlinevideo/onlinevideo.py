@@ -26,7 +26,7 @@ import ast
 import evas, elementary
 
 from epymc.modules import EmcModule
-from epymc.browser import EmcBrowser
+from epymc.browser3 import EmcBrowser3, EmcItemClass
 from epymc.utils import EmcExec
 from epymc.gui import EmcDialog
 
@@ -35,7 +35,6 @@ import epymc.mediaplayer as mediaplayer
 import epymc.utils as utils
 import epymc.gui as gui
 import epymc.ini as ini
-
 
 
 
@@ -49,6 +48,7 @@ if DEBUG:
    from pprint import pprint
    import pdb
 
+
 ACT_NONE = 0
 ACT_FOLDER = 1
 ACT_MORE = 2
@@ -60,6 +60,57 @@ F_INFO = 3
 F_ICON = 4
 F_POSTER = 5
 F_ACTION = 6
+
+
+_mod = None
+
+
+class ChannelItemClass(EmcItemClass):
+   def item_selected(self, url, channel):
+      _mod._current_src = channel
+      _mod._request_index()
+
+
+   def label_get(self, url, channel):
+      return url
+
+   def icon_get(self, url, channel):
+      return channel['icon']
+
+   def poster_get(self, url, channel):
+      return channel['poster']
+
+   def fanart_get(self, url, channel):
+      return channel['backdrop']
+
+   def info_get(self, url, channel):
+      return '<title>%s</><br>' \
+             '<hilight>version:</> %s<br>' \
+             '<hilight>author:</> %s<br>' \
+             '<br>%s<br>' % \
+             (channel['label'], channel['version'],
+              channel['author'], channel['info'])
+
+
+class StandardItemClass(EmcItemClass):
+   def item_selected(self, url, item_data):
+      _mod._request_page(item_data)
+
+   def label_get(self, url, item_data):
+      return item_data[F_LABEL]
+
+   def icon_get(self, url, item_data):
+      if not item_data[F_ICON] and item_data[F_ACTION] == ACT_FOLDER:
+            return 'icon/folder'
+      return item_data[F_ICON]
+   
+   def poster_get(self, url, item_data):
+      return item_data[F_POSTER] or _mod._current_src['poster']
+
+   def info_get(self, url, item_data):
+       return item_data[F_INFO]
+
+
 
 class OnlinevideoModule(EmcModule):
    name = 'onlinevideo'
@@ -81,28 +132,20 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       ]
 
    def __init__(self):
+      global _mod
+      
       LOG('dbg', 'Init module')
 
-      # create config ini section if not exists
-      # ini.add_section('film')
-
-      # open film/person database (they are created if not exists)
-      # self.__film_db = EmcDatabase('film')
-      # self.__person_db = EmcDatabase('person')
       self._item_data = {}
+      _mod = self
 
       # add an item in the mainmenu
       img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
       mainmenu.item_add('onlinechannels', 10, 'Online Channels',
                         img, self.cb_mainmenu)
 
-      # create a browser instance
-      self._browser = EmcBrowser('OnlineChannels', 'List',
-                              item_selected_cb = self.cb_url_selected,
-                              icon_get_cb = self.cb_icon_get,
-                              poster_get_cb = self.cb_poster_get,
-                              fanart_get_cb = self.cb_fanart_get,
-                              info_get_cb = self.cb_info_get)
+      # create the browser instance
+      self._browser = EmcBrowser3('OnlineChannels')
 
    def __shutdown__(self):
       LOG('dbg', 'Shutdown module')
@@ -139,62 +182,17 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       del parser
       return source
 
-
-###### BROWSER STUFF
    def cb_mainmenu(self):
-      self.create_root_page()
-      mainmenu.hide()
+      self._browser.page_add('olvid://root', 'Channels', None,
+                             self.populate_root_page)
       self._browser.show()
+      mainmenu.hide()
 
-   def create_root_page(self):
-      self._browser.page_add('olvid://root', 'Channels')
-      if not self._sources: self.build_sources_list()
-      for source in self._sources:
-         self._browser.item_add(source['name'], source['label'])
-
-   def cb_url_selected(self, page_url, item_url):
-      if page_url == 'olvid://root':
-         self.set_current_source(item_url)
-         self._request_index()
-      elif item_url == 'olvid://root':
-         self.create_root_page()
-      else:
-         self._request_index()
-
-   # def cb_source_selected(self, fullpath):
-      # self.__folders.append(fullpath)
-      # ini.set_string_list('film', 'folders', self.__folders, ';')
-      # self.__browser.refresh(recreate=True)
-
-   def cb_icon_get(self, page_url, item_url):
-      if page_url == 'olvid://root':
-         source = self.get_source_by_name(item_url)
-         return source['icon']
-      return None
-
-   def cb_poster_get(self, page_url, item_url):
-      if page_url == 'olvid://root':
-         source = self.get_source_by_name(item_url)
-         return source['poster']
-
-      print page_url, item_url
-      return None
-
-   def cb_fanart_get(self, page_url, item_url):
-      if page_url == 'olvid://root':
-         source = self.get_source_by_name(item_url)
-         return source['backdrop']
-      return None
-
-   def cb_info_get(self, page_url, item_url):
-      if page_url == 'olvid://root':
-         source = self.get_source_by_name(item_url)
-         text  = '<title>%s</><br>' \
-                 '<hilight>version:</> %s<br>' \
-                 '<hilight>author:</> %s<br>' \
-                 '<br>%s<br>' % \
-                 (source['label'], source['version'], source['author'], source['info'])
-         return text
+   def populate_root_page(self, browser, url):
+      if not self._sources:
+         self.build_sources_list()
+      for ch in self._sources:
+         self._browser.item_add(ChannelItemClass(), ch['name'], ch)
 
 
 ###### SOURCES STUFF
@@ -212,12 +210,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       for s in self._sources:
          if s['name'] == src_name:
             return s
-
-   def set_current_source(self, src_name):
-      for s in self._sources:
-         if s['name'] == src_name:
-            self._current_src = s
-            return
 
    def _request_index(self):
       src = self._current_src
@@ -274,38 +266,13 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          self._item_data = {}
 
          # new browser page
-         self._browser.page_add(url.encode('ascii'), label,
-                                item_selected_cb = self._item_selected_cb,
-                                icon_get_cb = self._item_icon_cb,
-                                poster_get_cb = self._item_poster_cb,
-                                fanart_get_cb = None,
-                                info_get_cb = self._item_info_cb,
-                                page_data = page_data)
+         self._browser.page_add(url.encode('ascii'), label, None,
+                                self._populate_requested_page, items)
+
+   def _populate_requested_page(self, browser, url, items):
       for item_data in items:
          (next_state, label, url, info, icon, poster, action) = item_data
-         self._browser.item_add(url, item_data[F_LABEL])
+         self._browser.item_add(StandardItemClass(), url, item_data)
          self._item_data[url] = item_data
 
-   def _item_selected_cb(self, page_url, item_url, page_data):
-      if self._item_data.has_key(item_url):
-         item_data = self._item_data[item_url]
-         self._request_page(item_data)
-      elif page_data:
-         self._request_page(page_data)
 
-   def _item_icon_cb(self, page_url, item_url):
-      if self._item_data.has_key(item_url):
-         item_data = self._item_data[item_url]
-         if not item_data[F_ICON] and item_data[F_ACTION] == ACT_FOLDER:
-            return 'icon/folder'
-         return item_data[F_ICON]
-
-   def _item_poster_cb(self, page_url, item_url):
-      if self._item_data.has_key(item_url):
-         item_data = self._item_data[item_url]
-         return item_data[F_POSTER] or self._current_src['poster']
-
-   def _item_info_cb(self, page_url, item_url):
-      if self._item_data.has_key(item_url):
-         item_data = self._item_data[item_url]
-         return item_data[F_INFO]

@@ -25,7 +25,7 @@ import threading
 import ecore
 
 from epymc.modules import EmcModule
-from epymc.browser import EmcBrowser
+from epymc.browser3 import EmcBrowser3, EmcItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog
 import epymc.mainmenu as mainmenu
@@ -33,12 +33,82 @@ import epymc.utils as utils
 import epymc.ini as ini
 
 
+def DBG(msg):
+   # print('MUSIC: ' + msg)
+   pass
+
 
 _audio_extensions = ['.mp3', '.MP3']
+_mod = None
 
-def DBG(msg):
-   print('MUSIC: ' + msg)
-   pass
+
+class RootArtistsItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      mod._browser.page_add('music://artists', 'Artists', None,
+                            mod.populate_artists_page)
+
+   def label_get(self, url, mod):
+      return 'Artists (%d)' % (len(mod._artists_db))
+
+
+class RootAlbumsItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      mod._browser.page_add('music://albums', 'Albums', None,
+                            mod.populate_albums_page)
+
+   def label_get(self, url, mod):
+      return 'Albums (%d)' % (len(mod._albums_db))
+
+
+class RootSongsItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      mod._browser.page_add('music://songs', 'Songs', None,
+                            mod.populate_songs_page)
+
+   def label_get(self, url, mod):
+      return 'Songs (%d)' % (len(mod._songs_db))
+
+
+class SongItemClass(EmcItemClass):
+   def item_selected(self, url, song):
+      _mod.song_selected(url)
+
+   def label_get(self, url, song):
+      return song['title']
+
+   def poster_get(self, url, song):
+      return _mod.song_poster_get(url)
+
+   def info_get(self, url, song):
+      return _mod.song_info_get(url)
+
+
+class AlbumItemClass(EmcItemClass):
+   def item_selected(self, url, album):
+      _mod.album_selected(url)
+
+   def label_get(self, url, album):
+      return album['name'] + '  by ' + album['artist']
+
+   def poster_get(self, url, album):
+      return _mod.album_poster_get(url)
+
+   def info_get(self, url, album):
+      return _mod.album_info_get(url)
+
+
+class ArtistItemClass(EmcItemClass):
+   def item_selected(self, url, artist):
+       _mod.artist_selected(url)
+
+   def label_get(self, url, artist):
+      return artist['name']
+
+   def poster_get(self, url, artist):
+      return _mod.artist_poster_get(url)
+
+   def info_get(self, url, artist):
+      return _mod.artist_info_get(url)
 
 
 class MusicModule(EmcModule):
@@ -50,7 +120,10 @@ and what it need to work well, can also use markup like <title>this</> or
 <b>this</>"""
 
    def __init__(self):
+      global _mod
+
       DBG('Init module')
+      _mod = self
 
       # create config ini section if not exists
       ini.add_section('music')
@@ -72,10 +145,7 @@ and what it need to work well, can also use markup like <title>this</> or
       mainmenu.item_add('music', 5, 'Music', None, self.cb_mainmenu)
 
       # create a browser instance
-      self._browser = EmcBrowser('Music', 'List',
-                           item_selected_cb = self.cb_item_selected,
-                           poster_get_cb = self.cb_poster_get,
-                           info_get_cb = self.cb_info_get)
+      self._browser = EmcBrowser3('Music')
 
    def __shutdown__(self):
       DBG('Shutdown module')
@@ -93,15 +163,16 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def cb_mainmenu(self):
       # get music folders from config
-      self.__folders = ini.get_string_list('music', 'sources', ';')
+      self.__folders = ini.get_string_list('music', 'folders', ';')
       if not self.__folders:
          print 'NO FOLDERS'
          #TODO alert the user. and instruct how to add folders
          return
 
-      self.make_root_page()
-      mainmenu.hide()
+      # show the root page
+      self._browser.page_add('music://root', 'Music', None, self.populate_root_page)
       self._browser.show()
+      mainmenu.hide()
 
       # Update db in a parallel thread
       self.dialog = EmcDialog(title = 'Rebuilding Database, please wait...',
@@ -122,95 +193,38 @@ and what it need to work well, can also use markup like <title>this</> or
 
       return False # kill the timer
 
-### pages
-   def make_root_page(self):
-      self._browser.page_add('music://root', 'Music')
-
+### browser pages
+   def populate_root_page(self, browser, page_url):
       count = len(self._artists_db)
-      self._browser.item_add('music://artists', 'Artists (%d)' % (count))
-      count = len(self._albums_db)
-      self._browser.item_add('music://albums', 'Albums (%d)' % (count))
-      count = len(self._songs_db)
-      self._browser.item_add('music://songs', 'Songs (%d)' % (count))
-      self._browser.item_add('music://generes', 'Generes (TODO)')
-      self._browser.item_add('music://playlists', 'Playlists (TODO)')
+      self._browser.item_add(RootArtistsItemClass(), 'music://artists', self)
+      self._browser.item_add(RootAlbumsItemClass(), 'music://albums', self)
+      self._browser.item_add(RootSongsItemClass(), 'music://songs', self)
+      # self._browser.item_add('music://generes', 'Generes (TODO)')
+      # self._browser.item_add('music://playlists', 'Playlists (TODO)')
 
-   def make_songs_list(self):
-      self._browser.page_add('music://songs', 'Songs')
-                       #~ item_selected_cb = self.cb_song_selected,
-                       #~ info_get_cb = self.cb_song_info_get)
+   def populate_songs_page(self, browser, page_url):
       L = list()
       for key in self._songs_db.keys():
-         item_data = self._songs_db.get_data(key)
-         L.append((key, item_data['title']))
+         L.append(self._songs_db.get_data(key))
 
-      L.sort(key = operator.itemgetter(1))
-      for k, t in L:
-         self._browser.item_add(k, t)
+      for song in sorted(L, key = operator.itemgetter('title')):
+         self._browser.item_add(SongItemClass(), song['url'], song)
 
-   def make_albums_list(self):
-      self._browser.page_add('music://albums', 'Albums')
-                       #~ item_selected_cb = self.cb_album_selected,
-                       #~ info_get_cb = self.cb_album_info_get)
+   def populate_albums_page(self, browser, page_url):
       L = list()
       for key in self._albums_db.keys():
-         album_data = self._albums_db.get_data(key)
-         label = album_data['name'] + '  by ' + album_data['artist']
-         L.append((key, label))
+         L.append(self._albums_db.get_data(key))
 
-      L.sort(key = operator.itemgetter(1))
-      for k, l in L:
-         self._browser.item_add(k, l)
+      for album in sorted(L, key = operator.itemgetter('name')):
+         self._browser.item_add(AlbumItemClass(), album['name'], album)
 
-   def make_artists_list(self):
-      self._browser.page_add('music://artists', 'Artists')
-                       #~ item_selected_cb = self.cb_artist_selected,
-                       #~ info_get_cb = self.cb_artist_info_get)
+   def populate_artists_page(self, browser, page_url):
       L = list()
       for key in self._artists_db.keys():
-         artist_data = self._artists_db.get_data(key)
-         label = artist_data['name']
-         L.append((key, label))
+         L.append(self._artists_db.get_data(key))
 
-      L.sort(key = operator.itemgetter(1))
-      for k, l in L:
-         self._browser.item_add(k, l)
-
-### browser callback 'dispatcher'
-   def cb_item_selected(self, page_url, item_url):
-      if item_url == 'music://root':
-         self.make_root_page()
-      elif item_url == 'music://songs':
-         self.make_songs_list()
-      elif item_url == 'music://albums':
-         self.make_albums_list()
-      elif item_url == 'music://artists':
-         self.make_artists_list()
-      else:
-         if page_url == 'music://songs':
-            self.song_selected(item_url)
-         elif page_url == 'music://albums':
-            self.album_selected(item_url)
-         elif page_url == 'music://artists':
-            self.artist_selected(item_url)
-
-   def cb_poster_get(self, page_url, item_url):
-      if page_url == 'music://albums':
-         return self.album_poster_get(item_url)
-      elif page_url == 'music://songs':
-         return self.song_poster_get(item_url)
-      elif page_url == 'music://artists':
-         return self.artist_poster_get(item_url)
-      return None
-
-   def cb_info_get(self, page_url, item_url):
-      if page_url == 'music://albums':
-         return self.album_info_get(item_url)
-      elif page_url == 'music://songs':
-         return self.song_info_get(item_url)
-      elif page_url == 'music://artists':
-         return self.artist_info_get(item_url)
-      return None
+      for artist in sorted(L, key = operator.itemgetter('name')):
+         self._browser.item_add(ArtistItemClass(), artist['name'], artist)
 
 ### artists stuff
    def artist_selected(self, artist):
@@ -241,7 +255,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
       # Search cover in song directory:
       #'front.jpg', 'cover.jpg' or '<Artist> - <Album>.jpg'
-      #~ if album_data['songs']:
+
       path = os.path.dirname(url)
       poster = os.path.join(path, 'front.jpg')
       if os.path.exists(poster): return poster

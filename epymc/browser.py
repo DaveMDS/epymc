@@ -42,6 +42,7 @@ ANIM_NONE = 0
 ANIM_BACK = -1
 ANIM_FORWARD = 1
 
+
 def init():
    global _memorydb
 
@@ -275,7 +276,6 @@ class EmcBrowser(object):
       full = '> ' + ''.join([p['title'] + ' > ' for p in self.pages])
       gui.text_set('topbar.title', full[0:-3])
 
-      
       view = page['view']
       if (view == self.current_view):
          # same style for the 2 pages, ask the view to perform the correct anim
@@ -332,21 +332,6 @@ class EmcBrowser(object):
       DBG('Create view: ' + view_name)
       _views[view_name] = eval('View' + view_name + '()')
       return _views[view_name]
-
-   # Stuff for Views
-   def _item_selected(self, url):
-      """ TODO Function doc """
-      if url.startswith('emc://'):
-         if url.endswith('//back'):
-            self.back()
-      else:
-         if callable(self.pages[-1]['item_selected_cb']):
-            func = self.pages[-1]['item_selected_cb']
-         else:
-            func = self.item_selected_cb
-         args = self.pages[-1]['args']
-         kargs = self.pages[-1]['kargs']
-         if callable(func): func(self.pages[-1]['url'], url, *args, **kargs)
 
 
 ################################################################################
@@ -594,13 +579,14 @@ class ViewGrid(object):
       gg.callback_clicked_double_add(self.gg_selected)
       gui.swallow_set('browser.grid.gengrid', gg)
       self.gg = gg
+      self.items_count = 0
 
-   def page_show(self, title, dir):
+   def page_show(self, title, anim):
       self.gg.clear()
       gui.text_set('browser.grid.title', title)
 
-   def item_add(self, url, label, parent_browser, dont_count = False):          # FIXME #
-      item_data = (url, label, parent_browser)                                  # FIXME #
+   def item_add(self, item_class, url, user_data):
+      item_data = (item_class, url, user_data)                                  # 3 #
       it = self.gg.item_append(self.itc, item_data)
       if not self.gg.selected_item_get():
          it.selected_set(True)
@@ -622,7 +608,7 @@ class ViewGrid(object):
 
    def input_event_cb(self, event):
       item = self.gg.selected_item_get()
-      (url, label, parent_browser) = item.data_get()                            # FIXME #
+      (item_class, url, user_data) = item.data_get()                            # 3 #
 
       if event == 'RIGHT':
          next = item.next_get()
@@ -667,26 +653,25 @@ class ViewGrid(object):
          return input_events.EVENT_BLOCK
 
       elif event == 'OK':
-         parent_browser._item_selected(url)
+         item_class.item_selected(url, user_data)
          return input_events.EVENT_BLOCK
 
       return input_events.EVENT_CONTINUE
 
    # gengrid model
    def gg_label_get(self, obj, part, item_data):
-      (url, label, parent_browser) = item_data                                  # FIXME #
-      return label
+      (item_class, url, user_data) = item_data                                  # 3 #
+      return item_class.label_get(url, user_data)
 
-   def gg_icon_get(self, obj, part, data):
-      (url, label, parent_browser) = data                                       # FIXME #
+   def gg_icon_get(self, obj, part, item_data):
+      (item_class, url, user_data) = item_data                                  # 3 #
+      icon = None
       if part == 'elm.swallow.icon':
-         icon = parent_browser._icon_get(url)
-         if icon: return icon
-         poster = parent_browser._poster_get(url)
-         if poster: return gui.load_image(poster)
+         icon = item_class.icon_get(url, user_data)
       elif part == 'elm.swallow.end':
-         return parent_browser._icon_end_get(url)
-      return None
+         icon = item_class.icon_end_get(url, user_data)
+      if icon:
+         return gui.load_icon(icon)
 
    def gg_state_get(self, obj, part, item_data):
       return False
@@ -699,5 +684,5 @@ class ViewGrid(object):
       pass
 
    def gg_selected(self, gg, item, *args, **kwargs):
-      (url, label, parent_browser) = item.data_get()                            # FIXME #
-      parent_browser._item_selected(url)
+      (item_class, url, user_data) = item.data_get()                            # 3 #
+      item_class.item_selected(url, user_data)

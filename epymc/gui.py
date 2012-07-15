@@ -321,7 +321,7 @@ class EmcButton(elementary.Button):
    def __init__(self, label=None, icon = None):
       elementary.Button.__init__(self, layout)
       self.style_set('emc')
-      # selff.focus_allow_set(False)
+      self.focus_allow_set(False)
       if label:
          self.text_set(label)
       if icon:

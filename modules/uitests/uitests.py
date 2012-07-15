@@ -90,7 +90,7 @@ class MyItemClass(EmcItemClass):
          f = os.path.expanduser('~/Video/testvideo.avi')
          mediaplayer.play_video(f)
          mediaplayer.title_set('Testing title')
-         mediaplayer.poster_set('dvd_cover_blank.png', self.path)
+         mediaplayer.poster_set('dvd_cover_blank.png', os.path.dirname(__file__))
 
       # Mediaplayer Online Video (good)
       # elif url == 'uitests://mpvo':

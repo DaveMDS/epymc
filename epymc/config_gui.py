@@ -26,7 +26,7 @@ import gui
 import mainmenu
 import input_events
 
-from browser3 import EmcBrowser3, EmcItemClass
+from browser import EmcBrowser, EmcItemClass
 
 def DBG(msg):
    print('CONFIG_GUI: ' + msg)
@@ -60,7 +60,7 @@ def init():
    mainmenu.item_add('config', 100, 'Config', None, _mainmenu_cb)
 
    # create a browser instance
-   _browser = EmcBrowser3('Configuration', 'List') # TODO use a custom style for config ?
+   _browser = EmcBrowser('Configuration', 'List') # TODO use a custom style for config ?
 
    root_item_add('config://modules/', 1, 'Modules', 'icon/module', _modules_list)
    root_item_add('config://scale/', 20, 'Scale', 'icon/scale', _change_scale)

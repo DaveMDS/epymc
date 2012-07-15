@@ -31,8 +31,8 @@ import epymc.ini as ini
 import epymc.gui as gui
 import epymc.mediaplayer as mediaplayer
 from films import TMDB_WithGui
-import epymc.browser3 as browser3
-from epymc.browser3 import EmcBrowser3, EmcItemClass
+import epymc.browser as browser
+from epymc.browser import EmcBrowser, EmcItemClass
 
 
 def DBG(msg):
@@ -178,7 +178,7 @@ class MyItemClass(EmcItemClass):
       # Browser Dump
       elif url == 'uitests://brdump':
          DBG('Dumping Browser')
-         browser3.dump_everythings()
+         browser.dump_everythings()
 
       # Buttons Theme
       elif url == 'uitests://buttons':
@@ -280,7 +280,7 @@ class UiTestsModule(EmcModule):
    def __init__(self):
       img = os.path.join(self.path, 'menu_bg.png')
       mainmenu.item_add('uitests', 5, 'UI tests', img, self.cb_mainmenu)
-      self._browser = EmcBrowser3('UI tests', 'List')
+      self._browser = EmcBrowser('UI tests', 'List')
 
    def __shutdown__(self):
       mainmenu.item_del('uitests')

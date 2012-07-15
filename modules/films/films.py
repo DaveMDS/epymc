@@ -25,7 +25,7 @@ import threading, Queue
 import ecore, evas, elementary
 
 from epymc.modules import EmcModule
-from epymc.browser3 import EmcBrowser3, EmcItemClass
+from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourceSelector
 from epymc.gui import EmcVKeyboard, EmcNotify
@@ -161,7 +161,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       mainmenu.item_add('film', 10, 'Movies', img, self.cb_mainmenu)
 
       # create a browser instance
-      self._browser = EmcBrowser3('Films', 'List')
+      self._browser = EmcBrowser('Films', 'List')
 
       # on idle scan all files (one shoot)
       if (ini.get_bool('film', 'enable_scanner')):

@@ -25,7 +25,7 @@ import threading
 import ecore
 
 from epymc.modules import EmcModule
-from epymc.browser3 import EmcBrowser3, EmcItemClass
+from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog
 import epymc.mainmenu as mainmenu
@@ -145,7 +145,7 @@ and what it need to work well, can also use markup like <title>this</> or
       mainmenu.item_add('music', 5, 'Music', None, self.cb_mainmenu)
 
       # create a browser instance
-      self._browser = EmcBrowser3('Music')
+      self._browser = EmcBrowser('Music')
 
    def __shutdown__(self):
       DBG('Shutdown module')

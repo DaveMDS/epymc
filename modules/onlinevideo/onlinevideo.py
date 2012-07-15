@@ -26,7 +26,7 @@ import ast
 import evas, elementary
 
 from epymc.modules import EmcModule
-from epymc.browser3 import EmcBrowser3, EmcItemClass
+from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.utils import EmcExec
 from epymc.gui import EmcDialog
 
@@ -145,7 +145,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                         img, self.cb_mainmenu)
 
       # create the browser instance
-      self._browser = EmcBrowser3('OnlineChannels')
+      self._browser = EmcBrowser('OnlineChannels')
 
    def __shutdown__(self):
       LOG('dbg', 'Shutdown module')

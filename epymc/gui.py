@@ -111,18 +111,12 @@ def init():
 
 
    # fill view buttons box in topbar
-   bt = elementary.Button(win)
-   bt.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-   bt.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-   bt.content_set(load_icon('icon/list'))
+   bt = EmcButton(win, icon='icon/list')
    bt.callback_clicked_add(_cb_btn_change_view, 'VIEW_LIST')
    layout.edje_get().part_box_append('topbar.box', bt)
    bt.show()
 
-   bt = elementary.Button(win)
-   bt.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-   bt.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-   bt.content_set(load_icon('icon/grid'))
+   bt = EmcButton(win, icon='icon/grid')
    bt.callback_clicked_add(_cb_btn_change_view, 'VIEW_GRID')
    layout.edje_get().part_box_append('topbar.box', bt)
    bt.show()

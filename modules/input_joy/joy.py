@@ -28,7 +28,7 @@ import ecore
 from epymc.modules import EmcModule
 from epymc.gui import EmcDialog
 from epymc.gui import EmcVKeyboard
-from epymc.browser3 import EmcItemClass
+from epymc.browser import EmcItemClass
 import epymc.input_events as input_events
 import epymc.ini as ini
 import epymc.config_gui as config_gui

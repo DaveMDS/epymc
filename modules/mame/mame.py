@@ -27,7 +27,7 @@ import ecore
 import elementary
 
 from epymc.modules import EmcModule
-from epymc.browser3 import EmcBrowser3, EmcItemClass
+from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.gui import EmcDialog
 from epymc.utils import EmcExec
 import epymc.mainmenu as mainmenu
@@ -129,7 +129,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
       _instance = self
       self._games = {} # key = game_id<str>  value = <MameGame> instance
-      self._browser = EmcBrowser3('MAME')
+      self._browser = EmcBrowser('MAME')
 
       img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
       mainmenu.item_add('mame', 50, 'M.A.M.E', img, self.cb_mainmenu)

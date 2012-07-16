@@ -71,44 +71,108 @@ class RootSongsItemClass(EmcItemClass):
 
 class SongItemClass(EmcItemClass):
    def item_selected(self, url, song):
-      _mod.song_selected(url)
+      import pprint
+      pprint.pprint(song)
+      print "TODO PLAY!!!!!!"
 
    def label_get(self, url, song):
       return song['title']
 
    def poster_get(self, url, song):
-      return _mod.song_poster_get(url)
+      # search "front.jpg"
+      path = os.path.dirname(url)
+      poster = os.path.join(path, 'front.jpg')
+      if os.path.exists(poster): return poster
+
+      # search "cover.jpg"
+      poster = os.path.join(path, 'cover.jpg')
+      if os.path.exists(poster): return poster
+
+      if not song.has_key('artist') or not song.has_key('album'):
+         return None
+
+      # search "<Artist> - <Album>.jpg"
+      poster = os.path.join(path, song['artist'] + ' - ' + song['album'] + '.jpg')
+      if os.path.exists(poster): return poster
+
+      # search in user cover dir:
+      # <config_dir>/music_covers/<Artist> - <Album>.jpg
+      poster = os.path.join(ini.get('music', 'covers_dir'),
+                            song['artist'] + ' - ' + song['album'] + '.jpg')
+      if os.path.exists(poster):
+         return poster
 
    def info_get(self, url, song):
-      return _mod.song_info_get(url)
+      text = '<hilight>' + song['title'] + '</><br>'
+      if song.has_key('artist'):
+         text += '<em>by ' + song['artist'] + '</><br>'
+      if song.has_key('album'):
+         text += 'from ' + song['album'] + '<br>'
+      if song.has_key('length'):
+         length = int(song['length']) / 1000
+         min = length / 60
+         sec = length % 60
+         text += 'duration: ' + str(min) + ':' + str(sec)  + '<br>'
+      return text
 
 
 class AlbumItemClass(EmcItemClass):
    def item_selected(self, url, album):
-      _mod.album_selected(url)
+      _mod._browser.page_add('music://album/'+album['name'], album['name'],
+                             None, _mod.populate_album_page, album)
 
    def label_get(self, url, album):
       return album['name'] + '  by ' + album['artist']
 
    def poster_get(self, url, album):
-      return _mod.album_poster_get(url)
+      # Search cover in first-song-of-album directory:
+      #'front.jpg', 'cover.jpg' or '<Artist> - <Album>.jpg'
+      if album['songs']:
+         path = os.path.dirname(album['songs'][0])
+         poster = os.path.join(path, 'front.jpg')
+         if os.path.exists(poster): return poster
+
+         poster = os.path.join(path, 'cover.jpg')
+         if os.path.exists(poster): return poster
+
+         poster = os.path.join(path, album['artist'] + ' - ' + album['name'] + '.jpg')
+         if os.path.exists(poster): return poster
+
+      # Search cover in user dir:
+      # <config_dir>/music_covers/<Artist> - <Album>.jpg
+      poster = os.path.join(ini.get('music', 'covers_dir'),
+                           album['artist'] + ' - ' + album['name'] + '.jpg')
+      if os.path.exists(poster):
+         return poster
 
    def info_get(self, url, album):
-      return _mod.album_info_get(url)
+      text = '<hilight>' + album['name'] + '</><br>'
+      text += '<em>by ' + album['artist'] + '</><br>'
+      text += str(len(album['songs'])) + ' songs'
+      lenght = 0
+      for song in album['songs']:
+         song_data = _mod._songs_db.get_data(song)
+         if song_data.has_key('length'):
+            lenght += int(song_data['length'])
+      text += ', ' + str(lenght / 60000) + ' min.'
+      return text
 
 
 class ArtistItemClass(EmcItemClass):
    def item_selected(self, url, artist):
-       _mod.artist_selected(url)
+      _mod._browser.page_add('music://artist/'+artist['name'], artist['name'],
+                             None, _mod.populate_artist_page, artist)
 
    def label_get(self, url, artist):
       return artist['name']
 
    def poster_get(self, url, artist):
-      return _mod.artist_poster_get(url)
+      # TODO implement
+      return None
 
    def info_get(self, url, artist):
-      return _mod.artist_info_get(url)
+      return '<hilight>%s</><br>%d albums, %d songs' % (artist['name'],
+              len(artist['albums']), len(artist['songs']))
 
 
 class MusicModule(EmcModule):
@@ -136,10 +200,10 @@ and what it need to work well, can also use markup like <title>this</> or
       if not os.path.exists(ini.get('music', 'covers_dir')):
          os.mkdir(ini.get('music', 'covers_dir'))
 
-      # open songs/albums/artists database (they are created if not exists)
-      self._songs_db = EmcDatabase('music_songs')
-      self._albums_db = EmcDatabase('music_albums')
-      self._artists_db = EmcDatabase('music_artists')
+      # databases loading posponed
+      self._songs_db = None     # key=url           data=dict
+      self._albums_db = None    # key=album_name    data=dict
+      self._artists_db = None   # key=artist_name   data=dict
 
       # add an item in the mainmenu
       mainmenu.item_add('music', 5, 'Music', None, self.cb_mainmenu)
@@ -169,8 +233,17 @@ and what it need to work well, can also use markup like <title>this</> or
          #TODO alert the user. and instruct how to add folders
          return
 
+      # open songs/albums/artists database (they are created if not exists)
+      if self._songs_db is None:
+         self._songs_db = EmcDatabase('music_songs')
+      if self._albums_db is None:
+         self._albums_db = EmcDatabase('music_albums')
+      if self._artists_db is None:
+         self._artists_db = EmcDatabase('music_artists')
+
       # show the root page
-      self._browser.page_add('music://root', 'Music', None, self.populate_root_page)
+      self._browser.page_add('music://root', 'Music', None,
+                             self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
 
@@ -181,7 +254,7 @@ and what it need to work well, can also use markup like <title>this</> or
       thread = UpdateDBThread(self.__folders, self._songs_db,
                               self._albums_db, self._artists_db)
       thread.start()
-      ecore.Timer(0.5, self.check_thread_done, thread)
+      ecore.Timer(0.2, self.check_thread_done, thread)
 
    def check_thread_done(self, thread):
       if thread.is_alive():
@@ -203,139 +276,35 @@ and what it need to work well, can also use markup like <title>this</> or
       # self._browser.item_add('music://playlists', 'Playlists (TODO)')
 
    def populate_songs_page(self, browser, page_url):
-      L = list()
-      for key in self._songs_db.keys():
-         L.append(self._songs_db.get_data(key))
-
+      """ list of all the songs """
+      L = [self._songs_db.get_data(k) for k in self._songs_db.keys()]
       for song in sorted(L, key = operator.itemgetter('title')):
          self._browser.item_add(SongItemClass(), song['url'], song)
 
    def populate_albums_page(self, browser, page_url):
-      L = list()
-      for key in self._albums_db.keys():
-         L.append(self._albums_db.get_data(key))
-
+      """ list of all albums """
+      L = [self._albums_db.get_data(k) for k in self._albums_db.keys()]
       for album in sorted(L, key = operator.itemgetter('name')):
          self._browser.item_add(AlbumItemClass(), album['name'], album)
 
    def populate_artists_page(self, browser, page_url):
-      L = list()
-      for key in self._artists_db.keys():
-         L.append(self._artists_db.get_data(key))
-
+      """ list of all artists """
+      L = [self._artists_db.get_data(k) for k in self._artists_db.keys()]
       for artist in sorted(L, key = operator.itemgetter('name')):
          self._browser.item_add(ArtistItemClass(), artist['name'], artist)
 
-### artists stuff
-   def artist_selected(self, artist):
-      artist_data = self._artists_db.get_data(artist)
-      import pprint
-      pprint.pprint(artist_data)
+   def populate_artist_page(self, browser, url, artist):
+      """ list of all songs for the given artist """
+      for song_url in artist['songs']:
+         song = self._songs_db.get_data(song_url)
+         self._browser.item_add(SongItemClass(), song['url'], song)
 
-   def artist_poster_get(self, artist):
-      # TODO implement
-      return None
-   
-   def artist_info_get(self, artist):
-      artist_data = self._artists_db.get_data(artist)
-      text = '<hilight>%s</><br>' % (artist_data['name'])
-      text += '%d albums, %d songs' % (len(artist_data['albums']), len(artist_data['songs']))
-      return text
+   def populate_album_page(self, browser, url, album):
+      """ list of all songs in the given album """
+      for song_url in album['songs']:
+         song = self._songs_db.get_data(song_url)
+         self._browser.item_add(SongItemClass(), song['url'], song)
 
-### songs stuff
-   def song_selected(self, url):
-      print 'SEL ' + url
-      song_data = self._songs_db.get_data(url)
-
-      import pprint
-      pprint.pprint(song_data)
-
-   def song_poster_get(self, url):
-      song_data = self._songs_db.get_data(url)
-
-      # Search cover in song directory:
-      #'front.jpg', 'cover.jpg' or '<Artist> - <Album>.jpg'
-
-      path = os.path.dirname(url)
-      poster = os.path.join(path, 'front.jpg')
-      if os.path.exists(poster): return poster
-
-      poster = os.path.join(path, 'cover.jpg')
-      if os.path.exists(poster): return poster
-
-      if not song_data.has_key('artist') or not song_data.has_key('album'):
-         return None
-
-      poster = os.path.join(path, song_data['artist'] + ' - ' + song_data['album'] + '.jpg')
-      if os.path.exists(poster): return poster
-
-      # Search cover in user dir:
-      # <config_dir>/music_covers/<Artist> - <Album>.jpg
-      poster = os.path.join(ini.get('music', 'covers_dir'),
-                     song_data['artist'] + ' - ' + song_data['album'] + '.jpg')
-      if os.path.exists(poster):
-         return poster
-
-      return None
-
-   def song_info_get(self, url):
-      song_data = self._songs_db.get_data(url)
-      text = '<hilight>' + song_data['title'] + '</><br>'
-      if song_data.has_key('artist'):
-         text += '<em>by ' + song_data['artist'] + '</><br>'
-      if song_data.has_key('album'):
-         text += 'from ' + song_data['album'] + '<br>'
-      if song_data.has_key('length'):
-         length = int(song_data['length']) / 1000
-         min = length / 60
-         sec = length % 60
-         text += 'duration: ' + str(min) + ':' + str(sec)  + '<br>'
-      return text
-
-### albums stuff
-   def album_selected(self, album):
-      album_data = self._albums_db.get_data(album)
-      import pprint
-      pprint.pprint(album_data)
-
-   def album_poster_get(self, album):
-      album_data = self._albums_db.get_data(album)
-
-      # Search cover in first-song-of-album directory:
-      #'front.jpg', 'cover.jpg' or '<Artist> - <Album>.jpg'
-      if album_data['songs']:
-         path = os.path.dirname(album_data['songs'][0])
-         poster = os.path.join(path, 'front.jpg')
-         if os.path.exists(poster): return poster
-
-         poster = os.path.join(path, 'cover.jpg')
-         if os.path.exists(poster): return poster
-
-         poster = os.path.join(path, album_data['artist'] + ' - ' + album + '.jpg')
-         if os.path.exists(poster): return poster
-
-      # Search cover in user dir:
-      # <config_dir>/music_covers/<Artist> - <Album>.jpg
-      poster = os.path.join(ini.get('music', 'covers_dir'),
-                           album_data['artist'] + ' - ' + album + '.jpg')
-      if os.path.exists(poster):
-         return poster
-
-      return None
-
-   def album_info_get(self, album):
-      album_data = self._albums_db.get_data(album)
-      text = '<hilight>' + album_data['name'] + '</><br>'
-      text += '<em>by ' + album_data['artist'] + '</><br>'
-      text += str(len(album_data['songs'])) + ' songs'
-      lenght = 0
-      for song in album_data['songs']:
-         song_data = self._songs_db.get_data(song)
-         if song_data.has_key('length'):
-            lenght += int(song_data['length'])
-         print song_data
-      text += ', ' + str(lenght / 60000) + ' min.'
-      return text
 
 ###############################################################################
 from mutagen.easyid3 import EasyID3

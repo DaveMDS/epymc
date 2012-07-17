@@ -27,14 +27,14 @@ import ecore
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
-from epymc.gui import EmcDialog
+from epymc.gui import EmcDialog, EmcNotify
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
 import epymc.ini as ini
 
 
 def DBG(msg):
-   # print('MUSIC: ' + msg)
+   print('MUSIC: ' + msg)
    pass
 
 
@@ -67,6 +67,14 @@ class RootSongsItemClass(EmcItemClass):
 
    def label_get(self, url, mod):
       return 'Songs (%d)' % (len(mod._songs_db))
+
+
+class RootRebuildItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      mod.rebuild_db()
+
+   def label_get(self, url, mod):
+      return 'Rescan library'
 
 
 class SongItemClass(EmcItemClass):
@@ -211,6 +219,8 @@ and what it need to work well, can also use markup like <title>this</> or
       # create a browser instance
       self._browser = EmcBrowser('Music')
 
+      self.rebuild_notify = None # rebuild notification object
+
    def __shutdown__(self):
       DBG('Shutdown module')
       # delete mainmenu item
@@ -223,7 +233,6 @@ and what it need to work well, can also use markup like <title>this</> or
       del self._songs_db
       del self._albums_db
       del self._artists_db
-
 
    def cb_mainmenu(self):
       # get music folders from config
@@ -247,22 +256,31 @@ and what it need to work well, can also use markup like <title>this</> or
       self._browser.show()
       mainmenu.hide()
 
+      # trigger a new scan
+      self.rebuild_db()
+
+   def rebuild_db(self):
       # Update db in a parallel thread
-      self.dialog = EmcDialog(title = 'Rebuilding Database, please wait...',
-                              spinner = True, style = 'cancel')
+      if self.rebuild_notify is None:
+         self.rebuild_notify = EmcNotify(
+                  '<hilight>Rebuilding Database</><br>please wait...', hidein=0)
 
-      thread = UpdateDBThread(self.__folders, self._songs_db,
-                              self._albums_db, self._artists_db)
-      thread.start()
-      ecore.Timer(0.2, self.check_thread_done, thread)
-
+         thread = UpdateDBThread(self.__folders, self._songs_db,
+                                 self._albums_db, self._artists_db)
+         thread.start()
+         ecore.Timer(2.0, self.check_thread_done, thread)
+      
    def check_thread_done(self, thread):
       if thread.is_alive():
+         self._browser.refresh()
          return True # renew the timer
 
-      # thread done, kill the dialog
-      self.dialog.delete()
-      del self.dialog
+      # thread done, close the notification
+      self.rebuild_notify.close()
+      self.rebuild_notify = None
+
+      # refresh the current page :/
+      self._browser.refresh(hard=True)
 
       return False # kill the timer
 
@@ -272,6 +290,7 @@ and what it need to work well, can also use markup like <title>this</> or
       self._browser.item_add(RootArtistsItemClass(), 'music://artists', self)
       self._browser.item_add(RootAlbumsItemClass(), 'music://albums', self)
       self._browser.item_add(RootSongsItemClass(), 'music://songs', self)
+      self._browser.item_add(RootRebuildItemClass(), 'music://rebuild', self)
       # self._browser.item_add('music://generes', 'Generes (TODO)')
       # self._browser.item_add('music://playlists', 'Playlists (TODO)')
 
@@ -329,8 +348,6 @@ class UpdateDBThread(threading.Thread):
             folder = folder[folder.find('://')+3:]
 
          print 'Scanning dir ' + folder + ' ...'
-         # count = 50 # TODO REMOVE ME
-
          for root, dirs, files in os.walk(folder):
             for file in files:
                (filename, ext) = os.path.splitext(file)
@@ -342,20 +359,16 @@ class UpdateDBThread(threading.Thread):
                   else:
                      print 'FOUND IN DB'
                   # TODO Check also file modification time
-
-                  #~ count -= 1 # TODO REMOVE ME
-                  #~ if count < 1:# TODO REMOVE ME
-                        #~ return # TODO REMOVE ME
                else:
                   print 'Error: invalid file extension for file: ' + file
 
    def read_metadata(self, full_path):
-      print 'GET METADATA FOR: ' + full_path
+      DBG('GET METADATA FOR: ' + full_path)
 
       meta = EasyID3(full_path)
 
-      import pprint
-      pprint.pprint(meta)
+      # import pprint
+      # pprint.pprint(meta)
 
       item_data = dict()
 
@@ -366,19 +379,19 @@ class UpdateDBThread(threading.Thread):
       else:
          item_data['title'] = full_path # TODO just file name
 
-
+      
       if meta.has_key('artist'):
          item_data['artist'] = meta['artist'][0].encode('utf-8')
 
-         # create artist item if necesary
+         # create artist item if necessary
          if not self.artists_db.id_exists(item_data['artist']):
-            print 'NEW ARTIST: ' + item_data['artist']
+            DBG('NEW ARTIST: ' + item_data['artist'])
             artist_data = dict()
             artist_data['name'] = item_data['artist']
             artist_data['albums'] = list()
             artist_data['songs'] = list()
          else:
-            print 'ARTIST EXIST'
+            DBG('ARTIST EXIST')
             artist_data = self.artists_db.get_data(item_data['artist'])
 
          # add song to song list (in artist), only if not exists yet
@@ -390,8 +403,8 @@ class UpdateDBThread(threading.Thread):
             artist_data['albums'].append(meta['album'])
 
          # write artist to db
-         self.artists_db.set_data(item_data['artist'], artist_data, thread_safe = False) # TODO thread_safe = True
-
+         self.artists_db.set_data(item_data['artist'], artist_data,
+                              thread_safe=False) # we should be the only writer
       else:
          item_data['artist'] = 'Unknow'
 
@@ -407,13 +420,13 @@ class UpdateDBThread(threading.Thread):
 
          # create album item if necesary
          if not self.albums_db.id_exists(item_data['album']):
-            print 'NEW ALBUM: ' + item_data['album']
+            DBG('NEW ALBUM: ' + item_data['album'])
             album_data = dict()
             album_data['name'] = item_data['album']
             album_data['artist'] = item_data['artist']
             album_data['songs'] = list()
          else:
-            print 'ALBUM EXIST'
+            DBG('ALBUM EXIST')
             album_data = self.albums_db.get_data(item_data['album'])
 
          # add song to song list (in album), only if not exists yet
@@ -421,8 +434,10 @@ class UpdateDBThread(threading.Thread):
             album_data['songs'].append(full_path)
 
          # write album to db
-         self.albums_db.set_data(item_data['album'], album_data, thread_safe = False) # TODO thread_safe = True
+         self.albums_db.set_data(item_data['album'], album_data,
+                              thread_safe=False) # we should be the only writer
 
       # write song to db
-      self.songs_db.set_data(full_path, item_data, thread_safe = False) # TODO thread_safe = True
+      self.songs_db.set_data(full_path, item_data,
+                             thread_safe=False) # we should be the only writer
 

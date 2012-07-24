@@ -27,6 +27,7 @@ from epymc.gui import EmcDialog, EmcVKeyboard, EmcSourceSelector
 from epymc.gui import EmcButton, EmcFocusManager2, EmcNotify
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
+import epymc.events as events
 import epymc.ini as ini
 import epymc.gui as gui
 import epymc.mediaplayer as mediaplayer
@@ -76,6 +77,15 @@ class MyItemClass(EmcItemClass):
       return text
 
    def item_selected(self, url, user_data):
+      # Events Sniffer
+      if url == 'uitests://sniffer':
+         events.listener_add('sniffer', lambda ev: EmcNotify('Sniffed ' + ev))
+         n = EmcNotify('Sniffer enabled.')
+
+      # Event Emit
+      if url == 'uitests://ev_emit':
+         events.event_emit('TEST_EVENT')
+
       # Notify
       if url == 'uitests://notify':
          n = EmcNotify('<b>TITLE</b><br>maybe some other texts..')
@@ -88,17 +98,17 @@ class MyItemClass(EmcItemClass):
       # Mediaplayer Local Video
       elif url == 'uitests://mpv':
          f = os.path.expanduser('~/Video/testvideo.avi')
-         mediaplayer.play_video(f)
+         mediaplayer.play_url(f)
          mediaplayer.title_set('Testing title')
          mediaplayer.poster_set('dvd_cover_blank.png', os.path.dirname(__file__))
 
       # Mediaplayer Online Video (good)
       # elif url == 'uitests://mpvo':
-         # mediaplayer.play_video('http://trailers.apple.com/movies/independent/airracers/airracers-tlr1_h480p.mov')
+         # mediaplayer.play_url('http://trailers.apple.com/movies/independent/airracers/airracers-tlr1_h480p.mov')
 
       # Mediaplayer Online Video (bad)
       elif url == 'uitests://mpvob':
-         mediaplayer.play_video('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4')
+         mediaplayer.play_url('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4')
 
       # VKeyboard
       elif url == 'uitests://vkbd':
@@ -292,6 +302,8 @@ class UiTestsModule(EmcModule):
       self._browser.show()
 
    def populate_root(self, browser, url):
+      browser.item_add(MyItemClass(), 'uitests://sniffer', 'Event Sniffer')
+      browser.item_add(MyItemClass(), 'uitests://ev_emit', 'Event Emit')
       browser.item_add(MyItemClass(), 'uitests://notify', 'Notify Stack')
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + FocusManager')
       browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')

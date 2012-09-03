@@ -56,7 +56,7 @@ class AddSourceItemClass(EmcItemClass):
    def selector_cb(self, fullpath, mod):
       mod._folders.append(fullpath)
       ini.set_string_list('film', 'folders', mod._folders, ';')
-      mod._browser.refresh(recreate=True)
+      mod._browser.refresh(hard=True)
 
    def label_get(self, url, mod):
       return 'Add source'

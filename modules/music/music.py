@@ -31,6 +31,7 @@ from epymc.gui import EmcDialog, EmcNotify
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
 import epymc.ini as ini
+import epymc.mediaplayer as mediaplayer
 
 
 def DBG(msg):
@@ -40,6 +41,18 @@ def DBG(msg):
 
 _audio_extensions = ['.mp3', '.MP3']
 _mod = None
+
+
+class RootOnAirItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      mod._browser.page_add('music://onair', 'OnAir', None,
+                            mod.populate_onair_page)
+
+   def label_get(self, url, mod):
+      return 'OnAir'
+
+   def icon_get(self, url, mod):
+      return 'icon/home'
 
 
 class RootArtistsItemClass(EmcItemClass):
@@ -82,6 +95,7 @@ class SongItemClass(EmcItemClass):
       import pprint
       pprint.pprint(song)
       print "TODO PLAY!!!!!!"
+      mediaplayer.queue_url(url, only_audio=True)
 
    def label_get(self, url, song):
       return song['title']
@@ -122,6 +136,13 @@ class SongItemClass(EmcItemClass):
          sec = length % 60
          text += 'duration: ' + str(min) + ':' + str(sec)  + '<br>'
       return text
+
+   def icon_get(self, url, song):
+      print "----"
+      print url
+      print mediaplayer._onair_url
+      if url == mediaplayer._onair_url:
+         return 'icon/play'
 
 
 class AlbumItemClass(EmcItemClass):
@@ -287,12 +308,19 @@ and what it need to work well, can also use markup like <title>this</> or
 ### browser pages
    def populate_root_page(self, browser, page_url):
       count = len(self._artists_db)
+      self._browser.item_add(RootOnAirItemClass(), 'music://onair', self)
       self._browser.item_add(RootArtistsItemClass(), 'music://artists', self)
       self._browser.item_add(RootAlbumsItemClass(), 'music://albums', self)
       self._browser.item_add(RootSongsItemClass(), 'music://songs', self)
       self._browser.item_add(RootRebuildItemClass(), 'music://rebuild', self)
       # self._browser.item_add('music://generes', 'Generes (TODO)')
       # self._browser.item_add('music://playlists', 'Playlists (TODO)')
+
+   def populate_onair_page(self, browser, page_url):
+      """ list of songs in the current queue """
+      for url in mediaplayer._url_queue:
+         song = self._songs_db.get_data(url)
+         self._browser.item_add(SongItemClass(), url, song)
 
    def populate_songs_page(self, browser, page_url):
       """ list of all the songs """
@@ -354,7 +382,7 @@ class UpdateDBThread(threading.Thread):
                if ext in _audio_extensions:
                   path = os.path.join(root, file)
 
-                  if not self.songs_db.id_exists(path):
+                  if not self.songs_db.id_exists('file://' + path):
                      self.read_metadata(path)
                   else:
                      print 'FOUND IN DB'
@@ -372,7 +400,7 @@ class UpdateDBThread(threading.Thread):
 
       item_data = dict()
 
-      item_data['url'] = full_path #TODO need to use a real url?
+      item_data['url'] = 'file://' + full_path
 
       if meta.has_key('title'):
          item_data['title'] = meta['title'][0].encode('utf-8') # TODO is the encode correct? doesn't evas support unicode now??
@@ -396,7 +424,7 @@ class UpdateDBThread(threading.Thread):
 
          # add song to song list (in artist), only if not exists yet
          if not full_path in artist_data['songs']:
-            artist_data['songs'].append(full_path)
+            artist_data['songs'].append('file://' + full_path)
 
          # add album to albums list (in artist), only if not exist yet
          if meta.has_key('album') and not meta['album'] in artist_data['albums']:
@@ -431,13 +459,13 @@ class UpdateDBThread(threading.Thread):
 
          # add song to song list (in album), only if not exists yet
          if not full_path in album_data['songs']:
-            album_data['songs'].append(full_path)
+            album_data['songs'].append('file://' + full_path)
 
          # write album to db
          self.albums_db.set_data(item_data['album'], album_data,
                               thread_safe=False) # we should be the only writer
 
       # write song to db
-      self.songs_db.set_data(full_path, item_data,
+      self.songs_db.set_data('file://' + full_path, item_data,
                              thread_safe=False) # we should be the only writer
 

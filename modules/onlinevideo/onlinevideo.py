@@ -235,7 +235,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          if line.startswith('PLAY!http://'):
             LOG('inf', 'yes sir..' + line)
             url = line[5:]
-            mediaplayer.play_video(url)
+            mediaplayer.play_url(url)
 
             # if self._item_data.has_key(url):
                # item_data = self._item_data[url]

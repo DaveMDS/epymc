@@ -43,6 +43,8 @@ _fman = None
 _video_visible = False
 _buffer_dialog = None
 _update_timer = None
+_url_queue = []
+_onair_url = None
 
 ### API ###
 def init():
@@ -64,7 +66,8 @@ def shutdown():
    input_events.listener_del("videoplayer")
 
 ### mediaplyer API ###
-def play_video(url):
+def play_url(url, only_audio=False):
+   global _onair_url
 
    if not _emotion:
       _init_emotion()
@@ -72,7 +75,9 @@ def play_video(url):
    if url.find('://', 2, 15) is -1:
       url = 'file://' + url
 
-   LOG('dbg', 'play_video: ' + str(url))
+   _onair_url = url
+
+   LOG('dbg', 'play_url: ' + str(url))
 
    if url.startswith('file://') and not os.path.exists(url[7:]):
       text = '<b>File not found:</b><br>' + str(url)
@@ -80,23 +85,32 @@ def play_video(url):
       return
 
    _emotion.file_set(url)
-   volume_set(_volume)
-   volume_mute_set(_volume_muted)
-   _emotion.audio_mute = _volume_muted
-   _emotion.play = True
-   video_player_show()
-   
+   if _emotion.play == False:
+      volume_set(_volume)
+      volume_mute_set(_volume_muted)
+      _emotion.audio_mute = _volume_muted
+      _emotion.play = True
+
+   if not only_audio:
+      video_player_show()
+
    ## TEST VARIOUS INFO
-   # LOG('inf', 'TITLE: ' + str(_emotion.title_get()))
-   # LOG('inf', 'VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
-   # LOG('inf', 'AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
-   # LOG('inf', 'VIDEO CHANS GET: ' + str(_emotion.video_channel_get()))
-   # LOG('inf', 'AUDIO CHANS GET: ' + str(_emotion.audio_channel_get()))
-   # LOG('inf', 'INFO DICT: ' + str(_emotion.meta_info_dict_get()))
-   # LOG('inf', 'SIZE: ' + str(_emotion.size))
-   # LOG('inf', 'IMAGE_SIZE: ' + str(_emotion.image_size))
-   # LOG('inf', 'RATIO: ' + str(_emotion.ratio_get()))
+   LOG('inf', 'TITLE: ' + str(_emotion.title_get()))
+   LOG('inf', 'VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
+   LOG('inf', 'AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
+   LOG('inf', 'VIDEO CHANS GET: ' + str(_emotion.video_channel_get()))
+   LOG('inf', 'AUDIO CHANS GET: ' + str(_emotion.audio_channel_get()))
+   LOG('inf', 'INFO DICT: ' + str(_emotion.meta_info_dict_get()))
+   LOG('inf', 'SIZE: ' + str(_emotion.size))
+   LOG('inf', 'IMAGE_SIZE: ' + str(_emotion.image_size))
+   LOG('inf', 'RATIO: ' + str(_emotion.ratio_get()))
    ##
+
+def queue_url(url, only_audio=False):
+   _url_queue.append(url)
+   if _emotion is None or _emotion.play == False:
+      play_url(url, only_audio)
+
 
 def stop():
    LOG('dbg', 'Stop()')
@@ -351,8 +365,15 @@ def _init_emotion():
 
 def _cb_playback_finished(vid):
    stop()
-   video_player_hide()
-   volume_hide()
+
+   if len(_url_queue) > 0:
+      _url_queue.pop(0)
+
+   if len(_url_queue) > 0:
+      play_url(_url_queue[0], only_audio=True)
+   else:
+      video_player_hide()
+      volume_hide()
 
 def _cb_frame_resize(vid):
    (w, h) = vid.image_size

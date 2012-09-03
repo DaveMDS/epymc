@@ -255,7 +255,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       del tmdb
 
    def play_film(self, url):
-      mediaplayer.play_video(url)
+      mediaplayer.play_url(url)
       try:
          e = self._film_db.get_data(url)
          mediaplayer.title_set(e['name'])

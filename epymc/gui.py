@@ -575,7 +575,7 @@ class EmcDialog(edje.Edje):
       self._spinner.hide()
 
    def progress_set(self, val):
-      gui.part_get('emc.dialog.progress').value_set(val)
+      self.part_external_object_get('emc.dialog.progress').value_set(val)
 
    def _cb_buttons(self, button):
       selected_cb = button.data['cb']
@@ -692,7 +692,6 @@ class EmcSourceSelector(EmcDialog):
       self.fman.focused_set(btn)
 
       self.populate(os.getenv('HOME'))
-      self.activate()
 
    def populate(self, folder):
       self._glist.clear()

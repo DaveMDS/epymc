@@ -309,7 +309,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')
       browser.item_add(MyItemClass(), 'uitests://mpvo', 'Mediaplayer - Online Video (good)')
       browser.item_add(MyItemClass(), 'uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
-      browser.item_add(MyItemClass(), 'uitests://tmdb', 'Themoviedb.org query with gui (need fix for non ascii)')
+      browser.item_add(MyItemClass(), 'uitests://tmdb', 'Themoviedb.org query with gui')
       browser.item_add(MyItemClass(), 'uitests://vkbd', 'Virtual Keyboard')
       browser.item_add(MyItemClass(), 'uitests://sselector', 'Source Selector')
       browser.item_add(MyItemClass(), 'uitests://dlg-info', 'Dialog - Info')

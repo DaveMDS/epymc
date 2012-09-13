@@ -127,27 +127,35 @@ elif STATE == 3:
 # read a page with a single video and play the video
 elif STATE == 69:
    try:
-      data = open_url(URL)
-      soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
-      iframe = soup('iframe')[0]
-      url2 = iframe['src']
-      
-      data = open_url(url2)
-      soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
+      html = open_url(URL)
 
-      if "xvideos" in url2:
-         print soup
-         # match = re.compile('(http://www.xvideos.com/.+?)"').findall(soup)
-         # html = get_html(match[0])
-         # match = re.compile('flv_url=(.+?)&amp').findall(html)
-         # fetchurl=urllib.unquote(match[0])
-         # print "fetchurl: %s" % fetchurl
-      elif "xhamster" in url2:
-         flashvars = soup('embed')[0]['flashvars']
-         srv = re.compile("srv=(.+?)&").findall(flashvars)[0]
-         fil = re.compile("file=(.+?)&").findall(flashvars)[0]
-         url = srv + '/key=' + fil
-         playUrl(url)
+      if "xvideos" in URL: # BROKEN !!
+         match = re.compile('(http://www.xvideos.com/.+?)"').findall(html)
+         html = open_url(match[0])
+         match = re.compile('flv_url=(.+?)&amp').findall(html)
+         fetchurl = urllib.unquote(match[0])
+         playUrl(fetchurl)
+
+      elif "pornhub" in URL: # untested
+         match = re.compile('href="([^"]+viewkey[^"]+)"').findall(html)
+         html = open_url(match[0])
+         match = re.compile('"video_url":"([^"]+)"').findall(html)
+         fetchurl = urllib2.unquote(match[0])
+         playUrl(fetchurl)
+
+      elif 'redtube' in URL: # untested
+         match = re.compile('(http://www.redtube.com/.+?)"').findall(html)
+         html = open_url(match[0])
+         match = re.compile('flv_h264_url=(.+?)"').findall(html)
+         fetchurl = urllib.unquote(match[0])
+         playUrl(fetchurl)
+
+      elif "xhamster" in URL: # OK
+         match = re.compile('xhamster.com/movies/(.+?)/').findall(html)
+         html = open_url('http://xhamster.com/xembed.php?video=%s' % match[0])
+         match = re.compile("srv=(.+?)&image").findall(html)
+         fetchurl = match[0].replace('&file', '/key')
+         playUrl(fetchurl)
 
    except:
       exit()

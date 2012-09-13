@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Emotion Media Center
+Comment=EFL Media Center Platform
+Exec=epymc.py
+Icon=epymc
+Terminal=true
+Type=Application
+Categories=Application;AudioVideo;

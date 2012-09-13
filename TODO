@@ -2,13 +2,9 @@
 
 BUGS
 =====
- * utf-8 -> ascii problem in some moviedb query (try searching for alien...)
- * downloading a poster 2 times (the same image) will segfault
- * playing 2 times the same video will segfault
  * mame's favorites got lost from config sometimes
  * video don't keep the right aspect, usually subs get cutted out
  * mediaplayer: when an online video end it will "restart in backgroud"
- * browser list items doesn't resize on scale
 
 MAIN
 =====
@@ -19,13 +15,8 @@ MAIN
  * use everywhere the new EmcFocusManager2
  * use everywhere EmcButton instead of elementary.Button
 
-MEDIAPLAYER
-============
- * need to request cache status to emotion, for online video.
-
 CORE
 =====
- * Browser: label must go in 'item_class' or refresh will not work :(
  * Make elementary engine configurable, or at least tell what engine is active
 
 MAME

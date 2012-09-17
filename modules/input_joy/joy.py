@@ -97,10 +97,6 @@ and what it need to work well, can also use markup like <title>this</> or
       if self.fdh: self.fdh.delete()
       if self.dev: self.dev.close()
 
-   def restart(self):
-      self.__shutdown__()
-      self.__init__()
-
    def joy_event_cb(self, handler):
       # read self.EVENT_SIZE bytes from the joystick 
       read_event = self.dev.read(self.EVENT_SIZE)
@@ -180,13 +176,13 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def device_changed_cb(self, vkbd, new_device):
       ini.set('joystick', 'device', new_device)
-      self.restart()
+      self.__restart__()
       bro = config_gui.browser_get()
       bro.refresh()
 
    def start_configurator(self):
       # recheck device
-      self.restart()
+      self.__restart__()
       if not self.dev or not self.fdh:
          EmcDialog(title = 'No joystick found', style = 'error',
                    text = 'Try to adjust your joystick device')

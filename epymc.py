@@ -82,7 +82,7 @@ def main():
    config_gui.shutdown()
    ini.write_to_file(os.path.join(user_config_dir, 'epymc.conf'))
    mediaplayer.shutdown()
-   gui.shoutdown()
+   gui.shutdown()
    browser.shutdown()
    sdb.shutdown()
 

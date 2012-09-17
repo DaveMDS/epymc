@@ -24,7 +24,10 @@ import ecore
 
 from epymc.modules import EmcModule
 import epymc.input_events as input_events
+from epymc.gui import EmcVKeyboard
+from epymc.browser import EmcItemClass
 import epymc.ini as ini
+import epymc.config_gui as config_gui
 
 
 def DBG(msg):
@@ -68,6 +71,10 @@ and what it need to work well, can also use markup like <title>this</> or
          # TODO spawn the configurator
          #~ return
 
+      # add an entry in the config section
+      config_gui.root_item_add('lirc', 51, 'Remote', icon = 'icon/remote',
+                               callback = self.config_panel_cb)
+
       try:
          self.sok = socket(AF_UNIX, OCK_STREAM)
          self.sok.connect(self.device)
@@ -78,6 +85,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def __shutdown__(self):
       DBG('Shutdown module: Lirc')
+      config_gui.root_item_del('lirc')
       if self.fdh: self.fdh.delete()
       if self.sok: self.sok.close()
 
@@ -86,3 +94,34 @@ and what it need to work well, can also use markup like <title>this</> or
       print data
 
       return True
+
+   ### config panel stuff
+   class DeviceItemClass(EmcItemClass):
+      def label_get(self, url, mod):
+         return 'Device (%s)' % (mod.device)
+
+      def item_selected(self, url, mod):
+         EmcVKeyboard(accept_cb = mod.device_changed_cb,
+                      title = 'Insert lirc device', text = mod.device)
+
+   class WizardItemClass(EmcItemClass):
+      def label_get(self, url, mod):
+         return 'Configure buttons'
+
+      def item_selected(self, url, mod):
+         mod.start_configurator()
+   
+   def config_panel_cb(self):
+      bro = config_gui.browser_get()
+      bro.page_add('config://lirc/', 'Remote', None, self.populate_lirc)
+
+   def populate_lirc(self, browser, url):
+      browser.item_add(self.DeviceItemClass(), 'config://lirc/device', self)
+      browser.item_add(self.WizardItemClass(), 'config://lirc/configurator', self)
+
+   def device_changed_cb(self, vkbd, new_device):
+      ini.set('lirc', 'device', new_device)
+      self.__restart__()
+      bro = config_gui.browser_get()
+      bro.refresh()
+   

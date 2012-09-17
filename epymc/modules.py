@@ -35,8 +35,12 @@ class EmcModule(object):
    def __init__(self):
       pass
 
-   def __shoutdown__(self):
+   def __shutdown__(self):
       pass
+
+   def __restart__(self):
+      self.__shutdown__()
+      self.__init__()
 
 
 _instances = {}

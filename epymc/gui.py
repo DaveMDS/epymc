@@ -134,7 +134,7 @@ def init():
 
    return True
 
-def shoutdown():
+def shutdown():
    input_events.listener_del('gui')
 
 def input_event_cb(event):

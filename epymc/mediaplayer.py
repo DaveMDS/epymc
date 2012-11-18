@@ -437,10 +437,10 @@ def input_event_cb(event):
       return input_events.EVENT_CONTINUE
 
    if event == 'EXIT':
-         stop()
-         video_player_hide()
-         volume_hide()
-         return input_events.EVENT_BLOCK
+      stop()
+      video_player_hide()
+      volume_hide()
+      return input_events.EVENT_BLOCK
 
    if _controls_visible:
       if event == 'BACK':
@@ -493,7 +493,29 @@ def input_event_cb(event):
          return input_events.EVENT_BLOCK
 
    if event == 'TOGGLE_PAUSE':
-      _cb_btn_play(_buttons[3])
+      _emotion.play = not _emotion.play
+      return input_events.EVENT_BLOCK
+   elif event == 'PLAY':
+      _emotion.play = True
+      return input_events.EVENT_BLOCK
+   elif event == 'PAUSE':
+      _emotion.play = False
+      return input_events.EVENT_BLOCK
+   elif event == 'STOP':
+      stop()
+      video_player_hide()
+      return input_events.EVENT_BLOCK
+   elif event == 'FORWARD':
+      forward()
+      return input_events.EVENT_BLOCK
+   elif event == 'BACKWARD':
+      backward()
+      return input_events.EVENT_BLOCK
+   elif event == 'FAST_FORWARD':
+      fforward()
+      return input_events.EVENT_BLOCK
+   elif event == 'FAST_BACKWARD':
+      fbackward()
       return input_events.EVENT_BLOCK
 
    return input_events.EVENT_CONTINUE

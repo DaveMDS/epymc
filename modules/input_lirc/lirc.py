@@ -21,12 +21,14 @@
 from socket import *
 
 import ecore
+import elementary
 
 from epymc.modules import EmcModule
 import epymc.input_events as input_events
 from epymc.gui import EmcVKeyboard, EmcDialog
 from epymc.browser import EmcItemClass
 import epymc.ini as ini
+import epymc.gui as gui
 import epymc.config_gui as config_gui
 
 
@@ -43,25 +45,16 @@ class LircModule(EmcModule):
 and what it need to work well, can also use markup like <title>this</> or
 <b>this</>"""
 
-
    DEFAULT_LIRC_SOCKET = '/var/run/lirc/lircd'
-
    sok = None
    fdh = None
-   
-   key_up = None
-   key_down = None
-   key_left = None
-   key_right = None
-   key_ok = None
-   key_back = None
-   
+
    def __init__(self):
       DBG('Init module')
 
       self.grab_key_func = None
       
-      # get lirc device from config
+      # get lirc socket from config
       ini.add_section('lirc')
       if not ini.has_option('lirc', 'device'):
          ini.set('lirc', 'device', self.DEFAULT_LIRC_SOCKET)
@@ -71,20 +64,18 @@ and what it need to work well, can also use markup like <title>this</> or
       config_gui.root_item_add('lirc', 51, 'Remote', icon = 'icon/remote',
                                callback = self.config_panel_cb)
 
-      # get lirc mapping from config
-      try:
-         self.key_up = ini.get_string('lirc', 'key_up');
-         self.key_down = ini.get_string('lirc', 'key_down');
-         self.key_left = ini.get_string('lirc', 'key_left');
-         self.key_right = ini.get_string('lirc', 'key_right');
-         self.key_ok = ini.get_string('lirc', 'key_ok');
-         self.key_back = ini.get_string('lirc', 'key_back');
-      except:
-         print 'Error: lirc configuration value missed'
-         # TODO spawn the configurator
+      # build the lirc_key => emc_input_event mapping from config
+      # self.keys => { 'lirc_key': 'emc_event', 'lirc_key': 'emc_event', ... }
+      self.keys = dict()
+      for name, lirc_key in ini.get_options('lirc'):
+         if name.startswith('key_'):
+            event = name[4:].upper()
+            for key in lirc_key.split('|'):
+               self.keys[key] = event
+      DBG(str(self.keys))
 
+      # try to open the lircd socket
       try:
-         # try to open the lircd socket
          self.sok = socket(AF_UNIX, SOCK_STREAM)
          self.sok.connect(self.device)
          self.fdh = ecore.FdHandler(self.sok.fileno(), ecore.ECORE_FD_READ,
@@ -101,111 +92,128 @@ and what it need to work well, can also use markup like <title>this</> or
       if self.sok: self.sok.close()
 
    def lirc_socket_cb(self, handler):
-      signal = ''
+      # try to decode the lirc messagge
+      # ex: CODE REPEAT KEY_NAME REMOTE_NAME
+      #     000000ab 00 KEY_UP MyRemoteName
       try:
          data = self.sok.recv(128)
          code, repeat, key, remote = data.strip().split()
          DBG('code:%s repeat:%s key:%s remote:%s' % (code, repeat, key, remote))
-
-         # if grabbed request call the grab function and return
-         if self.grab_key_func and callable(self.grab_key_func):
-            if repeat == '00':
-               self.grab_key_func(key)
-         else:
-            if   key == self.key_up:    signal = 'UP'
-            elif key == self.key_down:  signal = 'DOWN'
-            elif key == self.key_left:  signal = 'LEFT'
-            elif key == self.key_right: signal = 'RIGHT'
-            elif repeat == '00':
-               if   key == self.key_ok   and repeat == '00':  signal = 'OK'
-               elif key == self.key_back and repeat == '00':  signal = 'BACK'
-            input_events.event_emit(signal)
       except:
-         pass
+         print 'Error: cannot decode lirc messagge'
+         return True
+
+      # if grabbed request call the grab function, else emit the signal
+      if self.grab_key_func and callable(self.grab_key_func):
+         if repeat == '00':
+            self.grab_key_func(key)
+      else:
+         if key in self.keys:
+            signal = self.keys[key]
+            if signal in ['OK', 'BACK', 'VOLUME_MUTE', 'TOGGLE_PAUSE']:
+               # dont repeat this signals
+               if repeat == '00':
+                  input_events.event_emit(signal)
+            else:
+               # repeatable signals
+               input_events.event_emit(signal)
 
       return True
 
    ### config panel stuff
    class DeviceItemClass(EmcItemClass):
       def label_get(self, url, mod):
-         return 'Device (%s)' % (mod.device)
+         return 'Device: %s' % (mod.device)
+
+      def icon_get(self, url, key):
+         return 'icon/remote'
 
       def item_selected(self, url, mod):
          EmcVKeyboard(accept_cb = mod.device_changed_cb,
                       title = 'Insert lirc device', text = mod.device)
 
-   class WizardItemClass(EmcItemClass):
+   class KeyItemClass(EmcItemClass):
+      def label_get(self, url, data):
+         key, event = data
+         return 'Button: %s  Event: %s' % (key, event)
+
+   class AddKeyItemClass(EmcItemClass):
       def label_get(self, url, mod):
-         return 'Configure buttons'
+         return 'Add a new key'
+
+      def icon_get(self, url, mod):
+         return 'icon/plus'
 
       def item_selected(self, url, mod):
-         mod.start_configurator()
-   
+         mod.ask_a_single_key()
+
+
    def config_panel_cb(self):
       bro = config_gui.browser_get()
       bro.page_add('config://lirc/', 'Remote', None, self.populate_lirc)
 
    def populate_lirc(self, browser, url):
       browser.item_add(self.DeviceItemClass(), 'config://lirc/device', self)
-      browser.item_add(self.WizardItemClass(), 'config://lirc/configurator', self)
+      for key, event in self.keys.items():
+         browser.item_add(self.KeyItemClass(), 'config://lirc/button', (key, event))
+      browser.item_add(self.AddKeyItemClass(), 'config://lirc/addkey', self)
+      self.check_lirc()
 
    def device_changed_cb(self, vkbd, new_device):
       ini.set('lirc', 'device', new_device)
       self.__restart__()
-      bro = config_gui.browser_get()
-      bro.refresh()
-      
-   def start_configurator(self):
-      # recheck device
-      self.__restart__()
-      if not self.sok or not self.fdh:
-         EmcDialog(title = 'No remote found', style = 'error',
-                   text = 'Try to adjust your lirc socket address')
-         return
+      config_gui.browser_get().refresh()
+      self.check_lirc()
 
-      # wait for the first key
+   def check_lirc(self):
+      if not self.sok or not self.fdh:
+         EmcDialog(style = 'error',
+            text = 'Cannot connect to lirc using socket:<br>' + self.device)
+
+   def ask_a_single_key(self):
       self.grab_key_func = self.grabbed_key_func
-      self.dia_state = 'up'
       self.dia = EmcDialog(title = 'Configure remote', style = 'cancel',
-                      text = 'Press Up', done_cb = self.end_configurator)
+                           text = 'Press a key on your remote',
+                           canc_cb = self.ungrab_key)
+   
+   def ungrab_key(self, dialog):
+      self.grab_key_func = None
+      dialog.delete()
 
    def grabbed_key_func(self, key):
-      print key
-      if self.dia_state == 'up':
-         self.key_up = key
-         self.dia.text_set('Press Down')
-         self.dia_state = 'down'
-      elif self.dia_state == 'down':
-         self.key_down = key
-         self.dia.text_set('Press Left')
-         self.dia_state = 'left'
-      elif self.dia_state == 'left':
-         self.key_left = key
-         self.dia.text_set('Press Right')
-         self.dia_state = 'right'
-      elif self.dia_state == 'right':
-         self.key_right = key
-         self.dia.text_set('Press Ok')
-         self.dia_state = 'ok'
-      elif self.dia_state == 'ok':
-         self.key_ok = key
-         self.dia.text_set('Press Back')
-         self.dia_state = 'back'
-      elif self.dia_state == 'back':
-         self.key_back = key
-         self.dia.text_set('config done.')
-         self.dia_state = 'done'
-         # end & save
-         self.end_configurator()
-
-   def end_configurator(self):
+      # ungrab remote keys & delete the first dialog
       self.grab_key_func = None
       self.dia.delete()
-      ini.set('lirc', 'key_up', self.key_up)
-      ini.set('lirc', 'key_down', self.key_down)
-      ini.set('lirc', 'key_left', self.key_left)
-      ini.set('lirc', 'key_right', self.key_right)
-      ini.set('lirc', 'key_ok', self.key_ok)
-      ini.set('lirc', 'key_back', self.key_back)
+      
+      # create the events list
+      li = elementary.List(gui.win)
+      li.focus_allow_set(False)
+      for event in input_events.STANDARD_EVENTS.split():
+         li.item_append(event, None, None, None, None)
+      li.items_get()[0].selected_set(1)
+      li.show()
+      li.go()
 
-   
+      # put the list in a new dialog
+      dialog = EmcDialog(title = 'Choose an event to bind', style = 'minimal',
+                         content = li, done_cb = self.event_choosed_cb)
+      li.callback_clicked_double_add((lambda l,i: self.event_choosed_cb(dialog)))
+      self.pressed_key = key
+
+   def event_choosed_cb(self, dialog):
+      li = dialog.content_get()
+      item = li.selected_item_get()
+      event = item.text_get()
+      key = self.pressed_key
+
+      # update the keys mapping
+      self.keys[key] = event
+
+      # update ini
+      for key, event in self.keys.items():
+         ini.set('lirc', 'key_'+event.lower(), key)
+      dialog.delete()
+
+      # redraw the browser
+      config_gui.browser_get().refresh(hard=True)
+

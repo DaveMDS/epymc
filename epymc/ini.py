@@ -55,6 +55,9 @@ def has_options(options):
          return False
    return True
 
+def get_options(section):
+   return _config.items(section)
+
 def get(section, option):
    if not _config.has_option(section, option):
       return None

@@ -1,21 +1,44 @@
 
 DEPENDENCIES:
+=============
+the efl stack up to elementary and emotion
+the efl python bindings
 
-mutagen
- * sudo easy_install mutagen  OR
- * apt-get install python-mutagen
+
+mutagen:
+ sudo easy_install mutagen OR
+ apt-get install python-mutagen
 
 
 LIRC:
+=====
+EpyMC read your remote using the lirc daemon socket, usually /var/run/lirc/lircd.
+Lircd must be running and you must have a working lircd.conf
+Once lirc is up and running you can bind your buttons to the epymc events
+just using the config > remote section in the program.
 
 Usefull list of premade lird.conf files for many remote:
   http://lirc.sourceforge.net/remotes/
 and also:
   http://lircconfig.commandir.com/lircd.conf/
 
+You can test your lirc configuration by reading the socket and pressing keys:
+   socat - /var/run/lirc/lircd
+you should see something like this:
+   0000000asd 00 KEY_NAME YOUR_REMOTE_NAME
+
+Hint:
+To bind more than one key to the same event, you must edit the empymc.conf file
+by hand and separate multiple keys using the pipe| symbol. example:
+
+   [lirc]
+   device = /var/run/lirc/lircds
+   key_up = UP
+   key_down = DOWN|DOWN2
 
 
-SEARCH PATH:
+SEARCH PATHS:
+=============
  ~/.config/epymc/epymc.conf
  ~/.config/epymc/themes
  ~/.config/epymc/modules

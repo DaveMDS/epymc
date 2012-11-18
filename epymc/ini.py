@@ -79,6 +79,9 @@ def get_float(section, option):
 def get_bool(section, option):
    return _config.getboolean(section, option)
 
+def get_string(section, option):
+   return str(_config.get(section, option))
+
 def set(section, option, value):
    _config.set(section, option, value)
 

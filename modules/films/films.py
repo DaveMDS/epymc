@@ -72,6 +72,11 @@ class FilmItemClass(EmcItemClass):
    def label_get(self, url, mod):
       return os.path.basename(url)
 
+   def icon_end_get(self, url, user_data):
+      counts = mediaplayer.play_counts_get(url)
+      if counts['finished'] > 0:
+         return 'icon/check_on'
+
    def poster_get(self, url, mod):
       if mod._film_db.id_exists(url):
          e = mod._film_db.get_data(url)

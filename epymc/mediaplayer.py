@@ -51,6 +51,7 @@ _play_db = None     # key: url  data: play count (int)
 ### API ###
 def init():
    global _volume
+   global _play_db
 
    # default config values
    ini.add_section('mediaplayer')
@@ -109,15 +110,15 @@ def play_url(url, only_audio=False):
    LOG("COUNT: " + str(_play_db.get_data(url)))
    
    ## TEST VARIOUS INFO
-   LOG('inf', 'TITLE: ' + str(_emotion.title_get()))
-   LOG('inf', 'VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
-   LOG('inf', 'AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
-   LOG('inf', 'VIDEO CHANS GET: ' + str(_emotion.video_channel_get()))
-   LOG('inf', 'AUDIO CHANS GET: ' + str(_emotion.audio_channel_get()))
-   LOG('inf', 'INFO DICT: ' + str(_emotion.meta_info_dict_get()))
-   LOG('inf', 'SIZE: ' + str(_emotion.size))
-   LOG('inf', 'IMAGE_SIZE: ' + str(_emotion.image_size))
-   LOG('inf', 'RATIO: ' + str(_emotion.ratio_get()))
+   LOG('dbg', 'TITLE: ' + str(_emotion.title_get()))
+   LOG('dbg', 'VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
+   LOG('dbg', 'AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
+   LOG('dbg', 'VIDEO CHANS GET: ' + str(_emotion.video_channel_get()))
+   LOG('dbg', 'AUDIO CHANS GET: ' + str(_emotion.audio_channel_get()))
+   LOG('dbg', 'INFO DICT: ' + str(_emotion.meta_info_dict_get()))
+   LOG('dbg', 'SIZE: ' + str(_emotion.size))
+   LOG('dbg', 'IMAGE_SIZE: ' + str(_emotion.image_size))
+   LOG('dbg', 'RATIO: ' + str(_emotion.ratio_get()))
    ##
 
 def queue_url(url, only_audio=False):
@@ -125,6 +126,11 @@ def queue_url(url, only_audio=False):
    if _emotion is None or _emotion.play == False:
       play_url(url, only_audio)
 
+def play_counts_get(url):
+   try:
+      return _play_db.get_data(url)
+   except:
+      return {'started': 0, 'finished': 0}
 
 def stop():
    LOG('dbg', 'Stop()')
@@ -135,7 +141,6 @@ def stop():
    # necessary to hide a bug somewhere else:
    # without this the video restart to play when I set position to 0.0 :/
    _emotion.file_set('')
-   
 
 def forward():
    LOG('dbg', 'Forward cb' + str(_emotion.position))
@@ -378,6 +383,11 @@ def _init_emotion():
    gui.signal_cb_add('drag', 'volume.slider:dragable1', _drag_vol)
 
 def _cb_playback_finished(vid):
+
+   counts = _play_db.get_data(_onair_url)
+   counts['finished'] += 1
+   _play_db.set_data(_onair_url, counts)
+
    stop()
 
    if len(_url_queue) > 0:

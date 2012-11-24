@@ -982,7 +982,6 @@ group { name: "elm/genlist/item/default/browser";
       image: "bt_sm_hilight.png" COMP;
       image: "ilist_1.png" COMP;
       image: "ilist_item_shadow.png" COMP;
-
       image: "separator.png" COMP;
    }
    parts {
@@ -1046,7 +1045,7 @@ group { name: "elm/genlist/item/default/browser";
             }
             rel2 {
                relative: 0.0  1.0;
-               offset:   4   -5;
+               offset:     4   -5;
             }
          }
       }
@@ -1054,17 +1053,16 @@ group { name: "elm/genlist/item/default/browser";
          clip_to: "disclip";
          type: SWALLOW;
          description { state: "default" 0.0;
-            // fixed: 1 0;
             align: 0.0 0.5;
             rel1 {
                to_x: "elm.swallow.pad";
                relative: 1.0  0.0;
-               offset:   -1    4;
+               offset:    -1    4;
             }
             rel2 {
                to_x: "elm.swallow.pad";
                relative: 1.0  1.0;
-               offset:   -1   -5;
+               offset:    -1   -5;
             }
          }
       }
@@ -1072,17 +1070,14 @@ group { name: "elm/genlist/item/default/browser";
          clip_to: "disclip";
          type: SWALLOW;
          description { state: "default" 0.0;
-            fixed: 1 0;
             align: 1.0 0.5;
-            aspect: 1.0 1.0;
-            aspect_preference: VERTICAL;
             rel1 {
                relative: 1.0  0.0;
-               offset:   -5    4;
+               offset:    -5    4;
             }
             rel2 {
                relative: 1.0  1.0;
-               offset:   -5   -5;
+               offset:    -5   -5;
             }
          }
       }
@@ -1094,13 +1089,13 @@ group { name: "elm/genlist/item/default/browser";
          scale: 1;
          description { state: "default" 0.0;
             rel1 {
-               // to_x:     "elm.swallow.icon";
-               // relative: 1.0  0.0;
+               to_x:     "elm.swallow.icon";
+               relative: 1.0  0.0;
                offset:   0 4;
             }
             rel2 {
-               // to_x:     "elm.swallow.end";
-               // relative: 0.0  1.0;
+               to_x:     "elm.swallow.end";
+               relative: 0.0  1.0;
                offset:   -1 -5;
             }
             color: FONT_COLOR;
@@ -1108,8 +1103,8 @@ group { name: "elm/genlist/item/default/browser";
             text {
                font: FONT;
                size: (FONT_SIZE + 2);
-               align: 0.5 0.5;
-               min: 1 1;
+               align: 0.0 0.5;
+               min: 0 1;
             }
          }
          description { state: "selected" 0.0;
@@ -1118,6 +1113,35 @@ group { name: "elm/genlist/item/default/browser";
             color3: 0 0 0 64;
          }
       }
+      /*
+      part { name: "TESTING_ICON";
+         clip_to: "disclip";
+         type: RECT;
+         description { state: "default" 0.0;
+            color: 150 150 0 150;
+            rel1.to: "elm.swallow.icon";
+            rel2.to: "elm.swallow.icon";
+         }
+      }
+      part { name: "TESTING_TEXT";
+         clip_to: "disclip";
+         type: RECT;
+         description { state: "default" 0.0;
+            color: 0 150 150 150;
+            rel1.to: "elm.text";
+            rel2.to: "elm.text";
+         }
+      }
+      part { name: "TESTING_END";
+         clip_to: "disclip";
+         type: RECT;
+         description { state: "default" 0.0;
+            color: 150 0 150 150;
+            rel1.to: "elm.swallow.end";
+            rel2.to: "elm.swallow.end";
+         }
+      }
+      */
       part { name: "fg1";
          clip_to: "disclip";
          mouse_events: 0;

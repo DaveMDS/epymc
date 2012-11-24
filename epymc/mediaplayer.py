@@ -20,7 +20,7 @@
 
 import os
 import evas, ecore, edje, elementary, emotion
-import utils, ini, gui, input_events
+import utils, ini, gui, input_events, events
 from gui import EmcFocusManager2, EmcDialog, EmcButton
 from sdb import EmcDatabase
 
@@ -46,7 +46,7 @@ _buffer_dialog = None
 _update_timer = None
 _url_queue = []
 _onair_url = None
-_play_db = None     # key: url  data: play count (int)
+_play_db = None     # key: url  data: {'started': int, 'finished': int}
 
 ### API ###
 def init():
@@ -68,8 +68,11 @@ def init():
    input_events.listener_add("videoplayer", input_event_cb)
 
 def shutdown():
+   global _play_db
+   
    # TODO Shutdown all emotion stuff & the buttons list
    input_events.listener_del("videoplayer")
+   del _play_db
 
 ### mediaplyer API ###
 def play_url(url, only_audio=False):
@@ -97,17 +100,23 @@ def play_url(url, only_audio=False):
       _emotion.audio_mute = _volume_muted
       _emotion.play = True
 
+   events.event_emit('PLAYBACK_STARTED')
+
    if not only_audio:
       video_player_show()
 
-   # keep the count of played urls
-   if _play_db.has_key(url):
-      count = _play_db.get_data(url)
-      _play_db.set_data(url, count + 1)
+   # keep the counts of played/finished urls
+   if _play_db.id_exists(url):
+      counts = _play_db.get_data(url)
+      counts['started'] += 1
+      _play_db.set_data(url, counts)
    else:
-      _play_db.set_data(url, 1)
-
-   LOG("COUNT: " + str(_play_db.get_data(url)))
+      counts = dict()
+      counts['started'] = 1
+      counts['finished'] = 0
+      _play_db.set_data(url, counts)
+   LOG('dbg', 'url started: %d finished: %d' %
+              (counts['started'], counts['finished']))
    
    ## TEST VARIOUS INFO
    LOG('dbg', 'TITLE: ' + str(_emotion.title_get()))
@@ -141,6 +150,8 @@ def stop():
    # necessary to hide a bug somewhere else:
    # without this the video restart to play when I set position to 0.0 :/
    _emotion.file_set('')
+
+   events.event_emit('PLAYBACK_FINISHED')
 
 def forward():
    LOG('dbg', 'Forward cb' + str(_emotion.position))

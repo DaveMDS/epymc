@@ -35,6 +35,7 @@ import epymc.mediaplayer as mediaplayer
 import epymc.ini as ini
 import epymc.utils as utils
 import epymc.gui as gui
+import epymc.events as events
 
 
 # debuggin stuff
@@ -167,12 +168,18 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # create a browser instance
       self._browser = EmcBrowser('Films', 'List')
 
+      # listen to emc events
+      events.listener_add('films', self._events_cb)
+
       # on idle scan all files (one shoot)
       if (ini.get_bool('film', 'enable_scanner')):
          self._idler = ecore.Idler(self.idle_cb)
 
    def __shutdown__(self):
       DBG('Shutdown module')
+
+      # stop listening for events
+      events.listener_del('films')
 
       # kill the idler
       if self._idler:
@@ -315,6 +322,10 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
             cast = cast + (', ' if cast else '') + person['name']
       return cast
 
+   def _events_cb(self, event):
+      if event == 'PLAYBACK_FINISHED':
+         # refresh the page (maybe an unwatched film becomes watched)
+         self._browser.refresh()
 
 ###### INFO PANEL STUFF
    def show_film_info(self, url):

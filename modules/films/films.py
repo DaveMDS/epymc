@@ -104,7 +104,6 @@ class FilmItemClass(EmcItemClass):
          # text = 'àèé'
          return text.encode('utf-8','replace')
 
-
 class FolderItemClass(EmcItemClass):
    def item_selected(self, url, mod):
       mod._browser.page_add(url, os.path.basename(url), None, mod.populate_url)
@@ -256,12 +255,15 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    def play_film(self, url):
       mediaplayer.play_url(url)
-      try:
-         e = self._film_db.get_data(url)
-         mediaplayer.title_set(e['name'])
-         mediaplayer.poster_set(get_poster_filename(e['id']))
-      except:
-         pass
+      if self._film_db.id_exists(url):
+         try:
+            e = self._film_db.get_data(url)
+            mediaplayer.title_set(e['name'])
+            mediaplayer.poster_set(get_poster_filename(e['id']))
+         except:
+            pass
+      else:
+         mediaplayer.title_set(os.path.basename(url))
 
 ###### BROWSER STUFF
    def cb_mainmenu(self):

@@ -69,7 +69,8 @@ def init():
    if not theme_file:
       print 'ERROR: can\'t find a working theme file, exiting...'
       return False
-
+   print 'Using theme: ' + theme_file
+   
    # custom elementary theme
    elementary.theme_overlay_add(theme_file) # TODO REMOVE ME!!! is here for buttons
    elementary.theme_extension_add(theme_file)

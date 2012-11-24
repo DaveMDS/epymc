@@ -22,6 +22,7 @@ import os
 import evas, ecore, edje, elementary, emotion
 import utils, ini, gui, input_events
 from gui import EmcFocusManager2, EmcDialog, EmcButton
+from sdb import EmcDatabase
 
 
 DEBUG = True
@@ -45,6 +46,7 @@ _buffer_dialog = None
 _update_timer = None
 _url_queue = []
 _onair_url = None
+_play_db = None     # key: url  data: play count (int)
 
 ### API ###
 def init():
@@ -57,6 +59,9 @@ def init():
    if not ini.has_option('mediaplayer', 'backend'):
       ini.set('mediaplayer', 'backend', 'gstreamer')
    _volume = ini.get_int('mediaplayer', 'volume')
+
+   # simple db to store the count of played files
+   _play_db = EmcDatabase('playcount')
 
    # input events
    input_events.listener_add("videoplayer", input_event_cb)
@@ -94,6 +99,15 @@ def play_url(url, only_audio=False):
    if not only_audio:
       video_player_show()
 
+   # keep the count of played urls
+   if _play_db.has_key(url):
+      count = _play_db.get_data(url)
+      _play_db.set_data(url, count + 1)
+   else:
+      _play_db.set_data(url, 1)
+
+   LOG("COUNT: " + str(_play_db.get_data(url)))
+   
    ## TEST VARIOUS INFO
    LOG('inf', 'TITLE: ' + str(_emotion.title_get()))
    LOG('inf', 'VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))

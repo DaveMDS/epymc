@@ -58,10 +58,14 @@ def has_options(options):
 def get_options(section):
    return _config.items(section)
 
-def get(section, option):
-   if not _config.has_option(section, option):
-      return None
-   return _config.get(section, option)
+def get(section, option, default_value = None):
+   if _config.has_option(section, option):
+      return _config.get(section, option)
+
+   if default_value is not None:
+      set(section, option, default_value)
+      return default_value
+
 
 def get_string_list(section, option, separator = ' '):
    if not _config.has_option(section, option):

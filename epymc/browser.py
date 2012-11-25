@@ -28,6 +28,7 @@ import input_events
 import ini
 from sdb import EmcDatabase
 from utils import Singleton
+from widgets import EmcRemoteImage
 
 def DBG(msg):
    # print ('BROWSER: ' + msg)
@@ -384,7 +385,7 @@ class ViewList(object):
                                  state_get_func = self.__genlist_state_get)
 
       # RemoteImage (poster)
-      self.__im = gui.EmcRemoteImage(gui.win)
+      self.__im = EmcRemoteImage(gui.win)
       gui.swallow_set('browser.list.poster', self.__im)
 
    def page_show(self, title, anim):

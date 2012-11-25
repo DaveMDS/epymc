@@ -25,7 +25,7 @@ import elementary
 
 from epymc.modules import EmcModule
 import epymc.input_events as input_events
-from epymc.gui import EmcVKeyboard, EmcDialog
+from epymc.widgets import EmcVKeyboard, EmcDialog
 from epymc.browser import EmcItemClass
 import epymc.ini as ini
 import epymc.gui as gui

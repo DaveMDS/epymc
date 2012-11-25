@@ -27,6 +27,7 @@ import mainmenu
 import input_events
 
 from browser import EmcBrowser, EmcItemClass
+from widgets import EmcDialog
 
 def DBG(msg):
    print('CONFIG_GUI: ' + msg)
@@ -117,8 +118,8 @@ def _change_scale():
       d.text_set('Current Value: %s' % (gui.scale_get()))
       ini.set('general', 'scale', str(gui.scale_get()))
 
-   d = gui.EmcDialog(title = 'set scale', style = 'minimal',
-                     text = 'Current Value: %s' % (gui.scale_get()))
+   d = EmcDialog(title = 'set scale', style = 'minimal',
+                 text = 'Current Value: %s' % (gui.scale_get()))
    d.button_add('Bigger', selected_cb = _bigger)
    d.button_add('Smaller', selected_cb = _smaller)
    d.button_add('Reset', selected_cb = _reset)

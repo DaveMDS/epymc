@@ -26,8 +26,7 @@ import struct
 import ecore
 
 from epymc.modules import EmcModule
-from epymc.gui import EmcDialog
-from epymc.gui import EmcVKeyboard
+from epymc.widgets import EmcDialog, EmcVKeyboard
 from epymc.browser import EmcItemClass
 import epymc.input_events as input_events
 import epymc.ini as ini

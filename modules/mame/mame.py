@@ -28,7 +28,7 @@ import elementary
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
-from epymc.gui import EmcDialog
+from epymc.widgets import EmcDialog, EmcRemoteImage
 from epymc.utils import EmcExec
 import epymc.mainmenu as mainmenu
 import epymc.browser as browser
@@ -399,7 +399,7 @@ class MameGame(object):
       box.homogeneous_set(True)
       box.show()
 
-      image = gui.EmcRemoteImage(gui.win)
+      image = EmcRemoteImage(gui.win)
       image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       (local, remote) = self.poster_get()

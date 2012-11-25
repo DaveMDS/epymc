@@ -21,7 +21,7 @@
 import os
 import evas, ecore, edje, elementary, emotion
 import utils, ini, gui, input_events, events
-from gui import EmcFocusManager2, EmcDialog, EmcButton
+from widgets import EmcFocusManager2, EmcDialog, EmcButton
 from sdb import EmcDatabase
 
 

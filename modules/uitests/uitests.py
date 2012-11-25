@@ -23,8 +23,8 @@ import os
 import ecore, elementary
 
 from epymc.modules import EmcModule
-from epymc.gui import EmcDialog, EmcVKeyboard, EmcSourceSelector
-from epymc.gui import EmcButton, EmcFocusManager2, EmcNotify
+from epymc.widgets import EmcDialog, EmcVKeyboard, EmcSourceSelector
+from epymc.widgets import EmcButton, EmcFocusManager2, EmcNotify
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
 import epymc.events as events

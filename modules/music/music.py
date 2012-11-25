@@ -27,7 +27,7 @@ import ecore
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
-from epymc.gui import EmcDialog, EmcNotify
+from epymc.widgets import EmcDialog, EmcNotify
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
 import epymc.ini as ini

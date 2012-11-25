@@ -24,7 +24,7 @@ import evas, ecore, edje, elementary
 import ecore.x #used only to show/hide the cursor
 
 import utils, ini, gui, events, input_events
-from widgets import EmcButton
+from widgets import EmcButton, EmcDialog
 
 
 win = None

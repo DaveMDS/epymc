@@ -361,10 +361,7 @@ class MameGame(object):
    def poster_get(self):
       snap_file = os.path.join(MameModule._snapshoot_dir, self.gid, '0000.png')
       snap_url = 'http://www.progettoemma.net/snap/%s/0000.png' % self.gid
-      if os.path.isfile(snap_file):
-         return (snap_file, None)
-      else:
-         return (snap_file, snap_url)
+      return (snap_file, snap_url)
 
    def short_info_get(self):
       if self.parsed:
@@ -399,12 +396,8 @@ class MameGame(object):
       box.homogeneous_set(True)
       box.show()
 
-      image = EmcRemoteImage(gui.win)
-      image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       (local, remote) = self.poster_get()
-      image.url_set(remote, local)
-      image.show()
+      image = EmcRemoteImage(remote, local)
       box.pack_end(image)
 
       sentry = elementary.Entry(gui.win)

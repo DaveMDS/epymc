@@ -25,46 +25,43 @@ import utils, gui, input_events
 
 ################################################################################
 class EmcButton(elementary.Button):
-   """ TODO doc this """
-   def __init__(self, label=None, icon = None):
+   """ TODO documentation """
+
+   def __init__(self, label = None, icon = None):
       elementary.Button.__init__(self, gui.layout)
       self.style_set('emc')
       self.focus_allow_set(False)
-      if label:
-         self.text_set(label)
-      if icon:
-         self.content_set(gui.load_icon(icon))
+      if label: self.text_set(label)
+      if icon: self.content_set(gui.load_icon(icon))
       self.show()
 
-   # def color_set(self, r, g, b):
-      # self.ARGHHH
 
 ################################################################################
 class EmcRemoteImage(elementary.Image):
-   """ TODO doc this """
+   """ TODO documentation """
+   """ TODO on image_set abort the download ? """
 
-   def __init__(self, parent):
-      elementary.Image.__init__(self, parent)
-      self._parent = parent
-      self._pb = elementary.Progressbar(parent)
-      self._pb.style_set('wheel')
+   def __init__(self, url = None, dest = None):
+      elementary.Image.__init__(self, gui.layout)
+      self.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      self.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       self.on_move_add(self._cb_move_resize)
       self.on_resize_add(self._cb_move_resize)
+      self._spinner = elementary.Progressbar(gui.layout)
+      self._spinner.style_set('wheel')
+      if url: self.url_set(url, dest)
 
    def show(self):
-      print 'SHOW %d %d %d %d' % self.geometry_get()
       elementary.Image.show(self)
 
    def hide(self):
-      self._pb.hide()
+      self._spinner.hide()
       elementary.Image.hide(self)
 
    def url_set(self, url, dest = None):
       if dest and os.path.exists(dest):
-         # if dest exists then just set the image
          self.file_set(dest)
       else:
-         # else start spin & download
          self.file_set('')
          self.start_spin()
          utils.download_url_async(url, dest if dest else 'tmp',
@@ -72,32 +69,28 @@ class EmcRemoteImage(elementary.Image):
 
    def start_spin(self):
       self.show()
-      self._pb.show()
-      self._pb.pulse(True)
+      self._spinner.show()
+      self._spinner.pulse(True)
 
    def stop_spin(self):
-      self._pb.hide()
-      self._pb.pulse(False)
+      self._spinner.hide()
+      self._spinner.pulse(False)
 
    def _cb_move_resize(self, obj):
       (x, y, w, h) = self.geometry_get()
-      # print ('MOVE %d %d %d %d' % (x, y, w, h))
-      self._pb.resize(w, h)
-      self._pb.move(x, y)
-      # self._pb.raise_()  :/
-      if self._pb.clip != self.clip:
-         self._pb.clip = self.clip
+      self._spinner.resize(w, h)
+      self._spinner.move(x, y)
+      if self._spinner.clip != self.clip:
+         self._spinner.clip = self.clip
 
    def _cb_download_complete(self, dest, status):
       self.stop_spin()
       if status == 200: # Successfull HTTP code
          self.file_set(dest)
-         self.size_hint_min_set(100, 100) #TODO FIXME (needed by tmdb search results list)
       else:
-         self.file_set('')
          # TODO show a dummy image
+         self.file_set('')
 
-   #TODO on image_set abort the download ? 
 
 ################################################################################
 class EmcDialog(edje.Edje):

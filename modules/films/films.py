@@ -460,9 +460,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
          count = 0 
          for (image_thumb, image_big) in zip(images_thumb, images_big):
-            icon = EmcRemoteImage(li)
-            icon.url_set(image_thumb['url'])
-            li.item_append('', icon, None, None, (image_big['url'], film_info['id']))
+            img = EmcRemoteImage(image_thumb['url'])
+            li.item_append('', img, None, None, (image_big['url'], film_info['id']))
             count += 1
 
          li.items_get()[0].selected_set(1)
@@ -525,9 +524,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          li.style_set('image_list')
          count = 0
          for (image_thumb, image_big) in zip(images_thumb, images_big):
-            icon = EmcRemoteImage(li)
-            icon.url_set(image_thumb['url'])
-            li.item_append('', icon, None, None, (image_big['url'], film_info['id']))
+            img = EmcRemoteImage(image_thumb['url'])
+            li.item_append('', img, None, None, (image_big['url'], film_info['id']))
             count += 1
 
          li.items_get()[0].selected_set(1)
@@ -793,8 +791,7 @@ class TMDB_WithGui():
             icon = None
             for image in res['posters']:
                if image['image']['size'] == 'thumb' and image['image']['url']:
-                  icon = EmcRemoteImage(li)
-                  icon.url_set(image['image']['url'])
+                  icon = EmcRemoteImage(image['image']['url'])
                   icon.size_hint_min_set(100, 100) # TODO fixme
                   break
             DBG(res['name'])

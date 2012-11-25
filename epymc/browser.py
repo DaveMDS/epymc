@@ -385,7 +385,7 @@ class ViewList(object):
                                  state_get_func = self.__genlist_state_get)
 
       # RemoteImage (poster)
-      self.__im = EmcRemoteImage(gui.win)
+      self.__im = EmcRemoteImage()
       gui.swallow_set('browser.list.poster', self.__im)
 
    def page_show(self, title, anim):

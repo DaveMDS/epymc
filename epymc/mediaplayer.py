@@ -37,8 +37,6 @@ _volume = 0
 _volume_muted = False
 _emotion = None
 _controls_visible = False
-_volume_visible = False
-_volume_hide_timer = None
 _buttons = list()
 _fman = None
 _video_visible = False
@@ -225,14 +223,14 @@ def video_controls_show():
 
    gui.signal_emit('videoplayer,controls,show')
    _controls_visible = True
-   volume_show()
+   gui.volume_show()
 
 def video_controls_hide():
    global _controls_visible
 
    gui.signal_emit('videoplayer,controls,hide')
    _controls_visible = False
-   volume_hide()
+   gui.volume_hide()
 
 def video_controls_toggle():
    if _controls_visible:
@@ -240,23 +238,7 @@ def video_controls_toggle():
    else:
       video_controls_show()
 
-def volume_show(hidein = 0):
-   global _volume_visible
-   global _volume_hide_timer
 
-   gui.signal_emit('volume,show')
-   _volume_visible = True
-   if hidein > 0:
-      if _volume_hide_timer: _volume_hide_timer.delete()
-      _volume_hide_timer = ecore.Timer(hidein, volume_hide)
-
-def volume_hide():
-   global _volume_visible
-   global _volume_hide_timer
-
-   gui.signal_emit('volume,hide')
-   _volume_visible = False
-   _volume_hide_timer = None
 
 def poster_set(poster, extra_path = None):
    gui.swallow_set("videoplayer.controls.poster", gui.load_image(poster, extra_path))
@@ -457,15 +439,15 @@ def input_event_cb(event):
 
    if event == 'VOLUME_UP':
       volume_set(_volume + 5)
-      volume_show(hidein = 3)
+      events.event_emit('VOLUME_CHANGED')
       return input_events.EVENT_BLOCK
    elif event == 'VOLUME_DOWN':
       volume_set(_volume - 5)
-      volume_show(hidein = 3)
+      events.event_emit('VOLUME_CHANGED')
       return input_events.EVENT_BLOCK
    elif event == 'VOLUME_MUTE':
       volume_mute_toggle()
-      volume_show(hidein = 3)
+      events.event_emit('VOLUME_CHANGED')
       return input_events.EVENT_BLOCK
 
    if not _video_visible:
@@ -516,15 +498,12 @@ def input_event_cb(event):
          backward()
          return input_events.EVENT_BLOCK
       elif event == 'UP':
-         # fforward()
          volume_set(_volume + 5)
-         volume_show(hidein = 3)
-         
+         events.event_emit('VOLUME_CHANGED')
          return input_events.EVENT_BLOCK
       elif event == 'DOWN':
-         # fbackward()
          volume_set(_volume - 5)
-         volume_show(hidein = 3)
+         events.event_emit('VOLUME_CHANGED')
          return input_events.EVENT_BLOCK
 
    if event == 'TOGGLE_PAUSE':

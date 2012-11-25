@@ -29,6 +29,7 @@ import elementary
 import utils
 import ini
 import gui
+import events
 import input_events
 
 win = None
@@ -36,6 +37,7 @@ xwin = None
 layout = None
 theme_file = None
 backdrop_im = None
+_volume_hide_timer = None
 
 
 DEBUG = True
@@ -122,7 +124,9 @@ def init():
    layout.edje_get().part_box_append('topbar.box', bt)
    bt.show()
 
+   # listen to events and input_events
    input_events.listener_add('gui', input_event_cb)
+   events.listener_add('gui', event_cb)
 
    # once a minute ping the screensaver to prevent it disturbing
    def _sscb():
@@ -136,6 +140,7 @@ def init():
    return True
 
 def shutdown():
+   events.listener_del('gui')
    input_events.listener_del('gui')
 
 def input_event_cb(event):
@@ -153,6 +158,10 @@ def input_event_cb(event):
       return input_events.EVENT_BLOCK
 
    input_events.EVENT_CONTINUE
+
+def event_cb(event):
+   if event == 'VOLUME_CHANGED':
+      volume_show(hidein = 3)
 
 def _cb_win_del(win):
    ask_to_exit()
@@ -222,6 +231,27 @@ def _cb_exit_yes(button):
 
 def toggle_fullscreen():
    pass
+
+
+
+
+def volume_show(hidein = 0):
+   # global _volume_visible
+   global _volume_hide_timer
+
+   gui.signal_emit('volume,show')
+   # _volume_visible = True
+   if hidein > 0:
+      if _volume_hide_timer: _volume_hide_timer.delete()
+      _volume_hide_timer = ecore.Timer(hidein, volume_hide)
+
+def volume_hide():
+   # global _volume_visible
+   global _volume_hide_timer
+
+   gui.signal_emit('volume,hide')
+   # _volume_visible = False
+   _volume_hide_timer = None
 
 # mouse hide/show stuff
 last_mouse_pos = (0, 0)

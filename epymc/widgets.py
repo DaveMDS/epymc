@@ -108,7 +108,7 @@ class EmcDialog(edje.Edje):
    
    def __init__(self, title = None, text = None, content = None,
                 spinner = False, style = 'panel',
-                done_cb = None, canc_cb = None):
+                done_cb = None, canc_cb = None, user_data = None):
       # load the right edje object
       if style in EmcDialog.special_styles or style == 'minimal':
          group = 'emc/dialog/minimal'
@@ -133,6 +133,7 @@ class EmcDialog(edje.Edje):
       self._content = content
       self._done_cb = done_cb
       self._canc_cb = canc_cb
+      self._user_data = user_data
       self._buttons = []
       self.fman = EmcFocusManager2()
 
@@ -186,8 +187,15 @@ class EmcDialog(edje.Edje):
          self.button_add('Ok', (lambda btn: self.delete()))
 
       if style in ('yesno'):
-         self.button_add('No', (lambda btn: self.delete()))
-         self.button_add('Yes', (lambda btn: self._done_cb(self)))
+         if self._canc_cb:
+            self.button_add('No', (lambda btn: self._canc_cb(self)))
+         else:
+            self.button_add('No', (lambda btn: self.delete()))
+
+         if self._done_cb:
+            self.button_add('Yes', (lambda btn: self._done_cb(self)))
+         else:
+            self.button_add('Yes', (lambda btn: self.delete()))
 
       # Do we want the cancel button? we have the red-round-close...
       # if style in ('cancel'):
@@ -226,6 +234,9 @@ class EmcDialog(edje.Edje):
 
    def content_get(self):
       return self._content
+
+   def data_get(self):
+      return self._user_data
 
    def button_add(self, label, selected_cb = None, cb_data = None, icon = None):
       if not self._buttons:

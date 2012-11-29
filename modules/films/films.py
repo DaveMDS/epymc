@@ -77,6 +77,8 @@ class FilmItemClass(EmcItemClass):
       counts = mediaplayer.play_counts_get(url)
       if counts['finished'] > 0:
          return 'icon/check_on'
+      if counts['stop_at'] > 0:
+         return 'icon/check_off'
 
    def poster_get(self, url, mod):
       if mod._film_db.id_exists(url):
@@ -266,7 +268,30 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       del tmdb
 
    def play_film(self, url):
-      mediaplayer.play_url(url)
+      counts = mediaplayer.play_counts_get(url)
+      if counts['stop_at'] > 0:
+         pos = counts['stop_at']
+         h = int(pos / 3600)
+         m = int(pos / 60) % 60
+         s = int(pos % 60)
+         txt = "Continue from %d:%.2d:%.2d ?" % (h, m, s)
+         EmcDialog(text = txt, style = 'yesno', user_data = url,
+                   done_cb = self._dia_yes_cb,
+                   canc_cb = self._dia_no_cb)
+      else:
+         self.play_film_real(url, 0)
+
+   def _dia_yes_cb(self, dialog):
+      counts = mediaplayer.play_counts_get(dialog.data_get())
+      self.play_film_real(dialog.data_get(), counts['stop_at'])
+      dialog.delete()
+
+   def _dia_no_cb(self, dialog):
+      self.play_film_real(dialog.data_get(), 0)
+      dialog.delete()
+
+   def play_film_real(self, url, start_from):
+      mediaplayer.play_url(url, start_from = start_from)
       if self._film_db.id_exists(url):
          try:
             e = self._film_db.get_data(url)
@@ -276,7 +301,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
             pass
       else:
          mediaplayer.title_set(os.path.basename(url))
-
 ###### BROWSER STUFF
    def cb_mainmenu(self):
       # get film folders from config

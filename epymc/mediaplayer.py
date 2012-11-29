@@ -44,7 +44,7 @@ _buffer_dialog = None
 _update_timer = None
 _url_queue = []
 _onair_url = None
-_play_db = None     # key: url  data: {'started': int, 'finished': int}
+_play_db = None # key: url  data: {'started': 14, 'finished': 0, 'stop_at': 0 }
 
 ### API ###
 def init():
@@ -73,7 +73,7 @@ def shutdown():
    del _play_db
 
 ### mediaplyer API ###
-def play_url(url, only_audio=False):
+def play_url(url, only_audio = False, start_from = 0):
    global _onair_url
 
    if not _emotion:
@@ -92,6 +92,7 @@ def play_url(url, only_audio=False):
       return
 
    _emotion.file_set(url)
+   _emotion.position = start_from
    if _emotion.play == False:
       volume_set(_volume)
       volume_mute_set(_volume_muted)
@@ -109,9 +110,7 @@ def play_url(url, only_audio=False):
       counts['started'] += 1
       _play_db.set_data(url, counts)
    else:
-      counts = dict()
-      counts['started'] = 1
-      counts['finished'] = 0
+      counts = { 'started': 0, 'finished': 0, 'stop_at': 0 }
       _play_db.set_data(url, counts)
    LOG('dbg', 'url started: %d finished: %d' %
               (counts['started'], counts['finished']))
@@ -137,10 +136,22 @@ def play_counts_get(url):
    try:
       return _play_db.get_data(url)
    except:
-      return {'started': 0, 'finished': 0}
+      return { 'started': 0,   # num times started
+               'finished': 0,  # num times finished
+               'stop_at': 0 }  # last play pos
+             
 
 def stop():
    LOG('dbg', 'Stop()')
+
+   counts = _play_db.get_data(_onair_url)
+   if _emotion.position >= _emotion.play_length - 5:
+      counts['finished'] += 1
+      counts['stop_at'] = 0
+   else:
+      counts['stop_at'] = _emotion.position
+   _play_db.set_data(_onair_url, counts)
+
    _emotion.play = False
    _emotion.position = 0.0
 
@@ -377,10 +388,6 @@ def _init_emotion():
 
 def _cb_playback_finished(vid):
 
-   counts = _play_db.get_data(_onair_url)
-   counts['finished'] += 1
-   _play_db.set_data(_onair_url, counts)
-
    stop()
 
    if len(_url_queue) > 0:
@@ -421,12 +428,12 @@ def _update_slider():
       len = _emotion.play_length
 
       lh = int(len / 3600)
-      lm = int((len / 60) - (lh * 60))
-      ls = int(len - (lm * 60) - (lh * 3600))
+      lm = int(len / 60) % 60
+      ls = int(len % 60)
 
       ph = int(pos / 3600)
-      pm = int((pos / 60) - (ph * 60))
-      ps = int(pos - (pm * 60) - (ph * 3600))
+      pm = int(pos / 60) % 60
+      ps = int(pos % 60)
 
       if len > 0:
          gui.slider_val_set('videoplayer.controls.slider:dragable1', pos / len)

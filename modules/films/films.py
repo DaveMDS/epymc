@@ -293,14 +293,19 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def play_film_real(self, url, start_from):
       mediaplayer.play_url(url, start_from = start_from)
       if self._film_db.id_exists(url):
+         e = self._film_db.get_data(url)
          try:
-            e = self._film_db.get_data(url)
             mediaplayer.title_set(e['name'])
+         except:
+            mediaplayer.title_set(os.path.basename(url))
+         try:
             mediaplayer.poster_set(get_poster_filename(e['id']))
          except:
-            pass
+            mediaplayer.poster_set(None)
       else:
          mediaplayer.title_set(os.path.basename(url))
+         mediaplayer.poster_set(None)
+
 ###### BROWSER STUFF
    def cb_mainmenu(self):
       # get film folders from config

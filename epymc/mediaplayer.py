@@ -251,8 +251,11 @@ def video_controls_toggle():
 
 
 
-def poster_set(poster, extra_path = None):
-   gui.swallow_set("videoplayer.controls.poster", gui.load_image(poster, extra_path))
+def poster_set(poster = None, extra_path = None):
+   if poster:
+      gui.swallow_set("videoplayer.controls.poster", gui.load_image(poster, extra_path))
+   else:
+      gui.swallow_set("videoplayer.controls.poster", gui.load_image('dvd_cover_blank.png'))
 
 def title_set(title):
    gui.text_set("videoplayer.controls.title", title)

@@ -65,7 +65,6 @@ class AddSourceItemClass(EmcItemClass):
    def icon_get(self, url, mod):
       return 'icon/plus'
 
-
 class FilmItemClass(EmcItemClass):
    def item_selected(self, url, mod):
       mod.show_film_info(url)
@@ -103,14 +102,11 @@ class FilmItemClass(EmcItemClass):
          text = '<title>%s (%s %s)</><br>' \
                 '<hilight>Rating:</> %.0f/10<br>' \
                 '<hilight>Director:</> %s<br>' \
-                '<hilight>Cast:</> %s<br>%s' % \
+                '<hilight>Cast:</> %s<br>' % \
                 (e['name'], country, e['released'][:4],
                 e['rating'], mod._get_director(e),
-                mod._get_cast(e, 3), e['overview'])
-                # TODO genres
-         # ARGHHHHH the encode doesn't work :(
-         # text = 'àèé'
-         return text.encode('utf-8','replace')
+                mod._get_cast(e, 4))
+         return text
 
 class FolderItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -344,11 +340,14 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
             return person['name']
       return 'Unknow'
 
-   def _get_cast(self, e, max_num = 99): # TODO make max_num works
+   def _get_cast(self, e, max_num = 999):
       cast = ''
       for person in e['cast']:
          if person['job'] == 'Actor':
             cast = cast + (', ' if cast else '') + person['name']
+            max_num -= 1
+            if max_num < 1:
+               break
       return cast
 
    def _events_cb(self, event):

@@ -25,6 +25,7 @@
 images {
    image: "background.jpg" COMP;
    image: "frame.png" COMP;
+   image: "frame_box.png" COMP;
    image: "frame2.png" COMP;
    image: "frame3.png" COMP;
    image: "frame4.png" COMP;
@@ -248,11 +249,10 @@ collections {
             }
          }
          part { name: "topbar.list.spacer";
-            type: RECT;
+            type: SPACER;
             scale: 1;
             description { state: "default" 0.0;
                max: 9999 40;
-               visible: 0;
                align: 0.5 0.0;
             }
          }
@@ -273,13 +273,13 @@ collections {
             type: IMAGE;
             clip_to: "browser.list.clip";
             description { state: "default" 0.0;
-               rel1.offset: 5 10;
+               rel1.offset: 0 10;
                rel1.to: "topbar.list.spacer";
                rel1.relative: 0.0 1.0;
                rel2.relative: 0.5 1.0;
                rel2.offset: -1 -10;
                image.normal: "frame.png";
-               image.border: 0 0 92 78;
+               image.border: 32 32 92 78;
             }
          }
          part { name: "browser.list.list_clip";
@@ -289,11 +289,11 @@ collections {
                color: 255 255 255 0;
                rel1 {
                   to: "browser.list.list_frame";
-                  offset: 14 20;
+                  offset: 19 18;
                }
                rel2 {
                   to: "browser.list.list_frame";
-                  offset: -17 -75;
+                  offset: -20 -78;
                }
             }
             description { state: "visible" 0.0;
@@ -352,6 +352,19 @@ collections {
                }
             }
          }
+         part { name: "browser.list.total.bg";
+            clip_to: "browser.list.clip";
+            description { state: "default" 0.0;
+               image {
+                  normal: "frame_box.png";
+                  border: 3 3 3 3;
+               }
+               rel1.to: "browser.list.total";
+               rel1.offset: -15 -3;
+               rel2.to: "browser.list.total";
+               rel2.offset: 14 2;
+            }
+         }
          part { name: "browser.list.total"; /* API */
             type: TEXT;
             clip_to: "browser.list.clip";
@@ -362,18 +375,18 @@ collections {
                color3: 0 0 0 255;
                rel1 {
                   to: "browser.list.list_frame";
-                  relative: 0.70 1.0;
-                  offset: 0 -70;
+                  relative: 0.0 1.0;
+                  offset: 0 -105;
                }
                rel2 {
                   to: "browser.list.list_frame";
-                  relative: 0.96 1.0;
-                  offset: 0 -38;
                }
                text {
-                  text: "Total: 10";
+                  text: "X items";
                   font: FONT;
-                  size: FONT_SIZE_BIG-4;
+                  size: FONT_SIZE;
+                  align: 0.5 0.5;
+                  max: 1 1;
                }
             }
          }

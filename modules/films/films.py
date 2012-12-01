@@ -49,7 +49,7 @@ def DBG(msg):
 TMDB_API_KEY = '19eef197b81231dff0fd1a14a8d5f863' # Key of the user DaveMDS
 DEFAULT_INFO_LANG = 'en'
 DEFAULT_EXTENSIONS = 'avi mpg mpeg ogv mkv' #TODO fill better (uppercase ??)
-DEFAULT_BADWORDS = 'dvdrip AAC x264'
+DEFAULT_BADWORDS = 'dvdrip AAC x264 cd1 cd2'
 DEFAULT_MOVIE_REGEXP = '^(\[.*?\])?({.*?})?(?P<name>.*?)(\((?P<year>[0-9]*)\))?$'
 """ in a more readable form:
 ^                            # start of the string
@@ -81,7 +81,11 @@ class FilmItemClass(EmcItemClass):
       mod.show_film_info(url)
 
    def label_get(self, url, mod):
-      return os.path.basename(url)
+      try:
+         assert ini.get('film', 'db_names_in_list') == 'True'
+         return mod._film_db.get_data(url)['name']
+      except:
+         return os.path.basename(url)
 
    def icon_end_get(self, url, mod):
       counts = mediaplayer.play_counts_get(url)
@@ -179,6 +183,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          ini.set('film', 'movie_regexp', DEFAULT_MOVIE_REGEXP)
       if not ini.has_option('film', 'info_lang'):
          ini.set('film', 'info_lang', DEFAULT_INFO_LANG)
+      if not ini.has_option('film', 'db_names_in_list'):
+         ini.set('film', 'db_names_in_list', 'True')
 
       # get allowed exensions from config
       self._exts = ini.get_string_list('film', 'extensions')

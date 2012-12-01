@@ -1324,18 +1324,10 @@ group { name: "elm/gengrid/item/default/browser";
          clip_to: "disclip";
          type: SWALLOW;
          description { state: "default" 0.0;
-            fixed: 1 0;
-            align: 1.0 0.0;
             aspect: 1.0 1.0;
             aspect_preference: HORIZONTAL;
-            rel1 {
-               relative: 1.0 0.0;
-               offset: -5 -5;
-            }
-            rel2 {
-               relative: 1.0 1.0;
-               offset: 5 5;
-            }
+            rel1.relative: 0.5 0.5;
+
          }
       }
       part { name: "elm.text";

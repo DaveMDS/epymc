@@ -106,7 +106,8 @@ class FilmItemClass(EmcItemClass):
                 (e['name'], country, e['released'][:4],
                 e['rating'], mod._get_director(e),
                 mod._get_cast(e, 4))
-         return text
+         # return "test1: κόσμε END" # should see the Greek word 'kosme'
+         return text.encode('utf-8')
 
 class FolderItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -416,6 +417,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                 '<br><hilight>Overview:</hilight> %s' \
                   % (self._get_director(e), self._get_cast(e), e['released'],
                      e['rating'], e['overview'])
+         # o_sentry.entry_set("test2: κόσμε END") # should see the Greek word 'kosme')
          o_sentry.entry_set(info.encode('utf-8'))
 
          # update poster

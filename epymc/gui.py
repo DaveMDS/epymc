@@ -247,18 +247,15 @@ def mouse_show():
 
 ### Simple edje abstraction ###
 def part_get(name):
-   global layout
    return layout.edje_get().part_external_object_get(name)
 
 def signal_emit(sig, src = 'emc'):
-   global layout
    layout.edje_get().signal_emit(sig, src)
 
 def signal_cb_add(emission, source, cb):
    layout.edje_get().signal_callback_add(emission, source, cb)
 
 def text_set(part, text):
-   global layout
    layout.edje_get().part_text_set(part, text)
 
 def swallow_set(part, obj):

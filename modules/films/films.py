@@ -47,6 +47,7 @@ def DBG(msg):
 
 
 TMDB_API_KEY = '19eef197b81231dff0fd1a14a8d5f863' # Key of the user DaveMDS
+DEFAULT_INFO_LANG = 'en'
 DEFAULT_EXTENSIONS = 'avi mpg mpeg ogv mkv' #TODO fill better (uppercase ??)
 DEFAULT_BADWORDS = 'dvdrip AAC x264'
 DEFAULT_MOVIE_REGEXP = '^(\[.*?\])?({.*?})?(?P<name>.*?)(\((?P<year>[0-9]*)\))?$'
@@ -176,6 +177,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          ini.set('film', 'tmdb_retry_days', '3')
       if not ini.has_option('film', 'movie_regexp'):
          ini.set('film', 'movie_regexp', DEFAULT_MOVIE_REGEXP)
+      if not ini.has_option('film', 'info_lang'):
+         ini.set('film', 'info_lang', DEFAULT_INFO_LANG)
 
       # get allowed exensions from config
       self._exts = ini.get_string_list('film', 'extensions')
@@ -258,7 +261,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       ext = os.path.splitext(filename)[1]
       if ext[1:] in self._exts:
-         tmdb = TMDB()
+         tmdb = TMDB(lang = ini.get('film', 'info_lang'))
          name, year = get_film_name_from_url(url)
          if year:
             search = name + ' (' + year + ')'
@@ -633,7 +636,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
 ######## Get film info from themoviedb.org
    def _cb_panel_5(self, button):
-      tmdb = TMDB_WithGui()
+      tmdb = TMDB_WithGui(lang = ini.get('film', 'info_lang'))
       name, year = get_film_name_from_url(self._current_url)
       if year:
          search = name + ' (' + year + ')'
@@ -833,6 +836,7 @@ class TMDB_WithGui():
       DBG('TMDB Film search: ' + query)
       url = '%s/Movie.search/%s/json/%s/%s' % \
             (self.server, self.lang, self.key, query)
+      DBG('TMDB Film query: ' + url)
       self.dwl_handler = utils.download_url_async(url, 'tmp',
                               complete_cb = self._movie_search_done_cb,
                               progress_cb = self._cb_downloads_progress)

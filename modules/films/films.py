@@ -467,7 +467,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
             # TODO FIXME!!  This will crash If the downloaded poster
             #                is the same as the old one...dunno why :/
             # force a reload also if the filename is the same
-            o_image.file_set('')
+            # Update: seems fixed ... 
+            # o_image.file_set('')
             o_image.file_set(poster)
          else:
             print 'TODO show a dummy image'

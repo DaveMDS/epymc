@@ -72,12 +72,15 @@ class FilmItemClass(EmcItemClass):
    def label_get(self, url, mod):
       return os.path.basename(url)
 
-   def icon_end_get(self, url, user_data):
+   def icon_end_get(self, url, mod):
       counts = mediaplayer.play_counts_get(url)
       if counts['finished'] > 0:
          return 'icon/check_on'
       if counts['stop_at'] > 0:
          return 'icon/check_off'
+
+   def icon_get(self, url, mod):
+      return self.poster_get(url, mod)
 
    def poster_get(self, url, mod):
       if mod._film_db.id_exists(url):
@@ -106,8 +109,16 @@ class FilmItemClass(EmcItemClass):
                 (e['name'], country, e['released'][:4],
                 e['rating'], mod._get_director(e),
                 mod._get_cast(e, 4))
-         # return "test1: κόσμε END" # should see the Greek word 'kosme'
-         return text.encode('utf-8')
+      else:
+         text = '<title>%s</><br>' \
+                '<hilight>Size:</> %s<br>' \
+                '<hilight>Name:</> %s<br>' % \
+                (os.path.basename(url),
+                 utils.hum_size(os.path.getsize(utils.url2path(url))),
+                 get_film_name_from_url(url))
+         
+      # return "test1: κόσμε END" # should see the Greek word 'kosme'
+      return text.encode('utf-8')
 
 class FolderItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -136,7 +147,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    _idler = None      # EcoreIdler
    _idler_url = None  # also used as a semaphore
    _idler_db = None   # key: file_url  data: timestamp of the last unsuccessfull tmdb query
-   _idler_retry_after = 7 * 24 * 60 * 60
+   _idler_retry_after = 3 * 24 * 60 * 60
 
    def __init__(self):
       DBG('Init module')
@@ -148,7 +159,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       if not ini.has_option('film', 'extensions'):
          ini.set('film', 'extensions', DEFAULT_EXTENSIONS)
       if not ini.has_option('film', 'tmdb_retry_days'):
-         ini.set('film', 'tmdb_retry_days', '7')
+         ini.set('film', 'tmdb_retry_days', '3')
 
       # get allowed exensions from config
       self._exts = ini.get_string_list('film', 'extensions')
@@ -169,10 +180,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       # listen to emc events
       events.listener_add('films', self._events_cb)
-
-      # on idle scan all files (one shoot)
-      if (ini.get_bool('film', 'enable_scanner')):
-         self._idler = ecore.Idler(self.idle_cb)
 
    def __shutdown__(self):
       DBG('Shutdown module')
@@ -258,8 +265,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # clear the 'semaphore', now another file can be processed
       self._idler_url = None
 
-      # update browser
-      # self._browser.refresh()   # TODO check if visible and update if necessary  :/
+      # update the browser view
+      self._browser.refresh()
 
       # delete TMDB2 object
       del tmdb
@@ -314,6 +321,10 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self._browser.page_add('film://root', 'Films', None, self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
+
+      # on idle scan all files (one shoot every time the activity start)
+      if not self._generator and ini.get_bool('film', 'enable_scanner'):
+         self._idler = ecore.Idler(self.idle_cb)
 
    def populate_root_page(self, browser, page_url):
       for f in self._folders:
@@ -634,7 +645,7 @@ def get_film_name_from_url(url):
    film = re.sub(r'\[.*?\]', '', film)
    film = re.sub(r'\{.*?\}', '', film)
    # remove blacklisted words
-   blacklist = ['dvdrip', 'ITA', 'ENG', 'sub', 'AAC', 'x264']# TODO make this configurable
+   blacklist = ['dvdrip', 'AAC', 'x264']# TODO make this configurable
    for word in blacklist:
       film = re.sub('(?i)'+word, '', film)
    return film
@@ -656,6 +667,7 @@ class TMDB():
    def movie_search(self, query, complete_cb):
       DBG('TMDB  ===== Movie search: ' + query)
       self.complete_cb = complete_cb
+      query = query.strip().replace("'", "' ") # the api don't like "L'ultimo", must be "L' ultimo"... :/
       url = '%s/Movie.search/%s/json/%s/%s' % \
             (self.server, self.lang, self.key, query)
       self.dwl_handler = utils.download_url_async(url, 'tmp',
@@ -765,7 +777,6 @@ class TMDB_WithGui():
       self.dwl_handler = None
 
    def movie_search(self, query, complete_cb = None):
-      DBG('TMDB Film search: ' + query)
       self.complete_cb = complete_cb
       self.dialog = EmcDialog(title = 'themoviedb.org', style = 'progress',
                               text = '<b>Searching for:</>')
@@ -785,6 +796,8 @@ class TMDB_WithGui():
 
    # Movie.search/
    def _do_movie_search_query(self, query):
+      query = query.strip().replace("'", "' ") # the api don't like "L'ultimo", must be "L' ultimo"... :/
+      DBG('TMDB Film search: ' + query)
       url = '%s/Movie.search/%s/json/%s/%s' % \
             (self.server, self.lang, self.key, query)
       self.dwl_handler = utils.download_url_async(url, 'tmp',

@@ -48,6 +48,16 @@ def DBG(msg):
 
 TMDB_API_KEY = '19eef197b81231dff0fd1a14a8d5f863' # Key of the user DaveMDS
 DEFAULT_EXTENSIONS = 'avi mpg mpeg ogv mkv' #TODO fill better (uppercase ??)
+DEFAULT_BADWORDS = 'dvdrip AAC x264'
+DEFAULT_MOVIE_REGEXP = '^(\[.*?\])?({.*?})?(?P<name>.*?)(\((?P<year>[0-9]*)\))?$'
+""" in a more readable form:
+^                            # start of the string
+(\[.*?\])?                   # optional stuff between [ and ]
+(\{.*?\})?                   # optional stuff between { and }
+(?P<name>.*?)                # the name of the film  -  captured
+(?:\((?P<year>[0-9]*)\))?    # the year, must be within ( and )  -  captured
+$                            # end of the string
+"""
 
 
 class AddSourceItemClass(EmcItemClass):
@@ -110,12 +120,14 @@ class FilmItemClass(EmcItemClass):
                 e['rating'], mod._get_director(e),
                 mod._get_cast(e, 4))
       else:
+         name, year = get_film_name_from_url(url)
          text = '<title>%s</><br>' \
                 '<hilight>Size:</> %s<br>' \
-                '<hilight>Name:</> %s<br>' % \
+                '<hilight>Name:</> %s<br>' \
+                '<hilight>Year:</> %s<br>' % \
                 (os.path.basename(url),
                  utils.hum_size(os.path.getsize(utils.url2path(url))),
-                 get_film_name_from_url(url))
+                 name, year if year else 'Unknown')
          
       # return "test1: κόσμε END" # should see the Greek word 'kosme'
       return text.encode('utf-8')
@@ -158,8 +170,12 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          ini.set('film', 'enable_scanner', 'False')
       if not ini.has_option('film', 'extensions'):
          ini.set('film', 'extensions', DEFAULT_EXTENSIONS)
+      if not ini.has_option('film', 'badwords'):
+         ini.set('film', 'badwords', DEFAULT_BADWORDS)
       if not ini.has_option('film', 'tmdb_retry_days'):
          ini.set('film', 'tmdb_retry_days', '3')
+      if not ini.has_option('film', 'movie_regexp'):
+         ini.set('film', 'movie_regexp', DEFAULT_MOVIE_REGEXP)
 
       # get allowed exensions from config
       self._exts = ini.get_string_list('film', 'extensions')
@@ -243,7 +259,12 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       ext = os.path.splitext(filename)[1]
       if ext[1:] in self._exts:
          tmdb = TMDB()
-         tmdb.movie_search(get_film_name_from_url(url), self.idle_tmdb_complete)
+         name, year = get_film_name_from_url(url)
+         if year:
+            search = name + ' (' + year + ')'
+         else:
+            search = name
+         tmdb.movie_search(search, self.idle_tmdb_complete)
          self._idler_url = url
       
       return ecore.ECORE_CALLBACK_RENEW
@@ -613,8 +634,12 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 ######## Get film info from themoviedb.org
    def _cb_panel_5(self, button):
       tmdb = TMDB_WithGui()
-      film = get_film_name_from_url(self._current_url)
-      tmdb.movie_search(film, self._cb_search_complete)
+      name, year = get_film_name_from_url(self._current_url)
+      if year:
+         search = name + ' (' + year + ')'
+      else:
+         search = name
+      tmdb.movie_search(search, self._cb_search_complete)
 
    def _cb_search_complete(self, tmdb, movie_info):
       # store the result in db
@@ -640,15 +665,23 @@ def get_film_name_from_url(url):
    # remove path & extension
    film = os.path.basename(url)
    (film, ext) = os.path.splitext(film)
-   # remove stuff between '<[{' and '}]>' 
-   film = re.sub(r'<.*?>', '', film)
-   film = re.sub(r'\[.*?\]', '', film)
-   film = re.sub(r'\{.*?\}', '', film)
-   # remove blacklisted words
-   blacklist = ['dvdrip', 'AAC', 'x264']# TODO make this configurable
-   for word in blacklist:
+
+   # remove blacklisted words (case insensitive)
+   badwords = ini.get_string_list('film', 'badwords')
+   for word in badwords:
       film = re.sub('(?i)'+word, '', film)
-   return film
+
+   # apply the user regexp (must capure 'name' and 'year')
+   p = re.compile(ini.get('film', 'movie_regexp'))
+   m = p.match(film)
+   if m:
+      name = m.group('name')
+      year = m.group('year')
+   else:
+      name = film
+      year = None
+
+   return (name.strip(), year)
 
 
 
@@ -837,8 +870,6 @@ class TMDB_WithGui():
                   icon = EmcRemoteImage(image['image']['url'])
                   icon.size_hint_min_set(100, 100) # TODO fixme
                   break
-            DBG(res['name'])
-            DBG(res['released'])
             if res['released']:
                label = '%s (%s)' % (res['name'], res['released'][:4])
             else:

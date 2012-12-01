@@ -706,9 +706,9 @@ class EmcVKeyboard(EmcDialog):
       for i, c in enumerate(['u', 'v', 'w', 'x', 'y', 'z', '.', '@', '-', '_']):
          self._pack_btn(tb, i, 4, 1, 1, c, cb = self._default_btn_cb)
 
-      self._pack_btn(tb, 0, 5, 3, 1, 'ERASE', cb = self._erase_cb)
+      self._pack_btn(tb, 0, 5, 3, 1, 'UPPERCASE', cb = self._uppercase_cb)
       self._pack_btn(tb, 3, 5, 4, 1, 'SPACE', cb = self._space_cb)
-      self._pack_btn(tb, 7, 5, 3, 1, 'UPPERCASE', cb = self._uppercase_cb)
+      self._pack_btn(tb, 7, 5, 3, 1, 'ERASE', cb = self._erase_cb)
 
       self._pack_btn(tb, 0, 6, 4, 1, 'Dismiss', 'icon/cancel', self._dismiss_cb)
       self._pack_btn(tb, 6, 6, 4, 1, 'Accept',  'icon/ok',     self._accept_cb)
@@ -755,20 +755,21 @@ class EmcVKeyboard(EmcDialog):
    def _erase_cb(self, button):
       if len(self.entry.text) > 0:
          self.entry.text = self.entry.text[0:-1]
+         self.entry.cursor_end_set()
 
    def _space_cb(self, button):
       self.entry.entry_insert(' ')
 
    def _uppercase_cb(self, button):
       for btn in self.efm.all_get():
-         c = btn.label
+         c = btn.text
          if len(c) == 1 and c.isalpha():
             if c.islower():
-               btn.label = c.upper()
-               button.label = 'LOWERCASE'
+               btn.text = c.upper()
+               button.text = 'LOWERCASE'
             else:
-               btn.label = c.lower()
-               button.label = 'UPPERCASE'
+               btn.text = c.lower()
+               button.text = 'UPPERCASE'
       self.entry.cursor_end_set()
 
    def input_event_cb(self, event):

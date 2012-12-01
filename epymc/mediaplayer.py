@@ -79,6 +79,9 @@ def play_url(url, only_audio = False, start_from = 0):
    if not _emotion:
       _init_emotion()
 
+   if not _fman:
+      _init_mediaplayer_gui()
+
    if url.find('://', 2, 15) is -1:
       url = 'file://' + url
 
@@ -142,6 +145,8 @@ def play_counts_get(url):
              
 
 def stop():
+   global _emotion
+   
    LOG('dbg', 'Stop()')
 
    counts = _play_db.get_data(_onair_url)
@@ -152,13 +157,10 @@ def stop():
       counts['stop_at'] = _emotion.position
    _play_db.set_data(_onair_url, counts)
 
-   _emotion.play = False
-   _emotion.position = 0.0
-
-   # this cause a random color to be shown for an instant, but it is
-   # necessary to hide a bug somewhere else:
-   # without this the video restart to play when I set position to 0.0 :/
-   _emotion.file_set('')
+   # delete the emotion object
+   _emotion.delete()
+   del _emotion
+   _emotion = None
 
    events.event_emit('PLAYBACK_FINISHED')
 
@@ -285,15 +287,13 @@ def _update_timer_cb():
 
 def _init_emotion():
    global _emotion
-   global _fman
+
 
    backend = ini.get('mediaplayer', 'backend')
    _emotion = emotion.Emotion(gui.layout.evas, module_filename=backend)
    gui.swallow_set('videoplayer.video', _emotion)
    _emotion.smooth_scale = True
 
-   gui.layout.edje.signal_callback_add("mouse,down,1", "videoplayer.events",
-                                 (lambda a,s,d: video_controls_toggle()))
    # _emotion.on_key_down_add(_cb)
    # _emotion.on_audio_level_change_add(_cb_volume_change)
    _emotion.on_frame_resize_add(_cb_frame_resize)
@@ -303,6 +303,10 @@ def _init_emotion():
    #  yes, too often and not firing while buffering...Used a timer instead
    # _emotion.on_progress_change_add((lambda v: _update_slider()))
    # _emotion.on_frame_decode_add((lambda v: _update_slider()))
+  
+
+def _init_mediaplayer_gui():
+   global _fman
 
    # focus manager for play/stop/etc.. buttons
    _fman = EmcFocusManager2()
@@ -376,7 +380,6 @@ def _init_emotion():
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
 
-
    # update emotion position when mouse drag the progress slider
    def _drag_prog(obj, emission, source):
       (val,val2) = gui.slider_val_get('videoplayer.controls.slider:dragable1')
@@ -388,6 +391,10 @@ def _init_emotion():
       (val,val2) = gui.slider_val_get('volume.slider:dragable1')
       volume_set(val * 100.0)
    gui.signal_cb_add('drag', 'volume.slider:dragable1', _drag_vol)
+
+   # click on video to show/hide the controls
+   gui.layout.edje.signal_callback_add("mouse,down,1", "videoplayer.events",
+                                       (lambda a,s,d: video_controls_toggle()))
 
 def _cb_playback_finished(vid):
 

@@ -165,6 +165,12 @@ def load_image(name, path = None):
       im.file_set(theme_file, 'image/' + name)
       return im
 
+   # try in main theme file (as group: $name) (thus you can load 'icon/*')
+   if edje.file_group_exists(theme_file, name):
+      LOG('dbg', 'Found image in theme group: ' + name)
+      im.file_set(theme_file, name)
+      return im
+
    # TODO search in some system dirs
    
    # try in caller path

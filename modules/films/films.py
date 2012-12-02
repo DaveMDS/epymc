@@ -287,8 +287,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          try:
             url = self._idler_url
             self._film_db.set_data(url, movie_info)
-            text = 'Found film:<br>%s (%s)' % (movie_info['name'], movie_info['released'][:4])
-            EmcNotify(text)
+            text = '<title>New movie:</><br>%s (%s)' % (movie_info['name'], movie_info['released'][:4])
+            EmcNotify(text, icon = get_poster_filename(movie_info['id']))
          except:
             pass
 
@@ -725,10 +725,14 @@ class TMDB():
          self.complete_cb(self,None)
          return
 
-      f = open(dest, 'r')
-      data = json.loads(f.read())
-      f.close()
-      os.remove(dest)
+      try:
+         f = open(dest, 'r')
+         data = json.loads(f.read())
+         f.close()
+         os.remove(dest)
+      except:
+         DBG('TMDB  Error decoding json')
+         self.complete_cb(self, None)
 
       # no result found :(
       if len(data) == 0 or data[0] == 'Nothing found.':

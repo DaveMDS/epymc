@@ -834,28 +834,35 @@ collections {
 
 
 /// dialog & notify container boxes
-         part { name: "notify.box.stack"; /* API todoc*/
-            type: BOX;
-            scale: 1;
-            description { state: "default" 0.0;
-               max: 300 9999;
-               align: 0.0 1.0;
-               box {
-                  layout: "vertical";
-                  align: 0.0 0.9;
-                  padding: 6 6;
-               }
-            }
-         }
          part { name: "dialogs.box.stack"; /* API */
             type: BOX;
             description { state: "default" 0.0;
                box {
                   layout: "stack";
+                  min: 0 0;
                   // layout: "horizontal"; # funny...with more than one dialog
                }
             }
          }
+         part { name: "notify.box.stack"; /* API todoc*/
+            type: BOX;
+            scale: 1;
+            description { state: "default" 0.0;
+               align: 1.0 0.0;
+               rel1 {
+                  relative: 0.5 1.0;
+                  to_y: "topbar.list.spacer";
+                  offset: 0 25;
+               }
+               box {
+                  layout: "vertical";
+                  align: 1.0 0.0;
+                  padding: 6 6;
+                  // min: 1 0; # this should be correct, but in some ways break the film-info-panel :/
+               }
+            }
+         }
+
 
 
 /// debug label for embryo scripting
@@ -1567,22 +1574,33 @@ collections {
       }
    }
 
-/// notify
+/// notify items
    group { name: "emc/notify/default"; /* API todoc  */
-      min: 300 100;
+      min: 400 100;
       parts {
          part { name: "clipper";
             type: RECT;
             scale: 1;
             description { state: "default" 0.0;
-               color: 255 255 255 100;
+               color: 255 255 255 255;
             }
          }
          part { name: "bg";
-            type: RECT;
             clip_to: "clipper";
             scale: 1;
             description { state: "default" 0.0;
+               image.normal: "frame3.png";
+               image.border: 5 5 5 5;
+            }
+         }
+         part { name: "emc.swallow.icon";  /* API to doc    */
+            type: SWALLOW;
+            clip_to: "clipper";
+            scale: 1;
+            description { state: "default" 0.0;
+               aspect:1.0 1.0;
+               aspect_preference: VERTICAL;
+               align: 0.0 0.5;
             }
          }
          part { name: "emc.text.caption";  /* API to doc    */
@@ -1591,9 +1609,16 @@ collections {
             scale: 1;
             description { state: "default" 0.0;
                color: 0 0 0 255;
+               rel1 {
+                  relative: 1.0 0.0;
+                  to_x: "emc.swallow.icon";
+                  offset: 5 0;
+               }
                text {
-                  text:"caption<br>akjhasjkldhas ";
+                  text:"";
+                  // min: 1 1;
                   style: "epymc_dialog_style";
+                  align: 0.0 0.0;
                }
             }
          }

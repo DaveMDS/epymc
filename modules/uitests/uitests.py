@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import os, time
 
 import ecore, elementary
 
@@ -79,8 +79,8 @@ class MyItemClass(EmcItemClass):
    def item_selected(self, url, user_data):
       # Events Sniffer
       if url == 'uitests://sniffer':
-         events.listener_add('sniffer', lambda ev: EmcNotify('Sniffed ' + ev))
-         n = EmcNotify('Sniffer enabled.')
+         events.listener_add('sniffer', lambda ev: EmcNotify('<title>Event sniffer</><br>' + ev))
+         n = EmcNotify('Sniffer enabled.', hidein = 2)
 
       # Event Emit
       if url == 'uitests://ev_emit':
@@ -88,7 +88,17 @@ class MyItemClass(EmcItemClass):
 
       # Notify
       if url == 'uitests://notify':
-         n = EmcNotify('<b>TITLE</b><br>maybe some other texts..')
+         EmcNotify('<b>TITLE</b><br>' +
+                   'some informational text ...<br>' +
+                   'This one is without any icon<br>' +
+                    str(time.time()), hidein = 10)
+         EmcNotify('<b>This one with an image</b><br>' +
+                   'some informational text ...<br>' +
+                    str(time.time()), icon = 'dvd_cover_blank.png')
+         EmcNotify('<b>This one with an icon</b><br>' +
+                   'some informational text ...<br>' +
+                   'some informational text ...ljhl<br>' +
+                    str(time.time()), icon = 'icon/film')
 
       # TMDB
       elif url == 'uitests://tmdb':

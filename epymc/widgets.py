@@ -355,10 +355,12 @@ class EmcDialog(edje.Edje):
 class EmcNotify(edje.Edje):
    """ TODO doc this"""
 
-   def __init__(self, text, hidein=5.0):
+   def __init__(self, text, icon = 'icon/star', hidein = 5.0):
       group = 'emc/notify/default'
       edje.Edje.__init__(self, gui.layout.evas, file = gui.theme_file, group = group)
       self.part_text_set('emc.text.caption', text)
+      self._icon = gui.load_image(icon)
+      self.part_swallow('emc.swallow.icon', self._icon)
       gui.box_append('notify.box.stack', self)
       if hidein > 0.0:
          self.timer = ecore.Timer(hidein, self.hide_timer_cb)
@@ -368,6 +370,7 @@ class EmcNotify(edje.Edje):
 
    def hide_timer_cb(self):
       gui.box_remove('notify.box.stack', self)
+      self._icon.delete()
       self.delete()
       return ecore.ECORE_CALLBACK_CANCEL
 

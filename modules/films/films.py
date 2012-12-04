@@ -36,6 +36,7 @@ import epymc.ini as ini
 import epymc.utils as utils
 import epymc.gui as gui
 import epymc.events as events
+import epymc.config_gui as config_gui
 
 
 # debuggin stuff
@@ -200,6 +201,10 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
       mainmenu.item_add('film', 10, 'Movies', img, self.cb_mainmenu)
 
+       # add an entry in the config gui
+      config_gui.root_item_add('film', 50, 'Movie Collection', icon = 'icon/film',
+                               callback = config_panel_cb)
+
       # create a browser instance
       self._browser = EmcBrowser('Films', 'List')
 
@@ -221,6 +226,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       # delete mainmenu item
       mainmenu.item_del('film')
+
+      # delete config menu item
+      config_gui.root_item_del('film')
 
       # delete browser
       self._browser.delete()
@@ -693,8 +701,24 @@ def get_film_name_from_url(url):
 
    return (name.strip(), year)
 
+###### Config Panel stuff
 
+def config_panel_cb():
+   bro = config_gui.browser_get()
+   bro.page_add('config://films/', 'Movie Collection', None, populate_config)
 
+def populate_config(browser, url):
+
+   config_gui.standard_item_string_add('film', 'info_lang',
+                                       'Preferred language for contents')
+
+   config_gui.standard_item_bool_add('film', 'enable_scanner',
+                                     'Enable background scanner')
+
+   config_gui.standard_item_bool_add('film', 'db_names_in_list',
+                                     'Prefer movie titles in lists')
+
+   
 ###############################################################################
 import json
 

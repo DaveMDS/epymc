@@ -27,7 +27,7 @@ import mainmenu
 import input_events
 
 from browser import EmcBrowser, EmcItemClass
-from widgets import EmcDialog
+from widgets import EmcDialog, EmcVKeyboard
 
 def DBG(msg):
    print('CONFIG_GUI: ' + msg)
@@ -53,6 +53,81 @@ class RootItemClass(EmcItemClass):
       (name, label, weight, icon, callback) = user_data
       return icon
 
+class StdConfigItemBool(object): 
+   # this don't inherit from EmcItemClass to not be a Singleton
+   # this class is used by the function standard_item_bool_add(...)
+
+   def __init__(self, section, option, label, icon = None, info = None):
+      self._sec = section
+      self._opt = option
+      self._lbl = label
+      self._ico = icon
+      self._inf = info
+
+   def item_selected(self, url, user_data):
+      if ini.get(self._sec, self._opt) == "True":
+         ini.set(self._sec, self._opt, "False")
+      else:
+         ini.set(self._sec, self._opt, "True")
+      _browser.refresh()
+
+   def label_get(self, url, user_data):
+      return self._lbl
+
+   def icon_get(self, url, user_data):
+      return self._ico
+
+   def icon_end_get(self, url, user_data):
+      if ini.get(self._sec, self._opt) == "True":
+         return 'icon/check_on'
+      return 'icon/check_off'
+
+   def info_get(self, url, user_data):
+      return self._inf
+
+   def poster_get(self, url, user_data):
+      return None
+
+   def fanart_get(self, url, user_data):
+      return None
+
+class StdConfigItemString(object): 
+   # this don't inherit from EmcItemClass to not be a Singleton
+   # this class is used by the function standard_item_string_add(...)
+
+   def __init__(self, section, option, label, icon = None, info = None):
+      self._sec = section
+      self._opt = option
+      self._lbl = label
+      self._ico = icon
+      self._inf = info
+
+   def _kbd_accept_cb(self, vkeyb, text):
+      ini.set(self._sec, self._opt, text)
+      _browser.refresh()
+
+   def item_selected(self, url, user_data):
+      EmcVKeyboard(title = self._lbl,
+                   text = ini.get(self._sec, self._opt),
+                   accept_cb = self._kbd_accept_cb)
+
+   def label_get(self, url, user_data):
+      return self._lbl + '  ( ' + ini.get(self._sec, self._opt) + ' )'
+
+   def icon_get(self, url, user_data):
+      return self._ico
+
+   def icon_end_get(self, url, user_data):
+      return None
+
+   def info_get(self, url, user_data):
+      return self._inf
+
+   def poster_get(self, url, user_data):
+      return None
+
+   def fanart_get(self, url, user_data):
+      return None
 
 ### public functions
 def init():
@@ -89,6 +164,16 @@ def root_item_del(name):
          _root_items.remove((_name, _label, _weight, _ic, _cb))
       if _root_items_dict.has_key(_name):
          del _root_items_dict[_name]
+
+def standard_item_bool_add(section, option, label):
+   """ TODO doc """
+   _browser.item_add(StdConfigItemBool(section, option, label),
+                     'config://'+section+'/'+option, None)
+
+def standard_item_string_add(section, option, label):
+   """ TODO doc """
+   _browser.item_add(StdConfigItemString(section, option, label),
+                     'config://'+section+'/'+option, None)
 
 def browser_get():
    return _browser

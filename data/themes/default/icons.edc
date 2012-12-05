@@ -20,16 +20,23 @@
 
 IMAGE("dvd_cover_blank.png", 730, 890)
 
+ICON("emc")
 ICON("home")
 ICON("folder")
 ICON("close")
 ICON("back")
+ICON("forward")
 ICON("ok")
 ICON("cancel")
 ICON("check_on")
 ICON("check_off")
 ICON("minus")
 ICON("plus")
+
+ICON("arrowR")
+ICON("arrowL")
+ICON("arrowU")
+ICON("arrowD")
 
 ICON("list")
 ICON("grid")

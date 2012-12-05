@@ -53,6 +53,9 @@ class RootItemClass(EmcItemClass):
       (name, label, weight, icon, callback) = user_data
       return icon
 
+   def icon_end_get(self, url, user_data):
+      return 'icon/forward'
+
 class StdConfigItemBool(object): 
    # this don't inherit from EmcItemClass to not be a Singleton
    # this class is used by the function standard_item_bool_add(...)
@@ -71,25 +74,17 @@ class StdConfigItemBool(object):
          ini.set(self._sec, self._opt, "True")
       _browser.refresh()
 
-   def label_get(self, url, user_data):
-      return self._lbl
-
-   def icon_get(self, url, user_data):
-      return self._ico
-
+   
    def icon_end_get(self, url, user_data):
       if ini.get(self._sec, self._opt) == "True":
          return 'icon/check_on'
       return 'icon/check_off'
 
-   def info_get(self, url, user_data):
-      return self._inf
-
-   def poster_get(self, url, user_data):
-      return None
-
-   def fanart_get(self, url, user_data):
-      return None
+   def label_get(self, url, user_data): return self._lbl
+   def icon_get(self, url, user_data): return self._ico
+   def info_get(self, url, user_data): return self._inf
+   def poster_get(self, url, user_data): return None
+   def fanart_get(self, url, user_data): return None
 
 class StdConfigItemString(object): 
    # this don't inherit from EmcItemClass to not be a Singleton
@@ -114,20 +109,32 @@ class StdConfigItemString(object):
    def label_get(self, url, user_data):
       return self._lbl + '  ( ' + ini.get(self._sec, self._opt) + ' )'
 
-   def icon_get(self, url, user_data):
-      return self._ico
+   def icon_get(self, url, user_data): return self._ico
+   def icon_end_get(self, url, user_data): return None
+   def info_get(self, url, user_data): return self._inf
+   def poster_get(self, url, user_data): return None
+   def fanart_get(self, url, user_data): return None
 
-   def icon_end_get(self, url, user_data):
-      return None
+class StdConfigItemAction(object): 
+   # this don't inherit from EmcItemClass to not be a Singleton
+   # this class is used by the function standard_item_action_add(...)
 
-   def info_get(self, url, user_data):
-      return self._inf
+   def __init__(self, label, icon = None, info = None, selected_cb = None):
+      self._lbl = label
+      self._ico = icon
+      self._inf = info
+      self._cb = selected_cb
 
-   def poster_get(self, url, user_data):
-      return None
+   def item_selected(self, url, user_data):
+      if callable(self._cb):
+         self._cb()
 
-   def fanart_get(self, url, user_data):
-      return None
+   def label_get(self, url, user_data): return self._lbl
+   def icon_get(self, url, user_data): return self._ico
+   def icon_end_get(self, url, user_data): return None
+   def info_get(self, url, user_data): return self._inf
+   def poster_get(self, url, user_data): return None
+   def fanart_get(self, url, user_data): return None
 
 ### public functions
 def init():
@@ -138,10 +145,8 @@ def init():
    # create a browser instance
    _browser = EmcBrowser('Configuration', 'List') # TODO use a custom style for config ?
 
-   root_item_add('config://modules/', 1, 'Modules', 'icon/module', _modules_list)
-   root_item_add('config://scale/', 20, 'Scale', 'icon/scale', _change_scale)
-   root_item_add('config://fs/', 30, 'Fullscreen',
-                 None, _toggle_fullscreen)
+   root_item_add('config://general/', 1, 'General', 'icon/emc', _general_list)
+   root_item_add('config://modules/', 2, 'Modules', 'icon/module', _modules_list)
 
 def shutdown():
    _browser.delete()
@@ -165,15 +170,20 @@ def root_item_del(name):
       if _root_items_dict.has_key(_name):
          del _root_items_dict[_name]
 
-def standard_item_bool_add(section, option, label):
+def standard_item_bool_add(section, option, label, icon = None, info = None):
    """ TODO doc """
-   _browser.item_add(StdConfigItemBool(section, option, label),
+   _browser.item_add(StdConfigItemBool(section, option, label, icon, info),
                      'config://'+section+'/'+option, None)
 
-def standard_item_string_add(section, option, label):
+def standard_item_string_add(section, option, label, icon = None, info = None):
    """ TODO doc """
-   _browser.item_add(StdConfigItemString(section, option, label),
+   _browser.item_add(StdConfigItemString(section, option, label, icon, info),
                      'config://'+section+'/'+option, None)
+
+def standard_item_action_add(label, icon = None, info = None, selected_cb = None):
+   """ TODO doc """
+   _browser.item_add(StdConfigItemAction(label, icon, info, selected_cb),
+                     'config://useraction', None)
 
 def browser_get():
    return _browser
@@ -188,13 +198,17 @@ def _populate_root(browser, url):
    for item in _root_items:
       browser.item_add(RootItemClass(), item[0], item)
 
-##############  GUI  #########################################################
+##############  GENERAL  ######################################################
 import ini
 
-def _toggle_fullscreen():
-   ini.set('general', 'fullscreen', not gui.win.fullscreen)
-   input_events.event_emit('TOGGLE_FULLSCREEN')
+def _general_list():
+   _browser.page_add('config://general/', 'General', None, _general_populate)
 
+def _general_populate(browser, url):
+   standard_item_bool_add('general', 'fullscreen', 'Start in fullscreen')
+   standard_item_action_add('Adjust interface scale', 'icon/scale', selected_cb=_change_scale)
+   standard_item_bool_add('general', 'back_in_lists', 'Show Back item in lists', 'icon/back')
+   
 def _change_scale():
    def _bigger(dialog): gui.scale_bigger(); _save()
    def _smaller(dialog): gui.scale_smaller(); _save()

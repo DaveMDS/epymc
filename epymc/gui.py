@@ -24,7 +24,7 @@ import evas, ecore, edje, elementary
 import ecore.x #used only to show/hide the cursor
 
 import utils, ini, gui, events, input_events
-from widgets import EmcButton, EmcDialog
+from widgets import EmcButton, EmcDialog, EmcNotify
 
 
 win = None
@@ -249,6 +249,33 @@ def mouse_show():
    xwin.pointer_warp(*_last_mouse_pos)
    xwin.cursor_show()
    _mouse_visible = True
+
+### audio info/controls notify
+_audio_notify = None
+
+def audio_controls_show(text = None, icon = None):
+   global _audio_notify
+   
+   if _audio_notify is None:
+      _audio_notify = EmcNotify('', hidein = 0)
+
+   if text or icon:
+       audio_controls_set(text, icon)
+
+def audio_controls_hide():
+   global _audio_notify
+   
+   if _audio_notify:
+      _audio_notify.close()
+      _audio_notify = None
+
+def audio_controls_set(text = None, icon = None):
+   if _audio_notify is None:
+      return
+   if text: _audio_notify.text_set(text)
+   if icon: _audio_notify.icon_set(icon)
+
+
 
 
 ### Simple edje abstraction ###

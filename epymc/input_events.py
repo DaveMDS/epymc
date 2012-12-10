@@ -114,7 +114,7 @@ def event_emit(event):
       else:
          res = cb(event)
 
-      #~ print "  ->  '%s' (%s)" %  (name, ('continue' if res else 'block'))
+      # print "  ->  '%s' (%s)" %  (name, ('continue' if res else 'block'))
 
       if res == EVENT_BLOCK:
          return

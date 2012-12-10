@@ -47,17 +47,7 @@ condimentum sollicitudin dictum, congue ac quam. Proin eu erat arcu. Ut tellus
 augue, consectetur at lacinia ac, pharetra ornare leo. Quisque ut metus sit
 amet risus luctus condimentum. Suspendisse sodales suscipit arcu ut interdum.
 Aenean luctus, leo in lacinia pretium, felis odio euismod sapien, eu varius
-ipsum odio sit amet elit. Proin porta lectus sit amet ipsum pretium posuere.
-<br><br>Sed vel nisi vitae est ultricies ullamcorper sed non purus. Donec porta
-diam sed nulla volutpat non pretium ipsum lobortis. Donec quam mauris, porta
-sit amet congue a, mollis et nulla. Nulla facilisi. In augue eros, elementum
-quis interdum sed, tristique et dolor. Nam eget tempor nisi. Curabitur
-sollicitudin fermentum tortor, at commodo ipsum egestas sit amet. Lorem ipsum
-dolor sit amet, consectetur adipiscing elit. In urna neque, malesuada et
-tempus ac, adipiscing et sapien. Ut arcu tellus, molestie sit amet feugiat
-a, faucibus at dui. Aenean posuere ligula tellus. Cras interdum sollicitudin
-posuere. Donec laoreet pretium purus malesuada rhoncus. Sed pulvinar volutpat
-vulputate. 
+ipsum odio sit amet elit.
 """
 
 
@@ -287,6 +277,18 @@ class MyItemClass(EmcItemClass):
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
 
+      # Icons gallery
+      elif url == 'uitests://icons':
+         icon_names = 'emc home folder close back forward ok cancel check_on ' \
+            'check_off minus plus refresh arrowR arrowL arrowU arrowD list ' \
+            'grid star star_off module scale config play stop fwd ffwd bwd ' \
+            'fbwd ' \
+            'film mame music joystick keyboard remote'
+         li = elementary.List(gui.win)
+         for name in icon_names.split():
+            li.item_append(name, gui.load_icon('icon/' + name))
+         li.go()
+         EmcDialog(style = 'panel', title = 'Icons gallery', content = li)
 
 class UiTestsModule(EmcModule):
    name = 'uitests'
@@ -299,7 +301,7 @@ class UiTestsModule(EmcModule):
 
    def __init__(self):
       img = os.path.join(self.path, 'menu_bg.png')
-      mainmenu.item_add('uitests', 5, 'UI tests', img, self.cb_mainmenu)
+      mainmenu.item_add('uitests', 3, 'UI tests', img, self.cb_mainmenu)
       self._browser = EmcBrowser('UI tests', 'List')
 
    def __shutdown__(self):
@@ -316,6 +318,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://ev_emit', 'Event Emit')
       browser.item_add(MyItemClass(), 'uitests://notify', 'Notify Stack')
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + FocusManager')
+      browser.item_add(MyItemClass(), 'uitests://icons', 'Icons gallery')
       browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')
       browser.item_add(MyItemClass(), 'uitests://mpvo', 'Mediaplayer - Online Video (good)')
       browser.item_add(MyItemClass(), 'uitests://mpvob', 'Mediaplayer - Online Video (bad video)')

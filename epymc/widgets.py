@@ -35,6 +35,21 @@ class EmcButton(elementary.Button):
       if icon: self.content_set(gui.load_icon(icon))
       self.show()
 
+################################################################################
+class EmcMenu(elementary.Menu):
+   """ TODO doc this
+   item_add(self, parent = None, label = None, icon = None, callback = None, *args, **kwargs):
+   """
+
+   def __init__(self, relto = None):
+      elementary.Menu.__init__(self, gui.layout)
+      if relto:
+         # TODO better pos calc
+         x, y, w, h = relto.geometry
+         self.move(x, y + h)
+
+      self.show()
+
 
 ################################################################################
 class EmcRemoteImage(elementary.Image):
@@ -379,6 +394,13 @@ class EmcNotify(edje.Edje):
          self.timer.delete()
       self.hide_timer_cb()
 
+   def text_set(self, text):
+      self.part_text_set('emc.text.caption', text)
+   
+   def icon_set(self, icon):
+      self.part_text_set('emc.text.caption', text)
+      # TODO need to del the old image ??
+      self._icon = gui.load_image(icon)
 
 ###############################################################################
 class EmcSourceSelector(EmcDialog):

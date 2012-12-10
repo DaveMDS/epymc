@@ -226,13 +226,13 @@ class EmcBrowser(object):
       self._populate_page(page_data, is_back=True)
 
    def refresh(self, hard=False):
-      if hard:
-         # create the page
-         page = self.pages[-1]
-         self._populate_page(page, is_refresh=True)
-
-      else:
-         self.current_view.refresh()
+      if self.pages and self.current_view:
+         if hard:
+            # create the page
+            page = self.pages[-1]
+            self._populate_page(page, is_refresh=True)
+         else:
+            self.current_view.refresh()
 
    def change_style(self, style):
       # change only if needed

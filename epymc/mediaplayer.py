@@ -21,7 +21,7 @@
 import os
 import evas, ecore, edje, elementary, emotion
 import utils, ini, gui, input_events, events
-from widgets import EmcFocusManager2, EmcDialog, EmcButton
+from widgets import EmcFocusManager2, EmcDialog, EmcButton, EmcMenu
 from sdb import EmcDatabase
 
 
@@ -42,7 +42,6 @@ _fman = None
 _video_visible = False
 _buffer_dialog = None
 _update_timer = None
-_url_queue = []
 _onair_url = None
 _play_db = None # key: url  data: {'started': 14, 'finished': 0, 'stop_at': 0 }
 
@@ -63,13 +62,13 @@ def init():
    _play_db = EmcDatabase('playcount')
 
    # input events
-   input_events.listener_add("videoplayer", input_event_cb)
+   input_events.listener_add("mediaplayer", input_event_cb)
 
 def shutdown():
    global _play_db
-   
+
    # TODO Shutdown all emotion stuff & the buttons list
-   input_events.listener_del("videoplayer")
+   input_events.listener_del("mediaplayer")
    del _play_db
 
 ### mediaplyer API ###
@@ -120,20 +119,18 @@ def play_url(url, only_audio = False, start_from = 0):
    
    ## TEST VARIOUS INFO
    LOG('dbg', 'TITLE: ' + str(_emotion.title_get()))
+   LOG('dbg', 'CHAPTER COUNT: ' + str(_emotion.chapter_count()))
    LOG('dbg', 'VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
    LOG('dbg', 'AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
-   LOG('dbg', 'VIDEO CHANS GET: ' + str(_emotion.video_channel_get()))
-   LOG('dbg', 'AUDIO CHANS GET: ' + str(_emotion.audio_channel_get()))
+   LOG('dbg', 'SPU CHNS COUNT: ' + str(_emotion.spu_channel_count()))
+   LOG('dbg', 'VIDEO CHAN GET: ' + str(_emotion.video_channel_get()))
+   LOG('dbg', 'AUDIO CHAN GET: ' + str(_emotion.audio_channel_get()))
+   LOG('dbg', 'SPU CHAN GET: ' + str(_emotion.spu_channel_get()))
    LOG('dbg', 'INFO DICT: ' + str(_emotion.meta_info_dict_get()))
    LOG('dbg', 'SIZE: ' + str(_emotion.size))
    LOG('dbg', 'IMAGE_SIZE: ' + str(_emotion.image_size))
    LOG('dbg', 'RATIO: ' + str(_emotion.ratio_get()))
    ##
-
-def queue_url(url, only_audio=False):
-   _url_queue.append(url)
-   if _emotion is None or _emotion.play == False:
-      play_url(url, only_audio)
 
 def play_counts_get(url):
    try:
@@ -145,7 +142,7 @@ def play_counts_get(url):
              
 
 def stop():
-   global _emotion
+   global _emotion, _onair_url
    
    LOG('dbg', 'Stop()')
 
@@ -157,12 +154,16 @@ def stop():
       counts['stop_at'] = _emotion.position
    _play_db.set_data(_onair_url, counts)
 
+   _onair_url = None
+
    # delete the emotion object
    _emotion.delete()
    del _emotion
    _emotion = None
 
    events.event_emit('PLAYBACK_FINISHED')
+
+   
 
 def forward():
    LOG('dbg', 'Forward cb' + str(_emotion.position))
@@ -215,7 +216,7 @@ def video_player_show():
 
    gui.signal_emit('videoplayer,show')
    _video_visible = True
-   input_events.listener_promote('videoplayer')
+   input_events.listener_promote('mediaplayer')
    if _update_timer is not None:
       update_timer.delete()
    _update_timer = ecore.Timer(0.2, _update_timer_cb)
@@ -366,8 +367,8 @@ def _init_mediaplayer_gui():
 
    #  submenu audio
    bt = EmcButton('Audio')
-   # bt.callback_clicked_add(_cb_btn_fforward)
-   bt.data['cb'] = None
+   bt.callback_clicked_add(_cb_btn_audio)
+   bt.data['cb'] = _cb_btn_audio
    _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
@@ -400,14 +401,8 @@ def _cb_playback_finished(vid):
 
    stop()
 
-   if len(_url_queue) > 0:
-      _url_queue.pop(0)
-
-   if len(_url_queue) > 0:
-      play_url(_url_queue[0], only_audio=True)
-   else:
-      video_player_hide()
-      volume_hide()
+   video_player_hide()
+   gui.volume_hide()
 
 def _cb_frame_resize(vid):
    (w, h) = vid.image_size
@@ -431,6 +426,32 @@ def _cb_btn_fforward(btn):
 
 def _cb_btn_fbackward(btn):
    fbackward()
+
+def _cb_btn_audio(btn):
+   trk_cnt = _emotion.audio_channel_count()
+   print "count ", trk_cnt
+   print "current ", _emotion.audio_channel_get()
+
+   menu = EmcMenu(relto = btn)
+   
+   for n in range(trk_cnt):
+      name = _emotion.audio_channel_name_get(n)
+      if name:
+         name = "Track: " + name
+      else:
+         name = "Track #" + str(n + 1)
+      item = menu.item_add(None, name, None, _cb_audio_track, n)
+
+   menu.item_separator_add()
+   item = menu.item_add(None, "Mute", 'clock', _cb_menu_mute)
+   menu.show()
+   
+def _cb_audio_track(menu, item, track_num):
+   print track_num
+   _emotion.audio_channel_set(track_num)
+
+def _cb_menu_mute(menu, item):
+   volume_mute_toggle()
 
 def _update_slider():
    if _controls_visible:
@@ -458,22 +479,59 @@ def input_event_cb(event):
       volume_set(_volume + 5)
       events.event_emit('VOLUME_CHANGED')
       return input_events.EVENT_BLOCK
+
    elif event == 'VOLUME_DOWN':
       volume_set(_volume - 5)
       events.event_emit('VOLUME_CHANGED')
       return input_events.EVENT_BLOCK
+
    elif event == 'VOLUME_MUTE':
       volume_mute_toggle()
       events.event_emit('VOLUME_CHANGED')
       return input_events.EVENT_BLOCK
 
+   elif event == 'TOGGLE_PAUSE':
+      _emotion.play = not _emotion.play
+      return input_events.EVENT_BLOCK
+
+   elif event == 'PLAY':
+      _emotion.play = True
+      return input_events.EVENT_BLOCK
+
+   elif event == 'PAUSE':
+      _emotion.play = False
+      return input_events.EVENT_BLOCK
+
+   elif event == 'STOP':
+      stop()
+      video_player_hide()
+      return input_events.EVENT_BLOCK
+
+   elif event == 'FORWARD':
+      forward()
+      return input_events.EVENT_BLOCK
+
+   elif event == 'BACKWARD':
+      backward()
+      return input_events.EVENT_BLOCK
+
+   elif event == 'FAST_FORWARD':
+      fforward()
+      return input_events.EVENT_BLOCK
+
+   elif event == 'FAST_BACKWARD':
+      fbackward()
+      return input_events.EVENT_BLOCK
+
+
    if not _video_visible:
       return input_events.EVENT_CONTINUE
+
 
    if event == 'EXIT':
       stop()
       video_player_hide()
-      volume_hide()
+      gui.volume_hide()
       return input_events.EVENT_BLOCK
 
    if _controls_visible:
@@ -522,31 +580,5 @@ def input_event_cb(event):
          volume_set(_volume - 5)
          events.event_emit('VOLUME_CHANGED')
          return input_events.EVENT_BLOCK
-
-   if event == 'TOGGLE_PAUSE':
-      _emotion.play = not _emotion.play
-      return input_events.EVENT_BLOCK
-   elif event == 'PLAY':
-      _emotion.play = True
-      return input_events.EVENT_BLOCK
-   elif event == 'PAUSE':
-      _emotion.play = False
-      return input_events.EVENT_BLOCK
-   elif event == 'STOP':
-      stop()
-      video_player_hide()
-      return input_events.EVENT_BLOCK
-   elif event == 'FORWARD':
-      forward()
-      return input_events.EVENT_BLOCK
-   elif event == 'BACKWARD':
-      backward()
-      return input_events.EVENT_BLOCK
-   elif event == 'FAST_FORWARD':
-      fforward()
-      return input_events.EVENT_BLOCK
-   elif event == 'FAST_BACKWARD':
-      fbackward()
-      return input_events.EVENT_BLOCK
 
    return input_events.EVENT_CONTINUE

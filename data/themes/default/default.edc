@@ -13,7 +13,7 @@
 #define FONT_BOLD "Cuprum:style=Bold"
 // #define FONT "Sans"
 // #define FONT_BOLD "Sans:style=Bold"
-#define FONT_SIZE 20
+#define FONT_SIZE 22
 #define FONT_SIZE_BIG 26
 #define FONT_SIZE_BIGGER 48
 #define FONT_COLOR 255 255 255 255
@@ -57,7 +57,7 @@ styles {
    }
 
    style { name: "epymc_dialog_style";
-      base: "font=Sans font_size="FONT_SIZE" color=#777 wrap=word";
+      base: "font=Sans font_size="FONT_SIZE" color=#FFF wrap=word";
       tag:  "br" "\n";
       tag:  "tab" "\t";
       tag:  "em" "+ font=Sans:style=Oblique";
@@ -70,6 +70,7 @@ styles {
    style { name: "epymc_dialog_title_style";
       base: "font=Aclonica align=center font_size="FONT_SIZE_BIG" color=#"COLOR_ORANGE_HEX" wrap=none";
    }
+
    // font=Sans font_size=10 align=center color=#fff wrap=mixed ellipsis=1.0
    // font=Sans text_class=fileman_icon wrap=[word,mixed,none] style=soft_shadow shadow_color=#0002
    // left_margin=4 right_margin=4
@@ -1097,10 +1098,11 @@ collections {
    }
 
 /// dialogs
+
    group { name: "emc/dialog/panel"; /* API */
       images {
-         image: "shad_circ.png" COMP;
-         image: "bt_dis_base.png" COMP;
+         image: "dialog_bg.png" COMP;
+         image: "dialog_header.png" COMP;
          image: "roundclose.png" COMP;
       }
       parts {
@@ -1126,31 +1128,9 @@ collections {
                rel1.relative: 0.1 0.1;
                rel2.relative: 0.9 0.9;
                image {
-                  normal: "bt_dis_base.png";
-                  border: 4 4 4 4;
+                  normal: "dialog_bg.png";
+                  border: 3 4 3 5;
                }
-               image.middle: SOLID;
-            }
-         }
-         part { name: "emc.text.title"; /* API */
-            type: TEXTBLOCK;
-            clip_to: "clipper";
-            description { state: "default" 0.0;
-               rel1.to: "base";
-               rel2.to: "base";
-               rel1.relative: 0.0 0.0;
-               rel2.relative: 1.0 0.0;
-               visible: 0;
-               text {
-                  text:"missing title...";
-                  align: 0.5 0.5;
-                  style: "epymc_dialog_title_style";
-               }
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               visible: 1;
-               rel2.relative: 1.0 0.1;
             }
          }
          part { name: "emc.swallow.content"; /* API */
@@ -1160,14 +1140,54 @@ collections {
                rel1 {
                   to: "emc.text.title";
                   relative: 0.0 1.0;
-                  offset: 10 10;
+                  offset: 10 5;
                }
                rel2 {
                   to_y: "emc.box.buttons";
                   to_x: "base";
                   relative: 1.0 0.0;
-                  offset: -15 -10;
+                  offset: -10 -10;
                }
+            }
+         }
+         part { name: "titlebg";
+            clip_to: "clipper";
+            scale: 1;
+            description { state: "default" 0.0;
+               rel1.to: "emc.text.title";
+               rel2.to: "emc.text.title";
+               rel1.offset: 4 1;
+               rel2.offset: -4 25;
+               color: 255 255 255 200;
+               image.normal: "dialog_header.png";
+               image.border: 0 0 0 40;
+               visible: 0;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+            }
+         }
+         part { name: "emc.text.title"; /* API */
+            type: TEXTBLOCK;
+            clip_to: "clipper";
+            scale: 1;
+            description { state: "default" 0.0;
+               rel1.to: "base";
+               rel2.to: "base";
+               rel1.relative: 0.0 0.0;
+               rel2.relative: 1.0 0.0;
+               visible: 0;
+               text {
+                  text:"missing title...";
+                  align: 0.5 0.7;
+                  style: "epymc_dialog_title_style";
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               rel2.offset: 0 55;
             }
          }
          part { name: "close";
@@ -1213,12 +1233,12 @@ collections {
                rel2 {
                   to: "base";
                   relative: 1.0 1.0;
-                  offset: -9 -9;
+                  offset: -9 -15;
                }
             }
             description { state: "visible" 0.0;
                inherit: "default" 0.0;
-               rel1.relative: 0.0 0.85;
+               rel1.offset: 0 -45;
             }
          }
       }
@@ -1269,12 +1289,14 @@ collections {
             source: "emc";
             action: STATE_SET "visible" 0.0;
             target: "emc.text.title";
+            target: "titlebg";
          }
          program { name: "hide_title"; /* API */
-            signal: "emc,dialog,title,show";
+            signal: "emc,dialog,title,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             target: "emc.text.title";
+            target: "titlebg";
          }
          program { name: "show_buttons"; /* API */
             signal: "emc,dialog,buttons,show";
@@ -1291,10 +1313,9 @@ collections {
       }
    }
    group { name: "emc/dialog/minimal"; /* API */
-      min: 500 200;
       images {
-         image: "bt_dis_base.png" COMP;
-         image: "header_dialog.png" COMP;
+         image: "dialog_bg.png" COMP;
+         image: "dialog_header.png" COMP;
          image: "bulb-0.png" COMP;
          image: "warning.png" COMP;
          image: "error.png" COMP;
@@ -1323,12 +1344,11 @@ collections {
                rel1.offset: -2 -2;
                rel2.to_x: "emc.swallow.content";
                rel2.to_y: "emc.box.buttons";
-               rel2.offset: 25+2 10;
+               rel2.offset: 15+2 0;
                image {
-                  normal: "bt_dis_base.png";
-                  border: 4 4 4 4;
+                  normal: "dialog_bg.png";
+                  border: 3 4 3 5;
                }
-               image.middle: SOLID;
             }
          }
          part { name: "tagimage";
@@ -1373,14 +1393,15 @@ collections {
          part { name: "titlebg";
             type: IMAGE;
             clip_to: "clipper";
+            scale: 1;
             description { state: "default" 0.0;
                rel1.to: "emc.swallow.content";
                rel2.to: "emc.swallow.content";
                rel2.relative: 1.0 0.0;
-               rel1.offset: -25 -65;
-               rel2.offset: 25 20;
+               rel1.offset: -15 -53;
+               rel2.offset: 15 20;
                color: 255 255 255 200;
-               image.normal: "header_dialog.png";
+               image.normal: "dialog_header.png";
                image.border: 0 0 0 40;
             }
          }
@@ -1391,10 +1412,11 @@ collections {
             description { state: "default" 0.0;
                rel1.to: "titlebg";
                rel2.to: "titlebg";
+               rel2.offset: 0 -27;
                text {
                   text:"missing title...";
                   min: 1 1;
-                  align: 0.5 0.35;
+                  align: 0.5 0.7;
                   style: "epymc_dialog_title_style";
                }
             }
@@ -1404,7 +1426,7 @@ collections {
             clip_to: "clipper";
             description { state: "default" 0.0;
                fixed: 1 1;
-               min: 600 200;
+               min: 500 200;
                rel1.relative: 0.5 0.5;
                rel2.relative: 0.5 0.5;
             }

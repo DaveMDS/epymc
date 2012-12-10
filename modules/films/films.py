@@ -401,9 +401,12 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       return cast
 
    def _events_cb(self, event):
+      # TODO: check that we are active and visible
+      #       atm, this is fired also when a song end... 
       if event == 'PLAYBACK_FINISHED':
          # refresh the page (maybe an unwatched film becomes watched)
-         self._browser.refresh()
+         if self._browser is not None:
+            self._browser.refresh()
 
 ###### INFO PANEL STUFF
    def show_film_info(self, url):

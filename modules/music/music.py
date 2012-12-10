@@ -27,10 +27,12 @@ import ecore
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
-from epymc.widgets import EmcDialog, EmcNotify
+from epymc.widgets import EmcDialog, EmcNotify, EmcSourceSelector
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
+import epymc.events as events
 import epymc.ini as ini
+import epymc.gui as gui
 import epymc.mediaplayer as mediaplayer
 
 
@@ -54,7 +56,6 @@ class RootOnAirItemClass(EmcItemClass):
    def icon_get(self, url, mod):
       return 'icon/home'
 
-
 class RootArtistsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
       mod._browser.page_add('music://artists', 'Artists', None,
@@ -62,7 +63,6 @@ class RootArtistsItemClass(EmcItemClass):
 
    def label_get(self, url, mod):
       return 'Artists (%d)' % (len(mod._artists_db))
-
 
 class RootAlbumsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -72,7 +72,6 @@ class RootAlbumsItemClass(EmcItemClass):
    def label_get(self, url, mod):
       return 'Albums (%d)' % (len(mod._albums_db))
 
-
 class RootSongsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
       mod._browser.page_add('music://songs', 'Songs', None,
@@ -81,7 +80,6 @@ class RootSongsItemClass(EmcItemClass):
    def label_get(self, url, mod):
       return 'Songs (%d)' % (len(mod._songs_db))
 
-
 class RootRebuildItemClass(EmcItemClass):
    def item_selected(self, url, mod):
       mod.rebuild_db()
@@ -89,20 +87,56 @@ class RootRebuildItemClass(EmcItemClass):
    def label_get(self, url, mod):
       return 'Rescan library'
 
+   def icon_get(self, url, mod):
+      return 'icon/refresh'
+
+class RootAddSourceItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      EmcSourceSelector(done_cb = self.selector_cb, cb_data = mod)
+
+   def selector_cb(self, fullpath, mod):
+      mod._folders.append(fullpath)
+      ini.set_string_list('music', 'folders', mod._folders, ';')
+
+   def label_get(self, url, mod):
+      return 'Add source'
+
+   def icon_get(self, url, mod):
+      return 'icon/plus'
+
+class QueueAlbumItemClass(EmcItemClass):
+   def item_selected(self, url, album):
+      _mod.queue_album(album)
+
+   def label_get(self, url, album):
+      return 'Play the whole album'
+
+   def icon_get(self, url, album):
+      return 'icon/plus'
+
+class QueueArtistItemClass(EmcItemClass):
+   def item_selected(self, url, album):
+      _mod.queue_artist(album)
+
+   def label_get(self, url, album):
+      return 'Play all the songs'
+
+   def icon_get(self, url, album):
+      return 'icon/plus'
 
 class SongItemClass(EmcItemClass):
    def item_selected(self, url, song):
-      import pprint
-      pprint.pprint(song)
-      print "TODO PLAY!!!!!!"
-      mediaplayer.queue_url(url, only_audio=True)
+      _mod.queue_url(url, song)
 
    def label_get(self, url, song):
-      return song['title']
+      try:
+         return "%02d - %s" % (song['tracknumber'], song['title'])
+      except:
+         return song['title']
 
    def poster_get(self, url, song):
       # search "front.jpg"
-      path = os.path.dirname(url)
+      path = os.path.dirname(utils.url2path(url))
       poster = os.path.join(path, 'front.jpg')
       if os.path.exists(poster): return poster
 
@@ -138,12 +172,8 @@ class SongItemClass(EmcItemClass):
       return text
 
    def icon_get(self, url, song):
-      print "----"
-      print url
-      print mediaplayer._onair_url
       if url == mediaplayer._onair_url:
          return 'icon/play'
-
 
 class AlbumItemClass(EmcItemClass):
    def item_selected(self, url, album):
@@ -186,7 +216,6 @@ class AlbumItemClass(EmcItemClass):
       text += ', ' + str(lenght / 60000) + ' min.'
       return text
 
-
 class ArtistItemClass(EmcItemClass):
    def item_selected(self, url, artist):
       _mod._browser.page_add('music://artist/'+artist['name'], artist['name'],
@@ -207,10 +236,19 @@ class ArtistItemClass(EmcItemClass):
 class MusicModule(EmcModule):
    name = 'music'
    label = 'Music'
-   icon = 'icon/module'
+   icon = 'icon/music'
    info = """Long info for the <b>Music</b> module, explain what it does
 and what it need to work well, can also use markup like <title>this</> or
 <b>this</>"""
+
+   _browser = None        # browser instance
+   _rebuild_notify = None # rebuild notification object
+   _play_queue = []       # list of urls to play
+
+   _songs_db = None     # key=url           data=dict
+   _albums_db = None    # key=album_name    data=dict
+   _artists_db = None   # key=artist_name   data=dict
+
 
    def __init__(self):
       global _mod
@@ -229,21 +267,24 @@ and what it need to work well, can also use markup like <title>this</> or
       if not os.path.exists(ini.get('music', 'covers_dir')):
          os.mkdir(ini.get('music', 'covers_dir'))
 
-      # databases loading posponed
-      self._songs_db = None     # key=url           data=dict
-      self._albums_db = None    # key=album_name    data=dict
-      self._artists_db = None   # key=artist_name   data=dict
-
       # add an item in the mainmenu
-      mainmenu.item_add('music', 5, 'Music', None, self.cb_mainmenu)
+      img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
+      mainmenu.item_add('music', 5, 'Music', img, self.cb_mainmenu)
 
       # create a browser instance
       self._browser = EmcBrowser('Music')
 
-      self.rebuild_notify = None # rebuild notification object
+      # listen to emc events
+      events.listener_add('music', self.events_cb)
 
    def __shutdown__(self):
+      global _mod
+      
       DBG('Shutdown module')
+
+      # stop listen to emc events
+      events.listener_del('music')
+      
       # delete mainmenu item
       mainmenu.item_del('music')
 
@@ -251,17 +292,19 @@ and what it need to work well, can also use markup like <title>this</> or
       self._browser.delete()
 
       ## close databases
-      del self._songs_db
-      del self._albums_db
-      del self._artists_db
+      if self._songs_db: del self._songs_db
+      if self._albums_db: del self._albums_db
+      if self._artists_db: del self._artists_db
+
+      _mod = None
 
    def cb_mainmenu(self):
       # get music folders from config
-      self.__folders = ini.get_string_list('music', 'folders', ';')
-      if not self.__folders:
-         print 'NO FOLDERS'
+      self._folders = ini.get_string_list('music', 'folders', ';')
+      # if not self._folders:
+         # print 'NO FOLDERS'
          #TODO alert the user. and instruct how to add folders
-         return
+         # return
 
       # open songs/albums/artists database (they are created if not exists)
       if self._songs_db is None:
@@ -282,11 +325,11 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def rebuild_db(self):
       # Update db in a parallel thread
-      if self.rebuild_notify is None:
-         self.rebuild_notify = EmcNotify(
+      if self._rebuild_notify is None:
+         self._rebuild_notify = EmcNotify(
                   '<hilight>Rebuilding Database</><br>please wait...', hidein=0)
 
-         thread = UpdateDBThread(self.__folders, self._songs_db,
+         thread = UpdateDBThread(self._folders, self._songs_db,
                                  self._albums_db, self._artists_db)
          thread.start()
          ecore.Timer(2.0, self.check_thread_done, thread)
@@ -297,28 +340,96 @@ and what it need to work well, can also use markup like <title>this</> or
          return True # renew the timer
 
       # thread done, close the notification
-      self.rebuild_notify.close()
-      self.rebuild_notify = None
+      self._rebuild_notify.close()
+      self._rebuild_notify = None
 
       # refresh the current page :/
       self._browser.refresh(hard=True)
 
       return False # kill the timer
 
+   def queue_url(self, url, song = None):
+
+      if song is None:
+         song = self._songs_db.get_data(url)
+
+      self._play_queue.append(url)
+
+      if len(self._play_queue) == 1:
+         mediaplayer.play_url(url, only_audio = True)
+      else:
+         EmcNotify('<hilight>%s</><br>queued' % (song['title']))
+
+   def queue_album(self, album):
+
+      for url in album['songs']:
+         self._play_queue.append(url)
+
+      if mediaplayer._onair_url is None:
+         if len(self._play_queue) > 0:
+            mediaplayer.play_url(self._play_queue[0], only_audio = True)
+      
+      EmcNotify('<hilight>%s</><br>queued' % (album['name']))
+
+   def queue_artist(self, artist):
+
+      DBG(str(artist))
+      
+      for url in artist['songs']:
+         self._play_queue.append(url)
+
+      if mediaplayer._onair_url is None:
+         if len(self._play_queue) > 0:
+            mediaplayer.play_url(self._play_queue[0], only_audio = True)
+      
+      EmcNotify('<hilight>%s</><br>queued' % (artist['name']))
+
+
+   def events_cb(self, event):
+
+      if event == 'PLAYBACK_STARTED':
+         DBG('PLAYBACK_STARTED')
+         # update the audio controls
+         if len(self._play_queue) > 0:
+            song = self._songs_db.get_data(self._play_queue[0])
+            text = '<hilight>' + song['title'] + '</><br>'
+            if song.has_key('artist'):
+               text += '<em>by ' + song['artist'] + '</><br>'
+            if song.has_key('album'):
+               text += 'from ' + song['album'] + '<br>'
+            gui.audio_controls_show(text = text)
+         # update the browser view
+         self._browser.refresh()
+
+      elif event == 'PLAYBACK_FINISHED':
+         DBG('PLAYBACK_FINISHED')
+         # remove the finished song from queue
+         if len(self._play_queue) > 0:
+            self._play_queue.pop(0)
+         # play the next songs in queue
+         if len(self._play_queue) > 0:
+            mediaplayer.play_url(self._play_queue[0], only_audio = True)
+         # or hide the audio controls
+         else:
+            gui.audio_controls_hide()
+         # update the browser view
+         self._browser.refresh()
+
 ### browser pages
    def populate_root_page(self, browser, page_url):
       count = len(self._artists_db)
+      # self._browser.item_add('music://generes', 'Generes (TODO)')
+      # self._browser.item_add('music://playlists', 'Playlists (TODO)')
       self._browser.item_add(RootOnAirItemClass(), 'music://onair', self)
       self._browser.item_add(RootArtistsItemClass(), 'music://artists', self)
       self._browser.item_add(RootAlbumsItemClass(), 'music://albums', self)
       self._browser.item_add(RootSongsItemClass(), 'music://songs', self)
       self._browser.item_add(RootRebuildItemClass(), 'music://rebuild', self)
-      # self._browser.item_add('music://generes', 'Generes (TODO)')
-      # self._browser.item_add('music://playlists', 'Playlists (TODO)')
+      self._browser.item_add(RootAddSourceItemClass(), 'music://add_source', self)
 
    def populate_onair_page(self, browser, page_url):
       """ list of songs in the current queue """
-      for url in mediaplayer._url_queue:
+      for url in self._play_queue:
          song = self._songs_db.get_data(url)
          self._browser.item_add(SongItemClass(), url, song)
 
@@ -342,14 +453,32 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def populate_artist_page(self, browser, url, artist):
       """ list of all songs for the given artist """
+      self._browser.item_add(QueueArtistItemClass(), url, artist)
+      
       for song_url in artist['songs']:
+         # TODO order by album/tracknumber/title
+         # ... maybe use genlist group !
          song = self._songs_db.get_data(song_url)
          self._browser.item_add(SongItemClass(), song['url'], song)
 
    def populate_album_page(self, browser, url, album):
       """ list of all songs in the given album """
+      self._browser.item_add(QueueAlbumItemClass(), url, album)
+      
+      L = []
       for song_url in album['songs']:
          song = self._songs_db.get_data(song_url)
+         try:
+            song['label'] = "[%02d] - %s" % (song['tracknumber'], song['title'])
+         except:
+            song['label'] = song['title']
+         L.append(song)
+
+      # TODO sort by label
+      # ...or better don't do the label and sort by tracknumber/label
+      #
+      # for song in sorted(L, key='tracknumber'):
+      for song in L:
          self._browser.item_add(SongItemClass(), song['url'], song)
 
 
@@ -393,7 +522,10 @@ class UpdateDBThread(threading.Thread):
    def read_metadata(self, full_path):
       DBG('GET METADATA FOR: ' + full_path)
 
-      meta = EasyID3(full_path)
+      try:
+         meta = EasyID3(full_path)
+      except:
+         return
 
       # import pprint
       # pprint.pprint(meta)
@@ -407,7 +539,6 @@ class UpdateDBThread(threading.Thread):
       else:
          item_data['title'] = full_path # TODO just file name
 
-      
       if meta.has_key('artist'):
          item_data['artist'] = meta['artist'][0].encode('utf-8')
 
@@ -436,9 +567,14 @@ class UpdateDBThread(threading.Thread):
       else:
          item_data['artist'] = 'Unknow'
 
-
-      if meta.has_key('tracknumber'):
-         item_data['tracknumber'] = meta['tracknumber'][0].encode('utf-8')
+      try:
+         if '/' in meta['tracknumber'][0]:
+            tn = int(meta['tracknumber'][0].split('/')[0])
+         else:
+            tn = int(meta['tracknumber'][0])
+         item_data['tracknumber'] = tn
+      except:
+         pass
 
       if meta.has_key('length'):
          item_data['length'] = meta['length'][0].encode('utf-8')

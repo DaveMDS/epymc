@@ -37,7 +37,7 @@ MAINMENU_HIDDEN ??
 
 
 def DBG(msg):
-   print('EVENTS: ' + msg)
+   # print('EVENTS: ' + msg)
    pass
 
 

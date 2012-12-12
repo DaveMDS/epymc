@@ -1756,6 +1756,515 @@ group { name: "elm/entry/anchor/default";
    }
 }
 
+//// MENU (elm/menu/item/default) ///////////////////
+group { name: "elm/menu/item/default";
+   images {
+      image: "bt_base1.png" COMP;
+      image: "bt_base2.png" COMP;
+      image: "bt_hilight.png" COMP;
+      image: "bt_shine.png" COMP;
+      image: "bt_glow.png" COMP;
+      image: "bt_dis_base.png" COMP;
+      // image: "bt_dis_hilight.png" COMP;
+   }
+   script {
+      public menu_text_visible; //0:hide (default), 1:visible
+      public menu_disable; //0:enable, 1:disable
+   }
+   parts {
+      part { name: "sel_shadow";
+         mouse_events: 0;
+         description { state: "default" 0.0;
+            image.normal: "shadow_rounded_horiz.png";
+            image.border: 0 0 9 9;
+            rel1.offset: 15 -4;
+            rel2.offset: -15 5;
+            fill.smooth: 0;
+            color: 0 0 0 0;
+            visible: 0;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+            color: 255 255 255 255;
+         }
+      }
+      part { name: "sel_base";
+         mouse_events: 0;
+         description { state: "default" 0.0;
+            color: 255 255 255 0;
+            rel1.offset: 14 0;
+            rel2.offset: -15 0;
+            image {
+               normal: "vgrad_med_dark.png";
+            }
+            fill {
+               smooth: 0;
+               size {
+                  relative: 0.0 1.0;
+                  offset: 120 0;
+               }
+            }
+            image.middle: SOLID;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255;
+         }
+         description { state: "clicked" 0.0;
+            inherit: "default" 0.0;
+            inherit: "visible" 0.0;
+            image.normal: "bt_base1.png";
+            image.middle: SOLID;
+         }
+         description { state: "disabled" 0.0;
+            inherit:  "default" 0.0;
+         }
+      }
+      part { name: "bevel"; mouse_events: 0;
+         description { state: "default" 0.0;
+            rel1.offset: 14 0;
+            rel2.offset: -16 0;
+            // image.normal: "bevel_horiz_out.png";
+             image.normal: "bevel_curved_horiz_out.png";
+            image.border: 0 0 2 2;
+            image.middle: 0;
+            fill.smooth: 0;
+         }
+      }
+      part { name: "sel_bevel"; mouse_events: 0;
+         description { state: "default" 0.0;
+            rel1.offset: 14 0;
+            rel2.offset: -16 0;
+            image.normal: "bevel_horiz_out.png";
+            image.border: 0 0 2 2;
+            image.middle: 0;
+            fill.smooth: 0;
+            color: 0 0 0 0;
+            visible: 0;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255;
+            visible: 1;
+         }
+      }
+      part { name: "sel_shine"; mouse_events: 0;
+         description { state: "default" 0.0;
+            image.normal: "shine.png";
+            rel1.offset: 0 -2;
+            rel1.to: "sel_base";
+            rel2.relative: 1.0 0.0;
+            rel2.offset: -1 2;
+            rel2.to: "sel_base";
+            min: 69 5;
+            max: 69 5;
+            fixed: 1 1;
+            color: 0 0 0 0;
+            visible: 0;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255;
+            visible: 1;
+         }
+      }
+      part { name: "item_image_disabled"; // TODO
+         mouse_events: 1;
+         description { state: "default" 0.0;
+            color: 255 255 255 0;
+            image {
+               normal: "bt_dis_base.png";
+               border: 4 4 4 4;
+            }
+            image.middle: SOLID;
+         }
+         description { state: "disabled" 0.0;
+            inherit:  "default" 0.0;
+            color: 255 255 255 255;
+         }
+      }
+      part { name: "elm.swallow.content";
+         type: SWALLOW;
+         description { state: "default" 0.0;
+            fixed: 1 0;
+            visible: 1;
+            align: 0.0 0.5;
+            rel1.offset: 17 2;
+            rel2.relative: 0.0 1.0;
+            aspect: 1.0 1.0;
+            aspect_preference: VERTICAL;
+            rel2.offset: 4 -5;
+         }
+      }
+      part { name: "elm.text";
+         type: TEXT;
+         mouse_events:  0;
+         scale: 1;
+         description { state: "default" 0.0;
+            visible: 0;
+            rel1.to_x: "elm.swallow.content";
+            rel1.relative: 1.0 0.0;
+            rel1.offset: 5 7;
+            rel2.offset: -25 -8;
+            color: 0 0 0 255;
+            text {
+               font:     FONT;
+               size:     FONT_SIZE;
+               min:      1 1;
+               align:    0.0 0.5;
+               text_class: "menu_item";
+            }
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+            text.min: 1 1;
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            inherit: "visible" 0.0;
+            color: 254 254 254 255;
+         }
+         description { state: "disabled" 0.0;
+            inherit: "default" 0.0;
+            color: 0 0 0 128;
+         }
+         description { state: "disabled_visible" 0.0;
+            inherit: "default" 0.0;
+            inherit: "visible" 0.0;
+            color: 0 0 0 128;
+         }
+      }
+      part { name: "disabler";
+         mouse_events: 1;
+         type: RECT;
+         description { state: "default" 0.0;
+            color: 0 0 0 0;
+         }
+         description { state: "disabled" 0.0;
+            inherit: "default" 0.0;
+         }
+      }
+   }
+   programs {
+        //
+      program { name: "item_mouse_in";
+         signal: "mouse,in";
+         source: "disabler";
+         action: SIGNAL_EMIT "elm,action,activate" "";
+         after: "item_mouse_in_2";
+         after: "item_mouse_in_3";
+      }
+      program { name: "item_mouse_in_2";
+         transition: DECELERATE 0.5;
+         script {
+            new v, d;
+            v = get_int(menu_text_visible);
+            d = get_int(menu_disable);
+
+            if (v==1 && d==0)
+            run_program(PROGRAM:"selected_text");
+         }
+      }
+      program { name: "item_mouse_in_3";
+         action : STATE_SET "visible" 0.0;
+         target: "sel_base";
+         target: "sel_shadow";
+         target: "sel_bevel";
+         target: "sel_shine";
+         transition: DECELERATE 0.2;
+      }
+      program { name: "selected_text";
+         action: STATE_SET "selected" 0.0;
+         target: "elm.text";
+         transition: DECELERATE 0.2;
+      }
+      //
+
+      //
+      program { name: "item_mouse_out";
+         signal: "mouse,out";
+         source: "disabler";
+         action: SIGNAL_EMIT "elm,action,inactivate" "";
+         after: "item_mouse_out_2";
+         after: "item_mouse_out_3";
+      }
+      program { name: "item_mouse_out_2";
+         transition: DECELERATE 0.5;
+         script {
+            new v, d;
+            v = get_int(menu_text_visible);
+            d = get_int(menu_disable);
+
+            if (v==1 && d==0)
+            run_program(PROGRAM:"visible_text");
+         }
+      }
+      program { name: "item_mouse_out_3";
+         action: STATE_SET "default" 0.0;
+         target: "sel_base";
+         target: "sel_shadow";
+         target: "sel_bevel";
+         target: "sel_shine";
+         transition: DECELERATE 0.2;
+      }
+      program { name: "visible_text";
+         action: STATE_SET "visible" 0.0;
+         target: "elm.text";
+         transition: DECELERATE 0.2;
+      }
+      //
+
+      program { name: "item_unclick";
+         signal: "mouse,up,1";
+         source: "disabler";
+         action: STATE_SET "visible" 0.0;
+         target: "sel_base";
+      }
+      // program { name: "item_click2";
+         // signal: "mouse,down,1";
+         // source: "over3";
+         // action: STATE_SET "clicked" 0.0;
+         // target: "over3";
+      // }
+      // program { name: "item_unclick2";
+         // signal: "mouse,up,1";
+         // source: "over3";
+         // action: STATE_SET "default" 0.0;
+         // transition: DECELERATE 0.5;
+         // target: "over3";
+      // }
+      program { name: "item_unclick3";
+         signal: "mouse,up,1";
+         source: "disabler";
+         action: SIGNAL_EMIT "elm,action,click" "";
+      }
+      program { name: "text_show";
+         signal: "elm,state,text,visible";
+         source: "elm";
+         script {
+            set_int(menu_text_visible, 1);
+            set_state(PART:"elm.text", "visible", 0.0);
+         }
+      }
+      program { name: "text_hide";
+         signal: "elm,state,text,hidden";
+         source: "elm";
+         script {
+            set_int(menu_text_visible, 0);
+            set_state(PART:"elm.text", "default", 0.0);
+         }
+      }
+      program { name: "disable";
+         signal: "elm,state,disabled";
+         source: "elm";
+         action: STATE_SET "disabled" 0.0;
+         target: "sel_base";
+         target: "item_image_disabled";
+         target: "disabler";
+         after: "disable_text";
+      }
+      program { name: "disable_text";
+         script {
+            new v;
+            v = get_int(menu_text_visible);
+            if (v==1)
+            set_state(PART:"elm.text", "disabled_visible", 0.0);
+            else if (v==0)
+            set_state(PART:"elm.text", "disabled", 0.0);
+            set_int(menu_disable, 1);
+         }
+      }
+      program { name: "item_select";
+         signal: "elm,state,selected";
+         source: "elm";
+         after: "item_mouse_in_2";
+         after: "item_mouse_in_3";
+      }
+      program { name: "item_unselect";
+         signal: "elm,state,unselected";
+         source: "elm";
+         after: "item_mouse_out_2";
+         after: "item_mouse_out_3";
+      }
+      program { name: "enable";
+         signal: "elm,state,enabled";
+         source: "elm";
+         action: STATE_SET "default" 0.0;
+         target: "sel_base";
+         target: "item_image_disabled";
+         target: "disabler";
+         after: "enable_text";
+      }
+      program { name: "enable_text";
+         script {
+            new v;
+            v = get_int(menu_text_visible);
+            if (v==1)
+            set_state(PART:"elm.text", "visible", 0.0);
+            else  if (v==0)
+            set_state(PART:"elm.text", "default", 0.0);
+            set_int(menu_disable, 0);
+         }
+      }
+   }
+}
+
+group { name: "elm/menu/separator/default";
+   parts {
+      part { name: "separator";
+         type: SPACER;
+         description { state: "default" 0.0;
+            min: 2 2;
+            rel1.offset: 4 4;
+            rel2.offset: -5 -5;
+         }
+      }
+   }
+}
+
+group { name: "elm/hover/base/menu"; // This is the container obj for the menu
+   images {
+      image: "shadow_rounded_horiz.png" COMP;
+      image: "menu_bg.png" COMP;
+   }
+   parts {
+      part { name: "elm.swallow.offset";
+         type: SWALLOW;
+         description { state: "default" 0.0;
+            align: 0.0 0.0;
+            rel1.relative: 0.0 0.0;
+            rel2.relative: 0.0 0.0;
+         }
+      }
+      part { name: "elm.swallow.size";
+         type: SWALLOW;
+         description { state: "default" 0.0;
+            align: 0.0 0.0;
+            rel1.to: "elm.swallow.offset";
+            rel1.relative: 1.0 1.0;
+            rel2.to: "elm.swallow.offset";
+            rel2.relative: 1.0 1.0;
+         }
+      }
+      part { name: "base";
+         type: RECT;
+         mouse_events: 1;
+         description { state: "default" 0.0;
+            color: 0 0 0 0;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 1.0;
+            color: 0 0 0 64;
+         }
+      }
+      part { name: "elm.swallow.slot.left";
+         type: SWALLOW;
+         description { state: "default" 0.0;
+         }
+      }
+      part { name: "elm.swallow.slot.right";
+         type: SWALLOW;
+         description { state: "default" 0.0;
+         }
+      }
+      part { name: "elm.swallow.slot.top";
+         type: SWALLOW;
+         description { state: "default" 0.0;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+         }
+      }
+      part { name: "bottomclip";
+         type: RECT;
+         description { state: "default" 0.0;
+            rel1.to: "bottom";
+            rel2.to: "bottom";
+         }
+      }
+      part { name: "bottom";
+         clip_to: "bottomclip";
+         description { state: "default" 0.0;
+            visible: 0;
+            rel1.to: "elm.swallow.slot.bottom";
+            rel1.offset: 0 -13;
+            rel2.to: "elm.swallow.slot.bottom";
+            rel2.offset: 0 18;
+            image {
+               normal: "menu_bg.png";
+               border: 15 16 7 13;
+            }
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+      }
+      part { name: "elm.swallow.slot.bottom";
+         type: SWALLOW;
+         clip_to: "bottomclip";
+         description { state: "default" 0.0;
+            align: 0.5 1.0;
+            rel1.to: "elm.swallow.slot.middle";
+            rel1.relative: 0.0 1.0;
+            rel2.to: "elm.swallow.slot.middle";
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            rel1.offset: 0 13;
+            align: 0.5 0.0;
+         }
+      }
+      part { name: "elm.swallow.slot.middle";
+         type: SWALLOW;
+         repeat_events:1;
+         description { state: "default" 0.0;
+            rel1.to: "elm.swallow.size";
+            rel2.to: "elm.swallow.size";
+         }
+      }
+   }
+   programs {
+      program { name: "end";
+         signal: "mouse,up,1";
+         source: "base";
+         action: SIGNAL_EMIT "elm,action,dismiss" "";
+      }
+      program { name: "show";
+         signal: "elm,action,show";
+         source: "elm";
+         action: STATE_SET "visible" 0.0;
+                             // transition: DECELERATE 0.5;
+         target: "base";
+      }
+      program { name: "hide";
+         signal: "elm,action,hide";
+         source: "elm";
+         action: STATE_SET "default" 0.0;
+                 //            transition: DECELERATE 0.5;
+         target: "base";
+      }
+      program { name: "bottomshow";
+         signal: "elm,action,slot,bottom,show";
+         source: "elm";
+         action: STATE_SET "visible" 0.0;
+         transition: DECELERATE 0.5;
+         target: "bottom";
+         target: "elm.swallow.slot.bottom";
+      }
+      program { name: "bottomhide";
+         signal: "elm,action,slot,bottom,hide";
+         source: "elm";
+         action: STATE_SET "default" 0.0;
+         transition: DECELERATE 0.5;
+         target: "bottom";
+         target: "elm.swallow.slot.bottom";
+      }
+   }
+}
+
 //// VKEYBOARD ENTRY (elm/entry/base-single-noedit/default) ///////////////////
 group { name: "elm/entry/base-single-noedit/vkeyboard";
    parts {
@@ -2084,7 +2593,7 @@ group { name: "elm/button/base/emcHIDE";
       image: "bt_shine.png" COMP;
       image: "button_glow.png" COMP;
       image: "button_dis_base.png" COMP;
-      image: "bt_dis_hilight.png" COMP;
+      // image: "bt_dis_hilight.png" COMP;
    }
    parts {
       part { name: "button_image";

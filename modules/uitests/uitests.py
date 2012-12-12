@@ -24,7 +24,7 @@ import ecore, elementary
 
 from epymc.modules import EmcModule
 from epymc.widgets import EmcDialog, EmcVKeyboard, EmcSourceSelector
-from epymc.widgets import EmcButton, EmcFocusManager2, EmcNotify
+from epymc.widgets import EmcButton, EmcFocusManager2, EmcNotify, EmcMenu
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
 import epymc.events as events
@@ -73,11 +73,11 @@ class MyItemClass(EmcItemClass):
          n = EmcNotify('Sniffer enabled.', hidein = 2)
 
       # Event Emit
-      if url == 'uitests://ev_emit':
+      elif url == 'uitests://ev_emit':
          events.event_emit('TEST_EVENT')
 
       # Notify
-      if url == 'uitests://notify':
+      elif url == 'uitests://notify':
          EmcNotify('<b>TITLE</b><br>' +
                    'some informational text ...<br>' +
                    'This one is without any icon<br>' +
@@ -89,6 +89,20 @@ class MyItemClass(EmcItemClass):
                    'some informational text ...<br>' +
                    'some informational text ...ljhl<br>' +
                     str(time.time()), icon = 'icon/film')
+
+      # Menu
+      elif url == 'uitests://menu':
+         def _cb_menu(menu, item, label):
+            print("Selected item: " + label)
+         m = EmcMenu()
+         m.item_add(None, "Item 1", None, _cb_menu, "item1")
+         m.item_add(None, "Item 2", None, _cb_menu, "item2")
+         m.item_add(None, "Item 3", None, _cb_menu, "item3")
+         m.item_separator_add()
+         m.item_add(None, "Item 4", "clock", _cb_menu, "item4")
+         m.item_add(None, "Item 5", "home", _cb_menu, "item5")
+         m.item_separator_add()
+         i = m.item_add(None, "Item 6", None, _cb_menu, "item6")
 
       # TMDB
       elif url == 'uitests://tmdb':
@@ -317,6 +331,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://sniffer', 'Event Sniffer')
       browser.item_add(MyItemClass(), 'uitests://ev_emit', 'Event Emit')
       browser.item_add(MyItemClass(), 'uitests://notify', 'Notify Stack')
+      browser.item_add(MyItemClass(), 'uitests://menu', 'Menu')
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + FocusManager')
       browser.item_add(MyItemClass(), 'uitests://icons', 'Icons gallery')
       browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')

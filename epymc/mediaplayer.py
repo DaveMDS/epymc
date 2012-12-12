@@ -375,8 +375,8 @@ def _init_mediaplayer_gui():
 
    #  submenu video
    bt = EmcButton('Video')
-   # bt.callback_clicked_add(_cb_btn_fforward)
-   bt.data['cb'] = None
+   bt.callback_clicked_add(_cb_btn_video)
+   bt.data['cb'] = _cb_btn_video
    _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
@@ -437,17 +437,22 @@ def _cb_btn_audio(btn):
    for n in range(trk_cnt):
       name = _emotion.audio_channel_name_get(n)
       if name:
-         name = "Track: " + name
+         name = "Audio Track: " + name
       else:
-         name = "Track #" + str(n + 1)
-      item = menu.item_add(None, name, None, _cb_audio_track, n)
+         name = "Audio Track #" + str(n + 1)
+      item = menu.item_add(None, name, None, _cb_menu_audio_track, n)
 
    menu.item_separator_add()
    item = menu.item_add(None, "Mute", 'clock', _cb_menu_mute)
-   menu.show()
+
+
+def _cb_btn_video(btn):
+   print "VIDEO"
    
-def _cb_audio_track(menu, item, track_num):
-   print track_num
+
+def _cb_menu_audio_track(menu, item, track_num):
+   print("TODO: add support in emotion/gstreamer for this")
+   print("Change to audio track #" + str(track_num))
    _emotion.audio_channel_set(track_num)
 
 def _cb_menu_mute(menu, item):

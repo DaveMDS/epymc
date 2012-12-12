@@ -37,9 +37,7 @@ class EmcButton(elementary.Button):
 
 ################################################################################
 class EmcMenu(elementary.Menu):
-   """ TODO doc this
-   item_add(self, parent = None, label = None, icon = None, callback = None, *args, **kwargs):
-   """
+   """ TODO doc this """
 
    def __init__(self, relto = None):
       elementary.Menu.__init__(self, gui.layout)
@@ -48,8 +46,63 @@ class EmcMenu(elementary.Menu):
          x, y, w, h = relto.geometry
          self.move(x, y + h)
 
+      input_events.listener_add("EmcMenu", self._input_event_cb)
+      self.callback_clicked_add(self._dismiss_cb)
       self.show()
 
+   def item_add(self, parent = None, label = None, icon = None, callback = None, *args, **kwargs):
+      item = elementary.Menu.item_add(self, parent, label, icon, self._item_selected_cb, callback, *args, **kwargs)
+      if self.selected_item_get() is None:
+         item.selected_set(True)
+
+   def close(self):
+      input_events.listener_del("EmcMenu")
+      elementary.Menu.close(self)
+
+   def _item_selected_cb(self, menu, item, cb, *args, **kwargs):
+      input_events.listener_del("EmcMenu")
+      if callable(cb):
+         cb(menu, item, *args, **kwargs)
+      
+   def _dismiss_cb(self, menu):
+      input_events.listener_del("EmcMenu")
+
+   def _input_event_cb(self, event):
+      if event == 'UP':
+         item = self.selected_item_get()
+         if not item or not item.prev:
+            return input_events.EVENT_BLOCK
+         while item.prev and item.prev.is_separator():
+            item = item.prev
+         item.prev.selected_set(True)
+         return input_events.EVENT_BLOCK
+
+      elif event == 'DOWN':
+         item = self.selected_item_get()
+         if not item or not item.next:
+            return input_events.EVENT_BLOCK
+         while item.next and item.next.is_separator():
+            item = item.next
+         item.next.selected_set(True)
+         return input_events.EVENT_BLOCK
+
+      elif event == 'OK':
+         item = self.selected_item_get()
+         args, kwargs = self.selected_item_get().data_get()
+         cb = args[0]
+         if cb and callable(cb):
+            cb(self, item, *args[1:], **kwargs)
+         # self.close() # not sure I want this :/
+         return input_events.EVENT_BLOCK
+
+      elif event == 'BACK' or event == 'EXIT':
+         self.close()
+         return input_events.EVENT_BLOCK
+
+      elif event in ('LEFT', 'RIGHT'):
+         return input_events.EVENT_BLOCK
+
+      return input_events.EVENT_CONTINUE
 
 ################################################################################
 class EmcRemoteImage(elementary.Image):
@@ -105,7 +158,6 @@ class EmcRemoteImage(elementary.Image):
       else:
          # TODO show a dummy image
          self.file_set('')
-
 
 ################################################################################
 class EmcDialog(edje.Edje):

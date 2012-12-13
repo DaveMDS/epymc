@@ -81,6 +81,7 @@ def play_url(url, only_audio = False, start_from = 0):
    if not _fman:
       _init_mediaplayer_gui()
 
+   url = str(url) # ensure is a string, not unicode)
    if url.find('://', 2, 15) is -1:
       url = 'file://' + url
 

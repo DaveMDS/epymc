@@ -64,7 +64,7 @@ def init():
    LOG('inf', 'Using theme: ' + theme_file)
    
    # custom elementary theme
-   elementary.theme_overlay_add(theme_file) # TODO REMOVE ME!!! it's here for buttons
+   elementary.theme_overlay_add(theme_file) # TODO REMOVE ME!!! it's here for buttons, and others
    elementary.theme_extension_add(theme_file)
 
    # preferred evas engine
@@ -91,7 +91,11 @@ def init():
    win.resize_object_add(layout)
    layout.show()
    # show the mouse when moved
-   layout.edje.signal_callback_add("mouse,move", "*", (lambda o,e,s: mouse_show()))
+   layout.edje.signal_callback_add("mouse,move", "*",
+                                   (lambda o,e,s: mouse_show()))
+   # right click for BACK
+   layout.edje.signal_callback_add("mouse,up,3", "*",
+                                   (lambda o,e,s: input_events.event_emit('BACK')))
 
    win.show()
    win.scale_set(float(scale))

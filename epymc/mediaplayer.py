@@ -430,31 +430,38 @@ def _cb_btn_fbackward(btn):
 
 def _cb_btn_audio(btn):
    trk_cnt = _emotion.audio_channel_count()
-   print "count ", trk_cnt
-   print "current ", _emotion.audio_channel_get()
-
    menu = EmcMenu(relto = btn)
-   
    for n in range(trk_cnt):
       name = _emotion.audio_channel_name_get(n)
       if name:
-         name = "Audio Track: " + name
+         name = "Audio track: " + name
       else:
-         name = "Audio Track #" + str(n + 1)
+         name = "Audio track #" + str(n + 1)
       item = menu.item_add(None, name, None, _cb_menu_audio_track, n)
 
    menu.item_separator_add()
    item = menu.item_add(None, "Mute", 'clock', _cb_menu_mute)
 
-
 def _cb_btn_video(btn):
-   print "VIDEO"
-   
+   trk_cnt = _emotion.video_channel_count()
+   menu = EmcMenu(relto = btn)
+   for n in range(trk_cnt):
+      name = _emotion.video_channel_name_get(n)
+      if name:
+         name = "Video track: " + name
+      else:
+         name = "Video track #" + str(n + 1)
+      item = menu.item_add(None, name, None, _cb_menu_video_track, n)
 
 def _cb_menu_audio_track(menu, item, track_num):
    print("TODO: add support in emotion/gstreamer for this")
    print("Change to audio track #" + str(track_num))
    _emotion.audio_channel_set(track_num)
+
+def _cb_menu_video_track(menu, item, track_num):
+   print("TODO: add support in emotion/gstreamer for this")
+   print("Change to video track #" + str(track_num))
+   _emotion.video_channel_set(track_num)
 
 def _cb_menu_mute(menu, item):
    volume_mute_toggle()

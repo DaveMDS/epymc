@@ -60,12 +60,13 @@ class StdConfigItemBool(object):
    # this don't inherit from EmcItemClass to not be a Singleton
    # this class is used by the function standard_item_bool_add(...)
 
-   def __init__(self, section, option, label, icon = None, info = None):
+   def __init__(self, section, option, label, icon = None, info = None, cb = None):
       self._sec = section
       self._opt = option
       self._lbl = label
       self._ico = icon
       self._inf = info
+      self._cb = cb
 
    def item_selected(self, url, user_data):
       if ini.get(self._sec, self._opt) == "True":
@@ -255,7 +256,7 @@ def _general_list():
 
 def _general_populate(browser, url):
    standard_item_bool_add('general', 'fullscreen', 'Start in fullscreen')
-   standard_item_action_add('Adjust interface scale', 'icon/scale', selected_cb=_change_scale)
+   standard_item_action_add('Adjust interface scale', 'icon/scale', cb = _change_scale)
    standard_item_bool_add('general', 'back_in_lists', 'Show Back item in lists', 'icon/back')
    standard_item_string_from_list('general', 'evas_engine', 'Rendering engine',
                                   evas.render_method_list(), 'icon/evas')

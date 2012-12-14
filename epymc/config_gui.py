@@ -73,6 +73,8 @@ class StdConfigItemBool(object):
       else:
          ini.set(self._sec, self._opt, "True")
       _browser.refresh()
+      if callable(self._cb):
+         self._cb()
 
    
    def icon_end_get(self, url, user_data):
@@ -90,16 +92,19 @@ class StdConfigItemString(object):
    # this don't inherit from EmcItemClass to not be a Singleton
    # this class is used by the function standard_item_string_add(...)
 
-   def __init__(self, section, option, label, icon = None, info = None):
+   def __init__(self, section, option, label, icon = None, info = None, cb = None):
       self._sec = section
       self._opt = option
       self._lbl = label
       self._ico = icon
       self._inf = info
+      self._cb = cb
 
    def _kbd_accept_cb(self, vkeyb, text):
       ini.set(self._sec, self._opt, text)
       _browser.refresh()
+      if callable(self._cb):
+         self._cb()
 
    def item_selected(self, url, user_data):
       EmcVKeyboard(title = self._lbl,
@@ -119,19 +124,22 @@ class StdConfigItemStringFromList(object):
    # this don't inherit from EmcItemClass to not be a Singleton
    # this class is used by the function standard_item_string_add(...)
 
-   def __init__(self, section, option, label, strlist, icon = None, info = None):
+   def __init__(self, section, option, label, strlist, icon = None, info = None, cb = None):
       self._sec = section
       self._opt = option
       self._lbl = label
       self._ico = icon
       self._inf = info
       self._sli = strlist
+      self._cb = cb
 
    def _dia_list_selected_cb(self, dia):
       item = dia.list_item_selected_get()
       ini.set(self._sec, self._opt, item.text)
       _browser.refresh()
       dia.delete()
+      if callable(self._cb):
+         self._cb()
 
    def item_selected(self, url, user_data):
       dia = EmcDialog(self._lbl, style = 'list', done_cb = self._dia_list_selected_cb)
@@ -206,24 +214,24 @@ def root_item_del(name):
       if _root_items_dict.has_key(_name):
          del _root_items_dict[_name]
 
-def standard_item_bool_add(section, option, label, icon = None, info = None):
+def standard_item_bool_add(section, option, label, icon = None, info = None, cb = None):
    """ TODO doc """
-   _browser.item_add(StdConfigItemBool(section, option, label, icon, info),
+   _browser.item_add(StdConfigItemBool(section, option, label, icon, info, cb),
                      'config://'+section+'/'+option, None)
 
-def standard_item_string_add(section, option, label, icon = None, info = None):
+def standard_item_string_add(section, option, label, icon = None, info = None, cb = None):
    """ TODO doc """
-   _browser.item_add(StdConfigItemString(section, option, label, icon, info),
+   _browser.item_add(StdConfigItemString(section, option, label, icon, info, cb),
                      'config://'+section+'/'+option, None)
 
-def standard_item_string_from_list(section, option, label, strlist, icon = None, info = None):
+def standard_item_string_from_list(section, option, label, strlist, icon = None, info = None, cb = None):
    """ TODO doc """
-   _browser.item_add(StdConfigItemStringFromList(section, option, label, strlist, icon, info),
+   _browser.item_add(StdConfigItemStringFromList(section, option, label, strlist, icon, info, cb),
                      'config://'+section+'/'+option, None)
 
-def standard_item_action_add(label, icon = None, info = None, selected_cb = None):
+def standard_item_action_add(label, icon = None, info = None, cb = None):
    """ TODO doc """
-   _browser.item_add(StdConfigItemAction(label, icon, info, selected_cb),
+   _browser.item_add(StdConfigItemAction(label, icon, info, cb),
                      'config://useraction', None)
 
 def browser_get():

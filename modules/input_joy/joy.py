@@ -150,41 +150,30 @@ and what it need to work well, can also use markup like <title>this</> or
       return True # keep tha handler alive
 
 ### config panel stuff
-   class DeviceItemClass(EmcItemClass):
-      def label_get(self, url, mod):
-         return 'Device (%s)' % (mod.device)
-
-      def item_selected(self, url, mod):
-         EmcVKeyboard(accept_cb = mod.device_changed_cb,
-                      title = 'Insert joystick device', text = mod.device)
-
-   class WizardItemClass(EmcItemClass):
-      def label_get(self, url, mod):
-         return 'Configure buttons'
-
-      def item_selected(self, url, mod):
-         mod.start_configurator()
-
    def config_panel_cb(self):
       bro = config_gui.browser_get()
       bro.page_add('config://joystick/', 'Joystick', None, self.populate_joy)
 
    def populate_joy(self, browser, url):
-      browser.item_add(self.DeviceItemClass(), 'config://joystick/device', self)
-      browser.item_add(self.WizardItemClass(), 'config://joystick/configurator', self)
+      config_gui.standard_item_string_add('joystick', 'device', 'Device',
+                                 'icon/joystick', cb = self.device_changed_cb)
+      config_gui.standard_item_action_add('Configure buttons', cb = self.start_configurator)
 
-   def device_changed_cb(self, vkbd, new_device):
-      ini.set('joystick', 'device', new_device)
+   def device_changed_cb(self):
       self.__restart__()
-      bro = config_gui.browser_get()
-      bro.refresh()
+      self.check_device()
 
-   def start_configurator(self):
-      # recheck device
-      self.__restart__()
+   def check_device(self):
       if not self.dev or not self.fdh:
          EmcDialog(title = 'No joystick found', style = 'error',
                    text = 'Try to adjust your joystick device')
+         return False
+      return True
+
+   def start_configurator(self):
+      # retry device
+      self.__restart__()
+      if not self.check_device():
          return
 
       # wait for the first key

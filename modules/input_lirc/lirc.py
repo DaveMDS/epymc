@@ -121,17 +121,6 @@ and what it need to work well, can also use markup like <title>this</> or
       return True
 
    ### config panel stuff
-   class DeviceItemClass(EmcItemClass):
-      def label_get(self, url, mod):
-         return 'Device: %s' % (mod.device)
-
-      def icon_get(self, url, key):
-         return 'icon/remote'
-
-      def item_selected(self, url, mod):
-         EmcVKeyboard(accept_cb = mod.device_changed_cb,
-                      title = 'Insert lirc device', text = mod.device)
-
    class KeyItemClass(EmcItemClass):
       def label_get(self, url, data):
          key, event = data
@@ -153,22 +142,24 @@ and what it need to work well, can also use markup like <title>this</> or
       bro.page_add('config://lirc/', 'Remote', None, self.populate_lirc)
 
    def populate_lirc(self, browser, url):
-      browser.item_add(self.DeviceItemClass(), 'config://lirc/device', self)
+      config_gui.standard_item_string_add('lirc', 'device', 'Lirc socket',
+                                 'icon/remote', cb = self.device_changed_cb)
+         
       for key, event in self.keys.items():
          browser.item_add(self.KeyItemClass(), 'config://lirc/button', (key, event))
       browser.item_add(self.AddKeyItemClass(), 'config://lirc/addkey', self)
       self.check_lirc()
 
-   def device_changed_cb(self, vkbd, new_device):
-      ini.set('lirc', 'device', new_device)
+   def device_changed_cb(self):
       self.__restart__()
-      config_gui.browser_get().refresh()
       self.check_lirc()
 
    def check_lirc(self):
       if not self.sok or not self.fdh:
          EmcDialog(style = 'error',
             text = 'Cannot connect to lirc using socket:<br>' + self.device)
+         return False
+      return True
 
    def ask_a_single_key(self):
       self.grab_key_func = self.grabbed_key_func

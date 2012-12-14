@@ -24,7 +24,7 @@ import evas, ecore, edje, elementary
 import ecore.x #used only to show/hide the cursor
 
 import utils, ini, gui, events, input_events
-from widgets import EmcButton, EmcDialog, EmcNotify
+from widgets import EmcButton, EmcDialog, EmcNotify, EmcRemoteImage
 
 
 win = None
@@ -134,7 +134,8 @@ def load_icon(icon):
          can be a theme icon (ex: icon/folder).
    see icons.edc for all the existing icon
    """
-   #TODO if icon in an EvasObject just return it
+   if type(icon) in (elementary.Icon, elementary.Image, EmcRemoteImage):
+      return icon
    ic = elementary.Icon(gui.win)
    if icon[0] == '/':
       ic.file_set(icon)

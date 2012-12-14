@@ -503,21 +503,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       if self._film_db.id_exists(self._current_url):
          film_info = self._film_db.get_data(self._current_url)
 
-         # create the cast list
-         li = elementary.List(gui.win)
-         li.focus_allow_set(False)
+         dia = EmcDialog(title = 'Cast', style = 'list')
          for person in film_info['cast']:
             if person['job'] == 'Actor':
                label = person['name'] + ' as ' + person['character']
-               li.item_append(label, None, None, None, None)
-
-         li.items_get()[0].selected_set(1)
-         li.show()
-         li.go()
-         li.size_hint_min_set(300, 300) #TODO FIXME
-
-         # put the list ia a dialog
-         dialog = EmcDialog(title = 'Cast', content = li)
+               dia.list_item_append(label)
 
 
 ######## Choose poster
@@ -903,8 +893,10 @@ class TMDB_WithGui():
       # more matching results, show a list to choose from
       else:
          self.dialog.text_append('<b>Found %d results</b><br>' % (len(data)))
-         li = elementary.List(gui.win)
-         li.focus_allow_set(False)
+
+         title = 'Found %d results, which one?' % (len(data))
+         dialog2 = EmcDialog(title = title, style = 'list',
+                             done_cb = self._cb_list_ok, canc_cb = self._cb_list_cancel)
          for res in data:
             icon = None
             for image in res['posters']:
@@ -916,25 +908,15 @@ class TMDB_WithGui():
                label = '%s (%s)' % (res['name'], res['released'][:4])
             else:
                label = res['name']
-            li.item_append(label, icon, None, None, res['id'])
+            dialog2.list_item_append(label, icon, None, res['id'])
 
-         li.items_get()[0].selected_set(True)
-         li.show()
-         li.go()
-
-         title = 'Found %d results, which one?' % (len(data))
-         dialog2 = EmcDialog(title = title, content = li)
-         dialog2.button_add('Ok', self._cb_list_ok, dialog2)
-         dialog2.button_add('Cancel', self._cb_list_cancel, dialog2)
-
-   def _cb_list_cancel(self, button, dialog2):
+   def _cb_list_cancel(self, dialog2):
       dialog2.delete()
       self.dialog.delete()
 
-   def _cb_list_ok(self, button, dialog2):
+   def _cb_list_ok(self, dialog2):
       # get selected item id
-      li = dialog2.content_get()
-      item = li.selected_item_get()
+      item = dialog2.list_item_selected_get()
       (args, kargs) = item.data_get()
       tid = args[0]
       if not item or not tid: return

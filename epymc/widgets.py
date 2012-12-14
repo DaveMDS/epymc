@@ -366,11 +366,11 @@ class EmcDialog(edje.Edje):
    def text_append(self, text):
       self._textentry.entry_set(self._textentry.entry_get() + text)
 
-   def list_item_append(self, label, icon = None, end = None):
+   def list_item_append(self, label, icon = None, end = None, *args, **kwargs):
       if self._list:
          if icon: icon = gui.load_icon(icon)
          if end: end = gui.load_icon(end)
-         it = self._list.item_append(label, icon, end)
+         it = self._list.item_append(label, icon, end, None, *args, **kwargs)
          if not self._list.selected_item_get():
             it.selected = True
          return it

@@ -21,6 +21,7 @@
 IMAGE("dvd_cover_blank.png", 730, 890)
 
 ICON("emc")
+ICON("evas")
 ICON("home")
 ICON("folder")
 ICON("close")

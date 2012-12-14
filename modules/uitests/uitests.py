@@ -178,6 +178,17 @@ class MyItemClass(EmcItemClass):
          d.progress_set(self._progress)
          t = ecore.Timer(0.2, _progress_timer)
 
+      # Dialog - List
+      elif url == 'uitests://dlg-list':
+         def _dia_list_cb(dia):
+            item = dia.list_item_selected_get()
+            print('Selected: ' + str(item))
+            # dia.delete()
+         d = EmcDialog(title = 'Dialog - List', style = 'list', done_cb = _dia_list_cb)
+         d.list_item_append('item 1')
+         d.list_item_append('item 2', 'icon/home')
+         d.list_item_append('item 3', 'icon/star', 'icon/check_on')
+
       # Dialog - Panel full
       elif url == 'uitests://dlg-panel1':
          text = LOREM
@@ -298,11 +309,9 @@ class MyItemClass(EmcItemClass):
             'grid star star_off module scale config play stop fwd ffwd bwd ' \
             'fbwd ' \
             'film mame music joystick keyboard remote'
-         li = elementary.List(gui.win)
+         d = EmcDialog(title = 'Icons gallery', style = 'list')
          for name in icon_names.split():
-            li.item_append(name, gui.load_icon('icon/' + name))
-         li.go()
-         EmcDialog(style = 'panel', title = 'Icons gallery', content = li)
+            d.list_item_append(name, 'icon/' + name)
 
 class UiTestsModule(EmcModule):
    name = 'uitests'
@@ -346,6 +355,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://dlg-yesno', 'Dialog - YesNo')
       browser.item_add(MyItemClass(), 'uitests://dlg-cancel', 'Dialog - Cancel')
       browser.item_add(MyItemClass(), 'uitests://dlg-progress', 'Dialog - Progress')
+      browser.item_add(MyItemClass(), 'uitests://dlg-list', 'Dialog - List')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel1', 'Dialog - Panel full')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel2', 'Dialog - Panel no buttons')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel3', 'Dialog - Panel no title')

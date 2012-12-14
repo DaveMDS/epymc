@@ -115,6 +115,42 @@ class StdConfigItemString(object):
    def poster_get(self, url, user_data): return None
    def fanart_get(self, url, user_data): return None
 
+class StdConfigItemStringFromList(object): 
+   # this don't inherit from EmcItemClass to not be a Singleton
+   # this class is used by the function standard_item_string_add(...)
+
+   def __init__(self, section, option, label, strlist, icon = None, info = None):
+      self._sec = section
+      self._opt = option
+      self._lbl = label
+      self._ico = icon
+      self._inf = info
+      self._sli = strlist
+
+   def _dia_list_selected_cb(self, dia):
+      item = dia.list_item_selected_get()
+      ini.set(self._sec, self._opt, item.text)
+      _browser.refresh()
+      dia.delete()
+
+   def item_selected(self, url, user_data):
+      dia = EmcDialog(self._lbl, style = 'list', done_cb = self._dia_list_selected_cb)
+      for string in self._sli:
+         if string == ini.get(self._sec, self._opt):
+            it = dia.list_item_append(string, end = 'icon/check_on')
+            it.selected = True
+         else:
+            dia.list_item_append(string)
+
+   def label_get(self, url, user_data):
+      return self._lbl + '  ( ' + ini.get(self._sec, self._opt) + ' )'
+
+   def icon_get(self, url, user_data): return self._ico
+   def icon_end_get(self, url, user_data): return None
+   def info_get(self, url, user_data): return self._inf
+   def poster_get(self, url, user_data): return None
+   def fanart_get(self, url, user_data): return None
+
 class StdConfigItemAction(object): 
    # this don't inherit from EmcItemClass to not be a Singleton
    # this class is used by the function standard_item_action_add(...)
@@ -180,6 +216,11 @@ def standard_item_string_add(section, option, label, icon = None, info = None):
    _browser.item_add(StdConfigItemString(section, option, label, icon, info),
                      'config://'+section+'/'+option, None)
 
+def standard_item_string_from_list(section, option, label, strlist, icon = None, info = None):
+   """ TODO doc """
+   _browser.item_add(StdConfigItemStringFromList(section, option, label, strlist, icon, info),
+                     'config://'+section+'/'+option, None)
+
 def standard_item_action_add(label, icon = None, info = None, selected_cb = None):
    """ TODO doc """
    _browser.item_add(StdConfigItemAction(label, icon, info, selected_cb),
@@ -208,7 +249,12 @@ def _general_populate(browser, url):
    standard_item_bool_add('general', 'fullscreen', 'Start in fullscreen')
    standard_item_action_add('Adjust interface scale', 'icon/scale', selected_cb=_change_scale)
    standard_item_bool_add('general', 'back_in_lists', 'Show Back item in lists', 'icon/back')
-   
+   standard_item_string_from_list('general', 'evas_engine', 'Rendering engine',
+                                  evas.render_method_list(), 'icon/evas')
+   L = ['gstreamer', 'xine', 'generic']
+   standard_item_string_from_list('mediaplayer', 'backend', 'Multimedia engine',
+                                  L, 'icon/evas')
+
 def _change_scale():
    def _bigger(dialog): gui.scale_bigger(); _save()
    def _smaller(dialog): gui.scale_smaller(); _save()

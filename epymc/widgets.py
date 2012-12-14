@@ -165,28 +165,28 @@ class EmcDialog(edje.Edje):
    style can be 'panel' or 'minimal'
 
    you can also apply special style that perform specific task:
-      'info', 'error', 'warning', 'yesno', 'cancel', 'progress'
+      'info', 'error', 'warning', 'yesno', 'cancel', 'progress', 'list'
    """
 
-   special_styles = ['info', 'error', 'warning', 'yesno', 'cancel', 'progress']
+   minimal_styles = ['info', 'error', 'warning', 'yesno', 'cancel', 'progress']
    dialogs_counter = 0
-
    fman = None
    
    def __init__(self, title = None, text = None, content = None,
                 spinner = False, style = 'panel',
                 done_cb = None, canc_cb = None, user_data = None):
+
       # load the right edje object
-      if style in EmcDialog.special_styles or style == 'minimal':
+      if style in EmcDialog.minimal_styles or style == 'minimal':
          group = 'emc/dialog/minimal'
       else:
          group = 'emc/dialog/panel'
       edje.Edje.__init__(self, gui.layout.evas, file = gui.theme_file, group = group)
       self.signal_callback_add('emc,dialog,close', '', self._close_pressed)
       self.signal_callback_add('emc,dialog,hide,done', '',
-                               (lambda a,S,d: self._delete_real()))
+                               (lambda a,s,d: self._delete_real()))
       self.signal_callback_add('emc,dialog,show,done', '',
-                               (lambda a,s,D: None))
+                               (lambda a,s,d: None))
 
       # put the dialog in the dialogs box of the main edje obj,
       # this way we only manage one edje and don't have stacking problems.
@@ -201,8 +201,16 @@ class EmcDialog(edje.Edje):
       self._done_cb = done_cb
       self._canc_cb = canc_cb
       self._user_data = user_data
+      self._list = None
       self._buttons = []
       self.fman = EmcFocusManager2()
+
+      # title
+      if title is None:
+         self.signal_emit('emc,dialog,title,hide', 'emc')
+      else:
+         self.part_text_set('emc.text.title', title)
+         self.signal_emit('emc,dialog,title,show', 'emc')
 
       # vbox
       self._vbox = elementary.Box(gui.win)
@@ -212,11 +220,7 @@ class EmcDialog(edje.Edje):
       self._vbox.show()
       self.part_swallow('emc.swallow.content', self._vbox)
 
-      if title is not None:
-         self.part_text_set('emc.text.title', title)
-         self.signal_emit('emc,dialog,title,show', 'emc')
-         # TODO hide the title in None
-      
+      # text entry
       if text is not None:
          self._textentry = elementary.Entry(gui.win)
          self._textentry.style_set('dialog')
@@ -228,7 +232,9 @@ class EmcDialog(edje.Edje):
          #~ self._textentry.size_hint_align_set(0.5, 0.5)
          self._vbox.pack_end(self._textentry)
          self._textentry.show()
-      elif content is not None:
+
+      # user content
+      if content is not None:
          frame = elementary.Frame(gui.win)
          frame.style_set('pad_medium')
          frame.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
@@ -237,6 +243,17 @@ class EmcDialog(edje.Edje):
          frame.show()
          self._vbox.pack_end(frame)
 
+      # automatic list
+      if style == 'list':
+         self._list = elementary.List(gui.win)
+         self._list.focus_allow_set(False)
+         self._list.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+         self._list.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+         self._list.callback_activated_add(self._list_item_activated_cb)
+         self._list.show()
+         self._vbox.pack_end(self._list)
+
+      # spinner
       if spinner:
          self._spinner = elementary.Progressbar(gui.win)
          self._spinner.style_set('wheel')
@@ -244,12 +261,14 @@ class EmcDialog(edje.Edje):
          self._spinner.show()
          self._vbox.pack_end(self._spinner)
 
-      if style in EmcDialog.special_styles:
+      # set minimal styles + automatic title
+      if style in EmcDialog.minimal_styles:
          self.signal_emit('emc,dialog,%s,set' % (style), 'emc')
          if title is None:
             self.part_text_set('emc.text.title', style)
             self.signal_emit('emc,dialog,title,show', 'emc')
 
+      # buttons
       if style in ('info', 'error', 'warning'):
          self.button_add('Ok', (lambda btn: self.delete()))
 
@@ -271,8 +290,10 @@ class EmcDialog(edje.Edje):
          # else:
             # self.button_add('Cancel', (lambda btn: self.delete()))
 
+      # listen for input events
       input_events.listener_add(self._name, self._input_event_cb)
-      
+
+      # show
       self.show()
       self.signal_emit('emc,dialog,show', 'emc')
 
@@ -345,6 +366,25 @@ class EmcDialog(edje.Edje):
    def text_append(self, text):
       self._textentry.entry_set(self._textentry.entry_get() + text)
 
+   def list_item_append(self, label, icon = None, end = None):
+      if self._list:
+         if icon: icon = gui.load_icon(icon)
+         if end: end = gui.load_icon(end)
+         it = self._list.item_append(label, icon, end)
+         if not self._list.selected_item_get():
+            it.selected = True
+         return it
+
+   def list_item_selected_get(self):
+      if self._list:
+         return self._list.selected_item_get()
+
+   def _list_item_activated_cb(self, li, it):
+      if self._done_cb:
+         self._done_cb(self)
+      else:
+         self.delete()
+   
    def spinner_start(self):
       self._spinner.show()
       self._spinner.pulse(True)
@@ -375,8 +415,8 @@ class EmcDialog(edje.Edje):
          return input_events.EVENT_BLOCK
 
       # if content is elm List or Genlist then automanage the events
-      if self._content and type(self._content) in (elementary.List, elementary.Genlist):
-         list = self._content
+      if self._list or (self._content and type(self._content) in (elementary.List, elementary.Genlist)):
+         list = self._list or self._content
          item = list.selected_item_get()
          if not item:
             item = list.items_get()[0]
@@ -412,6 +452,8 @@ class EmcDialog(edje.Edje):
             self._cb_buttons(self.fman.focused_get())
          elif self._done_cb:
             self._done_cb(self)
+         else:
+            self.delete()
 
       if event in ('LEFT', 'RIGHT', 'UP', 'DOWN', 'OK'):
          return input_events.EVENT_BLOCK

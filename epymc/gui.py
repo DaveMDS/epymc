@@ -69,8 +69,11 @@ def init():
 
    # preferred evas engine
    # this seems totally buggy in elm, I should just do the preferred one
+   LOG('inf', 'emg: ' + str(elementary.engine_get()))
    elementary.preferred_engine_set(evas_engine)
    elementary.engine_set(evas_engine)
+   LOG('inf', 'pref: ' + str(elementary.preferred_engine_get()))
+   LOG('inf', 'emg: ' + str(elementary.engine_get()))
 
    # create the elm window
    win = elementary.Window('epymc', elementary.ELM_WIN_BASIC)

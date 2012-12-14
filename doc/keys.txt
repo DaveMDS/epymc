@@ -10,6 +10,7 @@ KEYS                             ACTION
 Arrows                           UP,DOWN,LEFT,RIGHT
 Enter or KP_Enter                OK
 BackSpace                        BACK
+RightMouseButton                 BACK
 Esc                              EXIT
 Space, p or Pause                TOGGLE_PAUSE
 s                                STOP

@@ -25,6 +25,7 @@ import evas, ecore, ecore.file, edje, elementary, emotion
 import epymc.modules as modules
 import epymc.utils as utils
 import epymc.gui as gui
+import epymc.widgets as widgets
 import epymc.config_gui as config_gui
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
@@ -72,6 +73,11 @@ def main():
 
    # show the mainmenu
    mainmenu.show()
+
+   # alert if the evas engine is not the requested one
+   if elementary.engine_get() != ini.get('general', 'evas_engine'):
+      widgets.EmcDialog(style = 'warning', text = 'Cannot start the engine: %s<br>' \
+                        'Falling back to standard_x11'  % ini.get('general', 'evas_engine'))
 
    # run the main loop
    elementary.run()

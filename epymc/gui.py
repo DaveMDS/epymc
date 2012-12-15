@@ -67,16 +67,15 @@ def init():
    elementary.theme_overlay_add(theme_file) # TODO REMOVE ME!!! it's here for buttons, and others
    elementary.theme_extension_add(theme_file)
 
-   # preferred evas engine
-   # this seems totally buggy in elm, I should just do the preferred one
-   LOG('inf', 'emg: ' + str(elementary.engine_get()))
-   elementary.preferred_engine_set(evas_engine)
-   elementary.engine_set(evas_engine)
-   LOG('inf', 'pref: ' + str(elementary.preferred_engine_get()))
-   LOG('inf', 'emg: ' + str(elementary.engine_get()))
-
    # create the elm window
-   win = elementary.Window('epymc', elementary.ELM_WIN_BASIC)
+   try:
+      elementary.preferred_engine_set(evas_engine)
+      win = elementary.Window('epymc', elementary.ELM_WIN_BASIC)
+      LOG('inf', 'Using evas engine: ' + evas_engine)
+   except:
+      elementary.preferred_engine_set('software_x11')
+      win = elementary.Window('epymc', elementary.ELM_WIN_BASIC)
+      LOG('err', 'Falling back to standard_x11')
    win.title_set('Enlightenment Media Center')
    win.callback_delete_request_add(lambda w: ask_to_exit())
    if fullscreen == 'True':

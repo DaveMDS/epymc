@@ -1,9 +1,8 @@
 
 DEPENDENCIES:
 =============
-the efl stack up to elementary and emotion
+the efl stack up to elementary and emotion (preferred emotion engine: generic/vlc)
 the efl python bindings
-
 
 mutagen:
  sudo easy_install mutagen OR
@@ -43,7 +42,9 @@ SEARCH PATHS:
  ~/.config/epymc/themes
  ~/.config/epymc/modules
  
+
 GREATINGS:
+==========
 tmdb.org
 progettoemma.net
 arcadehistory.com

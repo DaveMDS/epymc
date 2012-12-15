@@ -1692,8 +1692,8 @@ group { name: "elm/entry/base-noedit/dialog";
          entry_mode: PLAIN;
          select_mode: EXPLICIT;
          multiline: 1;
-         source: "elm/entry/selection/default"; // selection under
-         source5: "elm/entry/anchor/default"; // anchor under
+         source: "elm/entry/selection/emc"; // selection under
+         source5: "elm/entry/anchor/emc"; // anchor under
          description { state: "default" 0.0;
             fixed: 1 0;
             text {
@@ -1732,7 +1732,7 @@ group { name: "elm/entry/base-noedit/dialog";
    }
 }
 
-group { name: "elm/entry/selection/default";
+group { name: "elm/entry/selection/emc";
    parts {
       part { name: "bg";
          type: RECT;
@@ -1743,8 +1743,7 @@ group { name: "elm/entry/selection/default";
       }
    }
 }
-
-group { name: "elm/entry/anchor/default";
+group { name: "elm/entry/anchor/emc";
    parts {
       part { name: "bg";
          type: RECT;
@@ -1755,9 +1754,75 @@ group { name: "elm/entry/anchor/default";
       }
    }
 }
+group { name: "elm/entry/cursor/emc";
+   parts {
+      part { name: "clip";
+         type: RECT;
+         mouse_events: 0;
+         description { state: "default" 0.0;
+            rel1.offset: -5 -5;
+            rel2.offset: 5 5;
+            color: 0 0 0 0;
+            visible: 0;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255;
+            visible: 1;
+         }
+      }
+      part { name: "base";
+         type: RECT;
+         mouse_events: 0;
+         scale: 1;
+         clip_to: "clip";
+         description { state: "default" 0.0;
+            min: 2 10;
+            max: 2 99;
+            align: 0.0 0.5;
+            rel1.offset: -1 0;
+            color: 20 20 20 255;
+         }
+      }
+   }
+   programs {
+      program { name: "fade";
+         in: 0.5 0.0;
+         action: STATE_SET "default" 0.0;
+         transition: LINEAR 0.5;
+         target: "clip";
+         after: "fade2";
+      }
+      program { name: "fade2";
+         in: 0.3 0.0;
+         action: STATE_SET "visible" 0.0;
+         target: "clip";
+         after: "fade";
+      }
+      program { name: "noblink";
+         action: ACTION_STOP;
+         target: "fade";
+         target: "fade2";
+      }
+      program { name: "focused";
+         signal: "elm,action,focus";
+         source: "elm";
+         action: STATE_SET "visible" 0.0;
+         target: "clip";
+         after: "fade";
+      }
+      program { name: "unfocused";
+         signal: "elm,action,unfocus";
+         source: "elm";
+         action: STATE_SET "default" 0.0;
+         target: "clip";
+         after: "noblink";
+      }
+   }
+}
 
 //// MENU (elm/menu/item/default) ///////////////////
-group { name: "elm/menu/item/default";
+group { name: "elm/menu/item/emc";
    images {
       image: "bt_base1.png" COMP;
       image: "bt_base2.png" COMP;
@@ -2111,7 +2176,7 @@ group { name: "elm/menu/item/default";
    }
 }
 
-group { name: "elm/menu/separator/default";
+group { name: "elm/menu/separator/emc";
    parts {
       part { name: "separator";
          type: SPACER;
@@ -2266,20 +2331,20 @@ group { name: "elm/hover/base/menu"; // This is the container obj for the menu
 }
 
 //// VKEYBOARD ENTRY (elm/entry/base-single-noedit/default) ///////////////////
-group { name: "elm/entry/base-single-noedit/vkeyboard";
+group { name: "elm/entry/base-single/vkeyboard";
    parts {
       part { name: "elm.text";
          type: TEXTBLOCK;
-         entry_mode: PLAIN;
+         // entry_mode: PLAIN;
+         entry_mode: EDITABLE;
          multiline: 0;
-         source: "elm/entry/selection/default"; // selection under
-         source4: ""; // cursorover
-         source5: "elm/entry/anchor/default"; // anchor under
+         source: "elm/entry/selection/emc"; // selection under
+         source4: "elm/entry/cursor/emc"; // cursorover
+         source5: "elm/entry/anchor/emc"; // anchor under
          description { state: "default" 0.0;
             text {
                style: "epymc_dialog_style";
                min: 1 1;
-               max: 0 0;
                align: 0.0 0.5;
             }
          }
@@ -2292,6 +2357,7 @@ group { name: "elm/entry/base-single-noedit/vkeyboard";
       }
    }
 }
+
 
 //// BUTTONS (elm/button/base/default) OLD OLD OLD ////////////////////////////////////////
 group { name: "elm/button/base/OLDOLDOLD";
@@ -2985,9 +3051,9 @@ group { name: "elm/button/base/emc";
             rel2.offset: -8 0;
             color: FONT_COLOR;
             text {
-               font:     "Sans,Edje-Vera";
+               font:     FONT;
                size:     FONT_SIZE;
-               min:      0 0;
+               min:      1 1;
                align:    0.5 0.5;
                text_class: "button";
             }
@@ -2995,7 +3061,6 @@ group { name: "elm/button/base/emc";
          description { state: "visible" 0.0;
             inherit: "default" 0.0;
             visible: 1;
-            text.min: 1 1;
          }
          description { state: "disabled" 0.0;
             inherit: "default" 0.0;
@@ -3005,7 +3070,6 @@ group { name: "elm/button/base/emc";
             inherit: "default" 0.0;
             color: 180 180 180 255;
             visible: 1;
-            text.min: 1 1;
          }
       }
 

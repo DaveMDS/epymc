@@ -41,6 +41,7 @@ class EmcMenu(elementary.Menu):
 
    def __init__(self, relto = None):
       elementary.Menu.__init__(self, gui.layout)
+      self.style_set('emc')
       if relto:
          # TODO better pos calc
          x, y, w, h = relto.geometry
@@ -803,9 +804,10 @@ class EmcVKeyboard(EmcDialog):
       # entry
       self.entry = elementary.Entry(gui.win) # TODO use scrolled_entry instead
       self.entry.style_set('vkeyboard')
-      self.entry.editable_set(False)
       self.entry.single_line_set(True)
-      self.entry.focus_allow_set(False)
+      self.entry.context_menu_disabled_set(True)
+      # self.entry.editable_set(False)
+      # self.entry.focus_allow_set(True)
       self.entry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       self.entry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       if text: self.text_set(text)
@@ -822,7 +824,7 @@ class EmcVKeyboard(EmcDialog):
          self._pack_btn(tb, i, 2, 1, 1, c, cb = self._default_btn_cb)
       for i, c in enumerate(['k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't']):
          self._pack_btn(tb, i, 3, 1, 1, c, cb = self._default_btn_cb)
-      for i, c in enumerate(['u', 'v', 'w', 'x', 'y', 'z', '.', '@', '-', '_']):
+      for i, c in enumerate(['u', 'v', 'w', 'x', 'y', 'z', '.', ',', ':', ';']):
          self._pack_btn(tb, i, 4, 1, 1, c, cb = self._default_btn_cb)
 
       self._pack_btn(tb, 0, 5, 3, 1, 'UPPERCASE', cb = self._uppercase_cb)
@@ -830,6 +832,10 @@ class EmcVKeyboard(EmcDialog):
       self._pack_btn(tb, 7, 5, 3, 1, 'ERASE', cb = self._erase_cb)
 
       self._pack_btn(tb, 0, 6, 4, 1, 'Dismiss', 'icon/cancel', self._dismiss_cb)
+      self._pack_btn(tb, 4, 6, 1, 1, None, 'icon/arrowL',
+                                     lambda b: self.entry.cursor_prev())
+      self._pack_btn(tb, 5, 6, 1, 1, None, 'icon/arrowR',
+                                     lambda b: self.entry.cursor_next())
       self._pack_btn(tb, 6, 6, 4, 1, 'Accept',  'icon/ok',     self._accept_cb)
 
       # init the parent EmcDialog class
@@ -837,6 +843,9 @@ class EmcVKeyboard(EmcDialog):
 
        # catch input events
       input_events.listener_add('vkbd', self.input_event_cb)
+
+      # give focus to the entry, to show the cursor
+      self.entry.focus_set(True)
 
    def _pack_btn(self, tb, x, y, w, h, label, icon = None, cb = None):
       b = EmcButton(label=label, icon=icon)
@@ -868,28 +877,37 @@ class EmcVKeyboard(EmcDialog):
       self.delete()
 
    def _default_btn_cb(self, button):
-      self.entry.cursor_end_set()
       self.entry.entry_insert(button.text)
 
    def _erase_cb(self, button):
-      if len(self.entry.text) > 0:
-         self.entry.text = self.entry.text[0:-1]
-         self.entry.cursor_end_set()
+      pos = self.entry.cursor_pos_get()
+      if pos > 0:
+         text = self.entry.text
+         self.entry.text = text[:pos-1] + text[pos:]
+         self.entry.cursor_pos_set(pos - 1)
 
    def _space_cb(self, button):
       self.entry.entry_insert(' ')
 
    def _uppercase_cb(self, button):
       for btn in self.efm.all_get():
-         c = btn.text
-         if len(c) == 1 and c.isalpha():
+         c = btn.text_get()
+         if c and len(c) == 1 and c.isalpha():
             if c.islower():
                btn.text = c.upper()
                button.text = 'LOWERCASE'
             else:
                btn.text = c.lower()
                button.text = 'UPPERCASE'
-      self.entry.cursor_end_set()
+         elif c and len(c) == 1:
+            if   c == '.':  btn.text = '/'
+            elif c == '/':  btn.text = '.'
+            elif c == ',':  btn.text = '@'
+            elif c == '@':  btn.text = ','
+            elif c == ':':  btn.text = '-'
+            elif c == '-':  btn.text = ':'
+            elif c == ';':  btn.text = '_'
+            elif c == '_':  btn.text = ';'
 
    def input_event_cb(self, event):
       if event == 'OK':

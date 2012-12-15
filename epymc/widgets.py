@@ -203,6 +203,8 @@ class EmcDialog(edje.Edje):
       self._canc_cb = canc_cb
       self._user_data = user_data
       self._list = None
+      self._scroller = None
+      self._textentry = None
       self._buttons = []
       self.fman = EmcFocusManager2()
 
@@ -230,9 +232,16 @@ class EmcDialog(edje.Edje):
          self._textentry.entry_set(text)
          self._textentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
          self._textentry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-         #~ self._textentry.size_hint_align_set(0.5, 0.5)
-         self._vbox.pack_end(self._textentry)
          self._textentry.show()
+         
+         self._scroller = elementary.Scroller(gui.win)
+         self._scroller.focus_allow_set(False)
+         self._scroller.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+         self._scroller.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+         self._scroller.content_set(self._textentry)
+         self._scroller.show()
+
+         self._vbox.pack_end(self._scroller)
 
       # user content
       if content is not None:
@@ -359,7 +368,8 @@ class EmcDialog(edje.Edje):
       return self.part_text_get('emc.text.title')
 
    def text_set(self, text):
-      self._textentry.entry_set(text)
+      if self._textentry:
+         self._textentry.entry_set(text)
 
    def text_get(self):
       return self._textentry.entry_get()
@@ -442,6 +452,16 @@ class EmcDialog(edje.Edje):
                prev.show()
                return input_events.EVENT_BLOCK
 
+      # try to scroll the text entry
+      if self._scroller:
+         if event == 'UP':
+            x, y, w, h = self._scroller.region
+            self._scroller.region_bring_in(x, y - 100, w, h)
+         if event == 'DOWN':
+            x, y, w, h = self._scroller.region
+            self._scroller.region_bring_in(x, y + 100, w, h)
+
+      # focus between buttons
       if self._buttons:
          if event == 'LEFT':
             self.fman.focus_move('l')

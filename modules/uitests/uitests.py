@@ -191,7 +191,7 @@ class MyItemClass(EmcItemClass):
 
       # Dialog - Panel full
       elif url == 'uitests://dlg-panel1':
-         text = LOREM
+         text = LOREM*4
          d = EmcDialog(title = 'Dialog - Panel full', text = text, style = 'panel',
                        spinner = True)
          d.button_add('One')
@@ -228,8 +228,8 @@ class MyItemClass(EmcItemClass):
          def _dialog_close_cb(dialog):
             fman.delete()
             dialog.delete()
-         d = EmcDialog(title='button test', content=vbox0,
-                       style='panel', canc_cb=_dialog_close_cb)
+         d = EmcDialog(title = 'button test', content = vbox0, style = 'panel',
+                       done_cb = _dialog_close_cb, canc_cb = _dialog_close_cb)
          fman = EmcFocusManager2('uitest-buttons')
 
          ### Active buttons

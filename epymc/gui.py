@@ -48,6 +48,7 @@ def LOG(sev, msg):
 
 
 def init():
+   """ return: 0=failed 1=ok 2=fallback_engine"""
    global win, xwin, layout, theme_file
 
    # get config values, setting defaults if needed
@@ -60,7 +61,7 @@ def init():
    theme_file = utils.get_resource_file('themes', theme_name + '.edj', 'default.edj')
    if not theme_file:
       LOG('err', 'cannot find a working theme file, exiting...')
-      return False
+      return 0
    LOG('inf', 'Using theme: ' + theme_file)
    
    # custom elementary theme
@@ -72,10 +73,14 @@ def init():
       elementary.preferred_engine_set(evas_engine)
       win = elementary.Window('epymc', elementary.ELM_WIN_BASIC)
       LOG('inf', 'Using evas engine: ' + evas_engine)
+      ret = 1
    except:
       elementary.preferred_engine_set('software_x11')
       win = elementary.Window('epymc', elementary.ELM_WIN_BASIC)
       LOG('err', 'Falling back to standard_x11')
+      ret = 2
+
+   # configure the win
    win.title_set('Enlightenment Media Center')
    win.callback_delete_request_add(lambda w: ask_to_exit())
    if fullscreen == 'True':
@@ -123,7 +128,7 @@ def init():
          return False # abort the timer
    ecore.Timer(59, _sscb)
 
-   return True
+   return ret
 
 def shutdown():
    events.listener_del('gui')

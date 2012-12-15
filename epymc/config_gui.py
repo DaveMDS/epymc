@@ -258,8 +258,15 @@ def _general_populate(browser, url):
    standard_item_bool_add('general', 'fullscreen', 'Start in fullscreen')
    standard_item_action_add('Adjust interface scale', 'icon/scale', cb = _change_scale)
    standard_item_bool_add('general', 'back_in_lists', 'Show Back item in lists', 'icon/back')
+
+   L = evas.render_method_list()
+   if 'buffer' in L: L.remove('buffer')
+   if 'software_generic' in L: L.remove('software_generic')
+   if 'gl_x11' in L:
+      L.remove('gl_x11')
+      L.append('opengl_x11')
    standard_item_string_from_list('general', 'evas_engine', 'Rendering engine',
-                                  evas.render_method_list(), 'icon/evas')
+                                  L, 'icon/evas')
    L = ['gstreamer', 'xine', 'generic']
    standard_item_string_from_list('mediaplayer', 'backend', 'Multimedia engine',
                                   L, 'icon/evas')

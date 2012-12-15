@@ -62,7 +62,8 @@ def main():
    # init stuff
    sdb.init()
    browser.init()
-   if not gui.init(): return 2
+   gui_return = gui.init()
+   if gui_return < 1: return 2
    config_gui.init()
    mainmenu.init()
    mediaplayer.init()
@@ -75,9 +76,11 @@ def main():
    mainmenu.show()
 
    # alert if the evas engine is not the requested one
-   if elementary.engine_get() != ini.get('general', 'evas_engine'):
-      widgets.EmcDialog(style = 'warning', text = 'Cannot start the engine: %s<br>' \
-                        'Falling back to standard_x11'  % ini.get('general', 'evas_engine'))
+   if gui_return == 2:
+      widgets.EmcDialog(style = 'warning',
+                        text = 'Cannot initialize the engine:<br>%s<br>' \
+                               'Falling back to standard_x11'  % \
+                               ini.get('general', 'evas_engine'))
 
    # run the main loop
    elementary.run()

@@ -477,9 +477,7 @@ class MameGame(object):
                if line.startswith('$info'):
                   names = line[6:].split(',')
                   names.pop() # discard last element (is a '\n\r')
-                  print names
                   if self.gid in names:
-                     print names
                      state = 1
             # state1: skip until '$bio'
             elif state == 1:
@@ -490,6 +488,9 @@ class MameGame(object):
                if line.startswith('$end'):
                   state = 3 # done
                else:
+                  line = line.replace('\r', '')
+                  if line[0] == '-':
+                     line = '<hilight>%s</>' % line
                   history = history + line + '<br>'
             #state3: end
             elif state == 3:
@@ -502,16 +503,8 @@ class MameGame(object):
          EmcDialog(title = 'Game not found in history file', style = 'error')
          return
 
-      # build the dialog
-      se = elementary.ScrolledEntry(gui.win)
-      se.style_set('dialog')
-      se.editable_set(False)
-      se.show()
-      #~ se.bounce_set(0, 1)
-      se.entry_set(self.history)
-
-      dia = EmcDialog(title = self.name, content = se, style = 'default')
-      dia.button_add('Close', lambda btn: dia.delete())
+      # show a scrollable text dialog with the game history
+      EmcDialog(title = self.name, text = self.history, style = 'panel')
 
 ## delete game stuff
    def delete_zip(self):

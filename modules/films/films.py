@@ -410,34 +410,14 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
 ###### INFO PANEL STUFF
    def show_film_info(self, url):
-      self._current_url = url
-
-      box = elementary.Box(gui.win)
-      box.horizontal_set(1)
-      box.homogeneous_set(1)
-      box.show()
-
       image = elementary.Image(gui.win)
       image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       image.show()
-      box.pack_end(image)
+      dialog = EmcDialog(style = 'panel', text = ' ', content = image)
 
-      sentry = elementary.Entry(gui.win)
-      sentry.scrollable_set(True)
-      sentry.style_set('dialog')
-      sentry.editable_set(False)
-      sentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      sentry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      sentry.show()
-      box.pack_end(sentry)
-
-      dialog = EmcDialog(style = 'panel', content = box)
-
-      dialog.data['o_image'] = image
-      dialog.data['o_sentry'] = sentry
       self._dialog = dialog
-
+      self._current_url = url
       self.update_film_info(url)
 
    def hide_film_info(self):
@@ -445,9 +425,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       del self._dialog
 
    def update_film_info(self, url):
-      o_image = self._dialog.data['o_image']
-      o_sentry = self._dialog.data['o_sentry']
 
+      # update buttons
       self._dialog.buttons_clear()
       self._dialog.button_add('Play', self._cb_panel_1)
       if self._film_db.id_exists(url):
@@ -455,7 +434,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          self._dialog.button_add('Poster', self._cb_panel_3)
          self._dialog.button_add('Fanart', self._cb_panel_4)
       self._dialog.button_add('Search Info', self._cb_panel_5)
-      
+
+      o_image = self._dialog.content_get()
+
       if self._film_db.id_exists(url):
          print 'Found: ' + url
          e = self._film_db.get_data(url)
@@ -469,27 +450,22 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                 '<br><hilight>Overview:</hilight> %s' \
                   % (self._get_director(e), self._get_cast(e), e['released'],
                      e['rating'], e['overview'])
-         # o_sentry.entry_set("test2: κόσμε END") # should see the Greek word 'kosme')
-         o_sentry.entry_set(info.encode('utf-8'))
+         # self._dialog.text_set("test2: κόσμε END") # should see the Greek word 'kosme')
+         self._dialog.text_set(info.encode('utf-8'))
 
          # update poster
          poster = get_poster_filename(e['id'])
          if os.path.exists(poster):
-            # TODO FIXME!!  This will crash If the downloaded poster
-            #                is the same as the old one...dunno why :/
-            # force a reload also if the filename is the same
-            # Update: seems fixed ... 
-            # o_image.file_set('')
             o_image.file_set(poster)
          else:
-            print 'TODO show a dummy image'
+            # TODO show a dummy image
             o_image.file_set('')
       else:
          # TODO print also file size, video len, codecs, streams found, file metadata, etc..
          msg = 'Media:<br>' + url + '<br><br>' + \
                'No info stored for this media<br>' + \
                'Try the Search info button...'
-         o_sentry.entry_set(msg)
+         self._dialog.text_set(msg)
          # TODO make thumbnail
          o_image.file_set('')
 

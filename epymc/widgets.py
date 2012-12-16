@@ -223,6 +223,15 @@ class EmcDialog(edje.Edje):
       self._vbox.show()
       self.part_swallow('emc.swallow.content', self._vbox)
 
+      # if both text and content given then put them side by side
+      if text and content:
+         hbox = elementary.Box(gui.win)
+         hbox.horizontal_set(True)
+         hbox.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+         hbox.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+         hbox.show()
+         self._vbox.pack_end(hbox)
+      
       # text entry
       if text is not None:
          self._textentry = elementary.Entry(gui.win)
@@ -241,17 +250,23 @@ class EmcDialog(edje.Edje):
          self._scroller.content_set(self._textentry)
          self._scroller.show()
 
-         self._vbox.pack_end(self._scroller)
+         if content:
+            hbox.pack_end(self._scroller)
+         else:
+            self._vbox.pack_end(self._scroller)
 
       # user content
       if content is not None:
          frame = elementary.Frame(gui.win)
-         frame.style_set('pad_medium')
+         frame.style_set('pad_small')
          frame.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
          frame.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
          frame.content_set(content)
          frame.show()
-         self._vbox.pack_end(frame)
+         if text is not None:
+            hbox.pack_start(frame)
+         else:
+            self._vbox.pack_end(frame)
 
       # automatic list
       if style == 'list':

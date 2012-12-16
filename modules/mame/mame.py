@@ -391,21 +391,8 @@ class MameGame(object):
          self._more_game_info(when_finished = (lambda: self.dialog_show()))
          return
 
-      box = elementary.Box(gui.win)
-      box.horizontal_set(True)
-      box.homogeneous_set(True)
-      box.show()
-
       (local, remote) = self.poster_get()
       image = EmcRemoteImage(remote, local)
-      box.pack_end(image)
-
-      sentry = elementary.Entry(gui.win)
-      sentry.scrollable = True
-      sentry.style_set('dialog')
-      sentry.editable_set(False)
-      sentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      sentry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       text = '<hilight>Year:</> %s<br>' \
              '<hilight>Manufacturer:</> %s<br>' \
              '<hilight>Players:</> %s<br>' \
@@ -420,11 +407,8 @@ class MameGame(object):
               self.buttons, self.driver_savestate, self.driver_status,
               self.driver_emulation, self.driver_color,
               self.driver_sound, self.driver_graphic)
-      sentry.entry_set(text)
-      sentry.show()
-      box.pack_start(sentry)
 
-      self.dialog = EmcDialog(self.name, content = box)
+      self.dialog = EmcDialog(self.name, content = image, text = text)
 
       if self.file_name_get():
          self.dialog.button_add('Play', (lambda btn: self.run()))
@@ -461,7 +445,7 @@ class MameGame(object):
       if not os.path.exists(history_file):
          EmcDialog(title = 'No History file found',style = 'error',
                    text = 'The History file is not included in mame, you '
-                          'should download a copy from aracade-history.com <br>'
+                          'should download a copy from arcade-history.com <br>'
                           'The file must be unzipped and placed in ' + history_file)
          return
 

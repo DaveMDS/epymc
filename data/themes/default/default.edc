@@ -24,6 +24,13 @@
 #define COLOR_ORANGE 240 164 10
 #define COLOR_ORANGE_HEX F0A40A
 
+data {
+   item: "theme.name" "The default one";
+   item: "theme.version" "0.8";
+   item: "theme.author" "davemds";
+   item: "theme.info" "A more long description of the theme";
+}
+
 images {
    image: "background.jpg" COMP;
    image: "frame.png" COMP;
@@ -1098,7 +1105,6 @@ collections {
    }
 
 /// dialogs
-
    group { name: "emc/dialog/panel"; /* API */
       images {
          image: "dialog_bg.png" COMP;
@@ -1648,6 +1654,7 @@ collections {
       programs {
       }
    }
+
 /// sliders
    group { name: "emc/slider/default"; /* API */
       images {

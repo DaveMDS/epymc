@@ -537,7 +537,7 @@ class ViewList(object):
             self.__im.url_set(url, dest)
          else:
             self.__im.url_set(poster)
-      elif poster and poster.startswith('icon/'):
+      elif poster and (poster.startswith('icon/') or poster.startswith('image/')):
          self.__im.file_set(gui.theme_file, poster)
       else:
          self.__im.file_set(poster if poster else '')

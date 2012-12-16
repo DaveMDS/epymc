@@ -191,7 +191,8 @@ def init():
    _browser = EmcBrowser('Configuration', 'List') # TODO use a custom style for config ?
 
    root_item_add('config://general/', 1, 'General', 'icon/emc', _general_list)
-   root_item_add('config://modules/', 2, 'Modules', 'icon/module', _modules_list)
+   root_item_add('config://themes/', 2, 'Themes', 'icon/theme', _themes_list)
+   root_item_add('config://modules/', 3, 'Modules', 'icon/module', _modules_list)
 
 def shutdown():
    _browser.delete()
@@ -285,6 +286,41 @@ def _change_scale():
    d.button_add('Smaller', selected_cb = _smaller)
    d.button_add('Reset', selected_cb = _reset)
    
+##############  THEMES  #######################################################
+import gui
+
+class ThemesItemClass(EmcItemClass):
+   def item_selected(self, url, module):
+      ini.set('general', 'theme', url)
+      gui.set_theme_file(url)
+      _browser.refresh()
+
+   def label_get(self, url, theme_info):
+      return theme_info['name']
+
+   def icon_end_get(self, url, theme_info):
+      if gui.theme_file == url:
+         return 'icon/check_on'
+
+   def info_get(self, url, theme_info):
+      return '<title>%s</><br>' \
+             '<hilight>author: </>%s<br>' \
+             '<hilight>version: </>%s<br>' \
+             '%s' % (
+             theme_info['name'],
+             theme_info['author'],
+             theme_info['version'],
+             theme_info['info'])
+      
+
+def _themes_list():
+   _browser.page_add('config://themes/', 'Themes', None, _themes_populate)
+
+def _themes_populate(browser, url):
+   for theme in gui.get_available_themes():
+      info = gui.get_theme_info(theme)
+      if info:
+         browser.item_add(ThemesItemClass(), theme, info)
 
 ##############  MODULES  ######################################################
 import modules
@@ -296,7 +332,6 @@ class ModulesItemClass(EmcItemClass):
       else:
          modules.init_by_name(url)
       _browser.refresh()
-
 
    def label_get(self, url, module):
       return module.label

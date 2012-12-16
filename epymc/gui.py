@@ -58,15 +58,16 @@ def init():
    fullscreen = ini.get('general', 'fullscreen', False)
 
    # search the theme file, or use the default one
-   theme_file = utils.get_resource_file('themes', theme_name + '.edj', 'default.edj')
-   if not theme_file:
-      LOG('err', 'cannot find a working theme file, exiting...')
-      return 0
-   LOG('inf', 'Using theme: ' + theme_file)
-   
+   if not os.path.isabs(theme_name):
+      theme_file = utils.get_resource_file('themes', theme_name + '.edj', 'default.edj')
+      if not theme_file:
+         LOG('err', 'cannot find a working theme file, exiting...')
+         return 0
+   else:
+      theme_file = theme_name
+
    # custom elementary theme
-   elementary.theme_overlay_add(theme_file) # TODO REMOVE ME!!! it's here for buttons, and others
-   elementary.theme_extension_add(theme_file)
+   set_theme_file(theme_file)
 
    # create the elm window
    try:
@@ -136,6 +137,33 @@ def shutdown():
 
 
 ### Various externally accessible functions ###
+def get_available_themes():
+   # search in user config dir
+   d = os.path.join(utils.config_dir_get(), 'themes')
+   L = [os.path.join(d, name) for name in os.listdir(d) if name.endswith('.edj')]
+
+   # search relative to the script (epymc.py) dir
+   d = os.path.join(utils.base_dir_get(), 'data', 'themes')
+   L += [os.path.join(d, name) for name in os.listdir(d) if name.endswith('.edj')]
+
+   return L
+
+def get_theme_info(theme):
+   D = {}
+   D['name'] = edje.file_data_get(theme, 'theme.name') or 'Unknown'
+   D['version'] = edje.file_data_get(theme, 'theme.version') or ''
+   D['author'] = edje.file_data_get(theme, 'theme.author') or 'Unknown'
+   D['info'] = edje.file_data_get(theme, 'theme.info') or 'Unknown'
+   return D
+
+def set_theme_file(path):
+   global theme_file
+
+   LOG('inf', 'Using theme: ' + path)
+   elementary.theme_overlay_add(path) # TODO REMOVE ME!!! it's here for buttons, and others
+   elementary.theme_extension_add(path)
+   theme_file = path
+
 def load_icon(icon):
    """
    @icon can be a full path (if start with a '/' or
@@ -262,6 +290,7 @@ def mouse_show():
    xwin.cursor_show()
    _mouse_visible = True
 
+
 ### audio info/controls notify
 _audio_notify = None
 
@@ -286,8 +315,6 @@ def audio_controls_set(text = None, icon = None):
       return
    if text: _audio_notify.text_set(text)
    if icon: _audio_notify.icon_set(icon)
-
-
 
 
 ### Simple edje abstraction ###

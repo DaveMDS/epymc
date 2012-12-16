@@ -5,6 +5,13 @@
 Main elementary layout group: "emc/main/layout"
 All the icons in icons.edc must be implemented
 
+### Theme info ###
+   * Required data items:
+      item: "theme.name" "The theme name";
+      item: "theme.version" "0.1";
+      item: "theme.author" "author name";
+      item: "theme.info" "A more long description of the theme";
+
 ### Backdrop stuff ###
    * Required parts:
       "bg.swallow.backdrop1" -> edje SWALLOW

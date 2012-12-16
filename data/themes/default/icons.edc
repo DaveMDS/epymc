@@ -47,6 +47,7 @@ ICON("star")
 ICON("star_off")
 
 ICON("module")
+ICON("theme")
 ICON("scale")
 ICON("config")
 

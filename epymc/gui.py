@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import os, time, re
 
 import evas, ecore, edje, elementary
 import ecore.x #used only to show/hide the cursor
@@ -37,6 +37,8 @@ _volume_hide_timer = None
 _last_mouse_pos = (0, 0)
 _mouse_visible = True
 _mouse_skip_next = False
+_screensaver_ts = 0
+_screensaver_status = 0 # 0=inactive 1=active 2=monitor_off
 
 
 DEBUG = True
@@ -50,12 +52,20 @@ def LOG(sev, msg):
 def init():
    """ return: 0=failed 1=ok 2=fallback_engine"""
    global win, xwin, layout, theme_file
+   global _screensaver_ts, _screensaver_status
 
    # get config values, setting defaults if needed
    theme_name = ini.get('general', 'theme', default_value = 'default')
    evas_engine = ini.get('general', 'evas_engine', default_value = 'software_x11')
    scale = ini.get('general', 'scale', default_value = 1.0)
    fullscreen = ini.get('general', 'fullscreen', False)
+   ini.add_section('screensaver')
+   unused = ini.get('screensaver', 'on_after', 'never')
+   unused = ini.get('screensaver', 'monitor_off_after', 'never')
+   unused = ini.get('screensaver', 'keepalive_cmd', 'xdg-screensaver reset')
+   unused = ini.get('screensaver', 'activate_cmd', 'xdg-screensaver activate')
+   unused = ini.get('screensaver', 'monitor_off_cmd', 'xset dpms force off')
+   unused = ini.get('screensaver', 'only_in_fs', 'True')
 
    # search the theme file, or use the default one
    if not os.path.isabs(theme_name):
@@ -120,20 +130,17 @@ def init():
    input_events.listener_add('gui', _input_event_cb)
    events.listener_add('gui', _event_cb)
 
-   # once a minute ping the screensaver to prevent it disturbing
-   def _sscb():
-      try:
-         ecore.exe_run('xdg-screensaver reset')
-         return True # renew the timer
-      except:
-         return False # abort the timer
-   ecore.Timer(59, _sscb)
+   # timer that manage the screensaver/monitor policy
+   _screensaver_ts = time.time()
+   _screensaver_status = 0
+   ecore.Timer(30, _screensaver_timer_cb)
 
    return ret
 
 def shutdown():
    events.listener_del('gui')
    input_events.listener_del('gui')
+
 
 
 ### Various externally accessible functions ###
@@ -279,6 +286,8 @@ def mouse_hide():
 def mouse_show():
    global _last_mouse_pos, _mouse_visible, _mouse_skip_next
 
+   renew_screensaver()
+
    if _mouse_visible:
       return
    
@@ -290,6 +299,11 @@ def mouse_show():
    xwin.cursor_show()
    _mouse_visible = True
 
+def renew_screensaver():
+   global _screensaver_ts, _screensaver_status
+
+   _screensaver_ts = time.time()
+   _screensaver_status = 0
 
 ### audio info/controls notify
 _audio_notify = None
@@ -352,6 +366,77 @@ def box_remove(part, obj):
 
 
 ### Internal functions ###
+def _screensaver_timer_cb():
+   global _screensaver_status # 0=inactive 1=active 2=monitor_off
+
+   # not when windowed
+   if not win.fullscreen and ini.get('screensaver', 'only_in_fs') == 'True':
+      return True # renew the timer
+   
+   # get someting like "5 minutes" from config
+   try:
+      ss_on_after = ini.get('screensaver', 'on_after')
+      ss_on_after = int(re.sub('[^0-9]', '', ss_on_after)) * 60
+   except:
+      ss_on_after = 0
+
+   # get someting like "10 minutes" from config
+   try:
+      monitor_off_after = ini.get('screensaver', 'monitor_off_after')
+      monitor_off_after = int(re.sub('[^0-9]', '', monitor_off_after)) * 60
+   except:
+      monitor_off_after = 0
+
+   # got nothing to do
+   if ss_on_after == monitor_off_after == 0:
+      return True # renew the timer
+
+   # calc elapsed time since last user input
+   now = time.time()
+   elapsed = now - _screensaver_ts
+   LOG('dbg', "ScreenSaver: Timer! status: %d  elapsed: %f  ss_on_in: %.0f  mon_off_in: %.0f" % \
+        (_screensaver_status, elapsed,
+         _screensaver_ts + ss_on_after - now if ss_on_after > 0 else -1,
+         _screensaver_ts + monitor_off_after - now if monitor_off_after > 0 else -1))
+
+   def exe_run(cmd):
+      try:
+         ecore.exe_run(cmd)
+         return True
+      except:
+         return False
+
+   if _screensaver_status == 0:
+      # Status 0: the screensaver is off - user active
+      if ss_on_after > 0 and elapsed > ss_on_after:
+         # turn on the screensaver
+         LOG('dbg', 'ScreenSaver: activate screensaver')
+         _screensaver_status = 1
+         exe_run(ini.get('screensaver', 'activate_cmd'))
+      elif monitor_off_after > 0 and elapsed > monitor_off_after:
+         # turn off the monitor
+         LOG('dbg', 'ScreenSaver: monitor off')
+         _screensaver_status = 2
+         exe_run(ini.get('screensaver', 'monitor_off_cmd'))
+      else:
+         # or keep the screensaver alive
+         LOG('dbg', 'ScreenSaver: keep alive')
+         exe_run(ini.get('screensaver', 'keepalive_cmd'))
+
+   elif _screensaver_status == 1:
+      # Status 1: the screensaver is on - user away
+      if monitor_off_after > 0 and elapsed > monitor_off_after:
+         # turn off the monitor
+         LOG('dbg', 'ScreenSaver: monitor off')
+         _screensaver_status = 2
+         exe_run(ini.get('screensaver', 'monitor_off_cmd'))
+
+   elif _screensaver_status == 2:
+      # Status 2: the monitor is off - user probably sleeping :)
+      pass
+
+   return True # renew the timer
+
 def _input_event_cb(event):
    if event == 'TOGGLE_FULLSCREEN':
       win.fullscreen = not win.fullscreen

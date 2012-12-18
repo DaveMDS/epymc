@@ -105,6 +105,7 @@ def event_emit(event):
    DBG('Emit Event: ' + event + '  listeners: ' + str(len(_listeners)))
 
    gui.mouse_hide()
+   gui.renew_screensaver()
 
    for lis in reversed(_listeners):
       (name, cb, data) = lis

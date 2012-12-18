@@ -285,6 +285,11 @@ def _update_timer_cb():
       _emotion.play = False
 
    _update_slider()
+
+   # keep the screensaver out while playing videos
+   if _emotion.play == _video_visible == True:
+      gui.renew_screensaver()
+
    return True # timer renew
 
 def _init_emotion():

@@ -148,7 +148,7 @@ def stop():
    LOG('dbg', 'Stop()')
 
    counts = _play_db.get_data(_onair_url)
-   if _emotion.position >= _emotion.play_length - 5:
+   if _emotion.position >= _emotion.play_length - 5 or _emotion.position == 0.0: # vlc set the pos at zero when finished :/
       counts['finished'] += 1
       counts['stop_at'] = 0
    else:

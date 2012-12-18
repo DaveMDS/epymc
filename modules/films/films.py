@@ -90,7 +90,6 @@ class FilmItemClass(EmcItemClass):
 
    def icon_end_get(self, url, mod):
       counts = mediaplayer.play_counts_get(url)
-      print url, counts
       if counts['finished'] > 0:
          return 'icon/check_on'
       if counts['stop_at'] > 0:

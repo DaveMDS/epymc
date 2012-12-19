@@ -98,16 +98,16 @@ def grab_files(folders, show_hidden=False):
 
    # in a for loop
    for filename in self.grab_files(['/path/1', '/path/2/other']):
-      print filename
+      print(filename)
 
    # or asycrony ;)
    generator = self.grab_files(['/path/1', '/path/2/other'])
       ...
    try:
       filename = generator.next()
-      print filename
+      print(filename)
    except StopIteration:
-      print 'file list done'
+      print('file list done')
    """
    for folder in folders:
       if folder.startswith('file://'): # mhhhh...
@@ -136,7 +136,7 @@ def download_url_sync(url, dest, min_size = 0):
 
    (filename, headers) = urllib.urlretrieve(url, dest)
    DBG('Filename: ' + filename)
-   #~ print headers
+   # print(headers)
    if os.path.getsize(filename) < min_size:
       DBG('TOO SHORT ' + str(os.path.getsize(filename)))
       os.remove(filename)

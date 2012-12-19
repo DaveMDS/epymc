@@ -575,7 +575,7 @@ class MameGame(object):
             self.dialog.text_append('<b>Can not find the game online, sorry.</b>')
 
    def _cb_multi_download_progress(self, file, dltotal, dlnow, sources):
-      #~ print dlnow
+      # print(dlnow)
       pass
 
 ## game info (from mame -listxml <rom>)

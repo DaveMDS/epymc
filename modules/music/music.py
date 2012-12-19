@@ -302,7 +302,7 @@ and what it need to work well, can also use markup like <title>this</> or
       # get music folders from config
       self._folders = ini.get_string_list('music', 'folders', ';')
       # if not self._folders:
-         # print 'NO FOLDERS'
+         # print('NO FOLDERS')
          #TODO alert the user. and instruct how to add folders
          # return
 
@@ -497,14 +497,14 @@ class UpdateDBThread(threading.Thread):
    def run(self):
       global _audio_extensions
 
-      print 'This is the thread speaking, HALO'
+      print('This is the thread speaking, HALO')
 
       for folder in self.folders:
          # strip url
          if folder.find('://', 0, 16) > 0:
             folder = folder[folder.find('://')+3:]
 
-         print 'Scanning dir ' + folder + ' ...'
+         print('Scanning dir ' + folder + ' ...')
          for root, dirs, files in os.walk(folder):
             for file in files:
                (filename, ext) = os.path.splitext(file)
@@ -514,10 +514,10 @@ class UpdateDBThread(threading.Thread):
                   if not self.songs_db.id_exists('file://' + path):
                      self.read_metadata(path)
                   else:
-                     print 'FOUND IN DB'
+                     print('FOUND IN DB')
                   # TODO Check also file modification time
                else:
-                  print 'Error: invalid file extension for file: ' + file
+                  print('Error: invalid file extension for file: ' + file)
 
    def read_metadata(self, full_path):
       DBG('GET METADATA FOR: ' + full_path)

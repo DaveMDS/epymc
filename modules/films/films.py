@@ -438,7 +438,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       o_image = self._dialog.content_get()
 
       if self._film_db.id_exists(url):
-         print 'Found: ' + url
+         print('Found: ' + url)
          e = self._film_db.get_data(url)
 
          # update text info
@@ -612,7 +612,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # kill the dialog
       self._backdrop_dialog.delete()
       del self._backdrop_dialog
-      print status
       if status == 200:
           self._browser.refresh()
       else:

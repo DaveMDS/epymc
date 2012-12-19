@@ -75,7 +75,7 @@ elif STATE == 1:
                thumb = a('img')[0]['src']
                for title in div.parent.findAll('a', attrs = {'class' : 'title'}):
                   title = title.contents[0]
-                  # print title, url, thumb
+                  # print(title, url, thumb)
                   addItem(69, title, 'http://fantasti.cc' + url, poster=thumb)
 
       page = re.search('(\d+)$', URL)
@@ -102,7 +102,7 @@ elif STATE == 2:
          TITLE = '%s (%s vids)' % (TITLE, NUM_VIDS)
          THUMB = box.find('a', recursive=False).img['src']
          URL = box.find('a')['href']
-         # print TITLE, URL, THUMB
+         # print(TITLE, URL, THUMB)
          addItem(3, TITLE, 'http://fantasti.cc/' + URL, poster=THUMB)
    except:
       exit()
@@ -117,7 +117,7 @@ elif STATE == 3:
          TITLE = div.p.a['title']
          URL = div.p.a['href']
          THUMB = div.p.a.img['src']
-         # print TITLE, URL, THUMB
+         # print(TITLE, URL, THUMB)
          addItem(69, TITLE, 'http://fantasti.cc' + URL, poster=THUMB)
    except:
       exit()

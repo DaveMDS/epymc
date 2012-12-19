@@ -31,7 +31,7 @@ from utils import Singleton
 from widgets import EmcRemoteImage
 
 def DBG(msg):
-   # print ('BROWSER: ' + msg)
+   # print('BROWSER: ' + msg)
    pass
 
 
@@ -58,9 +58,9 @@ def shutdown():
 def dump_everythings():
    print('*' * 70)
    for v in _views:
-      print ('loaded view: ' + str(v))
+      print('loaded view: ' + str(v))
    for b in _instances:
-      print b
+      print(b)
 
 
 class EmcItemClass(Singleton):
@@ -304,7 +304,7 @@ class EmcBrowser(object):
          view.items_count -= 1
 
       # use this for extra debug
-      # print self
+      # print(self)
 
       # and finally populate the page
       url = page['url']

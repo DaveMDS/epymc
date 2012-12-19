@@ -98,7 +98,7 @@ def main():
    # shutdown elementary
    elementary.shutdown()
    
-   print 'Bye Bye...'
+   print('Bye Bye...')
    return 0
 
 if __name__ == '__main__':

@@ -47,7 +47,7 @@ _instances = {}
 
 
 def load_all():
-   print ('Searching for modules:')
+   print('Searching for modules:')
 
    # first check in ~/.config/epymc/modules ...
    path = os.path.join(utils.config_dir_get(), 'modules')
@@ -58,7 +58,7 @@ def load_all():
       for name in dirs:
          f = os.path.join(root, name, '__init__.py')
          if os.path.isfile(f):
-            print (' * load: ' + f)
+            print(' * load: ' + f)
             mod =  __import__(name)
    
    # ... then in the modules/ dir relative to script position
@@ -70,9 +70,9 @@ def load_all():
       for name in dirs:
          f = os.path.join(root, name, '__init__.py')
          if os.path.isfile(f):
-            print (' * load: ' + f)
+            print(' * load: ' + f)
             mod =  __import__(name)
-   print ''
+   print('')
 
 def get_module_by_name(name):
    for mod in EmcModule.__subclasses__():
@@ -115,10 +115,10 @@ def shutdown_by_name(name):
       del _instances[name]
 
 def shutdown_all():
-   print 'Shutting down modules:'
+   print('Shutting down modules:')
    L = list()
    for mod in _instances:
       L.append(mod)
    for mod in L:
       shutdown_by_name(mod)
-   print ''
+   print('')

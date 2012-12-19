@@ -34,7 +34,7 @@ import epymc.config_gui as config_gui
 
 
 def DBG(msg):
-   #~ print('JOY: ' + msg)
+   # print('JOY: ' + msg)
    pass
 
 
@@ -73,7 +73,7 @@ and what it need to work well, can also use markup like <title>this</> or
          self.invert_h = ini.get_bool('joystick', 'invert_h');
          self.invert_v = ini.get_bool('joystick', 'invert_v');
       except:
-         print ('Error: Joystick configuration value missed')
+         print('Error: Joystick configuration value missed')
          # TODO spawn the configurator
 
       # add an entry in the config gui
@@ -88,7 +88,7 @@ and what it need to work well, can also use markup like <title>this</> or
       except:
          self.dev = None
          self.fdh = None
-         print ('Error: can not open joystick device: ' + self.device)
+         print('Error: can not open joystick device: ' + self.device)
 
    def __shutdown__(self):
       DBG('Shutdown module: Joystick')

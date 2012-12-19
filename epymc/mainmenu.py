@@ -71,7 +71,7 @@ def item_add(name, weight, label, icon = None, callback = None):
       (w, h) = img.size_get()
       img.fill_set(0, 0, h * aspect, h)
 
-   #~ print 'ADD ' + name + ' W ' + str(weight) + ' before ' + str(before)
+   # print('ADD ' + name + ' W ' + str(weight) + ' before ' + str(before))
    img = None
    if icon:
       img = evas.Image(gui.win.evas)

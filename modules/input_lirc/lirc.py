@@ -100,7 +100,7 @@ and what it need to work well, can also use markup like <title>this</> or
          code, repeat, key, remote = data.strip().split()
          DBG('code:%s repeat:%s key:%s remote:%s' % (code, repeat, key, remote))
       except:
-         print 'Error: cannot decode lirc messagge'
+         print('Error: cannot decode lirc messagge')
          return True
 
       # if grabbed request call the grab function, else emit the signal

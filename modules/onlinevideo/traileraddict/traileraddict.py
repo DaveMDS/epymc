@@ -88,7 +88,7 @@ elif STATE == 2:
       title = arrow.nextSibling.nextSibling.contents[0]
       url = arrow.nextSibling.nextSibling['href']
       url = 'http://www.traileraddict.com' + url
-      # print title, url
+      # print(title, url)
       addItem(4, title, url.encode('ascii'))
 
 # find trailers in film page
@@ -100,7 +100,7 @@ elif STATE == 4:
       a = div.find('h2').contents[0]
       title = a.contents[0]
       url = 'http://www.traileraddict.com' + a['href']
-      # print title, url
+      # print(title, url)
       addItem(5, title, url.encode('ascii'), icon='icon/play')
 
 
@@ -114,7 +114,7 @@ elif STATE == 6:
       if a['href'].startswith('/trailer/'):
          title = a.find('img')['title']
          url = 'http://www.traileraddict.com' + a['href']
-         # print title, url
+         # print(title, url)
          addItem(5, title, url.encode('ascii'), icon='icon/play')
 
 # play video

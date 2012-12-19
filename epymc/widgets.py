@@ -323,7 +323,7 @@ class EmcDialog(edje.Edje):
       self.signal_emit('emc,dialog,show', 'emc')
 
    def activate(self):
-      print 'DEPRECATED EmcDialog.activate()'
+      print('DEPRECATED EmcDialog.activate()')
 
    def delete(self):
       input_events.listener_del(self._name)

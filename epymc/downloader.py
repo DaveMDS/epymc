@@ -71,7 +71,7 @@ def shutdown():
    global _threads
    global _timer
 
-   print 'Shutdown all downloader threads...',
+   print('Shutdown all downloader threads...')
 
    # tell all the threads to exit
    for i in range(NUM_WORKER_THREADS):
@@ -81,7 +81,7 @@ def shutdown():
    for t in _threads:
       t.join()
       del t
-   print 'done'
+   print('done')
 
    # delete respond timer
    _timer.delete()
@@ -120,7 +120,7 @@ def _download_worker():
    while True:
       # wait here until an item in the queue is present
       item = Q1.get()
-      #~ print 'worker ' + str(item)
+      # print('worker ' + str(item))
 
       # quit the worker if requested
       if isinstance(item, str) and item == 'exit':
@@ -133,7 +133,7 @@ def _download_worker():
 
          # check downloaded file size
          if os.path.getsize(filename) < min_size:
-            #~ print 'TOO SHORT ' + str(os.path.getsize(filename))
+            # print('TOO SHORT ' + str(os.path.getsize(filename)))
             os.remove(filename)
 
       else:

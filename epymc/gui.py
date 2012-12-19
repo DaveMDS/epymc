@@ -303,7 +303,9 @@ def renew_screensaver():
    global _screensaver_ts, _screensaver_status
 
    _screensaver_ts = time.time()
-   _screensaver_status = 0
+   if _screensaver_status != 0:
+      _screensaver_status = 0
+      _screensaver_timer_cb()
 
 ### audio info/controls notify
 _audio_notify = None

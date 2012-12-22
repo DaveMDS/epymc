@@ -568,7 +568,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
          # show the list in a dialog
          li = elementary.List(gui.win)
-         li.horizontal = True
          li.focus_allow_set(False)
          li.style_set('image_list')
          count = 0

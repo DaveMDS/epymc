@@ -244,6 +244,7 @@ class EmcDialog(edje.Edje):
          self._textentry.show()
          
          self._scroller = elementary.Scroller(gui.win)
+         self._scroller.style_set('dialog')
          self._scroller.focus_allow_set(False)
          self._scroller.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
          self._scroller.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
@@ -272,6 +273,7 @@ class EmcDialog(edje.Edje):
       if style == 'list':
          self._list = elementary.List(gui.win)
          self._list.focus_allow_set(False)
+         self._list.style_set('dialog')
          self._list.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
          self._list.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
          self._list.callback_activated_add(self._list_item_activated_cb)

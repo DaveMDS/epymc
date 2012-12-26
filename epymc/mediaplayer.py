@@ -76,7 +76,8 @@ def play_url(url, only_audio = False, start_from = 0):
    global _onair_url
 
    if not _emotion:
-      _init_emotion()
+      if not _init_emotion():
+         return False
 
    if not _fman:
       _init_mediaplayer_gui()
@@ -132,6 +133,8 @@ def play_url(url, only_audio = False, start_from = 0):
    LOG('dbg', 'IMAGE_SIZE: ' + str(_emotion.image_size))
    LOG('dbg', 'RATIO: ' + str(_emotion.ratio_get()))
    ##
+
+   return True
 
 def play_counts_get(url):
    try:
@@ -295,9 +298,13 @@ def _update_timer_cb():
 def _init_emotion():
    global _emotion
 
-
    backend = ini.get('mediaplayer', 'backend')
-   _emotion = emotion.Emotion(gui.layout.evas, module_filename=backend)
+   try:
+      _emotion = emotion.Emotion(gui.layout.evas, module_filename=backend)
+   except:
+      EmcDialog(style='error', text='Cannot init emotion engine:<br>'+str(backend))
+      return False
+
    gui.swallow_set('videoplayer.video', _emotion)
    _emotion.smooth_scale = True
 
@@ -310,6 +317,8 @@ def _init_emotion():
    #  yes, too often and not firing while buffering...Used a timer instead
    # _emotion.on_progress_change_add((lambda v: _update_slider()))
    # _emotion.on_frame_decode_add((lambda v: _update_slider()))
+
+   return True
   
 
 def _init_mediaplayer_gui():

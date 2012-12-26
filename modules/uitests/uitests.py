@@ -31,7 +31,7 @@ import epymc.events as events
 import epymc.ini as ini
 import epymc.gui as gui
 import epymc.mediaplayer as mediaplayer
-from films import TMDB_WithGui
+from films import TMDB_WithGui, get_film_name_from_url
 import epymc.browser as browser
 from epymc.browser import EmcBrowser, EmcItemClass
 
@@ -313,6 +313,28 @@ class MyItemClass(EmcItemClass):
          for name in icon_names.split():
             d.list_item_append(name, 'icon/' + name)
 
+      # Film name test
+      elif url == 'uitests://films_name':
+         urls = [ 'alien.avi',
+                  'alien (1978).avi',
+                  '(2003)alien 3.avi',
+                  '[DivX - ITA] alien 3.avi',
+                  '[DivX - ITA] ali]en 3.avi',
+                  '[DivX - ITA] al[i]en 3.avi',
+                  '[DivX - ITA]alien3.avi',
+                  '[DivX - ITA]   alien3   .avi',
+                  '[DivX - ITA]alien.3.la.clonazione.avi',
+                  '[DivX - ITA]alien 3 - la clonazione.avi',
+                  '{DivX - ITA} alien 3.avi',
+                  'alien {DivX - ITA}.avi',
+                  '[DivX - ITA] Die Hard I - Trappola di Cristallo.avi',
+                ]
+         t = ''
+         for u in urls:
+            t += '<hilight>URL:</> ' + u + '<br>'
+            t += '<hilight>name/year:</> ' + str(get_film_name_from_url(u)) + '<br><br>'
+         EmcDialog(title = 'Film name test', text = t)
+         
 class UiTestsModule(EmcModule):
    name = 'uitests'
    label = 'UI tests'
@@ -337,6 +359,7 @@ class UiTestsModule(EmcModule):
       self._browser.show()
 
    def populate_root(self, browser, url):
+      browser.item_add(MyItemClass(), 'uitests://films_name', 'Films name test')
       browser.item_add(MyItemClass(), 'uitests://sniffer', 'Event Sniffer')
       browser.item_add(MyItemClass(), 'uitests://ev_emit', 'Event Emit')
       browser.item_add(MyItemClass(), 'uitests://notify', 'Notify Stack')

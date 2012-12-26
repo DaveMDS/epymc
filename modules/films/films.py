@@ -51,11 +51,16 @@ TMDB_API_KEY = '19eef197b81231dff0fd1a14a8d5f863' # Key of the user DaveMDS
 DEFAULT_INFO_LANG = 'en'
 DEFAULT_EXTENSIONS = 'avi mpg mpeg ogv mkv' #TODO fill better (uppercase ??)
 DEFAULT_BADWORDS = 'dvdrip AAC x264 cd1 cd2'
-DEFAULT_MOVIE_REGEXP = '^(\[.*?\])?({.*?})?(?P<name>.*?)(\((?P<year>[0-9]*)\))?$'
+DEFAULT_BADWORDS_REGEXP = '\[.*?\] {.*?} \. -'
+""" in a more readable form:
+\[.*?\]   # match all stuff between [ and ]
+\{.*?\}   # match all stuff between { and }
+\.        # points become spaces
+-         # dashes become spaces (tmdb dont like dashes)
+"""
+DEFAULT_MOVIE_REGEXP = '^(?P<name>.*?)(\((?P<year>[0-9]*)\))?$'
 """ in a more readable form:
 ^                            # start of the string
-(\[.*?\])?                   # optional stuff between [ and ]
-(\{.*?\})?                   # optional stuff between { and }
 (?P<name>.*?)                # the name of the film  -  captured
 (?:\((?P<year>[0-9]*)\))?    # the year, must be within ( and )  -  captured
 $                            # end of the string
@@ -178,6 +183,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          ini.set('film', 'extensions', DEFAULT_EXTENSIONS)
       if not ini.has_option('film', 'badwords'):
          ini.set('film', 'badwords', DEFAULT_BADWORDS)
+      if not ini.has_option('film', 'badwords_regexp'):
+         ini.set('film', 'badwords_regexp', DEFAULT_BADWORDS_REGEXP)
       if not ini.has_option('film', 'tmdb_retry_days'):
          ini.set('film', 'tmdb_retry_days', '3')
       if not ini.has_option('film', 'movie_regexp'):
@@ -652,9 +659,12 @@ def get_film_name_from_url(url):
    (film, ext) = os.path.splitext(film)
 
    # remove blacklisted words (case insensitive)
-   badwords = ini.get_string_list('film', 'badwords')
-   for word in badwords:
-      film = re.sub('(?i)'+word, '', film)
+   for word in ini.get_string_list('film', 'badwords'):
+      film = re.sub('(?i)' + word, ' ', film)
+
+   # remove blacklisted regexp
+   for rgx in ini.get_string_list('film', 'badwords_regexp'):
+      film = re.sub(rgx, ' ', film)
 
    # apply the user regexp (must capure 'name' and 'year')
    p = re.compile(ini.get('film', 'movie_regexp'))
@@ -667,6 +677,7 @@ def get_film_name_from_url(url):
       year = None
 
    return (name.strip(), year)
+
 
 ###### Config Panel stuff
 

@@ -10,7 +10,7 @@
 // #endif
 
 #define FONT "Cuprum"
-#define FONT_BOLD "Cuprum:style=Bold"
+#define FONT_BOLD "AsapBold"
 // #define FONT "Sans"
 // #define FONT_BOLD "Sans:style=Bold"
 #define FONT_SIZE 22
@@ -46,7 +46,12 @@ images {
 }
 
 fonts {
-   font: "Cuprum.ttf" "Cuprum";
+   font: "Cuprum.otf" "Cuprum";
+   font: "Asap-Regular.otf" "Asap";
+   font: "Asap-Bold.otf" "AsapBold";
+   // font: "Asap-Italic.otf" "AsapItalic";
+   // font: "Asap-BoldItalic.otf" "AsapBoldItalic";
+   
    font: "CinemaRegular.ttf" "Cinema";
    font: "Aclonica.ttf" "Aclonica";
 }
@@ -56,21 +61,21 @@ styles {
       base: "font="FONT" font_size="FONT_SIZE" color=#fff wrap=word";
       tag:  "br" "\n";
       tag:  "tab" "\t";
-      tag:  "em" "+ font=Sans:style=Oblique";
-      tag:  "b" "+ font=Sans:style=Bold";
-      tag:  "title" "+ font=Sans:style=Bold color=#"COLOR_ORANGE_HEX" font_size="FONT_SIZE_BIG;
-      tag:  "hilight" "+ font=Sans:style=Bold";
+      tag:  "em" "+ font="FONT":style=Oblique";
+      tag:  "b" "+ font="FONT_BOLD;
+      tag:  "title" "+ font="FONT_BOLD" color=#"COLOR_ORANGE_HEX" font_size="FONT_SIZE_BIG;
+      tag:  "hilight" "+ font="FONT_BOLD;
       //~ tag:  "link" "+ color=#800 underline=on underline_color=#8008";
    }
 
    style { name: "epymc_dialog_style";
-      base: "font=Sans font_size="FONT_SIZE" color=#FFF wrap=word";
+      base: "font="FONT" font_size="FONT_SIZE" color=#FFF wrap=word";
       tag:  "br" "\n";
       tag:  "tab" "\t";
-      tag:  "em" "+ font=Sans:style=Oblique";
-      tag:  "b" "+ font=Sans:style=Bold";
-      tag:  "title" "+ font=Sans:style=Bold color=#b00 font_size="FONT_SIZE_BIG;
-      tag:  "hilight" "+ font=Sans:style=Bold";
+      tag:  "em" "+ font="FONT":style=Oblique";
+      tag:  "b" "+ font="FONT_BOLD;
+      tag:  "title" "+ font="FONT_BOLD" color=#b00 font_size="FONT_SIZE_BIG;
+      tag:  "hilight" "+ font="FONT_BOLD;
       //~ tag:  "link" "+ color=#800 underline=on underline_color=#8008";
    }
 

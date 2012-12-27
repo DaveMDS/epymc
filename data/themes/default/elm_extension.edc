@@ -3500,7 +3500,7 @@ group { name: "elm/button/base/emc";
             rel2.offset: -8 0;
             color: FONT_COLOR;
             text {
-               font:     FONT;
+               font:     "Asap";
                size:     FONT_SIZE;
                min:      1 1;
                align:    0.5 0.5;

@@ -409,7 +409,8 @@ class EmcDialog(edje.Edje):
 
    def _list_item_activated_cb(self, li, it):
       if self._done_cb:
-         self._done_cb(self)
+         args, kwargs = it.data
+         self._done_cb(self, *args, **kwargs)
       else:
          self.delete()
    
@@ -434,6 +435,9 @@ class EmcDialog(edje.Edje):
          selected_cb(button)
 
    def _input_event_cb(self, event):
+
+      if not self.visible:
+         return input_events.EVENT_CONTINUE
 
       if event in ['BACK', 'EXIT']:
          if self._canc_cb:
@@ -823,11 +827,12 @@ class EmcFocusManager2(object):
 class EmcVKeyboard(EmcDialog):
    """ TODO doc this """
    def __init__(self, accept_cb = None, dismiss_cb = None,
-                title = None, text = None):
+                title = None, text = None, user_data = None):
       """ TODO doc this """
 
       self.accept_cb = accept_cb
       self.dismiss_cb = dismiss_cb
+      self.user_data = user_data
       self.current_button = None
 
       # table
@@ -910,7 +915,10 @@ class EmcVKeyboard(EmcDialog):
 
    def _accept_cb(self, button):
       if self.accept_cb and callable(self.accept_cb):
-         self.accept_cb(self, self.entry.entry_get())
+         if self.user_data is not None:
+            self.accept_cb(self, self.entry.entry_get(), self.user_data)
+         else:
+            self.accept_cb(self, self.entry.entry_get())
       self.delete()
 
    def _default_btn_cb(self, button):

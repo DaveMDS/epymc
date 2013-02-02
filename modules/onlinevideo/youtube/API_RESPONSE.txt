@@ -1,0 +1,236 @@
+VIDEO LIST JSONC:
+{u'data': {u'totalItems': 153,
+           u'items': [{u'uploaded': u'2006-04-06T21:30:53.000Z', u'category': u'Comedy', u'updated': u'2012-12-29T11:53:48.000Z', u'rating': 4.702563, u'description': u'For more visit http://www.mightaswelldance.com', u'title': u'Evolution of Dance - By Judson Laipply', u'thumbnail': {u'hqDefault': u'http://i.ytimg.com/vi/dMH0bHeiRNg/hqdefault.jpg', u'sqDefault': u'http://i.ytimg.com/vi/dMH0bHeiRNg/default.jpg'}, u'content': {u'1': u'rtsp://v5.cache1.c.youtube.com/CiQLENy73wIaGwnYRKJ3bPTBdBMYDSANFEgGUghzdGFuZGFyZAw=/0/0/0/video.3gp', u'5': u'http://www.youtube.com/v/dMH0bHeiRNg?version=3&f=standard&app=youtube_gdata', u'6': u'rtsp://v5.cache1.c.youtube.com/CiQLENy73wIaGwnYRKJ3bPTBdBMYESARFEgGUghzdGFuZGFyZAw=/0/0/0/video.3gp'}, u'player': {u'default': u'http://www.youtube.com/watch?v=dMH0bHeiRNg&feature=youtube_gdata_player'}, u'accessControl': {u'comment': u'allowed', u'list': u'allowed', u'videoRespond': u'moderated', u'rate': u'allowed', u'syndicate': u'allowed', u'embed': u'allowed', u'commentVote': u'allowed', u'autoPlay': u'allowed'}, u'uploader': u'judsonlaipply', u'ratingCount': 984033, u'duration': 360, u'commentCount': 588108, u'likeCount': u'910861', u'favoriteCount': 0, u'id': u'dMH0bHeiRNg', u'viewCount': 208179953},
+                      {u'uploaded': u'2007-03-05T06:43:56.000Z', u'category': u'Music', u'updated': u'2012-12-29T11:48:42.000Z', u'accessControl': {u'comment': u'allowed', u'list': u'allowed', u'videoRespond': u'moderated', u'rate': u'allowed', u'syndicate': u'denied', u'embed': u'allowed', u'commentVote': u'allowed', u'autoPlay': u'allowed'}, u'rating': 4.954706, u'description': u'Linkin Park "Numb" Directed by Mr. Hahn\n\nSubscribe for new music:  http://bit.ly/RTaVFI \nMore Linkin Park videos:  http://youtube.com/linkinparktv\n\nLinkin Park on iTunes:  http://bit.ly/PovCh1\nVisit http://linkinpark.com/\n\nLike Linkin Park at http://facebook.com/linkinPark\nFollow on Twitter at http://twitter.com/linkinpark\n\nMP3:  http://smarturl.it/aem92g', u'title': u'Linkin Park - Numb', u'restrictions': [{u'type': u'country', u'relationship': u'deny', u'countries': u'DE'}], u'thumbnail': {u'hqDefault': u'http://i.ytimg.com/vi/kXYiU_JCYtU/hqdefault.jpg', u'sqDefault': u'http://i.ytimg.com/vi/kXYiU_JCYtU/default.jpg'}, u'content': {u'5': u'http://www.youtube.com/v/kXYiU_JCYtU?version=3&f=standard&app=youtube_gdata'}, u'player': {u'default': u'http://www.youtube.com/watch?v=kXYiU_JCYtU&feature=youtube_gdata_player'}, u'status': {u'reason': u'limitedSyndication', u'value': u'restricted'}, u'uploader': u'linkinparktv', u'ratingCount': 396257, u'duration': 187, u'commentCount': 113344, u'aspectRatio': u'widescreen', u'likeCount': u'391770', u'favoriteCount': 0, u'id': u'kXYiU_JCYtU', u'viewCount': 97724922},
+                      ...],
+           u'updated': u'2012-12-29T14:07:27.549Z',
+           u'itemsPerPage': 25,
+           u'startIndex': 1},
+ u'apiVersion': u'2.1'}
+
+VIDEO ITME JSONC:
+{u'uploaded': u'2006-04-06T21:30:53.000Z',
+ u'category': u'Comedy',
+ u'updated': u'2012-12-29T11:53:48.000Z',
+ u'rating': 4.702563,
+ u'description': u'For more visit http://www.mightaswelldance.com',
+ u'title': u'Evolution of Dance - By Judson Laipply',
+ u'thumbnail': {u'hqDefault': u'http://i.ytimg.com/vi/dMH0bHeiRNg/hqdefault.jpg',
+                u'sqDefault': u'http://i.ytimg.com/vi/dMH0bHeiRNg/default.jpg'},
+ u'content': {u'1': u'rtsp://v5.cache1.c.youtube.com/CiQLENy73wIaGwnYRKJ3bPTBdBMYDSANFEgGUghzdGFuZGFyZAw=/0/0/0/video.3gp',
+              u'5': u'http://www.youtube.com/v/dMH0bHeiRNg?version=3&f=standard&app=youtube_gdata',
+              u'6': u'rtsp://v5.cache1.c.youtube.com/CiQLENy73wIaGwnYRKJ3bPTBdBMYESARFEgGUghzdGFuZGFyZAw=/0/0/0/video.3gp'},
+ u'player': {u'default': u'http://www.youtube.com/watch?v=dMH0bHeiRNg&feature=youtube_gdata_player'},
+ u'accessControl': {u'comment': u'allowed', u'list': u'allowed', u'videoRespond': u'moderated', u'rate': u'allowed', u'syndicate': u'allowed', u'embed': u'allowed', u'commentVote': u'allowed', u'autoPlay': u'allowed'},
+ u'uploader': u'judsonlaipply',
+ u'ratingCount': 984033,
+ u'duration': 360,
+ u'commentCount': 588108,
+ u'likeCount': u'910861',
+ u'favoriteCount': 0,
+ u'id': u'dMH0bHeiRNg',
+ u'viewCount': 208179953
+}
+
+
+
+VIDEO ENTRY JSON:
+{u'category': [{u'term': u'http://gdata.youtube.com/schemas/2007#video', u'scheme': u'http://schemas.google.com/g/2005#kind'},
+               {u'term': u'Music', u'scheme': u'http://gdata.youtube.com/schemas/2007/categories.cat', u'label': u'Music'}],
+ u'updated': {u'$t': u'2012-12-28T08:38:23.000Z'},
+ u'author': [{u'name': {u'$t': u'josta'}, u'yt$userId': {u'$t': u'JFUGlvqZnAdykeApeEt5-A'}, u'uri': {u'$t': u'http://gdata.youtube.com/feeds/api/users/josta'}}],
+ u'gd$comments': {u'gd$feedLink': {u'href': u'http://gdata.youtube.com/feeds/api/videos/GVTN5o9Kgu8/comments?v=2', u'countHint': 5674, u'rel': u'http://gdata.youtube.com/schemas/2007#comments'}},
+ u'title': {u'$t': u'Sexual Healing'},
+ u'gd$rating': {u'max': 5, u'average': 4.911084, u'numRaters': 23033, u'rel': u'http://schemas.google.com/g/2005#overall', u'min': 1},
+ u'media$group': {u'media$player': {u'url': u'http://www.youtube.com/watch?v=GVTN5o9Kgu8&feature=youtube_gdata_player'},
+                  u'media$category': [{u'$t': u'Music', u'scheme': u'http://gdata.youtube.com/schemas/2007/categories.cat', u'label': u'Music'}],
+                  u'media$title': {u'$t': u'Sexual Healing', u'type': u'plain'},
+                  u'media$license': {u'$t': u'youtube', u'href': u'http://www.youtube.com/t/terms', u'type': u'text/html'},
+                  u'media$restriction': [{u'$t': u'DE', u'type': u'country', u'relationship': u'deny'}],
+                  u'yt$uploaded': {u'$t': u'2006-02-22T14:54:34.000Z'},
+                  u'yt$videoid': {u'$t': u'GVTN5o9Kgu8'},
+                  u'yt$duration': {u'seconds': u'245'},
+                  u'yt$uploaderId': {u'$t': u'UCJFUGlvqZnAdykeApeEt5-A'},
+                  u'media$thumbnail': [{u'url': u'http://i.ytimg.com/vi/GVTN5o9Kgu8/default.jpg', u'width': 120, u'time': u'00:02:02.500', u'yt$name': u'default', u'height': 90},
+                                       {u'url': u'http://i.ytimg.com/vi/GVTN5o9Kgu8/mqdefault.jpg', u'width': 320, u'yt$name': u'mqdefault', u'height': 180},
+                                       {u'url': u'http://i.ytimg.com/vi/GVTN5o9Kgu8/hqdefault.jpg', u'width': 480, u'yt$name': u'hqdefault', u'height': 360},
+                                       {u'url': u'http://i.ytimg.com/vi/GVTN5o9Kgu8/1.jpg', u'width': 120, u'time': u'00:01:01.250', u'yt$name': u'start', u'height': 90},
+                                       {u'url': u'http://i.ytimg.com/vi/GVTN5o9Kgu8/2.jpg', u'width': 120, u'time': u'00:02:02.500', u'yt$name': u'middle', u'height': 90},
+                                       {u'url': u'http://i.ytimg.com/vi/GVTN5o9Kgu8/3.jpg', u'width': 120, u'time': u'00:03:03.750', u'yt$name': u'end', u'height': 90}],
+                  u'media$content': [{u'medium': u'video', u'url': u'http://www.youtube.com/v/GVTN5o9Kgu8?version=3&f=standard&app=youtube_gdata', u'type': u'application/x-shockwave-flash', u'yt$format': 5, u'duration': 245, u'expression': u'full', u'isDefault': u'true'},
+                                     {u'medium': u'video', u'url': u'rtsp://v4.cache4.c.youtube.com/CiQLENy73wIaGwnvgkqP5s1UGRMYDSANFEgGUghzdGFuZGFyZAw=/0/0/0/video.3gp', u'type': u'video/3gpp', u'yt$format': 1, u'duration': 245, u'expression': u'full'},
+                                     {u'medium': u'video', u'url': u'rtsp://v4.cache4.c.youtube.com/CiQLENy73wIaGwnvgkqP5s1UGRMYESARFEgGUghzdGFuZGFyZAw=/0/0/0/video.3gp', u'type': u'video/3gpp', u'yt$format': 6, u'duration': 245, u'expression': u'full'}],
+                  u'media$credit': [{u'$t': u'josta', u'scheme': u'urn:youtube', u'role': u'uploader', u'yt$display': u'josta'}],
+                  u'media$keywords': {},
+                  u'media$description': {u'$t': u"MArvin Gaye Sing the famous sensual song -= Sexual Healing =-\r\noriginal video from '80's... \r\nr.i.p. Marvin..", u'type': u'plain'}},
+ u'gd$etag': u'W/"CU4EQn47eCp7I2A9WhNVFkU."',
+ u'yt$recorded': {u'$t': u'1966-01-06'},
+ u'yt$accessControl': [{u'action': u'comment', u'permission': u'moderated'},
+                       {u'action': u'commentVote', u'permission': u'denied'},
+                       {u'action': u'videoRespond', u'permission': u'denied'},
+                       {u'action': u'rate', u'permission': u'allowed'},
+                       {u'action': u'embed', u'permission': u'allowed'},
+                       {u'action': u'list', u'permission': u'allowed'},
+                       {u'action': u'autoPlay', u'permission': u'moderated'},
+                       {u'action': u'syndicate', u'permission': u'allowed'}],
+ u'yt$statistics': {u'viewCount': u'11608314', u'favoriteCount': u'0'},
+ u'content': {u'src': u'http://www.youtube.com/v/GVTN5o9Kgu8?version=3&f=standard&app=youtube_gdata', u'type': u'application/x-shockwave-flash'},
+ u'link': [{u'href': u'http://www.youtube.com/watch?v=GVTN5o9Kgu8&feature=youtube_gdata', u'type': u'text/html', u'rel': u'alternate'},
+           {u'href': u'http://gdata.youtube.com/feeds/api/videos/GVTN5o9Kgu8/responses?v=2', u'type': u'application/atom+xml', u'rel': u'http://gdata.youtube.com/schemas/2007#video.responses'},
+           {u'href': u'http://gdata.youtube.com/feeds/api/videos/GVTN5o9Kgu8/related?v=2', u'type': u'application/atom+xml', u'rel': u'http://gdata.youtube.com/schemas/2007#video.related'},
+           {u'href': u'http://gdata.youtube.com/feeds/api/users/JFUGlvqZnAdykeApeEt5-A?v=2', u'type': u'application/atom+xml', u'rel': u'http://gdata.youtube.com/schemas/2007#uploader'},
+           {u'href': u'http://gdata.youtube.com/feeds/api/videos/GVTN5o9Kgu8?v=2', u'type': u'application/atom+xml', u'rel': u'self'}],
+ u'published': {u'$t': u'2006-02-22T14:54:34.000Z'},
+ u'yt$rating': {u'numLikes': u'22521', u'numDislikes': u'512'},
+ u'id': {u'$t': u'tag:youtube.com,2008:video:GVTN5o9Kgu8'},
+ u'yt$location': {u'$t': u'soleto'}}
+
+
+VIDEO_INFO:
+no_get_video_log=1
+iv3_module=http%3A%2F%2Fs.ytimg.com%2Fyts%2Fswfbin%2Fiv3_module-vfl_nqa5q.swf
+afv_ad_tag=http%3A%2F%2Fgoogleads.g.doubleclick.net%2Fpagead%2Fads%3Fht_id%3D439818%26host%3Dca-host-pub-1800120140230655%26description_url%3Dhttp%253A%252F%252Fwww.youtube.com%252Fvideo%252FdMH0bHeiRNg%26loeid%3D906367%252C916807%252C930600%252C916624%26client%3Dca-pub-6219811747049371%26hl%3Dit%26ytdevice%3D1%26ad_type%3Dtext_image_flash%26channel%3Dinvideo_overlay_480x70_cat23%252Bafv_overlay%252BVertical_3%252BVertical_36%252BVertical_182%252BVertical_211%252BVertical_613%252Bafv_ugc%252Byt_mpvid_AATSA2u3Up_barnz%252Byt_cid_319133%252Bytexp_906367.916807.930600.916624.920704.912806.928001.922403.922405.929901.913605.929104.913546.913556.908496.920201.913302.919009.911116.926403.901451.902556%252Bytdevice_1%252Bytps_default%252Bytel_embedded
+iv_read_url=http%3A%2F%2Fwww.youtube.com%2Fannotations_iv%2Fread2%3Fexpire%3D1356855600%26signature%3DC17B43DB235A5F31C965C62B8CB9A5FCEB60B638.709D58F04500C4331A84419C67F2A06D95C04CCE%26key%3Da1%26hl%3Dit%26feat%3DCS%26video_id%3DdMH0bHeiRNg%26sparams%3Dexpire%252Cvideo_id
+ad_eurl=http%3A%2F%2Fwww.youtube.com%2Fvideo%2FdMH0bHeiRNg
+ad_module=http%3A%2F%2Fs.ytimg.com%2Fyts%2Fswfbin%2Fad-vflzzty_B.swf
+afv=True
+allow_ratings=1
+sffb=True
+avg_rating=4.70259691963
+supported_without_ads=1
+title=Evolution+of+Dance+-+By+Judson+Laipply
+iv_logging_level=4
+iv_queue_log_level=0
+ad_video_pub_id=ca-pub-6219811747049371
+ad_device=1
+ad_flags=1
+no_afv_instream=1
+timestamp=1356812040
+ad_channel_code_overlay=invideo_overlay_480x70_cat23%2Cafv_overlay%2CVertical_3%2CVertical_36%2CVertical_182%2CVertical_211%2CVertical_613%2Cafv_ugc%2Cyt_mpvid_AATSA2u3Up_barnz%2Cyt_cid_319133%2Cytexp_906367.916807.930600.916624.920704.912806.928001.922403.922405.929901.913605.929104.913546.913556.908496.920201.913302.919009.911116.926403.901451.902556%2Cytdevice_1%2Cytps_default%2Cytel_embedded
+host_language=it
+gut_tag=%2F4061%2Fytunknown%2Fmain
+storyboard_spec=http%3A%2F%2Fi1.ytimg.com%2Fsb%2FdMH0bHeiRNg%2Fstoryboard3_L%24L%2F%24N.jpg%7C48%2327%23100%2310%2310%230%23default%23k0A3Bm9odV0gaJu_7AGb-7oJknQ%7C60%2345%2374%2310%2310%235000%23M%24M%23lZEw-Ih1qIYBqB7THByigrsYoiw%7C120%2390%2374%235%235%235000%23M%24M%23v6OTHGbGbhe3_qH5Oodg-NFXEGA
+ad_host_tier=439818
+content_owner_name=CS
+allow_embed=1
+track_embed=1
+yt_pt=AD1B29neZO4fL9mZIXLVT32r8LoeTECv9UYPkck620atGvTVt1lhaz71Qrmgc2ZLZ6b1Roxcut-eu9N_wfpZ8V_Jrpw1pJUKaRLzI6muYNM_ZpdmLpxqRxZMpDiqbawKiZWYqpR8psujwOROBl2u
+fexp=906367%2C916807%2C930600%2C916624%2C920704%2C912806%2C928001%2C922403%2C922405%2C929901%2C913605%2C929104%2C913546%2C913556%2C908496%2C920201%2C913302%2C919009%2C911116%2C926403%2C901451%2C902556
+as_launched_in_country=1
+ad_host=ca-host-pub-1800120140230655
+tmi=1
+thumbnail_url=http%3A%2F%2Fi1.ytimg.com%2Fvi%2FdMH0bHeiRNg%2Fdefault.jpg
+excluded_ads=3%3D1_1%2C1_2%2C1_2_1%2C1_3%2C2_2%2C2_2_1
+ad_logging_flag=1
+iv_module=http%3A%2F%2Fs.ytimg.com%2Fyts%2Fswfbin%2Fiv_module-vflBA53yv.swf
+token=vjVQa1PpcFO5GcfR16-YBHWw-CYk8MvRI8miz_Zxp1o%3D
+account_playback_token=
+vq=auto
+watermark=%2Chttp%3A%2F%2Fs.ytimg.com%2Fyts%2Fimg%2Fwatermark%2Fyoutube_watermark-vflHX6b6E.png%2Chttp%3A%2F%2Fs.ytimg.com%2Fyts%2Fimg%2Fwatermark%2Fyoutube_hd_watermark-vflAzLcD6.png
+loeid=906367%2C916807%2C930600%2C916624
+video_verticals=%5B3%2C+211%2C+182%5D
+iv_close_button=0
+pltype=contentugc
+status=ok
+view_count=208191573
+keywords=Dancing%2Ccomedy%2Cspeaking%2Cspeaker%2Cmotivational+speaker%2CFunny%2CTraining%2CSuccess
+ptk=youtube_multi
+advideo=1
+video_id=dMH0bHeiRNg
+mpvid=AATSA2u3Up_barnz
+has_cc=False
+pyv_in_related_cafe_experiment_id=
+iv_allow_in_place_switch=1
+allowed_ads=%5B2%5D
+endscreen_module=http%3A%2F%2Fs.ytimg.com%2Fyts%2Fswfbin%2Fendscreen-vflW8uRdM.swf
+st_module=http%3A%2F%2Fs.ytimg.com%2Fyts%2Fswfbin%2Fst_module-vflrZq5S5.swf
+sw=1.0
+cid=319133
+shortform=True
+adsense_video_doc_id=yt_dMH0bHeiRNg
+afv_inslate_ad_tag=http%3A%2F%2Fgoogleads.g.doubleclick.net%2Fpagead%2Fads%3Fht_id%3D439818%26host%3Dca-host-pub-1800120140230655%26description_url%3Dhttp%253A%252F%252Fwww.youtube.com%252Fvideo%252FdMH0bHeiRNg%26loeid%3D906367%252C916807%252C930600%252C916624%26client%3Dca-pub-6219811747049371%26hl%3Dit%26ytdevice%3D1%26ad_type%3Duserchoice
+muted=0
+plid=AATSA2u3Xv9Tj1tA
+iv_load_policy=1
+url_encoded_fmt_stream_map=sig%3D345ECCE37A192048C9CDB8BE091711F103CFBBBA.CC4167A79ECB1080A5AF3C3D1FD3992A0F57EFB5%26fallback_host%3Dtc.v10.cache7.c.youtube.com%26type%3Dvideo%252Fwebm%253B%2Bcodecs%253D%2522vp8.0%252C%2Bvorbis%2522%26quality%3Dmedium%26itag%3D43%26url%3Dhttp%253A%252F%252Fr18---sn-hpa7enes.c.youtube.com%252Fvideoplayback%253Fsver%253D3%2526ipbits%253D8%2526ratebypass%253Dyes%2526expire%253D1356835516%2526key%253Dyt1%2526sparams%253Dcp%25252Cgcr%25252Cid%25252Cip%25252Cipbits%25252Citag%25252Cratebypass%25252Csource%25252Cupn%25252Cexpire%2526id%253D74c1f46c77a244d8%2526itag%253D43%2526mt%253D1356811991%2526fexp%253D906367%25252C916807%25252C930600%25252C916624%25252C920704%25252C912806%25252C928001%25252C922403%25252C922405%25252C929901%25252C913605%25252C929104%25252C913546%25252C913556%25252C908496%25252C920201%25252C913302%25252C919009%25252C911116%25252C926403%25252C901451%25252C902556%2526ms%253Dau%2526cp%253DU0hUS1hOU19GUENONF9QSFdGOl9hZFJmMVgyQk80%2526source%253Dyoutube%2526upn%253DigGR5YpAOfk%2526gcr%253Dit%2526ip%253D2.233.137.49%2526mv%253Dm%2Csig%3D90BCAACF2BD2F7841218D454BE869D54AEC59104.5ECEB46F5E549330AEB7ED2394362B04C7BA4072%26fallback_host%3Dtc.v13.cache6.c.youtube.com%26type%3Dvideo%252Fx-flv%26quality%3Dmedium%26itag%3D34%26url%3Dhttp%253A%252F%252Fr11---sn-hpa7en7y.c.youtube.com%252Fvideoplayback%253Fsver%253D3%2526ipbits%253D8%2526burst%253D40%2526algorithm%253Dthrottle-factor%2526factor%253D1.25%2526key%253Dyt1%2526sparams%253Dalgorithm%25252Cburst%25252Ccp%25252Cfactor%25252Cgcr%25252Cid%25252Cip%25252Cipbits%25252Citag%25252Csource%25252Cupn%25252Cexpire%2526id%253D74c1f46c77a244d8%2526itag%253D34%2526expire%253D1356835516%2526mt%253D1356811991%2526fexp%253D906367%25252C916807%25252C930600%25252C916624%25252C920704%25252C912806%25252C928001%25252C922403%25252C922405%25252C929901%25252C913605%25252C929104%25252C913546%25252C913556%25252C908496%25252C920201%25252C913302%25252C919009%25252C911116%25252C926403%25252C901451%25252C902556%2526ms%253Dau%2526cp%253DU0hUS1hOU19GUENONF9QSFdGOl9hZFJmMVgyQk80%2526source%253Dyoutube%2526upn%253DigGR5YpAOfk%2526gcr%253Dit%2526ip%253D2.233.137.49%2526mv%253Dm%2Csig%3D4B16E4F87478E4DDA8B7560F931352501FC6D974.B65219C7CA05E3F32E0DD62CF7AD52E6D38AC7FC%26fallback_host%3Dtc.v1.cache4.c.youtube.com%26type%3Dvideo%252Fmp4%253B%2Bcodecs%253D%2522avc1.42001E%252C%2Bmp4a.40.2%2522%26quality%3Dmedium%26itag%3D18%26url%3Dhttp%253A%252F%252Fr1---sn-hpa7enez.c.youtube.com%252Fvideoplayback%253Fsver%253D3%2526ipbits%253D8%2526ratebypass%253Dyes%2526expire%253D1356835516%2526key%253Dyt1%2526sparams%253Dcp%25252Cgcr%25252Cid%25252Cip%25252Cipbits%25252Citag%25252Cratebypass%25252Csource%25252Cupn%25252Cexpire%2526id%253D74c1f46c77a244d8%2526itag%253D18%2526mt%253D1356811991%2526fexp%253D906367%25252C916807%25252C930600%25252C916624%25252C920704%25252C912806%25252C928001%25252C922403%25252C922405%25252C929901%25252C913605%25252C929104%25252C913546%25252C913556%25252C908496%25252C920201%25252C913302%25252C919009%25252C911116%25252C926403%25252C901451%25252C902556%2526ms%253Dau%2526cp%253DU0hUS1hOU19GUENONF9QSFdGOl9hZFJmMVgyQk80%2526source%253Dyoutube%2526upn%253DigGR5YpAOfk%2526gcr%253Dit%2526ip%253D2.233.137.49%2526mv%253Dm%2Csig%3D95A01D3C825B6617E1DACC74FC7F6EC5E4677952.3021E95274E5BD0D6C2A81359A38D4F3BFF91F81%26fallback_host%3Dtc.v7.cache4.c.youtube.com%26type%3Dvideo%252Fx-flv%26quality%3Dsmall%26itag%3D5%26url%3Dhttp%253A%252F%252Fr6---sn-hpa7enez.c.youtube.com%252Fvideoplayback%253Fsver%253D3%2526ipbits%253D8%2526burst%253D40%2526algorithm%253Dthrottle-factor%2526factor%253D1.25%2526key%253Dyt1%2526sparams%253Dalgorithm%25252Cburst%25252Ccp%25252Cfactor%25252Cgcr%25252Cid%25252Cip%25252Cipbits%25252Citag%25252Csource%25252Cupn%25252Cexpire%2526id%253D74c1f46c77a244d8%2526itag%253D5%2526expire%253D1356835516%2526mt%253D1356811991%2526fexp%253D906367%25252C916807%25252C930600%25252C916624%25252C920704%25252C912806%25252C928001%25252C922403%25252C922405%25252C929901%25252C913605%25252C929104%25252C913546%25252C913556%25252C908496%25252C920201%25252C913302%25252C919009%25252C911116%25252C926403%25252C901451%25252C902556%2526ms%253Dau%2526cp%253DU0hUS1hOU19GUENONF9QSFdGOl9hZFJmMVgyQk80%2526source%253Dyoutube%2526upn%253DigGR5YpAOfk%2526gcr%253Dit%2526ip%253D2.233.137.49%2526mv%253Dm%2Csig%3DB29B98F0AC30C9A36F9491D93CBB006795576B61.10AD95D2F84F25190B35FAE4F1873D4860E72FE9%26fallback_host%3Dtc.v19.cache8.c.youtube.com%26type%3Dvideo%252F3gpp%253B%2Bcodecs%253D%2522mp4v.20.3%252C%2Bmp4a.40.2%2522%26quality%3Dsmall%26itag%3D17%26url%3Dhttp%253A%252F%252Fr16---sn-hpa7ene6.c.youtube.com%252Fvideoplayback%253Fsver%253D3%2526ipbits%253D8%2526burst%253D40%2526algorithm%253Dthrottle-factor%2526factor%253D1.25%2526key%253Dyt1%2526sparams%253Dalgorithm%25252Cburst%25252Ccp%25252Cfactor%25252Cgcr%25252Cid%25252Cip%25252Cipbits%25252Citag%25252Csource%25252Cupn%25252Cexpire%2526id%253D74c1f46c77a244d8%2526itag%253D17%2526expire%253D1356835516%2526mt%253D1356811991%2526fexp%253D906367%25252C916807%25252C930600%25252C916624%25252C920704%25252C912806%25252C928001%25252C922403%25252C922405%25252C929901%25252C913605%25252C929104%25252C913546%25252C913556%25252C908496%25252C920201%25252C913302%25252C919009%25252C911116%25252C926403%25252C901451%25252C902556%2526ms%253Dau%2526cp%253DU0hUS1hOU19GUENONF9QSFdGOl9hZFJmMVgyQk80%2526source%253Dyoutube%2526upn%253DigGR5YpAOfk%2526gcr%253Dit%2526ip%253D2.233.137.49%2526mv%253Dm
+ad_slots=0
+prefetch_ad_live_stream=True
+fmt_list=43%2F640x360%2F99%2F0%2F0%2C34%2F640x360%2F9%2F0%2F115%2C18%2F640x360%2F9%2F0%2F115%2C5%2F320x240%2F7%2F0%2F0%2C17%2F176x144%2F99%2F0%2F0
+cafe_experiment_id=
+loudness=-15.1700000763
+length_seconds=360
+author=judsonlaipply
+ftoken=
+video_wall=1
+inactive_skippable_threshold=600000
+
+----------------------
+url_encoded_fmt_stream_map:
+---------------------
+sig=345ECCE37A192048C9CDB8BE091711F103CFBBBA.CC4167A79ECB1080A5AF3C3D1FD3992A0F57EFB5
+fallback_host=tc.v10.cache7.c.youtube.com
+type=video%252Fwebm%253B%2Bcodecs%253D%2522vp8.0%252C%2Bvorbis%2522
+quality=medium
+itag=43
+url=http%253A%252F%252Fr18---sn-hpa7enes.c.youtube.com%252Fvideoplayback%253Fsver%253D3%2526ipbits%253D8%2526ratebypass%253Dyes%2526expire%253D1356835516%2526key%253Dyt1%2526sparams%253Dcp%25252Cgcr%25252Cid%25252Cip%25252Cipbits%25252Citag%25252Cratebypass%25252Csource%25252Cupn%25252Cexpire%2526id%253D74c1f46c77a244d8%2526itag%253D43%2526mt%253D1356811991%2526fexp%253D906367%25252C916807%25252C930600%25252C916624%25252C920704%25252C912806%25252C928001%25252C922403%25252C922405%25252C929901%25252C913605%25252C929104%25252C913546%25252C913556%25252C908496%25252C920201%25252C913302%25252C919009%25252C911116%25252C926403%25252C901451%25252C902556%2526ms%253Dau%2526cp%253DU0hUS1hOU19GUENONF9QSFdGOl9hZFJmMVgyQk80%2526source%253Dyoutube%2526upn%253DigGR5YpAOfk%2526gcr%253Dit%2526ip%253D2.233.137.49%2526mv%253Dm%2Csig=90BCAACF2BD2F7841218D454BE869D54AEC59104.5ECEB46F5E549330AEB7ED2394362B04C7BA4072
+
+fallback_host=tc.v13.cache6.c.youtube.com
+type=video%252Fx-flv
+quality=medium
+itag=34
+url=http%253A%252F%252Fr11---sn-hpa7en7y.c.youtube.com%252Fvideoplayback%253Fsver%253D3%2526ipbits%253D8%2526burst%253D40%2526algorithm%253Dthrottle-factor%2526factor%253D1.25%2526key%253Dyt1%2526sparams%253Dalgorithm%25252Cburst%25252Ccp%25252Cfactor%25252Cgcr%25252Cid%25252Cip%25252Cipbits%25252Citag%25252Csource%25252Cupn%25252Cexpire%2526id%253D74c1f46c77a244d8%2526itag%253D34%2526expire%253D1356835516%2526mt%253D1356811991%2526fexp%253D906367%25252C916807%25252C930600%25252C916624%25252C920704%25252C912806%25252C928001%25252C922403%25252C922405%25252C929901%25252C913605%25252C929104%25252C913546%25252C913556%25252C908496%25252C920201%25252C913302%25252C919009%25252C911116%25252C926403%25252C901451%25252C902556%2526ms%253Dau%2526cp%253DU0hUS1hOU19GUENONF9QSFdGOl9hZFJmMVgyQk80%2526source%253Dyoutube%2526upn%253DigGR5YpAOfk%2526gcr%253Dit%2526ip%253D2.233.137.49%2526mv%253Dm%2Csig=4B16E4F87478E4DDA8B7560F931352501FC6D974.B65219C7CA05E3F32E0DD62CF7AD52E6D38AC7FC
+
+fallback_host=tc.v1.cache4.c.youtube.com
+type=video%252Fmp4%253B%2Bcodecs%253D%2522avc1.42001E%252C%2Bmp4a.40.2%2522
+quality=medium
+itag=18
+url=http%253A%252F%252Fr1---sn-hpa7enez.c.youtube.com%252Fvideoplayback%253Fsver%253D3%2526ipbits%253D8%2526ratebypass%253Dyes%2526expire%253D1356835516%2526key%253Dyt1%2526sparams%253Dcp%25252Cgcr%25252Cid%25252Cip%25252Cipbits%25252Citag%25252Cratebypass%25252Csource%25252Cupn%25252Cexpire%2526id%253D74c1f46c77a244d8%2526itag%253D18%2526mt%253D1356811991%2526fexp%253D906367%25252C916807%25252C930600%25252C916624%25252C920704%25252C912806%25252C928001%25252C922403%25252C922405%25252C929901%25252C913605%25252C929104%25252C913546%25252C913556%25252C908496%25252C920201%25252C913302%25252C919009%25252C911116%25252C926403%25252C901451%25252C902556%2526ms%253Dau%2526cp%253DU0hUS1hOU19GUENONF9QSFdGOl9hZFJmMVgyQk80%2526source%253Dyoutube%2526upn%253DigGR5YpAOfk%2526gcr%253Dit%2526ip%253D2.233.137.49%2526mv%253Dm%2Csig=95A01D3C825B6617E1DACC74FC7F6EC5E4677952.3021E95274E5BD0D6C2A81359A38D4F3BFF91F81
+
+fallback_host=tc.v7.cache4.c.youtube.com
+type=video%252Fx-flv
+quality=small
+itag=5
+url=http%253A%252F%252Fr6---sn-hpa7enez.c.youtube.com%252Fvideoplayback%253Fsver%253D3%2526ipbits%253D8%2526burst%253D40%2526algorithm%253Dthrottle-factor%2526factor%253D1.25%2526key%253Dyt1%2526sparams%253Dalgorithm%25252Cburst%25252Ccp%25252Cfactor%25252Cgcr%25252Cid%25252Cip%25252Cipbits%25252Citag%25252Csource%25252Cupn%25252Cexpire%2526id%253D74c1f46c77a244d8%2526itag%253D5%2526expire%253D1356835516%2526mt%253D1356811991%2526fexp%253D906367%25252C916807%25252C930600%25252C916624%25252C920704%25252C912806%25252C928001%25252C922403%25252C922405%25252C929901%25252C913605%25252C929104%25252C913546%25252C913556%25252C908496%25252C920201%25252C913302%25252C919009%25252C911116%25252C926403%25252C901451%25252C902556%2526ms%253Dau%2526cp%253DU0hUS1hOU19GUENONF9QSFdGOl9hZFJmMVgyQk80%2526source%253Dyoutube%2526upn%253DigGR5YpAOfk%2526gcr%253Dit%2526ip%253D2.233.137.49%2526mv%253Dm%2Csig=B29B98F0AC30C9A36F9491D93CBB006795576B61.10AD95D2F84F25190B35FAE4F1873D4860E72FE9
+
+fallback_host=tc.v19.cache8.c.youtube.com
+type=video%252F3gpp%253B%2Bcodecs%253D%2522mp4v.20.3%252C%2Bmp4a.40.2%2522
+quality=small
+itag=17
+url=http%253A%252F%252Fr16---sn-hpa7ene6.c.youtube.com%252Fvideoplayback%253Fsver%253D3%2526ipbits%253D8%2526burst%253D40%2526algorithm%253Dthrottle-factor%2526factor%253D1.25%2526key%253Dyt1%2526sparams%253Dalgorithm%25252Cburst%25252Ccp%25252Cfactor%25252Cgcr%25252Cid%25252Cip%25252Cipbits%25252Citag%25252Csource%25252Cupn%25252Cexpire%2526id%253D74c1f46c77a244d8%2526itag%253D17%2526expire%253D1356835516%2526mt%253D1356811991%2526fexp%253D906367%25252C916807%25252C930600%25252C916624%25252C920704%25252C912806%25252C928001%25252C922403%25252C922405%25252C929901%25252C913605%25252C929104%25252C913546%25252C913556%25252C908496%25252C920201%25252C913302%25252C919009%25252C911116%25252C926403%25252C901451%25252C902556%2526ms%253Dau%2526cp%253DU0hUS1hOU19GUENONF9QSFdGOl9hZFJmMVgyQk80%2526source%253Dyoutube%2526upn%253DigGR5YpAOfk%2526gcr%253Dit%2526ip%253D2.233.137.49%2526mv%253Dm
+
+
+-----------------
+<?xml version='1.0' encoding='UTF-8'?>
+   <app:categories xmlns:app='http://www.w3.org/2007/app' xmlns:atom='http://www.w3.org/2005/Atom' xmlns:yt='http://gdata.youtube.com/schemas/2007' fixed='yes' scheme='http://gdata.youtube.com/schemas/2007/categories.cat'>
+
+   <atom:category term='Film' label='Film &amp; Animation' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Autos' label='Autos &amp; Vehicles' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Music' label='Music' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Animals' label='Pets &amp; Animals' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Sports' label='Sports' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Shortmov' label='Short Movies' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Travel' label='Travel &amp; Events' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Games' label='Gaming' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Videoblog' label='Videoblogging' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='People' label='People &amp; Blogs' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Comedy' label='Comedy' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Entertainment' label='Entertainment' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='News' label='News &amp; Politics' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Howto' label='Howto &amp; Style' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Education' label='Education' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Tech' label='Science &amp; Technology' xml:lang='en-US'><yt:assignable/><yt:browsable regions='AE AR AU BD BE BG BR CA CL CO CZ DE DK DZ EE EG ES ET FI FR GB GH GR HK HR HU ID IE IL IN IR IS IT JO JP KE KR LT LV MA MX MY NG NL NO NZ PE PH PK PL PT RO RS RU SA SE SG SI SK SN TH TN TR TW TZ UA UG US VN YE ZA'/></atom:category>
+   <atom:category term='Nonprofit' label='Nonprofits &amp; Activism' xml:lang='en-US'><yt:assignable/><yt:browsable regions='US'/></atom:category>
+   <atom:category term='Movies' label='Movies' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Movies_anime_animation' label='Anime/Animation' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Movies_action_adventure' label='Action/Adventure' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Movies_classics' label='Classics' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Movies_comedy' label='Comedy' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Movies_documentary' label='Documentary' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Movies_drama' label='Drama' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Movies_family' label='Family' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Movies_foreign' label='Foreign' xml:lang='en-US'><yt:deprecated/></atom:category> term='Movies_horror' label='Horror' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Movies_sci_fi_fantasy' label='Sci-Fi/Fantasy' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Movies_thriller' label='Thriller' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Movies_shorts' label='Shorts' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Shows' label='Shows' xml:lang='en-US'><yt:deprecated/></atom:category>
+   <atom:category term='Trailers' label='Trailers' xml:lang='en-US'><yt:deprecated/></atom:category></app:categories>

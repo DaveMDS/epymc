@@ -28,13 +28,14 @@ import evas, elementary
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.utils import EmcExec
-from epymc.widgets import EmcDialog
+from epymc.widgets import EmcDialog, EmcVKeyboard
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
 import epymc.utils as utils
 import epymc.gui as gui
 import epymc.ini as ini
+import epymc.events as events
 
 
 
@@ -52,6 +53,8 @@ if DEBUG:
 ACT_NONE = 0
 ACT_FOLDER = 1
 ACT_MORE = 2
+ACT_PLAY = 3
+ACT_SEARCH = 4
 
 F_STATE = 0
 F_LABEL = 1
@@ -122,7 +125,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    _browser = None
    _sources = []
    _current_src = None
-   _item_data = {}
    _run_dialog = None
 
    _search_folders = [
@@ -136,7 +138,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       
       LOG('dbg', 'Init module')
 
-      self._item_data = {}
       _mod = self
 
       # add an item in the mainmenu
@@ -212,67 +213,94 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
             return s
 
    def _request_index(self):
+      # request the index page from the channel
       src = self._current_src
       item_data = (0, src['label'], 'index', None, None, None, 0)
       self._request_page(item_data)
 
    def _request_page(self, item_data):
+      # request a specific page from the channel
+      (next_state, label, url, info, icon, poster, action) = item_data
+      if action == ACT_PLAY:
+         mediaplayer.play_url(url)
+         mediaplayer.title_set(label)
+         mediaplayer.poster_set(poster)
+      elif action == ACT_SEARCH:
+         EmcVKeyboard(title = 'Search query', user_data = item_data,
+                      accept_cb = self._search_vkeyb_done)
+      else:
+         src = self._current_src
+         cmd = '%s %d "%s"' % (src['exec'], next_state, url)
+         LOG('dbg', 'Executing: ' + cmd)
+         EmcExec(cmd, True, self._request_page_done, item_data)
+         self._run_dialog = EmcDialog(title = 'please wait', style = 'cancel',
+                                      text = 'Scraping site...', )
+
+   def _search_vkeyb_done(self, vkeyb, text, item_data):
       (next_state, label, url, info, icon, poster, action) = item_data
       src = self._current_src
-      cmd = '%s %d "%s"' % (src['exec'], next_state, url)
-      LOG('dbg', 'Executing: ' + cmd)
+      cmd = '%s %d "%s"' % (src['exec'], next_state, text)
+      LOG('dbg', 'ExecutingSearch: ' + cmd)
       EmcExec(cmd, True, self._request_page_done, item_data)
       self._run_dialog = EmcDialog(title = 'please wait', style = 'cancel',
                                    text = 'Scraping site...', )
 
-   def _request_page_done(self, output, page_data):
+   def _request_page_done(self, output, parent_item_data):
+      # parse the output of the channel execution
       self._run_dialog.delete()
-      # get all the valid items from the output of the command
       lines = output.split('\n')
       items = []
+      suggested = None
       for line in lines:
-         # LOG('dbg', ' ---' + line)
-         if line.startswith('PLAY!http://'):
+         LOG('dbg', ' ---' + line)
+         if line.startswith('PLAY!'):
             LOG('inf', 'yes sir..' + line)
             url = line[5:]
             mediaplayer.play_url(url)
-
-            # if self._item_data.has_key(url):
-               # item_data = self._item_data[url]
-               # mediaplayer.poster_set(item_data[F_POSTER])
-               # mediaplayer.title_set(item_data[F_TITLE])
-               # return item_data[F_POSTER] or self._current_src['poster']
-
-            return
+            mediaplayer.poster_set(parent_item_data[F_POSTER]) # TODO FIXME
+            mediaplayer.title_set(parent_item_data[F_LABEL])
+            suggested = [] # from now on every item is a suggestion
          else:
             try:
                # WARNING keep item_data consistent !
                (next_state, label, url, info, icon, poster, action) = \
                      ast.literal_eval(line)
                item_data = (next_state, label, url, info, icon, poster, action)
-               items.append(item_data)
+               if suggested is not None:
+                  suggested.append(item_data)
+               else:
+                  items.append(item_data)
                LOG('dbg', str(item_data))
             except:
                continue
       
-      if len(items) < 1:
+      if len(items) < 1 and suggested is None:
          EmcDialog(text = 'Error executing script', style = 'error')
          return
 
-      (next_state, label, url, info, icon, poster, action) = page_data
-      if action != ACT_MORE:
-         # store the items data in the dictiornary (key=url)
-         del self._item_data # TODO need to del all the item_data inside?? !!!!!!!!!!!!!!!!!!!!!!
-         self._item_data = {}
+      if suggested and len(suggested) > 0:
+         # prepare the suggestions dialog that will be shown on PLAYBACK_FINISHED
+         d = EmcDialog(title = 'Suggestions', style = 'list',
+                       done_cb = self._suggestion_selected_cb)
+         d.hide()
+         for item in suggested:
+            d.list_item_append(item[F_LABEL], item_data=item)
+         events.listener_add_single_shot("PLAYBACK_FINISHED", lambda: d.show())
 
-         # new browser page
+      (next_state, label, url, info, icon, poster, action) = parent_item_data
+      if items and action != ACT_MORE:
          self._browser.page_add(url.encode('ascii'), label, None,
                                 self._populate_requested_page, items)
+      else:
+         self._populate_requested_page(self._browser, url, items)
+
+   def _suggestion_selected_cb(self, dia, item_data):
+      self._request_page(item_data)
+      dia.delete()
 
    def _populate_requested_page(self, browser, url, items):
       for item_data in items:
          (next_state, label, url, info, icon, poster, action) = item_data
          self._browser.item_add(StandardItemClass(), url, item_data)
-         self._item_data[url] = item_data
 
 

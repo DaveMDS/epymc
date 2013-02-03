@@ -76,6 +76,7 @@ styles {
       tag:  "b" "+ font="FONT_BOLD;
       tag:  "title" "+ font="FONT_BOLD" color=#b00 font_size="FONT_SIZE_BIG;
       tag:  "hilight" "+ font="FONT_BOLD;
+      tag:  "center" "+ align=center";
       //~ tag:  "link" "+ color=#800 underline=on underline_color=#8008";
    }
 

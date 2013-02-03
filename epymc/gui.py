@@ -57,6 +57,7 @@ def init():
    # get config values, setting defaults if needed
    theme_name = ini.get('general', 'theme', default_value = 'default')
    evas_engine = ini.get('general', 'evas_engine', default_value = 'software_x11')
+   fps = ini.get('general', 'fps', default_value = 30)
    scale = ini.get('general', 'scale', default_value = 1.0)
    fullscreen = ini.get('general', 'fullscreen', False)
    ini.add_section('screensaver')
@@ -129,6 +130,9 @@ def init():
    # listen to events and input_events
    input_events.listener_add('gui', _input_event_cb)
    events.listener_add('gui', _event_cb)
+
+   # set efl frames per second
+   fps_set(fps)
 
    # timer that manage the screensaver/monitor policy
    _screensaver_ts = time.time()
@@ -311,6 +315,9 @@ def renew_screensaver():
    if _screensaver_status != 0:
       _screensaver_status = 0
       _screensaver_timer_cb()
+
+def fps_set(fps):
+   ecore.animator_frametime_set(1.0 / float(fps))
 
 ### audio info/controls notify
 _audio_notify = None

@@ -276,6 +276,13 @@ def _general_populate(browser, url):
    standard_item_string_from_list('mediaplayer', 'backend', 'Multimedia engine',
                                   L, 'icon/evas')
 
+   L = ['10', '20', '30', '60', '120']
+   standard_item_string_from_list('general', 'fps', 'Frames per second',
+                                  L, 'icon/evas', cb = _change_fps)
+
+def _change_fps():
+   gui.fps_set(ini.get_int('general', 'fps'))
+
 def _change_scale():
    def _bigger(dialog): gui.scale_bigger(); _save()
    def _smaller(dialog): gui.scale_smaller(); _save()

@@ -434,6 +434,32 @@ class EmcDialog(edje.Edje):
       elif selected_cb:
          selected_cb(button)
 
+   def scroll_by(self, sx=0, sy=0, animated=True, restart=False):
+      if self._scroller:
+         x, y, w, h = old_region = self._scroller.region
+         if animated:
+            self._scroller.region_bring_in(x + sx, y + sy, w, h)
+         else:
+            self._scroller.region_show(x + sx, y + sy, w, h)
+
+         if restart and old_region == self._scroller.region:
+            self._scroller.region_show(0, 0, w, h)
+
+   def autoscroll_enable(self):
+      self._autoscroll_amount = 0.0
+      ecore.Animator(self._autoscroll_animator_cb)
+
+   def _autoscroll_animator_cb(self):
+      if self.is_deleted():
+         return ecore.ECORE_CALLBACK_CANCEL
+
+      self._autoscroll_amount += ecore.animator_frametime_get() * 30.0
+      if self._autoscroll_amount >= 1.0:
+         self.scroll_by(0, int(self._autoscroll_amount), False, True)
+         self._autoscroll_amount = 0.0
+
+      return ecore.ECORE_CALLBACK_RENEW
+
    def _input_event_cb(self, event):
 
       if not self.visible:
@@ -446,7 +472,7 @@ class EmcDialog(edje.Edje):
             self.delete()
          return input_events.EVENT_BLOCK
 
-      # if content is elm List or Genlist then automanage the events
+      # if content is List or Genlist then automanage the events
       if self._list or (self._content and type(self._content) in (elementary.List, elementary.Genlist)):
          list = self._list or self._content
          item = list.selected_item_get()
@@ -476,11 +502,9 @@ class EmcDialog(edje.Edje):
       # try to scroll the text entry
       if self._scroller:
          if event == 'UP':
-            x, y, w, h = self._scroller.region
-            self._scroller.region_bring_in(x, y - 100, w, h)
+            self.scroll_by(0, -100)
          if event == 'DOWN':
-            x, y, w, h = self._scroller.region
-            self._scroller.region_bring_in(x, y + 100, w, h)
+            self.scroll_by(0, +100)
 
       # focus between buttons
       if self._buttons:

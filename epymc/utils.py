@@ -22,7 +22,10 @@ import os
 import urllib
 import tempfile
 
-import ecore.file
+try:
+   from efl.ecore import FileDownload, Exe, ECORE_EXE_PIPE_READ, ECORE_EXE_PIPE_READ_LINE_BUFFERED
+except:
+   import ecore.file.download as FileDownload
 
 
 def DBG(msg):
@@ -217,8 +220,10 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
    dwl_data = (complete_cb, progress_cb, min_size)
 
    # start the download
-   return ecore.file.download(encoded, dest, _cb_download_complete,
-               _cb_download_progress, dwl_data = dwl_data, *args, **kargs)
+   # return ecore.file.download(encoded, dest, _cb_download_complete,
+               # _cb_download_progress, dwl_data = dwl_data, *args, **kargs)
+   return FileDownload(encoded, dest, _cb_download_complete,
+                  _cb_download_progress, dwl_data = dwl_data, *args, **kargs)
 
 def download_abort(dwl_handler):
    ecore.file.download_abort(dwl_handler)
@@ -250,8 +255,7 @@ class EmcExec(object):
       self.grab_output = grab_output
       self.outbuffer = ''
       if grab_output:
-         self.exe = ecore.Exe(cmd, ecore.ECORE_EXE_PIPE_READ |
-                                   ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
+         self.exe = Exe(cmd, ECORE_EXE_PIPE_READ | ECORE_EXE_PIPE_READ_LINE_BUFFERED)
          self.exe.on_data_event_add(self.data_cb)
       else:
          self.exe = ecore.Exe(cmd)

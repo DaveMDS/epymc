@@ -18,8 +18,10 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-import ecore
-import ecore.x
+try:
+   from efl import ecore
+except:
+   import ecore, ecore.x
 
 from epymc.modules import EmcModule
 import epymc.input_events as input_events
@@ -73,7 +75,9 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def __init__(self):
       DBG('Init module')
-      self.handler = ecore.x.on_key_down_add(self._cb_key_down)
+      # TODO FIXME
+      # self.handler = ecore.x.on_key_down_add(self._cb_key_down)
+      self.handler = None
 
    def __shutdown__(self):
       DBG('Shutdown module')

@@ -22,7 +22,13 @@
 import os, re, time
 import threading, Queue
 
-import ecore, evas, elementary
+try:
+   from efl import ecore, evas, elementary
+   from efl.elementary.image import Image
+   from efl.elementary.list import List
+except:
+   import ecore, evas, elementary
+   from elementary import Image, List
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
@@ -417,7 +423,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
 ###### INFO PANEL STUFF
    def show_film_info(self, url):
-      image = elementary.Image(gui.win)
+      image = Image(gui.win)
       image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       image.show()
@@ -509,7 +515,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                images_big.append(image['image'])
 
          # show the list in a dialog
-         li = elementary.List(gui.win)
+         li = List(gui.win)
          li.horizontal = True
          li.style_set('image_list')
          li.focus_allow_set(False)
@@ -574,7 +580,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                images_big.append(image['image'])
 
          # show the list in a dialog
-         li = elementary.List(gui.win)
+         li = List(gui.win)
          li.focus_allow_set(False)
          li.style_set('image_list')
          count = 0

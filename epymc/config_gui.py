@@ -20,7 +20,10 @@
 
 from operator import itemgetter, attrgetter
 
-import evas
+try:
+   from efl import evas
+except:
+   import evas
 
 import gui
 import mainmenu
@@ -272,7 +275,7 @@ def _general_populate(browser, url):
       L.append('opengl_x11')
    standard_item_string_from_list('general', 'evas_engine', 'Rendering engine',
                                   L, 'icon/evas')
-   L = ['gstreamer', 'xine', 'generic']
+   L = ['gstreamer', 'xine', 'generic', 'vlc']
    standard_item_string_from_list('mediaplayer', 'backend', 'Multimedia engine',
                                   L, 'icon/evas')
 

@@ -19,7 +19,12 @@
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
 
-import os, Queue, threading, ecore
+import os, Queue, threading
+
+try:
+   from efl import ecore
+except:
+   import ecore
 
 from epymc.modules import EmcModule
 import epymc.input_events as input_events

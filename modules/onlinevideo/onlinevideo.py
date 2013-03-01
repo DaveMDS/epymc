@@ -23,7 +23,10 @@ import os
 import ConfigParser
 import ast
 
-import evas, elementary
+try:
+   from efl import evas, elementary
+except:
+   import evas, elementary
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass

@@ -287,6 +287,7 @@ elif STATE == 3:
       playUrl(L[0])
 
 
+   sys.exit(0)
    # now make the list of related videos
    print "ADSASDASDAS"
    url = 'http://gdata.youtube.com/feeds/api/videos/%s/related?v=2&alt=jsonc' % (video_id)

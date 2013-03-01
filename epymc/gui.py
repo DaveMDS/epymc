@@ -20,8 +20,16 @@
 
 import os, time, re
 
-import evas, ecore, edje, elementary
-import ecore.x #used only to show/hide the cursor
+try:
+   from efl import evas, ecore, edje, elementary
+   from efl.elementary.window import Window
+   from efl.elementary.layout import Layout
+   from efl.elementary.icon import Icon
+   from efl.elementary.image import Image
+except:
+   import evas, ecore, edje, elementary
+   import ecore.x #used only to show/hide the cursor
+   from elementary import Window, Layout, Icon, Image
 
 import utils, ini, gui, events, input_events
 from widgets import EmcButton, EmcDialog, EmcNotify, EmcRemoteImage
@@ -83,12 +91,12 @@ def init():
    # create the elm window
    try:
       elementary.preferred_engine_set(evas_engine)
-      win = elementary.Window('epymc', elementary.ELM_WIN_BASIC)
+      win = Window('epymc', elementary.ELM_WIN_BASIC)
       LOG('inf', 'Using evas engine: ' + evas_engine)
       ret = 1
    except:
       elementary.preferred_engine_set('software_x11')
-      win = elementary.Window('epymc', elementary.ELM_WIN_BASIC)
+      win = Window('epymc', elementary.ELM_WIN_BASIC)
       LOG('err', 'Falling back to standard_x11')
       ret = 2
 
@@ -98,10 +106,14 @@ def init():
    if fullscreen == 'True':
       win.fullscreen_set(1)
    # get the X window object, we need it to show/hide the mouse cursor
-   xwin = ecore.x.Window_from_xid(win.xwindow_xid_get())
+   try:
+      xwin = ecore.x.Window_from_xid(win.xwindow_xid_get())
+   except:
+      LOG('inf', 'ecore.x not available. Cannot hide / show the mouse pointer')
+      xwin = None
 
    # main layout (main theme)
-   layout = elementary.Layout(win)
+   layout = Layout(win)
    layout.file_set(theme_file, 'emc/main/layout')
    layout.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
    win.resize_object_add(layout)
@@ -181,9 +193,9 @@ def load_icon(icon):
          can be a theme icon (ex: icon/folder).
    see icons.edc for all the existing icon
    """
-   if type(icon) in (elementary.Icon, elementary.Image, EmcRemoteImage):
+   if type(icon) in (Icon, Image, EmcRemoteImage):
       return icon
-   ic = elementary.Icon(gui.win)
+   ic = Icon(gui.win)
    if icon[0] == '/':
       ic.file_set(icon)
    else:
@@ -202,7 +214,7 @@ def load_image(name, path = None):
    LOG('dbg', 'Requested image: ' + str(name))
    LOG('dbg', 'Extra path: ' + str(path))
 
-   im = elementary.Image(gui.win)
+   im = Image(gui.win)
 
    # if it's a full path just load it
    if os.path.exists(name):
@@ -275,7 +287,7 @@ def background_set(image):
    global backdrop_im
 
    if not backdrop_im:
-      backdrop_im = elementary.Image(gui.win)
+      backdrop_im = Image(gui.win)
       backdrop_im.fill_outside_set(True)
       swallow_set('bg.swallow.backdrop1', backdrop_im)
 
@@ -286,9 +298,11 @@ def mouse_hide():
    
    if not _mouse_visible: return
 
-   xwin.cursor_hide()
-   _last_mouse_pos = xwin.pointer_xy_get()
-   xwin.pointer_warp(2, 2)
+   if xwin is not None:
+      xwin.cursor_hide()
+      _last_mouse_pos = xwin.pointer_xy_get()
+      xwin.pointer_warp(2, 2)
+
    _mouse_visible = False
    _mouse_skip_next = True
 
@@ -304,8 +318,10 @@ def mouse_show():
       _mouse_skip_next = False
       return
 
-   xwin.pointer_warp(*_last_mouse_pos)
-   xwin.cursor_show()
+   if xwin is not None:
+      xwin.pointer_warp(*_last_mouse_pos)
+      xwin.cursor_show()
+
    _mouse_visible = True
 
 def renew_screensaver():

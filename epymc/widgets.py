@@ -19,16 +19,33 @@
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import evas, ecore, edje, elementary
+try:
+   from efl import evas, ecore, edje, elementary
+   from efl.elementary.button import Button
+   from efl.elementary.menu import Menu
+   from efl.elementary.image import Image
+   from efl.elementary.list import List
+   from efl.elementary.genlist import Genlist, GenlistItemClass
+   from efl.elementary.progressbar import Progressbar
+   from efl.elementary.box import Box
+   from efl.elementary.entry import Entry
+   from efl.elementary.scroller import Scroller
+   from efl.elementary.frame import Frame
+   from efl.elementary.table import Table
+except:
+   import evas, ecore, edje, elementary
+   from elementary import Button, Menu, Image, List, Progressbar, Box, entry
+   from elementary import GenList, GenlistItemClass, Scroller, Frame, Table
+
 import utils, gui, input_events
 
 
 ################################################################################
-class EmcButton(elementary.Button):
+class EmcButton(Button):
    """ TODO documentation """
 
    def __init__(self, label = None, icon = None):
-      elementary.Button.__init__(self, gui.layout)
+      Button.__init__(self, gui.layout)
       self.style_set('emc')
       self.focus_allow_set(False)
       if label: self.text_set(label)
@@ -36,11 +53,11 @@ class EmcButton(elementary.Button):
       self.show()
 
 ################################################################################
-class EmcMenu(elementary.Menu):
+class EmcMenu(Menu):
    """ TODO doc this """
 
    def __init__(self, relto = None):
-      elementary.Menu.__init__(self, gui.layout)
+      Menu.__init__(self, gui.layout)
       self.style_set('emc')
       if relto:
          # TODO better pos calc
@@ -52,13 +69,13 @@ class EmcMenu(elementary.Menu):
       self.show()
 
    def item_add(self, parent = None, label = None, icon = None, callback = None, *args, **kwargs):
-      item = elementary.Menu.item_add(self, parent, label, icon, self._item_selected_cb, callback, *args, **kwargs)
+      item = Menu.item_add(self, parent, label, icon, self._item_selected_cb, callback, *args, **kwargs)
       if self.selected_item_get() is None:
          item.selected_set(True)
 
    def close(self):
       input_events.listener_del("EmcMenu")
-      elementary.Menu.close(self)
+      Menu.close(self)
 
    def _item_selected_cb(self, menu, item, cb, *args, **kwargs):
       input_events.listener_del("EmcMenu")
@@ -106,26 +123,26 @@ class EmcMenu(elementary.Menu):
       return input_events.EVENT_CONTINUE
 
 ################################################################################
-class EmcRemoteImage(elementary.Image):
+class EmcRemoteImage(Image):
    """ TODO documentation """
    """ TODO on image_set abort the download ? """
 
    def __init__(self, url = None, dest = None):
-      elementary.Image.__init__(self, gui.layout)
+      Image.__init__(self, gui.layout)
       self.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       self.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       self.on_move_add(self._cb_move_resize)
       self.on_resize_add(self._cb_move_resize)
-      self._spinner = elementary.Progressbar(gui.layout)
+      self._spinner = Progressbar(gui.layout)
       self._spinner.style_set('wheel')
       if url: self.url_set(url, dest)
 
    def show(self):
-      elementary.Image.show(self)
+      Image.show(self)
 
    def hide(self):
       self._spinner.hide()
-      elementary.Image.hide(self)
+      Image.hide(self)
 
    def url_set(self, url, dest = None):
       if dest and os.path.exists(dest):
@@ -216,7 +233,7 @@ class EmcDialog(edje.Edje):
          self.signal_emit('emc,dialog,title,show', 'emc')
 
       # vbox
-      self._vbox = elementary.Box(gui.win)
+      self._vbox = Box(gui.win)
       self._vbox.horizontal_set(False)
       self._vbox.size_hint_align_set(evas.EVAS_HINT_FILL, 0.0)
       self._vbox.size_hint_weight_set(evas.EVAS_HINT_EXPAND, 0.0)
@@ -225,7 +242,7 @@ class EmcDialog(edje.Edje):
 
       # if both text and content given then put them side by side
       if text and content:
-         hbox = elementary.Box(gui.win)
+         hbox = Box(gui.win)
          hbox.horizontal_set(True)
          hbox.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
          hbox.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
@@ -234,7 +251,7 @@ class EmcDialog(edje.Edje):
       
       # text entry
       if text is not None:
-         self._textentry = elementary.Entry(gui.win)
+         self._textentry = Entry(gui.win)
          self._textentry.style_set('dialog')
          self._textentry.editable_set(False)
          self._textentry.context_menu_disabled_set(True)
@@ -243,7 +260,7 @@ class EmcDialog(edje.Edje):
          self._textentry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
          self._textentry.show()
          
-         self._scroller = elementary.Scroller(gui.win)
+         self._scroller = Scroller(gui.win)
          self._scroller.style_set('dialog')
          self._scroller.focus_allow_set(False)
          self._scroller.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
@@ -258,7 +275,7 @@ class EmcDialog(edje.Edje):
 
       # user content
       if content is not None:
-         frame = elementary.Frame(gui.win)
+         frame = Frame(gui.win)
          frame.style_set('pad_small')
          frame.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
          frame.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
@@ -271,7 +288,7 @@ class EmcDialog(edje.Edje):
 
       # automatic list
       if style == 'list':
-         self._list = elementary.List(gui.win)
+         self._list = List(gui.win)
          self._list.focus_allow_set(False)
          self._list.style_set('dialog')
          self._list.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
@@ -282,7 +299,7 @@ class EmcDialog(edje.Edje):
 
       # spinner
       if spinner:
-         self._spinner = elementary.Progressbar(gui.win)
+         self._spinner = Progressbar(gui.win)
          self._spinner.style_set('wheel')
          self._spinner.pulse(True)
          self._spinner.show()
@@ -473,14 +490,14 @@ class EmcDialog(edje.Edje):
          return input_events.EVENT_BLOCK
 
       # if content is List or Genlist then automanage the events
-      if self._list or (self._content and type(self._content) in (elementary.List, elementary.Genlist)):
+      if self._list or (self._content and type(self._content) in (List, Genlist)):
          list = self._list or self._content
          item = list.selected_item_get()
          if not item:
             item = list.items_get()[0]
 
          horiz = False
-         if type(self._content) is elementary.List:
+         if type(self._content) is List:
             horiz = list.horizontal
 
          if (horiz and event == 'RIGHT') or \
@@ -570,16 +587,16 @@ class EmcSourceSelector(EmcDialog):
    def __init__(self, title = 'Source Selector', done_cb=None, cb_data=None):
       self._selected_cb = done_cb
       self._selected_cb_data = cb_data
-      self._glist = elementary.Genlist(gui.win)
+      self._glist = Genlist(gui.win)
       self._glist.style_set('dialog')
       self._glist.homogeneous_set(True)
       self._glist.select_mode_set(elementary.ELM_OBJECT_SELECT_MODE_ALWAYS)
       self._glist.focus_allow_set(False)
       self._glist.callback_clicked_double_add(self._cb_item_selected)
-      self._glist_itc = elementary.GenlistItemClass(item_style = 'default',
+      self._glist_itc = GenlistItemClass(item_style = 'default',
                                  text_get_func = self._genlist_folder_label_get,
                                  content_get_func = self._genlist_folder_icon_get)
-      self._glist_itc_back = elementary.GenlistItemClass(item_style = 'default',
+      self._glist_itc_back = GenlistItemClass(item_style = 'default',
                                  text_get_func = self._genlist_back_label_get,
                                  content_get_func = self._genlist_back_icon_get)
       
@@ -860,7 +877,7 @@ class EmcVKeyboard(EmcDialog):
       self.current_button = None
 
       # table
-      tb = elementary.Table(gui.win)
+      tb = Table(gui.win)
       tb.homogeneous_set(True)
       tb.show()
 
@@ -868,7 +885,7 @@ class EmcVKeyboard(EmcDialog):
       self.part_text_set('emc.text.title', title or 'Insert text')
 
       # entry
-      self.entry = elementary.Entry(gui.win) # TODO use scrolled_entry instead
+      self.entry = Entry(gui.win) # TODO use scrolled_entry instead
       self.entry.style_set('vkeyboard')
       self.entry.single_line_set(True)
       self.entry.context_menu_disabled_set(True)

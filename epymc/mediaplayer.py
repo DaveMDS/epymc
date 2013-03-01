@@ -19,7 +19,10 @@
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import evas, ecore, edje, elementary, emotion
+try:
+   from efl import evas, ecore, edje, elementary, emotion
+except:
+   import evas, ecore, edje, elementary, emotion
 import utils, ini, gui, input_events, events
 from widgets import EmcFocusManager2, EmcDialog, EmcButton, EmcMenu
 from sdb import EmcDatabase
@@ -161,13 +164,15 @@ def stop():
    _onair_url = None
 
    # delete the emotion object
-   _emotion.delete()
-   del _emotion
-   _emotion = None
+   _emotion.play = False
+   _emotion.position = 0.0
+   
+   # _emotion.delete()
+   # del _emotion
+   # _emotion = None
 
    events.event_emit('PLAYBACK_FINISHED')
 
-   
 
 def forward():
    LOG('dbg', 'Forward cb' + str(_emotion.position))
@@ -300,7 +305,10 @@ def _init_emotion():
 
    backend = ini.get('mediaplayer', 'backend')
    try:
-      _emotion = emotion.Emotion(gui.layout.evas, module_filename=backend)
+      try:
+         _emotion = emotion.Emotion(gui.layout.evas, module_filename=backend)
+      except:
+         _emotion = emotion.Emotion(gui.layout.evas, module_name=backend)
    except:
       EmcDialog(style='error', text='Cannot init emotion engine:<br>'+str(backend))
       return False

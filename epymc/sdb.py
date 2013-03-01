@@ -21,7 +21,10 @@
 import os
 import shelve
 
-import ecore
+try:
+   from efl import ecore
+except:
+   import ecore
 import Queue
 
 import utils

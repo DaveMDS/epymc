@@ -20,7 +20,12 @@
 
 import os, time
 
-import ecore, elementary
+try:
+   from efl import ecore, elementary
+   from efl.elementary.box import Box
+except:
+   import ecore, elementary
+   from elementary import Box
 
 from epymc.modules import EmcModule
 from epymc.widgets import EmcDialog, EmcVKeyboard, EmcSourceSelector
@@ -61,7 +66,10 @@ class MyItemClass(EmcItemClass):
       text += '<b>Graphic engine</b> %s (%s)<br>' % (elementary.engine_get(), elementary.preferred_engine_get())
       text += '<b>base dir</b> %s<br>' % (utils.base_dir_get())
       text += '<b>config dir</b> %s<br>' % (utils.config_dir_get())
-      text += '<b>download available</b> %s<br>' % (ecore.file.download_protocol_available('http://'))
+      try:
+         text += '<b>download available</b> %s<br>' % (ecore.file_download_protocol_available('http://'))
+      except:
+         text += '<b>download available</b> %s<br>' % (ecore.file.download_protocol_available('http://'))
       text += '<b>theme</b> %s<br>' % (ini.get('general', 'theme'))
       text += '<b>theme file</b> %s<br>' % (gui.theme_file)
       return text
@@ -217,10 +225,10 @@ class MyItemClass(EmcItemClass):
 
       # Buttons Theme
       elif url == 'uitests://buttons':
-         vbox0 = elementary.Box(gui.win)
+         vbox0 = Box(gui.win)
          vbox0.show()
 
-         hbox = elementary.Box(gui.win)
+         hbox = Box(gui.win)
          hbox.horizontal_set(True)
          hbox.show()
          vbox0.pack_end(hbox)
@@ -233,7 +241,7 @@ class MyItemClass(EmcItemClass):
          fman = EmcFocusManager2('uitest-buttons')
 
          ### Active buttons
-         vbox = elementary.Box(gui.win)
+         vbox = Box(gui.win)
          vbox.show()
          # label
          b = EmcButton('only label')
@@ -250,7 +258,7 @@ class MyItemClass(EmcItemClass):
          hbox.pack_end(vbox)
 
          ### Disabled buttons
-         vbox = elementary.Box(gui.win)
+         vbox = Box(gui.win)
          vbox.show()
          # label
          b = EmcButton('only label disabled')
@@ -270,7 +278,7 @@ class MyItemClass(EmcItemClass):
          hbox.pack_end(vbox)
 
          # 7 butttons in a row (labels)
-         hbox2 = elementary.Box(gui.win)
+         hbox2 = Box(gui.win)
          hbox2.horizontal_set(True)
          hbox2.show()
          for i in xrange(0,8):
@@ -281,7 +289,7 @@ class MyItemClass(EmcItemClass):
          vbox0.pack_end(hbox2)
 
          # 7 butttons in a row (icons)
-         hbox2 = elementary.Box(gui.win)
+         hbox2 = Box(gui.win)
          hbox2.horizontal_set(True)
          hbox2.show()
          icons = ['icon/star','icon/home','icon/folder']
@@ -292,7 +300,7 @@ class MyItemClass(EmcItemClass):
          vbox0.pack_end(hbox2)
 
          # mediaplayer buttons
-         hbox2 = elementary.Box(gui.win)
+         hbox2 = Box(gui.win)
          hbox2.horizontal_set(True)
          hbox2.show()
          icons = ['icon/fbwd','icon/bwd','icon/stop','icon/play','icon/fwd','icon/ffwd']

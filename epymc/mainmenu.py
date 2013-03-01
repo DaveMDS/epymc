@@ -18,7 +18,10 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-import evas, elementary
+try:
+   from efl import evas, elementary
+except:
+   import evas, elementary
 
 import gui
 import mainmenu

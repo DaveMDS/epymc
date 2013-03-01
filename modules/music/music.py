@@ -22,7 +22,10 @@ import os
 import operator
 import threading
 
-import ecore
+try:
+   from efl import ecore
+except:
+   import ecore
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass

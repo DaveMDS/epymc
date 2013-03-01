@@ -18,9 +18,14 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-import evas
-import ecore
-import elementary
+try:
+   from efl import evas, ecore, elementary
+   from efl.elementary.genlist import Genlist, GenlistItem, GenlistItemClass
+   from efl.elementary.gengrid import Gengrid, GengridItem, GengridItemClass
+except:
+   import evas, ecore, elementary
+   from elementary import Genlist, GenlistItem, GenlistItemClass
+   from elementary import Gengrid, GengridItem, GengridItemClass
 
 import gui
 import mainmenu
@@ -379,10 +384,10 @@ class ViewList(object):
       self.gl2.callback_selected_add(self._cb_item_hilight)
 
       # genlist item class
-      self.itc = elementary.GenlistItemClass(item_style = 'default',
-                                 text_get_func = self.__genlist_label_get,
-                                 content_get_func = self.__genlist_icon_get,
-                                 state_get_func = self.__genlist_state_get)
+      self.itc = GenlistItemClass(item_style = 'default',
+                                  text_get_func = self.__genlist_label_get,
+                                  content_get_func = self.__genlist_icon_get,
+                                  state_get_func = self.__genlist_state_get)
 
       # RemoteImage (poster)
       self.__im = EmcRemoteImage()
@@ -391,7 +396,7 @@ class ViewList(object):
    def page_show(self, title, anim):
       """
       This function is called everytime a new page need to be showed.
-      The 'dir' param tell you direction of the browse:
+      The 'anim' param tell you direction of the browse:
          can be: ANIM_NONE, ANIM_BACK or ANIM_FORWARD
         -1 means we are going back (
          1 means forward
@@ -562,12 +567,12 @@ class ViewGrid(object):
       """ TODO Function doc """
       DBG('Init view: grid')
 
-      self.itc = elementary.GengridItemClass(item_style='default',
-                                       text_get_func=self.gg_label_get,
-                                       content_get_func=self.gg_icon_get,
-                                       state_get_func=self.gg_state_get,
-                                       del_func=self.gg_del)
-      gg = elementary.Gengrid(gui.win)
+      self.itc = GengridItemClass(item_style='default',
+                                  text_get_func=self.gg_label_get,
+                                  content_get_func=self.gg_icon_get,
+                                  state_get_func=self.gg_state_get,
+                                  del_func=self.gg_del)
+      gg = Gengrid(gui.win)
       gg.style_set('browser')
       gg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       gg.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)

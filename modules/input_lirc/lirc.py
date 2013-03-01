@@ -20,8 +20,10 @@
 
 from socket import *
 
-import ecore
-import elementary
+try:
+   from efl import ecore, elementary
+except:
+   import ecore, elementary
 
 from epymc.modules import EmcModule
 import epymc.input_events as input_events

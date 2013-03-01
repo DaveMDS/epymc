@@ -20,7 +20,10 @@
 
 import sys, os
 
-import evas, ecore, ecore.file, edje, elementary, emotion
+try:
+   from efl import evas, ecore, edje, elementary, emotion
+except:
+   import evas, ecore, ecore.file, edje, elementary, emotion
 
 import epymc.modules as modules
 import epymc.utils as utils
@@ -55,9 +58,15 @@ def main():
    ini.setup_defaults()
 
    # alert if CURL support not available (no download ability)
-   if not ecore.file.download_protocol_available('http://'):
-      print('ERROR. Ecore does not have CURL support.')
-      return 2
+   try:
+      if not ecore.file_download_protocol_available('http://'):
+         print('ERROR. Ecore does not have CURL support.')
+         return 2
+   except:
+      if not ecore.file.download_protocol_available('http://'):
+         print('ERROR. Ecore does not have CURL support.')
+         return 2
+
 
    # init stuff
    sdb.init()

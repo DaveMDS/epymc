@@ -23,7 +23,10 @@
 
 import struct
 
-import ecore
+try:
+   from efl import ecore
+except:
+   import ecore
 
 from epymc.modules import EmcModule
 from epymc.widgets import EmcDialog, EmcVKeyboard

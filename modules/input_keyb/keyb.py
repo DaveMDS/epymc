@@ -25,10 +25,11 @@ except:
 
 from epymc.modules import EmcModule
 import epymc.input_events as input_events
+import epymc.gui as gui
 
 
 def DBG(msg):
-   #~ print('KEYB: ' + msg)
+   # print('KEYB: ' + msg)
    pass
 
 
@@ -75,15 +76,16 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def __init__(self):
       DBG('Init module')
-      # TODO FIXME
       # self.handler = ecore.x.on_key_down_add(self._cb_key_down)
-      self.handler = None
+      # self.handler = None
+      gui.win.on_key_down_add(self._cb_key_down)
 
    def __shutdown__(self):
       DBG('Shutdown module')
-      if self.handler: self.handler.delete()
+      # if self.handler: self.handler.delete()
+      gui.win.on_key_down_del(self._cb_key_down)
 
-   def _cb_key_down(self, event):
+   def _cb_key_down(self, win, event):
       DBG('Key: ' + event.key)
       if _mapping.has_key(event.key):
          input_events.event_emit(_mapping[event.key])

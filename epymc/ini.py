@@ -33,14 +33,14 @@ def read_from_files(files):
 
 def write_to_file(file):
    print('Writing config to file: ' + file)
-   with open(file, 'wb') as configfile:
+   with open(file, 'w') as configfile:
       _config.write(configfile)
 
 def setup_defaults():
    s = 'general'
    add_section(s)
    if not _config.has_option(s, 'show_mature_contents'):
-      _config.set(s, 'show_mature_contents', False)
+      _config.set(s, 'show_mature_contents', 'False')
 
 def add_section(section):
    if not _config.has_section(section):
@@ -93,7 +93,7 @@ def get_string(section, option):
    return str(_config.get(section, option))
 
 def set(section, option, value):
-   _config.set(section, option, value)
+   _config.set(section, option, str(value))
 
 def set_string_list(section, option, values, separator = ' '):
    string = separator.join(values)

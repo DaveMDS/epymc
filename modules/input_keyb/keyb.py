@@ -76,13 +76,10 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def __init__(self):
       DBG('Init module')
-      # self.handler = ecore.x.on_key_down_add(self._cb_key_down)
-      # self.handler = None
       gui.win.on_key_down_add(self._cb_key_down)
 
    def __shutdown__(self):
       DBG('Shutdown module')
-      # if self.handler: self.handler.delete()
       gui.win.on_key_down_del(self._cb_key_down)
 
    def _cb_key_down(self, win, event):

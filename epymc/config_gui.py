@@ -214,7 +214,7 @@ def root_item_del(name):
    for (_name, _label, _weight, _ic, _cb) in _root_items:
       if _name == name:
          _root_items.remove((_name, _label, _weight, _ic, _cb))
-      if _root_items_dict.has_key(_name):
+      if _name in _root_items_dict:
          del _root_items_dict[_name]
 
 def standard_item_bool_add(section, option, label, icon = None, info = None, cb = None):

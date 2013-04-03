@@ -258,7 +258,7 @@ and what it need to work well, can also use markup like <title>this</> or
       for dir in MameModule._rompaths:
          for rom in os.listdir(dir):
             id = rom.strip('.zip')
-            if id and self._games.has_key(id):
+            if id and id in self._games:
                L.append(self._games[id])
 
       for game in sorted(L, key=operator.attrgetter('name')):
@@ -273,7 +273,7 @@ and what it need to work well, can also use markup like <title>this</> or
    def populate_favgames_page(self, browser, page_url):
       """ Create the list of favorite games """
       for gid in MameModule._favorites:
-         if self._games.has_key(gid):
+         if gid in self._games:
             game = self._games[gid]
             self._browser.item_add(GameItemClass(), gid, game)
 
@@ -295,7 +295,7 @@ and what it need to work well, can also use markup like <title>this</> or
       """ Create the list of games in a given cat """
       cat_name = url[12:]
       for gid in MameModule._categories[cat_name]:
-         if self._games.has_key(gid):
+         if gid in self._games:
             self._browser.item_add(GameItemClass(), gid, self._games[gid])
 
    def _parse_cats_file(self):
@@ -324,7 +324,7 @@ and what it need to work well, can also use markup like <title>this</> or
                state = 2
             else:
                (game_id, cat) = stripped.split('=')
-               if MameModule._categories.has_key(cat):
+               if cat in MameModule._categories:
                   MameModule._categories[cat].append(game_id)
                else:
                   MameModule._categories[cat] = [game_id]

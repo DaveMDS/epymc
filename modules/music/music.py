@@ -147,7 +147,7 @@ class SongItemClass(EmcItemClass):
       poster = os.path.join(path, 'cover.jpg')
       if os.path.exists(poster): return poster
 
-      if not song.has_key('artist') or not song.has_key('album'):
+      if not 'artist' in song or not 'album' in song:
          return None
 
       # search "<Artist> - <Album>.jpg"
@@ -163,11 +163,11 @@ class SongItemClass(EmcItemClass):
 
    def info_get(self, url, song):
       text = '<hilight>' + song['title'] + '</><br>'
-      if song.has_key('artist'):
+      if 'artist' in song:
          text += '<em>by ' + song['artist'] + '</><br>'
-      if song.has_key('album'):
+      if 'album' in song:
          text += 'from ' + song['album'] + '<br>'
-      if song.has_key('length'):
+      if 'length' in song:
          length = int(song['length']) / 1000
          min = length / 60
          sec = length % 60
@@ -214,7 +214,7 @@ class AlbumItemClass(EmcItemClass):
       lenght = 0
       for song in album['songs']:
          song_data = _mod._songs_db.get_data(song)
-         if song_data.has_key('length'):
+         if 'length' in song_data:
             lenght += int(song_data['length'])
       text += ', ' + str(lenght / 60000) + ' min.'
       return text
@@ -396,9 +396,9 @@ and what it need to work well, can also use markup like <title>this</> or
          if len(self._play_queue) > 0:
             song = self._songs_db.get_data(self._play_queue[0])
             text = '<hilight>' + song['title'] + '</><br>'
-            if song.has_key('artist'):
+            if 'artist' in song:
                text += '<em>by ' + song['artist'] + '</><br>'
-            if song.has_key('album'):
+            if 'album' in song:
                text += 'from ' + song['album'] + '<br>'
             gui.audio_controls_show(text = text)
          # update the browser view
@@ -537,12 +537,12 @@ class UpdateDBThread(threading.Thread):
 
       item_data['url'] = 'file://' + full_path
 
-      if meta.has_key('title'):
+      if 'title' in meta:
          item_data['title'] = meta['title'][0].encode('utf-8') # TODO is the encode correct? doesn't evas support unicode now??
       else:
          item_data['title'] = full_path # TODO just file name
 
-      if meta.has_key('artist'):
+      if 'artist' in meta:
          item_data['artist'] = meta['artist'][0].encode('utf-8')
 
          # create artist item if necessary
@@ -561,7 +561,7 @@ class UpdateDBThread(threading.Thread):
             artist_data['songs'].append('file://' + full_path)
 
          # add album to albums list (in artist), only if not exist yet
-         if meta.has_key('album') and not meta['album'] in artist_data['albums']:
+         if 'album' in meta and not meta['album'] in artist_data['albums']:
             artist_data['albums'].append(meta['album'])
 
          # write artist to db
@@ -579,10 +579,10 @@ class UpdateDBThread(threading.Thread):
       except:
          pass
 
-      if meta.has_key('length'):
+      if 'length' in meta:
          item_data['length'] = meta['length'][0].encode('utf-8')
 
-      if meta.has_key('album'):
+      if 'album' in meta:
          item_data['album'] = meta['album'][0].encode('utf-8')
 
          # create album item if necesary

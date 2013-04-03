@@ -89,7 +89,7 @@ def list_get():
    return EmcModule.__subclasses__()
 
 def is_enabled(name):
-   return _instances.has_key(name)
+   return name in _instances
 
 def init_by_name(name):
    for mod in EmcModule.__subclasses__():
@@ -118,7 +118,7 @@ def save_enabled():
    ini.set('general', 'modules', ' '.join(_instances.keys()))
 
 def shutdown_by_name(name):
-   if _instances.has_key(name):
+   if name in _instances:
       _instances[name].__shutdown__()
       del _instances[name]
 

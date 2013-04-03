@@ -87,7 +87,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def _cb_key_down(self, win, event):
       DBG('Key: ' + event.key)
-      if _mapping.has_key(event.key):
+      if event.key in _mapping:
          input_events.event_emit(_mapping[event.key])
       else:
          print('Unhandled key: ' + event.key)

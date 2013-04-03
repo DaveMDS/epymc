@@ -328,7 +328,7 @@ class EmcBrowser(object):
       return input_events.EVENT_BLOCK
 
    def _create_or_get_view(self, view_name):
-      if _views.has_key(view_name):
+      if view_name in _views:
          DBG('View exists: ' + view_name)
          return _views[view_name]
       # call the constructor of the given class style ex: ViewList()

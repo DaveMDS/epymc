@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import os
 import shelve
 
@@ -44,7 +45,8 @@ class EmcDatabase(object):
    """ TODO doc this """
 
    def __init__(self, name):
-      file = os.path.join(utils.config_dir_get(), 'db_' + name)
+      file = os.path.join(utils.config_dir_get(),
+                          'db_py%d_%s' %(sys.version_info[0], name))
       DBG('Open db: ' + name + ' from file: ' + file)
       self._sh = shelve.open(file)
       self._name = name

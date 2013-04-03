@@ -60,7 +60,7 @@ ICON("fbwd")
 
 
 // Those should go in a module specific edc...
-ICON("film")
+ICON("movie")
 ICON("mame")
 ICON("music")
 ICON("joystick")

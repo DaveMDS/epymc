@@ -20,7 +20,12 @@
 
 
 import os, re, time
-import threading, Queue
+import threading
+
+try:
+   import queue as Queue
+except:
+   import Queue
 
 try:
    from efl import ecore, evas, elementary
@@ -49,7 +54,7 @@ import epymc.config_gui as config_gui
 from pprint import pprint
 import pdb
 def DBG(msg):
-   print('FILM: %s' % (msg))
+   print('MOVIES: %s' % (msg))
    # pass
 
 
@@ -67,7 +72,7 @@ DEFAULT_BADWORDS_REGEXP = '\[.*?\] {.*?} \. -'
 DEFAULT_MOVIE_REGEXP = '^(?P<name>.*?)(\((?P<year>[0-9]*)\))?$'
 """ in a more readable form:
 ^                            # start of the string
-(?P<name>.*?)                # the name of the film  -  captured
+(?P<name>.*?)                # the name of the movie  -  captured
 (?:\((?P<year>[0-9]*)\))?    # the year, must be within ( and )  -  captured
 $                            # end of the string
 """
@@ -79,7 +84,7 @@ class AddSourceItemClass(EmcItemClass):
 
    def selector_cb(self, fullpath, mod):
       mod._folders.append(fullpath)
-      ini.set_string_list('film', 'folders', mod._folders, ';')
+      ini.set_string_list('movies', 'folders', mod._folders, ';')
       mod._browser.refresh(hard=True)
 
    def label_get(self, url, mod):
@@ -88,14 +93,14 @@ class AddSourceItemClass(EmcItemClass):
    def icon_get(self, url, mod):
       return 'icon/plus'
 
-class FilmItemClass(EmcItemClass):
+class MovieItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod.show_film_info(url)
+      mod.show_movie_info(url)
 
    def label_get(self, url, mod):
       try:
-         assert ini.get('film', 'db_names_in_list') == 'True'
-         return mod._film_db.get_data(url)['name']
+         assert ini.get('movies', 'db_names_in_list') == 'True'
+         return mod._movie_db.get_data(url)['name']
       except:
          return os.path.basename(url)
 
@@ -110,22 +115,22 @@ class FilmItemClass(EmcItemClass):
       return self.poster_get(url, mod)
 
    def poster_get(self, url, mod):
-      if mod._film_db.id_exists(url):
-         e = mod._film_db.get_data(url)
+      if mod._movie_db.id_exists(url):
+         e = mod._movie_db.get_data(url)
          poster = get_poster_filename(e['id'])
          if os.path.exists(poster):
             return poster
 
    def fanart_get(self, url, mod):
-      if mod._film_db.id_exists(url):
-         e = mod._film_db.get_data(url)
+      if mod._movie_db.id_exists(url):
+         e = mod._movie_db.get_data(url)
          fanart = get_backdrop_filename(e['id'])
          if os.path.exists(fanart):
             return fanart
 
    def info_get(self, url, mod):
-      if mod._film_db.id_exists(url):
-         e = mod._film_db.get_data(url)
+      if mod._movie_db.id_exists(url):
+         e = mod._movie_db.get_data(url)
          country = ''
          if len(e['countries']) > 0:
             country = e['countries'][0]['code']
@@ -137,7 +142,7 @@ class FilmItemClass(EmcItemClass):
                 e['rating'], mod._get_director(e),
                 mod._get_cast(e, 4))
       else:
-         name, year = get_film_name_from_url(url)
+         name, year = get_movie_name_from_url(url)
          text = '<title>%s</><br>' \
                 '<hilight>Size:</> %s<br>' \
                 '<hilight>Name:</> %s<br>' \
@@ -160,17 +165,17 @@ class FolderItemClass(EmcItemClass):
       return 'icon/folder'
 
 
-class FilmsModule(EmcModule):
-   name = 'films'
-   label = 'Films'
-   icon = 'icon/film'
-   info = """Long info for the film module, explain what it does and what it 
+class MoviesModule(EmcModule):
+   name = 'movies'
+   label = 'Movies'
+   icon = 'icon/movie'
+   info = """Long info for the movies module, explain what it does and what it 
 need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    _browser = None
    _exts = None        # list of allowed extensions
-   _film_db = None     # key: film_url  data: dictionary as of the tmdb api
-   _person_db = None   # key: ?????     data: dictionary as of the tmdb api
+   _movie_db = None    # key: movie_url  data: dictionary as of the tmdb api
+   _person_db = None   # key: ?????      data: dictionary as of the tmdb api
 
    _generator = None
    _idler = None      # EcoreIdler
@@ -182,53 +187,53 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       DBG('Init module')
 
       # create config ini section if not exists, with defaults
-      ini.add_section('film')
-      if not ini.has_option('film', 'enable_scanner'):
-         ini.set('film', 'enable_scanner', 'False')
-      if not ini.has_option('film', 'extensions'):
-         ini.set('film', 'extensions', DEFAULT_EXTENSIONS)
-      if not ini.has_option('film', 'badwords'):
-         ini.set('film', 'badwords', DEFAULT_BADWORDS)
-      if not ini.has_option('film', 'badwords_regexp'):
-         ini.set('film', 'badwords_regexp', DEFAULT_BADWORDS_REGEXP)
-      if not ini.has_option('film', 'tmdb_retry_days'):
-         ini.set('film', 'tmdb_retry_days', '3')
-      if not ini.has_option('film', 'movie_regexp'):
-         ini.set('film', 'movie_regexp', DEFAULT_MOVIE_REGEXP)
-      if not ini.has_option('film', 'info_lang'):
-         ini.set('film', 'info_lang', DEFAULT_INFO_LANG)
-      if not ini.has_option('film', 'db_names_in_list'):
-         ini.set('film', 'db_names_in_list', 'True')
+      ini.add_section('movies')
+      if not ini.has_option('movies', 'enable_scanner'):
+         ini.set('movies', 'enable_scanner', 'False')
+      if not ini.has_option('movies', 'extensions'):
+         ini.set('movies', 'extensions', DEFAULT_EXTENSIONS)
+      if not ini.has_option('movies', 'badwords'):
+         ini.set('movies', 'badwords', DEFAULT_BADWORDS)
+      if not ini.has_option('movies', 'badwords_regexp'):
+         ini.set('movies', 'badwords_regexp', DEFAULT_BADWORDS_REGEXP)
+      if not ini.has_option('movies', 'tmdb_retry_days'):
+         ini.set('movies', 'tmdb_retry_days', '3')
+      if not ini.has_option('movies', 'movie_regexp'):
+         ini.set('movies', 'movie_regexp', DEFAULT_MOVIE_REGEXP)
+      if not ini.has_option('movies', 'info_lang'):
+         ini.set('movies', 'info_lang', DEFAULT_INFO_LANG)
+      if not ini.has_option('movies', 'db_names_in_list'):
+         ini.set('movies', 'db_names_in_list', 'True')
 
       # get allowed exensions from config
-      self._exts = ini.get_string_list('film', 'extensions')
-      self._idler_retry_after = ini.get_int('film', 'tmdb_retry_days')
+      self._exts = ini.get_string_list('movies', 'extensions')
+      self._idler_retry_after = ini.get_int('movies', 'tmdb_retry_days')
       self._idler_retry_after *= 24 * 60 * 60
 
-      # open film/person database (they are created if not exists)
-      self._film_db = EmcDatabase('film')
+      # open movie/person database (they are created if not exists)
+      self._movie_db = EmcDatabase('movies')
       self._person_db = EmcDatabase('person')
-      self._idler_db = EmcDatabase('filmidlercache')
+      self._idler_db = EmcDatabase('movieidlercache')
 
       # add an item in the mainmenu
       img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
-      mainmenu.item_add('film', 10, 'Movies', img, self.cb_mainmenu)
+      mainmenu.item_add('movies', 10, 'Movies', img, self.cb_mainmenu)
 
        # add an entry in the config gui
-      config_gui.root_item_add('film', 50, 'Movie Collection', icon = 'icon/film',
+      config_gui.root_item_add('movies', 50, 'Movie Collection', icon = 'icon/movie',
                                callback = config_panel_cb)
 
       # create a browser instance
-      self._browser = EmcBrowser('Films', 'List')
+      self._browser = EmcBrowser('Movies', 'List')
 
       # listen to emc events
-      events.listener_add('films', self._events_cb)
+      events.listener_add('movies', self._events_cb)
 
    def __shutdown__(self):
       DBG('Shutdown module')
 
       # stop listening for events
-      events.listener_del('films')
+      events.listener_del('movies')
 
       # kill the idler
       if self._idler:
@@ -238,16 +243,16 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # TODO clean better the idler? abort if a download in process?
 
       # delete mainmenu item
-      mainmenu.item_del('film')
+      mainmenu.item_del('movies')
 
       # delete config menu item
-      config_gui.root_item_del('film')
+      config_gui.root_item_del('movies')
 
       # delete browser
       self._browser.delete()
 
       ## close databases
-      del self._film_db
+      del self._movie_db
       del self._person_db
       del self._idler_db
 
@@ -260,23 +265,23 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          
       # the first time build the generator object 
       if self._generator is None:
-         folders = ini.get_string_list('film', 'folders', ';')
+         folders = ini.get_string_list('movies', 'folders', ';')
          self._generator = utils.grab_files(folders)
-         EmcNotify("Film scanner started")
+         EmcNotify("Movies scanner started")
 
       # get the next file from the generator
       try:
          filename = self._generator.next()
       except StopIteration:
-         EmcNotify("Film scanner done")
-         DBG("Film scanner done")
+         EmcNotify("Movies scanner done")
+         DBG("Movies scanner done")
          self._generator = None
          return ecore.ECORE_CALLBACK_CANCEL
 
       url = 'file://' + filename
 
-      if self._film_db.id_exists(url):
-         DBG('I know this film (skipping):' + url)
+      if self._movie_db.id_exists(url):
+         DBG('I know this movie (skipping):' + url)
          return ecore.ECORE_CALLBACK_RENEW
 
       if self._idler_db.id_exists(url):
@@ -288,8 +293,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       ext = os.path.splitext(filename)[1]
       if ext[1:] in self._exts:
-         tmdb = TMDB(lang = ini.get('film', 'info_lang'))
-         name, year = get_film_name_from_url(url)
+         tmdb = TMDB(lang = ini.get('movies', 'info_lang'))
+         name, year = get_movie_name_from_url(url)
          if year:
             search = name + ' (' + year + ')'
          else:
@@ -304,10 +309,10 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # store the current time in the cache db
          self._idler_db.set_data(self._idler_url, time.time())
       else:
-         # store the result in film db
+         # store the result in movie db
          try:
             url = self._idler_url
-            self._film_db.set_data(url, movie_info)
+            self._movie_db.set_data(url, movie_info)
             text = '<title>New movie:</><br>%s (%s)' % (movie_info['name'], movie_info['released'][:4])
             EmcNotify(text, icon = get_poster_filename(movie_info['id']))
          except:
@@ -322,7 +327,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # delete TMDB2 object
       del tmdb
 
-   def play_film(self, url):
+   def play_movie(self, url):
       counts = mediaplayer.play_counts_get(url)
       if counts['stop_at'] > 0:
          pos = counts['stop_at']
@@ -334,21 +339,21 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                    done_cb = self._dia_yes_cb,
                    canc_cb = self._dia_no_cb)
       else:
-         self.play_film_real(url, 0)
+         self.play_movie_real(url, 0)
 
    def _dia_yes_cb(self, dialog):
       counts = mediaplayer.play_counts_get(dialog.data_get())
-      self.play_film_real(dialog.data_get(), counts['stop_at'])
+      self.play_movie_real(dialog.data_get(), counts['stop_at'])
       dialog.delete()
 
    def _dia_no_cb(self, dialog):
-      self.play_film_real(dialog.data_get(), 0)
+      self.play_movie_real(dialog.data_get(), 0)
       dialog.delete()
 
-   def play_film_real(self, url, start_from):
+   def play_movie_real(self, url, start_from):
       mediaplayer.play_url(url, start_from = start_from)
-      if self._film_db.id_exists(url):
-         e = self._film_db.get_data(url)
+      if self._movie_db.id_exists(url):
+         e = self._movie_db.get_data(url)
          try:
             mediaplayer.title_set(e['name'])
          except:
@@ -363,25 +368,25 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
 ###### BROWSER STUFF
    def cb_mainmenu(self):
-      # get film folders from config
-      self._folders = ini.get_string_list('film', 'folders', ';')
+      # get movies folders from config
+      self._folders = ini.get_string_list('movies', 'folders', ';')
 
       # if not self._folders:
          #TODO alert the user. and instruct how to add folders
 
-      self._browser.page_add('film://root', 'Films', None, self.populate_root_page)
+      self._browser.page_add('movies://root', 'Movies', None, self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
 
       # on idle scan all files (one shoot every time the activity start)
-      if not self._generator and ini.get_bool('film', 'enable_scanner'):
+      if not self._generator and ini.get_bool('movies', 'enable_scanner'):
          self._idler = ecore.Idler(self.idle_cb)
 
    def populate_root_page(self, browser, page_url):
       for f in self._folders:
          self._browser.item_add(FolderItemClass(), f, self)
 
-      self._browser.item_add(AddSourceItemClass(), 'film://add_source', self);
+      self._browser.item_add(AddSourceItemClass(), 'movies://add_source', self);
 
    def populate_url(self, browser, url):
       dirs, files = [], []
@@ -395,7 +400,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       for fname in dirs:
          self._browser.item_add(FolderItemClass(), url + '/' + fname, self)
       for fname in files:
-         self._browser.item_add(FilmItemClass(), url + '/' + fname, self)
+         self._browser.item_add(MovieItemClass(), url + '/' + fname, self)
 
    def _get_director(self,e):
       for person in e['cast']:
@@ -417,12 +422,12 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # TODO: check that we are active and visible
       #       atm, this is fired also when a song end... 
       if event == 'PLAYBACK_FINISHED':
-         # refresh the page (maybe an unwatched film becomes watched)
+         # refresh the page (maybe an unwatched movie becomes watched)
          if self._browser is not None:
             self._browser.refresh()
 
 ###### INFO PANEL STUFF
-   def show_film_info(self, url):
+   def show_movie_info(self, url):
       image = Image(gui.win)
       image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
@@ -431,18 +436,18 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       self._dialog = dialog
       self._current_url = url
-      self.update_film_info(url)
+      self.update_movie_info(url)
 
-   def hide_film_info(self):
+   def hide_movie_info(self):
       self._dialog.delete()
       del self._dialog
 
-   def update_film_info(self, url):
+   def update_movie_info(self, url):
 
       # update buttons
       self._dialog.buttons_clear()
       self._dialog.button_add('Play', self._cb_panel_1)
-      if self._film_db.id_exists(url):
+      if self._movie_db.id_exists(url):
          self._dialog.button_add('Cast', self._cb_panel_2)
          self._dialog.button_add('Poster', self._cb_panel_3)
          self._dialog.button_add('Fanart', self._cb_panel_4)
@@ -450,9 +455,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       o_image = self._dialog.content_get()
 
-      if self._film_db.id_exists(url):
+      if self._movie_db.id_exists(url):
          print('Found: ' + url)
-         e = self._film_db.get_data(url)
+         e = self._movie_db.get_data(url)
 
          # update text info
          self._dialog.title_set(e['name'].encode('utf-8'))
@@ -485,15 +490,15 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
 
    def _cb_panel_1(self, button):
-      self.play_film(self._current_url)
-      self.hide_film_info()
+      self.play_movie(self._current_url)
+      self.hide_movie_info()
 
    def _cb_panel_2(self, button):
-      if self._film_db.id_exists(self._current_url):
-         film_info = self._film_db.get_data(self._current_url)
+      if self._movie_db.id_exists(self._current_url):
+         movie_info = self._movie_db.get_data(self._current_url)
 
          dia = EmcDialog(title = 'Cast', style = 'list')
-         for person in film_info['cast']:
+         for person in movie_info['cast']:
             if person['job'] == 'Actor':
                label = person['name'] + ' as ' + person['character']
                dia.list_item_append(label)
@@ -501,14 +506,14 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
 ######## Choose poster
    def _cb_panel_3(self, button):
-      if self._film_db.id_exists(self._current_url):
-         film_info = self._film_db.get_data(self._current_url)
+      if self._movie_db.id_exists(self._current_url):
+         movie_info = self._movie_db.get_data(self._current_url)
 
          # create a list of posters
          images_thumb = []
          images_big = []
-         pprint(film_info['posters'])
-         for image in film_info['posters']:
+         pprint(movie_info['posters'])
+         for image in movie_info['posters']:
             if image['image']['size'] == 'mid':
                images_thumb.append(image['image'])
             if image['image']['size'] == 'original':
@@ -523,7 +528,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          count = 0 
          for (image_thumb, image_big) in zip(images_thumb, images_big):
             img = EmcRemoteImage(image_thumb['url'])
-            li.item_append('', img, None, None, (image_big['url'], film_info['id']))
+            li.item_append('', img, None, None, (image_big['url'], movie_info['id']))
             count += 1
 
          li.items_get()[0].selected_set(1)
@@ -562,18 +567,18 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self._poster_dialog.delete()
       del self._poster_dialog
 
-      self.update_film_info(self._current_url)
+      self.update_movie_info(self._current_url)
       self._browser.refresh()
 
 ######## Choose fanart
    def _cb_panel_4(self, button):
-      if self._film_db.id_exists(self._current_url):
-         film_info = self._film_db.get_data(self._current_url)
+      if self._movie_db.id_exists(self._current_url):
+         movie_info = self._movie_db.get_data(self._current_url)
 
          # create a list of backdrops
          images_thumb = []
          images_big = []
-         for image in film_info['backdrops']:
+         for image in movie_info['backdrops']:
             if image['image']['size'] == 'thumb':
                images_thumb.append(image['image'])
             elif image['image']['size'] == 'original': # TODO choose better the wanted size
@@ -586,7 +591,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          count = 0
          for (image_thumb, image_big) in zip(images_thumb, images_big):
             img = EmcRemoteImage(image_thumb['url'])
-            li.item_append('', img, None, None, (image_big['url'], film_info['id']))
+            li.item_append('', img, None, None, (image_big['url'], movie_info['id']))
             count += 1
 
          li.items_get()[0].selected_set(1)
@@ -629,10 +634,10 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       else:
          EmcDialog(title = 'Download error !!', style = 'error')
 
-######## Get film info from themoviedb.org
+######## Get movie info from themoviedb.org
    def _cb_panel_5(self, button):
-      tmdb = TMDB_WithGui(lang = ini.get('film', 'info_lang'))
-      name, year = get_film_name_from_url(self._current_url)
+      tmdb = TMDB_WithGui(lang = ini.get('movies', 'info_lang'))
+      name, year = get_movie_name_from_url(self._current_url)
       if year:
          search = name + ' (' + year + ')'
       else:
@@ -641,45 +646,45 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    def _cb_search_complete(self, tmdb, movie_info):
       # store the result in db
-      self._film_db.set_data(self._current_url, movie_info)
+      self._movie_db.set_data(self._current_url, movie_info)
       # update browser
       self._browser.refresh()
       # update info panel
-      self.update_film_info(self._current_url)
+      self.update_movie_info(self._current_url)
       # delete TMDB object
       del tmdb
 
 
 ###### UTILS
 def get_poster_filename(tmdb_id):
-   return os.path.join(utils.config_dir_get(), 'film',
+   return os.path.join(utils.config_dir_get(), 'movies',
                        str(tmdb_id), 'poster.jpg')
 
 def get_backdrop_filename(tmdb_id):
-   return os.path.join(utils.config_dir_get(), 'film',
+   return os.path.join(utils.config_dir_get(), 'movies',
                        str(tmdb_id), 'backdrop.jpg')
 
-def get_film_name_from_url(url):
+def get_movie_name_from_url(url):
    # remove path & extension
-   film = os.path.basename(url)
-   (film, ext) = os.path.splitext(film)
+   movie = os.path.basename(url)
+   (movie, ext) = os.path.splitext(movie)
 
    # remove blacklisted words (case insensitive)
-   for word in ini.get_string_list('film', 'badwords'):
-      film = re.sub('(?i)' + word, ' ', film)
+   for word in ini.get_string_list('movies', 'badwords'):
+      movie = re.sub('(?i)' + word, ' ', movie)
 
    # remove blacklisted regexp
-   for rgx in ini.get_string_list('film', 'badwords_regexp'):
-      film = re.sub(rgx, ' ', film)
+   for rgx in ini.get_string_list('movies', 'badwords_regexp'):
+      movie = re.sub(rgx, ' ', movie)
 
    # apply the user regexp (must capure 'name' and 'year')
-   p = re.compile(ini.get('film', 'movie_regexp'))
-   m = p.match(film)
+   p = re.compile(ini.get('movies', 'movie_regexp'))
+   m = p.match(movie)
    if m:
       name = m.group('name')
       year = m.group('year')
    else:
-      name = film
+      name = movie
       year = None
 
    return (name.strip(), year)
@@ -689,17 +694,17 @@ def get_film_name_from_url(url):
 
 def config_panel_cb():
    bro = config_gui.browser_get()
-   bro.page_add('config://films/', 'Movie Collection', None, populate_config)
+   bro.page_add('config://movies/', 'Movie Collection', None, populate_config)
 
 def populate_config(browser, url):
 
-   config_gui.standard_item_string_add('film', 'info_lang',
+   config_gui.standard_item_string_add('movies', 'info_lang',
                                        'Preferred language for contents')
 
-   config_gui.standard_item_bool_add('film', 'enable_scanner',
+   config_gui.standard_item_bool_add('movies', 'enable_scanner',
                                      'Enable background scanner')
 
-   config_gui.standard_item_bool_add('film', 'db_names_in_list',
+   config_gui.standard_item_bool_add('movies', 'db_names_in_list',
                                      'Prefer movie titles in lists')
 
    
@@ -750,7 +755,7 @@ class TMDB():
       # found, yhea! get the full movie data
       elif len(data) >= 1:
          DBG('TMDB  Found one: %s (%s)' % (data[0]['name'], data[0]['released'][:4]))
-         # text = 'Found film:<br>%s (%s)' % (data[0]['name'], data[0]['released'][:4])
+         # text = 'Found movie:<br>%s (%s)' % (data[0]['name'], data[0]['released'][:4])
          # EmcNotify(text)
          self._do_movie_getinfo_query(data[0]['id'])
 
@@ -852,10 +857,10 @@ class TMDB_WithGui():
    # Movie.search/
    def _do_movie_search_query(self, query):
       query = query.strip().replace("'", "' ") # the api don't like "L'ultimo", must be "L' ultimo"... :/
-      DBG('TMDB Film search: ' + query)
+      DBG('TMDB Movie search: ' + query)
       url = '%s/Movie.search/%s/json/%s/%s' % \
             (self.server, self.lang, self.key, query)
-      DBG('TMDB Film query: ' + url)
+      DBG('TMDB Movie query: ' + url)
       self.dwl_handler = utils.download_url_async(url, 'tmp',
                               complete_cb = self._movie_search_done_cb,
                               progress_cb = self._cb_downloads_progress)

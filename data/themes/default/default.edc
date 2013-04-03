@@ -872,7 +872,7 @@ collections {
                   layout: "vertical";
                   align: 1.0 0.0;
                   padding: 6 6;
-                  // min: 1 0; # this should be correct, but in some ways break the film-info-panel :/
+                  // min: 1 0; # this should be correct, but in some ways break the movie-info-panel :/
                }
             }
          }

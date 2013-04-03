@@ -40,7 +40,7 @@ import epymc.mediaplayer as mediaplayer
 import epymc.browser as browser
 from epymc.browser import EmcBrowser, EmcItemClass
 
-# from .films import TMDB_WithGui, get_film_name_from_url
+# from .movies import TMDB_WithGui, get_movie_name_from_url
 
 
 def DBG(msg):
@@ -98,7 +98,7 @@ class MyItemClass(EmcItemClass):
          EmcNotify('<b>This one with an icon</b><br>' +
                    'some informational text ...<br>' +
                    'some informational text ...ljhl<br>' +
-                    str(time.time()), icon = 'icon/film')
+                    str(time.time()), icon = 'icon/movie')
 
       # Menu
       elif url == 'uitests://menu':
@@ -318,13 +318,13 @@ class MyItemClass(EmcItemClass):
             'check_off minus plus refresh arrowR arrowL arrowU arrowD list ' \
             'grid star star_off module scale config play stop fwd ffwd bwd ' \
             'fbwd ' \
-            'film mame music joystick keyboard remote'
+            'movie mame music joystick keyboard remote'
          d = EmcDialog(title = 'Icons gallery', style = 'list')
          for name in icon_names.split():
             d.list_item_append(name, 'icon/' + name)
 
-      # Film name test
-      # elif url == 'uitests://films_name':
+      # Movie name test
+      # elif url == 'uitests://movies_name':
          # urls = [ 'alien.avi',
                   # 'alien (1978).avi',
                   # '(2003)alien 3.avi',
@@ -342,8 +342,8 @@ class MyItemClass(EmcItemClass):
          # t = ''
          # for u in urls:
             # t += '<hilight>URL:</> ' + u + '<br>'
-            # t += '<hilight>name/year:</> ' + str(get_film_name_from_url(u)) + '<br><br>'
-         # EmcDialog(title = 'Film name test', text = t)
+            # t += '<hilight>name/year:</> ' + str(get_movie_name_from_url(u)) + '<br><br>'
+         # EmcDialog(title = 'Movie name test', text = t)
          
 class UiTestsModule(EmcModule):
    name = 'uitests'
@@ -369,7 +369,7 @@ class UiTestsModule(EmcModule):
       self._browser.show()
 
    def populate_root(self, browser, url):
-      browser.item_add(MyItemClass(), 'uitests://films_name', 'Films name test')
+      browser.item_add(MyItemClass(), 'uitests://movies_name', 'Movies name test')
       browser.item_add(MyItemClass(), 'uitests://sniffer', 'Event Sniffer')
       browser.item_add(MyItemClass(), 'uitests://ev_emit', 'Event Emit')
       browser.item_add(MyItemClass(), 'uitests://notify', 'Notify Stack')

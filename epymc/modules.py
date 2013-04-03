@@ -21,8 +21,8 @@
 import sys
 import os
 
-import ini
-import utils
+from . import ini
+from . import utils
 
 
 

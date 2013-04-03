@@ -23,9 +23,10 @@ try:
    from efl import evas, ecore, edje, elementary, emotion
 except:
    import evas, ecore, edje, elementary, emotion
-import utils, ini, gui, input_events, events
-from widgets import EmcFocusManager2, EmcDialog, EmcButton, EmcMenu
-from sdb import EmcDatabase
+
+from . import utils, ini, gui, input_events, events
+from .gui import EmcFocusManager2, EmcDialog, EmcButton, EmcMenu
+from .sdb import EmcDatabase
 
 
 DEBUG = True

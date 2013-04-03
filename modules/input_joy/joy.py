@@ -29,7 +29,7 @@ except:
    import ecore
 
 from epymc.modules import EmcModule
-from epymc.widgets import EmcDialog, EmcVKeyboard
+from epymc.gui import EmcDialog, EmcVKeyboard
 from epymc.browser import EmcItemClass
 import epymc.input_events as input_events
 import epymc.ini as ini

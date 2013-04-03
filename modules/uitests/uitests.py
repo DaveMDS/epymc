@@ -28,17 +28,19 @@ except:
    from elementary import Box
 
 from epymc.modules import EmcModule
-from epymc.widgets import EmcDialog, EmcVKeyboard, EmcSourceSelector
-from epymc.widgets import EmcButton, EmcFocusManager2, EmcNotify, EmcMenu
+from epymc.gui import EmcDialog, EmcVKeyboard, EmcSourceSelector, \
+   EmcButton, EmcFocusManager2, EmcNotify, EmcMenu
+
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
 import epymc.events as events
 import epymc.ini as ini
 import epymc.gui as gui
 import epymc.mediaplayer as mediaplayer
-from films import TMDB_WithGui, get_film_name_from_url
 import epymc.browser as browser
 from epymc.browser import EmcBrowser, EmcItemClass
+
+# from .films import TMDB_WithGui, get_film_name_from_url
 
 
 def DBG(msg):
@@ -113,9 +115,9 @@ class MyItemClass(EmcItemClass):
          i = m.item_add(None, "Item 6", None, _cb_menu, "item6")
 
       # TMDB
-      elif url == 'uitests://tmdb':
-         s = TMDB_WithGui()
-         s.movie_search('alien')
+      # elif url == 'uitests://tmdb':
+         # s = TMDB_WithGui()
+         # s.movie_search('alien')
 
       # Mediaplayer Local Video
       elif url == 'uitests://mpv':
@@ -322,26 +324,26 @@ class MyItemClass(EmcItemClass):
             d.list_item_append(name, 'icon/' + name)
 
       # Film name test
-      elif url == 'uitests://films_name':
-         urls = [ 'alien.avi',
-                  'alien (1978).avi',
-                  '(2003)alien 3.avi',
-                  '[DivX - ITA] alien 3.avi',
-                  '[DivX - ITA] ali]en 3.avi',
-                  '[DivX - ITA] al[i]en 3.avi',
-                  '[DivX - ITA]alien3.avi',
-                  '[DivX - ITA]   alien3   .avi',
-                  '[DivX - ITA]alien.3.la.clonazione.avi',
-                  '[DivX - ITA]alien 3 - la clonazione.avi',
-                  '{DivX - ITA} alien 3.avi',
-                  'alien {DivX - ITA}.avi',
-                  '[DivX - ITA] Die Hard I - Trappola di Cristallo.avi',
-                ]
-         t = ''
-         for u in urls:
-            t += '<hilight>URL:</> ' + u + '<br>'
-            t += '<hilight>name/year:</> ' + str(get_film_name_from_url(u)) + '<br><br>'
-         EmcDialog(title = 'Film name test', text = t)
+      # elif url == 'uitests://films_name':
+         # urls = [ 'alien.avi',
+                  # 'alien (1978).avi',
+                  # '(2003)alien 3.avi',
+                  # '[DivX - ITA] alien 3.avi',
+                  # '[DivX - ITA] ali]en 3.avi',
+                  # '[DivX - ITA] al[i]en 3.avi',
+                  # '[DivX - ITA]alien3.avi',
+                  # '[DivX - ITA]   alien3   .avi',
+                  # '[DivX - ITA]alien.3.la.clonazione.avi',
+                  # '[DivX - ITA]alien 3 - la clonazione.avi',
+                  # '{DivX - ITA} alien 3.avi',
+                  # 'alien {DivX - ITA}.avi',
+                  # '[DivX - ITA] Die Hard I - Trappola di Cristallo.avi',
+                # ]
+         # t = ''
+         # for u in urls:
+            # t += '<hilight>URL:</> ' + u + '<br>'
+            # t += '<hilight>name/year:</> ' + str(get_film_name_from_url(u)) + '<br><br>'
+         # EmcDialog(title = 'Film name test', text = t)
          
 class UiTestsModule(EmcModule):
    name = 'uitests'

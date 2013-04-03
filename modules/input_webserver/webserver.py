@@ -19,7 +19,12 @@
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
 
-import os, Queue, threading
+import os, threading
+
+try:
+   import queue as Queue
+except:
+   import Queue
 
 try:
    from efl import ecore
@@ -31,7 +36,10 @@ import epymc.input_events as input_events
 import epymc.utils as utils
 import epymc.ini as ini
 
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+try:
+   from http.server import BaseHTTPRequestHandler, HTTPServer
+except:
+   from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 def DBG(msg):
    # print('WEBSERVER: ' + msg)

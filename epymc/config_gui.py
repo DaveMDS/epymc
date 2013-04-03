@@ -25,12 +25,10 @@ try:
 except:
    import evas
 
-import gui
-import mainmenu
-import input_events
+from . import gui, mainmenu, input_events, ini, modules
 
-from browser import EmcBrowser, EmcItemClass
-from widgets import EmcDialog, EmcVKeyboard
+from .browser import EmcBrowser, EmcItemClass
+from .gui import EmcDialog, EmcVKeyboard
 
 def DBG(msg):
    print('CONFIG_GUI: ' + msg)
@@ -253,8 +251,6 @@ def _populate_root(browser, url):
       browser.item_add(RootItemClass(), item[0], item)
 
 ##############  GENERAL  ######################################################
-import ini
-
 def _general_list():
    _browser.page_add('config://general/', 'General', None, _general_populate)
 
@@ -301,7 +297,6 @@ def _change_scale():
    d.button_add('Reset', selected_cb = _reset)
    
 ##############  THEMES  #######################################################
-import gui
 
 class ThemesItemClass(EmcItemClass):
    def item_selected(self, url, module):
@@ -337,7 +332,6 @@ def _themes_populate(browser, url):
          browser.item_add(ThemesItemClass(), theme, info)
 
 ##############  MODULES  ######################################################
-import modules
 
 class ModulesItemClass(EmcItemClass):
    def item_selected(self, url, module):

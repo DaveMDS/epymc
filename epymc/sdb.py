@@ -25,9 +25,13 @@ try:
    from efl import ecore
 except:
    import ecore
-import Queue
 
-import utils
+try:
+   import queue as Queue
+except:
+   import Queue
+
+from . import utils
 
 def DBG(msg):
    # print('SDB: ' + msg)

@@ -31,7 +31,7 @@ except:
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.utils import EmcExec
-from epymc.widgets import EmcDialog, EmcVKeyboard
+from epymc.gui import EmcDialog, EmcVKeyboard
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer

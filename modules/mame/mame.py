@@ -29,7 +29,7 @@ except:
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
-from epymc.widgets import EmcDialog, EmcRemoteImage
+from epymc.gui import EmcDialog, EmcRemoteImage
 from epymc.utils import EmcExec
 import epymc.mainmenu as mainmenu
 import epymc.browser as browser

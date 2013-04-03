@@ -23,10 +23,7 @@ try:
 except:
    import evas, elementary
 
-import gui
-import mainmenu
-import config_gui
-import input_events
+from . import gui, input_events
 
 
 _items = {}  # key: name  value: elm_list_item
@@ -42,7 +39,7 @@ def init():
    li = gui.part_get('mainmenu.list')
    li.style_set('mainmenu');
    li.focus_allow_set(False)
-   mainmenu.item_add('exit', 200, 'Exit', None, cb_exit)
+   item_add('exit', 200, 'Exit', None, cb_exit)
 
 def show():
    list = gui.part_get('mainmenu.list')

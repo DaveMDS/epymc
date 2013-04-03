@@ -33,8 +33,8 @@ except:
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
-from epymc.widgets import EmcDialog, EmcRemoteImage, EmcSourceSelector
-from epymc.widgets import EmcVKeyboard, EmcNotify
+from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourceSelector, \
+   EmcVKeyboard, EmcNotify
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer

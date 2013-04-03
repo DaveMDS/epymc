@@ -18,7 +18,10 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-import ConfigParser
+try:
+   import configparser as ConfigParser
+except:
+   import ConfigParser
 
 _config = ConfigParser.ConfigParser()
 

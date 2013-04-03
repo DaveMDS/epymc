@@ -20,6 +20,7 @@
 
 import sys
 import os
+import traceback
 
 from . import ini
 from . import utils
@@ -70,8 +71,12 @@ def load_all():
       for name in dirs:
          f = os.path.join(root, name, '__init__.py')
          if os.path.isfile(f):
-            print(' * load: ' + f)
-            mod =  __import__(name)
+            try:
+               print(' * loading: ' + f)
+               mod =  __import__(name)
+            except:
+               print(' * FAILED: ' + f)
+               traceback.print_exc()
    print('')
 
 def get_module_by_name(name):
@@ -90,7 +95,10 @@ def init_by_name(name):
    for mod in EmcModule.__subclasses__():
       if mod.name == name:
          if not name in _instances:
-            _instances[name] = mod()
+            try:
+               _instances[name] = mod()
+            except:
+               traceback.print_exc()
 
 def init_all():
    for mod in EmcModule.__subclasses__():

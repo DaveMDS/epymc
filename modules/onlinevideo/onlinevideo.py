@@ -20,8 +20,12 @@
 
 
 import os
-import ConfigParser
 import ast
+try:
+   import configparser as ConfigParser
+except:
+   import ConfigParser
+
 
 try:
    from efl import evas, elementary

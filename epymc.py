@@ -28,7 +28,6 @@ except:
 import epymc.modules as modules
 import epymc.utils as utils
 import epymc.gui as gui
-import epymc.widgets as widgets
 import epymc.config_gui as config_gui
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
@@ -86,10 +85,10 @@ def main():
 
    # alert if the evas engine is not the requested one
    if gui_return == 2:
-      widgets.EmcDialog(style = 'warning',
-                        text = 'Cannot initialize the engine:<br>%s<br>' \
-                               'Falling back to standard_x11'  % \
-                               ini.get('general', 'evas_engine'))
+      gui.EmcDialog(style = 'warning',
+                    text = 'Cannot initialize the engine:<br>%s<br>' \
+                           'Falling back to standard_x11'  % \
+                           ini.get('general', 'evas_engine'))
 
    # run the main loop
    elementary.run()

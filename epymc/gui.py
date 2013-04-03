@@ -141,12 +141,12 @@ def init():
    win.scale_set(float(scale))
 
    # fill view buttons box in topbar
-   bt = EmcButton(win, icon = 'icon/list')
+   bt = EmcButton(icon = 'icon/list')
    bt.callback_clicked_add(lambda b: input_events.event_emit('VIEW_LIST'))
    box_append('topbar.box', bt)
    bt.show()
 
-   bt = EmcButton(win, icon = 'icon/grid')
+   bt = EmcButton(icon = 'icon/grid')
    bt.callback_clicked_add(lambda b: input_events.event_emit('VIEW_GRID'))
    box_append('topbar.box', bt)
    bt.show()

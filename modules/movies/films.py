@@ -161,7 +161,7 @@ class FolderItemClass(EmcItemClass):
 
 
 class FilmsModule(EmcModule):
-   name = 'film'
+   name = 'films'
    label = 'Films'
    icon = 'icon/film'
    info = """Long info for the film module, explain what it does and what it 

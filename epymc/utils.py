@@ -19,8 +19,12 @@
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import urllib
 import tempfile
+
+try:
+   from urllib.parse import quote as urllib_quote
+except:
+   from urllib import quote as urllib_quote
 
 try:
    from efl.ecore import FileDownload, Exe, ECORE_EXE_PIPE_READ, ECORE_EXE_PIPE_READ_LINE_BUFFERED
@@ -127,26 +131,6 @@ def grab_files(folders, show_hidden=False):
                else:
                   print('Unidentified name %s. It could be a symbolic link' % full_path)
 
-def download_url_sync(url, dest, min_size = 0):
-   """
-   Copy the contents of a file from a given URL to a local file, blocking
-   the code while the download is in progress, you should use the async
-   version instead.
-   """
-   dir = os.path.dirname(dest)
-   if not os.path.exists(dir):
-      os.makedirs(dir)
-
-   (filename, headers) = urllib.urlretrieve(url, dest)
-   DBG('Filename: ' + filename)
-   # print(headers)
-   if os.path.getsize(filename) < min_size:
-      DBG('TOO SHORT ' + str(os.path.getsize(filename)))
-      os.remove(filename)
-      return None
-
-   return headers
-
 def download_url_async(url, dest = 'tmp', min_size = 0,
                        complete_cb = None, progress_cb = None,
                        urlencode = True, *args, **kargs):
@@ -200,7 +184,7 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
    # urlencode the url (but not the http:// part, or ':' will be converted)
    if urlencode:
       (_prot, _url) = url.split('://', 1)
-      encoded = '://'.join((_prot, urllib.quote(_url)))
+      encoded = '://'.join((_prot, urllib_quote(_url)))
    else:
       encoded = url
 

@@ -23,7 +23,7 @@
 
  WARNING: THIS FILE IS DEPRECATED, DONT USE THIS FILE !!!
 
-   Use utils.download_url_sync/async() instead
+   Use utils.download_url_async() instead
 
    The file is still here just for reference in case we will need
    to code something similar in the future.

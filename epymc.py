@@ -28,8 +28,8 @@ except:
 import epymc.modules as modules
 import epymc.utils as utils
 import epymc.gui as gui
-import epymc.config_gui as config_gui
 import epymc.mainmenu as mainmenu
+import epymc.config_gui as config_gui
 import epymc.mediaplayer as mediaplayer
 import epymc.ini as ini
 import epymc.sdb as sdb
@@ -72,8 +72,8 @@ def main():
    browser.init()
    gui_return = gui.init()
    if gui_return < 1: return 2
-   config_gui.init()
    mainmenu.init()
+   config_gui.init()
    mediaplayer.init()
 
    # load & init modules

@@ -265,7 +265,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       # get the next file from the generator
       try:
-         filename = self._generator.next()
+         filename = next(self._generator)
       except StopIteration:
          EmcNotify("Movies scanner done")
          DBG("Movies scanner done")

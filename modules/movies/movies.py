@@ -830,7 +830,8 @@ class TMDBv3(object):
          img = EmcRemoteImage(thumb_url)
          li.item_append('', img, None, None, (big_url, data['id']))
 
-      li.items_get()[0].selected_set(1)
+      if len(data['posters']) > 0:
+         li.items_get()[0].selected_set(1)
       li.show()
       li.go()
 
@@ -891,14 +892,15 @@ class TMDBv3(object):
       li.horizontal = False
       li.style_set('image_list')
       li.focus_allow_set(False)
-         
+
       for backdrop in data['backdrops']:
          thumb_url = self._build_img_url(backdrop['file_path'], 300)
          big_url = self._build_img_url(backdrop['file_path'], 1280)
          img = EmcRemoteImage(thumb_url)
          li.item_append('', img, None, None, (big_url, data['id']))
 
-      li.items_get()[0].selected_set(1)
+      if len(data['backdrops']) > 0:
+         li.items_get()[0].selected_set(1)
       li.show()
       li.go()
 

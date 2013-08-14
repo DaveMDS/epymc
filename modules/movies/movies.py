@@ -39,7 +39,7 @@ from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourceSelector, \
-   EmcVKeyboard, EmcNotify
+   EmcVKeyboard, EmcNotify, EmcRemoteImage2
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
@@ -721,7 +721,7 @@ class TMDBv3(object):
          self.complete_cb(self, None)
          return
 
-      # store the movie data
+      # store the movie data for later "parse"
       self.movie_info = data
 
       # download the first poster image found

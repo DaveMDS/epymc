@@ -205,7 +205,7 @@ def load_icon(icon):
          can be a theme icon (ex: icon/folder).
    see icons.edc for all the existing icon
    """
-   if type(icon) in (Icon, Image, EmcRemoteImage):
+   if type(icon) in (Icon, Image, EmcRemoteImage, EmcRemoteImage2):
       return icon
    ic = Icon(win)
    if icon[0] == '/':
@@ -773,6 +773,58 @@ class EmcMenu(Menu):
       return input_events.EVENT_CONTINUE
 
 ################################################################################
+class EmcRemoteImage2(Image):
+   """ THIS ONE USE Image remote url feature that is 1.8 only !!
+       not used atm, waiting to drop 1.7 support
+       also waiting for a "dest" suppoort in Image
+   """
+
+   def __init__(self, url = None, dest = None):
+      Image.__init__(self, layout)
+      self.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      self.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+      
+      self.on_move_add(self._cb_move_resize)
+      self.on_resize_add(self._cb_move_resize)
+      self._spinner = Progressbar(self)
+      self._spinner.style_set('wheel')
+      self._spinner.pulse = True
+      self.callback_download_start_add(lambda o: self.start_spin())
+      self.callback_download_done_add(lambda o: self.stop_spin())
+      self.callback_download_error_add(lambda o: self.stop_spin())# TODO show a dummy img
+      if url: self.url_set(url, dest)
+
+   def show(self):
+      Image.show(self)
+
+   def hide(self):
+      self._spinner.hide()
+      Image.hide(self)
+
+   def url_set(self, url, dest = None):
+      if dest and os.path.exists(dest):
+         self.file_set(dest)
+      else:
+         self.file_set(url)
+
+   def start_spin(self):
+      self.show()
+      self._spinner.show()
+      self._spinner.pulse(True)
+
+   def stop_spin(self):
+      self._spinner.hide()
+      self._spinner.pulse(False)
+
+   def _cb_move_resize(self, obj):
+      (x, y, w, h) = self.geometry_get()
+      self._spinner.resize(w, h)
+      self._spinner.move(x, y)
+      if self._spinner.clip != self.clip:
+         self._spinner.clip = self.clip
+
+
+
 class EmcRemoteImage(Image):
    """ TODO documentation """
    """ TODO on image_set abort the download ? """

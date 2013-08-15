@@ -145,7 +145,7 @@ class MovieItemClass(EmcItemClass):
                 (os.path.basename(url),
                  utils.hum_size(os.path.getsize(utils.url2path(url))),
                  name, year if year else 'Unknown')
-         
+
       # return "test1: κόσμε END" # should see the Greek word 'kosme'
       return text.encode('utf-8')
 
@@ -164,7 +164,7 @@ class MoviesModule(EmcModule):
    name = 'movies'
    label = 'Movies'
    icon = 'icon/movie'
-   info = """Long info for the movies module, explain what it does and what it 
+   info = """Long info for the movies module, explain what it does and what it
 need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    _browser = None     # the browser widget instance
@@ -252,12 +252,12 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    def idle_cb(self):
       # DBG('Mainloop idle')
-      
+
       if self._idler_url is not None:
          # DBG('im busy')
          return ecore.ECORE_CALLBACK_RENEW
-         
-      # the first time build the generator object 
+
+      # the first time build the generator object
       if self._generator is None:
          folders = ini.get_string_list('movies', 'folders', ';')
          self._generator = utils.grab_files(folders)
@@ -289,11 +289,18 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       if ext[1:] in self._exts:
          tmdb = TMDBv3(lang = ini.get('movies', 'info_lang'))
          name, year = get_movie_name_from_url(url)
-         tmdb.movie_search(name, year, self.idle_tmdb_complete)
+         tmdb.movie_search(name, year, self.idle_search_done_cb)
          self._idler_url = url
 
       return ecore.ECORE_CALLBACK_RENEW
 
+   def idle_search_done_cb(self, tmdb_obj, results, status):
+      if len(results) > 0:
+         tmdb_obj.get_movie_info(results[0]['tmdb_id'], self.idle_tmdb_complete)
+      else:
+         # clear the 'semaphore', now another file can be processed
+         self._idler_url = None
+      
    def idle_tmdb_complete(self, tmdb, movie_info):
       if movie_info is None:
          # store the current time in the cache db
@@ -403,7 +410,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    def _events_cb(self, event):
       # TODO: check that we are active and visible
-      #       atm, this is fired also when a song end... 
+      #       atm, this is fired also when a song end...
       if event == 'PLAYBACK_FINISHED':
          # refresh the page (maybe an unwatched movie becomes watched)
          if self._browser is not None:
@@ -488,34 +495,173 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       if self._movie_db.id_exists(self._current_url):
          movie_info = self._movie_db.get_data(self._current_url)
          tmdb = TMDBv3()
-         tmdb.all_posters_list(movie_info['tmdb_id'], self._cb_panel_3_complete)
+         tmdb.get_posters(movie_info['tmdb_id'], self._cb_posters_list_complete)
 
-   def _cb_panel_3_complete(self):
+   def _cb_posters_list_complete(self, tmdb, posters):
+      li = List(gui.win)
+      li.horizontal = True
+      li.style_set('image_list')
+      li.focus_allow_set(False)
+
+      for poster in posters:
+         img = EmcRemoteImage(poster['thumb_url'])
+         it = li.item_append('', img, None, None, poster)
+         if not li.selected_item: it.selected = True
+
+      li.show()
+      li.go()
+
+      title = '%d posters available' % (len(posters))
+      dialog = EmcDialog(title = title, content = li,
+                         done_cb = self._cb_posters_list_ok)
+      li.callback_clicked_double_add((lambda l,i: self._cb_posters_list_ok(dialog)))
+
+   def _cb_posters_list_ok(self, dialog):
+      poster = dialog.content_get().selected_item_get().data_get()[0][0]
+      dest = get_poster_filename(poster['movie_id'])
+      utils.download_url_async(poster['url'], dest,
+                               complete_cb = self._cb_image_done,
+                               progress_cb = self._cb_image_progress)
+
+      # kill the list dialog
+      dialog.delete()
+      del dialog
+
+      # show a progress dialog
+      self._poster_dialog = EmcDialog(title = 'Downloading Image',
+                                      style = 'progress')
+
+   def _cb_image_progress(self, dest, tot, done):
+      if tot > 0: self._poster_dialog.progress_set(float(done) / float(tot))
+
+   def _cb_image_done(self, dest, status):
+      # kill the dialog
+      self._poster_dialog.delete()
+      del self._poster_dialog
+      # update browser and info panel
       self.update_movie_info(self._current_url)
       self._browser.refresh()
+
 
 ######## Choose fanart
    def _cb_panel_4(self, button):
       if self._movie_db.id_exists(self._current_url):
          movie_info = self._movie_db.get_data(self._current_url)
          tmdb = TMDBv3()
-         tmdb.all_backdrops_list(movie_info['tmdb_id'], self._cb_panel_3_complete)
+         tmdb.get_backdrops(movie_info['tmdb_id'], self._cb_backdrops_list_complete)
+
+   def _cb_backdrops_list_complete(self, tmdb, backdrops):
+      li = List(gui.win)
+      li.horizontal = False
+      li.style_set('image_list')
+      li.focus_allow_set(False)
+
+      for backdrop in backdrops:
+         img = EmcRemoteImage(backdrop['thumb_url'])
+         it = li.item_append('', img, None, None, backdrop)
+         if not li.selected_item: it.selected = True
+
+      li.show()
+      li.go()
+
+      title = '%d fanarts available' % (len(backdrops))
+      dialog = EmcDialog(title = title, content = li,
+                         done_cb = self._cb_backdrops_list_ok)
+      li.callback_clicked_double_add((lambda l,i: self._cb_backdrops_list_ok(dialog)))
+
+   def _cb_backdrops_list_ok(self, dialog):
+      # download the selected backdrop
+      backdrop = dialog.content_get().selected_item_get().data_get()[0][0]
+      dest = get_backdrop_filename(backdrop['movie_id'])
+      utils.download_url_async(backdrop['url'], dest,
+                               complete_cb = self._cb_image_done,
+                               progress_cb = self._cb_image_progress)
+
+      # kill the list dialog
+      dialog.delete()
+      del dialog
+
+      # show a progress dialog
+      self._poster_dialog = EmcDialog(title = 'Downloading Image',
+                                      style = 'progress')
 
 
 ######## Get movie info from themoviedb.org
    def _cb_panel_5(self, button):
-      tmdb = TMDBv3(interactive=True, lang = ini.get('movies', 'info_lang'))
       name, year = get_movie_name_from_url(self._current_url)
-      tmdb.movie_search(name, year, self._cb_search_complete)
+      self._do_movie_search(name, year)
 
-   def _cb_search_complete(self, tmdb, movie_info):
+   def _do_movie_search(self, name, year):
+      tmdb = TMDBv3(lang = ini.get('movies', 'info_lang'))
+      tmdb.movie_search(name, year, self._cb_search_done)
+      if year:
+         text = '<b>Searching for:</><br>%s (%s)<br>' % (name, year)
+      else:
+         text = '<b>Searching for:</><br>%s<br>' % (name)
+
+      self.tmdb_dialog = EmcDialog(title = 'themoviedb.org',
+                                   style = 'progress', text = text,
+                                   user_data = tmdb)
+      self.tmdb_dialog.button_add('Change name',
+                  lambda b: EmcVKeyboard(text=name, accept_cb=self._vkbd_cb))
+
+   def _vkbd_cb(self, vkbd, txt):
+      if self.tmdb_dialog: self.tmdb_dialog.delete()
+      self._do_movie_search(txt, None)
+
+   def _cb_search_done(self, tmdb, results, status):
+      if len(results) == 0:
+         self.tmdb_dialog.text_append('<br>nothing found, please try with a better name')#TODO explain better the format
+      elif len(results) == 1:
+         tmdb.get_movie_info(results[0]['tmdb_id'],
+                             self._cb_info_done, self._cb_info_progress)
+         self.tmdb_dialog.text_append('<b>Downloading movie info...</b>')
+      else:
+         self.tmdb_dialog.text_append('<b>Found %d results</b><br>' % (len(results)))
+         title = 'Found %d results, which one?' % (len(results))
+         dialog2 = EmcDialog(title = title, style = 'list',
+                             done_cb = self._cb_list_ok,
+                             canc_cb = self._cb_list_cancel)
+         for res in results:
+            icon = EmcRemoteImage(res['poster_url'])
+            icon.size_hint_min_set(100, 100) # TODO fixme
+            label = '%s (%s)' % (res['title'], res['year'])
+            dialog2.list_item_append(label, icon, None, res['tmdb_id'])
+
+   def _cb_list_cancel(self, dialog2):
+      dialog2.delete()
+      self.tmdb_dialog.delete()
+      self.tmdb_dialog = None
+
+   def _cb_list_ok(self, dialog2):
+      # get selected item id
+      item = dialog2.list_item_selected_get()
+      (args, kargs) = item.data_get()
+      tid = args[0]
+      if not item or not tid: return
+
+      # kill the list dialog
+      dialog2.delete()
+
+      # download selected movie info + images
+      tmdb = self.tmdb_dialog.data_get()
+      tmdb.get_movie_info(tid, self._cb_info_done, self._cb_info_progress)
+      self.tmdb_dialog.text_append('<b>Downloading movie info...</b>')
+
+
+   def _cb_info_progress(self, tmdb, progress, stage):
+      self.tmdb_dialog.progress_set(progress)
+
+
+   def _cb_info_done(self, tmdb, movie_info):
       # store the result in db
       self._movie_db.set_data(self._current_url, movie_info)
-      # update browser
+      # update browser and info panel
       self._browser.refresh()
-      # update info panel
       self.update_movie_info(self._current_url)
-      # delete TMDB object
+      # clean up
+      self.tmdb_dialog.delete()
+      self.tmdb_dialog = None
       del tmdb
 
 
@@ -555,7 +701,6 @@ def get_movie_name_from_url(url):
 
 
 ###### Config Panel stuff ######
-
 def config_panel_cb():
    bro = config_gui.browser_get()
    bro.page_add('config://movies/', 'Movie Collection', None, populate_config)
@@ -571,7 +716,7 @@ def populate_config(browser, url):
    config_gui.standard_item_bool_add('movies', 'db_names_in_list',
                                      'Prefer movie titles in lists')
 
-   
+
 ###### TMDB API v3 ######
 import json
 try:
@@ -581,122 +726,81 @@ except:
 
 
 class TMDBv3(object):
-   """ TMDB API v3 """
-   def __init__(self, api_key=TMDB_API_KEY, lang='en', interactive=False):
+   """ TMDB API v3
+
+   tmdb = TMDBv3()
+
+   # search for a given movie name + year:
+   tmdb.movie_search('Alien', 1979, search_done_cb)
+   def search_done_cb(tmdb_obj, results, status):
+
+   # get movie info + poster + backdrop:
+   tmdb.get_movie_info(tmdb_id, info_done_cb, info_progress_cb)
+   def info_progress_cb(tmdb, progress, stage):
+   def info_done_cb(self, tmdb, movie_info):
+
+   # get list of all available posters:
+   tmdb.get_posters(tmdb_id, list_complete_cb)
+   def list_complete_cb(self, tmdb, posters):
+
+   # get list of all available backdrop:
+   tmdb.get_backdrops(tmdb_id, list_complete_cb)
+   def list_complete_cb(self, tmdb, backdrops):
+
+   # abort the current operation:
+   tmdb.abort()
+
+   """
+   def __init__(self, api_key=TMDB_API_KEY, lang='en'):
       self.key = api_key
       self.lang = lang
-      self.interactive = interactive
       self.base_url = 'http://api.themoviedb.org/3'
-      self.complete_cb = None
-      self.dialog = None
       self.dwl_handler = None
-      self.query_str = None
+      self.done_cb = None
+      self.progress_cb = None
+      self.download_stage = 0
 
-   def movie_search(self, query, year, complete_cb):
-      self.query_str = query
-      self.year = year
-      self.complete_cb = complete_cb
-      if self.interactive:
-         self.dialog = EmcDialog(title = 'themoviedb.org',
-                                 style = 'progress',
-                                 text = '<b>Searching for:</>')
-         self.dialog.button_add('Change name', self._change_name_cb)
-      self._do_movie_search_query(query)
-
-   def _change_name_cb(self, button):
+   # abort the current operation
+   def abort(self):
       if self.dwl_handler:
          utils.download_abort(self.dwl_handler)
          self.dwl_handler = None
 
-      EmcVKeyboard(text = self.query_str,
-               accept_cb = (lambda vkb, txt: self._do_movie_search_query(txt)))
+   # movie search
+   def movie_search(self, name, year, done_cb):
+      self.done_cb = done_cb
+      self.download_stage = 1
 
-   def _cb_downloads_progress(self, dest, tot, done):
-      if self.dialog and tot > 0:
-         self.dialog.progress_set(float(done) / float(tot))
-
-   def _build_img_url(self, final_part, size):
-      # TODO base url and sizes should be queryed with: /3/configuration
-      return 'http://d3gtl9l2a4fn1j.cloudfront.net/t/p/w' + str(size) + final_part
-
-   # /3/search/movie
-   def _do_movie_search_query(self, query):
       url = '%s/search/movie?api_key=%s&language=%s&query=%s' % \
-            (self.base_url, self.key, self.lang, urllib_quote(query))
-      if self.year:
-         url += '&year=' + str(self.year)
-      DBG('TMDB Movie query: ' + url)
+            (self.base_url, self.key, self.lang, urllib_quote(name))
+      if year: url += '&year=%s' % (year)
+      DBG('TMDB Movie search query: ' + url)
+
       self.dwl_handler = utils.download_url_async(url, 'tmp', urlencode = False,
-                              complete_cb = self._movie_search_done_cb,
-                              progress_cb = self._cb_downloads_progress)
-      if self.interactive:
-         self.dialog.text_set('<b>Searching for:</><br>' + query + '<br>')
+                              complete_cb = self._movie_search_done_cb)
 
    def _movie_search_done_cb(self, dest, status):
       self.dwl_handler = None
 
-      if status != 200:
-         if self.interactive: self.dialog.text_append('<b>ERROR</b><br>')
-         self.complete_cb(self, None)
-         return
+      results = []
+      if status == 200:
+         data = self._read_json_file_and_delete_it(dest)
+         for result in  data['results']:
+            try:
+               results.append({
+                  'tmdb_id': result['id'],
+                  'title': result['title'],
+                  'year': result['release_date'][:4],
+                  'poster_url': self._build_img_url(result['poster_path'], 154)
+               })
+            except: pass
+      self.done_cb(self, results, status)
 
-      f = open(dest, 'r')
-      data = json.loads(f.read())
-      f.close()
-      os.remove(dest)
-
-      # no result found :(
-      if data['total_results'] == 0:
-         if self.interactive:
-            self.dialog.text_append('<br>nothing found, please try with a better name')#TODO explain better the format
-         self.complete_cb(self, None)
-         return
-
-      # one result found, yhea! now request the full movie info
-      elif data['total_results'] == 1 or not self.interactive:
-         self._do_movie_info_query(data['results'][0]['id'])
-
-      # more matching results, show a list to choose from
-      elif self.interactive:
-         self.dialog.text_append('<b>Found %d results</b><br>' % (data['total_results']))
-
-         title = 'Found %d results, which one?' % (data['total_results'])
-         dialog2 = EmcDialog(title = title, style = 'list',
-                             done_cb = self._cb_list_ok,
-                             canc_cb = self._cb_list_cancel)
-         for res in data['results']:
-            icon = None
-            if 'poster_path' in res and res['poster_path'] is not None:
-               complete_url = self._build_img_url(res['poster_path'], 154)
-               icon = EmcRemoteImage(complete_url)
-               icon.size_hint_min_set(100, 100) # TODO fixme
-            if 'release_date' in res:
-               label = '%s (%s)' % (res['title'], res['release_date'][:4])
-            else:
-               label = res['title']
-            dialog2.list_item_append(label, icon, None, res['id'])
-
-   def _cb_list_cancel(self, dialog2):
-      dialog2.delete()
-      self.dialog.delete()
-
-   def _cb_list_ok(self, dialog2):
-      # get selected item id
-      item = dialog2.list_item_selected_get()
-      (args, kargs) = item.data_get()
-      tid = args[0]
-      if not item or not tid: return
-
-      # kill the list dialog
-      dialog2.delete()
-
-      # download selected movie info + images
-      self._do_movie_info_query(tid)
-
-   # 3/movie/{id}
-   def _do_movie_info_query(self, tid):
-      if self.interactive:
-         self.dialog.text_append('<b>Downloading movie data, </b>')
+   # get movie info
+   def get_movie_info(self, tid, done_cb, progress_cb = None):
+      self.done_cb = done_cb
+      self.progress_cb = progress_cb
+      self.download_stage = 2
       url = '%s/movie/%s?api_key=%s&language=%s&append_to_response=casts' % \
              (self.base_url, tid, self.key, self.lang)
       DBG('TMDB Movie query: ' + url)
@@ -706,26 +810,16 @@ class TMDBv3(object):
 
    def _movie_info_done_cb(self, dest, status):
       self.dwl_handler = None
+      self.download_stage = 3
 
       if status != 200:
-         if self.interactive: self.dialog.text_append('<b>ERROR</b><br>')
-         return
-   
-      f = open(dest, 'r')
-      data = json.loads(f.read())
-      f.close()
-      os.remove(dest)
-
-      if len(data) < 1:
-         if self.interactive: self.dialog.text_append('<b>ERROR</b><br>')
-         self.complete_cb(self, None)
+         # error, go to next step
+         self._movie_poster_done_cb(dest, 200)
          return
 
-      # store the movie data for later "parse"
+      # store the movie data for parsing later
+      data = self._read_json_file_and_delete_it(dest)
       self.movie_info = data
-
-      # download the first poster image found
-      if self.interactive: self.dialog.text_append('<b>poster, </b>')
 
       if 'poster_path' in data and data['poster_path'] is not None:
          dest = get_poster_filename(data['id'])
@@ -739,10 +833,8 @@ class TMDBv3(object):
 
    def _movie_poster_done_cb(self, dest, status):
       self.dwl_handler = None
+      self.download_stage = 4
 
-      # download the first backdrop image found
-      if self.interactive: self.dialog.text_append('<b>fanart, </b>')
-      
       if 'backdrop_path' in self.movie_info and self.movie_info['backdrop_path'] is not None:
          dest = get_backdrop_filename(self.movie_info['id'])
          complete_url = self._build_img_url(self.movie_info['backdrop_path'], 780)
@@ -755,9 +847,7 @@ class TMDBv3(object):
 
    def _movie_backdrop_done_cb(self, dest, status):
       self.dwl_handler = None
-
-      # kill the main dialog
-      if self.interactive: self.dialog.delete()
+      self.download_stage = 0
 
       # build the movie info dict
       tmdb = self.movie_info
@@ -797,137 +887,68 @@ class TMDBv3(object):
       }
 
       # call the complete callback
-      self.complete_cb(self, info)
+      self.done_cb(self, info)
 
-   ## all_posters_list
-   def all_posters_list(self, tid, complete_cb):
-      self.complete_cb = complete_cb
+   def _cb_downloads_progress(self, dest, tot, done):
+      if tot > 0 and self.progress_cb:
+         prog = float(done) / float(tot) / 4.0 + self.download_stage * 0.25
+         self.progress_cb(self, prog, self.download_stage)
+
+   # posters list
+   def get_posters(self, tmdb_id, done_cb):
+      self.done_cb = done_cb
       url = '%s/movie/%s/images?api_key=%s' % \
-            (self.base_url, tid, self.key)
+            (self.base_url, tmdb_id, self.key)
       DBG('TMDB images query: ' + url)
       self.dwl_handler = utils.download_url_async(url, 'tmp', urlencode = False,
                               complete_cb = self._poster_list_done_cb)
 
    def _poster_list_done_cb(self, dest, status):
-      if status != 200:
-         # self.complete_cb(self, None)
-         return
+      self.dwl_handler = None
+      results = []
+      if status == 200:
+         data = self._read_json_file_and_delete_it(dest)
+         for poster in data['posters']:
+            results.append({
+               'movie_id': data['id'],
+               'thumb_url': self._build_img_url(poster['file_path'], 154),
+               'url': self._build_img_url(poster['file_path'], 500)
+            })
+      self.done_cb(self, results)
 
-      f = open(dest, 'r')
-      data = json.loads(f.read())
-      f.close()
-      os.remove(dest)
-
-      # show the list in a dialog
-      li = List(gui.win)
-      li.horizontal = True
-      li.style_set('image_list')
-      li.focus_allow_set(False)
-         
-      for poster in data['posters']:
-         thumb_url = self._build_img_url(poster['file_path'], 154)
-         big_url = self._build_img_url(poster['file_path'], 500)
-         img = EmcRemoteImage(thumb_url)
-         li.item_append('', img, None, None, (big_url, data['id']))
-
-      if len(data['posters']) > 0:
-         li.items_get()[0].selected_set(1)
-      li.show()
-      li.go()
-
-      title = '%d posters available' % (len(data['posters']))
-      dialog = EmcDialog(title = title, content = li,
-                         done_cb = self._cb_poster_ok)
-      li.callback_clicked_double_add((lambda l,i: self._cb_poster_ok(dialog)))
-
-   def _cb_poster_ok(self, dialog):
-      li = dialog.content_get()
-      item = li.selected_item_get()
-      if not item: return
-
-      self._poster_dialog = dialog
-      (url, id) = item.data_get()[0][0]
-      dest = get_poster_filename(id)
-      utils.download_url_async(url, dest, complete_cb = self._cb_poster_done,
-                                          progress_cb = self._cb_poster_progress)
-
-      # kill the dialog
-      self._poster_dialog.delete()
-      del self._poster_dialog
-
-      # make a progress dialog
-      self._poster_dialog = EmcDialog(title = 'Downloading Image',
-                                      style = 'progress')
-   
-   def _cb_poster_progress(self, dest, tot, done):
-      if tot > 0: self._poster_dialog.progress_set(float(done) / float(tot))
-
-   def _cb_poster_done(self, dest, status):
-      # kill the dialog
-      self._poster_dialog.delete()
-      del self._poster_dialog
-      self.complete_cb()
-
-   ## all_backdrops_list
-   def all_backdrops_list(self, tid, complete_cb):
-      self.complete_cb = complete_cb
+   # backdrops list
+   def get_backdrops(self, tmdb_id, done_cb):
+      self.done_cb = done_cb
       url = '%s/movie/%s/images?api_key=%s' % \
-            (self.base_url, tid, self.key)
+            (self.base_url, tmdb_id, self.key)
       DBG('TMDB images query: ' + url)
       self.dwl_handler = utils.download_url_async(url, 'tmp', urlencode = False,
-                              complete_cb = self._backdrop_list_done_cb)
+                              complete_cb = self._backdrops_list_done_cb)
 
-   def _backdrop_list_done_cb(self, dest, status):
-      if status != 200:
-         # self.complete_cb(self, None)
-         return
+   def _backdrops_list_done_cb(self, dest, status):
+      self.dwl_handler = None
+      results = []
+      if status == 200:
+         data = self._read_json_file_and_delete_it(dest)
+         for backdrop in data['backdrops']:
+            results.append({
+               'movie_id': data['id'],
+               'thumb_url': self._build_img_url(backdrop['file_path'], 300),
+               'url': self._build_img_url(backdrop['file_path'], 1280)
+            })
+      self.done_cb(self, results)
 
-      f = open(dest, 'r')
+   # utils
+   def _build_img_url(self, final_part, size):
+      # TODO base url and sizes should be queryed with: /3/configuration
+      return 'http://d3gtl9l2a4fn1j.cloudfront.net/t/p/w' + str(size) + final_part
+
+   def _read_json_file_and_delete_it(self, path):
+      f = open(path, 'r')
       data = json.loads(f.read())
       f.close()
-      os.remove(dest)
-
-      # show the list in a dialog
-      li = List(gui.win)
-      li.horizontal = False
-      li.style_set('image_list')
-      li.focus_allow_set(False)
-
-      for backdrop in data['backdrops']:
-         thumb_url = self._build_img_url(backdrop['file_path'], 300)
-         big_url = self._build_img_url(backdrop['file_path'], 1280)
-         img = EmcRemoteImage(thumb_url)
-         li.item_append('', img, None, None, (big_url, data['id']))
-
-      if len(data['backdrops']) > 0:
-         li.items_get()[0].selected_set(1)
-      li.show()
-      li.go()
-
-      title = '%d fanarts available' % (len(data['backdrops']))
-      dialog = EmcDialog(title = title, content = li,
-                         done_cb = self._cb_backdrop_ok)
-      li.callback_clicked_double_add((lambda l,i: self._cb_backdrop_ok(dialog)))
-
-   def _cb_backdrop_ok(self, dialog):
-      li = dialog.content_get()
-      item = li.selected_item_get()
-      if not item: return
-
-      self._poster_dialog = dialog
-      (url, id) = item.data_get()[0][0]
-      dest = get_backdrop_filename(id)
-      utils.download_url_async(url, dest, complete_cb = self._cb_poster_done,
-                                          progress_cb = self._cb_poster_progress)
-
-      # kill the dialog
-      self._poster_dialog.delete()
-      del self._poster_dialog
-
-      # make a progress dialog
-      self._poster_dialog = EmcDialog(title = 'Downloading Fanart',
-                                      style = 'progress')
-
+      os.remove(path)
+      return data
 
 
 """ TMDB APIv3 response for the movie Alien (plus casts)

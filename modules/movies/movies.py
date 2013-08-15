@@ -633,13 +633,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.tmdb_dialog.delete()
       self.tmdb_dialog = None
 
-   def _cb_list_ok(self, dialog2):
-      # get selected item id
-      item = dialog2.list_item_selected_get()
-      (args, kargs) = item.data_get()
-      tid = args[0]
-      if not item or not tid: return
-
+   def _cb_list_ok(self, dialog2, tid):
       # kill the list dialog
       dialog2.delete()
 

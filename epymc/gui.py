@@ -1236,7 +1236,11 @@ class EmcDialog(edje.Edje):
          if self._buttons:
             self._cb_buttons(self.fman.focused_get())
          elif self._done_cb:
-            self._done_cb(self)
+            if self._list:
+               it = self._list.selected_item
+               self._list_item_activated_cb(self._list, it)
+            else:
+               self._done_cb(self)
          else:
             self.delete()
 

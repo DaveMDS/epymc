@@ -28,11 +28,11 @@ except:
    import Queue
 
 try:
-   from efl import ecore, evas, elementary
+   from efl import ecore, evas, elementary, emotion
    from efl.elementary.image import Image
    from efl.elementary.list import List
 except:
-   import ecore, evas, elementary
+   import ecore, evas, elementary, emotion
    from elementary import Image, List
 
 from epymc.modules import EmcModule
@@ -170,11 +170,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    _browser = None     # the browser widget instance
    _exts = None        # list of allowed extensions
    _movie_db = None    # key: movie_url  data: dictionary as of the tmdb api
-
-   _generator = None
-   _idler = None      # EcoreIdler
-   _idler_url = None  # also used as a semaphore
-   _idler_db = None   # key: file_url  data: timestamp of the last unsuccessfull tmdb query
+   _idler_db = None    # key: file_url  data: timestamp of the last unsuccessfull tmdb query
+   _scanner = None     # BackgroundScanner instance
 
    def __init__(self):
       DBG('Init module')
@@ -200,8 +197,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       # get allowed exensions from config
       self._exts = ini.get_string_list('movies', 'extensions')
-      self._idler_retry_after = ini.get_int('movies', 'tmdb_retry_days')
-      self._idler_retry_after *= 24 * 60 * 60
 
       # open movie/idler databases (they are created if not exists)
       self._movie_db = EmcDatabase('movies')
@@ -212,8 +207,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       mainmenu.item_add('movies', 10, 'Movies', img, self.cb_mainmenu)
 
        # add an entry in the config gui
-      config_gui.root_item_add('movies', 50, 'Movie Collection', icon = 'icon/movie',
-                               callback = config_panel_cb)
+      config_gui.root_item_add('movies', 50, 'Movie Collection',
+                               icon = 'icon/movie', callback = config_panel_cb)
 
       # create a browser instance
       self._browser = EmcBrowser('Movies', 'List')
@@ -228,11 +223,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       events.listener_del('movies')
 
       # kill the idler
-      if self._idler:
-         self._idler.delete()
-         self._idler = None
-         self._idler_url = None
-      # TODO clean better the idler? abort if a download in process?
+      if self._scanner:
+         self._scanner.abort()
+         self._scanner = None
 
       # delete mainmenu item
       mainmenu.item_del('movies')
@@ -246,82 +239,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       ## close databases
       del self._movie_db
       del self._idler_db
-
-   def idle_cb(self):
-      # DBG('Mainloop idle')
-
-      if self._idler_url is not None:
-         # DBG('im busy')
-         return ecore.ECORE_CALLBACK_RENEW
-
-      # the first time build the generator object
-      if self._generator is None:
-         folders = ini.get_string_list('movies', 'folders', ';')
-         self._generator = utils.grab_files(folders)
-         EmcNotify("Movies scanner started")
-
-      # get the next file from the generator
-      try:
-         filename = next(self._generator)
-      except StopIteration:
-         EmcNotify("Movies scanner done")
-         DBG("Movies scanner done")
-         self._generator = None
-         return ecore.ECORE_CALLBACK_CANCEL
-
-      url = 'file://' + filename
-
-      if self._movie_db.id_exists(url):
-         DBG('I know this movie (skipping):' + url)
-         return ecore.ECORE_CALLBACK_RENEW
-
-      if self._idler_db.id_exists(url):
-         elapsed = time.time() - self._idler_db.get_data(url)
-         if elapsed < self._idler_retry_after:
-            DBG('I scanned this %d seconds ago (skipping): %s' % (elapsed, url))
-            return ecore.ECORE_CALLBACK_RENEW
-         self._idler_db.del_data(url)
-
-      ext = os.path.splitext(filename)[1]
-      if ext[1:] in self._exts:
-         tmdb = TMDBv3(lang = ini.get('movies', 'info_lang'))
-         name, year = get_movie_name_from_url(url)
-         tmdb.movie_search(name, year, self.idle_search_done_cb)
-         self._idler_url = url
-
-      return ecore.ECORE_CALLBACK_RENEW
-
-   def idle_search_done_cb(self, tmdb_obj, results, status):
-      if len(results) > 0:
-         tmdb_obj.get_movie_info(results[0]['tmdb_id'], self.idle_tmdb_complete)
-      else:
-         # clear the 'semaphore', now another file can be processed
-         del tmdb_obj
-         self._idler_url = None
-      
-   def idle_tmdb_complete(self, tmdb, movie_info):
-      if movie_info is None:
-         # store the current time in the cache db
-         self._idler_db.set_data(self._idler_url, time.time())
-         self.idle_add_done(tmdb)
-      else:
-         # store the result in movie db
-         try:
-            url = self._idler_url
-            self._movie_db.set_data(url, movie_info)
-            text = '<title>Found movie:</><br>%s (%s)' % (movie_info['title'], movie_info['release_date'][:4])
-            EmcNotify(text, icon = get_poster_filename(movie_info['id']))
-         except:
-            pass
-
-      # clear the 'semaphore', now another file can be processed
-      self._idler_url = None
-
-      # update the browser view
-      self._browser.refresh()
-
-      # delete TMDB2 object
-      del tmdb
 
    def play_movie(self, url):
       counts = mediaplayer.play_counts_get(url)
@@ -376,8 +293,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       mainmenu.hide()
 
       # on idle scan all files (one shot every time the activity start)
-      if not self._generator and ini.get_bool('movies', 'enable_scanner'):
-         self._idler = ecore.Idler(self.idle_cb)
+      if not self._scanner and ini.get_bool('movies', 'enable_scanner'):
+         self._scanner = BackgroundScanner(self._browser, self._movie_db, self._idler_db)
 
    def populate_root_page(self, browser, page_url):
       for f in self._folders:
@@ -738,6 +655,107 @@ class CastPanel(EmcDialog):
          icon = EmcRemoteImage(movie['poster_path'])
          icon.size_hint_min_set(100, 100) # TODO FIXME
          dia.list_item_append(label, icon)
+
+
+class BackgroundScanner(ecore.Idler):
+   def __init__(self, browser, movie_db, idler_db):
+      self._browser = browser
+      self._movie_db = movie_db
+      self._idler_db = idler_db
+      self._current_url = None  # also used as a semaphore
+      self._generator = None
+      self._tmdb = None # TMDBv3 instance
+      self._retry_after = ini.get_int('movies', 'tmdb_retry_days')
+      self._retry_after *= 24 * 60 * 60
+
+      ecore.Idler.__init__(self, self._idle_cb)
+
+   def abort(self):
+      # stop the idler
+      self.delete()
+      # abort any tmdb operations
+      if self._tmdb:
+         self._tmdb.abort()
+         del self._tmdb
+         self._tmdb = None
+         
+   def _idle_cb(self):
+      # DBG('Mainloop idle')
+      
+      if self._current_url is not None:
+         # DBG('im busy')
+         return ecore.ECORE_CALLBACK_RENEW
+
+      # the first time build the generator object
+      if self._generator is None:
+         folders = ini.get_string_list('movies', 'folders', ';')
+         self._generator = utils.grab_files(folders)
+         EmcNotify("Movies scanner started")
+
+      # get the next file from the generator
+      try:
+         filename = next(self._generator)
+      except StopIteration:
+         EmcNotify("Movies scanner done")
+         DBG("Movies scanner done")
+         self._generator = None
+         return ecore.ECORE_CALLBACK_CANCEL
+
+      url = 'file://' + filename
+
+      if self._movie_db.id_exists(url):
+         DBG('I know this movie (skipping):' + url)
+         return ecore.ECORE_CALLBACK_RENEW
+
+      if self._idler_db.id_exists(url):
+         elapsed = time.time() - self._idler_db.get_data(url)
+         if elapsed < self._retry_after:
+            DBG('I scanned this %d seconds ago (skipping): %s' % (elapsed, url))
+            return ecore.ECORE_CALLBACK_RENEW
+         self._idler_db.del_data(url)
+
+      if emotion.extension_may_play_get(filename):
+         self._tmdb = TMDBv3(lang = ini.get('movies', 'info_lang'))
+         name, year = get_movie_name_from_url(url)
+         self._tmdb.movie_search(name, year, self._search_done_cb)
+         self._current_url = url
+
+      return ecore.ECORE_CALLBACK_RENEW
+
+   def _search_done_cb(self, tmdb_obj, results, status):
+      if status == 200 and len(results) > 0:
+         self._tmdb.get_movie_info(results[0]['tmdb_id'], self._tmdb_complete)
+      else:
+         # store the current time in the cache db
+         self._idler_db.set_data(self._current_url, time.time())
+         # clear the 'semaphore', now another file can be processed
+         del self._tmdb
+         self._tmdb = None
+         self._current_url = None
+
+   def _tmdb_complete(self, tmdb, movie_info):
+      if movie_info is None:
+         # store the current time in the cache db
+         self._idler_db.set_data(self._idler_url, time.time())
+      else:
+         # store the result in movie db
+         try:
+            self._movie_db.set_data(self._current_url, movie_info)
+            text = '<title>Found movie:</><br>%s (%s)' % \
+                   (movie_info['title'], movie_info['release_date'][:4])
+            EmcNotify(text, icon = get_poster_filename(movie_info['id']))
+         except:
+            pass
+
+      # clear the 'semaphore', now another file can be processed
+      self._current_url = None
+
+      # update the browser view
+      self._browser.refresh()
+
+      # delete TMDBv3 object
+      del self._tmdb
+      self._tmdb = None
 
 
 ###### UTILS

@@ -27,8 +27,10 @@ except:
    from urllib import quote as urllib_quote
 
 try:
+   from efl import ecore
    from efl.ecore import FileDownload, Exe, ECORE_EXE_PIPE_READ, ECORE_EXE_PIPE_READ_LINE_BUFFERED
 except:
+   import ecore
    from ecore.file import download as FileDownload
 
 
@@ -210,7 +212,10 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
                   _cb_download_progress, dwl_data = dwl_data, *args, **kargs)
 
 def download_abort(dwl_handler):
-   ecore.file.download_abort(dwl_handler)
+   try:
+      ecore.file_download_abort(dwl_handler)
+   except:
+      ecore.file.download_abort(dwl_handler)
 
 
 class Singleton(object):

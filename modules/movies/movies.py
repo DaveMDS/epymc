@@ -55,7 +55,7 @@ def DBG(msg):
    print('MOVIES: %s' % (msg))
    # pass
 
-
+MOVIE_DB_VERSION = 1
 TMDB_API_KEY = '19eef197b81231dff0fd1a14a8d5f863' # Key of the user DaveMDS
 DEFAULT_INFO_LANG = 'en'
 DEFAULT_EXTENSIONS = 'avi mpg mpeg ogv mkv' #TODO fill better (uppercase ??)
@@ -209,10 +209,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # get allowed exensions from config
       self._exts = ini.get_string_list('movies', 'extensions')
 
-      # open movie/idler databases (they are created if not exists)
-      self._movie_db = EmcDatabase('movies')
-      self._idler_db = EmcDatabase('movieidlercache')
-
       # add an item in the mainmenu
       img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
       mainmenu.item_add('movies', 10, 'Movies', img, self.cb_mainmenu)
@@ -247,9 +243,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # delete browser
       self._browser.delete()
 
-      ## close databases
-      del self._movie_db
-      del self._idler_db
+      # close databases
+      if self._movie_db is not None: del self._movie_db
+      if self._idler_db is not None: del self._idler_db
 
    def play_movie(self, url):
       counts = mediaplayer.play_counts_get(url)
@@ -302,6 +298,12 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self._browser.page_add('movies://root', 'Movies', None, self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
+
+      # open movie/idler databases (they are created if not exists)
+      if self._movie_db is None:
+         self._movie_db = EmcDatabase('movies', MOVIE_DB_VERSION)
+      if self._idler_db is None:
+         self._idler_db = EmcDatabase('movieidlercache', MOVIE_DB_VERSION)
 
       # on idle scan all files (one shot every time the activity start)
       if not self._scanner and ini.get_bool('movies', 'enable_scanner'):

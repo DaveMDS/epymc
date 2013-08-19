@@ -158,7 +158,8 @@ class MovieItemClass(EmcItemClass):
                  name, year if year else 'Unknown')
 
       # return "test1: κόσμε END" # should see the Greek word 'kosme'
-      return text.encode('utf-8')
+      # return text.encode('utf-8')
+      return text.replace('&', '&amp;') # :/
 
 class FolderItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -381,7 +382,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          e = self._movie_db.get_data(url)
 
          # update text info
-         self._dialog.title_set(e['title'].encode('utf-8'))
+         self._dialog.title_set(e['title'].replace('&', '&amp;'))
          info = '<hilight>Director: </hilight> %s <br>' \
                 '<hilight>Cast: </hilight> %s <br>' \
                 '<hilight>Released: </hilight> %s <br>' \
@@ -391,7 +392,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                   % (e['director'], self._get_cast(e), e['release_date'],
                      e['countries'], e['rating'], e['overview'])
          # self._dialog.text_set("test2: κόσμε END") # should see the Greek word 'kosme')
-         self._dialog.text_set(info.encode('utf-8'))
+         self._dialog.text_set(info.replace('&', '&amp;'))
 
          # update poster
          poster = get_poster_filename(e['id'])
@@ -401,6 +402,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
             # TODO show a dummy image
             o_image.file_set('')
       else:
+         name, year = get_movie_name_from_url(url)
+         self._dialog.title_set(name)
          # TODO print also file size, video len, codecs, streams found, file metadata, etc..
          msg = 'Media:<br>' + url + '<br><br>' + \
                'No info stored for this media<br>' + \

@@ -170,7 +170,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    _browser = None     # the browser widget instance
    _exts = None        # list of allowed extensions
    _movie_db = None    # key: movie_url  data: dictionary as of the tmdb api
-   _person_db = None   # key: ?????      data: dictionary as of the tmdb api
 
    _generator = None
    _idler = None      # EcoreIdler
@@ -204,9 +203,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self._idler_retry_after = ini.get_int('movies', 'tmdb_retry_days')
       self._idler_retry_after *= 24 * 60 * 60
 
-      # open movie/person database (they are created if not exists)
+      # open movie/idler databases (they are created if not exists)
       self._movie_db = EmcDatabase('movies')
-      self._person_db = EmcDatabase('person')
       self._idler_db = EmcDatabase('movieidlercache')
 
       # add an item in the mainmenu
@@ -247,7 +245,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       ## close databases
       del self._movie_db
-      del self._person_db
       del self._idler_db
 
    def idle_cb(self):
@@ -299,12 +296,14 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          tmdb_obj.get_movie_info(results[0]['tmdb_id'], self.idle_tmdb_complete)
       else:
          # clear the 'semaphore', now another file can be processed
+         del tmdb_obj
          self._idler_url = None
       
    def idle_tmdb_complete(self, tmdb, movie_info):
       if movie_info is None:
          # store the current time in the cache db
          self._idler_db.set_data(self._idler_url, time.time())
+         self.idle_add_done(tmdb)
       else:
          # store the result in movie db
          try:
@@ -363,6 +362,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          mediaplayer.title_set(os.path.basename(url))
          mediaplayer.poster_set(None)
 
+
 ###### BROWSER STUFF
    def cb_mainmenu(self):
       # get movies folders from config
@@ -415,6 +415,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # refresh the page (maybe an unwatched movie becomes watched)
          if self._browser is not None:
             self._browser.refresh()
+
 
 ###### INFO PANEL STUFF
    def show_movie_info(self, url):
@@ -477,18 +478,33 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # TODO make thumbnail
          o_image.file_set('')
 
+
+######## Play
    def _cb_panel_1(self, button):
       self.play_movie(self._current_url)
       self.hide_movie_info()
 
+
+######## Cast
    def _cb_panel_2(self, button):
       if self._movie_db.id_exists(self._current_url):
          movie_info = self._movie_db.get_data(self._current_url)
 
-         dia = EmcDialog(title = 'Cast', style = 'list')
+         dia = EmcDialog(title = 'Cast', style = 'list',
+                         done_cb = lambda d, pid: CastPanel(pid))
+         dia.button_add('Info', self._cb_cast_info, dia)
+
          for person in sorted(movie_info['cast'], key=itemgetter('order')):
-            label = person['name'] + ' as ' + person['character']
-            dia.list_item_append(label)
+            label = '%s as %s' % (person['name'], person['character'])
+            icon = EmcRemoteImage(person['profile_path']) # TODO use 'dest' to cache the img
+            icon.size_hint_min_set(100, 100) # TODO FIXME
+            dia.list_item_append(label, icon, None, person['id'])
+
+   def _cb_cast_info(self, button, list_dia):
+      item = list_dia.list_item_selected_get()
+      pid = item.data[0][0]
+      CastPanel(pid)
+
 
 ######## Choose poster
    def _cb_panel_3(self, button):
@@ -642,10 +658,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       tmdb.get_movie_info(tid, self._cb_info_done, self._cb_info_progress)
       self.tmdb_dialog.text_append('<b>Downloading movie info...</b>')
 
-
    def _cb_info_progress(self, tmdb, progress, stage):
       self.tmdb_dialog.progress_set(progress)
-
 
    def _cb_info_done(self, tmdb, movie_info):
       # store the result in db
@@ -657,6 +671,73 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.tmdb_dialog.delete()
       self.tmdb_dialog = None
       del tmdb
+
+
+class CastPanel(EmcDialog):
+   def __init__(self, pid):
+      self.pid = pid
+      self.info = None
+
+      tmdb = TMDBv3(lang = ini.get('movies', 'info_lang'))
+      tmdb.get_cast_info(self.pid, self._fetch_done_cb, self._fetch_progress_cb)
+      self._dia = EmcDialog(style = 'progress', title = 'Fetching info',
+                            text = 'please wait...')
+
+   def _fetch_progress_cb(self, tmdb, progress):
+      self._dia.progress_set(progress)
+
+   def _fetch_done_cb(self, tmdb, result):
+      self.info = result
+      self._dia.delete()
+      del tmdb
+
+      image = EmcRemoteImage(self.info['profile_path'])
+      image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+      image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+      image.show()
+
+      text = '<hilight>%s</><br>' % self.info['name']
+      if self.info['biography']:
+         text += '%s<br><br>' % self.info['biography'].replace('\n', '<br>')
+      if self.info['birthday']:
+         text += '<hilight>Birthday:</> %s<br>' % (self.info['birthday'])
+      if self.info['deathday']:
+         text += '<hilight>Deathday:</> %s<br>' % (self.info['deathday'])
+      if self.info['place_of_birth']:
+         text += '<hilight>Place of birth:</> %s<br>' % (self.info['place_of_birth'])
+
+      EmcDialog.__init__(self, title = self.info['name'], style = 'panel',
+                               content = image, text = text)
+
+      c = len(self.info['credits']['cast'])
+      self.button_add('Movies (%s)' % c, lambda b: self.movies_dialog())
+      c = len(self.info['images']['profiles'])
+      self.button_add('Photos (%s)' % c, lambda b: self.photos_dialog())
+
+   def photos_dialog(self):
+      li = List(gui.win)
+      li.horizontal = True
+      li.style_set('image_list')
+      li.focus_allow_set(False)
+
+      for image in self.info['images']['profiles']:
+         img = EmcRemoteImage(image['file_path'])
+         it = li.item_append('', img)
+         if not li.selected_item:
+            it.selected = True
+
+      li.show()
+      li.go()
+
+      EmcDialog(title = self.info['name'], content = li)
+
+   def movies_dialog(self):
+      dia = EmcDialog(style = 'list', title = self.info['name'])
+      for movie in self.info['credits']['cast']:
+         label = '%s as %s' % (movie['title'], movie['character'])
+         icon = EmcRemoteImage(movie['poster_path'])
+         icon.size_hint_min_set(100, 100) # TODO FIXME
+         dia.list_item_append(label, icon)
 
 
 ###### UTILS
@@ -731,15 +812,20 @@ class TMDBv3(object):
    # get movie info + poster + backdrop:
    tmdb.get_movie_info(tmdb_id, info_done_cb, info_progress_cb)
    def info_progress_cb(tmdb, progress, stage):
-   def info_done_cb(self, tmdb, movie_info):
+   def info_done_cb(tmdb, movie_info):
 
    # get list of all available posters:
    tmdb.get_posters(tmdb_id, list_complete_cb)
-   def list_complete_cb(self, tmdb, posters):
+   def list_complete_cb(tmdb, posters):
 
    # get list of all available backdrop:
    tmdb.get_backdrops(tmdb_id, list_complete_cb)
-   def list_complete_cb(self, tmdb, backdrops):
+   def list_complete_cb(tmdb, backdrops):
+
+   # get info for a list of casts
+   tmdb.get_cast_info(cast_ids, cast_done_cb, cast_progress_cb):
+   def cast_progress_cb(tmdb, progress):
+   def cast_done_cb(tmdb, result):
 
    # abort the current operation:
    tmdb.abort()
@@ -861,6 +947,12 @@ class TMDBv3(object):
       except:
          countries = ''
 
+      for person in tmdb['casts']['cast']:
+         person['profile_path'] = self._build_img_url(person['profile_path'], 154)
+
+      for person in tmdb['casts']['crew']:
+         person['profile_path'] = self._build_img_url(person['profile_path'], 154)
+
       info = {
          'id':             tmdb['id'],
          'tmdb_id':        tmdb['id'],
@@ -932,10 +1024,41 @@ class TMDBv3(object):
             })
       self.done_cb(self, results)
 
+   # get cast info
+   def get_cast_info(self, cast_id, done_cb, progress_cb):
+      self.done_cb = done_cb
+      self.progress_cb = progress_cb
+
+      url = '%s/person/%s?api_key=%s&language=%s&append_to_response=credits,images' % \
+             (self.base_url, cast_id, self.key, self.lang)
+      DBG('TMDB People query: ' + url)
+      self.dwl_handler = utils.download_url_async(url, 'tmp', urlencode = False,
+                                          complete_cb = self._cast_info_done_cb,
+                                          progress_cb = self._cast_info_progress_cb)
+
+   def _cast_info_progress_cb(self, dest, tot, done):
+      if tot > 0 and self.progress_cb:
+         self.progress_cb(self, float(done) / float(tot))
+
+   def _cast_info_done_cb(self, dest, status):
+      if status != 200:
+         self.done_cb(self, None)
+      else:
+         data = self._read_json_file_and_delete_it(dest)
+         data['profile_path'] = self._build_img_url(data['profile_path'], 185) # ARGHHHH h632
+         for img in data['images']['profiles']:
+            img['file_path'] = self._build_img_url(img['file_path'], 185) # ARGHHHH h632
+         for movie in data['credits']['cast']:
+            movie['poster_path'] = self._build_img_url(movie['poster_path'], 154)
+         for movie in data['credits']['crew']:
+            movie['poster_path'] = self._build_img_url(movie['poster_path'], 154)
+         self.done_cb(self, data)
+      
    # utils
    def _build_img_url(self, final_part, size):
       # TODO base url and sizes should be queryed with: /3/configuration
-      return 'http://d3gtl9l2a4fn1j.cloudfront.net/t/p/w' + str(size) + final_part
+      if final_part:
+         return 'http://d3gtl9l2a4fn1j.cloudfront.net/t/p/w' + str(size) + final_part
 
    def _read_json_file_and_delete_it(self, path):
       f = open(path, 'r')

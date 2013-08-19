@@ -91,6 +91,17 @@ class AddSourceItemClass(EmcItemClass):
    def icon_get(self, url, mod):
       return 'icon/plus'
 
+class RescanItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      if not mod._scanner:
+         mod._scanner = BackgroundScanner(mod._browser, mod._movie_db, mod._idler_db)
+
+   def label_get(self, url, mod):
+      return 'Rescan library'
+
+   def icon_get(self, url, mod):
+      return 'icon/refresh'
+
 class MovieItemClass(EmcItemClass):
    def item_selected(self, url, mod):
       mod.show_movie_info(url)
@@ -300,6 +311,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       for f in self._folders:
          self._browser.item_add(FolderItemClass(), f, self)
 
+      self._browser.item_add(RescanItemClass(), 'movies://rescan_library', self);
       self._browser.item_add(AddSourceItemClass(), 'movies://add_source', self);
 
    def populate_url(self, browser, url):

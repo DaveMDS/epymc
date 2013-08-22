@@ -48,32 +48,39 @@ class EmcDatabase(object):
    """ TODO doc this """
 
    def __init__(self, name, version = None):
-      dbname = os.path.join(utils.config_dir_get(),
-                          'db_py%d_%s' %(sys.version_info[0], name))
-      DBG('Open db: ' + name + ' from file: ' + dbname)
-      
       self._name = name
       self._vers = version
       self._vkey = '__database__version__'
+
+      # build the db name (different db for py2 and py3)
+      dbname = os.path.join(utils.config_dir_get(),
+                          'db_py%d_%s' %(sys.version_info[0], name))
+      DBG('Open db: ' + name + ' from file: ' + dbname)
+
+      # check if the db exist (or is the first time we use it)
+      first_run = False if glob.glob(dbname + '*') else True
+
+      # open the shelve
       self._sh = shelve.open(dbname)
 
-      if (version is not None) and (self.get_version() != version):
-            # the db is outdated
-            text = '<b>The database "%s" is outdated!</b><br><br>The old file has been renamed with a .backup extension and a new (empty) one has been created.<br><br>Sorry for the incovenience.'  % (name)
-            EmcDialog(style = 'warning', title = 'EpyMC Database', text = text)
+      if (not first_run) and (version is not None) and (self.get_version() != version):
+         # the db is outdated
+         text = '<b>The database "%s" is outdated!</b><br><br>The old file has been renamed with a .backup extension and a new (empty) one has been created.<br><br>Sorry for the incovenience.'  % (name)
+         EmcDialog(style = 'warning', title = 'EpyMC Database', text = text)
 
-            # close the shelve
-            self._sh.close()
+         # close the shelve
+         self._sh.close()
 
-            # rename db files to .backup
-            for fname in glob.glob(dbname + '*'):
-               os.rename(fname, fname + '.backup')
+         # rename db files to .backup
+         for fname in glob.glob(dbname + '*'):
+            os.rename(fname, fname + '.backup')
 
-            # reopen a new (empty) shelve
-            self._sh = shelve.open(dbname)
+         # reopen a new (empty) shelve
+         self._sh = shelve.open(dbname)
 
-            # store the version inside the db
-            self._sh[self._vkey] = version
+      if version is not None:
+         # store the version inside the db
+         self._sh[self._vkey] = version
 
    def __del__(self):
       self._sh.close()

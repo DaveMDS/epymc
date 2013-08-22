@@ -19,27 +19,21 @@
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
 
-import os, re, time, threading
+import os, re, time
 from operator import itemgetter
-
-try:
-   import queue as Queue
-except:
-   import Queue
 
 try:
    from efl import ecore, evas, elementary, emotion
    from efl.elementary.image import Image
-   from efl.elementary.list import List
 except:
    import ecore, evas, elementary, emotion
-   from elementary import Image, List
+   from elementary import Image
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourceSelector, \
-   EmcVKeyboard, EmcNotify, EmcRemoteImage2
+   EmcVKeyboard, EmcNotify
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
@@ -352,9 +346,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 ###### INFO PANEL STUFF
    def show_movie_info(self, url):
       image = Image(gui.win)
-      image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      image.show()
       dialog = EmcDialog(style = 'panel', text = ' ', content = image)
 
       self._dialog = dialog
@@ -372,8 +363,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self._dialog.button_add('Play', self._cb_panel_1)
       if self._movie_db.id_exists(url):
          self._dialog.button_add('Cast', self._cb_panel_2)
-         self._dialog.button_add('Poster', self._cb_panel_3)
-         self._dialog.button_add('Fanart', self._cb_panel_4)
+         self._dialog.button_add('Posters', self._cb_panel_3)
+         self._dialog.button_add('Backdrops', self._cb_panel_4)
       self._dialog.button_add('Search Info', self._cb_panel_5)
 
       o_image = self._dialog.content_get()
@@ -448,26 +439,14 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          tmdb.get_posters(movie_info['tmdb_id'], self._cb_posters_list_complete)
 
    def _cb_posters_list_complete(self, tmdb, posters):
-      li = List(gui.win)
-      li.horizontal = True
-      li.style_set('image_list')
-      li.focus_allow_set(False)
-
-      for poster in posters:
-         img = EmcRemoteImage(poster['thumb_url'])
-         it = li.item_append('', img, None, None, poster)
-         if not li.selected_item: it.selected = True
-
-      li.show()
-      li.go()
-
       title = '%d posters available' % (len(posters))
-      dialog = EmcDialog(title = title, content = li,
+      dialog = EmcDialog(style = 'image_list_horiz', title = title,
                          done_cb = self._cb_posters_list_ok)
-      li.callback_clicked_double_add((lambda l,i: self._cb_posters_list_ok(dialog)))
+      for poster in posters:
+         icon = EmcRemoteImage(poster['thumb_url'])
+         dialog.list_item_append(None, icon, poster = poster)
 
-   def _cb_posters_list_ok(self, dialog):
-      poster = dialog.content_get().selected_item_get().data_get()[0][0]
+   def _cb_posters_list_ok(self, dialog, poster):
       dest = get_poster_filename(poster['movie_id'])
       utils.download_url_async(poster['url'], dest,
                                complete_cb = self._cb_image_done,
@@ -501,27 +480,16 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          tmdb.get_backdrops(movie_info['tmdb_id'], self._cb_backdrops_list_complete)
 
    def _cb_backdrops_list_complete(self, tmdb, backdrops):
-      li = List(gui.win)
-      li.horizontal = False
-      li.style_set('image_list')
-      li.focus_allow_set(False)
 
+      title = '%d backdrops available' % (len(backdrops))
+      dialog = EmcDialog(style = 'image_list_vert', title = title,
+                         done_cb = self._cb_backdrops_list_ok)
       for backdrop in backdrops:
          img = EmcRemoteImage(backdrop['thumb_url'])
-         it = li.item_append('', img, None, None, backdrop)
-         if not li.selected_item: it.selected = True
+         dialog.list_item_append(None, img, backdrop = backdrop)
 
-      li.show()
-      li.go()
-
-      title = '%d fanarts available' % (len(backdrops))
-      dialog = EmcDialog(title = title, content = li,
-                         done_cb = self._cb_backdrops_list_ok)
-      li.callback_clicked_double_add((lambda l,i: self._cb_backdrops_list_ok(dialog)))
-
-   def _cb_backdrops_list_ok(self, dialog):
+   def _cb_backdrops_list_ok(self, dialog, backdrop):
       # download the selected backdrop
-      backdrop = dialog.content_get().selected_item_get().data_get()[0][0]
       dest = get_backdrop_filename(backdrop['movie_id'])
       utils.download_url_async(backdrop['url'], dest,
                                complete_cb = self._cb_image_done,
@@ -625,11 +593,6 @@ class CastPanel(EmcDialog):
       self._dia.delete()
       del tmdb
 
-      image = EmcRemoteImage(self.info['profile_path'])
-      image.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      image.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      image.show()
-
       text = '<hilight>%s</><br>' % self.info['name']
       if self.info['biography']:
          text += '%s<br><br>' % self.info['biography'].replace('\n', '<br>')
@@ -640,6 +603,7 @@ class CastPanel(EmcDialog):
       if self.info['place_of_birth']:
          text += '<hilight>Place of birth:</> %s<br>' % (self.info['place_of_birth'])
 
+      image = EmcRemoteImage(self.info['profile_path'])
       EmcDialog.__init__(self, title = self.info['name'], style = 'panel',
                                content = image, text = text)
 
@@ -649,21 +613,10 @@ class CastPanel(EmcDialog):
       self.button_add('Photos (%s)' % c, lambda b: self.photos_dialog())
 
    def photos_dialog(self):
-      li = List(gui.win)
-      li.horizontal = True
-      li.style_set('image_list')
-      li.focus_allow_set(False)
-
+      dia = EmcDialog(style = 'image_list_horiz', title = self.info['name'])
       for image in self.info['images']['profiles']:
          img = EmcRemoteImage(image['file_path'])
-         it = li.item_append('', img)
-         if not li.selected_item:
-            it.selected = True
-
-      li.show()
-      li.go()
-
-      EmcDialog(title = self.info['name'], content = li)
+         dia.list_item_append(None, img)
 
    def movies_dialog(self):
       dia = EmcDialog(style = 'list', title = self.info['name'])

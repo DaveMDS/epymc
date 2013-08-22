@@ -102,7 +102,10 @@ class EmcItemClass(Singleton):
           You can also return a valid url (http://) to automatically
           download the image to a random temp file. In addition you can also
           set the destinatioon path for the given url, just use ';'.
-          ex: 'http://my.url/of/the/image;/my/local/dest/path' """
+          ex: 'http://my.url/of/the/image;/my/local/dest/path'
+          UPDATE: To set an url and a destination just return a tuple, as:
+          (url, local_path)
+          """
       # DBG(('poster_get(%s)' % url))
       return None
 
@@ -533,7 +536,11 @@ class ViewList(object):
 
       # Ask for the item poster and show (or auto-download) it
       poster = item_class.poster_get(url, user_data)
-      if poster and poster.startswith('http://'):
+      if isinstance(poster, tuple):
+         (url, dest) = poster
+         self.__im.url_set(url, dest)
+      elif poster and poster.startswith('http://'):
+         # TODO remove this ugliness and use the tuple in MAME
          if poster.find(';') != -1:
             (url, dest) = poster.split(';')
             self.__im.url_set(url, dest)

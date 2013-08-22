@@ -61,7 +61,7 @@ _screensaver_ts = 0
 _screensaver_status = 0 # 0=inactive 1=active 2=monitor_off
 
 
-DEBUG = True
+DEBUG = False
 DEBUGN = 'GUI'
 def LOG(sev, msg):
    if   sev == 'err': print('%s ERROR: %s' % (DEBUGN, msg))

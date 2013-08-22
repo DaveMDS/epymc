@@ -97,10 +97,14 @@ def hum_size(bytes):
       size = '%.2fb' % bytes
    return size
 
-def grab_files(folders, show_hidden=False):
+def splitpath(path):
+   """ Convert a string path in a list of all the components """
+   return [p for p in path.split(os.path.sep) if p != '']
+
+def grab_files(folders, show_hidden=False, recursive=True):
    """
    This is a generator function, you give a list of directories to
-   scan (recursively) and the generator will return all the files
+   scan (recursively or not) and the generator will return all the files
    path, one file on each next() call.
 
    Usage:
@@ -109,7 +113,7 @@ def grab_files(folders, show_hidden=False):
    for filename in self.grab_files(['/path/1', '/path/2/other']):
       print(filename)
 
-   # or asycrony ;)
+   # or asynchrony ;)
    generator = self.grab_files(['/path/1', '/path/2/other'])
       ...
    try:
@@ -117,6 +121,7 @@ def grab_files(folders, show_hidden=False):
       print(filename)
    except StopIteration:
       print('file list done')
+
    """
    for folder in folders:
       if folder.startswith('file://'): # mhhhh...
@@ -125,7 +130,11 @@ def grab_files(folders, show_hidden=False):
          if show_hidden or name[0] != '.':
             full_path = os.path.join(folder, name)
             if os.access(full_path, os.R_OK):
-               if os.path.isdir(full_path):
+               # not recursive version
+               if not recursive:
+                  yield full_path
+               # the recursive one
+               elif os.path.isdir(full_path):
                   for entry in grab_files([full_path]):
                      yield entry
                elif os.path.isfile(full_path):
@@ -206,8 +215,6 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
    dwl_data = (complete_cb, progress_cb, min_size)
 
    # start the download
-   # return ecore.file.download(encoded, dest, _cb_download_complete,
-               # _cb_download_progress, dwl_data = dwl_data, *args, **kargs)
    return FileDownload(encoded, dest, _cb_download_complete,
                   _cb_download_progress, dwl_data = dwl_data, *args, **kargs)
 

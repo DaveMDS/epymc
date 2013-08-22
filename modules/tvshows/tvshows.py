@@ -23,17 +23,20 @@ import os, re, time
 
 try:
    from efl import ecore, evas
+   from efl.elementary.image import Image
 except:
    import ecore, evas
+   from elementary import Image
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
-from epymc.gui import EmcDialog, EmcSourceSelector, EmcNotify
+from epymc.gui import EmcDialog, EmcSourceSelector, EmcNotify, EmcRemoteImage
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
 import epymc.ini as ini
+import epymc.gui as gui
 import epymc.utils as utils
 import epymc.events as events
 import epymc.config_gui as config_gui
@@ -45,7 +48,7 @@ def DBG(msg):
    print('TVSHOWS: %s' % (msg))
    # pass
 
-TVSHOWS_DB_VERSION = 1
+TVSHOWS_DB_VERSION = 2
 TVDB_API_KEY = 'A5B4979B52BF8797' # Key of the user DaveMDS
 DEFAULT_INFO_LANG = 'en'
 DEFAULT_EPISODE_REGEXP = '[Ss]*(?P<season>[0-9]+)[Xx]*[Ee]*(?P<episode>[0-9]+)'
@@ -88,6 +91,17 @@ class RescanItemClass(EmcItemClass):
       return 'icon/refresh'
 
 
+class SerieInfoItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      InfoPanel(mod._current_serie_name)
+
+   def label_get(self, url, mod):
+      return 'Serie info'
+
+   def icon_get(self, url, mod):
+      return 'icon/tv'
+
+
 class FileItemClass(EmcItemClass):
    def item_selected(self, url, mod):
       mod_instance.play_url(url)
@@ -117,6 +131,7 @@ class FolderItemClass(EmcItemClass):
 
 class SerieItemClass(EmcItemClass):
    def item_selected(self, url, serie_name):
+      mod_instance._current_serie_name = serie_name
       mod_instance._current_base_path = os.path.split(url)[0]
       mod_instance._browser.page_add(url, serie_name,
                                      None, mod_instance.populate_url)
@@ -179,11 +194,12 @@ class TvShowsModule(EmcModule):
    info = """Long info for the tvshows module, explain what it does and what it
 need to work well, can also use markup like <title>this</> or <b>this</>"""
 
-   _browser = None           # the Browser widget instance
-   _scanner = None           # the BackgroundScanner instance
-   _tvshows_db = None        # key: show_name  data: a BIG dict
-   _idler_db = None          # key: show_name  data: dict
-   _current_base_path = None # the base folder of the current show
+   _browser = None            # the Browser widget instance
+   _scanner = None            # the BackgroundScanner instance
+   _tvshows_db = None         # key: show_name  data: a BIG dict
+   _idler_db = None           # key: show_name  data: dict
+   _current_base_path = None  # the base folder of the current show
+   _current_serie_name = None # the current show name
 
    def __init__(self):
       DBG('Init module')
@@ -323,8 +339,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                item_url = 'file://' + full_path
                self._browser.item_add(SerieItemClass(), item_url, fname)
 
-      self._browser.item_add(RescanItemClass(), 'tvshows://rescan_library', self);
-      self._browser.item_add(AddSourceItemClass(), 'tvshows://add_source', self);
+      self._browser.item_add(RescanItemClass(), 'tvshows://rescan_library', self)
+      self._browser.item_add(AddSourceItemClass(), 'tvshows://add_source', self)
 
    def populate_url(self, browser, url):
       # build ordered list of files and dirs (relative to the show base dir)
@@ -340,11 +356,12 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # populate directories
       for relative in dirs:
          item_url = self._current_base_path + relative
-         try:
-            (show_name, s_num, e_num) = get_serie_from_relative_url(relative)
-            # TODO
-         except:
-            self._browser.item_add(FolderItemClass(), item_url, self)
+         # TODO 
+         # try:
+            # (show_name, s_num, e_num) = get_serie_from_relative_url(relative)
+            # DBG([show_name, s_num, e_num])
+         # except:
+         self._browser.item_add(FolderItemClass(), item_url, self)
 
       # populate files
       for relative in files:
@@ -358,6 +375,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          except:
             self._browser.item_add(FileItemClass(), item_url, self)
 
+      self._browser.item_add(SerieInfoItemClass(), 'tvshows://rescan_library', self)
+
 
    def _events_cb(self, event):
       # TODO: check that we are active and visible
@@ -367,6 +386,138 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          if self._browser is not None:
             self._browser.refresh()
 
+
+class InfoPanel(EmcDialog):
+   def __init__(self, serie_name):
+      self._serie_name = serie_name
+      if mod_instance._tvshows_db.id_exists(serie_name):
+         self._db_data = mod_instance._tvshows_db.get_data(serie_name)
+      else:
+         self._db_data = None
+
+      self._image = Image(gui.win)
+      EmcDialog.__init__(self, style = 'panel', title = serie_name,
+                         text = ' ', content = self._image)
+      self.button_add('Posters', self._posters_button_cb)
+      self.button_add('Backdrops', self._backdrop_button_cb)
+      self.button_add('Banners', self._banners_button_cb)
+      self.button_add('Actors (TODO)', self._actors_button_cb)
+      self.button_add('Refresh info', self._refresh_info_button_cb)
+      self.update()
+
+   def update(self):
+      if self._db_data:
+         d = self._db_data
+         info = '<hilight>First aired: </hilight> %s <br>' \
+                '<hilight>Network:</hilight> %s<br>' \
+                '<hilight>Seasons:</hilight> %s<br>' \
+                '<hilight>Genres:</hilight> %s<br>' \
+                '<hilight>Runtime:</hilight> %s min<br>' \
+                '<hilight>Rating:</hilight> %s<br>' \
+                '<hilight>Status:</hilight> %s<br>' \
+                '<br><hilight>Overview:</hilight><br>%s<br>' \
+                '<br><hilight>Actors:</hilight> %s<br>' \
+                  % (d['first_aired'], d['network'], len(d['seasons']),
+                     ', '.join(d['genres']), d['runtime'], d['rating'],
+                     d['status'], d['overview'], ', '.join(d['casts']))
+
+         self._image.file = get_poster_filename(self._db_data['id'])
+         self.text_set(info)
+      else:
+         text = 'No info stored for this serie.<br>' \
+                'Please try the "refresh info" button.'
+         self.text_set(text)
+
+   ### images
+   def _posters_button_cb(self, button):
+      title = '%s posters found' % len(self._db_data['posters'])
+      dia = EmcDialog(style = 'image_list_horiz', title = title,
+                      done_cb = self._image_choosed_cb)
+      for poster in self._db_data['posters']:
+         icon = EmcRemoteImage(poster['thumb_url'])
+         dia.list_item_append(None, icon, dwnl_url = poster['url'],
+                     dest_path = get_poster_filename(self._db_data['id']))
+
+   def _backdrop_button_cb(self, button):
+      title = '%s backdrops found' % len(self._db_data['backdrops'])
+      dia = EmcDialog(style = 'image_list_vert', title = title,
+                      done_cb = self._image_choosed_cb)
+      for backdrop in self._db_data['backdrops']:
+         icon = EmcRemoteImage(backdrop['thumb_url'])
+         dia.list_item_append(None, icon, dwnl_url = backdrop['url'],
+                     dest_path = get_backdrop_filename(self._db_data['id']))
+
+   def _banners_button_cb(self, button):
+      title = '%s banners found' % len(self._db_data['banners'])
+      dia = EmcDialog(style = 'image_list_vert', title = title,
+                      done_cb = self._image_choosed_cb)
+      for banner in self._db_data['banners']:
+         icon = EmcRemoteImage(banner['url'])
+         dia.list_item_append(None, icon, dwnl_url = banner['url'],
+                     dest_path = get_banner_filename(self._db_data['id']))
+
+   def _image_choosed_cb(self, dia, dwnl_url, dest_path):
+      dia.delete()
+      dia = EmcDialog(style = 'progress', title = 'Downloading image')
+      utils.download_url_async(dwnl_url, dest_path,
+                               complete_cb = self._cb_image_done,
+                               progress_cb = self._cb_image_progress,
+                               dia = dia)
+
+   def _cb_image_progress(self, dest, tot, done, dia):
+      if tot > 0: dia.progress_set(float(done) / float(tot))
+
+   def _cb_image_done(self, dest, status, dia):
+      if os.path.basename(dest) == 'poster.jpg':
+         self._image.file = dest
+      mod_instance._browser.refresh()
+      dia.delete()
+
+   ### actors
+   def _actors_button_cb(self, button):
+      DBG("TODO")
+
+   ### refresh infos
+   def _refresh_info_button_cb(self, button):
+      tvdb = TVDB(lang = ini.get('tvshows', 'info_lang'))
+      tvdb.search_series_by_name(self._serie_name, self._search_done_cb)
+
+   def _search_done_cb(self, tvdb, results, status):
+      if status == 200 and len(results) > 0:
+         title = 'Found %d results, which one?' % len(results)
+         dia = EmcDialog(style = 'image_list_vert', title = title,
+                         done_cb = self._result_choosed_cb,
+                         user_data = tvdb)
+         for item in results:
+            if item['banner']:
+               img = EmcRemoteImage(item['banner'])
+               dia.list_item_append(None, img, serie_id = item['id'])
+      else:
+         text = 'The search for "%s" did not make any results.<br>' \
+                'If your show is listed on thetvdb.com please rename ' \
+                'your folder to match the title on the site.<br>' \
+                'If otherwise it is not in the online database please ' \
+                'contribute and add it yourself.' % self._serie_name
+         EmcDialog(style = 'minimal', title = 'Nothing found', text = text)
+
+   def _result_choosed_cb(self, dia, serie_id):
+      tvdb = dia.data_get()
+      tvdb.fetch_all_data_for_serie(serie_id, self._refresh_done_cb)
+
+      dia.delete()
+      # TODO give credits here
+      self._prog_dia = EmcDialog(style = 'minimal', spinner = True,
+                                 title = 'Fetching updated info',
+                                 text = 'Please wait...')
+
+   def _refresh_done_cb(self, tvdb, data, status):
+      self._prog_dia.delete()
+      if status == 200 and data:
+         mod_instance._tvshows_db.set_data(self._serie_name, data)
+         self._db_data = data
+         self.update()
+      
+   
 
 ###### Utils
 def get_serie_from_relative_url(url):

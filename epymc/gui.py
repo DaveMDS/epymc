@@ -885,7 +885,8 @@ class EmcDialog(edje.Edje):
    style can be 'panel' or 'minimal'
 
    you can also apply special style that perform specific task:
-      'info', 'error', 'warning', 'yesno', 'cancel', 'progress', 'list'
+      'info', 'error', 'warning', 'yesno', 'cancel', 'progress',
+      'list', 'image_list_horiz', 'image_list_vert'
    """
 
    minimal_styles = ['info', 'error', 'warning', 'yesno', 'cancel', 'progress']
@@ -989,10 +990,14 @@ class EmcDialog(edje.Edje):
             self._vbox.pack_end(frame)
 
       # automatic list
-      if style == 'list':
+      if style in ['list', 'image_list_horiz', 'image_list_vert']:
          self._list = List(win)
          self._list.focus_allow_set(False)
-         self._list.style_set('dialog')
+         if style == 'list':
+            self._list.style_set('dialog')
+         else:
+            self._list.style_set('image_list')
+         self._list.horizontal = True if style == 'image_list_horiz' else False
          self._list.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
          self._list.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
          self._list.callback_activated_add(self._list_item_activated_cb)
@@ -1003,6 +1008,7 @@ class EmcDialog(edje.Edje):
       if spinner:
          self._spinner = Progressbar(win)
          self._spinner.style_set('wheel')
+         self._spinner.pulse_mode = True
          self._spinner.pulse(True)
          self._spinner.show()
          self._vbox.pack_end(self._spinner)
@@ -1199,7 +1205,7 @@ class EmcDialog(edje.Edje):
             item = list.items_get()[0]
 
          horiz = False
-         if type(self._content) is List:
+         if type(list) is List:
             horiz = list.horizontal
 
          if (horiz and event == 'RIGHT') or \

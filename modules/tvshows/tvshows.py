@@ -48,7 +48,7 @@ def DBG(msg):
    print('TVSHOWS: %s' % (msg))
    # pass
 
-TVSHOWS_DB_VERSION = 2
+TVSHOWS_DB_VERSION = 3
 TVDB_API_KEY = 'A5B4979B52BF8797' # Key of the user DaveMDS
 DEFAULT_INFO_LANG = 'en'
 DEFAULT_EPISODE_REGEXP = '[Ss]*(?P<season>[0-9]+)[Xx]*[Ee]*(?P<episode>[0-9]+)'
@@ -128,6 +128,10 @@ class FolderItemClass(EmcItemClass):
    def icon_get(self, url, mod):
       return 'icon/folder'
 
+   def fanart_get(self, url, mod):
+      if mod_instance._tvshows_db.id_exists(mod._current_serie_name):
+         e = mod_instance._tvshows_db.get_data(mod._current_serie_name)
+         return get_backdrop_filename(e['id'])
 
 class SerieItemClass(EmcItemClass):
    def item_selected(self, url, serie_name):
@@ -182,9 +186,23 @@ class EpisodeItemClass(EmcItemClass):
       episode_id = episode_data['id']
       return (episode_data['thumb_url'], get_episode_filename(series_id, episode_id))
 
+   def fanart_get(self, url, episode_data):
+      if mod_instance._tvshows_db.id_exists(mod_instance._current_serie_name):
+         e = mod_instance._tvshows_db.get_data(mod_instance._current_serie_name)
+         return get_backdrop_filename(e['id'])
+
    def info_get(self, url, episode_data):
-      return '<title>Episode %d: %s</><br>%s' % (episode_data['episode_num'],
-             episode_data['title'], episode_data['overview'])
+      return '<title>Episode %d: %s</><br>' \
+             '<hilight>Director:</> %s<br>' \
+             '<hilight>Writer:</> %s<br>' \
+             '<hilight>Overview:</> %s</><br>' \
+             '<hilight>First aired: %s</><br>' \
+             '<hilight>Guest stars: %s</><br>' % \
+               (episode_data['episode_num'], episode_data['title'],
+                ', '.join(episode_data['director']),
+                ', '.join(episode_data['writer']),
+                episode_data['overview'], episode_data['first_aired'],
+                ', '.join(episode_data['guest_stars']))
 
 
 class TvShowsModule(EmcModule):
@@ -198,7 +216,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    _scanner = None            # the BackgroundScanner instance
    _tvshows_db = None         # key: show_name  data: a BIG dict
    _idler_db = None           # key: show_name  data: dict
-   _current_base_path = None  # the base folder of the current show
+   _current_base_path = None  # the current base folder (the user source dir)
    _current_serie_name = None # the current show name
 
    def __init__(self):
@@ -289,19 +307,18 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    def play_url_real(self, url, start_from):
       mediaplayer.play_url(url, start_from = start_from)
-      # if self._movie_db.id_exists(url):
-         # e = self._movie_db.get_data(url)
-         # try:
-            # mediaplayer.title_set(e['name'])
-         # except:
-            # mediaplayer.title_set(os.path.basename(url))
-         # try:
-            # mediaplayer.poster_set(get_poster_filename(e['id']))
-         # except:
-            # mediaplayer.poster_set(None)
-      # else:
-      mediaplayer.title_set(os.path.basename(url))
-      mediaplayer.poster_set(None)
+      title = os.path.basename(url)
+      poster = None
+      try: 
+         e = self._tvshows_db.get_data(self._current_serie_name)
+         relative = url.replace(self._current_base_path, '')
+         (show_name, s_num, e_num) = get_serie_from_relative_url(relative)
+         title = "%s. %s" % (e_num, e['seasons'][s_num]['episodes'][e_num]['title'])
+         poster = get_poster_filename(e['id'])
+      except:
+         pass
+      mediaplayer.title_set(title)
+      mediaplayer.poster_set(poster)
 
 
 ###### BROWSER STUFF
@@ -362,7 +379,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # except:
          self._browser.item_add(FolderItemClass(), item_url, self)
 
-      # populate files
+      # then populate files
       for relative in files:
          item_url = self._current_base_path + relative
          try:
@@ -909,11 +926,11 @@ class TVDB(object):
             'title': episode.findtext('EpisodeName'),
             'season_num': season_num,
             'episode_num': episode_num,
-            'director': episode.findtext('Director'),  # TODO split
-            'writer': episode.findtext('Writer'), # TODO split
+            'director': episode.findtext('Director', '||').split('|')[1:-1],
+            'writer': episode.findtext('Writer', '||').split('|')[1:-1],
             'overview': episode.findtext('Overview'),
             'first_aired': episode.findtext('FirstAired'),
-            'guest_stars': episode.findtext('GuestStarts'), # TODO split
+            'guest_stars': episode.findtext('GuestStarts', '||').split('|')[1:-1],
             'thumb_url': self._build_image_url(episode.findtext('filename')),
          }
 

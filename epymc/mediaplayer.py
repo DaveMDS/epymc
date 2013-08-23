@@ -124,18 +124,18 @@ def play_url(url, only_audio = False, start_from = 0):
               (counts['started'], counts['finished']))
    
    ## TEST VARIOUS INFO
-   LOG('dbg', 'TITLE: ' + str(_emotion.title_get()))
-   LOG('dbg', 'CHAPTER COUNT: ' + str(_emotion.chapter_count()))
-   LOG('dbg', 'VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
-   LOG('dbg', 'AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
-   LOG('dbg', 'SPU CHNS COUNT: ' + str(_emotion.spu_channel_count()))
-   LOG('dbg', 'VIDEO CHAN GET: ' + str(_emotion.video_channel_get()))
-   LOG('dbg', 'AUDIO CHAN GET: ' + str(_emotion.audio_channel_get()))
-   LOG('dbg', 'SPU CHAN GET: ' + str(_emotion.spu_channel_get()))
-   LOG('dbg', 'INFO DICT: ' + str(_emotion.meta_info_dict_get()))
-   LOG('dbg', 'SIZE: ' + str(_emotion.size))
-   LOG('dbg', 'IMAGE_SIZE: ' + str(_emotion.image_size))
-   LOG('dbg', 'RATIO: ' + str(_emotion.ratio_get()))
+   # LOG('dbg', 'TITLE: ' + str(_emotion.title_get()))
+   # LOG('dbg', 'CHAPTER COUNT: ' + str(_emotion.chapter_count()))
+   # LOG('dbg', 'VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
+   # LOG('dbg', 'AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
+   # LOG('dbg', 'SPU CHNS COUNT: ' + str(_emotion.spu_channel_count()))
+   # LOG('dbg', 'VIDEO CHAN GET: ' + str(_emotion.video_channel_get()))
+   # LOG('dbg', 'AUDIO CHAN GET: ' + str(_emotion.audio_channel_get()))
+   # LOG('dbg', 'SPU CHAN GET: ' + str(_emotion.spu_channel_get()))
+   # LOG('dbg', 'INFO DICT: ' + str(_emotion.meta_info_dict_get()))
+   # LOG('dbg', 'SIZE: ' + str(_emotion.size))
+   # LOG('dbg', 'IMAGE_SIZE: ' + str(_emotion.image_size))
+   # LOG('dbg', 'RATIO: ' + str(_emotion.ratio_get()))
    ##
 
    return True
@@ -168,9 +168,9 @@ def stop():
    _emotion.play = False
    _emotion.position = 0.0
    
-   # _emotion.delete()
-   # del _emotion
-   # _emotion = None
+   _emotion.delete()
+   del _emotion
+   _emotion = None
 
    events.event_emit('PLAYBACK_FINISHED')
 

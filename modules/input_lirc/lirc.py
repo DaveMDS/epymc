@@ -22,6 +22,7 @@ from socket import *
 
 try:
    from efl import ecore, elementary
+   from efl.elementary.list import List
 except:
    import ecore, elementary
 
@@ -179,7 +180,7 @@ and what it need to work well, can also use markup like <title>this</> or
       self.dia.delete()
       
       # create the events list
-      li = elementary.List(gui.win)
+      li = List(gui.win)
       li.focus_allow_set(False)
       for event in input_events.STANDARD_EVENTS.split():
          li.item_append(event, None, None, None, None)

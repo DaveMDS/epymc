@@ -25,7 +25,7 @@ try:
 except:
    import evas
 
-from . import gui, mainmenu, input_events, ini, modules
+from . import gui, mainmenu, input_events, ini, modules, utils
 
 from .browser import EmcBrowser, EmcItemClass
 from .gui import EmcDialog, EmcVKeyboard
@@ -326,7 +326,7 @@ def _themes_list():
    _browser.page_add('config://themes/', 'Themes', None, _themes_populate)
 
 def _themes_populate(browser, url):
-   for theme in gui.get_available_themes():
+   for theme in utils.get_available_themes():
       info = gui.get_theme_info(theme)
       if info:
          browser.item_add(ThemesItemClass(), theme, info)

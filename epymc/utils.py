@@ -18,9 +18,7 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import tempfile
-import pkg_resources
+import os, tempfile, pkg_resources, glob
 
 try:
    from urllib.parse import quote as urllib_quote
@@ -41,7 +39,7 @@ def DBG(msg):
 
 
 # _base_dir = None
-user_conf_dir = os.path.expanduser('~/.config/epymc')
+user_conf_dir = os.path.expanduser('~/.config/epymc') # TODO use xdg-stuff
 
 # def base_dir_set(d):
    # global _base_dir
@@ -64,23 +62,27 @@ def get_resource_file(res_type, res_name, default = None):
    for res in [res_name, default]:
 
       # search in user config dir
-      f = os.path.join(config_dir_get(), res_type, res_name)
+      f = os.path.join(user_conf_dir, res_type, res_name)
       if os.path.exists(f):
          return f
       
       # search using python setuptools resource manager
       try:
-         return pkg_resources.resource_filename(__name__, '/'.join([res_type, res_name]))
-      except:
-         pass
-
-      # search relative to the script (epymc.py) dir
-      # f = os.path.join(base_dir_get(), 'data', res_type, res_name)
-      # if os.path.exists(f):
-         # return f
+         return pkg_resources.resource_filename('epymc', res_type+'/'+res_name)
+      except: pass
 
    # not found :(
    return None
+
+def get_available_themes():
+   # first search in user config dir
+   L = glob.glob(os.path.join(user_conf_dir, 'themes', '*.edj'))
+
+   # search inside the installed package using setuptools resource management
+   for fname in pkg_resources.resource_listdir('epymc', 'themes'):
+      L.append(pkg_resources.resource_filename('epymc', 'themes/' + fname))
+
+   return L
 
 def url2path(url):
    # TODO ... convert the url to a local path !!

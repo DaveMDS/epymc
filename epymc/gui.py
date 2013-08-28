@@ -172,16 +172,6 @@ def shutdown():
 
 
 ### Various externally accessible functions ###
-def get_available_themes():
-   # search in user config dir
-   d = os.path.join(utils.config_dir_get(), 'themes')
-   L = [os.path.join(d, name) for name in os.listdir(d) if name.endswith('.edj')]
-
-   # search relative to the script (epymc.py) dir
-   # d = os.path.join(utils.base_dir_get(), 'data', 'themes')
-   # L += [os.path.join(d, name) for name in os.listdir(d) if name.endswith('.edj')]
-
-   return L
 
 def get_theme_info(theme):
    D = {}

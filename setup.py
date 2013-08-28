@@ -2,11 +2,24 @@
 from setuptools import setup, find_packages
 
 
-# reference:
+# setuptools reference:
 # http://pythonhosted.org/setuptools/setuptools.html
 # http://pythonhosted.org/setuptools/pkg_resources.html
 # http://peak.telecommunity.com/DevCenter/PkgResources
 
+# commands to investigate:
+# sdist, bdist, bdist_egg, bdist_rpm, bdist_deb
+# build, install, develop
+
+# --single-version-externally-managed
+# --prefix=
+# --install-layout=deb
+
+# packaging references:
+# http://www.debian.org/doc/packaging-manuals/python-policy/
+# http://developer.ubuntu.com/packaging/html/python-packaging.html
+# http://shallowsky.com/blog/programming/packaging-python-rpm.html
+# http://shallowsky.com/blog/programming/python-debian-packages-w-stdeb.html
 
 setup(
    name = 'EpyMC',

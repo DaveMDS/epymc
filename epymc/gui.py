@@ -178,8 +178,8 @@ def get_available_themes():
    L = [os.path.join(d, name) for name in os.listdir(d) if name.endswith('.edj')]
 
    # search relative to the script (epymc.py) dir
-   d = os.path.join(utils.base_dir_get(), 'data', 'themes')
-   L += [os.path.join(d, name) for name in os.listdir(d) if name.endswith('.edj')]
+   # d = os.path.join(utils.base_dir_get(), 'data', 'themes')
+   # L += [os.path.join(d, name) for name in os.listdir(d) if name.endswith('.edj')]
 
    return L
 

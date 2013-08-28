@@ -21,10 +21,10 @@
 import sys
 import os
 import traceback
+import pkg_resources
 
 from . import ini
 from . import utils
-
 
 
 class EmcModule(object):
@@ -44,10 +44,17 @@ class EmcModule(object):
       self.__init__()
 
 
-_instances = {}
+_instances = {} # key: module_name   val: EmcModule instance
 
 
 def load_all():
+   print('Searching for modules:')
+
+   for entrypoint in pkg_resources.iter_entry_points("epymc_modules"):
+      plugin_class = entrypoint.load()
+
+"""
+def load_all_OLD():
    print('Searching for modules:')
 
    # first check in ~/.config/epymc/modules ...
@@ -63,9 +70,9 @@ def load_all():
             mod =  __import__(name)
    
    # ... then in the modules/ dir relative to script position
-   path = os.path.join(utils.base_dir_get(), 'modules')
-   if not path in sys.path:
-      sys.path.insert(0, path)
+   # path = os.path.join(utils.base_dir_get(), 'modules')
+   # if not path in sys.path:
+      # sys.path.insert(0, path)
 
    for root, dirs, files in os.walk(path):
       for name in dirs:
@@ -78,6 +85,7 @@ def load_all():
                print(' * FAILED: ' + f)
                traceback.print_exc()
    print('')
+"""
 
 def get_module_by_name(name):
    for mod in EmcModule.__subclasses__():

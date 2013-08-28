@@ -20,6 +20,7 @@
 
 import os
 import tempfile
+import pkg_resources
 
 try:
    from urllib.parse import quote as urllib_quote
@@ -39,38 +40,44 @@ def DBG(msg):
    pass
 
 
-_base_dir = None
-_config_dir = None
+# _base_dir = None
+user_conf_dir = os.path.expanduser('~/.config/epymc')
 
-def base_dir_set(d):
-   global _base_dir
-   _base_dir = os.path.abspath(d)
+# def base_dir_set(d):
+   # global _base_dir
+   # _base_dir = os.path.abspath(d)
+# 
+# def base_dir_get():
+   # return _base_dir
 
-def base_dir_get():
-   return _base_dir
+def config_dir_get(): # TODO remove and directly use utils.user_conf_dir
+   return user_conf_dir
 
-def config_dir_get():
-   global _config_dir
-   if not _config_dir:
-      _config_dir = os.path.expanduser('~/.config/epymc')
-   return _config_dir
-
-def get_resource_file(type, resource, default = None):
+def get_resource_file(res_type, res_name, default = None):
    """
-   This will search the given reasource (the file name) in user config dir and
-   then in the script dir. ex:
+   This will search the given reasource (the file name) first in user config
+   directory (usually ~/.config/epymc) and then will try using setuptool
+   resources utils
+   Example:
       full_path = get_resource_file('themes', 'mytheme.edj', 'default.edj')
    """
-   for res in [resource, default]:
+   for res in [res_name, default]:
+
       # search in user config dir
-      f = os.path.join(config_dir_get(), type, res)
+      f = os.path.join(config_dir_get(), res_type, res_name)
       if os.path.exists(f):
          return f
+      
+      # search using python setuptools resource manager
+      try:
+         return pkg_resources.resource_filename(__name__, '/'.join([res_type, res_name]))
+      except:
+         pass
 
       # search relative to the script (epymc.py) dir
-      f = os.path.join(base_dir_get(), 'data', type, res)
-      if os.path.exists(f):
-         return f
+      # f = os.path.join(base_dir_get(), 'data', res_type, res_name)
+      # if os.path.exists(f):
+         # return f
 
    # not found :(
    return None

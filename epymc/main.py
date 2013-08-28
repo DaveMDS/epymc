@@ -36,12 +36,12 @@ import epymc.sdb as sdb
 import epymc.browser as browser
 
 
-def main():
+def start_epymc():
    #init elementary
    elementary.init()
 
    # set the base path
-   utils.base_dir_set(os.path.dirname(__file__))
+   # utils.base_dir_set(os.path.dirname(__file__))
 
    # create config dir if necessary
    user_config_dir = utils.config_dir_get()
@@ -109,5 +109,5 @@ def main():
    print('Bye Bye...')
    return 0
 
-if __name__ == '__main__':
-   sys.exit(main())
+# if __name__ == '__main__':
+   # sys.exit(main())

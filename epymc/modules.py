@@ -51,7 +51,13 @@ def load_all():
    print('Searching for modules:')
 
    for entrypoint in pkg_resources.iter_entry_points("epymc_modules"):
-      plugin_class = entrypoint.load()
+      try:
+         print(' * loading: ' + entrypoint.name)
+         entrypoint.load()
+      except:
+         print('    FAILED: ' + entrypoint.name)
+         traceback.print_exc()
+   print('')
 
 """
 def load_all_OLD():

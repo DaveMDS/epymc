@@ -59,6 +59,11 @@ setup(
    # data files
    package_data = {
       'epymc': ['themes/*.edj'],
+      'epymc.plugins.movies': ['menu_bg.png'],
+      'epymc.plugins.tvshows': ['menu_bg.png'],
+      'epymc.plugins.onlinevideo': ['menu_bg.png'],
+      'epymc.plugins.music': ['menu_bg.png'],
+      'epymc.plugins.uitests': ['menu_bg.png'], # TODO move out of main tree
    },
 
    # data_files = [

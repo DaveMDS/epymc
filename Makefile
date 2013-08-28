@@ -10,13 +10,10 @@
 all:themes
 
 themes:
-	edje_cc -v data/themes/default/default.edc \
-		-id data/themes/default/images/ \
-		-fd data/themes/default/fonts/
-	mv data/themes/default/default.edj data/themes/
-
-clean:
-	rm data/themes/default.edj
+	edje_cc -v epymc/themes/default/default.edc \
+		-id epymc/themes/default/images/ \
+		-fd epymc/themes/default/fonts/
+	mv epymc/themes/default/default.edj epymc/themes/
 
 install-local:themes
 	mkdir --parents ~/.local/share/applications/
@@ -26,7 +23,7 @@ install-local:themes
 	sed -i 's:Exec=.*:Exec=${CURDIR}/epymc.py:' epymc.desktop
 	mv epymc.desktop ~/.local/share/applications/
 	cp data/desktop/epymc.png ~/.local/share/icons/
-	cp data/themes/default.edj ~/.config/epymc/themes/
+	cp epymc/themes/default.edj ~/.config/epymc/themes/
 
 uninstall-local:
 	rm -f ~/.local/share/applications/epymc.desktop

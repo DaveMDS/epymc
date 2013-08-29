@@ -2,24 +2,41 @@
 from setuptools import setup, find_packages
 
 
+
 # setuptools reference:
 # http://pythonhosted.org/setuptools/setuptools.html
 # http://pythonhosted.org/setuptools/pkg_resources.html
+# http://docs.python.org/dev/distutils/index.html
 # http://peak.telecommunity.com/DevCenter/PkgResources
+
+# other "complex" setup.py scripts:
+# http://bazaar.launchpad.net/~gnome-terminator/terminator/trunk/files
 
 # commands to investigate:
 # sdist, bdist, bdist_egg, bdist_rpm, bdist_deb
-# build, install, develop
+# build, install, develop, clean
 
 # --single-version-externally-managed
 # --prefix=
 # --install-layout=deb
+
+# Note that the various alternate installation schemes are mutually exclusive:
+# you can pass --user, or --home, or --prefix and --exec-prefix,
+#   or --install-base and --install-platbase
+# but you can't mix from these groups.
 
 # packaging references:
 # http://www.debian.org/doc/packaging-manuals/python-policy/
 # http://developer.ubuntu.com/packaging/html/python-packaging.html
 # http://shallowsky.com/blog/programming/packaging-python-rpm.html
 # http://shallowsky.com/blog/programming/python-debian-packages-w-stdeb.html
+
+# http://bugs.gramps-project.org/print_bug_page.php?bug_id=2621
+
+
+# import setuptools
+# print dir(setuptools)
+# exit(0)
 
 setup(
    name = 'EpyMC',
@@ -69,7 +86,7 @@ setup(
 
    
    
-   # data files
+   # data files that goens inside the epymc package
    package_data = {
       'epymc': ['themes/*.edj'],
       'epymc.plugins.movies': ['menu_bg.png'],
@@ -85,6 +102,10 @@ setup(
    # data_files=[('bitmaps', ['bm/b1.gif', 'bm/b2.gif']),
                   # ('config', ['cfg/data.cfg']),
                   # ('/etc/init.d', ['init-script'])]
+   data_files = [
+      ('share/applications', ['data/desktop/epymc.desktop']),
+      ('share/icons', ['data/desktop/epymc.png']),
+   ],
 
    # dependencies
    install_requires = 'efl >= 1.7.99',

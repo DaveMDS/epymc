@@ -20,6 +20,9 @@ from setuptools import setup, find_packages
 # --prefix=
 # --install-layout=deb
 
+# commands to document:
+# setup.py clean --all
+
 # Note that the various alternate installation schemes are mutually exclusive:
 # you can pass --user, or --home, or --prefix and --exec-prefix,
 #   or --install-base and --install-platbase
@@ -85,16 +88,13 @@ setup(
    },
 
    
+   zip_safe = False,
+   include_package_data = True,
    
    # data files that goens inside the epymc package
-   package_data = {
-      'epymc': ['themes/*.edj'],
-      'epymc.plugins.movies': ['menu_bg.png'],
-      'epymc.plugins.tvshows': ['menu_bg.png'],
-      'epymc.plugins.onlinevideo': ['menu_bg.png'],
-      'epymc.plugins.music': ['menu_bg.png'],
-      'epymc.plugins.uitests': ['menu_bg.png'], # TODO move out of main tree
-   },
+   # package_data = {
+      # 'epymc': ['themes/*.edj'],
+   # },
 
    # data_files = [
       # ('themes', ['themes/default.edj']),

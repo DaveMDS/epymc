@@ -1,5 +1,6 @@
 
-from setuptools import setup, find_packages
+import os, glob, subprocess, shutil
+from setuptools import setup, find_packages, Command
 
 
 
@@ -8,6 +9,7 @@ from setuptools import setup, find_packages
 # http://pythonhosted.org/setuptools/pkg_resources.html
 # http://docs.python.org/dev/distutils/index.html
 # http://peak.telecommunity.com/DevCenter/PkgResources
+# http://ziade.org/2007/09/30/extending-setuptools-adding-a-new-command/
 
 # other "complex" setup.py scripts:
 # http://bazaar.launchpad.net/~gnome-terminator/terminator/trunk/files
@@ -37,9 +39,28 @@ from setuptools import setup, find_packages
 # http://bugs.gramps-project.org/print_bug_page.php?bug_id=2621
 
 
-# import setuptools
-# print dir(setuptools)
-# exit(0)
+
+class BuildThemes(Command):
+
+   description = 'rebuild all the themes found in data/themes using edje_cc'
+   user_options = []
+
+   def initialize_options(self): pass
+   def finalize_options(self): pass
+
+   def run(self):
+      for theme_dir in glob.glob('data/themes/*'):
+         name = os.path.basename(theme_dir)
+         edc_name = os.path.join(theme_dir, name + '.edc')
+         edj_name = os.path.join(theme_dir, name + '.edj')
+         print('building theme: ' + name)
+         subprocess.call(['edje_cc', '-v', edc_name,
+                                     '-id', os.path.join(theme_dir, 'images'),
+                                     '-fd', os.path.join(theme_dir, 'fonts')
+                        ])
+         dest = os.path.join('epymc', 'themes', name + '.edj')
+         shutil.move(edj_name, dest)
+         os.chmod(dest, 0644)
 
 setup(
    name = 'EpyMC',
@@ -107,6 +128,10 @@ setup(
       ('share/icons', ['data/desktop/epymc.png']),
    ],
 
+   cmdclass = {
+      'build_themes': BuildThemes,
+   },
+   
    # dependencies
    install_requires = 'efl >= 1.7.99',
 

@@ -89,11 +89,11 @@ class EmcDatabase(object):
       return len(self._sh)
 
    def get_data(self, key):
-      DBG('Get Data on db ' + self._name + ', key: ' + key)
+      DBG('Get Data for db: %s, key: %s' % (self._name, key))
       return self._sh[key]
 
    def set_data(self, key, data, thread_safe=False):
-      DBG('Set data for db ' + self._name + ', id: ' + key)
+      DBG('Set data for db: %s, id: %s' % (self._name, key))
       if thread_safe:
          # just put in the queue
          _queue.put((self, key, data))

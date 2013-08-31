@@ -147,12 +147,14 @@ def play_counts_get(url):
       return { 'started': 0,   # num times started
                'finished': 0,  # num times finished
                'stop_at': 0 }  # last play pos
-             
 
 def stop():
    global _emotion, _onair_url
-   
+
    LOG('dbg', 'Stop()')
+
+   if _emotion is None:
+      return
 
    counts = _play_db.get_data(_onair_url)
    if _emotion.position >= _emotion.play_length - 5 or _emotion.position == 0.0: # vlc set the pos at zero when finished :/
@@ -173,7 +175,6 @@ def stop():
    _emotion = None
 
    events.event_emit('PLAYBACK_FINISHED')
-
 
 def forward():
    LOG('dbg', 'Forward cb' + str(_emotion.position))

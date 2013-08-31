@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 import os, glob, subprocess, shutil
 from distutils.log import warn, info, error
@@ -89,13 +90,13 @@ setup(
    license = 'GNU GPL v3',
 
    requires = ['efl (>= 1.7.999)'],
-   provide = ['epymc'],
+   provides = ['epymc'],
 
    # Automatically search all packages (dirs that have an __init__.py file)
    packages = find_packages(),
 
    entry_points = {
-      # This will create the epymc 'executable' script
+      # This will create the 'epymc' executable script
       'gui_scripts': [
          'epymc = epymc.main:start_epymc',
       ],
@@ -109,6 +110,7 @@ setup(
          'tvshows = epymc.plugins.tvshows:TvShowsModule',
          'onlinevideo = epymc.plugins.onlinevideo:OnlinevideoModule',
          'music = epymc.plugins.music:MusicModule',
+         'mame = epymc.plugins.mame:MameModule',
 
          # TODO move those as a standalone module (to demostrate how)
          # ...and to test that the setuptools entrypoints magic work

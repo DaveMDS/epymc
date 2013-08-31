@@ -89,16 +89,21 @@ class GameItemClass(EmcItemClass):
    def label_get(self, url, game):
       return game.name
 
-   def info_get(self, url, game):
-      return game.short_info_get()
+   # Short info disabled to avoid a nasty BUG:
+   #   the game class do this async if it has not yet fetched the game info
+   #   using the mame executable (EmcExe). When the exe is done it call the
+   #   browser refresh() function, that will trigger another download of the
+   #   poster...while the download of the poster is still in progress...
+   # def info_get(self, url, game):
+      # return game.short_info_get()
 
    def icon_get(self, url, game):
       if url in MameModule._favorites:
          return 'icon/star'
 
-   def poster_get(self, url, game):
+   def poster_get(self, item_url, game):
       (local, url) = game.poster_get()
-      return local if not url else url + ';' + local
+      return (url, local)
 
 
 class CatItemClass(EmcItemClass):
@@ -150,8 +155,8 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def cb_mainmenu(self):
       """ Mainmenu clicked, build the root page """
-      #set backdrop image
-      bg = os.path.join(utils.base_dir_get(), 'modules', 'mame', 'mamebg.jpg')
+      # set backdrop image
+      bg = os.path.join(os.path.dirname(__file__), 'mamebg.jpg')
       gui.background_set(bg)
 
       # read favorite list from config (just the first time)

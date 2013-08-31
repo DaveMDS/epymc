@@ -100,10 +100,9 @@ class EmcItemClass(Singleton):
       """ Called when a view need to show the poster/cover/big_image of your
           item, must return the full path of a valid image file.
           You can also return a valid url (http://) to automatically
-          download the image to a random temp file. In addition you can also
-          set the destinatioon path for the given url, just use ';'.
-          ex: 'http://my.url/of/the/image;/my/local/dest/path'
-          UPDATE: To set an url and a destination just return a tuple, as:
+          download the image to a random temp file.
+          In addition you can also set the destination path for the given url,
+          to set an url AND a destination just return a tuple, as:
           (url, local_path)
           """
       # DBG(('poster_get(%s)' % url))
@@ -540,12 +539,7 @@ class ViewList(object):
          (url, dest) = poster
          self.__im.url_set(url, dest)
       elif poster and poster.startswith('http://'):
-         # TODO remove this ugliness and use the tuple in MAME
-         if poster.find(';') != -1:
-            (url, dest) = poster.split(';')
-            self.__im.url_set(url, dest)
-         else:
-            self.__im.url_set(poster)
+         self.__im.url_set(poster)
       elif poster and (poster.startswith('icon/') or poster.startswith('image/')):
          self.__im.file_set(gui.theme_file, poster)
       else:

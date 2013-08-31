@@ -360,6 +360,8 @@ class MameGame(object):
       self.driver_sound = None
       self.driver_graphic = None
 
+      self._dwnl_handler = None
+
    def run(self):
       DBG('RUN GAME: ' + self.gid)
       ecore.exe_run('%s %s' % (MAME_EXE, self.gid))
@@ -514,7 +516,7 @@ class MameGame(object):
       if done:
          self.dialog.delete()
          EmcDialog(title = 'Game deleted', style = 'info')
-         _instance._browser.refresh(recreate=True)
+         _instance._browser.refresh(hard=True)
       else:
          EmcDialog(text = 'Can not delete game', style = 'error')
 
@@ -536,8 +538,8 @@ class MameGame(object):
       # create the new download dialog
       self.dialog.delete()
       self.dialog = EmcDialog(title = 'Game download', spinner = True,
-                              text = '', style= 'cancel')
-      self.dialog.button_add('Close', lambda btn: self.dialog.delete()) # TODO abort download well if needed
+                              text = '', style= 'progress')
+      self.dialog.button_add('Close', self.close_dialog)
 
       # Try to download the game from various roms site
       sources = []
@@ -553,15 +555,21 @@ class MameGame(object):
 
       self._try_download_multi_sources(sources, dest)
 
+   def close_dialog(self, dia):
+      if self._dwnl_handler:
+         utils.download_abort(self._dwnl_handler)
+         self._dwnl_handler = None
+      self.dialog.delete()
+
    def _try_download_multi_sources(self, sources, dest):
       (title, url) = sources.pop(0)
       self.dialog.text_append(title)
       DBG('Download from: ' + url)
       try:
-         utils.download_url_async(url, dest, min_size = 2000,
-                           complete_cb = self._cb_multi_download_complete,
-                           progress_cb = self._cb_multi_download_progress,
-                           sources = sources)
+         self._dwnl_handler = utils.download_url_async(url, dest, min_size = 2000,
+                                 complete_cb = self._cb_multi_download_complete,
+                                 progress_cb = self._cb_multi_download_progress,
+                                 sources = sources)
       except SystemError:
          if sources:
             self._try_download_multi_sources(sources, dest)
@@ -571,6 +579,7 @@ class MameGame(object):
          self.dialog.spinner_start()
 
    def _cb_multi_download_complete(self, dest, status, sources):
+      self._dwnl_handler = None
       self.dialog.spinner_stop()
       if status == 200: # no errors
          self.dialog.text_append('<b>Download done :)</>')
@@ -580,9 +589,9 @@ class MameGame(object):
          else:
             self.dialog.text_append('<b>Can not find the game online, sorry.</b>')
 
-   def _cb_multi_download_progress(self, file, dltotal, dlnow, sources):
-      # print(dlnow)
-      pass
+   def _cb_multi_download_progress(self, dest, tot, done, sources):
+      if tot > 0: self.dialog.progress_set(float(done) / float(tot))
+
 
 ## game info (from mame -listxml <rom>)
    def _more_game_info(self, when_finished = None):

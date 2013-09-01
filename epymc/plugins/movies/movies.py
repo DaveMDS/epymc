@@ -730,11 +730,11 @@ class BackgroundScanner(ecore.Idler):
 
 ###### UTILS
 def get_poster_filename(tmdb_id):
-   return os.path.join(utils.config_dir_get(), 'movies',
+   return os.path.join(utils.user_conf_dir, 'movies',
                        str(tmdb_id), 'poster.jpg')
 
 def get_backdrop_filename(tmdb_id):
-   return os.path.join(utils.config_dir_get(), 'movies',
+   return os.path.join(utils.user_conf_dir, 'movies',
                        str(tmdb_id), 'backdrop.jpg')
 
 def get_movie_name_from_url(url):

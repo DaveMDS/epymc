@@ -135,7 +135,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    _search_folders = [
       os.path.dirname(__file__),
-      os.path.join(utils.config_dir_get(), 'channels')
+      os.path.join(utils.user_conf_dir, 'channels')
       # TODO add a system dir....but where?
       ]
 

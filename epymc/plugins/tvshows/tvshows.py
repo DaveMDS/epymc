@@ -566,19 +566,19 @@ def get_serie_from_relative_url(url):
       return (serie, season, episode)
 
 def get_poster_filename(tvshows_id):
-   return os.path.join(utils.config_dir_get(), 'tvshows',
+   return os.path.join(utils.user_conf_dir, 'tvshows',
                        str(tvshows_id), 'poster.jpg')
 
 def get_backdrop_filename(tvshows_id):
-   return os.path.join(utils.config_dir_get(), 'tvshows',
+   return os.path.join(utils.user_conf_dir, 'tvshows',
                        str(tvshows_id), 'backdrop.jpg')
 
 def get_banner_filename(tvshows_id):
-   return os.path.join(utils.config_dir_get(), 'tvshows',
+   return os.path.join(utils.user_conf_dir, 'tvshows',
                        str(tvshows_id), 'banner.jpg')
 
 def get_episode_filename(tvshows_id, episode_id):
-   return os.path.join(utils.config_dir_get(), 'tvshows',
+   return os.path.join(utils.user_conf_dir, 'tvshows',
                        str(tvshows_id), episode_id + '.jpg')
 
 

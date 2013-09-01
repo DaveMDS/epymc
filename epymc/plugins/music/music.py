@@ -264,7 +264,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
       # make default of covers_dir if necessary
       if not ini.has_option('music', 'covers_dir'):
-         dir = os.path.join(utils.config_dir_get(), 'music_covers')
+         dir = os.path.join(utils.user_conf_dir, 'music_covers')
          ini.set('music', 'covers_dir', dir)
 
       if not os.path.exists(ini.get('music', 'covers_dir')):

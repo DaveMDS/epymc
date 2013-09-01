@@ -43,16 +43,15 @@ def start_epymc():
    # utils.base_dir_set(os.path.dirname(__file__))
 
    # create config dir if necessary
-   user_config_dir = utils.config_dir_get()
-   if not os.path.exists(user_config_dir):
-      os.makedirs(user_config_dir)
-      os.mkdir(os.path.join(user_config_dir, 'plugins'))
-      os.mkdir(os.path.join(user_config_dir, 'themes'))
-      os.mkdir(os.path.join(user_config_dir, 'channels'))
+   if not os.path.exists(utils.user_conf_dir):
+      os.makedirs(utils.user_conf_dir)
+      os.mkdir(os.path.join(utils.user_conf_dir, 'plugins'))
+      os.mkdir(os.path.join(utils.user_conf_dir, 'themes'))
+      os.mkdir(os.path.join(utils.user_conf_dir, 'channels'))
 
    #TODO add a system dir...but where??
    ini.read_from_files(['epymc.conf',
-                        os.path.join(user_config_dir, 'epymc.conf')])
+                        os.path.join(utils.user_conf_dir, 'epymc.conf')])
    ini.setup_defaults()
 
    # alert if CURL support not available (no download ability)
@@ -96,7 +95,7 @@ def start_epymc():
    modules.save_enabled()
    modules.shutdown_all()
    config_gui.shutdown()
-   ini.write_to_file(os.path.join(user_config_dir, 'epymc.conf'))
+   ini.write_to_file(os.path.join(utils.user_conf_dir, 'epymc.conf'))
    mediaplayer.shutdown()
    gui.shutdown()
    browser.shutdown()

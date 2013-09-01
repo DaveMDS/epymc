@@ -53,7 +53,7 @@ class EmcDatabase(object):
       self._vkey = '__database__version__'
 
       # build the db name (different db for py2 and py3)
-      dbname = os.path.join(utils.config_dir_get(),
+      dbname = os.path.join(utils.user_conf_dir,
                           'db_py%d_%s' %(sys.version_info[0], name))
       DBG('Open db: ' + name + ' from file: ' + dbname)
 

@@ -66,8 +66,8 @@ class MyItemClass(EmcItemClass):
    def info_get(self, url, user_data):
       text  = '<title>System info:</><br>'
       text += '<b>Graphic engine</b> %s (%s)<br>' % (elementary.engine_get(), elementary.preferred_engine_get())
-      text += '<b>base dir</b> %s<br>' % (utils.base_dir_get())
-      text += '<b>config dir</b> %s<br>' % (utils.config_dir_get())
+      text += '<b>base dir</b> %s<br>' % (utils.emc_base_dir)
+      text += '<b>config dir</b> %s<br>' % (utils.user_conf_dir)
       try:
          text += '<b>download available</b> %s<br>' % (ecore.file_download_protocol_available('http://'))
       except:

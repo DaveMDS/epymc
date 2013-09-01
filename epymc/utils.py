@@ -43,15 +43,7 @@ user_conf_dir = os.path.expanduser('~/.config/epymc') # TODO use xdg-stuff
 
 DBG('emc_base_dir: %s' % emc_base_dir)
 DBG('user_conf_dir: %s' % user_conf_dir)
-# def base_dir_set(d):
-   # global _base_dir
-   # _base_dir = os.path.abspath(d)
-# 
-# def base_dir_get():
-   # return _base_dir
 
-def config_dir_get(): # TODO remove and directly use utils.user_conf_dir
-   return user_conf_dir
 
 def get_resource_file(res_type, res_name, default = None):
    """

@@ -38,9 +38,11 @@ def DBG(msg):
    pass
 
 
-# _base_dir = None
+emc_base_dir = os.path.dirname(__file__)
 user_conf_dir = os.path.expanduser('~/.config/epymc') # TODO use xdg-stuff
 
+DBG('emc_base_dir: %s' % emc_base_dir)
+DBG('user_conf_dir: %s' % user_conf_dir)
 # def base_dir_set(d):
    # global _base_dir
    # _base_dir = os.path.abspath(d)

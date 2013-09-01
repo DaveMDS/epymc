@@ -46,7 +46,7 @@ def start_epymc():
    user_config_dir = utils.config_dir_get()
    if not os.path.exists(user_config_dir):
       os.makedirs(user_config_dir)
-      os.mkdir(os.path.join(user_config_dir, 'modules'))
+      os.mkdir(os.path.join(user_config_dir, 'plugins'))
       os.mkdir(os.path.join(user_config_dir, 'themes'))
       os.mkdir(os.path.join(user_config_dir, 'channels'))
 
@@ -108,5 +108,5 @@ def start_epymc():
    print('Bye Bye...')
    return 0
 
-# if __name__ == '__main__':
-   # sys.exit(main())
+if __name__ == '__main__':
+   sys.exit(start_epymc())

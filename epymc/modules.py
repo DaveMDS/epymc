@@ -21,7 +21,6 @@
 import sys
 import os
 import traceback
-import pkg_resources
 
 from . import ini
 from . import utils
@@ -48,6 +47,31 @@ _instances = {} # key: module_name   val: EmcModule instance
 
 
 def load_all():
+
+   def _scan_folder(path):
+      print('Searching for modules in: %s' % path)
+      if not path in sys.path:
+         sys.path.insert(0, path)
+      for root, dirs, files in os.walk(path):
+         for name in dirs:
+            f = os.path.join(root, name, '__init__.py')
+            if os.path.isfile(f):
+               try:
+                  print(' * loading: %s' % name)
+                  mod =  __import__(name)
+               except:
+                  print(' * FAILED: %s' % f)
+                  traceback.print_exc()
+      print('')
+
+   # load from the plugins/ dir relative to script position
+   _scan_folder(os.path.join(utils.emc_base_dir, 'plugins'))
+
+   # load from ~/.config/epymc/plugins ...
+   _scan_folder(os.path.join(utils.user_conf_dir, 'plugins'))
+
+"""
+def load_all_SETUPTOOLS():
    print('Searching for modules:')
 
    for entrypoint in pkg_resources.iter_entry_points("epymc_modules"):
@@ -57,39 +81,6 @@ def load_all():
       except:
          print('    FAILED: ' + entrypoint.name)
          traceback.print_exc()
-   print('')
-
-"""
-def load_all_OLD():
-   print('Searching for modules:')
-
-   # first check in ~/.config/epymc/modules ...
-   path = os.path.join(utils.config_dir_get(), 'modules')
-   if not path in sys.path:
-      sys.path.insert(0, path)
-
-   for root, dirs, files in os.walk(path):
-      for name in dirs:
-         f = os.path.join(root, name, '__init__.py')
-         if os.path.isfile(f):
-            print(' * load: ' + f)
-            mod =  __import__(name)
-   
-   # ... then in the modules/ dir relative to script position
-   # path = os.path.join(utils.base_dir_get(), 'modules')
-   # if not path in sys.path:
-      # sys.path.insert(0, path)
-
-   for root, dirs, files in os.walk(path):
-      for name in dirs:
-         f = os.path.join(root, name, '__init__.py')
-         if os.path.isfile(f):
-            try:
-               print(' * loading: ' + f)
-               mod =  __import__(name)
-            except:
-               print(' * FAILED: ' + f)
-               traceback.print_exc()
    print('')
 """
 

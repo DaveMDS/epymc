@@ -31,6 +31,8 @@ from setuptools import setup, find_packages, Command
 # http://bugs.gramps-project.org/print_bug_page.php?bug_id=2621
 #
 
+# ERR<8850>:ecore lib/ecore/ecore_pipe.c:626 _ecore_pipe_read() Only read 3 bytes from the pipe, although we need to read 4 bytes.
+# munmapping !
 
 class CustomCommand(Command):
    description = ''
@@ -101,23 +103,23 @@ setup(
          'epymc = epymc.main:start_epymc',
       ],
       # This define a custom entry point called 'epymc_modules'
-      'epymc_modules': [
-         'input_keyb = epymc.plugins.input_keyb:KeyboardModule',
-         'input_joy = epymc.plugins.input_joy:JoystickModule',
-         'input_lirc = epymc.plugins.input_lirc:LircModule',
-
-         'movies = epymc.plugins.movies:MoviesModule',
-         'tvshows = epymc.plugins.tvshows:TvShowsModule',
-         'onlinevideo = epymc.plugins.onlinevideo:OnlinevideoModule',
-         'music = epymc.plugins.music:MusicModule',
-         'mame = epymc.plugins.mame:MameModule',
+      # 'epymc_modules': [
+         # 'input_keyb = epymc.plugins.input_keyb:KeyboardModule',
+         # 'input_joy = epymc.plugins.input_joy:JoystickModule',
+         # 'input_lirc = epymc.plugins.input_lirc:LircModule',
+# 
+         # 'movies = epymc.plugins.movies:MoviesModule',
+         # 'tvshows = epymc.plugins.tvshows:TvShowsModule',
+         # 'onlinevideo = epymc.plugins.onlinevideo:OnlinevideoModule',
+         # 'music = epymc.plugins.music:MusicModule',
+         # 'mame = epymc.plugins.mame:MameModule',
 
          # TODO move those as a standalone module (to demostrate how)
          # ...and to test that the setuptools entrypoints magic work
          #    also using the single_version_externally_managed option.
-         'uitests = epymc.plugins.uitests:UiTestsModule',
-         'input_webserver = epymc.plugins.input_webserver:WebserverModule',
-      ]
+         # 'uitests = epymc.plugins.uitests:UiTestsModule',
+         # 'input_webserver = epymc.plugins.input_webserver:WebserverModule',
+      # ]
    },
 
    # Include all the data files found in every packages.

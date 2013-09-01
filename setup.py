@@ -3,6 +3,7 @@
 # usage:
 #
 # python setup.py install [--prefix=]
+# python setup.py uninstall [--prefix=]
 # python setup.py build_themes
 # python setup.py clean --all
 # python setup.py sdist|bdist

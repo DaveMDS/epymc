@@ -52,7 +52,6 @@ SMALLER
 
 """
 
-# from . import gui
 
 def DBG(msg):
    # print('INPUT_EVENTS: ' + msg)

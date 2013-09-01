@@ -22,8 +22,8 @@ import sys
 import os
 import traceback
 
-from . import ini
-from . import utils
+from epymc import ini
+from epymc import utils
 
 
 class EmcModule(object):

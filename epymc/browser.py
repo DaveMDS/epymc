@@ -27,10 +27,10 @@ except:
    from elementary import Genlist, GenlistItem, GenlistItemClass
    from elementary import Gengrid, GengridItem, GengridItemClass
 
-from . import gui, mainmenu, input_events, ini
-from .sdb import EmcDatabase
-from .utils import Singleton
-from .gui import EmcRemoteImage
+from epymc import gui, mainmenu, input_events, ini
+from epymc.sdb import EmcDatabase
+from epymc.utils import Singleton
+from epymc.gui import EmcRemoteImage
 
 def DBG(msg):
    # print('BROWSER: ' + msg)

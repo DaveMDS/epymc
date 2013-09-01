@@ -43,8 +43,7 @@ except:
       Progressbar, Box, Entry, Scroller, Frame, List, Table, Genlist, \
       GenlistItemClass
 
-from . import utils, ini, events, input_events
-# from .widgets import EmcButton, EmcDialog, EmcNotify, EmcRemoteImage
+from epymc import utils, ini, events, input_events
 
 
 win = None

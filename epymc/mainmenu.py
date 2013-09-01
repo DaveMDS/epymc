@@ -23,7 +23,7 @@ try:
 except:
    import evas, elementary
 
-from . import gui, input_events
+from epymc import gui, input_events
 
 
 _items = {}  # key: name  value: elm_list_item

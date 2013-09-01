@@ -25,10 +25,10 @@ try:
 except:
    import evas
 
-from . import gui, mainmenu, input_events, ini, modules, utils
+from epymc import gui, mainmenu, input_events, ini, modules, utils
 
-from .browser import EmcBrowser, EmcItemClass
-from .gui import EmcDialog, EmcVKeyboard
+from epymc.browser import EmcBrowser, EmcItemClass
+from epymc.gui import EmcDialog, EmcVKeyboard
 
 def DBG(msg):
    print('CONFIG_GUI: ' + msg)

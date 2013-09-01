@@ -33,8 +33,8 @@ try:
 except:
    import Queue
 
-from . import utils
-from .gui import EmcDialog
+from epymc import utils
+from epymc.gui import EmcDialog
 
 
 def DBG(msg):

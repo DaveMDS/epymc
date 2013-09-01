@@ -24,9 +24,9 @@ try:
 except:
    import evas, ecore, edje, elementary, emotion
 
-from . import utils, ini, gui, input_events, events
-from .gui import EmcFocusManager2, EmcDialog, EmcButton, EmcMenu
-from .sdb import EmcDatabase
+from epymc import utils, ini, gui, input_events, events
+from epymc.gui import EmcFocusManager2, EmcDialog, EmcButton, EmcMenu
+from epymc.sdb import EmcDatabase
 
 
 DEBUG = True

@@ -89,13 +89,15 @@ def init():
    unused = ini.get('screensaver', 'only_in_fs', 'True')
 
    # search the theme file, or use the default one
-   if not os.path.isabs(theme_name):
-      theme_file = utils.get_resource_file('themes', theme_name + '.edj', 'default.edj')
-      if not theme_file:
+   if os.path.isabs(theme_name) and os.path.exists(theme_name):
+      theme_file = theme_name
+   else:
+      if not theme_name.endswith('.edj'):
+         theme_name += '.edj'
+      theme_file = utils.get_resource_file('themes', theme_name, 'default.edj')
+      if theme_file is None:
          LOG('err', 'cannot find a working theme file, exiting...')
          return 0
-   else:
-      theme_file = theme_name
 
    # custom elementary theme
    set_theme_file(theme_file)

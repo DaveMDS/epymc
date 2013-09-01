@@ -4,6 +4,6 @@ Name=Emotion Media Center
 Comment=EFL Media Center Platform
 Exec=epymc
 Icon=epymc
-Terminal=true
+Terminal=false
 Type=Application
 Categories=Application;AudioVideo;

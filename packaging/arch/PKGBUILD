@@ -1,0 +1,29 @@
+#Maintainer nixalot <nixalot at nixalot dot com>
+
+pkgname=epymc-svn
+_pkgname=epymc
+_urlname=EpyMC
+pkgver=750
+pkgrel=1
+pkgdesc="Media Center application written in python and built on the Enlightenment Foundation Library - svn"
+provides=$_pkgname
+arch=(any)
+license=(LGPL3)
+url="https://code.google.com/p/e17mods/wiki/${_urlname}"
+makedepends=('subversion')
+depends=('efl-git' 'elementary-git' 'python-efl-git')
+optdepends=('lirc: remote control support')
+source=("${_pkgname}::svn+http://e17mods.googlecode.com/svn/trunk/APPS/epymc")
+md5sums=('SKIP')
+
+pkgver() {
+    cd "$srcdir/$_pkgname"
+    
+    echo "$(svn info | awk '/^Revision:/ {print $2}')"
+}
+
+package() {
+    cd "$srcdir/$_pkgname"
+
+    python setup.py install --prefix=$pkgdir/usr
+}

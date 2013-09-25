@@ -298,7 +298,7 @@ def _update_timer_cb():
 
    # keep the screensaver out while playing videos
    if _emotion.play == _video_visible == True:
-      gui.renew_screensaver()
+      events.event_emit('KEEP_ALIVE')
 
    return True # timer renew
 

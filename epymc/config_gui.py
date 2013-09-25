@@ -258,10 +258,6 @@ def _general_populate(browser, url):
    standard_item_bool_add('general', 'fullscreen', 'Start in fullscreen')
    standard_item_action_add('Adjust interface scale', 'icon/scale', cb = _change_scale)
    standard_item_bool_add('general', 'back_in_lists', 'Show Back item in lists', 'icon/back')
-   L = ['never', '1 minute', '5 minutes', '10 minutes', '30 minutes', '60 minutes']
-   standard_item_string_from_list('screensaver', 'on_after', 'Turn on screensaver after', L)
-   standard_item_string_from_list('screensaver', 'monitor_off_after', 'Turn off monitor after', L)
-   standard_item_bool_add('screensaver', 'only_in_fs', 'Manage screensaver only in fullscreen')
 
    L = evas.render_method_list()
    if 'buffer' in L: L.remove('buffer')

@@ -52,6 +52,7 @@ SMALLER
 
 """
 
+from epymc import events
 
 def DBG(msg):
    # print('INPUT_EVENTS: ' + msg)
@@ -99,12 +100,10 @@ def listener_promote(name):
          return
 
 def event_emit(event):
-   global _listeners
-
    DBG('Emit Event: ' + event + '  listeners: ' + str(len(_listeners)))
 
    # gui.mouse_hide()
-   # gui.renew_screensaver()
+   events.event_emit('KEEP_ALIVE')
 
    for lis in reversed(_listeners):
       (name, cb, data) = lis

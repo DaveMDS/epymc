@@ -86,20 +86,25 @@ def play_url(url, only_audio = False, start_from = 0):
    if not _fman:
       _init_mediaplayer_gui()
 
-   url = str(url) # ensure is a string, not unicode)
+   url = str(url) # must be a string not unicode, otherwise it cannot be hashed
    if url.find('://', 2, 15) is -1:
       url = 'file://' + url
 
    _onair_url = url
 
-   LOG('dbg', 'play_url: ' + str(url))
+   LOG('dbg', 'play_url: %s' % url)
 
    if url.startswith('file://') and not os.path.exists(url[7:]):
       text = '<b>File not found:</b><br>' + str(url)
       EmcDialog(text = text, style = 'error')
       return
 
-   _emotion.file_set(url)
+   # Do not pass "file://" to emotion. Vlc has a bug somewhere that prevent
+   # files with special chars in them to play (the bug don't appear if no
+   # "file://" is given. The bug can be seen also using normal vlc from
+   # the command line.
+   _emotion.file_set(url[7:] if url.startswith('file://') else url)
+
    _emotion.position = start_from
    if _emotion.play == False:
       volume_set(_volume)

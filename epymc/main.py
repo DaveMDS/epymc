@@ -19,10 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys, os
 
-try:
-   from efl import evas, ecore, edje, elementary, emotion
-except:
-   import evas, ecore, ecore.file, edje, elementary, emotion
+from efl import evas, ecore, edje, elementary, emotion
 
 import epymc.modules as modules
 import epymc.utils as utils

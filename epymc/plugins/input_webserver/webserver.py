@@ -26,10 +26,7 @@ try:
 except:
    import Queue
 
-try:
-   from efl import ecore
-except:
-   import ecore
+from efl import ecore
 
 from epymc.modules import EmcModule
 import epymc.input_events as input_events

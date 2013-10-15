@@ -20,13 +20,9 @@
 
 from operator import itemgetter, attrgetter
 
-try:
-   from efl import evas
-except:
-   import evas
+from efl import evas
 
 from epymc import gui, mainmenu, input_events, ini, modules, utils
-
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.gui import EmcDialog, EmcVKeyboard
 

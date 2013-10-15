@@ -22,7 +22,6 @@ import time, re
 
 from efl.ecore import Timer, Exe, ECORE_CALLBACK_RENEW
 
-
 from epymc.modules import EmcModule
 import epymc.ini as ini
 import epymc.gui as gui

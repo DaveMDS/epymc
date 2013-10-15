@@ -20,12 +20,8 @@
 
 import os, time
 
-try:
-   from efl import ecore, elementary
-   from efl.elementary.box import Box
-except:
-   import ecore, elementary
-   from elementary import Box
+from efl import ecore, elementary
+from efl.elementary.box import Box
 
 from epymc.modules import EmcModule
 from epymc.gui import EmcDialog, EmcVKeyboard, EmcSourceSelector, \

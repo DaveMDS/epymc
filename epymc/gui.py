@@ -20,28 +20,21 @@
 
 import os
 
-try:
-   from efl import evas, ecore, edje, elementary
-   from efl.elementary.window import Window
-   from efl.elementary.layout import Layout
-   from efl.elementary.icon import Icon
-   from efl.elementary.image import Image
-   from efl.elementary.button import Button
-   from efl.elementary.menu import Menu
-   from efl.elementary.progressbar import Progressbar
-   from efl.elementary.box import Box
-   from efl.elementary.entry import Entry
-   from efl.elementary.scroller import Scroller
-   from efl.elementary.frame import Frame
-   from efl.elementary.list import List
-   from efl.elementary.table import Table
-   from efl.elementary.genlist import Genlist, GenlistItemClass
-except:
-   import evas, ecore, edje, elementary
-   import ecore.x #used only to show/hide the cursor
-   from elementary import Window, Layout, Icon, Image, Button, Menu, \
-      Progressbar, Box, Entry, Scroller, Frame, List, Table, Genlist, \
-      GenlistItemClass
+from efl import evas, ecore, edje, elementary
+from efl.elementary.window import Window
+from efl.elementary.layout import Layout
+from efl.elementary.icon import Icon
+from efl.elementary.image import Image
+from efl.elementary.button import Button
+from efl.elementary.menu import Menu
+from efl.elementary.progressbar import Progressbar
+from efl.elementary.box import Box
+from efl.elementary.entry import Entry
+from efl.elementary.scroller import Scroller
+from efl.elementary.frame import Frame
+from efl.elementary.list import List
+from efl.elementary.table import Table
+from efl.elementary.genlist import Genlist, GenlistItemClass
 
 from epymc import utils, ini, events, input_events
 

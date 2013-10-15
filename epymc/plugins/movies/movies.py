@@ -22,12 +22,8 @@
 import os, re, time
 from operator import itemgetter
 
-try:
-   from efl import ecore, evas, elementary, emotion
-   from efl.elementary.image import Image
-except:
-   import ecore, evas, elementary, emotion
-   from elementary import Image
+from efl import ecore, evas, elementary, emotion
+from efl.elementary.image import Image
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass

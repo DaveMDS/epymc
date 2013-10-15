@@ -25,12 +25,8 @@ try:
 except:
    from urllib import quote as urllib_quote
 
-try:
-   from efl import ecore
-   from efl.ecore import FileDownload, Exe, ECORE_EXE_PIPE_READ, ECORE_EXE_PIPE_READ_LINE_BUFFERED
-except:
-   import ecore
-   from ecore.file import download as FileDownload
+from efl import ecore
+from efl.ecore import FileDownload, Exe, ECORE_EXE_PIPE_READ, ECORE_EXE_PIPE_READ_LINE_BUFFERED
 
 
 def DBG(msg):

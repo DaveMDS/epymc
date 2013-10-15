@@ -19,10 +19,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-try:
-   from efl import evas, ecore, edje, elementary, emotion
-except:
-   import evas, ecore, edje, elementary, emotion
+
+from efl import evas, ecore, edje, elementary, emotion
 
 from epymc import utils, ini, gui, input_events, events
 from epymc.gui import EmcFocusManager2, EmcDialog, EmcButton, EmcMenu

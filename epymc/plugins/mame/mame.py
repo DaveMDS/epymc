@@ -22,10 +22,7 @@ import os
 import xml.dom.minidom
 import operator
 
-try:
-   from efl import evas, ecore, elementary
-except:
-   import evas, ecore, elementary
+from efl import evas, ecore, elementary
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass

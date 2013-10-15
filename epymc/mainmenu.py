@@ -18,10 +18,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-   from efl import evas, elementary
-except:
-   import evas, elementary
+
+from efl import evas, elementary
 
 from epymc import gui, input_events
 

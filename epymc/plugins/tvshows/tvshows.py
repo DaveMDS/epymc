@@ -21,12 +21,8 @@
 
 import os, re, time
 
-try:
-   from efl import ecore, evas
-   from efl.elementary.image import Image
-except:
-   import ecore, evas
-   from elementary import Image
+from efl import ecore, evas
+from efl.elementary.image import Image
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass

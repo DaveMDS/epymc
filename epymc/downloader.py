@@ -38,7 +38,7 @@ import tempfile
 import threading
 import Queue
 
-import ecore
+from efl import ecore
 
 
 def DBG(msg):

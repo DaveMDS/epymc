@@ -25,11 +25,7 @@ try:
 except:
    import ConfigParser
 
-
-try:
-   from efl import evas, elementary
-except:
-   import evas, elementary
+from efl import evas, elementary
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass

@@ -18,14 +18,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-   from efl import evas, ecore, elementary
-   from efl.elementary.genlist import Genlist, GenlistItem, GenlistItemClass
-   from efl.elementary.gengrid import Gengrid, GengridItem, GengridItemClass
-except:
-   import evas, ecore, elementary
-   from elementary import Genlist, GenlistItem, GenlistItemClass
-   from elementary import Gengrid, GengridItem, GengridItemClass
+
+from efl import evas, ecore, elementary
+from efl.elementary.genlist import Genlist, GenlistItem, GenlistItemClass
+from efl.elementary.gengrid import Gengrid, GengridItem, GengridItemClass
 
 from epymc import gui, mainmenu, input_events, ini
 from epymc.sdb import EmcDatabase

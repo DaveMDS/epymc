@@ -24,14 +24,11 @@ import shelve
 import glob
 
 try:
-   from efl import ecore
-except:
-   import ecore
-
-try:
    import queue as Queue
 except:
    import Queue
+
+from efl import ecore
 
 from epymc import utils
 from epymc.gui import EmcDialog

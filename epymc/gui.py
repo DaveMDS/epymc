@@ -746,7 +746,6 @@ class EmcRemoteImage(Image):
       if dest and os.path.exists(dest):
          self.file_set(dest)
       else:
-         self.file_set('')
          self.start_spin()
          utils.download_url_async(url, dest if dest else 'tmp',
                                   complete_cb = self._cb_download_complete)

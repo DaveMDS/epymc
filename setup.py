@@ -15,10 +15,11 @@
 # http://docs.python.org/distutils/
 #
 
-import os, sys, glob, subprocess, shutil
+import os, sys, glob, subprocess, shutil, fnmatch
 from distutils.core import setup, Command
 from distutils.log import warn, info, error
 from distutils.dir_util import remove_tree
+from distutils.command.install_lib import install_lib
 
 
 class BuildThemes(Command):
@@ -84,6 +85,18 @@ class Uninstall(Command):
          for egg in glob.glob(path):
             self.remove_file(egg)
 
+class Install(install_lib):
+   executables = [
+      '*/onlinevideo/*/*.py',
+   ]
+   def run(self):
+      install_lib.run(self)
+      for fn in self.get_outputs():
+         for e in self.executables:
+            if fnmatch.fnmatch(fn, e):
+               mode = ((os.stat(fn).st_mode) | 0555) & 07777
+               info("changing mode of %s to %o", fn, mode)
+               os.chmod(fn, mode)
 
 setup (
    name = 'EpyMC',
@@ -96,7 +109,7 @@ setup (
    license = 'GNU GPL v3',
    platforms = 'linux',
 
-   requires = ['efl (>= 1.7.999)'],
+   requires = ['efl (>= 1.8.0)'],
    provides = ['epymc'],
 
    packages = [
@@ -139,5 +152,6 @@ setup (
    cmdclass = {
       'build_themes': BuildThemes,
       'uninstall': Uninstall,
+      'install_lib': Install,
    },
 )

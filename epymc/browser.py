@@ -20,7 +20,8 @@
 
 
 from efl import evas, ecore, elementary
-from efl.elementary.genlist import Genlist, GenlistItem, GenlistItemClass
+from efl.elementary.genlist import Genlist, GenlistItem, GenlistItemClass,\
+   ELM_OBJECT_SELECT_MODE_ALWAYS
 from efl.elementary.gengrid import Gengrid, GengridItem, GengridItemClass
 
 from epymc import gui, mainmenu, input_events, ini
@@ -363,7 +364,7 @@ class ViewList(object):
       self.gl1 = gui.part_get('browser.list.genlist1')
       self.gl1.style_set('browser')
       self.gl1.homogeneous_set(True)
-      self.gl1.select_mode_set(elementary.ELM_OBJECT_SELECT_MODE_ALWAYS)
+      self.gl1.select_mode_set(ELM_OBJECT_SELECT_MODE_ALWAYS)
       self.gl1.focus_allow_set(False)
       self.gl1.callback_clicked_double_add(self._cb_item_selected)
       self.gl1.callback_selected_add(self._cb_item_hilight)
@@ -373,7 +374,7 @@ class ViewList(object):
       self.gl2 = gui.part_get('browser.list.genlist2')
       self.gl2.style_set('browser')
       self.gl2.homogeneous_set(True)
-      self.gl1.select_mode_set(elementary.ELM_OBJECT_SELECT_MODE_ALWAYS)
+      self.gl1.select_mode_set(ELM_OBJECT_SELECT_MODE_ALWAYS)
       self.gl2.focus_allow_set(False)
       self.gl2.callback_clicked_double_add(self._cb_item_selected)
       self.gl2.callback_selected_add(self._cb_item_hilight)

@@ -21,7 +21,7 @@
 import os
 
 from efl import evas, ecore, edje, elementary
-from efl.elementary.window import Window
+from efl.elementary.window import Window, ELM_WIN_BASIC
 from efl.elementary.layout import Layout
 from efl.elementary.icon import Icon
 from efl.elementary.image import Image
@@ -34,7 +34,9 @@ from efl.elementary.scroller import Scroller
 from efl.elementary.frame import Frame
 from efl.elementary.list import List
 from efl.elementary.table import Table
-from efl.elementary.genlist import Genlist, GenlistItemClass
+from efl.elementary.genlist import Genlist, GenlistItemClass, ELM_OBJECT_SELECT_MODE_ALWAYS
+from efl.elementary.theme import theme_overlay_add, theme_extension_add
+from efl.elementary.configuration import preferred_engine_set
 
 from epymc import utils, ini, events, input_events
 
@@ -86,13 +88,13 @@ def init():
 
    # create the elm window
    try:
-      elementary.preferred_engine_set(evas_engine)
-      win = Window('epymc', elementary.ELM_WIN_BASIC)
+      preferred_engine_set(evas_engine)
+      win = Window('epymc', ELM_WIN_BASIC)
       LOG('inf', 'Using evas engine: ' + evas_engine)
       ret = 1
    except:
-      elementary.preferred_engine_set('software_x11')
-      win = Window('epymc', elementary.ELM_WIN_BASIC)
+      preferred_engine_set('software_x11')
+      win = Window('epymc', ELM_WIN_BASIC)
       LOG('err', 'Falling back to standard_x11')
       ret = 2
 
@@ -164,8 +166,8 @@ def set_theme_file(path):
    global theme_file
 
    LOG('inf', 'Using theme: ' + path)
-   elementary.theme_overlay_add(path) # TODO REMOVE ME!!! it's here for buttons, and others
-   elementary.theme_extension_add(path)
+   theme_overlay_add(path) # TODO REMOVE ME!!! it's here for buttons, and others
+   theme_extension_add(path)
    theme_file = path
 
 def load_icon(icon):
@@ -629,7 +631,7 @@ class EmcMenu(Menu):
          item = self.selected_item_get()
          if not item or not item.prev:
             return input_events.EVENT_BLOCK
-         while item.prev and item.prev.is_separator():
+         while item.prev and item.prev.is_separator:
             item = item.prev
          item.prev.selected_set(True)
          return input_events.EVENT_BLOCK
@@ -638,7 +640,7 @@ class EmcMenu(Menu):
          item = self.selected_item_get()
          if not item or not item.next:
             return input_events.EVENT_BLOCK
-         while item.next and item.next.is_separator():
+         while item.next and item.next.is_separator:
             item = item.next
          item.next.selected_set(True)
          return input_events.EVENT_BLOCK
@@ -1190,7 +1192,7 @@ class EmcSourceSelector(EmcDialog):
       self._glist = Genlist(win)
       self._glist.style_set('dialog')
       self._glist.homogeneous_set(True)
-      self._glist.select_mode_set(elementary.ELM_OBJECT_SELECT_MODE_ALWAYS)
+      self._glist.select_mode_set(ELM_OBJECT_SELECT_MODE_ALWAYS)
       self._glist.focus_allow_set(False)
       self._glist.callback_clicked_double_add(self._cb_item_selected)
       self._glist_itc = GenlistItemClass(item_style = 'default',

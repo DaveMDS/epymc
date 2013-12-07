@@ -85,6 +85,8 @@ class Uninstall(Command):
          for egg in glob.glob(path):
             self.remove_file(egg)
 
+
+
 class Install(install_lib):
    executables = [
       '*/onlinevideo/*/*.py',
@@ -97,6 +99,7 @@ class Install(install_lib):
                mode = ((os.stat(fn).st_mode) | 0555) & 07777
                info("changing mode of %s to %o", fn, mode)
                os.chmod(fn, mode)
+
 
 setup (
    name = 'EpyMC',

@@ -1024,7 +1024,7 @@ class EmcDialog(edje.Edje):
 
    def _list_item_activated_cb(self, li, it):
       if self._done_cb:
-         args, kwargs = it.data
+         args, kwargs = it.data_get()
          self._done_cb(self, *args, **kwargs)
       else:
          self.delete()

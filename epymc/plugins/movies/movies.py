@@ -423,7 +423,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    def _cb_cast_info(self, button, list_dia):
       item = list_dia.list_item_selected_get()
-      pid = item.data[0][0]
+      pid = item.data_get()[0][0]
       CastPanel(pid)
 
 

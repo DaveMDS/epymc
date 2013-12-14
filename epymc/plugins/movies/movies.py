@@ -397,7 +397,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                'Try the Search info button...'
          self._dialog.text_set(msg)
          # TODO make thumbnail
-         o_image.file_set('')
+         # o_image.file_set('')
 
 
 ######## Play

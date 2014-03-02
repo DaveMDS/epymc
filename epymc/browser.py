@@ -23,6 +23,9 @@ from efl import evas, ecore, elementary
 from efl.elementary.genlist import Genlist, GenlistItem, GenlistItemClass,\
    ELM_OBJECT_SELECT_MODE_ALWAYS
 from efl.elementary.gengrid import Gengrid, GengridItem, GengridItemClass
+from efl.elementary.layout import Layout
+from efl.elementary.label import Label, ELM_WRAP_NONE, \
+   ELM_LABEL_SLIDE_MODE_NONE, ELM_LABEL_SLIDE_MODE_AUTO
 
 from epymc import gui, mainmenu, input_events, ini
 from epymc.sdb import EmcDatabase
@@ -368,22 +371,22 @@ class ViewList(object):
       self.gl1.focus_allow_set(False)
       self.gl1.callback_clicked_double_add(self._cb_item_selected)
       self.gl1.callback_selected_add(self._cb_item_hilight)
+      self.gl1.callback_unselected_add(self._cb_item_unhilight)
       self.current_list = self.gl1
 
       # EXTERNAL Genlist2
       self.gl2 = gui.part_get('browser.list.genlist2')
       self.gl2.style_set('browser')
       self.gl2.homogeneous_set(True)
-      self.gl1.select_mode_set(ELM_OBJECT_SELECT_MODE_ALWAYS)
+      self.gl2.select_mode_set(ELM_OBJECT_SELECT_MODE_ALWAYS)
       self.gl2.focus_allow_set(False)
       self.gl2.callback_clicked_double_add(self._cb_item_selected)
       self.gl2.callback_selected_add(self._cb_item_hilight)
+      self.gl2.callback_unselected_add(self._cb_item_unhilight)
 
       # genlist item class
-      self.itc = GenlistItemClass(item_style = 'default',
-                                  text_get_func = self.__genlist_label_get,
-                                  content_get_func = self.__genlist_icon_get,
-                                  state_get_func = self.__genlist_state_get)
+      self.itc = GenlistItemClass(item_style = 'full',
+                                  content_get_func = self.__gl_full_content_get)
 
       # RemoteImage (poster)
       self.__im = EmcRemoteImage()
@@ -489,35 +492,56 @@ class ViewList(object):
       return input_events.EVENT_CONTINUE
 
    ### GenList Item Class
-   def __genlist_label_get(self, obj, part, item_data):
+   def __gl_full_content_get(self, obj, part, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
-      DBG(('_label get(%s)' % url))
-      return item_class.label_get(url, user_data)
+      DBG('_content get(%s)' % url)
 
-   def __genlist_icon_get(self, obj, part, item_data):
-      (item_class, url, user_data) = item_data                                  # 3 #
-      DBG(('_content get(%s)' % url))
-      icon = None
-      if part == 'elm.swallow.icon':
-         icon = item_class.icon_get(url, user_data)
-      elif part == 'elm.swallow.end':
-         icon = item_class.icon_end_get(url, user_data)
+      text = item_class.label_get(url, user_data)
+      icon = item_class.icon_get(url, user_data)
+      iend = item_class.icon_end_get(url, user_data)
+
+      ly = Layout(gui.win, file=(gui.theme_file, 'emc/browser/list_item/normal'))
+
       if icon:
-         return gui.load_icon(icon)
+         ly.content_set('brower.item.icon', gui.load_icon(icon))
+         ly.signal_emit('icon,show', 'emc')
+      if iend:
+         ly.content_set('brower.item.icon_end', gui.load_icon(iend))
+         ly.signal_emit('icon_end,show', 'emc')
 
-   def __genlist_state_get(self, obj, part, item_data):
-      return False
+      label = ly.edje.part_external_object_get('brower.item.label1')
+      label.text = text
+
+      # start the slide now, but should start on item_hilight :(
+      label.style = 'slide_short/browser'
+      label.slide_mode = ELM_LABEL_SLIDE_MODE_AUTO # Should be NONE
+      label.slide_speed = 50
+      # label.slide_go()
+
+      return ly
 
    ### GenList Callbacks
-   def _cb_item_selected(self, list, item):
+   def _cb_item_selected(self, gl, item):
       (item_class, url, user_data) = item.data_get()                            # 3 #
       item_class.item_selected(url, user_data)
 
-   def _cb_item_hilight(self, list, item):
+   def _cb_item_hilight(self, gl, item):
+      DBG("TODO: Start slide") # TODO
+      # ly = item.part_content_get('elm.swallow.content')
+      # label = ly.edje.part_external_object_get('brower.item.label1')
+      # label.slide_mode = ELM_LABEL_SLIDE_MODE_AUTO
+      # label.slide_go()
+
       if self.timer: self.timer.delete()
       if self.timer2: self.timer2.delete()
       self.timer = ecore.timer_add(0.5, self._cb_timer, item.data_get())
       self.timer2 = ecore.timer_add(1.0, self._cb_timer2, item.data_get())
+
+   def _cb_item_unhilight(self, gl, item):
+      DBG("TODO: Stop slide") # TODO
+      # ly = item.part_content_get('elm.swallow.content')
+      # label = ly.edje.part_external_object_get('brower.item.label1')
+      # label.slide_mode = ELM_LABEL_SLIDE_MODE_NONE
 
    def _cb_timer(self, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #

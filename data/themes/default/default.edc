@@ -84,6 +84,10 @@ styles {
       base: "font=Aclonica align=center font_size="FONT_SIZE_BIG" color=#"COLOR_ORANGE_HEX" wrap=none";
    }
 
+   style { name: "epymc_label_slide_style";
+      base:  "font="FONT" font_size="FONT_SIZE" color=#fff wrap=none";
+   }
+
    // font=Sans font_size=10 align=center color=#fff wrap=mixed ellipsis=1.0
    // font=Sans text_class=fileman_icon wrap=[word,mixed,none] style=soft_shadow shadow_color=#0002
    // left_margin=4 right_margin=4
@@ -1106,6 +1110,98 @@ collections {
             source: "emc";
             action: STATE_SET "default" 0.0;
             target: "volume.icon";
+         }
+      }
+   }
+
+/// browser list item
+   group { name: "emc/browser/list_item/normal"; /* API todoc */
+      parts {
+         part { name: "brower.item.icon"; /* API todoc */
+            type: SWALLOW;
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               min: 1 40;
+               max: 1 40;
+               align: 0.0 0.5;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               min: 40 40;
+               max: 40 40;
+            }
+         }
+         part { name: "brower.item.icon_end"; /* API todoc */
+            type: SWALLOW;
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               min: 1 40;
+               max: 1 40;
+               align: 1.0 0.5;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               min: 40 40;
+               max: 40 40;
+            }
+         }
+
+         part { name: "brower.item.label1"; /* API todoc */
+            type: EXTERNAL;
+            source: "elm/label";
+            mouse_events: 0;
+            scale: 1;
+
+            description { state: "default" 0.0;
+               rel1 {
+                  to_x: "brower.item.icon";
+                  relative: 1.0  0.0;
+                  offset: 1  1;
+               }
+               rel2 {
+                  to_x: "brower.item.icon_end";
+                  relative: 0.0  1.0;
+                  offset: -1  -1;
+               }
+            }
+         }
+         /* DEBUG START
+         part { name: "TESTING_ICON";
+            type: RECT;
+            description { state: "default" 0.0;
+               color: 80 80 0 80;
+               rel1.to: "brower.item.icon";
+               rel2.to: "brower.item.icon";
+            }
+         }
+         part { name: "TESTING_TEXT";
+            type: RECT;
+            description { state: "default" 0.0;
+               color: 0 80 80 80;
+               rel1.to: "brower.item.label1";
+               rel2.to: "brower.item.label1";
+            }
+         }
+         part { name: "TESTING_END";
+            type: RECT;
+            description { state: "default" 0.0;
+               color: 80 0 80 80;
+               rel1.to: "brower.item.icon_end";
+               rel2.to: "brower.item.icon_end";
+            }
+         }
+         DEBUG END */
+      }
+      programs {
+         program { signal: "icon,show"; source: "emc"; /* API todoc */
+            action: STATE_SET "visible" 0.0;
+            target: "brower.item.icon";
+         }
+         program { signal: "icon_end,show"; source: "emc"; /* API todoc */
+            action: STATE_SET "visible" 0.0;
+            target: "brower.item.icon_end";
          }
       }
    }

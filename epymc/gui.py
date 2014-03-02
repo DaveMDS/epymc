@@ -183,7 +183,11 @@ def load_icon(icon):
       ic.file_set(icon)
    else:
       ic.file_set(theme_file, icon)
-   ic.size_hint_aspect_set(evas.EVAS_ASPECT_CONTROL_VERTICAL, 1, 1)
+   # TODO fix tests->icons_gallery and tests->source_selector
+   #      and icons in browser (config)
+   #      and icons in the 2 view buttons
+   # ic.size_hint_aspect_set(evas.EVAS_ASPECT_CONTROL_VERTICAL, 1, 1)
+   # ic.size_hint_aspect_set(evas.EVAS_ASPECT_CONTROL_BOTH, 1, 1)
    return ic
 
 def load_image(name, path = None):

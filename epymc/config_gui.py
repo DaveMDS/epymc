@@ -263,7 +263,7 @@ def _general_populate(browser, url):
       L.append('opengl_x11')
    standard_item_string_from_list('general', 'evas_engine', 'Rendering engine',
                                   L, 'icon/evas')
-   L = ['gstreamer', 'xine', 'generic', 'vlc']
+   L = ['vlc', 'gstreamer1', 'gstreamer', 'xine', 'generic']
    standard_item_string_from_list('mediaplayer', 'backend', 'Multimedia engine',
                                   L, 'icon/evas')
 

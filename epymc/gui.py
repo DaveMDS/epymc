@@ -52,6 +52,8 @@ _last_mouse_pos = (0, 0)
 _mouse_visible = True
 _mouse_skip_next = False
 
+_theme_generation = "1"
+
 
 DEBUG = False
 DEBUGN = 'GUI'
@@ -82,6 +84,14 @@ def init():
       if theme_file is None:
          LOG('err', 'cannot find a working theme file, exiting...')
          return 0
+
+   # check the theme generation
+   gen = edje.file_data_get(theme_file, 'theme.generation')
+   if gen != _theme_generation:
+      LOG('err', "Theme '{}' not in sync with actual code base.\n"
+                 "Needed generation: {} - theme: {} .. aborting".format(
+                 theme_file, _theme_generation, gen))
+      return 0
 
    # custom elementary theme
    set_theme_file(theme_file)

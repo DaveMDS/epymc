@@ -86,7 +86,6 @@ class Uninstall(Command):
             self.remove_file(egg)
 
 
-
 class Install(install_lib):
    executables = [
       '*/onlinevideo/*/*.py',
@@ -104,15 +103,15 @@ class Install(install_lib):
 setup (
    name = 'EpyMC',
    version = '0.9',
-   author = 'Davide "davemds" Andreoli',
+   author = 'Davide <davemds> Andreoli',
    author_email = 'dave@gurumeditation.it',
-   url = 'http://code.google.com/p/e17mods/wiki/EpyMC',
+   url = 'http://github.com/DaveMDS/epymc',
    description = 'Emotion Media Center',
    long_description = 'EpyMC is a media center written in python that use the Enlightenment Foundation Libraries',
    license = 'GNU GPL v3',
    platforms = 'linux',
 
-   requires = ['efl (>= 1.8.0)'],
+   requires = ['efl (>= 1.9.0)'],
    provides = ['epymc'],
 
    packages = [

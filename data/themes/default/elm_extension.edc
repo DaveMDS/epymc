@@ -989,7 +989,7 @@ group { name: "elm/list/item/mainmenu";
                font: "Aclonica";
                size: 45;
                min: 1 1;
-//                  min: 0 1;
+               ellipsis: -1;
                align: 0.5 0.5;
             }
          }

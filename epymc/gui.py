@@ -52,7 +52,7 @@ _last_mouse_pos = (0, 0)
 _mouse_visible = True
 _mouse_skip_next = False
 
-_theme_generation = "1"
+_theme_generation = "2"
 
 EXPAND_BOTH = evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND
 EXPAND_HORIZ = evas.EVAS_HINT_EXPAND, 0.0

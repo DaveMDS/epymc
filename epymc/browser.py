@@ -21,7 +21,7 @@
 
 from efl import evas, ecore, elementary
 from efl.elementary.genlist import Genlist, GenlistItem, GenlistItemClass,\
-   ELM_OBJECT_SELECT_MODE_ALWAYS
+   ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS
 from efl.elementary.gengrid import Gengrid, GengridItem, GengridItemClass
 from efl.elementary.layout import Layout
 from efl.elementary.label import Label, ELM_WRAP_NONE, \
@@ -366,6 +366,7 @@ class ViewList(object):
       # EXTERNAL Genlist1
       self.gl1 = gui.part_get('browser.list.genlist1')
       self.gl1.style_set('browser')
+      self.gl1.mode_set(ELM_LIST_COMPRESS)
       self.gl1.homogeneous_set(True)
       self.gl1.select_mode_set(ELM_OBJECT_SELECT_MODE_ALWAYS)
       self.gl1.focus_allow_set(False)
@@ -377,6 +378,7 @@ class ViewList(object):
       # EXTERNAL Genlist2
       self.gl2 = gui.part_get('browser.list.genlist2')
       self.gl2.style_set('browser')
+      self.gl2.mode_set(ELM_LIST_COMPRESS)
       self.gl2.homogeneous_set(True)
       self.gl2.select_mode_set(ELM_OBJECT_SELECT_MODE_ALWAYS)
       self.gl2.focus_allow_set(False)

@@ -1652,8 +1652,8 @@ group { name: "elm/genlist/item_odd/default/dialog";
    }
 }
 
-//// BROWSER GENLIST ITEM FULL (elm/genlist/item/full/default) ////////////////
-group { name: "elm/genlist/item/full/browser";
+//// BROWSER GENLIST ITEM FULL (elm/genlist/item_compress/full/default) ///////
+group { name: "elm/genlist/item_compress/full/browser";
    data.item: "selectraise" "on";
    data.item: "contents" "elm.swallow.content";
    // data.item: "treesize" 20;

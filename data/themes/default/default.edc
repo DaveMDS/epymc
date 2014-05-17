@@ -1525,6 +1525,7 @@ collections {
                text {
                   text:"missing title...";
                   min: 1 1;
+                  ellipsis: -1;
                   align: 0.5 0.7;
                   style: "epymc_dialog_title_style";
                }

@@ -1837,6 +1837,7 @@ group { name: "elm/label/base/slide_short/browser";
                // style: "label_style";
                style: "epymc_label_slide_style";
                min: 0 1;
+               ellipsis: -1;
             }
          }
          description { state: "slide_end" 0.0;
@@ -1848,6 +1849,7 @@ group { name: "elm/label/base/slide_short/browser";
                // style: "label_style";
                style: "epymc_label_slide_style";
                min: 1 1;
+               ellipsis: -1;
             }
          }
          description { state: "slide_begin" 0.0;
@@ -2390,6 +2392,7 @@ group { name: "elm/menu/item/emc";
                font:     FONT;
                size:     FONT_SIZE;
                min:      1 1;
+               ellipsis: -1;
                align:    0.0 0.5;
                text_class: "menu_item";
             }
@@ -2758,6 +2761,7 @@ group { name: "elm/entry/base-single/vkeyboard";
             text {
                style: "epymc_dialog_style";
                min: 1 1;
+               ellipsis: -1;
                align: 0.0 0.5;
             }
          }
@@ -2883,6 +2887,7 @@ group { name: "elm/button/base/emcHIDE";
                font:     "Sans,Edje-Vera";
                size:     FONT_SIZE;
                min:      0 0;
+               ellipsis: -1;
                align:    0.5 0.5;
                text_class: "button";
             }
@@ -3175,6 +3180,7 @@ group { name: "elm/button/base/emc";
                font:     "Asap";
                size:     FONT_SIZE;
                min:      1 1;
+               ellipsis: -1;
                align:    0.5 0.5;
                text_class: "button";
             }

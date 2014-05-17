@@ -127,6 +127,7 @@ setup (
       'epymc.plugins.mame',
       'epymc.plugins.music',
       'epymc.plugins.uitests',
+      'epymc.plugins.calibrator',
    ],
 
    package_data = {
@@ -136,6 +137,7 @@ setup (
       'epymc.plugins.mame': ['*.png', '*.jpg'],
       'epymc.plugins.music': ['*.png'],
       'epymc.plugins.uitests': ['*.png'],
+      'epymc.plugins.calibrator': ['*.jpg', '*.png'],
       'epymc.plugins.onlinevideo': [ '*.png',
          'traileraddict/*',
          'youtube/*',

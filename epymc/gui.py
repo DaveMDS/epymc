@@ -54,6 +54,10 @@ _mouse_skip_next = False
 
 _theme_generation = "1"
 
+EXPAND_BOTH = evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND
+EXPAND_HORIZ = evas.EVAS_HINT_EXPAND, 0.0
+FILL_BOTH = evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL
+FILL_HORIZ = evas.EVAS_HINT_FILL, 0.5
 
 DEBUG = False
 DEBUGN = 'GUI'

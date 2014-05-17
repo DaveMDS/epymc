@@ -363,32 +363,24 @@ class ViewList(object):
       self.timer = self.timer2 = None
       self.items_count = 0;            # This is accessed from the browser
 
-      # EXTERNAL Genlist1
+      # EXTERNAL Genlists
       self.gl1 = gui.part_get('browser.list.genlist1')
-      self.gl1.style_set('browser')
-      self.gl1.mode_set(ELM_LIST_COMPRESS)
-      self.gl1.homogeneous_set(True)
-      self.gl1.select_mode_set(ELM_OBJECT_SELECT_MODE_ALWAYS)
-      self.gl1.focus_allow_set(False)
-      self.gl1.callback_clicked_double_add(self._cb_item_selected)
-      self.gl1.callback_selected_add(self._cb_item_hilight)
-      self.gl1.callback_unselected_add(self._cb_item_unhilight)
+      self.gl2 = gui.part_get('browser.list.genlist2')
       self.current_list = self.gl1
 
-      # EXTERNAL Genlist2
-      self.gl2 = gui.part_get('browser.list.genlist2')
-      self.gl2.style_set('browser')
-      self.gl2.mode_set(ELM_LIST_COMPRESS)
-      self.gl2.homogeneous_set(True)
-      self.gl2.select_mode_set(ELM_OBJECT_SELECT_MODE_ALWAYS)
-      self.gl2.focus_allow_set(False)
-      self.gl2.callback_clicked_double_add(self._cb_item_selected)
-      self.gl2.callback_selected_add(self._cb_item_hilight)
-      self.gl2.callback_unselected_add(self._cb_item_unhilight)
+      for gl in (self.gl1, self.gl2):
+         gl.style = 'browser'
+         gl.mode = ELM_LIST_COMPRESS
+         gl.homogeneous = True
+         gl.select_mode = ELM_OBJECT_SELECT_MODE_ALWAYS
+         gl.focus_allow = False
+         gl.callback_clicked_double_add(self._cb_item_selected)
+         gl.callback_selected_add(self._cb_item_hilight)
+         gl.callback_unselected_add(self._cb_item_unhilight)
 
       # genlist item class
-      self.itc = GenlistItemClass(item_style = 'full',
-                                  content_get_func = self.__gl_full_content_get)
+      self.itc = GenlistItemClass(item_style='full',
+                                  content_get_func=self.__gl_full_content_get)
 
       # RemoteImage (poster)
       self.__im = EmcRemoteImage()

@@ -287,14 +287,13 @@ def _update_timer_cb():
    if _buffer_dialog is not None:
       _buffer_dialog.progress_set(_emotion.buffer_size)
       if _emotion.buffer_size >= 1.0:
-         _emotion.play = _buffer_dialog.data['playing_state']
+         _emotion.play = True
          _buffer_dialog.delete()
          _buffer_dialog = None
 
    elif _emotion.buffer_size < 1.0:
       _buffer_dialog = EmcDialog(title='buffering', style = 'progress',
                                  canc_cb = _dialog_canc_cb)
-      _buffer_dialog.data['playing_state'] = _emotion.play
       _emotion.play = False
 
    _update_slider()

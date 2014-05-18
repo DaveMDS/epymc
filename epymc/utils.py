@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, tempfile, glob
+import os, tempfile, glob, re
 
 try:
    from urllib.parse import quote as urllib_quote
@@ -96,6 +96,11 @@ def hum_size(bytes):
 def splitpath(path):
    """ Convert a string path in a list of all the components """
    return [p for p in path.split(os.path.sep) if p != '']
+
+def natural_sort(l): 
+   convert = lambda text: int(text) if text.isdigit() else text.lower() 
+   alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)] 
+   return sorted(l, key=alphanum_key)
 
 def grab_files(folders, show_hidden=False, recursive=True):
    """

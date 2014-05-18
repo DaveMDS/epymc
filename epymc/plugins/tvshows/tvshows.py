@@ -396,7 +396,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def populate_url(self, browser, url):
       # build ordered list of files and dirs (relative to the show base dir)
       dirs, files = [], []
-      for fname in sorted(os.listdir(url[7:]), key=str.lower):
+      for fname in utils.natural_sort(os.listdir(url[7:])):
          if fname[0] == '.': continue
          relative = url.replace(self._current_base_path, '')
          if os.path.isdir(os.path.join(url[7:], fname)):
@@ -418,7 +418,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          item_url = self._current_base_path + relative
          try:
             (show_name, s_num, e_num) = get_serie_from_relative_url(relative)
-            DBG([show_name, s_num, e_num])
             e = self._tvshows_db.get_data(show_name)
             episode_data = e['seasons'][s_num]['episodes'][e_num]
             self._browser.item_add(EpisodeItemClass(), item_url, episode_data)

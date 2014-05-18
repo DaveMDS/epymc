@@ -172,24 +172,25 @@ class SeasonItemClass(EmcItemClass):
       return os.path.basename(url)
 
    def icon_get(self, url, season_num):
-      return self.poster_get(url, season_num) or 'icon/folder'
+      serie_name = mod_instance._current_serie_name
+      if mod_instance._tvshows_db.id_exists(serie_name):
+         e = mod_instance._tvshows_db.get_data(serie_name)
+
+         icon_file = get_icon_filename(e['id'], season_num)
+         if os.path.exists(icon_file):
+            return icon_file
+
+         return get_icon_filename(e['id'])
 
    def poster_get(self, url, season_num):
       serie_name = mod_instance._current_serie_name
       if mod_instance._tvshows_db.id_exists(serie_name):
          e = mod_instance._tvshows_db.get_data(serie_name)
 
-         # we have the file yet
          poster_file = get_poster_filename(e['id'], season_num)
          if os.path.exists(poster_file):
             return poster_file
 
-         # search for a poster that match the season
-         for p in e['posters']:
-            if p['season'] == str(season_num):
-               return (p['url'], poster_file)
-
-         # or use the global serie poster
          return get_poster_filename(e['id'])
 
    def fanart_get(self, url, season_num):
@@ -407,7 +408,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       for relative in dirs:
          item_url = self._current_base_path + relative
          try:
-            (show_name, s_num, e_num) = get_serie_from_relative_url(relative)
+            (show_name, s_num) = get_serie_from_relative_dir_url(relative)
             self._browser.item_add(SeasonItemClass(), item_url, s_num)
          except:
             self._browser.item_add(FolderItemClass(), item_url, self)
@@ -425,7 +426,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
             self._browser.item_add(FileItemClass(), item_url, self)
 
       self._browser.item_add(SerieInfoItemClass(), 'tvshows://refresh_serie', self)
-
 
    def _events_cb(self, event):
       # TODO: check that we are active and visible
@@ -560,9 +560,9 @@ class InfoPanel(EmcDialog):
                                  title = 'Fetching updated info',
                                  text = 'Please wait...')
 
-   def _refresh_done_cb(self, tvdb, data, status):
+   def _refresh_done_cb(self, tvdb, data):
       self._prog_dia.delete()
-      if status == 200 and data:
+      if data:
          mod_instance._tvshows_db.set_data(self._serie_name, data)
          self._db_data = data
          self.update()
@@ -579,7 +579,6 @@ def get_serie_from_relative_url(url):
    /Prison Break/1x01 - Pilot.avi
    /Prison Break/s1e01 - Pilot.avi
    /Prison Break/s01e01 - Pilot.avi
-   /Prison Break/Season 1    # this form will return -1 as the episode number
    """
    # split the url in a list
    parts = utils.splitpath(url)
@@ -598,10 +597,21 @@ def get_serie_from_relative_url(url):
       episode = int(m.group('episode'))
       return (serie, season, episode)
 
-   # or search the season number in the folder name (ex: Alias/Stagione 1)
+def get_serie_from_relative_dir_url(url):
+   """
+   TESTCASES:
+   /Prison Break/Season 1
+   """
+   # split the url in a list
+   parts = utils.splitpath(url)
+
+   # the serie name is always the first folder name
+   serie = parts[0]
+
+   # now search for a number in the second folder name
    try:
       num = filter(str.isdigit, parts[1])
-      return (serie, int(num), -1)
+      return (serie, int(num))
    except:
       return None
 
@@ -616,6 +626,15 @@ def get_poster_filename(tvshows_id, season_num=None, episode_id=None):
       return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
                           'poster.jpg')
 
+
+def get_icon_filename(tvshows_id, season_num=None):
+   if season_num:
+      return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
+                          'icon_s%d.jpg' % season_num)
+   else:
+      return os.path.join(utils.user_conf_dir, 'tvshows',
+                          str(tvshows_id), 'icon.jpg')
+
 def get_backdrop_filename(tvshows_id):
    return os.path.join(utils.user_conf_dir, 'tvshows',
                        str(tvshows_id), 'backdrop.jpg')
@@ -624,9 +643,6 @@ def get_banner_filename(tvshows_id):
    return os.path.join(utils.user_conf_dir, 'tvshows',
                        str(tvshows_id), 'banner.jpg')
 
-def get_icon_filename(tvshows_id):
-   return os.path.join(utils.user_conf_dir, 'tvshows',
-                       str(tvshows_id), 'icon.jpg')
 
 
 ###### Config Panel stuff
@@ -650,7 +666,6 @@ class BackgroundScanner(ecore.Idler):
       self._generator = None          # the file generator instance
       self._tvdb = None               # the TVDB instance
       self._current_serie_name = None # also used as a semaphore
-      self._current_serie_data = None # the whole data (for the notification)
       self._retry_after = 1 * 24 * 60 * 60
 
       ecore.Idler.__init__(self, lambda: self._step_func())
@@ -729,59 +744,30 @@ class BackgroundScanner(ecore.Idler):
       if status == 200 and len(results) > 0:
          tvdb.fetch_all_data_for_serie(results[0]['id'], self._fetch_data_done_cb)
       else:
-         self._fetch_data_done_cb(tvdb, None, 1)
+         self._fetch_data_done_cb(tvdb, None)
 
-   def _fetch_data_done_cb(self, tvdb, result, status):
+   def _fetch_data_done_cb(self, tvdb, result):
       # store result info into the idler-db
       self._idler_db.set_data(self._current_serie_name, {
          'last_search_time': time.time(),
-         'last_search_success': True if (status == 200 and result) else False
+         'last_search_success': True if result else False
       })
 
-      if status == 200 and result:
+      if result:
          # store the data into tvshow-db
          self._tvshows_db.set_data(self._current_serie_name, result)
 
-         # remember the data to show the notificationa at the end
-         self._current_serie_data = result
-
-         # now download the backdrop/poster/banner/icon default images
-         self._dwl_h['bd'] = utils.download_url_async(result['backdrop_url'],
-                                       get_backdrop_filename(result['id']),
-                                       complete_cb = self._images_done_cb,
-                                       img_type = 'bd')
-         self._dwl_h['po'] = utils.download_url_async(result['poster_url'],
-                                       get_poster_filename(result['id']),
-                                       complete_cb = self._images_done_cb,
-                                       img_type = 'po')
-         self._dwl_h['ba'] = utils.download_url_async(result['banner_url'],
-                                       get_banner_filename(result['id']),
-                                       complete_cb = self._images_done_cb,
-                                       img_type = 'ba')
-         icon_url = result['poster_url'].replace('banners/', 'banners/_cache/')
-         self._dwl_h['ic'] = utils.download_url_async(icon_url,
-                                       get_icon_filename(result['id']),
-                                       complete_cb = self._images_done_cb,
-                                       img_type = 'ic')
-      else:
-         # clear the "semaphore", now another serie can be processed
-         self._current_serie_name = None
-         self._current_serie_data = None
-
-   def _images_done_cb(self, dest, status, img_type):
-      del self._dwl_h[img_type]
-      if not self._dwl_h: # dict empty, all downloads done
          # show a cool notification
-         data = self._current_serie_data
          text = '<title>Found serie:</><br>%s<br>%s seasons' % \
-                (data['name'], len(data['seasons']))
-         EmcNotify(text, icon=get_icon_filename(data['id']))
+                (result['name'], len(result['seasons']))
+         EmcNotify(text, icon=get_icon_filename(result['id']))
+
          # refresh the browser view
          self._browser.refresh()
-         
-         # clear the "semaphore", now another serie can be processed
-         self._current_serie_name = None
-         self._current_serie_data = None
+
+      # clear the "semaphore", now another serie can be processed
+      self._current_serie_name = None
+      self._current_serie_data = None
 
 
 ###### thetvdb.com XML api implementation
@@ -816,8 +802,9 @@ class TVDB(object):
       self._base_url = 'http://thetvdb.com/api'
       self._dwl_handler = None
       self._done_cb = None
+      self._data = None
 
-   # abort the current operation
+   ## abort the current operation
    def abort(self):
       if self._dwl_handler:
          utils.download_abort(self._dwl_handler)
@@ -848,7 +835,7 @@ class TVDB(object):
 
       self._done_cb(self, results, status)
 
-   # fetch all data for the given serie_id
+   ## fetch all data for the given serie_id
    def fetch_all_data_for_serie(self, serie_id, done_cb):
       self._done_cb = done_cb
       url = '%s/%s/series/%s/all/%s.zip' % \
@@ -866,25 +853,23 @@ class TVDB(object):
          self._done_cb(self, None, status)
          return
 
-      data = None
-      
       with zipfile.ZipFile(dest, 'r') as Z:
          # read and parse the <lang>.xml file
          with Z.open(self._lang + '.xml') as f:
-            data = self._parse_general_info(f)
+            self._data = self._parse_general_info(f)
          # read and parse the banners.xml file
          with Z.open('banners.xml') as f:
             (backdrops, posters, banners) = self._parse_banners(f)
-            data['backdrops'] = backdrops
-            data['posters'] = posters
-            data['banners'] = banners
+            self._data['backdrops'] = backdrops
+            self._data['posters'] = posters
+            self._data['banners'] = banners
          # TODO actors.xml
          
       # remove the downloaded zip file
       os.remove(dest)
 
-      # call the complete callback
-      self._done_cb(self, data, status)
+      # fetch images
+      self._fetch_images()
 
    def _parse_banners(self, file_obj):
       # read the XML from the file-like object
@@ -989,6 +974,58 @@ class TVDB(object):
 
       return data
 
+   ## fetch all the images for the given serie_id
+   def _fetch_images(self):
+      e = self._data
+      self._dwl_h = {}
+      # get backdrop/poster/banner/icon of the serie
+      self._dwl_h['bd'] = utils.download_url_async(e['backdrop_url'],
+                                       get_backdrop_filename(e['id']),
+                                       complete_cb=self._images_done_cb,
+                                       img_key='bd')
+      self._dwl_h['ba'] = utils.download_url_async(e['banner_url'],
+                                       get_banner_filename(e['id']),
+                                       complete_cb=self._images_done_cb,
+                                       img_key='ba')
+      self._dwl_h['po'] = utils.download_url_async(e['poster_url'],
+                                       get_poster_filename(e['id']),
+                                       complete_cb=self._images_done_cb,
+                                       img_key='po')
+      icon_url = e['poster_url'].replace('banners/', 'banners/_cache/')
+      self._dwl_h['ic'] = utils.download_url_async(icon_url,
+                                       get_icon_filename(e['id']),
+                                       complete_cb=self._images_done_cb,
+                                       img_key='ic')
+      # and all the seasons poster+icon
+      for season in e['seasons']:
+         poster_en = None # english
+         poster_la = None # language
+         
+         for poster in e['posters']:
+            if poster['season'] == str(season):
+               if not poster_en and poster['lang'] == 'en':
+                  poster_en = poster
+               if not poster_la and poster['lang'] == self._lang:
+                  poster_la = poster
+         poster = poster_la or poster_en
+
+         if poster:
+            key = 'po' + str(season)
+            self._dwl_h[key] = utils.download_url_async(poster['url'],
+                                          get_poster_filename(e['id'], season),
+                                          complete_cb=self._images_done_cb,
+                                          img_key=key)
+            key = 'ic' + str(season)
+            self._dwl_h[key] = utils.download_url_async(poster['thumb_url'],
+                                          get_icon_filename(e['id'], season),
+                                          complete_cb=self._images_done_cb,
+                                          img_key=key)
+
+   def _images_done_cb(self, dest, status, img_key):
+      del self._dwl_h[img_key]
+      if not self._dwl_h: # dict empty, all downloads done
+         self._done_cb(self, self._data)
+   
    # utils
    def _build_image_url(self, final_part):
       if final_part is not None:

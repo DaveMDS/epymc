@@ -174,10 +174,6 @@ class SeasonItemClass(EmcItemClass):
    def icon_get(self, url, season_num):
       return self.poster_get(url, season_num) or 'icon/folder'
 
-   def info_get(self, url, season_num):
-      return '<title>%s</title><br><subtitle>Season %d</subtitle>' % \
-             (mod_instance._current_serie_name, season_num)
-
    def poster_get(self, url, season_num):
       serie_name = mod_instance._current_serie_name
       if mod_instance._tvshows_db.id_exists(serie_name):
@@ -779,7 +775,7 @@ class BackgroundScanner(ecore.Idler):
          data = self._current_serie_data
          text = '<title>Found serie:</><br>%s<br>%s seasons' % \
                 (data['name'], len(data['seasons']))
-         EmcNotify(text, icon = get_poster_filename(data['id']))
+         EmcNotify(text, icon=get_icon_filename(data['id']))
          # refresh the browser view
          self._browser.refresh()
          

@@ -129,6 +129,7 @@ class FolderItemClass(EmcItemClass):
          e = mod_instance._tvshows_db.get_data(mod._current_serie_name)
          return get_backdrop_filename(e['id'])
 
+
 class SerieItemClass(EmcItemClass):
    def item_selected(self, url, serie_name):
       mod_instance._current_serie_name = serie_name
@@ -147,7 +148,7 @@ class SerieItemClass(EmcItemClass):
    def icon_get(self, url, serie_name):
       if mod_instance._tvshows_db.id_exists(serie_name):
          e = mod_instance._tvshows_db.get_data(serie_name)
-         return get_poster_filename(e['id']) # TODO !!!!!!!!!!!! thumbnail
+         return get_icon_filename(e['id'])
       else:
          return 'icon/folder'
 
@@ -160,6 +161,7 @@ class SerieItemClass(EmcItemClass):
       if mod_instance._tvshows_db.id_exists(serie_name):
          e = mod_instance._tvshows_db.get_data(serie_name)
          return get_backdrop_filename(e['id'])
+
 
 class SeasonItemClass(EmcItemClass):
    def item_selected(self, url, season_num):
@@ -626,6 +628,10 @@ def get_banner_filename(tvshows_id):
    return os.path.join(utils.user_conf_dir, 'tvshows',
                        str(tvshows_id), 'banner.jpg')
 
+def get_icon_filename(tvshows_id):
+   return os.path.join(utils.user_conf_dir, 'tvshows',
+                       str(tvshows_id), 'icon.jpg')
+
 
 ###### Config Panel stuff
 def config_panel_cb():
@@ -743,7 +749,7 @@ class BackgroundScanner(ecore.Idler):
          # remember the data to show the notificationa at the end
          self._current_serie_data = result
 
-         # now download the backdrop/poster/banner default images
+         # now download the backdrop/poster/banner/icon default images
          self._dwl_h['bd'] = utils.download_url_async(result['backdrop_url'],
                                        get_backdrop_filename(result['id']),
                                        complete_cb = self._images_done_cb,
@@ -756,6 +762,11 @@ class BackgroundScanner(ecore.Idler):
                                        get_banner_filename(result['id']),
                                        complete_cb = self._images_done_cb,
                                        img_type = 'ba')
+         icon_url = result['poster_url'].replace('banners/', 'banners/_cache/')
+         self._dwl_h['ic'] = utils.download_url_async(icon_url,
+                                       get_icon_filename(result['id']),
+                                       complete_cb = self._images_done_cb,
+                                       img_type = 'ic')
       else:
          # clear the "semaphore", now another serie can be processed
          self._current_serie_name = None
@@ -961,7 +972,6 @@ class TVDB(object):
          if not season_num in seasons:
             seasons[season_num] = {
                'season_num': season_num,
-               # TODO season poster
                'episodes': {}
             }
 

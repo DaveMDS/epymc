@@ -747,8 +747,7 @@ class EmcRemoteImage(Image):
       self.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
       self.on_move_add(self._cb_move_resize)
       self.on_resize_add(self._cb_move_resize)
-      self._spinner = Progressbar(layout)
-      self._spinner.style_set('wheel')
+      self._spinner = Progressbar(self, style='wheel', pulse_mode=True)
       if url: self.url_set(url, dest)
 
    def show(self):
@@ -783,6 +782,7 @@ class EmcRemoteImage(Image):
          self._spinner.clip = self.clip
 
    def _cb_download_complete(self, dest, status):
+      if self.is_deleted(): return
       self.stop_spin()
       if status == 200: # Successfull HTTP code
          self.file_set(dest)

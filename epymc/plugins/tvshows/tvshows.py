@@ -489,7 +489,8 @@ class InfoPanel(EmcDialog):
       for poster in self._db_data['posters']:
          icon = EmcRemoteImage(poster['thumb_url'])
          dia.list_item_append(None, icon, dwnl_url = poster['url'],
-                     dest_path = get_poster_filename(self._db_data['id']))
+                     dest_path = get_poster_filename(self._db_data['id']),
+                     thumb_url = poster['thumb_url'])
 
    def _backdrop_button_cb(self, button):
       title = '%s backdrops found' % len(self._db_data['backdrops'])
@@ -509,13 +510,18 @@ class InfoPanel(EmcDialog):
          dia.list_item_append(None, icon, dwnl_url = banner['url'],
                      dest_path = get_banner_filename(self._db_data['id']))
 
-   def _image_choosed_cb(self, dia, dwnl_url, dest_path):
+   def _image_choosed_cb(self, dia, dwnl_url, dest_path, thumb_url=None):
       dia.delete()
       dia = EmcDialog(style = 'progress', title = 'Downloading image')
       utils.download_url_async(dwnl_url, dest_path,
                                complete_cb = self._cb_image_done,
                                progress_cb = self._cb_image_progress,
                                dia = dia)
+      # also download icon for poster
+      if thumb_url and dest_path.endswith('/poster.jpg'):
+         icon_path = dest_path.replace('poster.jpg', 'icon.jpg')
+         utils.download_url_async(thumb_url, icon_path)
+                                  
 
    def _cb_image_progress(self, dest, tot, done, dia):
       if tot > 0: dia.progress_set(float(done) / float(tot))
@@ -628,7 +634,6 @@ def get_poster_filename(tvshows_id, season_num=None, episode_id=None):
       return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
                           'poster.jpg')
 
-
 def get_icon_filename(tvshows_id, season_num=None):
    if season_num is not None:
       return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
@@ -644,7 +649,6 @@ def get_backdrop_filename(tvshows_id):
 def get_banner_filename(tvshows_id):
    return os.path.join(utils.user_conf_dir, 'tvshows',
                        str(tvshows_id), 'banner.jpg')
-
 
 
 ###### Config Panel stuff

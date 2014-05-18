@@ -180,7 +180,11 @@ class SeasonItemClass(EmcItemClass):
          if os.path.exists(icon_file):
             return icon_file
 
-         return get_icon_filename(e['id'])
+         icon_file = get_icon_filename(e['id'])
+         if os.path.exists(icon_file):
+            return icon_file
+
+      return 'icon/folder'
 
    def poster_get(self, url, season_num):
       serie_name = mod_instance._current_serie_name
@@ -607,10 +611,9 @@ def get_serie_from_relative_dir_url(url):
    # the serie name is always the first folder name
    serie = parts[0]
 
-   # now search for a number in the second folder name
+   # now search the first number in the second folder name
    try:
-      num = filter(str.isdigit, parts[1])
-      return (serie, int(num))
+      return (serie, int(re.findall('\d+', parts[1])[0]))
    except:
       return None
 

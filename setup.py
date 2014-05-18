@@ -95,7 +95,7 @@ class Install(install_lib):
       for fn in self.get_outputs():
          for e in self.executables:
             if fnmatch.fnmatch(fn, e):
-               mode = ((os.stat(fn).st_mode) | 0555) & 07777
+               mode = ((os.stat(fn).st_mode) | 0o0555) & 0o07777
                info("changing mode of %s to %o", fn, mode)
                os.chmod(fn, mode)
 

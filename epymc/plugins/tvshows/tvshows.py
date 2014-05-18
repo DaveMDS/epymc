@@ -161,6 +161,45 @@ class SerieItemClass(EmcItemClass):
          e = mod_instance._tvshows_db.get_data(serie_name)
          return get_backdrop_filename(e['id'])
 
+class SeasonItemClass(EmcItemClass):
+   def item_selected(self, url, season_num):
+      mod_instance._browser.page_add(url, os.path.basename(url),
+                                     None, mod_instance.populate_url)
+
+   def label_get(self, url, season_num):
+      return os.path.basename(url)
+
+   def icon_get(self, url, season_num):
+      return self.poster_get(url, season_num) or 'icon/folder'
+
+   def info_get(self, url, season_num):
+      return '<title>%s</title><br><subtitle>Season %d</subtitle>' % \
+             (mod_instance._current_serie_name, season_num)
+
+   def poster_get(self, url, season_num):
+      serie_name = mod_instance._current_serie_name
+      if mod_instance._tvshows_db.id_exists(serie_name):
+         e = mod_instance._tvshows_db.get_data(serie_name)
+
+         # we have the file yet
+         poster_file = get_poster_filename(e['id'], season_num)
+         if os.path.exists(poster_file):
+            return poster_file
+
+         # search for a poster that match the season
+         for p in e['posters']:
+            if p['season'] == str(season_num):
+               return (p['url'], poster_file)
+
+         # or use the global serie poster
+         return get_poster_filename(e['id'])
+
+   def fanart_get(self, url, season_num):
+      serie_name = mod_instance._current_serie_name
+      if mod_instance._tvshows_db.id_exists(serie_name):
+         e = mod_instance._tvshows_db.get_data(serie_name)
+         return get_backdrop_filename(e['id'])
+
 
 class EpisodeItemClass(EmcItemClass):
    
@@ -368,12 +407,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # populate directories
       for relative in dirs:
          item_url = self._current_base_path + relative
-         # TODO 
-         # try:
-            # (show_name, s_num, e_num) = get_serie_from_relative_url(relative)
-            # DBG([show_name, s_num, e_num])
-         # except:
-         self._browser.item_add(FolderItemClass(), item_url, self)
+         try:
+            (show_name, s_num, e_num) = get_serie_from_relative_url(relative)
+            self._browser.item_add(SeasonItemClass(), item_url, s_num)
+         except:
+            self._browser.item_add(FolderItemClass(), item_url, self)
 
       # then populate files
       for relative in files:
@@ -387,7 +425,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          except:
             self._browser.item_add(FileItemClass(), item_url, self)
 
-      self._browser.item_add(SerieInfoItemClass(), 'tvshows://rescan_library', self)
+      self._browser.item_add(SerieInfoItemClass(), 'tvshows://refresh_serie', self)
 
 
    def _events_cb(self, event):
@@ -529,8 +567,7 @@ class InfoPanel(EmcDialog):
          mod_instance._tvshows_db.set_data(self._serie_name, data)
          self._db_data = data
          self.update()
-      
-   
+
 
 ###### Utils
 def get_serie_from_relative_url(url):
@@ -543,8 +580,8 @@ def get_serie_from_relative_url(url):
    /Prison Break/1x01 - Pilot.avi
    /Prison Break/s1e01 - Pilot.avi
    /Prison Break/s01e01 - Pilot.avi
+   /Prison Break/Season 1    # this form will return -1 as the episode number
    """
-
    # split the url in a list
    parts = utils.splitpath(url)
    if len(parts) < 2:
@@ -562,9 +599,20 @@ def get_serie_from_relative_url(url):
       episode = int(m.group('episode'))
       return (serie, season, episode)
 
-def get_poster_filename(tvshows_id):
-   return os.path.join(utils.user_conf_dir, 'tvshows',
-                       str(tvshows_id), 'poster.jpg')
+   # or search the season number in the folder name (ex: Alias/Stagione 1)
+   try:
+      num = filter(str.isdigit, parts[1])
+      return (serie, int(num), -1)
+   except:
+      return None
+
+def get_poster_filename(tvshows_id, season_num=None):
+   if season_num:
+      return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
+                          'poster_s%d.jpg' % season_num)
+   else:
+      return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
+                          'poster.jpg')
 
 def get_backdrop_filename(tvshows_id):
    return os.path.join(utils.user_conf_dir, 'tvshows',

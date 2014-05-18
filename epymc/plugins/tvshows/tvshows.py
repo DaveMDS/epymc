@@ -219,7 +219,8 @@ class EpisodeItemClass(EmcItemClass):
    def poster_get(self, url, episode_data):
       series_id = episode_data['series_id']
       episode_id = episode_data['id']
-      return (episode_data['thumb_url'], get_episode_filename(series_id, episode_id))
+      return (episode_data['thumb_url'],
+              get_poster_filename(series_id, episode_id=episode_id))
 
    def fanart_get(self, url, episode_data):
       if mod_instance._tvshows_db.id_exists(mod_instance._current_serie_name):
@@ -606,8 +607,11 @@ def get_serie_from_relative_url(url):
    except:
       return None
 
-def get_poster_filename(tvshows_id, season_num=None):
-   if season_num:
+def get_poster_filename(tvshows_id, season_num=None, episode_id=None):
+   if episode_id:
+      return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
+                          episode_id + '.jpg')
+   elif season_num:
       return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
                           'poster_s%d.jpg' % season_num)
    else:
@@ -621,10 +625,6 @@ def get_backdrop_filename(tvshows_id):
 def get_banner_filename(tvshows_id):
    return os.path.join(utils.user_conf_dir, 'tvshows',
                        str(tvshows_id), 'banner.jpg')
-
-def get_episode_filename(tvshows_id, episode_id):
-   return os.path.join(utils.user_conf_dir, 'tvshows',
-                       str(tvshows_id), episode_id + '.jpg')
 
 
 ###### Config Panel stuff

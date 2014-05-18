@@ -618,10 +618,10 @@ def get_serie_from_relative_dir_url(url):
       return None
 
 def get_poster_filename(tvshows_id, season_num=None, episode_id=None):
-   if episode_id:
+   if episode_id is not None:
       return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
                           episode_id + '.jpg')
-   elif season_num:
+   elif season_num is not None:
       return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
                           'poster_s%d.jpg' % season_num)
    else:
@@ -630,7 +630,7 @@ def get_poster_filename(tvshows_id, season_num=None, episode_id=None):
 
 
 def get_icon_filename(tvshows_id, season_num=None):
-   if season_num:
+   if season_num is not None:
       return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
                           'icon_s%d.jpg' % season_num)
    else:

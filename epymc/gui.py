@@ -194,9 +194,14 @@ def load_icon(icon):
       return icon
    ic = Icon(win)
    if icon[0] == '/':
-      ic.file_set(icon)
+      try:
+         ic.file_set(icon)
+      except: pass
    else:
-      ic.file_set(theme_file, icon)
+      try:
+         ic.file_set(theme_file, icon)
+      except: pass
+
    ic.size_hint_aspect_set(evas.EVAS_ASPECT_CONTROL_VERTICAL, 1, 1)
    return ic
 
@@ -288,7 +293,9 @@ def background_set(image):
       backdrop_im.fill_outside_set(True)
       swallow_set('bg.swallow.backdrop1', backdrop_im)
 
-   backdrop_im.file_set(image)
+   try:
+      backdrop_im.file_set(image)
+   except: pass
 
 def mouse_hide():
    global _last_mouse_pos, _mouse_visible, _mouse_skip_next

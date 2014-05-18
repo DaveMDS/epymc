@@ -432,8 +432,9 @@ class InfoPanel(EmcDialog):
                   % (d['first_aired'], d['network'], len(d['seasons']),
                      ', '.join(d['genres']), d['runtime'], d['rating'],
                      d['status'], d['overview'], ', '.join(d['casts']))
-
-         self._image.file = get_poster_filename(self._db_data['id'])
+         try:
+            self._image.file = get_poster_filename(self._db_data['id'])
+         except: pass
          self.text_set(info)
       else:
          text = 'No info stored for this serie.<br>' \

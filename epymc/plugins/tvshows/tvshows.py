@@ -575,6 +575,7 @@ class InfoPanel(EmcDialog):
          mod_instance._tvshows_db.set_data(self._serie_name, data)
          self._db_data = data
          self.update()
+         mod_instance._browser.refresh()
 
 
 ###### Utils

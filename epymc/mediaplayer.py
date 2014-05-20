@@ -233,7 +233,7 @@ def video_player_show():
    input_events.listener_promote('mediaplayer')
    if _update_timer is not None:
       update_timer.delete()
-   _update_timer = ecore.Timer(0.2, _update_timer_cb)
+   _update_timer = ecore.Timer(1.0, _update_timer_cb)
 
 def video_player_hide():
    global _video_visible

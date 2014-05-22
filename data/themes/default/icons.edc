@@ -52,6 +52,7 @@ ICON("scale")
 ICON("config")
 
 ICON("play")
+ICON("pause")
 ICON("stop")
 ICON("fwd")
 ICON("ffwd")

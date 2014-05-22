@@ -313,8 +313,8 @@ class MyItemClass(EmcItemClass):
       elif url == 'uitests://icons':
          icon_names = 'emc home folder close back forward ok cancel check_on ' \
             'check_off minus plus refresh arrowR arrowL arrowU arrowD list ' \
-            'grid star star_off module scale config play stop fwd ffwd bwd ' \
-            'fbwd ' \
+            'grid star star_off module scale config play pause stop fwd ' \
+            'ffwd bwd fbwd ' \
             'movie mame music joystick keyboard remote'
          d = EmcDialog(title = 'Icons gallery', style = 'list')
          for name in icon_names.split():

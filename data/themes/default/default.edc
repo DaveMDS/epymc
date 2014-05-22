@@ -703,7 +703,6 @@ collections {
                   text: "0:00:00";
                   font: FONT_BOLD;
                   size: (FONT_SIZE + 2);
-                  // fit: 1 0;
                   align: 0.5 1.0;
                }
             }
@@ -726,10 +725,11 @@ collections {
                }
                text {
                   text: "0:00:00";
-                  font: "Sans:style=Bold";
+                  font: FONT_BOLD;
                   size: (FONT_SIZE + 2);
-                  // fit: 1 0;
                   align: 0.5 1.0;
+                  min: 1 0;
+                  ellipsis: -1;
                }
             }
          }

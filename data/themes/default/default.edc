@@ -18,6 +18,8 @@
 #define FONT_SIZE_BIGGER 48
 #define FONT_COLOR 255 255 255 255
 #define FONT_COLOR3 0 0 0 64
+#define FONT_COLOR_NOSEL 150 150 150 255
+#define FONT_COLOR3_NOSEL 0 0 0 64
 
 #define COLOR_BLUE 63 108 168
 #define COLOR_GREEN 63 168 108
@@ -44,6 +46,7 @@ images {
    image: "header.png" COMP;
    image: "volume.png" COMP;
    image: "volume_muted.png" COMP;
+   image: "bt_dis_base.png" COMP;
 }
 
 fonts {

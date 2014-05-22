@@ -32,17 +32,17 @@ class BuildThemes(Command):
          name = os.path.basename(theme_dir)
          edc_name = os.path.join(theme_dir, name + '.edc')
          edj_name = os.path.join(theme_dir, name + '.edj')
-         info('building theme: ' + name)
+         info('building theme: "%s" from: %s' % (name, edc_name))
          ret = subprocess.call(['edje_cc', '-v', edc_name,
-                                     '-id', os.path.join(theme_dir, 'images'),
-                                     '-fd', os.path.join(theme_dir, 'fonts')
+                                    '-id', os.path.join(theme_dir, 'images'),
+                                    '-fd', os.path.join(theme_dir, 'fonts')
                               ])
          if ret == 0:
             info('Moving generated edje file to epymc/themes/ folder')
             dest = os.path.join('epymc', 'themes', name + '.edj')
             shutil.move(edj_name, dest)
          else:
-            error('Error generating theme %s' % name)
+            error('Error generating theme: "%s"' % name)
 
 
 class Uninstall(Command):

@@ -133,7 +133,7 @@ class MyItemClass(EmcItemClass):
 
       # VKeyboard
       elif url == 'uitests://vkbd':
-         EmcVKeyboard(title = 'Virtual Keyboard', text = 'This is the keyboard test!')
+         EmcVKeyboard(title='Virtual Keyboard', text='This is the keyboard test!')
 
       # Source Selector
       elif url == 'uitests://sselector':
@@ -143,29 +143,29 @@ class MyItemClass(EmcItemClass):
       # Dialog - Info
       elif url == 'uitests://dlg-info':
          text = 'This is an <br><br><b>Info</><br>dialog<br>'
-         EmcDialog(title = 'Dialog - Info', text = text, style = 'info')
+         EmcDialog(title='Dialog - Info', text=text, style='info')
 
       # Dialog - Warning
       elif url == 'uitests://dlg-warning':
          text = 'This is an <br><br><b>Warning</><br>dialog<br>'
-         EmcDialog(title = 'Dialog - Warning', text = text, style = 'warning')
+         EmcDialog(title='Dialog - Warning', text=text, style='warning')
 
       # Dialog - Error
       elif url == 'uitests://dlg-error':
          text = 'This is an <br><br><b>Error</><br>dialog<br>'
-         EmcDialog(title = 'Dialog - Error', text = text, style = 'error')
+         EmcDialog(title='Dialog - Error', text=text, style='error')
 
       # Dialog - YesNo
       elif url == 'uitests://dlg-yesno':
          text = 'This is an <br><br><b>Yes/No</><br>dialog<br>'
-         EmcDialog(title = 'Dialog - YesNo', text = text, style = 'yesno',
-                   done_cb =  (lambda btn: DBG('done')))
+         EmcDialog(title='Dialog - YesNo', text=text, style='yesno',
+                   done_cb=lambda btn: DBG('done'))
 
       # Dialog - Cancel
       elif url == 'uitests://dlg-cancel':
          text = 'This is an <br><br><b>Cancel operation</><br>dialog<br>'
-         EmcDialog(title = 'Dialog - Cancel', text = text, style = 'cancel',
-                   spinner = True)
+         EmcDialog(title='Dialog - Cancel', text=text, style='cancel',
+                   spinner=True)
 
       # Dialog - Progress
       elif url == 'uitests://dlg-progress':
@@ -180,8 +180,8 @@ class MyItemClass(EmcItemClass):
             return True # renew the callback
 
          text = 'This is a <br><br><b>Progress operation</><br>dialog<br>'
-         d = EmcDialog(title = 'Dialog - Progress', text = text,
-                         style = 'progress', canc_cb = _canc_cb)
+         d = EmcDialog(title='Dialog - Progress', text=text,
+                       style='progress', canc_cb=_canc_cb)
          self._progress = 0.0
          d.progress_set(self._progress)
          t = ecore.Timer(0.2, _progress_timer)
@@ -192,7 +192,7 @@ class MyItemClass(EmcItemClass):
             item = dia.list_item_selected_get()
             print('Selected: ' + str(item))
             # dia.delete()
-         d = EmcDialog(title = 'Dialog - List', style = 'list', done_cb = _dia_list_cb)
+         d = EmcDialog(title='Dialog - List', style='list', done_cb=_dia_list_cb)
          d.list_item_append('item 1')
          d.list_item_append('item 2', 'icon/home')
          d.list_item_append('item 3', 'icon/star', 'icon/check_on')
@@ -200,8 +200,8 @@ class MyItemClass(EmcItemClass):
       # Dialog - Panel full
       elif url == 'uitests://dlg-panel1':
          text = LOREM*4
-         d = EmcDialog(title = 'Dialog - Panel full', text = text, style = 'panel',
-                       spinner = True)
+         d = EmcDialog(title='Dialog - Panel full', text=text, style='panel',
+                       spinner=True)
          d.button_add('One')
          d.button_add('Two')
          d.button_add('Tree')
@@ -209,14 +209,13 @@ class MyItemClass(EmcItemClass):
       # Dialog - Panel no buttons
       elif url == 'uitests://dlg-panel2':
          text = LOREM
-         d = EmcDialog(title = 'Dialog - Panel full', text = text, style = 'panel',
-                       spinner = True)
+         d = EmcDialog(title='Dialog - Panel full', text=text, style='panel',
+                       spinner=True)
 
       # Dialog - Panel no title
       elif url == 'uitests://dlg-panel3':
          text = LOREM
-         d = EmcDialog(text = text, style = 'panel',
-                       spinner = True)
+         d = EmcDialog(text=text, style='panel', spinner=True)
 
       # Browser Dump
       elif url == 'uitests://brdump':
@@ -236,8 +235,8 @@ class MyItemClass(EmcItemClass):
          def _dialog_close_cb(dialog):
             fman.delete()
             dialog.delete()
-         d = EmcDialog(title = 'button test', content = vbox0, style = 'panel',
-                       done_cb = _dialog_close_cb, canc_cb = _dialog_close_cb)
+         d = EmcDialog(title='button test', content=vbox0, style='panel',
+                       done_cb=_dialog_close_cb, canc_cb=_dialog_close_cb)
          fman = EmcFocusManager('uitest-buttons')
 
          ### Active buttons
@@ -317,7 +316,7 @@ class MyItemClass(EmcItemClass):
             'grid star star_off module scale config play pause stop fwd ' \
             'ffwd bwd fbwd ' \
             'movie mame music joystick keyboard remote'
-         d = EmcDialog(title = 'Icons gallery', style = 'list')
+         d = EmcDialog(title='Icons gallery', style='list')
          for name in icon_names.split():
             d.list_item_append(name, 'icon/' + name)
 

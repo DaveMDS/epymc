@@ -34,7 +34,8 @@ from efl.elementary.scroller import Scroller
 from efl.elementary.frame import Frame
 from efl.elementary.list import List
 from efl.elementary.table import Table
-from efl.elementary.genlist import Genlist, GenlistItemClass, ELM_OBJECT_SELECT_MODE_ALWAYS
+from efl.elementary.genlist import Genlist, GenlistItemClass, \
+   ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS
 from efl.elementary.theme import theme_overlay_add, theme_extension_add
 from efl.elementary.configuration import preferred_engine_set
 
@@ -707,8 +708,6 @@ class EmcRemoteImage2(Image):
       if self._spinner.clip != self.clip:
          self._spinner.clip = self.clip
 
-
-
 class EmcRemoteImage(Image):
    """ TODO documentation """
    """ TODO on image_set abort the download ? """
@@ -1181,11 +1180,9 @@ class EmcSourceSelector(EmcDialog):
    def __init__(self, title='Source Selector', done_cb=None, cb_data=None):
       self._selected_cb = done_cb
       self._selected_cb_data = cb_data
-      self._glist = Genlist(win)
-      self._glist.style_set('dialog')
-      self._glist.homogeneous_set(True)
-      self._glist.select_mode_set(ELM_OBJECT_SELECT_MODE_ALWAYS)
-      self._glist.focus_allow_set(False)
+      self._glist = Genlist(win, style='dialog', homogeneous=True,
+                            select_mode=ELM_OBJECT_SELECT_MODE_ALWAYS,
+                            focus_allow=False, mode=ELM_LIST_COMPRESS)
       self._glist.callback_clicked_double_add(self._cb_item_selected)
       self._glist_itc = GenlistItemClass(item_style='default',
                                  text_get_func=self._genlist_folder_label_get,

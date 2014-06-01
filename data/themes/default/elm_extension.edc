@@ -1393,8 +1393,8 @@ group { name: "elm/list/item_odd/default";
    }
 }
 
-//// DIALOG GENLIST (source selector) (elm/genlist/item/default/default) //////
-group { name: "elm/genlist/item/default/dialog";
+//// DIALOG GENLIST (source selector) (elm/genlist/item_compress/default/default)
+group { name: "elm/genlist/item_compress/default/dialog";
    data.item: "stacking" "above";
    data.item: "selectraise" "on";
    data.item: "texts" "elm.text";
@@ -1651,10 +1651,12 @@ group { name: "elm/genlist/item/default/dialog";
       }
    }
 }
-group { name: "elm/genlist/item_odd/default/dialog";
-   inherit: "elm/genlist/item/default/dialog";
+group { name: "elm/genlist/item_compress_odd/default/dialog";
+   // WHY THE ODD DO NOT WORK ?????
+   inherit: "elm/genlist/item_compress/default/dialog";
    parts {
       part { name: "base";
+         type: RECT;
          description { state: "default" 0.0;
             color: 56 56 56 255;
          }

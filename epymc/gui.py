@@ -317,19 +317,17 @@ def audio_controls_set(text = None, icon = None):
 def part_get(name):
    return layout.edje_get().part_external_object_get(name)
 
-def signal_emit(sig, src = 'emc'):
-   layout.edje_get().signal_emit(sig, src)
+def signal_emit(sig, src='emc'):
+   layout.signal_emit(sig, src)
 
 def signal_cb_add(emission, source, cb):
-   layout.edje_get().signal_callback_add(emission, source, cb)
+   layout.signal_callback_add(emission, source, cb)
 
 def text_set(part, text):
-   layout.edje_get().part_text_set(part, text)
+   layout.part_text_set(part, text)
 
 def swallow_set(part, obj):
-   old = layout.edje_get().part_swallow_get(part)
-   if old: old.delete()
-   layout.edje_get().part_swallow(part, obj)
+   layout.part_content_set(part, obj)
 
 def slider_val_set(part, value):
    layout.edje_get().part_drag_value_set(part, value, value)
@@ -338,13 +336,13 @@ def slider_val_get(part):
    return layout.edje_get().part_drag_value_get(part)
 
 def box_append(part, obj):
-   layout.edje_get().part_box_append(part, obj)
+   layout.box_append(part, obj)
 
 def box_prepend(part, obj):
-   layout.edje_get().part_box_prepend(part, obj)
+   layout.box_prepend(part, obj)
 
 def box_remove(part, obj):
-   layout.edje_get().part_box_remove(part, obj)
+   layout.box_remove(part, obj)
 
 
 ### Internal functions ###

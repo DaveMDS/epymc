@@ -2179,72 +2179,6 @@ group { name: "elm/entry/anchor/emc";
       }
    }
 }
-group { name: "elm/entry/cursor/emc";
-   parts {
-      part { name: "clip";
-         type: RECT;
-         mouse_events: 0;
-         description { state: "default" 0.0;
-            rel1.offset: -5 -5;
-            rel2.offset: 5 5;
-            color: 0 0 0 0;
-            visible: 0;
-         }
-         description { state: "visible" 0.0;
-            inherit: "default" 0.0;
-            color: 255 255 255 255;
-            visible: 1;
-         }
-      }
-      part { name: "base";
-         type: RECT;
-         mouse_events: 0;
-         scale: 1;
-         clip_to: "clip";
-         description { state: "default" 0.0;
-            min: 2 10;
-            max: 2 99;
-            align: 0.0 0.5;
-            rel1.offset: -1 0;
-            color: 20 20 20 255;
-         }
-      }
-   }
-   programs {
-      program { name: "fade";
-         in: 0.5 0.0;
-         action: STATE_SET "default" 0.0;
-         transition: LINEAR 0.5;
-         target: "clip";
-         after: "fade2";
-      }
-      program { name: "fade2";
-         in: 0.3 0.0;
-         action: STATE_SET "visible" 0.0;
-         target: "clip";
-         after: "fade";
-      }
-      program { name: "noblink";
-         action: ACTION_STOP;
-         target: "fade";
-         target: "fade2";
-      }
-      program { name: "focused";
-         signal: "elm,action,focus";
-         source: "elm";
-         action: STATE_SET "visible" 0.0;
-         target: "clip";
-         after: "fade";
-      }
-      program { name: "unfocused";
-         signal: "elm,action,unfocus";
-         source: "elm";
-         action: STATE_SET "default" 0.0;
-         target: "clip";
-         after: "noblink";
-      }
-   }
-}
 
 //// MENU (elm/menu/item/default) /////////////////////////////////////////////
 group { name: "elm/menu/item/emc";
@@ -2746,17 +2680,16 @@ group { name: "elm/hover/base/menu/emc";
    }
 }
 
-//// VKEYBOARD ENTRY (elm/entry/base-single-noedit/default) ///////////////////
+//// VKEYBOARD ENTRY (elm/entry/base-single/default) //////////////////////////
 group { name: "elm/entry/base-single/vkeyboard";
    parts {
       part { name: "elm.text";
          type: TEXTBLOCK;
-         // entry_mode: PLAIN;
          entry_mode: EDITABLE;
+         cursor_mode: BEFORE;
          multiline: 0;
-         source: "elm/entry/selection/emc"; // selection under
-         source4: "elm/entry/cursor/emc"; // cursorover
-         source5: "elm/entry/anchor/emc"; // anchor under
+         // source: "elm/entry/selection/emc"; // selection under
+         source4: "elm/entry/cursor/vkeyboard"; // cursorover
          description { state: "default" 0.0;
             text {
                style: "epymc_dialog_style";
@@ -2765,17 +2698,40 @@ group { name: "elm/entry/base-single/vkeyboard";
                align: 0.0 0.5;
             }
          }
-         description { state: "disabled" 0.0;
-            inherit: "default" 0.0;
-            text {
-               style: "epymc_dialog_style";
-            }
+      }
+   }
+}
+group { name: "elm/entry/cursor/vkeyboard";
+   parts {
+      part { name: "cursor"; type: RECT;
+         description { state: "default" 0.0;
+            color: 255 255 255 0;
          }
+         description { state: "visible" 0.0;
+            color: 255 255 255 255;
+         }
+      }
+   }
+   programs {
+      program { name: "pulse1";
+         signal: "load";
+         source: "";
+         action: STATE_SET "visible" 0.0;
+         transition: LINEAR 0.5;
+         target: "cursor";
+         after: "pulse2";
+      }
+      program { name: "pulse2";
+         in: 1.0 0.0;
+         action: STATE_SET "default" 0.0;
+         transition: LINEAR 0.5;
+         target: "cursor";
+         after: "pulse1";
       }
    }
 }
 
-//// BUTTONS3 (elm/button/base/default) ///////////////////////////////////////
+//// BUTTONS (elm/button/base/default) ////////////////////////////////////////
 group { name: "elm/button/base/emc";
    images {
       image: "button_normal.png" COMP;
@@ -3076,3 +3032,4 @@ group { name: "elm/button/base/emc";
 #undef MASK
 #undef DISABLE
 }
+

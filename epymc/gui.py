@@ -578,8 +578,8 @@ You should have received a copy of the GNU Lesser General Public License along w
 class EmcButton(Button):
    """ TODO documentation """
 
-   def __init__(self, label=None, icon=None):
-      Button.__init__(self, layout)
+   def __init__(self, label=None, icon=None, **kargs):
+      Button.__init__(self, layout, **kargs)
       self.style_set('emc')
       self.focus_allow_set(False)
       if label: self.text_set(label)
@@ -1359,7 +1359,6 @@ class EmcFocusManager(object):
       return input_events.EVENT_CONTINUE
 
 ###############################################################################
-# class EmcVKeyboard(elementary.InnerWindow):
 class EmcVKeyboard(EmcDialog):
    """ TODO doc this """
    def __init__(self, accept_cb=None, dismiss_cb=None,
@@ -1372,22 +1371,16 @@ class EmcVKeyboard(EmcDialog):
       self.current_button = None
 
       # table
-      tb = Table(win)
-      tb.homogeneous_set(True)
+      tb = Table(win, homogeneous=True)
       tb.show()
 
       # set dialog title
       self.part_text_set('emc.text.title', title or 'Insert text')
 
-      # entry
-      self.entry = Entry(win) # TODO use scrolled_entry instead
-      self.entry.style_set('vkeyboard')
-      self.entry.single_line_set(True)
-      self.entry.context_menu_disabled_set(True)
-      # self.entry.editable_set(False)
-      # self.entry.focus_allow_set(True)
-      self.entry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      self.entry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+      # entry (TODO use scrolled_entry instead)
+      self.entry = Entry(win, style='vkeyboard', single_line=True,
+                         context_menu_disabled=True, focus_allow=False,
+                         size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
       if text: self.text_set(text)
       tb.pack(self.entry, 0, 0, 10, 1)
       self.entry.show()
@@ -1419,16 +1412,11 @@ class EmcVKeyboard(EmcDialog):
       # init the parent EmcDialog class
       EmcDialog.__init__(self, title=title, style='minimal', content=tb)
 
-       # catch input events
+      # catch input events
       input_events.listener_add('vkbd', self.input_event_cb)
 
-      # give focus to the entry, to show the cursor
-      self.entry.focus_set(True)
-
    def _pack_btn(self, tb, x, y, w, h, label, icon=None, cb=None):
-      b = EmcButton(label=label, icon=icon)
-      b.size_hint_weight_set(evas.EVAS_HINT_EXPAND, 0.0)
-      b.size_hint_align_set(evas.EVAS_HINT_FILL, 0.0)
+      b = EmcButton(label=label, icon=icon, size_hint_align=FILL_HORIZ)
       if cb: b.callback_clicked_add(cb)
       b.data['cb'] = cb
       self.efm.obj_add(b)
@@ -1500,7 +1488,8 @@ class EmcVKeyboard(EmcDialog):
       elif event == 'LEFT':  self.efm.focus_move('l')
       elif event == 'RIGHT': self.efm.focus_move('r')
       elif event == 'UP':    self.efm.focus_move('u')
-      elif event == 'DOWN':  self.efm.focus_move('d')         
-      
+      elif event == 'DOWN':  self.efm.focus_move('d')
+      else: return input_events.EVENT_CONTINUE
+
       return input_events.EVENT_BLOCK
   

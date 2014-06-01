@@ -1205,7 +1205,7 @@ class EmcSourceSelector(EmcDialog):
       if folder != parent_folder:
          self._glist.item_append(self._glist_itc_back, parent_folder)
 
-      for fname in sorted(os.listdir(folder)):
+      for fname in utils.natural_sort(os.listdir(folder)):
          fullpath = os.path.join(folder, fname)
          if fname[0] != '.' and os.path.isdir(fullpath):
             self._glist.item_append(self._glist_itc, fullpath)

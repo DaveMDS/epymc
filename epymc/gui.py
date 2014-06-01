@@ -42,16 +42,11 @@ from epymc import utils, ini, events, input_events
 
 
 win = None
-xwin = None
 layout = None
 theme_file = None
 backdrop_im = None
 
 _volume_hide_timer = None
-_last_mouse_pos = (0, 0)
-_mouse_visible = True
-_mouse_skip_next = False
-
 _theme_generation = "2"
 
 EXPAND_BOTH = evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND
@@ -69,7 +64,7 @@ def LOG(sev, msg):
 
 def init():
    """ return: 0=failed 1=ok 2=fallback_engine"""
-   global win, xwin, layout, theme_file
+   global win, layout, theme_file
 
    # get config values, setting defaults if needed
    theme_name = ini.get('general', 'theme', default_value = 'default')
@@ -117,12 +112,6 @@ def init():
    win.callback_delete_request_add(lambda w: ask_to_exit())
    if fullscreen == 'True':
       win.fullscreen_set(1)
-   # get the X window object, we need it to show/hide the mouse cursor
-   try:
-      xwin = ecore.x.Window_from_xid(win.xwindow_xid_get())
-   except:
-      LOG('inf', 'ecore.x not available. Cannot hide / show the mouse pointer')
-      xwin = None
 
    # main layout (main theme)
    layout = Layout(win)
@@ -130,9 +119,7 @@ def init():
    layout.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
    win.resize_object_add(layout)
    layout.show()
-   # show the mouse when moved
-   layout.edje.signal_callback_add("mouse,move", "*",
-                                   (lambda o,e,s: mouse_show()))
+
    # right click for BACK
    layout.edje.signal_callback_add("mouse,up,3", "*",
                                    (lambda o,e,s: input_events.event_emit('BACK')))
@@ -296,36 +283,6 @@ def background_set(image):
    try:
       backdrop_im.file_set(image)
    except: pass
-
-def mouse_hide():
-   global _last_mouse_pos, _mouse_visible, _mouse_skip_next
-   
-   if not _mouse_visible: return
-
-   if xwin is not None:
-      xwin.cursor_hide()
-      _last_mouse_pos = xwin.pointer_xy_get()
-      xwin.pointer_warp(2, 2)
-
-   _mouse_visible = False
-   _mouse_skip_next = True
-
-def mouse_show():
-   global _last_mouse_pos, _mouse_visible, _mouse_skip_next
-
-   if _mouse_visible:
-      return
-   
-   if _mouse_skip_next:
-      _mouse_skip_next = False
-      return
-
-   if xwin is not None:
-      xwin.pointer_warp(*_last_mouse_pos)
-      xwin.cursor_show()
-
-   _mouse_visible = True
-
 
 def fps_set(fps):
    ecore.animator_frametime_set(1.0 / float(fps))

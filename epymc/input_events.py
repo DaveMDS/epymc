@@ -102,7 +102,6 @@ def listener_promote(name):
 def event_emit(event):
    DBG('Emit Event: ' + event + '  listeners: ' + str(len(_listeners)))
 
-   # gui.mouse_hide()
    events.event_emit('KEEP_ALIVE')
 
    for lis in reversed(_listeners):

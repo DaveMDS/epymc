@@ -320,6 +320,20 @@ collections {
                align: 0.5 0.0;
             }
          }
+         program { name: "topbar_show"; /* API */
+            signal: "topbar,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.4;
+            target: "topbar.clip";
+         }
+         program { name: "topbar_hide"; /* API */
+            signal: "topbar,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.4;
+            target: "topbar.clip";
+         }
 
 /// browser view: list
          part { name: "browser.list.clip";
@@ -519,6 +533,101 @@ collections {
                }
             }
          }
+         program { name: "browser_list_show"; /* API */
+            signal: "browser,list,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: LINEAR 1.0;
+            target: "browser.list.clip";
+            target: "browser.list.list_clip";
+         }
+         program { name: "browser_list_hide"; /* API */
+            signal: "browser,list,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: LINEAR 1.0;
+            target: "browser.list.clip";
+            target: "browser.list.list_clip";
+         }
+         program { name: "browser_list_info_show"; /* API */
+            signal: "browser,list,info,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.35;
+            target: "browser.list.info_bg";
+         }
+         program { name: "browser_list_info_hide"; /* API */
+            signal: "browser,list,info,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: DECELERATE 0.35;
+            target: "browser.list.info_bg";
+         }
+         program { name: "browser_list_flip_left"; /* API */
+            signal: "browser,list,flip_left";
+            source: "emc";
+            script {
+               new buf[16];
+               new Float:val;
+               get_state(PART:"browser.list.genlist1", buf, sizeof(buf), val);
+               // DBG("%s   %f", buf, val)
+               if (!strcmp(buf, "default") || !strcmp(buf, "center")) {
+                  // DBG("CASE 1")
+                  set_state(PART:"browser.list.genlist2", "on_the_right", 0.0);
+                  run_program(PROGRAM:"gl1_to_left");
+               }
+               else if (!strcmp(buf, "left")) {
+                  // DBG("CASE 2")
+                  set_state(PART:"browser.list.genlist1", "right", 0.0);
+                  set_state(PART:"browser.list.genlist2", "on_the_left", 0.0);
+                  run_program(PROGRAM:"gl1_to_center");
+               }
+               else if (!strcmp(buf, "right")) {
+                  // DBG("CASE 3")
+                  run_program(PROGRAM:"gl1_to_center");
+               }
+            }
+         }
+         program { name: "browser_list_flip_right"; /* API */
+            signal: "browser,list,flip_right";
+            source: "emc";
+            script {
+               new buf[16];
+               new Float:val;
+               get_state(PART:"browser.list.genlist1", buf, sizeof(buf), val);
+               // DBG("%s   %f", buf, val)
+               if (!strcmp(buf, "default") || !strcmp(buf, "center")) {
+                  // DBG("CASE 1 (back)")
+                  set_state(PART:"browser.list.genlist2", "on_the_left", 0.0);
+                  run_program(PROGRAM:"gl1_to_right");
+               }
+               else if (!strcmp(buf, "right")) {
+                  // DBG("CASE 2 (back)")
+                  set_state(PART:"browser.list.genlist1", "left", 0.0);
+                  set_state(PART:"browser.list.genlist2", "on_the_right", 0.0);
+                  run_program(PROGRAM:"gl1_to_center");
+               }
+               else if (!strcmp(buf, "left")) {
+                  // DBG("CASE 3 (back)")
+                  run_program(PROGRAM:"gl1_to_center");
+               }
+            }
+         }
+         program { name: "gl1_to_left";
+            action: STATE_SET "left" 0.0;
+            transition: DECELERATE 0.25;
+            target: "browser.list.genlist1";
+         }
+         program { name: "gl1_to_right";
+            action: STATE_SET "right" 0.0;
+            transition: DECELERATE 0.25;
+            target: "browser.list.genlist1";
+         }
+         program { name: "gl1_to_center";
+            action: STATE_SET "center" 0.0;
+            transition: DECELERATE 0.25;
+            target: "browser.list.genlist1";
+         }
 
 /// browser view: grid
          part { name: "browser.grid.gengrid"; /* API */
@@ -556,6 +665,20 @@ collections {
                visible: 1;
             }
          }
+         program { name: "browser_grid_show"; /* API */
+            signal: "browser,grid,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: LINEAR 1.0;
+            target: "browser.grid.clip";
+         }
+         program { name: "browser_grid_hide"; /* API */
+            signal: "browser,grid,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: LINEAR 1.0;
+            target: "browser.grid.clip";
+         }
 
 /// mainmenu
          part { name: "mainmenu.list"; /* API */
@@ -578,6 +701,20 @@ collections {
                rel1.relative: 0.0 0.0;
                rel2.relative: 1.0 1.0;
             }
+         }
+         program { name: "mainmenu_show"; /* API */
+            signal: "mainmenu,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.00;
+            transition: DECELERATE 0.5;
+            target: "mainmenu.list";
+         }
+         program { name: "mainmenu_hide"; /* API */
+            signal: "mainmenu,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.00;
+            transition: ACCELERATE 0.5;
+            target: "mainmenu.list";
          }
 
 /// videoplayer
@@ -825,6 +962,41 @@ collections {
                color3: FONT_COLOR3;
             }
          }
+         program { name: "videoplayer_show"; /* API */
+            signal: "videoplayer,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.00;
+            transition: LINEAR 0.4;
+            target: "videoplayer.clip";
+            target: "videoplayer.events";
+            
+         }
+         program { name: "videoplayer_hide"; /* API */
+            signal: "videoplayer,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.00;
+            transition: LINEAR 0.4;
+            target: "videoplayer.clip";
+            target: "videoplayer.events";
+         }
+         program { name: "videoplayer_controls_show"; /* API */
+            signal: "videoplayer,controls,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.4;
+            target: "videoplayer.controls.bg";
+            target: "videoplayer.controls.title";
+            target: "videoplayer.controls.poster";
+         }
+         program { name: "videoplayer_controls_hide"; /* API */
+            signal: "videoplayer,controls,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.4;
+            target: "videoplayer.controls.bg";
+            target: "videoplayer.controls.title";
+            target: "videoplayer.controls.poster";
+         }
 
 /// volume
          part { name: "volume.bg";
@@ -893,7 +1065,32 @@ collections {
                image.normal: "volume_muted.png";
             }
          }
-
+         program { name: "volume_show"; /* API */
+            signal: "volume,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.3;
+            target: "volume.bg";
+         }
+         program { name: "volume_hide"; /* API */
+            signal: "volume,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.3;
+            target: "volume.bg";
+         }
+         program { name: "volume_mute_on"; /* API */
+            signal: "volume,mute,on";
+            source: "emc";
+            action: STATE_SET "muted" 0.0;
+            target: "volume.icon";
+         }
+         program { name: "volume_mute_off"; /* API */
+            signal: "volume,mute,off";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            target: "volume.icon";
+         }
 
 /// dialog & notify container boxes
          part { name: "dialogs.box.stack"; /* API */
@@ -925,8 +1122,6 @@ collections {
             }
          }
 
-
-
 /// debug label for embryo scripting
          #if DEBUG_ENABLE
          part { name: "embryo_dbg";
@@ -950,210 +1145,6 @@ collections {
             script {
                clock_cb(0);
             }
-         }
-///
-         program { name: "mainmenu_show"; /* API */
-            signal: "mainmenu,show";
-            source: "emc";
-            action: STATE_SET "visible" 0.00;
-            transition: DECELERATE 0.5;
-            target: "mainmenu.list";
-         }
-         program { name: "mainmenu_hide"; /* API */
-            signal: "mainmenu,hide";
-            source: "emc";
-            action: STATE_SET "default" 0.00;
-            transition: ACCELERATE 0.5;
-            target: "mainmenu.list";
-         }
-///
-         program { name: "browser_list_show"; /* API */
-            signal: "browser,list,show";
-            source: "emc";
-            action: STATE_SET "visible" 0.0;
-            transition: LINEAR 1.0;
-            target: "browser.list.clip";
-            target: "browser.list.list_clip";
-         }
-         program { name: "browser_list_hide"; /* API */
-            signal: "browser,list,hide";
-            source: "emc";
-            action: STATE_SET "default" 0.0;
-            transition: LINEAR 1.0;
-            target: "browser.list.clip";
-            target: "browser.list.list_clip";
-         }
-         program { name: "browser_list_info_show"; /* API */
-            signal: "browser,list,info,show";
-            source: "emc";
-            action: STATE_SET "visible" 0.0;
-            transition: DECELERATE 0.35;
-            target: "browser.list.info_bg";
-         }
-         program { name: "browser_list_info_hide"; /* API */
-            signal: "browser,list,info,hide";
-            source: "emc";
-            action: STATE_SET "default" 0.0;
-            transition: DECELERATE 0.35;
-            target: "browser.list.info_bg";
-         }
-         program { name: "browser_list_flip_left"; /* API */
-            signal: "browser,list,flip_left";
-            source: "emc";
-            script {
-               new buf[16];
-               new Float:val;
-               get_state(PART:"browser.list.genlist1", buf, sizeof(buf), val);
-               // DBG("%s   %f", buf, val)
-               if (!strcmp(buf, "default") || !strcmp(buf, "center")) {
-                  // DBG("CASE 1")
-                  set_state(PART:"browser.list.genlist2", "on_the_right", 0.0);
-                  run_program(PROGRAM:"gl1_to_left");
-               }
-               else if (!strcmp(buf, "left")) {
-                  // DBG("CASE 2")
-                  set_state(PART:"browser.list.genlist1", "right", 0.0);
-                  set_state(PART:"browser.list.genlist2", "on_the_left", 0.0);
-                  run_program(PROGRAM:"gl1_to_center");
-               }
-               else if (!strcmp(buf, "right")) {
-                  // DBG("CASE 3")
-                  run_program(PROGRAM:"gl1_to_center");
-               }
-            }
-         }
-         program { name: "browser_list_flip_right"; /* API */
-            signal: "browser,list,flip_right";
-            source: "emc";
-            script {
-               new buf[16];
-               new Float:val;
-               get_state(PART:"browser.list.genlist1", buf, sizeof(buf), val);
-               // DBG("%s   %f", buf, val)
-               if (!strcmp(buf, "default") || !strcmp(buf, "center")) {
-                  // DBG("CASE 1 (back)")
-                  set_state(PART:"browser.list.genlist2", "on_the_left", 0.0);
-                  run_program(PROGRAM:"gl1_to_right");
-               }
-               else if (!strcmp(buf, "right")) {
-                  // DBG("CASE 2 (back)")
-                  set_state(PART:"browser.list.genlist1", "left", 0.0);
-                  set_state(PART:"browser.list.genlist2", "on_the_right", 0.0);
-                  run_program(PROGRAM:"gl1_to_center");
-               }
-               else if (!strcmp(buf, "left")) {
-                  // DBG("CASE 3 (back)")
-                  run_program(PROGRAM:"gl1_to_center");
-               }
-            }
-         }
-         program { name: "gl1_to_left";
-            action: STATE_SET "left" 0.0;
-            transition: DECELERATE 0.25;
-            target: "browser.list.genlist1";
-         }
-         program { name: "gl1_to_right";
-            action: STATE_SET "right" 0.0;
-            transition: DECELERATE 0.25;
-            target: "browser.list.genlist1";
-         }
-         program { name: "gl1_to_center";
-            action: STATE_SET "center" 0.0;
-            transition: DECELERATE 0.25;
-            target: "browser.list.genlist1";
-         }
-///
-         program { name: "browser_grid_show"; /* API */
-            signal: "browser,grid,show";
-            source: "emc";
-            action: STATE_SET "visible" 0.0;
-            transition: LINEAR 1.0;
-            target: "browser.grid.clip";
-         }
-         program { name: "browser_grid_hide"; /* API */
-            signal: "browser,grid,hide";
-            source: "emc";
-            action: STATE_SET "default" 0.0;
-            transition: LINEAR 1.0;
-            target: "browser.grid.clip";
-         }
-///
-         program { name: "topbar_show"; /* API */
-            signal: "topbar,show";
-            source: "emc";
-            action: STATE_SET "visible" 0.0;
-            transition: DECELERATE 0.4;
-            target: "topbar.clip";
-         }
-         program { name: "topbar_hide"; /* API */
-            signal: "topbar,hide";
-            source: "emc";
-            action: STATE_SET "default" 0.0;
-            transition: ACCELERATE 0.4;
-            target: "topbar.clip";
-         }
-///
-         program { name: "videoplayer_show"; /* API */
-            signal: "videoplayer,show";
-            source: "emc";
-            action: STATE_SET "visible" 0.00;
-            transition: LINEAR 0.4;
-            target: "videoplayer.clip";
-            target: "videoplayer.events";
-            
-         }
-         program { name: "videoplayer_hide"; /* API */
-            signal: "videoplayer,hide";
-            source: "emc";
-            action: STATE_SET "default" 0.00;
-            transition: LINEAR 0.4;
-            target: "videoplayer.clip";
-            target: "videoplayer.events";
-         }
-         program { name: "videoplayer_controls_show"; /* API */
-            signal: "videoplayer,controls,show";
-            source: "emc";
-            action: STATE_SET "visible" 0.0;
-            transition: DECELERATE 0.4;
-            target: "videoplayer.controls.bg";
-            target: "videoplayer.controls.title";
-            target: "videoplayer.controls.poster";
-         }
-         program { name: "videoplayer_controls_hide"; /* API */
-            signal: "videoplayer,controls,hide";
-            source: "emc";
-            action: STATE_SET "default" 0.0;
-            transition: ACCELERATE 0.4;
-            target: "videoplayer.controls.bg";
-            target: "videoplayer.controls.title";
-            target: "videoplayer.controls.poster";
-         }
-///
-         program { name: "volume_show"; /* API */
-            signal: "volume,show";
-            source: "emc";
-            action: STATE_SET "visible" 0.0;
-            transition: DECELERATE 0.3;
-            target: "volume.bg";
-         }
-         program { name: "volume_hide"; /* API */
-            signal: "volume,hide";
-            source: "emc";
-            action: STATE_SET "default" 0.0;
-            transition: ACCELERATE 0.3;
-            target: "volume.bg";
-         }
-         program { name: "volume_mute_on"; /* API */
-            signal: "volume,mute,on";
-            source: "emc";
-            action: STATE_SET "muted" 0.0;
-            target: "volume.icon";
-         }
-         program { name: "volume_mute_off"; /* API */
-            signal: "volume,mute,off";
-            source: "emc";
-            action: STATE_SET "default" 0.0;
-            target: "volume.icon";
          }
       }
    }
@@ -1797,8 +1788,6 @@ collections {
                }
             }
          }
-      }
-      programs {
       }
    }
 

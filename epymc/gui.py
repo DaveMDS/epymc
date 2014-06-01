@@ -71,10 +71,10 @@ def init():
    global _backdrop_im1, _backdrop_im2, _backdrop_curr
 
    # get config values, setting defaults if needed
-   theme_name = ini.get('general', 'theme', default_value = 'default')
-   evas_engine = ini.get('general', 'evas_engine', default_value = 'software_x11')
-   fps = ini.get('general', 'fps', default_value = 30)
-   scale = ini.get('general', 'scale', default_value = 1.0)
+   theme_name = ini.get('general', 'theme', default_value='default')
+   evas_engine = ini.get('general', 'evas_engine', default_value='software_x11')
+   fps = ini.get('general', 'fps', default_value=30)
+   scale = ini.get('general', 'scale', default_value=1.0)
    fullscreen = ini.get('general', 'fullscreen', False)
 
    # search the theme file, or use the default one
@@ -126,7 +126,7 @@ def init():
 
    # right click for BACK
    layout.edje.signal_callback_add("mouse,up,3", "*",
-                                   (lambda o,e,s: input_events.event_emit('BACK')))
+                              (lambda o,e,s: input_events.event_emit('BACK')))
 
    # two Image objects for the backdrop
    _backdrop_im1 = Image(win, fill_outside=True)
@@ -249,11 +249,11 @@ def load_image(name, path = None):
 
 def ask_to_exit():
    text = '<center>' + credits.replace('\n', '<br>') + '</center>'
-   d = EmcDialog(title = 'credits', style = 'minimal', text = text)
-   d.button_add("Cancel", selected_cb = lambda b: d.delete())
-   d.button_add("Suspend", selected_cb = None)
-   d.button_add("Shutdown", selected_cb = None)
-   d.button_add("Exit", selected_cb = lambda b: elementary.exit())
+   d = EmcDialog(title='credits', style='minimal', text=text)
+   d.button_add("Cancel", selected_cb=lambda b: d.delete())
+   d.button_add("Suspend", selected_cb=None)
+   d.button_add("Shutdown", selected_cb=None)
+   d.button_add("Exit", selected_cb=lambda b: elementary.exit())
    d.autoscroll_enable()
 
 def volume_show(hidein = 0):
@@ -307,7 +307,7 @@ def fps_set(fps):
 ### audio info/controls notify
 _audio_notify = None
 
-def audio_controls_show(text = None, icon = None):
+def audio_controls_show(text=None, icon=None):
    global _audio_notify
    
    if _audio_notify is None:
@@ -323,7 +323,7 @@ def audio_controls_hide():
       _audio_notify.close()
       _audio_notify = None
 
-def audio_controls_set(text = None, icon = None):
+def audio_controls_set(text=None, icon=None):
    if _audio_notify is None:
       return
    if text: _audio_notify.text_set(text)
@@ -578,7 +578,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 class EmcButton(Button):
    """ TODO documentation """
 
-   def __init__(self, label = None, icon = None):
+   def __init__(self, label=None, icon=None):
       Button.__init__(self, layout)
       self.style_set('emc')
       self.focus_allow_set(False)
@@ -590,7 +590,7 @@ class EmcButton(Button):
 class EmcMenu(Menu):
    """ TODO doc this """
 
-   def __init__(self, relto = None):
+   def __init__(self, relto=None):
       Menu.__init__(self, layout)
       self.style_set('emc')
       if relto:
@@ -602,7 +602,7 @@ class EmcMenu(Menu):
       self.callback_clicked_add(self._dismiss_cb)
       self.show()
 
-   def item_add(self, parent = None, label = None, icon = None, callback = None, *args, **kwargs):
+   def item_add(self, parent=None, label=None, icon=None, callback=None, *args, **kwargs):
       item = Menu.item_add(self, parent, label, icon, self._item_selected_cb, callback, *args, **kwargs)
       if self.selected_item_get() is None:
          item.selected_set(True)
@@ -663,7 +663,7 @@ class EmcRemoteImage2(Image):
        also waiting for a "dest" suppoort in Image
    """
 
-   def __init__(self, url = None, dest = None):
+   def __init__(self, url=None, dest=None):
       Image.__init__(self, layout)
       self.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       self.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
@@ -685,7 +685,7 @@ class EmcRemoteImage2(Image):
       self._spinner.hide()
       Image.hide(self)
 
-   def url_set(self, url, dest = None):
+   def url_set(self, url, dest=None):
       if dest and os.path.exists(dest):
          self.file_set(dest)
       else:
@@ -713,7 +713,7 @@ class EmcRemoteImage(Image):
    """ TODO documentation """
    """ TODO on image_set abort the download ? """
 
-   def __init__(self, url = None, dest = None):
+   def __init__(self, url=None, dest=None):
       Image.__init__(self, layout)
       self.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       self.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
@@ -729,13 +729,13 @@ class EmcRemoteImage(Image):
       self._spinner.hide()
       Image.hide(self)
 
-   def url_set(self, url, dest = None):
+   def url_set(self, url, dest=None):
       if dest and os.path.exists(dest):
          self.file_set(dest)
       else:
          self.start_spin()
          utils.download_url_async(url, dest if dest else 'tmp',
-                                  complete_cb = self._cb_download_complete)
+                                  complete_cb=self._cb_download_complete)
 
    def start_spin(self):
       self.show()
@@ -776,16 +776,15 @@ class EmcDialog(edje.Edje):
    dialogs_counter = 0
    fman = None
    
-   def __init__(self, title = None, text = None, content = None,
-                spinner = False, style = 'panel',
-                done_cb = None, canc_cb = None, user_data = None):
+   def __init__(self, title=None, text=None, content=None, spinner=False,
+                style='panel', done_cb=None, canc_cb=None, user_data=None):
 
       # load the right edje object
       if style in EmcDialog.minimal_styles or style == 'minimal':
          group = 'emc/dialog/minimal'
       else:
          group = 'emc/dialog/panel'
-      edje.Edje.__init__(self, layout.evas, file = theme_file, group = group)
+      edje.Edje.__init__(self, layout.evas, file=theme_file, group=group)
       self.signal_callback_add('emc,dialog,close', '', self._close_pressed)
       self.signal_callback_add('emc,dialog,hide,done', '',
                                (lambda a,s,d: self._delete_real()))
@@ -961,7 +960,7 @@ class EmcDialog(edje.Edje):
    def data_get(self):
       return self._user_data
 
-   def button_add(self, label, selected_cb = None, cb_data = None, icon = None):
+   def button_add(self, label, selected_cb=None, cb_data=None, icon=None):
       if not self._buttons:
          self.signal_emit('emc,dialog,buttons,show', 'emc')
 
@@ -1002,7 +1001,7 @@ class EmcDialog(edje.Edje):
    def text_append(self, text):
       self._textentry.entry_set(self._textentry.entry_get() + text)
 
-   def list_item_append(self, label, icon = None, end = None, *args, **kwargs):
+   def list_item_append(self, label, icon=None, end=None, *args, **kwargs):
       if self._list:
          if icon: icon = load_icon(icon)
          if end: end = load_icon(end)
@@ -1142,9 +1141,9 @@ class EmcDialog(edje.Edje):
 class EmcNotify(edje.Edje):
    """ TODO doc this"""
 
-   def __init__(self, text, icon = 'icon/star', hidein = 5.0):
+   def __init__(self, text, icon='icon/star', hidein=5.0):
       group = 'emc/notify/default'
-      edje.Edje.__init__(self, layout.evas, file = theme_file, group = group)
+      edje.Edje.__init__(self, layout.evas, file=theme_file, group=group)
       self.part_text_set('emc.text.caption', text)
       self._icon = load_image(icon)
       self.part_swallow('emc.swallow.icon', self._icon)
@@ -1179,7 +1178,7 @@ class EmcSourceSelector(EmcDialog):
    """ TODO doc this
    """
 
-   def __init__(self, title = 'Source Selector', done_cb=None, cb_data=None):
+   def __init__(self, title='Source Selector', done_cb=None, cb_data=None):
       self._selected_cb = done_cb
       self._selected_cb_data = cb_data
       self._glist = Genlist(win)
@@ -1188,16 +1187,16 @@ class EmcSourceSelector(EmcDialog):
       self._glist.select_mode_set(ELM_OBJECT_SELECT_MODE_ALWAYS)
       self._glist.focus_allow_set(False)
       self._glist.callback_clicked_double_add(self._cb_item_selected)
-      self._glist_itc = GenlistItemClass(item_style = 'default',
-                                 text_get_func = self._genlist_folder_label_get,
-                                 content_get_func = self._genlist_folder_icon_get)
-      self._glist_itc_back = GenlistItemClass(item_style = 'default',
-                                 text_get_func = self._genlist_back_label_get,
-                                 content_get_func = self._genlist_back_icon_get)
+      self._glist_itc = GenlistItemClass(item_style='default',
+                                 text_get_func=self._genlist_folder_label_get,
+                                 content_get_func=self._genlist_folder_icon_get)
+      self._glist_itc_back = GenlistItemClass(item_style='default',
+                                 text_get_func=self._genlist_back_label_get,
+                                 content_get_func=self._genlist_back_icon_get)
       
       EmcDialog.__init__(self, title, content=self._glist, style='panel')
-      self.button_add('select', selected_cb = self._cb_done_selected)
-      btn = self.button_add('browse', selected_cb = self._cb_browse_selected)
+      self.button_add('select', selected_cb=self._cb_done_selected)
+      btn = self.button_add('browse', selected_cb=self._cb_browse_selected)
       self.fman.focused_set(btn)
 
       self.populate(os.getenv('HOME'))
@@ -1462,8 +1461,8 @@ class EmcFocusManager2(object):
 # class EmcVKeyboard(elementary.InnerWindow):
 class EmcVKeyboard(EmcDialog):
    """ TODO doc this """
-   def __init__(self, accept_cb = None, dismiss_cb = None,
-                title = None, text = None, user_data = None):
+   def __init__(self, accept_cb=None, dismiss_cb=None,
+                      title=None, text=None, user_data=None):
       """ TODO doc this """
 
       self.accept_cb = accept_cb
@@ -1497,27 +1496,27 @@ class EmcVKeyboard(EmcDialog):
 
       # standard keyb
       for i, c in enumerate(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']):
-         self._pack_btn(tb, i, 1, 1, 1, c, cb = self._default_btn_cb)
+         self._pack_btn(tb, i, 1, 1, 1, c, cb=self._default_btn_cb)
       for i, c in enumerate(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']):
-         self._pack_btn(tb, i, 2, 1, 1, c, cb = self._default_btn_cb)
+         self._pack_btn(tb, i, 2, 1, 1, c, cb=self._default_btn_cb)
       for i, c in enumerate(['k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't']):
-         self._pack_btn(tb, i, 3, 1, 1, c, cb = self._default_btn_cb)
+         self._pack_btn(tb, i, 3, 1, 1, c, cb=self._default_btn_cb)
       for i, c in enumerate(['u', 'v', 'w', 'x', 'y', 'z', '.', ',', ':', ';']):
-         self._pack_btn(tb, i, 4, 1, 1, c, cb = self._default_btn_cb)
+         self._pack_btn(tb, i, 4, 1, 1, c, cb=self._default_btn_cb)
 
-      self._pack_btn(tb, 0, 5, 3, 1, 'UPPERCASE', cb = self._uppercase_cb)
-      self._pack_btn(tb, 3, 5, 4, 1, 'SPACE', cb = self._space_cb)
-      self._pack_btn(tb, 7, 5, 3, 1, 'ERASE', cb = self._erase_cb)
+      self._pack_btn(tb, 0, 5, 3, 1, 'UPPERCASE', cb=self._uppercase_cb)
+      self._pack_btn(tb, 3, 5, 4, 1, 'SPACE', cb=self._space_cb)
+      self._pack_btn(tb, 7, 5, 3, 1, 'ERASE', cb=self._erase_cb)
 
       self._pack_btn(tb, 0, 6, 4, 1, 'Dismiss', 'icon/cancel', self._dismiss_cb)
       self._pack_btn(tb, 4, 6, 1, 1, None, 'icon/arrowL',
                                      lambda b: self.entry.cursor_prev())
       self._pack_btn(tb, 5, 6, 1, 1, None, 'icon/arrowR',
                                      lambda b: self.entry.cursor_next())
-      self._pack_btn(tb, 6, 6, 4, 1, 'Accept',  'icon/ok',     self._accept_cb)
+      self._pack_btn(tb, 6, 6, 4, 1, 'Accept',  'icon/ok', self._accept_cb)
 
       # init the parent EmcDialog class
-      EmcDialog.__init__(self, title = title, style = 'minimal', content = tb)
+      EmcDialog.__init__(self, title=title, style='minimal', content=tb)
 
        # catch input events
       input_events.listener_add('vkbd', self.input_event_cb)
@@ -1525,7 +1524,7 @@ class EmcVKeyboard(EmcDialog):
       # give focus to the entry, to show the cursor
       self.entry.focus_set(True)
 
-   def _pack_btn(self, tb, x, y, w, h, label, icon = None, cb = None):
+   def _pack_btn(self, tb, x, y, w, h, label, icon=None, cb=None):
       b = EmcButton(label=label, icon=icon)
       b.size_hint_weight_set(evas.EVAS_HINT_EXPAND, 0.0)
       b.size_hint_align_set(evas.EVAS_HINT_FILL, 0.0)

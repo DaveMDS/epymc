@@ -1009,6 +1009,9 @@ class EmcDialog(edje.Edje):
             it.selected = True
          return it
 
+   def list_clear(self):
+      self._list.clear()
+
    def list_item_selected_get(self):
       if self._list:
          return self._list.selected_item_get()
@@ -1174,75 +1177,55 @@ class EmcNotify(edje.Edje):
 
 ###############################################################################
 class EmcSourceSelector(EmcDialog):
-   """ TODO doc this
+   """
+   Open a dialog that allow the user to choose a path on the filesystem.
+
+   Args:
+      title:
+         The (optional) dialog title.
+      done_cb:
+         The function to call when the selection is over.
+         Signature: cb(path, [cb_data])
+      cb_data:
+         Optional user-data to pass back in the done_cb function.
    """
 
    def __init__(self, title='Source Selector', done_cb=None, cb_data=None):
       self._selected_cb = done_cb
       self._selected_cb_data = cb_data
-      self._glist = Genlist(win, style='dialog', homogeneous=True,
-                            select_mode=ELM_OBJECT_SELECT_MODE_ALWAYS,
-                            focus_allow=False, mode=ELM_LIST_COMPRESS)
-      self._glist.callback_clicked_double_add(self._cb_item_selected)
-      self._glist_itc = GenlistItemClass(item_style='default',
-                                 text_get_func=self._genlist_folder_label_get,
-                                 content_get_func=self._genlist_folder_icon_get)
-      self._glist_itc_back = GenlistItemClass(item_style='default',
-                                 text_get_func=self._genlist_back_label_get,
-                                 content_get_func=self._genlist_back_icon_get)
-      
-      EmcDialog.__init__(self, title, content=self._glist, style='panel')
-      self.button_add('select', selected_cb=self._cb_done_selected)
-      btn = self.button_add('browse', selected_cb=self._cb_browse_selected)
-      self.fman.focused_set(btn)
+
+      EmcDialog.__init__(self, title, style='list', done_cb=self._btn_browse_cb)
+      b2 = self.button_add('Select', self._btn_select_cb)
+      b1 = self.button_add('Browse', self._btn_browse_cb)
+      self.fman.focused_set(b1)
 
       self.populate(os.getenv('HOME'))
 
    def populate(self, folder):
-      self._glist.clear()
-
       parent_folder = os.path.normpath(os.path.join(folder, '..'))
       if folder != parent_folder:
-         self._glist.item_append(self._glist_itc_back, parent_folder)
-
+         it = self.list_item_append('Parent folder', 'icon/arrowU')
+         it.data['fullpath'] = parent_folder
       for fname in utils.natural_sort(os.listdir(folder)):
          fullpath = os.path.join(folder, fname)
          if fname[0] != '.' and os.path.isdir(fullpath):
-            self._glist.item_append(self._glist_itc, fullpath)
+            it = self.list_item_append(fname, 'icon/folder')
+            it.data['fullpath'] = fullpath
 
-      self._glist.first_item.selected = True;
+   def _btn_browse_cb(self, btn):
+      path = self.list_item_selected_get().data['fullpath']
+      self.list_clear()
+      self.populate(path)
 
-   def _cb_item_selected(self, list, item):
-      self.populate(item.data_get())
-
-   def _cb_done_selected(self, button):
-      item = self._glist.selected_item_get()
-      if item and callable(self._selected_cb):
+   def _btn_select_cb(self, btn):
+      path = self.list_item_selected_get().data['fullpath']
+      if path and callable(self._selected_cb):
          if self._selected_cb_data:
-            self._selected_cb('file://' + item.data_get(), self._selected_cb_data)
+            self._selected_cb('file://' + path, self._selected_cb_data)
          else:
-            self._selected_cb('file://' + item.data_get())
+            self._selected_cb('file://' + path)
+
       self.delete()
-
-   def _cb_browse_selected(self, button):
-      item = self._glist.selected_item_get()
-      self.populate(item.data_get())
-
-   def _genlist_folder_label_get(self, obj, part, item_data):
-      return os.path.basename(item_data)
-
-   def _genlist_folder_icon_get(self, obj, part, item_data):
-      if part == 'elm.swallow.icon':
-         return load_icon('icon/folder')
-      return None
-   
-   def _genlist_back_label_get(self, obj, part, item_data):
-      return 'back'
-
-   def _genlist_back_icon_get(self, obj, part, data):
-      if part == 'elm.swallow.icon':
-         return load_icon('icon/back')
-      return None
 
 ###############################################################################
 class EmcFocusManager(object):

@@ -137,7 +137,8 @@ class MyItemClass(EmcItemClass):
 
       # Source Selector
       elif url == 'uitests://sselector':
-         EmcSourceSelector(title = 'Source Selector Test')
+         EmcSourceSelector(title='Source Selector Test',
+                           done_cb=lambda p: DBG('Selected: ' + p))
 
       # Dialog - Info
       elif url == 'uitests://dlg-info':

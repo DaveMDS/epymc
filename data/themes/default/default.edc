@@ -355,7 +355,7 @@ collections {
                rel1.to: "topbar.list.spacer";
                rel1.relative: 0.0 1.0;
                rel2.relative: 0.5 1.0;
-               rel2.offset: -1 -10;
+               rel2.offset: -1 10;
                image.normal: "frame.png";
                image.border: 32 32 92 78;
             }
@@ -473,14 +473,16 @@ collections {
             clip_to: "browser.list.clip";
             description { state: "default" 0.0;
                rel1 {
+                  to_x: "browser.list.info_bg";
                   to_y: "topbar.list.spacer";
-                  relative: 0.5 1.0;
-                  offset: 20 20;
+                  relative: 0.0 1.0;
+                  offset: 6 20;
                }
                rel2 {
+                  to_x: "browser.list.info_bg";
                   to_y: "browser.list.info_bg";
                   relative: 1.0 0.0;
-                  offset: -20 0;
+                  offset: -8 -18;
                }
             }
          }
@@ -494,23 +496,16 @@ collections {
                }
                rel1 {
                   relative: 0.5 (1.0 + 0.0);
-                  offset: 10 -5;
                }
                rel2 {
                   relative: 1.0 (1.0 + 0.35);
-                  offset: -12 -22;
+                  offset: -12 -9;
                }
             }
             description { state: "visible" 0.0;
                inherit: "default" 0.0;
-               rel1 {
-                  relative: 0.5 (1.0 - 0.35);
-                  offset: 10 -5;
-               }
-               rel2 {
-                  relative: 1.0 (1.0 + 0.0);
-                  offset: -12 -22;
-               }
+               rel1.relative: 0.5 (1.0 - 0.35);
+               rel2.relative: 1.0 (1.0 + 0.0);
             }
          }
          part { name: "browser.list.info"; /* API */

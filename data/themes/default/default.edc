@@ -31,7 +31,7 @@ data {
    item: "theme.version" "0.8";
    item: "theme.author" "davemds";
    item: "theme.info" "A more long description of the theme";
-   item: "theme.generation" "2";
+   item: "theme.generation" "3";
 }
 
 images {
@@ -153,15 +153,55 @@ collections {
                image.normal: "background.jpg";
             }
          }
-         part { name: "bg.swallow.backdrop1"; /* API */
-            type: SWALLOW;
+         part { name: "bg.clip1";
+            type: RECT;
             description { state: "default" 0.0;
+               color: 255 255 255 0;
+            }
+            description { state: "bd1" 0.0;
+               color: 255 255 255 255;
+            }
+            description { state: "bd2" 0.0;
+               color: 255 255 255 0;
             }
          }
-         part { name: "bg.swallow.backdrop2"; /* API _unused_ */
-            type: SWALLOW;
+         part { name: "bg.clip2";
+            type: RECT;
             description { state: "default" 0.0;
+               color: 255 255 255 0;
             }
+            description { state: "bd1" 0.0;
+               color: 255 255 255 0;
+            }
+            description { state: "bd2" 0.0;
+               color: 255 255 255 255;
+            }
+         }
+         part { name: "bg.swallow.backdrop1"; /* API */
+            type: SWALLOW;
+            clip_to: "bg.clip1";
+            description { state: "default" 0.0; }
+         }
+         part { name: "bg.swallow.backdrop2"; /* API */
+            type: SWALLOW;
+            clip_to: "bg.clip2";
+            description { state: "default" 0.0; }
+         }
+         program { name: "backdrop_show_1"; /* API */
+            signal: "backdrop,show,1";
+            source: "emc";
+            action: STATE_SET "bd1" 0.00;
+            transition: LINEAR 1.0;
+            target: "bg.clip1";
+            target: "bg.clip2";
+         }
+         program { name: "backdrop_show_2"; /* API */
+            signal: "backdrop,show,2";
+            source: "emc";
+            action: STATE_SET "bd2" 0.00;
+            transition: LINEAR 1.0;
+            target: "bg.clip1";
+            target: "bg.clip2";
          }
 
 /// browser top bar

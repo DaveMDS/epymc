@@ -11,11 +11,17 @@ All the icons in icons.edc must be implemented
       item: "theme.version" "0.1";
       item: "theme.author" "author name";
       item: "theme.info" "A more long description of the theme";
+      item: "theme.generation" "XX";
+
 
 ### Backdrop stuff ###
    * Required parts:
       "bg.swallow.backdrop1" -> edje SWALLOW
-      "bg.swallow.backdrop2" -> edje SWALLOW  __unused__
+      "bg.swallow.backdrop2" -> edje SWALLOW
+
+   * Signals received from the application:
+      "backdrop,show,1" "emc"
+      "backdrop,show,2" "emc"
 
 
 ### TopBar stuff ###

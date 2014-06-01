@@ -44,10 +44,13 @@ from epymc import utils, ini, events, input_events
 win = None
 layout = None
 theme_file = None
-backdrop_im = None
+
+_backdrop_im1 = None
+_backdrop_im2 = None
+_backdrop_curr = None
 
 _volume_hide_timer = None
-_theme_generation = "2"
+_theme_generation = "3"
 
 EXPAND_BOTH = evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND
 EXPAND_HORIZ = evas.EVAS_HINT_EXPAND, 0.0
@@ -65,6 +68,7 @@ def LOG(sev, msg):
 def init():
    """ return: 0=failed 1=ok 2=fallback_engine"""
    global win, layout, theme_file
+   global _backdrop_im1, _backdrop_im2, _backdrop_curr
 
    # get config values, setting defaults if needed
    theme_name = ini.get('general', 'theme', default_value = 'default')
@@ -123,6 +127,13 @@ def init():
    # right click for BACK
    layout.edje.signal_callback_add("mouse,up,3", "*",
                                    (lambda o,e,s: input_events.event_emit('BACK')))
+
+   # two Image objects for the backdrop
+   _backdrop_im1 = Image(win, fill_outside=True)
+   _backdrop_im2 = Image(win, fill_outside=True)
+   swallow_set('bg.swallow.backdrop1', _backdrop_im1)
+   swallow_set('bg.swallow.backdrop2', _backdrop_im2)
+   _backdrop_curr = _backdrop_im2
 
    win.show()
    win.scale_set(float(scale))
@@ -273,15 +284,21 @@ def scale_reset():
    win.scale_set(1.0)
 
 def background_set(image):
-   global backdrop_im
+   global _backdrop_curr
 
-   if not backdrop_im:
-      backdrop_im = Image(win)
-      backdrop_im.fill_outside_set(True)
-      swallow_set('bg.swallow.backdrop1', backdrop_im)
+   if image == _backdrop_curr.file[0]:
+      return
+
+   if _backdrop_curr == _backdrop_im1:
+      _backdrop_curr = _backdrop_im2
+      signal = 'backdrop,show,2'
+   else:
+      _backdrop_curr = _backdrop_im1
+      signal = 'backdrop,show,1'
 
    try:
-      backdrop_im.file_set(image)
+      _backdrop_curr.file_set(image)
+      signal_emit(signal)
    except: pass
 
 def fps_set(fps):

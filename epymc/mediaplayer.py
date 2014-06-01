@@ -23,7 +23,7 @@ import os
 from efl import evas, ecore, edje, elementary, emotion
 
 from epymc import utils, ini, gui, input_events, events
-from epymc.gui import EmcFocusManager2, EmcDialog, EmcButton, EmcMenu
+from epymc.gui import EmcFocusManager, EmcDialog, EmcButton, EmcMenu
 from epymc.sdb import EmcDatabase
 
 
@@ -337,7 +337,7 @@ def _init_mediaplayer_gui():
    global _fman
 
    # focus manager for play/stop/etc.. buttons
-   _fman = EmcFocusManager2()
+   _fman = EmcFocusManager()
 
    #  <<  fast backward
    bt = EmcButton(icon='icon/fbwd')

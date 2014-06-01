@@ -808,7 +808,7 @@ class EmcDialog(edje.Edje):
       self._scroller = None
       self._textentry = None
       self._buttons = []
-      self.fman = EmcFocusManager2()
+      self.fman = EmcFocusManager()
 
       # title
       if title is None:
@@ -1253,105 +1253,6 @@ class EmcFocusManager(object):
    This class manage a list of elementary objects, usually buttons.
    You provide all the objects that can receive focus and the class
    will take care of selecting the right object when you move the selection
-   """
-   # this is here to hide another bug somewhere, seems __init__ is
-   # not executed as I get:
-   #   'EmcFocusManager' object has no attribute 'objs'
-   # happend when the delete() method is executed...
-   # ...obj should always exists, also without this line.  :/
-   objs = []
-
-   def __init__(self):
-      self.objs = []
-      self.focused = None
-
-   def delete(self):
-      """
-      Delete the FocusManager instance and free all the resources used
-      """
-      if self.objs:
-         for o in self.objs:
-            o.on_mouse_in_del(self._mouse_in_cb)
-         del self.objs
-      del self
-
-   def obj_add(self, obj):
-      """
-      Add an object to the chain, obj must be an evas object that support
-      disabled_set() 'interface', usually an elementary obj will do the work.
-      """
-      if not self.focused:
-         self.focused = obj
-         obj.disabled_set(False)
-      else:
-         obj.disabled_set(True)
-      obj.on_mouse_in_add(self._mouse_in_cb)
-      self.objs.append(obj)
-
-   def focused_set(self, obj):
-      """
-      Give focus to the given obj
-      """
-      if self.focused:
-         self.focused.disabled_set(True)
-      obj.disabled_set(False)
-      self.focused = obj
-
-   def focused_get(self):
-      """
-      Get the object that has focus
-      """
-      return self.focused
-
-   def focus_move(self, direction):
-      """
-      Try to move the selection in th given direction.
-      direction can be: 'l'eft, 'r'ight, 'u'p or 'd'own
-      """
-      x, y = self.focused.center
-      nearest = None
-      distance = 99999
-      for obj in self.objs:
-         if obj != self.focused:
-            ox, oy = obj.center
-            # discard objects in the wrong direction
-            if   direction == 'l' and ox >= x: continue
-            elif direction == 'r' and ox <= x: continue
-            elif direction == 'u' and oy >= y: continue
-            elif direction == 'd' and oy <= y: continue
-
-            # simple calc distance (with priority in the current direction)
-            if direction in ['l', 'r']:
-               dis = abs(x - ox) + (abs(y - oy) * 10)
-            else:
-               dis = (abs(x - ox) * 10) + abs(y - oy)
-
-            # remember the nearest object
-            if dis < distance:
-               distance = dis
-               nearest = obj
-
-      # select the new object if found
-      if nearest:
-         self.focused_set(nearest)
-
-   def all_get(self):
-      """
-      Get the list of all the objects that was previously added
-      """
-      return self.objs
-
-   def _mouse_in_cb(self, obj, event):
-      if self.focused != obj:
-         self.focused_set(obj)
-
-
-###############################################################################
-class EmcFocusManager2(object):
-   """
-   This class manage a list of elementary objects, usually buttons.
-   You provide all the objects that can receive focus and the class
-   will take care of selecting the right object when you move the selection
    Dont forget to call the delete() method when not needed anymore!!
    If you want the class to automanage input events just pass an unique name
    as the autoeventsname param. 
@@ -1492,7 +1393,7 @@ class EmcVKeyboard(EmcDialog):
       self.entry.show()
 
       # focus manager
-      self.efm = EmcFocusManager2()
+      self.efm = EmcFocusManager()
 
       # standard keyb
       for i, c in enumerate(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']):

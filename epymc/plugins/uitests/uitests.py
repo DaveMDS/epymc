@@ -26,7 +26,7 @@ from efl.elementary.configuration import engine_get, preferred_engine_get
 
 from epymc.modules import EmcModule
 from epymc.gui import EmcDialog, EmcVKeyboard, EmcSourceSelector, \
-   EmcButton, EmcFocusManager2, EmcNotify, EmcMenu
+   EmcButton, EmcFocusManager, EmcNotify, EmcMenu
 
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
@@ -237,7 +237,7 @@ class MyItemClass(EmcItemClass):
             dialog.delete()
          d = EmcDialog(title = 'button test', content = vbox0, style = 'panel',
                        done_cb = _dialog_close_cb, canc_cb = _dialog_close_cb)
-         fman = EmcFocusManager2('uitest-buttons')
+         fman = EmcFocusManager('uitest-buttons')
 
          ### Active buttons
          vbox = Box(gui.win)

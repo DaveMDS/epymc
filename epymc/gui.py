@@ -384,8 +384,6 @@ def _event_cb(event):
       volume_show(hidein = 3)
 
 
-
-
 credits = """
 
 
@@ -575,9 +573,10 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 """
 
+
 ################################################################################
 class EmcButton(Button):
-   """ TODO documentation """
+   """ A simple wrapper around the elm Button class """
 
    def __init__(self, label=None, icon=None, **kargs):
       Button.__init__(self, layout, **kargs)

@@ -395,14 +395,11 @@ credits = """
 programming
 DAVIDE ANDREOLI
 
-
 graphics
 DAVIDE ANDREOLI
 
-
 edc design
 DAVIDE ANDREOLI
-
 
 python efl
 BORIS FAURE
@@ -414,7 +411,6 @@ JOOST ALBERS
 KAI HUUHKO
 SIMON BUSCH
 TIAGO FALCÃO
-
 
 efl team
 ADAM SIMPKINS
@@ -564,13 +560,6 @@ EpyMC is free software: you can redistribute it and/or modify it under the terms
 EpyMC is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License along with EpyMC. If not, see http://www.gnu.org/licenses/
-
-
-
-
-
-
-
 """
 
 
@@ -802,7 +791,6 @@ class EmcDialog(edje.Edje):
       self._canc_cb = canc_cb
       self._user_data = user_data
       self._list = None
-      self._scroller = None
       self._textentry = None
       self._buttons = []
       self.fman = EmcFocusManager()
@@ -829,27 +817,15 @@ class EmcDialog(edje.Edje):
 
       # text entry
       if text is not None:
-         self._textentry = Entry(win)
-         self._textentry.style_set('scrolledentry')
-         self._textentry.editable_set(False)
-         self._textentry.context_menu_disabled_set(True)
-         self._textentry.entry_set(text)
-         self._textentry.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-         self._textentry.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+         self._textentry = EmcScrolledEntry(text=text,
+                                            size_hint_weight=EXPAND_BOTH,
+                                            size_hint_align=FILL_BOTH)
          self._textentry.show()
-         
-         self._scroller = Scroller(win)
-         self._scroller.style_set('dialog')
-         self._scroller.focus_allow_set(False)
-         self._scroller.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-         self._scroller.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-         self._scroller.content_set(self._textentry)
-         self._scroller.show()
 
          if content:
-            hbox.pack_end(self._scroller)
+            hbox.pack_end(self._textentry)
          else:
-            self._vbox.pack_end(self._scroller)
+            self._vbox.pack_end(self._textentry)
 
       # user content
       if content is not None:
@@ -923,6 +899,8 @@ class EmcDialog(edje.Edje):
       self.signal_emit('emc,dialog,hide', 'emc')
 
    def _delete_real(self):
+      if self._textentry:
+         self._textentry.delete()
       if self.part_swallow_get('emc.swallow.content'):
          self.part_swallow_get('emc.swallow.content').delete()
       for b in self._buttons:
@@ -976,13 +954,13 @@ class EmcDialog(edje.Edje):
 
    def text_set(self, text):
       if self._textentry:
-         self._textentry.entry_set(text)
+         self._textentry.text_set(text)
 
    def text_get(self):
-      return self._textentry.entry_get()
+      return self._textentry.text_get()
 
    def text_append(self, text):
-      self._textentry.entry_set(self._textentry.entry_get() + text)
+      self._textentry.text_set(self._textentry.text_get() + text)
 
    def list_item_append(self, label, icon=None, end=None, *args, **kwargs):
       if self._list:
@@ -1027,31 +1005,8 @@ class EmcDialog(edje.Edje):
       elif selected_cb:
          selected_cb(button)
 
-   def scroll_by(self, sx=0, sy=0, animated=True, restart=False):
-      if self._scroller:
-         x, y, w, h = old_region = self._scroller.region
-         if animated:
-            self._scroller.region_bring_in(x + sx, y + sy, w, h)
-         else:
-            self._scroller.region_show(x + sx, y + sy, w, h)
-
-         if restart and old_region == self._scroller.region:
-            self._scroller.region_show(0, 0, w, h)
-
    def autoscroll_enable(self):
-      self._autoscroll_amount = 0.0
-      ecore.Animator(self._autoscroll_animator_cb)
-
-   def _autoscroll_animator_cb(self):
-      if self.is_deleted():
-         return ecore.ECORE_CALLBACK_CANCEL
-
-      self._autoscroll_amount += ecore.animator_frametime_get() * 30.0
-      if self._autoscroll_amount >= 1.0:
-         self.scroll_by(0, int(self._autoscroll_amount), False, True)
-         self._autoscroll_amount = 0.0
-
-      return ecore.ECORE_CALLBACK_RENEW
+      self._textentry.autoscroll = True
 
    def _input_event_cb(self, event):
 
@@ -1093,11 +1048,11 @@ class EmcDialog(edje.Edje):
                return input_events.EVENT_BLOCK
 
       # try to scroll the text entry
-      if self._scroller:
+      if self._textentry:
          if event == 'UP':
-            self.scroll_by(0, -100)
+            self._textentry.scroll_by(0, -100)
          if event == 'DOWN':
-            self.scroll_by(0, +100)
+            self._textentry.scroll_by(0, +100)
 
       # focus between buttons
       if self._buttons:
@@ -1486,6 +1441,17 @@ class EmcScrolledEntry(Entry, Scrollable):
       if self._autoscroll:
          self._autoscroll_stop()
          self._autoscroll_start()
+
+   def scroll_by(self, sx=0, sy=0, animated=True):
+      x, y, w, h = self.region
+      if animated:
+         self.region_bring_in(x + sx, y + sy, w, h)
+      else:
+         self.region_show(x + sx, y + sy, w, h)
+
+   def delete(self):
+      self._autoscroll_stop()
+      Entry.delete(self)
 
    def _autoscroll_start(self):
       if self._animator is None:

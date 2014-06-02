@@ -30,7 +30,7 @@ from efl.elementary.menu import Menu
 from efl.elementary.progressbar import Progressbar
 from efl.elementary.box import Box
 from efl.elementary.entry import Entry
-from efl.elementary.scroller import Scroller
+from efl.elementary.scroller import Scroller, Scrollable
 from efl.elementary.frame import Frame
 from efl.elementary.list import List
 from efl.elementary.table import Table
@@ -835,7 +835,7 @@ class EmcDialog(edje.Edje):
       # text entry
       if text is not None:
          self._textentry = Entry(win)
-         self._textentry.style_set('dialog')
+         self._textentry.style_set('scrolledentry')
          self._textentry.editable_set(False)
          self._textentry.context_menu_disabled_set(True)
          self._textentry.entry_set(text)
@@ -1472,3 +1472,67 @@ class EmcVKeyboard(EmcDialog):
 
       return input_events.EVENT_BLOCK
   
+###############################################################################
+class EmcScrolledEntry(Entry, Scrollable):
+   """ A non editable, multiline text entry, with autoscroll ability. """
+   def __init__(self, autoscroll=False, **kargs):
+      self._animator = None
+      self._timer = None
+      self._autoscroll_amount = 0.0
+      self._autoscroll = autoscroll
+      Entry.__init__(self, layout, style='scrolledentry',
+                     editable=False, scrollable=True, **kargs)
+
+   @property
+   def autoscroll(self):
+      return self._autoscroll
+
+   @autoscroll.setter
+   def autoscroll(self, value):
+      if value != self._autoscroll:
+         self._autoscroll = value
+         if value is True:
+            self._autoscroll_start()
+         else:
+            self._autoscroll_stop()
+
+   def text_set(self, text):
+      Entry.text_set(self, text)
+      if self._autoscroll:
+         self._autoscroll_stop()
+         self._autoscroll_start()
+
+   def _autoscroll_start(self):
+      if self._animator is None:
+         self.region_show(0, 0, 10, 10)
+         self._timer = ecore.Timer(3.0, self._delayed_start)
+
+   def _autoscroll_stop(self):
+      if self._animator is not None:
+         self._animator.delete()
+         self._animator = None
+      if self._timer is not None:
+         self._timer.delete()
+         self._timer = None
+
+   def _delayed_start(self):
+      self._animator = ecore.Animator(self._animator_cb)
+
+   def _animator_cb(self):
+      self._autoscroll_amount += ecore.animator_frametime_get() * 15
+      x, y, w, h = old_region = self.region
+      # print("anim  ", old_region, self._autoscroll_amount)
+
+      # at least one pixel to scroll ?
+      if self._autoscroll_amount >= 1.0:
+         self.region_show(0, y + int(self._autoscroll_amount), w, h)
+         self._autoscroll_amount = 0.0
+
+         # bottom reached ?
+         if old_region == self.region:
+            self._timer = ecore.Timer(3.0, self._autoscroll_start)
+            self._animator = None
+            return ecore.ECORE_CALLBACK_CANCEL
+
+      return ecore.ECORE_CALLBACK_RENEW
+

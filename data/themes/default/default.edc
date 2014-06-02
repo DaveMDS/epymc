@@ -69,17 +69,6 @@ styles {
       tag:  "b" "+ font="FONT_BOLD;
       tag:  "title" "+ font="FONT_BOLD" color=#"COLOR_ORANGE_HEX" font_size="FONT_SIZE_BIG;
       tag:  "hilight" "+ font="FONT_BOLD;
-      //~ tag:  "link" "+ color=#800 underline=on underline_color=#8008";
-   }
-
-   style { name: "epymc_dialog_style";
-      base: "font="FONT" font_size="FONT_SIZE" color=#FFF wrap=word";
-      tag:  "br" "\n";
-      tag:  "tab" "\t";
-      tag:  "em" "+ font="FONT":style=Oblique";
-      tag:  "b" "+ font="FONT_BOLD;
-      tag:  "title" "+ font="FONT_BOLD" color=#b00 font_size="FONT_SIZE_BIG;
-      tag:  "hilight" "+ font="FONT_BOLD;
       tag:  "center" "+ align=center";
       //~ tag:  "link" "+ color=#800 underline=on underline_color=#8008";
    }
@@ -509,9 +498,8 @@ collections {
             }
          }
          part { name: "browser.list.info"; /* API */
-            type: TEXTBLOCK;
+            type: SWALLOW;
             clip_to: "browser.list.clip";
-            multiline: 1;
             scale: 1;
             description { state: "default" 0.0;
                rel1 {
@@ -521,10 +509,6 @@ collections {
                rel2 {
                   to: "browser.list.info_bg";
                   offset: -15 -10;
-               }
-               text {
-                  style: "epymc_default_style";
-                  align: 0.0 0.0;
                }
             }
          }
@@ -1779,7 +1763,7 @@ collections {
                text {
                   text:"";
                   // min: 1 1;
-                  style: "epymc_dialog_style";
+                  style: "epymc_default_style";
                   align: 0.0 0.0;
                }
             }

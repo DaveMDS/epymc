@@ -30,7 +30,7 @@ from efl.elementary.label import Label, ELM_WRAP_NONE, \
 from epymc import gui, mainmenu, input_events, ini
 from epymc.sdb import EmcDatabase
 from epymc.utils import Singleton
-from epymc.gui import EmcRemoteImage
+from epymc.gui import EmcRemoteImage, EmcScrolledEntry
 
 def DBG(msg):
    # print('BROWSER: ' + msg)
@@ -386,6 +386,10 @@ class ViewList(object):
       self.__im = EmcRemoteImage()
       gui.swallow_set('browser.list.poster', self.__im)
 
+      # AutoScrolledEntry (info)
+      self._ase = EmcScrolledEntry(autoscroll=True)
+      gui.swallow_set('browser.list.info', self._ase)
+
    def page_show(self, title, anim):
       """
       This function is called everytime a new page need to be showed.
@@ -440,6 +444,7 @@ class ViewList(object):
       if self.timer: self.timer.delete()
       if self.timer2: self.timer2.delete()
       gui.signal_emit('browser,list,hide')
+      self._ase.autoscroll = False
 
    def clear(self):
       """ Clear the view """
@@ -543,9 +548,11 @@ class ViewList(object):
       # Fill the textblock with item info info
       text = item_class.info_get(url, user_data)
       if text:
-         gui.text_set('browser.list.info', text)
+         self._ase.text_set(text)
+         self._ase.autoscroll = True
          gui.signal_emit('browser,list,info,show')
       else:
+         self._ase.autoscroll = False
          gui.signal_emit('browser,list,info,hide')
 
       # Ask for the item poster and show (or auto-download) it

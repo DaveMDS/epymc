@@ -783,17 +783,13 @@
        } \
    } \
 
-group { name: "elm/scroller/base/dialog"; // dialog text scroller
-   // alias: "elm/list/base/default";
-   // alias: "elm/genlist/base/default";
-   // alias: "elm/gengrid/base/default";
-
-   alias: "elm/list/base/mainmenu";    // mainmenu list
-   alias: "elm/list/base/dialog";      // dialog lists
-   alias: "elm/list/base/image_list";  // dialog lists (poster/fanart)
-   alias: "elm/genlist/base/dialog";   // source selector
-   alias: "elm/genlist/base/browser";  // browser genlist
-   alias: "elm/gengrid/base/browser";  // browser gengrid
+group { name: "elm/scroller/base/dialog";     // dialog text scroller
+   alias: "elm/list/base/mainmenu";           // mainmenu list
+   alias: "elm/list/base/dialog";             // dialog lists
+   alias: "elm/list/base/image_list";         // dialog lists (poster/fanart)
+   alias: "elm/genlist/base/browser";         // browser genlist
+   alias: "elm/gengrid/base/browser";         // browser gengrid
+   alias: "elm/scroller/entry/scrolledentry"; // EmcScrolledEntry
 
    data {
       item: "focus_highlight" "off";
@@ -1838,8 +1834,8 @@ group { name: "elm/gengrid/item/default/browser";
    }
 }
 
-//// DIALOGS ENTRY (elm/entry/base-noedit/default) ////////////////////////////
-group { name: "elm/entry/base-noedit/dialog";
+//// SCROLLED ENTRY (elm/entry/base-noedit/default) ////////////////////
+group { name: "elm/entry/base-noedit/scrolledentry";
    parts {
       part { name: "elm.text";
          type: TEXTBLOCK;
@@ -1853,16 +1849,13 @@ group { name: "elm/entry/base-noedit/dialog";
          description { state: "default" 0.0;
             fixed: 1 0;
             text {
-               style: "epymc_dialog_style";
+               style: "epymc_default_style";
                min: 0 1;
                align: 0.0 0.0;
             }
          }
          description { state: "disabled" 0.0;
             inherit: "default" 0.0;
-            text {
-               style: "epymc_dialog_style";
-            }
          }
       }
    }
@@ -2423,7 +2416,7 @@ group { name: "elm/entry/base-single/vkeyboard";
          source4: "elm/entry/cursor/vkeyboard"; // cursorover
          description { state: "default" 0.0;
             text {
-               style: "epymc_dialog_style";
+               style: "epymc_default_style";
                min: 1 1;
                ellipsis: -1;
                align: 0.0 0.5;

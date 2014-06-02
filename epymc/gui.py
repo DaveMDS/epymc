@@ -782,7 +782,8 @@ class EmcDialog(edje.Edje):
          group = 'emc/dialog/minimal'
       else:
          group = 'emc/dialog/panel'
-      edje.Edje.__init__(self, layout.evas, file=theme_file, group=group)
+      edje.Edje.__init__(self, layout.evas, file=theme_file, group=group,
+                         size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH)
       self.signal_callback_add('emc,dialog,close', '', self._close_pressed)
       self.signal_callback_add('emc,dialog,hide,done', '',
                                (lambda a,s,d: self._delete_real()))
@@ -792,8 +793,6 @@ class EmcDialog(edje.Edje):
       # put the dialog in the dialogs box of the main edje obj,
       # this way we only manage one edje and don't have stacking problems.
       # otherwise dialogs will stole the mouse events.
-      self.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      self.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
       box_append('dialogs.box.stack', self)
 
       EmcDialog.dialogs_counter += 1
@@ -816,22 +815,18 @@ class EmcDialog(edje.Edje):
          self.signal_emit('emc,dialog,title,show', 'emc')
 
       # vbox
-      self._vbox = Box(win)
-      self._vbox.horizontal_set(False)
-      self._vbox.size_hint_align_set(evas.EVAS_HINT_FILL, 0.0)
-      self._vbox.size_hint_weight_set(evas.EVAS_HINT_EXPAND, 0.0)
+      self._vbox = Box(win, horizontal=False, size_hint_align=FILL_HORIZ,
+                       size_hint_weight=EXPAND_HORIZ)
       self._vbox.show()
       self.part_swallow('emc.swallow.content', self._vbox)
 
       # if both text and content given then put them side by side
       if text and content:
-         hbox = Box(win)
-         hbox.horizontal_set(True)
-         hbox.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-         hbox.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+         hbox = Box(win, horizontal=True, size_hint_align=FILL_BOTH,
+                    size_hint_weight=EXPAND_BOTH)
          hbox.show()
          self._vbox.pack_end(hbox)
-      
+
       # text entry
       if text is not None:
          self._textentry = Entry(win)
@@ -858,11 +853,8 @@ class EmcDialog(edje.Edje):
 
       # user content
       if content is not None:
-         frame = Frame(win)
-         frame.style_set('pad_small')
-         frame.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-         frame.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-         frame.content_set(content)
+         frame = Frame(win, style='pad_small', size_hint_align=FILL_BOTH,
+                       size_hint_weight=EXPAND_BOTH, content=content)
          frame.show()
          if text is not None:
             hbox.pack_start(frame)
@@ -871,24 +863,17 @@ class EmcDialog(edje.Edje):
 
       # automatic list
       if style in ['list', 'image_list_horiz', 'image_list_vert']:
-         self._list = List(win)
-         self._list.focus_allow_set(False)
-         if style == 'list':
-            self._list.style_set('dialog')
-         else:
-            self._list.style_set('image_list')
-         self._list.horizontal = True if style == 'image_list_horiz' else False
-         self._list.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-         self._list.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+         self._list = List(win, focus_allow=False, size_hint_align=FILL_BOTH,
+                           size_hint_weight=EXPAND_BOTH, content=content,
+                           horizontal=True if style == 'image_list_horiz' else False,
+                           style='dialog' if style == 'list' else 'image_list')
          self._list.callback_activated_add(self._list_item_activated_cb)
          self._list.show()
          self._vbox.pack_end(self._list)
 
       # spinner
       if spinner:
-         self._spinner = Progressbar(win)
-         self._spinner.style_set('wheel')
-         self._spinner.pulse_mode = True
+         self._spinner = Progressbar(win, style='wheel', pulse_mode=True)
          self._spinner.pulse(True)
          self._spinner.show()
          self._vbox.pack_end(self._spinner)
@@ -902,25 +887,25 @@ class EmcDialog(edje.Edje):
 
       # buttons
       if style in ('info', 'error', 'warning'):
-         self.button_add('Ok', (lambda btn: self.delete()))
+         self.button_add('Ok', lambda btn: self.delete())
 
       if style in ('yesno'):
          if self._canc_cb:
-            self.button_add('No', (lambda btn: self._canc_cb(self)))
+            self.button_add('No', lambda btn: self._canc_cb(self))
          else:
-            self.button_add('No', (lambda btn: self.delete()))
+            self.button_add('No', lambda btn: self.delete())
 
          if self._done_cb:
-            self.button_add('Yes', (lambda btn: self._done_cb(self)))
+            self.button_add('Yes', lambda btn: self._done_cb(self))
          else:
-            self.button_add('Yes', (lambda btn: self.delete()))
+            self.button_add('Yes', lambda btn: self.delete())
 
       # Do we want the cancel button? we have the red-round-close...
       # if style in ('cancel'):
          # if canc_cb:
-            # self.button_add('Cancel', (lambda btn: self._canc_cb(self)))
+            # self.button_add('Cancel', lambda btn: self._canc_cb(self))
          # else:
-            # self.button_add('Cancel', (lambda btn: self.delete()))
+            # self.button_add('Cancel', lambda btn: self.delete())
 
       # listen for input events
       input_events.listener_add(self._name, self._input_event_cb)
@@ -1521,7 +1506,7 @@ class EmcScrolledEntry(Entry, Scrollable):
    def _animator_cb(self):
       self._autoscroll_amount += ecore.animator_frametime_get() * 15
       x, y, w, h = old_region = self.region
-      # print("anim  ", old_region, self._autoscroll_amount)
+      # print("Animator  ", old_region, self._autoscroll_amount)
 
       # at least one pixel to scroll ?
       if self._autoscroll_amount >= 1.0:

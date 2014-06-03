@@ -1158,6 +1158,7 @@ class EmcFolderSelector(EmcDialog):
 
       self.delete()
 
+################################################################################
 class EmcSourcesManager(EmcDialog):
    """ Open a dialog that allow the user to manage (add/remove) source
    folders. The manager automatically get the folders list from config file,

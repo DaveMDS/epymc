@@ -28,7 +28,7 @@ from efl.elementary.image import Image
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
-from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourceSelector, \
+from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourcesManager, \
    EmcVKeyboard, EmcNotify
 
 import epymc.mainmenu as mainmenu
@@ -65,18 +65,19 @@ DEFAULT_MOVIE_REGEXP = '^(?P<name>.*?)(\((?P<year>[0-9]*)\))?$'
 $                            # end of the string
 """
 
+_mod = None
+
 
 class AddSourceItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      EmcSourceSelector(done_cb=self.selector_cb, cb_data=mod)
+      EmcSourcesManager('movies', done_cb=self._manager_cb)
 
-   def selector_cb(self, fullpath, mod):
-      mod._folders.append(fullpath)
-      ini.set_string_list('movies', 'folders', mod._folders, ';')
-      mod._browser.refresh(hard=True)
+   def _manager_cb(self, sources):
+      _mod._folders = sources
+      _mod._browser.refresh(hard=True)
 
    def label_get(self, url, mod):
-      return 'Add source'
+      return 'Manage sources'
 
    def icon_get(self, url, mod):
       return 'icon/plus'
@@ -176,8 +177,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    _scanner = None     # BackgroundScanner instance
 
    def __init__(self):
+      global _mod
+      
       DBG('Init module')
-
+      _mod = self
+      
       # create config ini section if not exists, with defaults
       ini.add_section('movies')
       if not ini.has_option('movies', 'enable_scanner'):

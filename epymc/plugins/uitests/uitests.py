@@ -25,7 +25,7 @@ from efl.elementary.box import Box
 from efl.elementary.configuration import engine_get, preferred_engine_get
 
 from epymc.modules import EmcModule
-from epymc.gui import EmcDialog, EmcVKeyboard, EmcSourceSelector, \
+from epymc.gui import EmcDialog, EmcVKeyboard, EmcFolderSelector, \
    EmcButton, EmcFocusManager, EmcNotify, EmcMenu
 
 import epymc.mainmenu as mainmenu
@@ -137,7 +137,7 @@ class MyItemClass(EmcItemClass):
 
       # Source Selector
       elif url == 'uitests://sselector':
-         EmcSourceSelector(title='Source Selector Test',
+         EmcFolderSelector(title='Source Selector Test',
                            done_cb=lambda p: DBG('Selected: ' + p))
 
       # Dialog - Info

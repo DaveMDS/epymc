@@ -971,6 +971,9 @@ class EmcDialog(edje.Edje):
             it.selected = True
          return it
 
+   def list_go(self):
+      self._list.go()
+
    def list_clear(self):
       self._list.clear()
 
@@ -1022,29 +1025,18 @@ class EmcDialog(edje.Edje):
 
       # if content is List or Genlist then automanage the events
       if self._list or (self._content and type(self._content) in (List, Genlist)):
-         list = self._list or self._content
-         item = list.selected_item_get()
-         if not item:
-            item = list.items_get()[0]
-
-         horiz = False
-         if type(list) is List:
-            horiz = list.horizontal
-
-         if (horiz and event == 'RIGHT') or \
-            (not horiz and event == 'DOWN'):
-            next = item.next_get()
-            if next:
-               next.selected_set(1)
-               next.show()
-               return input_events.EVENT_BLOCK
-
-         if (horiz and event == 'LEFT') or \
-            (not horiz and event == 'UP'):
-            prev = item.prev_get()
-            if prev:
-               prev.selected_set(1)
-               prev.show()
+         li = self._list or self._content
+         item = li.selected_item_get()
+         if item:
+            new_it = None
+            horiz = li.horizontal if type(li) is List else False
+            if (horiz and event == 'RIGHT') or (not horiz and event == 'DOWN'):
+               new_it = item.next_get()
+            if (horiz and event == 'LEFT') or (not horiz and event == 'UP'):
+               new_it = item.prev_get()
+            if new_it:
+               new_it.selected = True
+               new_it.show()
                return input_events.EVENT_BLOCK
 
       # try to scroll the text entry
@@ -1114,8 +1106,8 @@ class EmcNotify(edje.Edje):
       # TODO need to del the old image ??
       self._icon = load_image(icon)
 
-###############################################################################
-class EmcSourceSelector(EmcDialog):
+################################################################################
+class EmcFolderSelector(EmcDialog):
    """
    Open a dialog that allow the user to choose a path on the filesystem.
 
@@ -1166,7 +1158,61 @@ class EmcSourceSelector(EmcDialog):
 
       self.delete()
 
-###############################################################################
+class EmcSourcesManager(EmcDialog):
+   """ Open a dialog that allow the user to manage (add/remove) source
+   folders. The manager automatically get the folders list from config file,
+   using the group passed in the contructor and the 'folders' config item.
+   The config item is also automatically updated when finished.
+
+   Args:
+      conf_group:
+         The name of the config section to read the folders list from.
+      title:
+         Optional title for the dialog.
+      done_cb:
+         Function called when the user press the 'done' button.
+         Signature: cb(new_folders_list)
+   """
+   def __init__(self, conf_group, title='Sources Manager', done_cb=None):
+      EmcDialog.__init__(self, title, style='list')
+      self.button_add('Done', icon='icon/ok',
+                      selected_cb=self._cb_btn_done)
+      self.button_add('Add', icon='icon/plus',
+                      selected_cb=self._cb_btn_add)
+      self.button_add('Remove', icon='icon/minus',
+                      selected_cb=self._cb_btn_remove)
+      self._sources = ini.get_string_list(conf_group, 'folders', ';')
+      self._conf_group = conf_group
+      self._done_cb = done_cb
+      self._populate()
+
+   def _populate(self):
+      self.list_clear()
+      for src in self._sources:
+         self.list_item_append(src, 'icon/folder')
+      self.list_go()
+
+   def _cb_btn_add(self, btn):
+      EmcFolderSelector(title='Choose a new source', done_cb=self._cb_selected)
+
+   def _cb_btn_remove(self, btn):
+      it = self.list_item_selected_get()
+      if it and it.text in self._sources:
+         self._sources.remove(it.text)
+         self._populate()
+
+   def _cb_selected(self, path):
+      if not path in self._sources:
+         self._sources.append(path)
+         self._populate()
+
+   def _cb_btn_done(self, btn):
+      ini.set_string_list(self._conf_group, 'folders', self._sources, ';')
+      if callable(self._done_cb):
+         self._done_cb(self._sources)
+      self.delete()
+
+################################################################################
 class EmcFocusManager(object):
    """
    This class manage a list of elementary objects, usually buttons.
@@ -1277,7 +1323,7 @@ class EmcFocusManager(object):
          return input_events.EVENT_BLOCK
       return input_events.EVENT_CONTINUE
 
-###############################################################################
+################################################################################
 class EmcVKeyboard(EmcDialog):
    """ TODO doc this """
    def __init__(self, accept_cb=None, dismiss_cb=None,
@@ -1412,7 +1458,7 @@ class EmcVKeyboard(EmcDialog):
 
       return input_events.EVENT_BLOCK
   
-###############################################################################
+################################################################################
 class EmcScrolledEntry(Entry, Scrollable):
    """ A non editable, multiline text entry, with autoscroll ability. """
    def __init__(self, autoscroll=False, **kargs):

@@ -27,7 +27,7 @@ from efl.elementary.image import Image
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
-from epymc.gui import EmcDialog, EmcSourceSelector, EmcNotify, EmcRemoteImage
+from epymc.gui import EmcDialog, EmcSourcesManager, EmcNotify, EmcRemoteImage
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
@@ -61,15 +61,14 @@ mod_instance = None
 
 class AddSourceItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      EmcSourceSelector(done_cb = self.selector_cb, cb_data = mod)
+      EmcSourcesManager('tvshows', done_cb=self._manager_cb)
 
-   def selector_cb(self, fullpath, mod):
-      mod._folders.append(fullpath)
-      ini.set_string_list('tvshows', 'folders', mod._folders, ';')
-      mod._browser.refresh(hard=True)
+   def _manager_cb(self, sources):
+      mod_instance._folders = sources
+      mod_instance._browser.refresh(hard=True)
 
    def label_get(self, url, mod):
-      return 'Add source'
+      return 'Manage sources'
 
    def icon_get(self, url, mod):
       return 'icon/plus'

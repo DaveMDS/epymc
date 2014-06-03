@@ -27,7 +27,7 @@ from efl import ecore
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
-from epymc.gui import EmcDialog, EmcNotify, EmcSourceSelector
+from epymc.gui import EmcDialog, EmcNotify, EmcSourcesManager
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
 import epymc.events as events
@@ -92,14 +92,13 @@ class RootRebuildItemClass(EmcItemClass):
 
 class RootAddSourceItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      EmcSourceSelector(done_cb = self.selector_cb, cb_data = mod)
+      EmcSourcesManager('music', done_cb=self._manager_cb)
 
-   def selector_cb(self, fullpath, mod):
-      mod._folders.append(fullpath)
-      ini.set_string_list('music', 'folders', mod._folders, ';')
+   def _manager_cb(self, sources):
+      _mod._folders = sources
 
    def label_get(self, url, mod):
-      return 'Add source'
+      return 'Manage sources'
 
    def icon_get(self, url, mod):
       return 'icon/plus'

@@ -204,7 +204,7 @@ def volume_set(vol):
 
    _volume = max(0, min(int(vol), 100))
    ini.set('mediaplayer', 'volume', _volume)
-   gui.slider_val_set('volume.slider:dragable1', _volume / 100.0)
+   gui.volume_set(_volume / 100.0)
    if _emotion:
       _emotion.audio_volume_set(_volume / 100.0)
 
@@ -265,8 +265,6 @@ def video_controls_toggle():
       video_controls_hide()
    else:
       video_controls_show()
-
-
 
 def poster_set(poster = None, extra_path = None):
    if poster:
@@ -506,7 +504,7 @@ def _update_slider():
       ps = int(pos % 60)
 
       if len > 0:
-         gui.slider_val_set('videoplayer.controls.slider:dragable1', pos / len)
+         gui.part_get('videoplayer.controls.slider').value = pos / len
       gui.text_set('videoplayer.controls.position', '%i:%02i:%02i' % (ph,pm,ps))
       gui.text_set('videoplayer.controls.length', '%i:%02i:%02i' % (lh,lm,ls))
 

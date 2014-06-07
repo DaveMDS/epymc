@@ -815,10 +815,9 @@ collections {
             }
          }
          part { name: "videoplayer.controls.slider"; /* API */
-            type: GROUP;
-            source: "emc/slider/default";
-            mouse_events: 1;
-            repeat_events: 1;
+            type: EXTERNAL;
+            source: "elm/slider";
+            mouse_events: 0;
             scale: 1;
             description { state: "default" 0.0;
                fixed: 1 1;
@@ -832,7 +831,6 @@ collections {
                   to: "videoplayer.controls.bg";
                   to_x: "videoplayer.controls.length";
                   relative: 0.0 1.0;
-                  // offset: -10 0;
                }
             }
          }
@@ -1002,10 +1000,9 @@ collections {
             }
          }
          part { name: "volume.slider"; /* API */
-            type: GROUP;
-            source: "emc/slider/default";
-            mouse_events: 1;
-            repeat_events: 1;
+            type: EXTERNAL;
+            source: "elm/slider";
+            mouse_events: 0;
             scale: 1;
             description { state: "default" 0.0;
                fixed: 1 1;
@@ -1017,7 +1014,7 @@ collections {
                }
                rel2 {
                   to: "volume.bg";
-                  offset: -8 0;
+                  offset: -12 0;
                }
             }
          }
@@ -1771,140 +1768,5 @@ collections {
       }
    }
 
-/// sliders
-   group { name: "emc/slider/default"; /* API */
-      images {
-         image: "slider_bg.png" COMP;
-         image: "slider_bg_over.png" COMP;
-         image: "slider_indicator.png" COMP;
-      }
-      parts {
-         part { name: "base";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               max: 99999 20;
-               min: 0 6;
-               rel1 {
-                  offset: 1 0;
-               }
-               rel2 {
-                  offset: -2 -1;
-               }
-               image.normal: "slider_bg.png";
-               fill.smooth: 0;
-            }
-         }
-         part { name: "level2";
-            type: RECT;
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               rel1.to: "base";
-               rel2 {
-                  to_y: "base";
-                  to_x: "dragable2";
-                  relative: 0.5 1.0;
-               }
-               color: COLOR_GREEN 200;
-            }
-         }
-         part { name: "level";
-            type: RECT;
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               rel1.to: "base";
-               rel2 {
-                  to_y: "base";
-                  to_x: "dragable1";
-                  relative: 0.5 1.0;
-               }
-               color: COLOR_BLUE 200;
-            }
-         }
-         part { name: "base_over";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               rel1.to: "base";
-               rel1.offset: -1 -1;
-               rel2.to: "base";
-               rel2.offset: 0 0;
-               image {
-                  normal: "slider_bg_over.png";
-                  border: 3 3 3 3;
-               }
-               fill.smooth: 0;
-            }
-         }
-         part { name: "dragable1"; /* API */
-            type: RECT;
-            mouse_events: 1;
-            repeat_events: 1;
-            scale: 1;
-            dragable {
-               x: 1 1 0;
-               y: 0 0 0;
-               confine: "base";
-              
-            }
-            description { state: "default" 0.0;
-               min: 0 20;
-               max: 0 20;
-               fixed: 1 1;
-               rel1 {
-                  relative: 0.5 0.0;
-                  to_x: "base";
-               }
-               rel2 {
-                  relative: 0.5 1.0;
-                  to_x: "base";
-               }
-            }
-         }
-         part { name: "dragable_image";
-            type: IMAGE;
-            dragable {
-               x: 0 0 0;
-               y: 0 0 0;
-               confine: "base";
-               events: "dragable1";
-            }
-            description { state: "default" 0.0;
-               min: 16 22;
-               max: 16 22;
-               fixed: 1 1;
-               align: 0.5 1.0;
-               rel1.to: "dragable1";
-               rel2.to: "dragable1";
-               image {
-                  normal: "slider_indicator.png";
-                  border: 0 0 0 8;
-               }
-            }
-         }
-         part { name: "dragable2"; /* API */
-            type: RECT;
-            scale: 1;
-            dragable {
-               x: 1 1 0;
-               y: 0 0 0;
-               confine: "base";
-            }
-            description { state: "default" 0.0;
-               min: 0 20;
-               max: 0 20;
-               fixed: 1 1;
-               rel1 {
-                  relative: 0.5 0.0;
-                  to_x: "base";
-               }
-               rel2 {
-                  relative: 0.5 1.0;
-                  to_x: "base";
-               }
-            }
-         }
-      }
-   }
 }
 

@@ -63,8 +63,9 @@ def item_add(name, weight, label, icon, callback, subitems=[]):
    img = gui.load_image(icon)
 
    sublist = List(_list, focus_allow=False, style='mainmenu')
-   for label, icon, url in subitems:
-      sublist.item_append(label, gui.load_icon(icon) if icon else None)
+   for _label, _icon, _url in subitems:
+      si = sublist.item_append(_label, gui.load_icon(_icon) if _icon else None)
+      si.data['url'] = _url
 
    before = None
    for it in _list.items:
@@ -83,7 +84,12 @@ def item_add(name, weight, label, icon, callback, subitems=[]):
    item.data['callback'] = callback
 
 def _cb_item_selected(li, item):
-   item.data['callback']()
+   callback = item.data['callback']
+   subitem = item.data['sublist'].selected_item
+   if subitem:
+      callback(subitem.data['url'])
+   else:
+      callback()
 
 def item_del(name):
    for item in _list.items:
@@ -99,11 +105,17 @@ def input_event_cb(event):
    if event == 'RIGHT':
       if item.next:
          item.next.selected = True
+         sublist = item.data['sublist']
+         if sublist and sublist.selected_item:
+            sublist.selected_item.selected = False
       return input_events.EVENT_BLOCK
 
    elif event == 'LEFT':
       if item.prev:
          item.prev.selected = True
+         sublist = item.data['sublist']
+         if sublist and sublist.selected_item:
+            sublist.selected_item.selected = False
       return input_events.EVENT_BLOCK
 
    elif event == 'DOWN':

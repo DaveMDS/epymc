@@ -949,7 +949,6 @@ group { name: "elm/list/item/mainmenu";   // Subitems vertical list
             // }
          // }
       }
-      
       part { name: "icon_clip";
          type: RECT;
          description { state: "default" 0.0;
@@ -982,9 +981,9 @@ group { name: "elm/list/item/mainmenu";   // Subitems vertical list
          }
       }
       part { name: "elm.text";
-         type:           TEXT;
-         effect:         SOFT_SHADOW;
-         mouse_events:   0;
+         type: TEXT;
+         effect: SOFT_SHADOW;
+         mouse_events: 0;
          scale: 1;
          description {
             state: "default" 0.0;
@@ -992,18 +991,12 @@ group { name: "elm/list/item/mainmenu";   // Subitems vertical list
             color3: 0 0 0 50;
             color2: 0 0 0 50;
             text {
-               font: "Aclonica";
-               size: 45;
+               font: FONT;
+               size: FONT_SIZE_BIG;
                min: 1 1;
                ellipsis: -1;
                align: 0.5 0.5;
             }
-         }
-         description { state: "selected" 0.0;
-            inherit: "default" 0.0;
-            color: COLOR_ORANGE 255;
-            color3: 0 0 0 100;
-            text.size: 65;
          }
       }
       part { name: "fg1";
@@ -1051,9 +1044,9 @@ group { name: "elm/list/item/mainmenu";   // Subitems vertical list
          action:  STATE_SET "selected" 0.0;
          transition: DECELERATE 0.2 CURRENT;
          // target:  "bg";
-         // target:  "fg1";
-         // target:  "fg2";
-         target:  "elm.text";
+         target:  "fg1";
+         target:  "fg2";
+         // target:  "elm.text";
          //target:  "elm.swallow.icon";
          target:  "icon_clip";
       }
@@ -1063,9 +1056,9 @@ group { name: "elm/list/item/mainmenu";   // Subitems vertical list
          action:  STATE_SET "default" 0.0;
          transition: DECELERATE 0.3 CURRENT;
          // target:  "bg";
-         // target:  "fg1";
-         // target:  "fg2";
-         target:  "elm.text";
+         target:  "fg1";
+         target:  "fg2";
+         // target:  "elm.text";
          //target:  "elm.swallow.icon";
          target:  "icon_clip";
       }
@@ -1097,7 +1090,7 @@ group { name: "elm/list/h_item/mainmenu"; // Main horizontal list
             align: 0.5 0.0;
             text {
                font: FONT;
-               size: (FONT_SIZE_BIG + 10);
+               size: FONT_SIZE_BIGGER;
                min: 0 1;
                ellipsis: -1;
             }

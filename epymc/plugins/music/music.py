@@ -267,7 +267,13 @@ and what it need to work well, can also use markup like <title>this</> or
          os.mkdir(ini.get('music', 'covers_dir'))
 
       # add an item in the mainmenu
-      mainmenu.item_add('music', 5, 'Music', 'icon/music', self.cb_mainmenu)
+      subitems = [
+         ('Artists', None, 'music://artists'),
+         ('Albums', None, 'music://albums'),
+         ('Songs', None, 'music://songs'),
+      ]
+      mainmenu.item_add('music', 5, 'Music', 'icon/music',
+                        self.cb_mainmenu, subitems)
 
       # create a browser instance
       self._browser = EmcBrowser('Music')
@@ -296,7 +302,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
       _mod = None
 
-   def cb_mainmenu(self):
+   def cb_mainmenu(self, url=None):
       # get music folders from config
       self._folders = ini.get_string_list('music', 'folders', ';')
       # if not self._folders:
@@ -312,14 +318,21 @@ and what it need to work well, can also use markup like <title>this</> or
       if self._artists_db is None:
          self._artists_db = EmcDatabase('music_artists')
 
-      # show the root page
-      self._browser.page_add('music://root', 'Music', None,
-                             self.populate_root_page)
+      # start the browser in the requested page
+      if url is None:
+         self._browser.page_add('music://root', 'Music', None, self.populate_root_page)
+      elif url == 'music://artists':
+         self._browser.page_add(url, 'Artists', None, self.populate_artists_page)
+      elif url == 'music://albums':
+         self._browser.page_add(url, 'Albums', None, self.populate_albums_page)
+      elif url == 'music://songs':
+         self._browser.page_add(url, 'Songs', None, self.populate_songs_page)
+
       self._browser.show()
       mainmenu.hide()
 
-      # trigger a new scan
-      self.rebuild_db()
+      # trigger a new scan (DISABLED FOR NOW)
+      # self.rebuild_db()
 
    def rebuild_db(self):
       # Update db in a parallel thread

@@ -204,8 +204,15 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # get allowed exensions from config
       self._exts = ini.get_string_list('movies', 'extensions')
 
+      # get movies folders from config
+      self._folders = ini.get_string_list('movies', 'folders', ';')
+
       # add an item in the mainmenu
-      mainmenu.item_add('movies', 10, 'Movies', 'icon/movie', self.cb_mainmenu)
+      subitems = []
+      for f in self._folders:
+         subitems.append((os.path.basename(f), None, f))
+      mainmenu.item_add('movies', 10, 'Movies', 'icon/movie',
+                        self.cb_mainmenu, subitems)
 
        # add an entry in the config gui
       config_gui.root_item_add('movies', 50, 'Movie Collection',
@@ -282,14 +289,17 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
 
 ###### BROWSER STUFF
-   def cb_mainmenu(self):
-      # get movies folders from config
-      self._folders = ini.get_string_list('movies', 'folders', ';')
+   def cb_mainmenu(self, url=None):
 
       # if not self._folders:
          #TODO alert the user. and instruct how to add folders
 
-      self._browser.page_add('movies://root', 'Movies', None, self.populate_root_page)
+      # start the browser in the wanted page
+      if url is None:
+         self._browser.page_add('movies://root', 'Movies', None, self.populate_root_page)
+      else:
+         self._browser.page_add(url, os.path.basename(url), None, self.populate_url)
+         
       self._browser.show()
       mainmenu.hide()
 

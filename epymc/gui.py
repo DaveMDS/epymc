@@ -36,7 +36,6 @@ from efl.elementary.list import List
 from efl.elementary.table import Table
 from efl.elementary.genlist import Genlist, GenlistItemClass, \
    ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS
-from efl.elementary.slider import Slider
 from efl.elementary.theme import theme_overlay_add, theme_extension_add
 from efl.elementary.configuration import preferred_engine_set
 
@@ -270,7 +269,7 @@ def volume_hide():
    _volume_hide_timer = None
 
 def volume_set(value):
-   part_get('volume.slider').value = value
+   slider_val_set('volume.slider:dragable1', value)
 
 def scale_set(scale):
    win.scale_set(scale)
@@ -350,6 +349,12 @@ def text_set(part, text):
 
 def swallow_set(part, obj):
    layout.part_content_set(part, obj)
+
+def slider_val_set(part, value):
+   layout.edje_get().part_drag_value_set(part, value, value)
+
+def slider_val_get(part):
+   return layout.edje_get().part_drag_value_get(part)
 
 def box_append(part, obj):
    layout.box_append(part, obj)

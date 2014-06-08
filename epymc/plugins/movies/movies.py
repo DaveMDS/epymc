@@ -270,7 +270,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       if self._movie_db.id_exists(url):
          e = self._movie_db.get_data(url)
          try:
-            mediaplayer.title_set(e['name'])
+            mediaplayer.title_set(e['title'])
          except:
             mediaplayer.title_set(os.path.basename(url))
          try:

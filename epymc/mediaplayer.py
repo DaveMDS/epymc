@@ -504,7 +504,7 @@ def _update_slider():
       ps = int(pos % 60)
 
       if len > 0:
-         gui.part_get('videoplayer.controls.slider').value = pos / len
+         gui.slider_val_set('videoplayer.controls.slider:dragable1', pos / len)
       gui.text_set('videoplayer.controls.position', '%i:%02i:%02i' % (ph,pm,ps))
       gui.text_set('videoplayer.controls.length', '%i:%02i:%02i' % (lh,lm,ls))
 

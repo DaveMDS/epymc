@@ -659,24 +659,17 @@ collections {
          }
 
 /// mainmenu
-         part { name: "mainmenu.list"; /* API */
-            type: EXTERNAL;
-            source: "elm/list";
+         part { name: "mainmenu.list.swallow"; /* API */
+            type: SWALLOW;
             description { state: "default" 0.0;
                rel1.relative: 0.0 -1.0;
+               rel1.offset: 10 0;
                rel2.relative: 1.0 0.0;
-               align: 1.0 1.0;
-               params {
-                  choice: "horizontal mode" "scroll";
-                  choice: "scroll horizontal" "off";
-                  choice: "scroll vertical" "off";
-                  bool: "multi" "0";
-                  bool: "always_select" "1";
-               }
+               rel2.offset: -11 -1;
             }
-            description { state: "visible" 0;
+            description { state: "visible" 0.0;
                inherit: "default" 0.0;
-               rel1.relative: 0.0 0.0;
+               rel1.relative: 0.0 0.15;
                rel2.relative: 1.0 1.0;
             }
          }
@@ -684,15 +677,15 @@ collections {
             signal: "mainmenu,show";
             source: "emc";
             action: STATE_SET "visible" 0.00;
-            transition: DECELERATE 0.5;
-            target: "mainmenu.list";
+            transition: DECELERATE 0.4;
+            target: "mainmenu.list.swallow";
          }
          program { name: "mainmenu_hide"; /* API */
             signal: "mainmenu,hide";
             source: "emc";
             action: STATE_SET "default" 0.00;
-            transition: ACCELERATE 0.5;
-            target: "mainmenu.list";
+            transition: ACCELERATE 0.4;
+            target: "mainmenu.list.swallow";
          }
 
 /// videoplayer

@@ -281,8 +281,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # ini.set('tvshows', 'db_names_in_list', 'True')
 
       # add an item in the mainmenu
-      img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
-      mainmenu.item_add('tvshows', 11, 'Tv Shows', img, self.cb_mainmenu)
+      mainmenu.item_add('tvshows', 11, 'Tv Shows', 'icon/tv', self.cb_mainmenu)
 
       # add an entry in the config gui
       config_gui.root_item_add('tvshows', 51, 'Tv Shows Collection',

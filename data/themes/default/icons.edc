@@ -3,7 +3,6 @@
    group { name: "icon/"NAME; \
       images { image: "icon_"NAME".png" COMP; } \
       parts { part { name: "main_bg"; \
-         mouse_events: 0; \
          description { state: "default" 0.0; \
             image.normal: "icon_"NAME".png"; }}}}
 
@@ -34,6 +33,7 @@ ICON("check_off")
 ICON("minus")
 ICON("plus")
 ICON("refresh")
+ICON("exit")
 
 ICON("arrowR")
 ICON("arrowL")

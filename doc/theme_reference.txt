@@ -36,7 +36,7 @@ All the icons in icons.edc must be implemented
 
 ### MainMenu stuff ###
    * Required parts:
-      "mainmenu.list" -> elm_list
+      "mainmenu.list.swallow" -> edje SWALLOW
 
    * Signals received from the application:
       "mainmenu,show" "emc"

@@ -267,8 +267,7 @@ and what it need to work well, can also use markup like <title>this</> or
          os.mkdir(ini.get('music', 'covers_dir'))
 
       # add an item in the mainmenu
-      img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
-      mainmenu.item_add('music', 5, 'Music', img, self.cb_mainmenu)
+      mainmenu.item_add('music', 5, 'Music', 'icon/music', self.cb_mainmenu)
 
       # create a browser instance
       self._browser = EmcBrowser('Music')

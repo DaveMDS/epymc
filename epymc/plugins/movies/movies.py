@@ -205,8 +205,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self._exts = ini.get_string_list('movies', 'extensions')
 
       # add an item in the mainmenu
-      img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
-      mainmenu.item_add('movies', 10, 'Movies', img, self.cb_mainmenu)
+      mainmenu.item_add('movies', 10, 'Movies', 'icon/movie', self.cb_mainmenu)
 
        # add an entry in the config gui
       config_gui.root_item_add('movies', 50, 'Movie Collection',

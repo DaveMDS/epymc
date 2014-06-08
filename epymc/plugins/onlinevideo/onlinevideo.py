@@ -143,7 +143,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       _mod = self
 
       # add an item in the mainmenu
-      img = os.path.join(os.path.dirname(__file__), 'menu_bg.png')
+      img = os.path.join(os.path.dirname(__file__), 'ov_icon.png')
       mainmenu.item_add('onlinechannels', 15, 'Online Channels',
                         img, self.cb_mainmenu)
 

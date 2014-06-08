@@ -19,110 +19,115 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from efl import evas, elementary
+from efl.elementary.list import List
+from efl.elementary.scroller import Scrollable, \
+   ELM_SCROLLER_POLICY_ON, ELM_SCROLLER_POLICY_OFF
 
 from epymc import gui, input_events
 
 
-_items = {}  # key: name  value: elm_list_item
-_items_weight = {}  # key: elm_list_item  value: weight(int)
+_list = None # MainmenuList widget (the main horizontal list)
 
 
-
-def cb_exit():
-   gui.ask_to_exit()
+class MainmenuList(List, Scrollable):
+   def __init__(self):
+      List.__init__(self, gui.layout, horizontal=True,
+                    focus_allow=False, style='mainmenu')
+      self.policy = ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF
 
 
 def init():
-   li = gui.part_get('mainmenu.list')
-   li.style_set('mainmenu');
-   li.focus_allow_set(False)
-   item_add('exit', 200, 'Exit', None, cb_exit)
+   global _list
+
+   _list = MainmenuList()
+   gui.swallow_set('mainmenu.list.swallow', _list)
+
+   item_add('exit', 200, 'Exit', 'icon/exit', lambda: gui.ask_to_exit())
 
 def show():
-   list = gui.part_get('mainmenu.list')
-   list.callback_clicked_double_add(_cb_item_selected)
-   if not list.selected_item_get():
-      list.items_get()[0].selected_set(1)
-   list.go()
+   _list.callback_clicked_double_add(_cb_item_selected)
+   if not _list.selected_item:
+      _list.first_item.selected = True
+   _list.go()
    gui.signal_emit('mainmenu,show')
    input_events.listener_add('mainmenu', input_event_cb)
 
 def hide():
-   list = gui.part_get('mainmenu.list')
-   list.callback_clicked_double_del(_cb_item_selected)
+   _list.callback_clicked_double_del(_cb_item_selected)
    input_events.listener_del('mainmenu')
    gui.signal_emit('mainmenu,hide')
 
-def item_add(name, weight, label, icon = None, callback = None):
-   list = gui.part_get('mainmenu.list')
+def item_add(name, weight, label, icon, callback, subitems=[]):
+   # print('ADD ' + name + ' W ' + str(weight) + ' before ' + str(before.text if before else None))
+
+   img = gui.load_image(icon)
+
+   sublist = List(_list, focus_allow=False, style='mainmenu')
+   for label, icon, url in subitems:
+      sublist.item_append(label, gui.load_icon(icon) if icon else None)
 
    before = None
-   for it in list.items_get():
-      if weight <= _items_weight[it]:
+   for it in _list.items:
+      if weight <= it.data['weight']:
          before = it
          break
 
-   def _on_resize_cb(img):
-      (w, h) = img.image_size_get()
-      aspect = float(w) / float(h)
-      (w, h) = img.size_get()
-      img.fill_set(0, 0, h * aspect, h)
-
-   # print('ADD ' + name + ' W ' + str(weight) + ' before ' + str(before))
-   img = None
-   if icon:
-      img = evas.Image(gui.win.evas)
-      img.on_resize_add(_on_resize_cb)
-      img.file_set(icon)
    if before:
-      item = list.item_insert_before(before, label, img, None, None, callback)
+      item = _list.item_insert_before(before, label, img, sublist)
    else:
-      item = list.item_append(label, img, None, None, callback)
+      item = _list.item_append(label, img, sublist)
 
-   _items[name] = item
-   _items_weight[item] = weight
+   item.data['sublist'] = sublist
+   item.data['weight'] = weight
+   item.data['name'] = name
+   item.data['callback'] = callback
 
-def _cb_item_selected(list, item):
-   cb = item.data_get()[0][0]
-   if cb: cb()
+def _cb_item_selected(li, item):
+   item.data['callback']()
 
 def item_del(name):
-   item = _items[name]
-   del _items_weight[item]
-   item.delete()
-   del _items[name]
+   for item in _list.items:
+      if item.data['name'] == name:
+         item.delete()
 
 def input_event_cb(event):
-   list = gui.part_get('mainmenu.list')
-   item = list.selected_item_get()
+   item = _list.selected_item
    if not item:
-      item = list.items_get()[0]
-      item.selected_set(1)
+      item = _list.first_item
+      item.selected = True
 
-   if event == 'DOWN':
-      next = item.next_get()
-      if next:
-         next.selected_set(1)
-      else:
-         list.items_get()[0].selected_set(1)
+   if event == 'RIGHT':
+      if item.next:
+         item.next.selected = True
       return input_events.EVENT_BLOCK
+
+   elif event == 'LEFT':
+      if item.prev:
+         item.prev.selected = True
+      return input_events.EVENT_BLOCK
+
+   elif event == 'DOWN':
+      sublist = item.data['sublist']
+      subitem = sublist.selected_item
+      if subitem and subitem.next:
+         subitem.next.selected = True
+      elif not subitem and sublist.first_item:
+         sublist.first_item.selected = True
 
    elif event == 'UP':
-      prev = item.prev_get()
-      if prev:
-         prev.selected_set(1)
-      else:
-         list.items_get()[-1].selected_set(1)
-      return input_events.EVENT_BLOCK
+      sublist = item.data['sublist']
+      subitem = sublist.selected_item
+      if subitem and subitem.prev:
+         subitem.prev.selected = True
+      elif subitem:
+         subitem.selected = False
 
    elif event == 'OK':
-      _cb_item_selected(list, item)
+      _cb_item_selected(_list, item)
       return input_events.EVENT_BLOCK
 
    elif event == 'EXIT':
       gui.ask_to_exit()
       return input_events.EVENT_BLOCK
-
 
    return input_events.EVENT_CONTINUE

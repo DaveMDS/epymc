@@ -182,7 +182,7 @@ class StdConfigItemAction(object):
 def init():
    global _browser
 
-   mainmenu.item_add('config', 100, 'Config', None, _mainmenu_cb)
+   mainmenu.item_add('config', 100, 'Config', 'icon/config', _mainmenu_cb)
 
    # create a browser instance
    _browser = EmcBrowser('Configuration', 'List') # TODO use a custom style for config ?

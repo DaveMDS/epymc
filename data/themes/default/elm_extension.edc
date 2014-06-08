@@ -863,8 +863,8 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
   }
 }
 
-//// MAINMENU LIST ITEM (elm/list/item/default) ///////////////////////////////
-group { name: "elm/list/item/mainmenu";
+//// MAINMENU LISTS ITEM (elm/list/item/default) //////////////////////////////
+group { name: "elm/list/item/mainmenu";   // Subitems vertical list
    alias: "elm/list/item_odd/mainmenu";
    data.item: "stacking" "above";
    images {
@@ -1068,6 +1068,103 @@ group { name: "elm/list/item/mainmenu";
          target:  "elm.text";
          //target:  "elm.swallow.icon";
          target:  "icon_clip";
+      }
+   }
+}
+group { name: "elm/list/h_item/mainmenu"; // Main horizontal list
+   alias: "elm/list/h_item_odd/mainmenu";
+
+   data.item: "selectraise" "on";
+   data.item: "focusraise" "on";
+   
+   parts {
+      part { name: "base";
+         type: SPACER;
+         description { state: "default" 0.0;
+            min: 128 128;
+         }
+      }
+      part { name: "elm.text"; /* API */
+         type: TEXT;
+         mouse_events: 0;
+         clip_to: "sublist_clip";
+         effect: GLOW;
+         description { state: "default" 0.0;
+            color: FONT_COLOR;
+            color2: FONT_COLOR3;
+            color3: FONT_COLOR3;
+            rel2.relative: 1.0 0.0;
+            align: 0.5 0.0;
+            text {
+               font: FONT;
+               size: (FONT_SIZE_BIG + 10);
+               min: 0 1;
+               ellipsis: -1;
+            }
+         }
+      }
+      part { name: "icon_container";
+         type: SPACER;
+         description { state: "default" 0.0;
+            min: 128 128;
+            max: 128 128;
+            fixed: 1 1;
+            rel1.to: "elm.text";
+            rel1.relative: 0.0 1.0;
+            rel2.to: "base";
+            align: 0.0 0.0;
+         }
+      }
+      part { name: "elm.swallow.icon"; /* API */
+         type: SWALLOW;
+         mouse_events: 1;
+         repeat_events: 1;
+         description { state: "default" 0.0;
+            rel1.to: "icon_container";
+            rel2.to: "icon_container";
+            rel1.relative: 0.15 0.15;
+            rel2.relative: 0.85 0.85;
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            rel1.relative: 0.0 0.0;
+            rel2.relative: 1.0 1.0;
+         }
+      }
+      part { name: "sublist_clip";
+         type: RECT;
+         description { state: "default" 0.0;
+            color: 255 255 255 0;
+            rel1.relative: -1.0 -1.0;
+            rel2.relative: 2.0 2.0;
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255;
+         }
+      }
+      part { name: "elm.swallow.end"; /* API */
+         type: SWALLOW;
+         clip_to: "sublist_clip";
+         description { state: "default" 0.0;
+            rel1.to: "icon_container";
+            rel1.relative: 0.0 1.0;
+            rel2.to: "base";
+         }
+      }
+      program {
+         signal: "elm,state,selected"; source: "elm";
+         action: STATE_SET "selected" 0.0;
+         transition: LINEAR 0.2 CURRENT;
+         target: "elm.swallow.icon";
+         target: "sublist_clip";
+      }
+      program {
+         signal: "elm,state,unselected"; source: "elm";
+         action: STATE_SET "default" 0.0;
+         transition: LINEAR 0.2 CURRENT;
+         target: "elm.swallow.icon";
+         target: "sublist_clip";
       }
    }
 }

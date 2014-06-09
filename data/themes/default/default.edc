@@ -26,6 +26,16 @@
 #define COLOR_ORANGE 240 164 10
 #define COLOR_ORANGE_HEX F0A40A
 
+//// GENERIC MACROS ///////////////////////////////////////////////////////////
+#define ASPECT_FILL(_ASPECT) \
+   aspect: _ASPECT _ASPECT; aspect_preference: NONE;
+#define TILED_PATTERN(_WIDTH, _HEIGHT) \
+   fill { size { relative: 0.0 0.0; offset: _WIDTH _HEIGHT; } }
+#define TILED_HORIZ(_WIDTH) \
+   fill { size { relative: 0.0 1.0; offset: _WIDTH 0; } }
+#define FIXED_SIZE(_WIDTH, _HEIGHT) \
+   min: _WIDTH _HEIGHT; max: _WIDTH _HEIGHT; fixed: 1 1;
+
 data {
    item: "theme.name" "The default one";
    item: "theme.version" "0.8";
@@ -41,11 +51,12 @@ images {
    image: "frame2.png" COMP;
    image: "frame3.png" COMP;
    image: "mp_controls_bg.png" COMP;
-   image: "button_bar.png" COMP;
    image: "separator.png" COMP;
    image: "header.png" COMP;
    image: "volume.png" COMP;
    image: "volume_muted.png" COMP;
+   image: "menu_bg.png" COMP;
+   image: "shine.png" COMP;
 }
 
 fonts {
@@ -523,7 +534,7 @@ collections {
             signal: "browser,list,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
-            transition: LINEAR 1.0;
+            transition: LINEAR 0.5;
             target: "browser.list.clip";
             target: "browser.list.list_clip";
          }
@@ -654,23 +665,109 @@ collections {
             signal: "browser,grid,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
-            transition: LINEAR 1.0;
+            transition: LINEAR 0.5;
             target: "browser.grid.clip";
          }
 
 /// mainmenu
-         part { name: "mainmenu.list.swallow"; /* API */
-            type: SWALLOW;
+         part { name: "mainmenu.title.bg";
             description { state: "default" 0.0;
-               rel1.relative: 0.0 -1.0;
-               rel1.offset: 10 0;
-               rel2.relative: 1.0 0.0;
-               rel2.offset: -11 -1;
+               rel1 {
+                  to: "mainmenu.title";
+               }
+               rel2 {
+                  to: "mainmenu.title";
+                  offset: -1 32;
+               }
+               image {
+                  normal: "header.png";
+                  border: 31 39 2 39;
+               }
+            }
+         }
+         part { name: "mainmenu.title";
+            type: TEXT;
+            effect: SOFT_SHADOW;
+            scale: 1;
+            description { state: "default" 0.0;
+               rel1.relative: 0.0 -0.3;
+               rel2.relative: 1.0 -0.3;
+               align: 0.5 0.0;
+               color: 220 220 220 255;
+               color3: 0 0 0 64;
+               text {
+                  text: "Emotion Media Center";
+                  font: FONT;
+                  size: FONT_SIZE_BIGGER;
+                  ellipsis: -1;
+                  min: 1 1;
+               }
             }
             description { state: "visible" 0.0;
                inherit: "default" 0.0;
-               rel1.relative: 0.0 0.15;
-               rel2.relative: 1.0 1.0;
+               rel1.relative: 0.0 0.0;
+               rel2.relative: 1.0 0.0;
+            }
+         }
+         part { name: "mainmenu.list.bar";
+            scale: 1;
+            description { state: "default" 0.0;
+               color: 255 255 255 180;
+               min: 128 128;
+               max: -1 128;
+               fixed: 1 1;
+               align: 0.5 0.0;
+               rel1 {
+                  to_y: "mainmenu.list.swallow";
+                  offset: -15 0;
+               }
+               rel2 {
+                  to_y: "mainmenu.list.swallow";
+                  offset: 16 -1;
+               }
+               image {
+                  normal: "menu_bg.png";
+                  border: 15 16 7 13;
+               }
+            }
+         }
+         part { name: "mainmenu.list.bar.shine";
+            type: IMAGE;
+            description { state: "default" 0.0;
+               FIXED_SIZE(120, 5)
+               rel1 {
+                  to: "mainmenu.list.bar";
+                  offset: 0 6;
+               }
+               rel2 {
+                  to: "mainmenu.list.bar";
+                  relative: 1.0 0.0;
+                  offset: -1 6;
+               }
+               image.normal: "shine.png";
+            }
+         }
+         part { name: "mainmenu.list.swallow"; /* API */
+            type: SWALLOW;
+            description { state: "default" 0.0;
+               rel1 {
+                  relative: 0.0 -1.0;
+                  offset: 128 64;
+               }
+               rel2 {
+                  relative: 1.0 0.0;
+                  offset: -129 -1;
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               rel1 {
+                  to_y: "mainmenu.title.bg";
+                  relative: 0.0 1.0;
+               }
+               rel2 {
+                  relative: 1.0 1.0;
+               }
             }
          }
          program { name: "mainmenu_show"; /* API */
@@ -679,6 +776,7 @@ collections {
             action: STATE_SET "visible" 0.00;
             transition: DECELERATE 0.4;
             target: "mainmenu.list.swallow";
+            target: "mainmenu.title";
          }
          program { name: "mainmenu_hide"; /* API */
             signal: "mainmenu,hide";
@@ -686,6 +784,7 @@ collections {
             action: STATE_SET "default" 0.00;
             transition: ACCELERATE 0.4;
             target: "mainmenu.list.swallow";
+            target: "mainmenu.title";
          }
 
 /// videoplayer

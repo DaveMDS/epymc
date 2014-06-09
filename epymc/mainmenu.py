@@ -62,7 +62,7 @@ def item_add(name, weight, label, icon, callback, subitems=[]):
 
    img = gui.load_image(icon)
 
-   sublist = List(_list, focus_allow=False, style='mainmenu')
+   sublist = List(_list, focus_allow=False, style='mainmenu_sublist')
    for _label, _icon, _url in subitems:
       si = sublist.item_append(_label, gui.load_icon(_icon) if _icon else None)
       si.data['url'] = _url

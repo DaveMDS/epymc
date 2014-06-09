@@ -370,17 +370,15 @@ def box_remove(part, obj):
 def _input_event_cb(event):
    if event == 'TOGGLE_FULLSCREEN':
       win.fullscreen = not win.fullscreen
-      return input_events.EVENT_BLOCK
    elif event == 'SCALE_BIGGER':
       scale_bigger()
-      return input_events.EVENT_BLOCK
    elif event == 'SCALE_SMALLER':
       scale_smaller()
-      return input_events.EVENT_BLOCK
    elif event == 'SCALE_RESET':
       scale_reset()
-      return input_events.EVENT_BLOCK
-   input_events.EVENT_CONTINUE
+   else:
+      return input_events.EVENT_CONTINUE
+   return input_events.EVENT_BLOCK
 
 def _event_cb(event):
    if event == 'VOLUME_CHANGED':

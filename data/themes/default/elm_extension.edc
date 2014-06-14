@@ -868,6 +868,8 @@ group { name: "elm/list/base/mainmenu_sublist"; // Scroller for subitems list
          type: RECT;
          mouse_events: 0;
          description { state: "default" 0.0;
+            rel1.relative: -1.0 0.0;
+            rel2.relative: 5.0 1.0;
          }
       }
       part { name: "elm.swallow.content";
@@ -960,8 +962,11 @@ group { name: "elm/list/h_item/mainmenu";       // Main horizontal list item
          type: RECT;
          description { state: "default" 0.0;
             color: 255 255 255 0;
+            rel1.relative: -1.0 0.0;
+            rel2.relative: 5.0 1.0;
          }
          description { state: "selected" 0.0;
+            inherit: "default" 0.0;
             color: 255 255 255 255;
          }
       }
@@ -1002,9 +1007,8 @@ group { name: "elm/list/item/mainmenu_sublist"; // Sub vertical list item
    alias: "elm/list/item_odd/mainmenu_sublist";
    data.item: "stacking" "above";
    images {
-      image: "bt_sm_base1.png" COMP;
-      image: "bt_sm_shine.png" COMP;
-      image: "bt_sm_hilight.png" COMP;
+      image: "menu_bg_submenu.png" COMP;
+      image: "shine.png" COMP;
    }
    parts {
       part { name: "event";
@@ -1015,91 +1019,34 @@ group { name: "elm/list/item/mainmenu_sublist"; // Sub vertical list item
             color: 0 0 0 0;
          }
       }
-      /*part { name: "base_sh";
+      part { name: "bg";
          mouse_events: 0;
-         description {
-            state: "default" 0.0;
-            align: 0.0 0.0;
-            min: 0 10;
-            fixed: 1 1;
+         description { state: "default" 0.0;
+            visible: 0;
             rel1 {
-               to: "base";
-               relative: 0.0 1.0;
-               offset: 0 0;
+               offset: -5 0;
             }
             rel2 {
-               to: "base";
-               relative: 1.0 1.0;
-               offset: -1 0;
+               offset: 6 -1;
             }
             image {
-               // normal: "ilist_item_shadow.png";
+               normal: "menu_bg_submenu.png";
+               border: 0 0 1 1;
             }
-            fill.smooth: 0;
-         }
-      }
-      part { name: "base";
-         mouse_events: 0;
-         description {
-            state: "default" 0.0;
-            image {
-               //~ normal: "ilist_1.png";
-               border: 2 2 2 2;
-            }
-            fill.smooth: 0;
-         }
-      }*/
-      part { name: "bg";
-         type: SPACER;
-         mouse_events: 0;
-         description { state: "default" 0.0;
-            // visible: 0;
-            // color: 255 255 255 0;
-            // rel1 {
-               // relative: 0.0 0.0;
-               // offset: -5 -5;
-            // }
-            // rel2 {
-               // relative: 1.0 1.0;
-               // offset: 4 4;
-            // }
-            // image {
-               // normal: "bt_sm_base1.png";
-               // border: 6 6 6 6;
-            // }
-            // image.middle: SOLID;
-         }
-         // description { state: "selected" 0.0;
-            // inherit: "default" 0.0;
-            // visible: 1;
-            // color: 255 255 255 100;
-            // rel1 {
-               // relative: 0.0 0.0;
-               // offset: -2 -2;
-            // }
-            // rel2 {
-               // relative: 1.0 1.0;
-               // offset: 1 1;
-            // }
-         // }
-      }
-      part { name: "icon_clip";
-         type: RECT;
-         description { state: "default" 0.0;
-            color: 255 255 255 0;
+            image.middle: NONE;
          }
          description { state: "selected" 0.0;
-            color: 255 255 255 255;
+            inherit: "default" 0.0;
+            visible: 1;
          }
       }
-      part { name: "elm.swallow.icon";
+      part { name: "elm.swallow.icon"; /* API */
          type: SWALLOW;
-         clip_to: "icon_clip";
          description { state: "default" 0.0;
             align: 0.5 0.5;
          }
       }
-      part { name: "elm.swallow.end";
+      part { name: "elm.swallow.end"; /* API */
          type: SWALLOW;
          description { state: "default" 0.0;
             fixed: 1 0;
@@ -1114,87 +1061,57 @@ group { name: "elm/list/item/mainmenu_sublist"; // Sub vertical list item
             }
          }
       }
-      part { name: "elm.text";
+      part { name: "elm.text"; /* API */
          type: TEXT;
          effect: SOFT_SHADOW;
          mouse_events: 0;
          scale: 1;
          description {
             state: "default" 0.0;
-            color: 255 255 255 255;
-            color3: 0 0 0 50;
-            color2: 0 0 0 50;
+            color: FONT_COLOR;
+            color3: FONT_COLOR3;
             text {
                font: FONT;
                size: FONT_SIZE_BIG;
                min: 1 1;
                ellipsis: -1;
-               align: 0.5 0.5;
+               align: 0.0 0.5;
             }
          }
       }
-      part { name: "fg1";
-         mouse_events: 0;
-         description { state: "default" 0.0;
-            visible: 0;
-            color: 255 255 255 0;
-            rel1.to: "bg";
-            rel2.relative: 1.0 0.5;
-            rel2.to: "bg";
-            image {
-               normal: "bt_sm_hilight.png";
-               border: 6 6 6 0;
+      part { name: "shine";
+            description { state: "default" 0.0;
+               visible: 0;
+               FIXED_SIZE(69, 5)
+               rel1 {
+                  to: "bg";
+               }
+               rel2 {
+                  to: "bg";
+                  relative: 1.0 0.0;
+               }
+               image.normal: "shine.png";
+            }
+            description { state: "selected" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
             }
          }
-         description { state: "selected" 0.0;
-            inherit: "default" 0.0;
-            visible: 1;
-            color: 255 255 255 100;
-         }
-      }
-      part { name: "fg2";
-         mouse_events: 0;
-         description { state: "default" 0.0;
-            visible: 0;
-            color: 255 255 255 0;
-            rel1.to: "bg";
-            rel2.to: "bg";
-            image {
-               normal: "bt_sm_shine.png";
-               border: 6 6 6 0;
-            }
-         }
-         description { state: "selected" 0.0;
-            inherit: "default" 0.0;
-            visible: 1;
-            color: 255 255 255 100;
-         }
-      }
    }
    programs {
       program { name: "go_active";
          signal:  "elm,state,selected";
          source:  "elm";
          action:  STATE_SET "selected" 0.0;
-         transition: DECELERATE 0.2 CURRENT;
-         // target:  "bg";
-         target:  "fg1";
-         target:  "fg2";
-         // target:  "elm.text";
-         //target:  "elm.swallow.icon";
-         target:  "icon_clip";
+         target:  "bg";
+         target:  "shine";
       }
       program { name: "go_passive";
          signal:  "elm,state,unselected";
          source:  "elm";
          action:  STATE_SET "default" 0.0;
-         transition: DECELERATE 0.3 CURRENT;
-         // target:  "bg";
-         target:  "fg1";
-         target:  "fg2";
-         // target:  "elm.text";
-         //target:  "elm.swallow.icon";
-         target:  "icon_clip";
+         target:  "bg";
+         target:  "shine";
       }
    }
 }

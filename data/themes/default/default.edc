@@ -677,7 +677,7 @@ collections {
                }
                rel2 {
                   to: "mainmenu.title";
-                  offset: -1 32;
+                  offset: -1 28;
                }
                image {
                   normal: "header.png";
@@ -697,8 +697,8 @@ collections {
                color3: 0 0 0 64;
                text {
                   text: "Emotion Media Center";
-                  font: FONT;
-                  size: FONT_SIZE_BIGGER;
+                  font: "Aclonica";
+                  size: (FONT_SIZE_BIG+10);
                   ellipsis: -1;
                   min: 1 1;
                }

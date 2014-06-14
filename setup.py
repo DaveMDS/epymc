@@ -20,29 +20,35 @@ from distutils.core import setup, Command
 from distutils.log import warn, info, error
 from distutils.dir_util import remove_tree
 from distutils.command.install_lib import install_lib
+from distutils.command.build import build
+from distutils.dep_util import newer_group
 
 
 class BuildThemes(Command):
-   description = 'rebuild all the themes found in data/themes using edje_cc'
+   description = 'Compile all the themes found in data/themes using edje_cc'
    user_options = []
    def initialize_options(self): pass
    def finalize_options(self): pass
    def run(self):
-      for theme_dir in glob.glob('data/themes/*'):
+      for theme_dir in glob.glob(os.path.join('data', 'themes', '*')):
          name = os.path.basename(theme_dir)
          edc_name = os.path.join(theme_dir, name + '.edc')
          edj_name = os.path.join(theme_dir, name + '.edj')
-         info('building theme: "%s" from: %s' % (name, edc_name))
-         ret = subprocess.call(['edje_cc', '-v', edc_name,
+         dst_name = os.path.join('epymc', 'themes', name + '.edj')
+         sources = glob.glob(os.path.join(theme_dir, '*.edc')) + \
+                   glob.glob(os.path.join(theme_dir, 'images', '*')) + \
+                   glob.glob(os.path.join(theme_dir, 'fonts', '*'))
+         if newer_group(sources, dst_name):
+            info('building theme: "%s" from: %s' % (name, edc_name))
+            ret = subprocess.call(['edje_cc', '-v', edc_name,
                                     '-id', os.path.join(theme_dir, 'images'),
                                     '-fd', os.path.join(theme_dir, 'fonts')
-                              ])
-         if ret == 0:
-            info('Moving generated edje file to epymc/themes/ folder')
-            dest = os.path.join('epymc', 'themes', name + '.edj')
-            shutil.move(edj_name, dest)
-         else:
-            error('Error generating theme: "%s"' % name)
+                                 ])
+            if ret == 0:
+               info('Moving generated edje file to epymc/themes/ folder')
+               shutil.move(edj_name, dst_name)
+            else:
+               error('Error generating theme: "%s"' % name)
 
 
 class Uninstall(Command):
@@ -84,6 +90,12 @@ class Uninstall(Command):
          path = os.path.join(self.prefix, 'lib', py, search, 'EpyMC-*.egg-info')
          for egg in glob.glob(path):
             self.remove_file(egg)
+
+
+class Build(build):
+   def run(self):
+      self.run_command("build_themes")
+      build.run(self)
 
 
 class Install(install_lib):
@@ -157,5 +169,6 @@ setup (
       'build_themes': BuildThemes,
       'uninstall': Uninstall,
       'install_lib': Install,
+      'build': Build,
    },
 )

@@ -35,6 +35,12 @@
    fill { size { relative: 0.0 1.0; offset: _WIDTH 0; } }
 #define FIXED_SIZE(_WIDTH, _HEIGHT) \
    min: _WIDTH _HEIGHT; max: _WIDTH _HEIGHT; fixed: 1 1;
+#define DBG_SHOW(_PART, _R, _G, _B) \
+   part { name: "dbg_show"_PART; \
+      type: RECT; mouse_events: 0; \
+      description { state: "default" 0.0; \
+            rel1.to: _PART; rel2.to: _PART; \
+            color: _R _G _B 50; } }
 
 data {
    item: "theme.name" "The default one";

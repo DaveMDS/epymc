@@ -15,6 +15,12 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
    }
 
    parts {
+      program {
+         signal: "load"; source: "";
+         script {
+            emit("reload", "elm");
+         }
+      }
       // vert bar /////
       part { name: "sb_vbar_show"; type: RECT;
          description { state: "default" 0.0;

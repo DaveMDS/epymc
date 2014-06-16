@@ -39,8 +39,8 @@
    part { name: "dbg_show"_PART; \
       type: RECT; mouse_events: 0; \
       description { state: "default" 0.0; \
-            rel1.to: _PART; rel2.to: _PART; \
-            color: _R _G _B 50; } }
+         rel1.to: _PART; rel2.to: _PART; \
+         color: _R _G _B 50; } }
 
 data {
    item: "theme.name" "The default one";
@@ -520,11 +520,11 @@ collections {
             description { state: "default" 0.0;
                rel1 {
                   to: "browser.list.info_bg";
-                  offset: 15 15;
+                  offset: 15 9;
                }
                rel2 {
                   to: "browser.list.info_bg";
-                  offset: -15 -10;
+                  offset: -12 -10;
                }
             }
          }

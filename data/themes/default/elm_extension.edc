@@ -1,4 +1,5 @@
 //// SCROLLER (elm/scroller/base/default) /////////////////////////////////////
+#define SBSIZE 14
 group { name: "elm/scroller/base/dialog";     // dialog text scroller
    alias: "elm/list/base/dialog";             // dialog lists
    alias: "elm/list/base/image_list";         // dialog lists (poster/fanart)
@@ -8,10 +9,12 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
 
    data.item: "focus_highlight" "off";
    images {
-      image: "sb_horiz_base.png" COMP;
       image: "sb_horiz_slider.png" COMP;
-      image: "sb_vert_base.png" COMP;
       image: "sb_vert_slider.png" COMP;
+      image: "inset_bar_horiz_base.png" COMP;
+      image: "inset_bar_horiz_light.png" COMP;
+      image: "inset_bar_vert_base.png" COMP;
+      image: "inset_bar_vert_light.png" COMP;
    }
 
    parts {
@@ -34,7 +37,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
          scale: 1;
          description { state: "default" 0.0;
             fixed: 1 1;
-            min: 15 1;
+            min: SBSIZE 1;
             align: 1.0 0.0;
             rel1.relative: 1.0 0.0;
             rel1.offset: -1 0;
@@ -88,7 +91,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
          dragable.confine: "sb_vbar_base";
          description { state: "default" 0.0;
             fixed: 1 1;
-            min: 15 13;
+            min: SBSIZE SBSIZE;
             rel1.relative: 0.5  0.5;
             rel1.to: "sb_vbar_base";
             rel2.relative: 0.5  0.5;
@@ -104,7 +107,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
          clip_to: "sb_vbar";
          description { state: "default" 0.0;
             fixed: 1 1;
-            min: 15 1;
+            min: SBSIZE 1;
             align: 0.5 0.0;
             color: 0 0 0 0;
             rel1.to: "sb_vbar";
@@ -121,7 +124,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
          clip_to: "sb_vbar";
          description { state: "default" 0.0;
             fixed: 1 1;
-            min: 15 1;
+            min: SBSIZE 1;
             align: 0.5 1.0;
             color: 0 0 0 0;
             rel1.to: "sb_vbar";
@@ -171,7 +174,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
          scale: 1;
          description { state: "default" 0.0;
             fixed: 1 1;
-            min: 1 15;
+            min: 1 SBSIZE;
             align: 0.0 1.0;
             rel1.relative: 0.0 1.0;
             rel1.offset: 0 -1;
@@ -225,7 +228,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
          dragable.confine: "sb_hbar_base";
          description { state: "default" 0.0;
             fixed: 1 1;
-            min: 13 15;
+            min: SBSIZE SBSIZE;
             rel1.relative: 0.5  0.5;
             rel1.to: "sb_hbar_base";
             rel2.relative: 0.5  0.5;
@@ -241,7 +244,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
          clip_to: "sb_hbar";
          description { state: "default" 0.0;
             fixed: 1 1;
-            min: 1 15;
+            min: 1 SBSIZE;
             align: 0.0 0.5;
             color: 0 0 0 0;
             rel1.to: "sb_hbar";
@@ -258,7 +261,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
          clip_to: "sb_hbar";
          description { state: "default" 0.0;
             fixed: 1 1;
-            min: 1 15;
+            min: 1 SBSIZE;
             align: 1.0 0.5;
             color: 0 0 0 0;
             rel1.to: "sb_hbar";
@@ -313,9 +316,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
       part { name: "elm.swallow.background"; type: SWALLOW;
          clip_to: "clipper";
          description { state: "default" 0.0;
-            rel1.offset: 1 1;
             rel2.relative: 0.0 0.0;
-            rel2.offset: -2 -2;
             rel2.to_x: "sb_vbar";
             rel2.to_y: "sb_hbar";
          }
@@ -323,9 +324,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
       part { name: "elm.swallow.content"; type: SWALLOW;
          clip_to: "clipper";
          description { state: "default" 0.0;
-            rel1.offset: 1 1;
             rel2.relative: 0.0 0.0;
-            rel2.offset: -2 -2;
             rel2.to_x: "sb_vbar";
             rel2.to_y: "sb_hbar";
          }
@@ -338,26 +337,70 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
          }
       }
       // bars images /////
+      part { name: "hbar_bg_light";
+         mouse_events: 0;
+         description { state: "default" 0.0;
+            rel1.to: "hbar_bg";
+            rel1.offset: 0 1;
+            rel2.to: "hbar_bg";
+            rel2.offset: -1 0;
+            image {
+               normal: "inset_bar_horiz_light.png";
+               border: 32 32 0 0;
+               border_scale_by: 0.25;
+               border_scale: 1;
+            }
+         }
+      }
       part { name: "hbar_bg"; mouse_events: 0;
          description { state: "default" 0.0;
             rel1.to: "sb_hbar_a1";
             rel1.relative: 1.0 0.0;
             rel2.to: "sb_hbar_a2";
             rel2.relative: 0.0 1.0;
-            image.normal: "sb_horiz_base.png";
-            image.border: 10 10 0 0;
+            color: 255 255 255 128;
+            image {
+               normal: "inset_bar_horiz_base.png";
+               border: 32 32 0 0;
+               border_scale_by: 0.25;
+               border_scale: 1;
+            }
          }
       }
       part { name: "hbar_slider"; mouse_events: 0;
          clip_to: "sb_hbar_show";
          description { state: "default" 0.0;
             fixed: 1 1;
-            rel1.to: "elm.dragable.hbar";
-            rel2.to: "elm.dragable.hbar";
-            image.normal: "sb_horiz_slider.png";
-            image.border: 10 10 0 0;
-            fill.smooth: 0;
-            min: 15 15;
+            rel1 {
+               to: "elm.dragable.hbar";
+               offset: 0 1;
+            }
+            rel2 {
+               to: "elm.dragable.hbar";
+               offset: -1 -2;
+            }
+            color: 255 255 255 128;
+            image {
+               normal: "sb_horiz_slider.png";
+               border: 32 32 2 2;
+               border_scale_by: 0.25;
+               border_scale: 1;
+            }
+         }
+      }
+      part { name: "vbar_bg_light";
+         mouse_events:  0;
+         description { state: "default" 0.0;
+            rel1.to: "vbar_bg";
+            rel1.offset: 0 1;
+            rel2.to: "vbar_bg";
+            rel2.offset: -1 0;
+            image {
+               normal: "inset_bar_vert_light.png";
+               border: 0 0 32 32;
+               border_scale_by: 0.25;
+               border_scale: 1;
+            }
          }
       }
       part { name: "vbar_bg"; mouse_events: 0;
@@ -366,21 +409,34 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
             rel1.relative: 0.0 1.0;
             rel2.to: "sb_vbar_a2";
             rel2.relative: 1.0 0.0;
-            image.normal: "sb_vert_base.png";
-            image.border: 0 0 10 10;
+            color: 255 255 255 128;
+            image {
+               normal: "inset_bar_vert_base.png";
+               border: 0 0 32 32;
+               border_scale_by: 0.25;
+               border_scale: 1;
+            }
          }
       }
       part { name: "vbar_slider"; mouse_events: 0;
          clip_to: "sb_vbar_show";
          description { state: "default" 0.0;
             fixed: 1 1;
-            rel1.to: "elm.dragable.vbar";
-            rel2.to: "elm.dragable.vbar";
-            image.normal: "sb_vert_slider.png";
-            image.border: 0 0 10 10;
-            fill.smooth: 0;
-            min: 15 15; 
-            fixed: 1 1;
+            rel1 {
+               to: "elm.dragable.vbar";
+               offset: 1 0;
+            }
+            rel2 {
+               to: "elm.dragable.vbar";
+               offset: -2 -1;
+            }
+            color: 255 255 255 128;
+            image {
+               normal: "sb_vert_slider.png";
+               border: 2 2 32 32;
+               border_scale_by: 0.25;
+               border_scale: 1;
+            }
          }
       }
       part { name: "dim_effect"; type: RECT; mouse_events: 0;
@@ -479,6 +535,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
       }
    }
 }
+#undef SBSIZE
 
 //// MAINMENU LISTS ///////////////////////////////////////////////////////////
 group { name: "elm/list/base/mainmenu";         // Scroller for horizontal list

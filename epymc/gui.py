@@ -38,6 +38,8 @@ from efl.elementary.genlist import Genlist, GenlistItemClass, \
    ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS
 from efl.elementary.theme import theme_overlay_add, theme_extension_add
 from efl.elementary.configuration import preferred_engine_set
+from efl.elementary.configuration import scale_set as elm_scale_set
+from efl.elementary.configuration import scale_get as elm_scale_get
 
 from epymc import utils, ini, events, input_events
 
@@ -272,19 +274,19 @@ def volume_set(value):
    slider_val_set('volume.slider:dragable1', value)
 
 def scale_set(scale):
-   win.scale_set(scale)
+   elm_scale_set(scale)
 
 def scale_get():
-   return win.scale_get()
+   return elm_scale_get()
 
 def scale_bigger():
-   win.scale_set(win.scale_get() + 0.1)
+   scale_set(scale_get() + 0.1)
 
 def scale_smaller():
-   win.scale_set(win.scale_get() - 0.1)
+   scale_set(scale_get() - 0.1)
 
 def scale_reset():
-   win.scale_set(1.0)
+   scale_set(1.0)
 
 def background_set(image):
    global _backdrop_curr

@@ -39,6 +39,8 @@ ICON("arrowR")
 ICON("arrowL")
 ICON("arrowU")
 ICON("arrowD")
+ICON("next")
+ICON("prev")
 
 ICON("list")
 ICON("grid")

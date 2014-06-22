@@ -75,9 +75,8 @@ class ChannelItemClass(EmcItemClass):
       _mod._current_src = channel
       _mod._request_index()
 
-
    def label_get(self, url, channel):
-      return url
+      return channel['label']
 
    def icon_get(self, url, channel):
       return channel['icon']

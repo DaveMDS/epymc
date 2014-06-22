@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os, sys, urllib2
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 AGENT='Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'
 
@@ -64,20 +64,22 @@ if STATE == 0:
 # the page for each category
 elif STATE == 1:
    data = open_url(URL)
-   soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
+   soup = BeautifulSoup(data)
 
-   videos = soup.findAll('div', attrs={'class' : "media_thumbnail medium"})
+   videos = soup.findAll('a', attrs={'class': 'js-no-tooltip teaser-video-content'})
    for video in videos:
       try:
-         url = video('a')[0]['href']
-         name = video('a')[0]['title']
-         thumb = video('img')[0]['src']
-         addItem(2, name, 'http://www.zapiks.com' + url, poster=thumb)
+         url = 'http://www.zapiks.com' + video['href']
+         name  = video['title'].replace('Video - ', '')
+         thumb = video.find('div', attrs={'class': 'teaser-thumbnail'})['style']
+         thumb = thumb.replace("background-image : url('", '').replace("')", '')
+         addItem(2, name, url, poster=thumb)
       except:
          pass
    try:
-      nextPage = soup.find('span', attrs={'class' : "next"})('a')[1]['href']
-      addItem(1, 'More items...', 'http://www.zapiks.com' + nextPage, icon='icon/next', action=ACT_MORE)
+      cur_page = soup.find('li', attrs={'class': 'active'})
+      next_page = cur_page.next_sibling.a['href']
+      addItem(1, 'More items...', 'http://www.zapiks.com' + next_page, icon='icon/next', action=ACT_MORE)
    except:
       pass
 
@@ -85,11 +87,11 @@ elif STATE == 1:
 # extract the video link from the video page
 elif STATE == 2:
    data = open_url(URL)
-   soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
-   vid = soup.find('link', attrs={'rel' : "video_src"})['href']
-   vidId = vid[-5:]
-   url2 = 'http://www.zapiks.com/view/index.php?file='+vidId+'&lang=fr'
+   soup = BeautifulSoup(data)
+   vid = soup.find('div', attrs={'class': 'video video-responsive js-video-player'})
+   vid = vid['data-media-id']
 
+   url2 = 'http://www.zapiks.com/view/index.php?file=' + vid
    data = open_url(url2)
    soup = BeautifulSoup(data)
    video_url = soup.find('file').string

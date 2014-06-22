@@ -25,7 +25,7 @@
 
 
 import os, sys, urllib2, re, hashlib
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 AGENT='Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'
 
@@ -62,7 +62,7 @@ if STATE == 0:
 # ComingSoon/Top150/OutNow pages
 elif STATE == 2:
    data = open_url(URL)
-   soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
+   soup = BeautifulSoup(data)
    movies = soup.find(id='featured_c').findAll('a', attrs={'class':'m_title'})
    print movies
    for m in movies:
@@ -74,7 +74,7 @@ elif STATE == 2:
 # list available trailers for a movie
 elif STATE == 4:
    data = open_url(URL)
-   soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
+   soup = BeautifulSoup(data)
 
    try:
       poster = soup.find('a', attrs={'class': 'posterimgwrapper'}).find('img')['src']

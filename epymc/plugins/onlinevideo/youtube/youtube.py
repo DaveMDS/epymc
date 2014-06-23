@@ -214,38 +214,37 @@ elif STATE == 3:
    e = '&ps=default&eurl=&gl=US&hl=en'
 
    # get the video id from the url
-   # print '***', URL
    m = re.search('^http://www\\.youtube\\.com/watch\\?v=([0-9A-Za-z_-]+).*', URL)
    video_id = m.group(1)
 
-   # try video_info 1 (el=embedded)
-   url = '%sget_video_info?video_id=%s&el=%s%s' %(b, video_id, 'embedded', e)
-   videoinfo = open_url(url)
-   m = re.search('^.*&token=([^&]+).*$', videoinfo)
-   if not m:
-      # try video_info 2 (el=vevo)
-      url = '%sget_video_info?video_id=%s&el=%s%s' %(b, video_id, 'vevo', e)
-      videoinfo = open_url(url)
-      m = re.search('^.*&token=([^&]+).*$', videoinfo)
-      if not m:
-          # try video_info 3 (el=detailpage)
-         url = '%sget_video_info?video_id=%s&el=%s%s' %(b, video_id, 'detailpage', e)
-         videoinfo = open_url(url)
-         m = re.search('^.*&token=([^&]+).*$', videoinfo)
-         if not m:
-            exit # TODO fixme
-   video_token = urllib.unquote(m.group(1))
+   # get the video token using the get_video_info query
+   video_token = None
+   for el_type in ['&el=embedded', '&el=detailpage', '&el=vevo', '']:
+      video_info_url = \
+         '%sget_video_info?&video_id=%s%s&ps=default&eurl=&gl=US&hl=en' \
+          % (b, video_id, el_type)
+      videoinfo = open_url(video_info_url)
 
-   # parse video_info response
+      match = re.search('^.*&token=([^&]+).*$', videoinfo)
+      if match is not None:
+         video_token = urllib.unquote(match.group(1))
+         break
+
+   if video_token is None:
+      print("ERROR: cannot find the video token")
+      sys.exit(1)
+
+   # get available formats (always from the get_video_info results)
    m = re.search('^.*&url_encoded_fmt_stream_map=([^&]+).*$', videoinfo)
    formatmap = urllib.unquote(m.group(1))
+
    L = []
    url_360p = url_720p = url_1080p = None
    for media in formatmap.split(','):
-      # print "-----------------------------------------------------"
       itag = -1
       murl = None
       sig = None
+      sig_enc = None
       for param in media.split('&'):
          if param.startswith('itag='):
             itag = int(param[5:])
@@ -253,13 +252,23 @@ elif STATE == 3:
             murl = urllib.unquote(param[4:])
          elif param.startswith('sig='):
             sig = param[4:]
-      if (itag == -1) or (murl is None) or (sig is None):
+         elif param.startswith('s='):
+            sig_enc = param[2:]
+
+      if (itag == -1) or (murl is None):
          continue
 
       # print "ITAG->",itag
       # print "MURL->",murl
       # print "SIG->",sig
-      murl += '&signature=' + sig
+
+      if sig is not None:
+         murl += '&signature=' + sig
+      elif sig_enc is not None:
+         # TODO decript signature
+         print("WARNING: Encripted signature unsupported")
+         continue
+
 
       # :/
       if itag == 18: # 360p
@@ -269,6 +278,7 @@ elif STATE == 3:
       elif itag == 37: # 1080p
          url_1080p = murl
       else:
+         print("WARNING: Unknown itag %s" % itag)
          L.append(murl)
 
    # choose the wanted resolution :/
@@ -307,12 +317,6 @@ elif STATE == 3:
       icon = item['thumbnail']['sqDefault']
 # 
       addItem(3, title, url, poster=poster)
-
-
-
-
-
-
 
 
 

@@ -39,6 +39,8 @@ import epymc.gui as gui
 import epymc.ini as ini
 import epymc.events as events
 
+from epymc.extapi.onlinevideo import ACT_NONE, ACT_FOLDER, ACT_MORE, \
+   ACT_PLAY, ACT_SEARCH
 
 
 DEBUG = True
@@ -51,12 +53,6 @@ if DEBUG:
    from pprint import pprint
    import pdb
 
-
-ACT_NONE = 0
-ACT_FOLDER = 1
-ACT_MORE = 2
-ACT_PLAY = 3
-ACT_SEARCH = 4
 
 F_STATE = 0
 F_LABEL = 1

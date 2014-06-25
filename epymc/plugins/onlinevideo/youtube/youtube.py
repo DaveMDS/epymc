@@ -18,10 +18,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, re, subprocess
+import os, sys, re
 
-from epymc.extapi.onlinevideo import \
-   api_version, user_agent, state_get, \
+from epymc.extapi.onlinevideo import api_version, user_agent, state_get, \
    fetch_url, play_url, item_add, call_ydl, \
    ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 

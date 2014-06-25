@@ -18,9 +18,7 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-print("********************* 1")
 import os, sys, urllib2, json, subprocess
-# import os, sys, urllib2, json
 
 
 api_version = 4

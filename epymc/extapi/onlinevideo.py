@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+# This Python file uses the following encoding: utf-8
+#
+# Copyright (C) 2010-2014 Davide Andreoli <dave@gurumeditation.it>
+#
+# This file is part of EpyMC.
+#
+# EpyMC is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# EpyMC is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
+
+print("********************* 1")
+import os, sys, urllib2, json, subprocess
+# import os, sys, urllib2, json
+
+
+api_version = 4
+user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'
+
+ACT_NONE = 0
+ACT_FOLDER = 1
+ACT_MORE = 2
+ACT_PLAY = 3
+ACT_SEARCH = 4
+
+def state_get():
+    return int(sys.argv[1]), sys.argv[2]
+
+def item_add(next_state, label, url, info=None, icon=None, poster=None, action=ACT_NONE):
+   """ TODO doc """
+   print((next_state, label, url, info, icon, poster, action))
+
+def play_url(url):
+   """ TODO doc """
+   print('PLAY!' + url)
+
+def fetch_url(url, parser=None):
+   """ TODO doc """
+   req = urllib2.Request(url)
+   # req.addheaders = [('Referer', 'http://www.zapiks.com'), (user_agent)]
+   f = urllib2.urlopen(req)
+   data = f.read()
+   f.close()
+
+   if parser == 'json':
+       data = json.loads(data)
+
+   return data
+
+def call_ydl(url):
+   """ TODO doc """
+   ydl = os.path.join(os.path.dirname(__file__), 'youtube-dl')
+   p = subprocess.Popen([ydl, '--get-url', url], stdout=subprocess.PIPE)
+   out, err = p.communicate()
+   return out
+
+
+
+

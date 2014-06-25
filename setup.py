@@ -101,6 +101,7 @@ class Build(build):
 class Install(install_lib):
    executables = [
       '*/onlinevideo/*/*.py',
+      '*/extapi/youtube-dl',
    ]
    def run(self):
       install_lib.run(self)
@@ -128,6 +129,7 @@ setup (
 
    packages = [
       'epymc',
+      'epymc.extapi',
       'epymc.plugins.input_keyb',
       'epymc.plugins.input_lirc',
       'epymc.plugins.input_joy',
@@ -144,6 +146,7 @@ setup (
 
    package_data = {
       'epymc': ['themes/*.edj'],
+      'epymc.extapi': ['youtube-dl'],
       'epymc.plugins.movies': ['*.png'],
       'epymc.plugins.tvshows': ['*.png'],
       'epymc.plugins.mame': ['*.png', '*.jpg'],

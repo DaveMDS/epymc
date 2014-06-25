@@ -21,4 +21,4 @@
 # Inspired from the work on:
 # http://www.jezra.net/blog/Python_Joystick_Class_using_Gobject
 
-from .joy import *
+from .joy import JoystickModule

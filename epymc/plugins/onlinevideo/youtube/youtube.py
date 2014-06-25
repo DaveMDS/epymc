@@ -18,38 +18,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, urllib, urllib2, json, re
-# from BeautifulSoup import BeautifulSoup
+import os, sys, re, subprocess
 
-AGENT='Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'
+from epymc.extapi.onlinevideo import \
+   api_version, user_agent, state_get, \
+   fetch_url, play_url, item_add, call_ydl, \
+   ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
+
+
 ITEMS_PER_PAGE = 50
 
-### API V.3  ###################################################################
-STATE = int(sys.argv[1])
-URL = sys.argv[2]
+STATE, URL = state_get()
 
-ACT_NONE = 0; ACT_FOLDER = 1; ACT_MORE = 2; ACT_PLAY = 3; ACT_SEARCH = 4
 
-def addItem(next_state, label, url, info = None, icon = None, poster = None, action = ACT_NONE):
-   print((next_state, label, url, info, icon, poster, action))
-
-def playUrl(url):
-   print('PLAY!' + url)
-
-### API END  ###################################################################
 
 
 # youtube api reference:
 # https://developers.google.com/youtube/2.0/developers_guide_protocol
 
 
-def open_url(url):
-   req = urllib2.Request(url)
-   # req.addheaders = [('Referer', 'http://www.zapiks.com'), (AGENT)]
-   content = urllib2.urlopen(req)
-   data = content.read()
-   content.close()
-   return data
+
 
 def seconds_to_time_string(seconds):
    seconds = int(seconds)
@@ -61,6 +49,7 @@ def seconds_to_time_string(seconds):
    else:
       return "%d:%02d" % (m,s)
 
+
 CATS = ['Film', 'Autos', 'Music', 'Animals', 'Sports', 'Shortmov', 'Travel',
 'Games', 'Videoblog', 'People', 'Comedy', 'Entertainment', 'News', 'Howto',
 'Education', 'Tech', 'Nonprofit', 'Movies', 'Shows', 'Trailers']
@@ -71,18 +60,16 @@ if STATE == 0:
    # b = 'http://gdata.youtube.com/feeds/api/standardfeeds/IT/'
    std = 'http://gdata.youtube.com/feeds/api/standardfeeds/'
    e = 'v=2&alt=jsonc&max-results=' + str(ITEMS_PER_PAGE)
-   # e = 'v=2&alt=json'
-   # d = os.path.dirname(__file__)
-   addItem(4, 'Search videos', 'search', None, action=ACT_SEARCH)
-   addItem(4, 'Search channels (TODO)', 'search', None, action=ACT_SEARCH)
-   addItem(2, 'Categories :/', 'cats', None, action=ACT_FOLDER)
-   addItem(1, 'Top rated', std+'top_rated?'+e, None, action=ACT_FOLDER)
-   addItem(1, 'Top favorites', std+'top_favorites?'+e, None, action=ACT_FOLDER)
-   addItem(1, 'Most shared', std+'most_shared?'+e, None, action=ACT_FOLDER)
-   addItem(1, 'Most popular', std+'most_popular?'+e, None, action=ACT_FOLDER)
-   # addItem(1, 'Most recent', std+'most_recent?'+e, None, action=ACT_FOLDER)
-   addItem(1, 'Most discussed', std+'most_discussed?'+e, None, action=ACT_FOLDER)
-   addItem(1, 'Most viewed', std+'most_viewed?'+e, None, action=ACT_FOLDER)
+   item_add(4, 'Search videos', 'search', None, action=ACT_SEARCH)
+   item_add(4, 'Search channels (TODO)', 'search', None, action=ACT_SEARCH)
+   item_add(2, 'Categories :/', 'cats', None, action=ACT_FOLDER)
+   item_add(1, 'Top rated', std+'top_rated?'+e, None, action=ACT_FOLDER)
+   item_add(1, 'Top favorites', std+'top_favorites?'+e, None, action=ACT_FOLDER)
+   item_add(1, 'Most shared', std+'most_shared?'+e, None, action=ACT_FOLDER)
+   item_add(1, 'Most popular', std+'most_popular?'+e, None, action=ACT_FOLDER)
+   # item_add(1, 'Most recent', std+'most_recent?'+e, None, action=ACT_FOLDER)
+   item_add(1, 'Most discussed', std+'most_discussed?'+e, None, action=ACT_FOLDER)
+   item_add(1, 'Most viewed', std+'most_viewed?'+e, None, action=ACT_FOLDER)
    
 
 
@@ -92,7 +79,8 @@ elif STATE == 2:
    e = 'v=2&alt=jsonc&max-results=' + str(ITEMS_PER_PAGE)
    for cat in CATS:
       url = '%stop_rated_%s?%s' % (std, cat, e)
-      addItem(1, cat, url, None, action=ACT_FOLDER)
+      item_add(1, cat, url, None, action=ACT_FOLDER)
+
 
 # parse a list of video (jsonc)
 elif STATE == 1 or STATE == 4:
@@ -102,8 +90,7 @@ elif STATE == 1 or STATE == 4:
       print "search for:" , URL
       URL = 'http://gdata.youtube.com/feeds/api/videos?q=%s&v=2&alt=jsonc&max-results=%d' % (URL, ITEMS_PER_PAGE)
 
-   jsdata = open_url(URL)
-   data = json.loads(jsdata)
+   data = fetch_url(URL, parser='json')
 
    for item in data['data']['items']:
       try:
@@ -139,10 +126,10 @@ elif STATE == 1 or STATE == 4:
                  rat_avg, rat_max, viewed, likes,
                  desc.replace('\r\n', '<br>'))
 
-         addItem(3, title, url, info=info, icon=None, poster=poster)
+         item_add(3, title, url, info=info, icon=None, poster=poster)
 
       except:
-         addItem(0, 'error parsing data', None)
+         item_add(0, 'error parsing data', None)
 
    total_items = data['data']['totalItems']
    start_index = data['data']['startIndex']
@@ -152,18 +139,18 @@ elif STATE == 1 or STATE == 4:
       if 'start-index' in URL:
          URL = re.sub('&start-index=[0-9]+', '', URL)
       URL += '&start-index=%d' % (start_index + ITEMS_PER_PAGE)
-      addItem(1, 'more of the %d results...' % (total_items), URL, action=ACT_MORE)
+      item_add(1, 'more of the %d results...' % (total_items), URL, action=ACT_MORE)
 
  # try:
       # nextPage = soup.find('span', attrs={'class' : "next"})('a')[1]['href']
-      # addItem(1, 'More items...', 'http://www.zapiks.com' + nextPage, icon='icon/next', action=ACT_MORE)
+      # item_add(1, 'More items...', 'http://www.zapiks.com' + nextPage, icon='icon/next', action=ACT_MORE)
    # except:
       # pass
 
+
 # parse a list of video (json)
 elif STATE == 111: # __UNUSED__
-   jsdata = open_url(URL)
-   data = json.loads(jsdata)
+   data = fetch_url(URL, parser='json')
 
    # see https://developers.google.com/youtube/2.0/developers_guide_jsonc
    for e in data['feed']['entry']:
@@ -202,111 +189,23 @@ elif STATE == 111: # __UNUSED__
                  seconds_to_time_string(duration),
                  rat_avg, rat_max, viewed, likes, dislikes,
                  desc.replace('\r\n', '<br>'))
-         addItem(2, title, url, info=info, icon=None, poster=poster, action=ACT_PLAY)
+         item_add(2, title, url, info=info, icon=None, poster=poster, action=ACT_PLAY)
       except:
-         addItem(0, 'error parsing data', None)
+         item_add(0, 'error parsing data', None)
 
 
-# search and play the real video stream from the youtube url
-# credit: http://gitorious.org/minitube/minitube/blobs/master/src/video.cpp
 elif STATE == 3:
-   b = 'http://www.youtube.com/'
-   e = '&ps=default&eurl=&gl=US&hl=en'
+   play_url(call_ydl(URL)) # run youtube-dl to get the real video url   \o/
 
-   # get the video id from the url
-   m = re.search('^http://www\\.youtube\\.com/watch\\?v=([0-9A-Za-z_-]+).*', URL)
-   video_id = m.group(1)
-
-   # get the video token using the get_video_info query
-   video_token = None
-   for el_type in ['&el=embedded', '&el=detailpage', '&el=vevo', '']:
-      video_info_url = \
-         '%sget_video_info?&video_id=%s%s&ps=default&eurl=&gl=US&hl=en' \
-          % (b, video_id, el_type)
-      videoinfo = open_url(video_info_url)
-
-      match = re.search('^.*&token=([^&]+).*$', videoinfo)
-      if match is not None:
-         video_token = urllib.unquote(match.group(1))
-         break
-
-   if video_token is None:
-      print("ERROR: cannot find the video token")
-      sys.exit(1)
-
-   # get available formats (always from the get_video_info results)
-   m = re.search('^.*&url_encoded_fmt_stream_map=([^&]+).*$', videoinfo)
-   formatmap = urllib.unquote(m.group(1))
-
-   L = []
-   url_360p = url_720p = url_1080p = None
-   for media in formatmap.split(','):
-      itag = -1
-      murl = None
-      sig = None
-      sig_enc = None
-      for param in media.split('&'):
-         if param.startswith('itag='):
-            itag = int(param[5:])
-         elif param.startswith('url='):
-            murl = urllib.unquote(param[4:])
-         elif param.startswith('sig='):
-            sig = param[4:]
-         elif param.startswith('s='):
-            sig_enc = param[2:]
-
-      if (itag == -1) or (murl is None):
-         continue
-
-      # print "ITAG->",itag
-      # print "MURL->",murl
-      # print "SIG->",sig
-
-      if sig is not None:
-         murl += '&signature=' + sig
-      elif sig_enc is not None:
-         # TODO decript signature
-         print("WARNING: Encripted signature unsupported")
-         continue
-
-
-      # :/
-      if itag == 18: # 360p
-         url_360p = murl
-      elif itag == 22: # 720p
-         url_720p = murl
-      elif itag == 37: # 1080p
-         url_1080p = murl
-      else:
-         print("WARNING: Unknown itag %s" % itag)
-         L.append(murl)
-
-   # choose the wanted resolution :/
-   res = 'low' # ini_get('youtube', 'resolution') # low, medium or high
-   if url_1080p and res == 'high':
-      print "HI"
-      playUrl(url_1080p)
-   elif url_720p and res in ('medium', 'high'):
-      print "MED"
-      playUrl(url_720p)
-   elif url_360p:
-      print "LOW"
-      playUrl(url_360p)
-   else:
-      print "UNKNOWN"
-      playUrl(L[0])
-
-
-   sys.exit(0)
+"""
    # now make the list of related videos
    print "ADSASDASDAS"
    url = 'http://gdata.youtube.com/feeds/api/videos/%s/related?v=2&alt=jsonc' % (video_id)
    # print url
-   jsdata = open_url(url)
-   data = json.loads(jsdata)
+   data = fetch_url(url, parser='json')
    for item in data['data']['items']:
       # print item
-      # addItem(2, 'sug1', 'url')
+      # item_add(2, 'sug1', 'url')
       author = item['uploader']
       title = item['title']
       desc = item['description']
@@ -315,21 +214,6 @@ elif STATE == 3:
       url = item['player']['default']
       poster = item['thumbnail']['hqDefault']
       icon = item['thumbnail']['sqDefault']
-# 
-      addItem(3, title, url, poster=poster)
 
-
-
-
-   # download the video page
-   # html = open_url(URL)
-
-   # extract the video token
-   # m = re.search('.*, \"t\": \"([^\"]+)\".*', html)
-   # video_token =  m.group(1)
-
-   # print " ", video_id, video_token, formatmap
-   # url = 'http://www.youtube.com/get_video?video_id=%s&t=%s&eurl=&el=&ps=&asv=&fmt=%s' % \
-         # (video_id, video_token, 18)
-   
-   # playUrl(url)
+      item_add(3, title, url, poster=poster)
+"""

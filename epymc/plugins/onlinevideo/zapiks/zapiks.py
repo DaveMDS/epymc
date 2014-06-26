@@ -18,81 +18,71 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, urllib2
+import os, urllib2, traceback
 from bs4 import BeautifulSoup
 
-AGENT='Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'
 
-### API V.3  ###################################################################
-STATE = int(sys.argv[1])
-URL = sys.argv[2]
+from epymc.extapi.onlinevideo import api_version, user_agent, state_get, \
+   fetch_url, play_url, item_add, call_ydl, \
+   ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 
-ACT_NONE = 0; ACT_FOLDER = 1; ACT_MORE = 2
 
-def addItem(next_state, label, url, info = None, icon = None, poster = None, action = ACT_NONE):
-   print((next_state, label, url, info, icon, poster, action))
+ST_HOME = 0
+ST_VIDEO_LIST = 1
+ST_PLAY = 2
 
-def playUrl(url):
-   print('PLAY!' + url)
+base = 'http://www.zapiks.com/'
 
-### API END  ###################################################################
+STATE, URL = state_get()
 
-def open_url(url):
-   req = urllib2.Request(url)
-   req.addheaders = [('Referer', 'http://www.zapiks.com'), (AGENT)]
-   content = urllib2.urlopen(req)
-   data = content.read()
-   content.close()
-   return data
 
 # this is the first page, show fixed categories
-if STATE == 0:
-   b = 'http://www.zapiks.com/'
+if STATE == ST_HOME:
+   b = base
    u = '/popular_1.php'
    d = os.path.dirname(__file__)
-   addItem(1, 'Surf', b+'surf_'+u, poster=os.path.join(d,'surf.png'), action=ACT_FOLDER)
-   addItem(1, 'Snowboard', b+'snowboard_'+u, poster=os.path.join(d,'snowboard.png'), action=ACT_FOLDER)
-   addItem(1, 'Mountain Bike', b+'mountainbike_'+u, poster=os.path.join(d,'vtt.png'), action=ACT_FOLDER)
-   addItem(1, 'Bmx', b+'bmx_'+u, poster=os.path.join(d,'bmx.png'), action=ACT_FOLDER)
-   addItem(1, 'Skate', b+'skate_'+u, poster=os.path.join(d,'skate.png'), action=ACT_FOLDER)
-   addItem(1, 'Ski', b+'ski_'+u, poster=os.path.join(d,'ski.png'), action=ACT_FOLDER)
-   addItem(1, 'Kite', b+'kite_'+u, poster=os.path.join(d,'zapiks.png'), action=ACT_FOLDER)
-   addItem(1, 'Wakeboard', b+'wake_'+u, poster=os.path.join(d,'zapiks.png'), action=ACT_FOLDER)
-   addItem(1, 'Other', b+'other_'+u, poster=os.path.join(d,'zapiks.png'), action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Surf', b+'surf_'+u, poster=os.path.join(d,'surf.png'), action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Snowboard', b+'snowboard_'+u, poster=os.path.join(d,'snowboard.png'), action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Mountain Bike', b+'mountainbike_'+u, poster=os.path.join(d,'vtt.png'), action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Bmx', b+'bmx_'+u, poster=os.path.join(d,'bmx.png'), action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Skate', b+'skate_'+u, poster=os.path.join(d,'skate.png'), action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Ski', b+'ski_'+u, poster=os.path.join(d,'ski.png'), action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Kite', b+'kite_'+u, poster=os.path.join(d,'zapiks.png'), action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Wakeboard', b+'wake_'+u, poster=os.path.join(d,'zapiks.png'), action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Other', b+'other_'+u, poster=os.path.join(d,'zapiks.png'), action=ACT_FOLDER)
 
 
 # the page for each category
-elif STATE == 1:
-   data = open_url(URL)
-   soup = BeautifulSoup(data)
+elif STATE == ST_VIDEO_LIST:
+   soup = fetch_url(URL, parser='bs4')
 
-   videos = soup.findAll('a', attrs={'class': 'js-no-tooltip teaser-video-content'})
+   videos = soup.findAll('a', class_='teaser-video-content')
    for video in videos:
       try:
          url = 'http://www.zapiks.com' + video['href']
          name  = video['title'].replace('Video - ', '')
-         thumb = video.find('div', attrs={'class': 'teaser-thumbnail'})['style']
+         thumb = video.find('div', class_='teaser-thumbnail')['style']
          thumb = thumb.replace("background-image : url('", '').replace("')", '')
-         addItem(2, name, url, poster=thumb)
+         
+         item_add(ST_PLAY, name, url, poster=thumb)
       except:
+         traceback.print_exc()
          pass
    try:
-      cur_page = soup.find('li', attrs={'class': 'active'})
+      cur_page = soup.find('li', class_='active')
       next_page = cur_page.next_sibling.a['href']
-      addItem(1, 'More items...', 'http://www.zapiks.com' + next_page, icon='icon/next', action=ACT_MORE)
+      item_add(ST_VIDEO_LIST, 'More items...', 'http://www.zapiks.com' + next_page, icon='icon/next', action=ACT_MORE)
    except:
       pass
 
 
 # extract the video link from the video page
-elif STATE == 2:
-   data = open_url(URL)
-   soup = BeautifulSoup(data)
-   vid = soup.find('div', attrs={'class': 'video video-responsive js-video-player'})
+elif STATE == ST_PLAY:
+   soup = fetch_url(URL, parser='bs4')
+   vid = soup.find('div', class_='video')
    vid = vid['data-media-id']
 
    url2 = 'http://www.zapiks.com/view/index.php?file=' + vid
-   data = open_url(url2)
-   soup = BeautifulSoup(data)
+   soup = fetch_url(url2, parser='bs4')
    video_url = soup.find('file').string
-   playUrl(video_url)
+   play_url(video_url)

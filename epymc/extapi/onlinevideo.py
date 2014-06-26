@@ -19,6 +19,8 @@
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
 import os, sys, urllib2, json, subprocess
+from bs4 import BeautifulSoup
+from urlparse import parse_qs
 
 
 api_version = 4
@@ -45,12 +47,17 @@ def fetch_url(url, parser=None):
    """ TODO doc """
    req = urllib2.Request(url)
    # req.addheaders = [('Referer', 'http://www.zapiks.com'), (user_agent)]
+   # req.addheaders = [(user_agent)]
    f = urllib2.urlopen(req)
    data = f.read()
    f.close()
 
    if parser == 'json':
-       data = json.loads(data)
+      data = json.loads(data)
+   elif parser == 'bs4':
+      data = BeautifulSoup(data)
+   elif parser == 'querystr':
+      data = parse_qs(data)
 
    return data
 

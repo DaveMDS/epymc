@@ -267,7 +267,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                   suggested.append(item_data)
                else:
                   items.append(item_data)
-               LOG('dbg', str(item_data))
+               # LOG('dbg', str(item_data))
             except:
                continue
       

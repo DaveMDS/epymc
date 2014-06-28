@@ -43,6 +43,9 @@ def play_url(url):
    """ TODO doc """
    print('PLAY!' + url)
 
+def local_resource(_file_, res):
+   return os.path.join(os.path.dirname(_file_), res)
+
 def fetch_url(url, parser=None):
    """ TODO doc """
    req = urllib2.Request(url)

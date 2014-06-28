@@ -24,7 +24,6 @@ from urlparse import parse_qs
 
 
 api_version = 4
-user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'
 
 ACT_NONE = 0
 ACT_FOLDER = 1

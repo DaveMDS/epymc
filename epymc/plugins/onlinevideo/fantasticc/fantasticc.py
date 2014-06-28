@@ -21,7 +21,7 @@
 import sys, urllib2, re
 from bs4 import BeautifulSoup
 
-from epymc.extapi.onlinevideo import api_version, user_agent, state_get, \
+from epymc.extapi.onlinevideo import api_version, state_get, \
    fetch_url, play_url, item_add, call_ydl, \
    ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 

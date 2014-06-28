@@ -33,26 +33,38 @@ ACT_PLAY = 3
 ACT_SEARCH = 4
 
 def state_get():
-    return int(sys.argv[1]), sys.argv[2]
+   """ Get the state (and the url) of the current running scraper process """
+   return int(sys.argv[1]), sys.argv[2]
 
 def item_add(next_state, label, url, info=None, icon=None, poster=None, action=ACT_NONE):
-   """ TODO doc """
+   """ Add an item to the current page """
    print((next_state, label, url, info, icon, poster, action))
 
 def play_url(url):
-   """ TODO doc """
+   """ Tell EpyMC to start the playback of the given url """
    print('PLAY!' + url)
 
 def local_resource(_file_, res):
+   """ Get the full path of a resouce included with the scraper """
    return os.path.join(os.path.dirname(_file_), res)
 
 def fetch_url(url, headers=None, parser=None):
-   """ TODO doc """
+   """
+   Download the given url and return the page data, optionally parsed.
 
+   Args:
+      headers: dict of headers to send with the request
+      parser: can be one of json, bs4, querystr
+
+   Return:
+      The downloaded data, optionally parsed if parser is given
+
+   """
    if headers is not None:
       req = urllib2.Request(url, headers=headers)
    else:
       req = urllib2.Request(url)
+
    f = urllib2.urlopen(req)
    data = f.read()
    f.close()
@@ -67,18 +79,29 @@ def fetch_url(url, headers=None, parser=None):
    return data
 
 def call_ydl(url):
-   """ TODO doc """
+   """ Call youtube-dl with the given url and return the direct video url """
    ydl = os.path.join(os.path.dirname(__file__), 'youtube-dl')
    p = subprocess.Popen([ydl, '--get-url', url], stdout=subprocess.PIPE)
    out, err = p.communicate()
    return out
 
 def url_encode(params):
-   """ TODO doc """
+   """
+   Encode a dictionary as an url query str.
+
+   Args:
+      params: dictionary of key/values to encode
+              ex: {'page': 2, 'filter': 'myfilter'}
+   
+   Returns:
+      A string suitable to use in url params.
+      ex: "page=2&filter=myfilter"
+
+   """
    return urlencode(params)
 
 def seconds_to_duration(seconds):
-   """ TODO doc """
+   """Convert the number of seconds in a readable duration """
    seconds = int(seconds)
    h = int(seconds / 3600)
    m = int(seconds / 60) % 60
@@ -89,7 +112,7 @@ def seconds_to_duration(seconds):
       return "%d:%02d" % (m,s)
 
 def translate_iso_date(iso_date):
-   """ TODO doc """
+   """ Translate an iso date string in a relative date string """
    from dateutil.parser import parse as date_parse
    from dateutil.relativedelta import relativedelta
    import datetime

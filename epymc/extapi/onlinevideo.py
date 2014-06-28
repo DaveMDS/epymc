@@ -48,7 +48,10 @@ def local_resource(_file_, res):
 def fetch_url(url, headers=None, parser=None):
    """ TODO doc """
 
-   req = urllib2.Request(url, headers=headers)
+   if headers is not None:
+      req = urllib2.Request(url, headers=headers)
+   else:
+      req = urllib2.Request(url)
    f = urllib2.urlopen(req)
    data = f.read()
    f.close()

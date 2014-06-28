@@ -21,6 +21,7 @@
 import os, sys, urllib2, json, subprocess
 from bs4 import BeautifulSoup
 from urlparse import parse_qs
+from urllib import urlencode
 
 
 api_version = 4
@@ -72,6 +73,44 @@ def call_ydl(url):
    out, err = p.communicate()
    return out
 
+def url_encode(params):
+   """ TODO doc """
+   return urlencode(params)
 
+def seconds_to_duration(seconds):
+   """ TODO doc """
+   seconds = int(seconds)
+   h = int(seconds / 3600)
+   m = int(seconds / 60) % 60
+   s = int(seconds % 60)
+   if h > 0:
+      return "%d:%02d:%02d" % (h,m,s)
+   else:
+      return "%d:%02d" % (m,s)
 
+def translate_iso_date(iso_date):
+   """ TODO doc """
+   from dateutil.parser import parse as date_parse
+   from dateutil.relativedelta import relativedelta
+   import datetime
+   import pytz
+
+   dt = date_parse(iso_date)
+   today = datetime.datetime.now(pytz.utc)
+   delta = relativedelta(today, dt)
+
+   if delta.years > 1:
+      return '{} years ago'.format(delta.years)
+   elif delta.years > 0:
+      return '1 year ago'
+   elif delta.months > 1:
+      return '{} months ago'.format(delta.months)
+   elif delta.months > 0:
+      return '1 month ago'
+   elif delta.days > 1:
+      return '{} days ago'.format(delta.days)
+   elif delta.days > 0:
+      return '1 day ago'
+   else:
+      return '{} hours ago'.format(delta.hours)
 

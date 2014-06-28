@@ -20,7 +20,7 @@
 
 import os, time
 
-from efl import ecore, elementary
+from efl import ecore, edje, elementary
 from efl.elementary.box import Box
 from efl.elementary.configuration import engine_get, preferred_engine_get
 
@@ -311,14 +311,10 @@ class MyItemClass(EmcItemClass):
 
       # Icons gallery
       elif url == 'uitests://icons':
-         icon_names = 'emc home folder close back forward ok cancel check_on ' \
-            'check_off minus plus refresh arrowR arrowL arrowU arrowD list ' \
-            'grid star star_off module scale config play pause stop fwd ' \
-            'ffwd bwd fbwd ' \
-            'movie mame music joystick keyboard remote'
          d = EmcDialog(title='Icons gallery', style='list')
-         for name in icon_names.split():
-            d.list_item_append(name, 'icon/' + name)
+         for group in sorted(edje.file_collection_list(gui.theme_file)):
+            if group.startswith('icon/'):
+               d.list_item_append(group[5:], group)
 
       # Movie name test
       # elif url == 'uitests://movies_name':
@@ -345,7 +341,7 @@ class MyItemClass(EmcItemClass):
 class UiTestsModule(EmcModule):
    name = 'uitests'
    label = 'UI tests'
-   icon = 'icon/module'
+   icon = 'icon/star'
    info = """This module serve as test for the various epymc components."""
    path = os.path.dirname(__file__)
 

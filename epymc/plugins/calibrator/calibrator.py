@@ -46,7 +46,7 @@ sheets = [
 class CalibratorModule(EmcModule):
    name = 'calibrator'
    label = 'Screen calibrator'
-   icon = 'icon/module'
+   icon = 'icon/calib'
    info = """Use this module to calibrate your screen parameters."""
    path = os.path.dirname(__file__)
 

@@ -46,11 +46,10 @@ def play_url(url):
 def local_resource(_file_, res):
    return os.path.join(os.path.dirname(_file_), res)
 
-def fetch_url(url, parser=None):
+def fetch_url(url, headers=None, parser=None):
    """ TODO doc """
-   req = urllib2.Request(url)
-   # req.addheaders = [('Referer', 'http://www.zapiks.com'), (user_agent)]
-   # req.addheaders = [(user_agent)]
+
+   req = urllib2.Request(url, headers=headers)
    f = urllib2.urlopen(req)
    data = f.read()
    f.close()

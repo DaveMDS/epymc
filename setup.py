@@ -156,6 +156,7 @@ setup (
       'epymc.plugins.onlinevideo': [ '*.png',
          'traileraddict/*',
          'youtube/*',
+         'vimeo/*',
          'zapiks/*',
          'fantasticc/*',
       ],

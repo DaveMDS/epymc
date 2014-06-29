@@ -30,12 +30,20 @@ app_token = '55e9f802ceb814b649ef3c9504d4d38f' # Official token for EpyMC
 headers = { 'Authorization': 'Bearer '+app_token, 'User-Agent': 'EpyMC',
             'Accept': 'application/vnd.vimeo.*+json;version=3.0' }
 
+icon_channels = local_resource(__file__, 'icon_channels.png')
+icon_groups = local_resource(__file__, 'icon_groups.png')
+icon_categories = local_resource(__file__, 'icon_categories.png')
+icon_users = local_resource(__file__, 'icon_users.png')
+icon_videos = 'icon/play'
+
 ITEMS_PER_PAGE = 50
 
 ST_HOME = 0
 ST_VIDEO_LIST = 1
 ST_CHANN_LIST = 2
-ST_CATEGORIES = 3
+ST_GROUP_LIST = 3
+ST_USERS_LIST = 4
+ST_CATEGORIES = 5
 ST_PLAY = 10
 
 STATE, URL = state_get()
@@ -49,9 +57,12 @@ def vimeo_api_call(endpoint, **kargs):
    return vimeo_api_url(url)
 
 def video_item_add(video):
-   poster = [ p['link'] for p in video['pictures'] if p['width'] == 640 ][0]
+   try:
+      poster = [ p['link'] for p in video['pictures'] if p['width'] == 640 ][0]
+   except:
+      poster = None
    info = u'<title>{}</title><br>' \
-           '<hilight>Duration: </hilight> {}<br>' \
+           '<hilight>Duration</hilight> {}<br>' \
            'from <i>{}</i>, added <i>{}</i>.<br>' \
            '{} plays / {} likes / {} comments<br>' \
            '<br>{}'.format(
@@ -63,30 +74,102 @@ def video_item_add(video):
                video['stats']['likes'],
                video['stats']['comments'],
                video['description'] or '')
-   item_add(ST_PLAY, video['name'], video['link'], poster=poster, info=info)
+   item_add(ST_PLAY, video['name'], video['link'], icon=icon_videos,
+                     poster=poster, info=info)
 
 def channel_item_add(channel):
    url = api_base + channel['metadata']['connections']['videos']
-   poster = [ p['link'] for p in channel['pictures'] if p['width'] == 640 ][0]
+   try:
+      poster = [ p['link'] for p in channel['pictures'] if p['width'] == 640 ][0]
+   except:
+      poster = None
    info = u'<title>{}</title><br>' \
-           'from <i>{}</i><br>' \
+           '<hilight>from</hilight> <i>{}</i><br>' \
+           '<hilight>created</hilight> <i>{}</i><br>' \
+           '<hilight>last update</hilight> <i>{}</i><br>' \
            '{} videos / {} followers<br>' \
            '<br>{}'.format(
                channel['name'],
                channel['user']['name'],
+               relative_date(channel['created_time']),
+               relative_date(channel['modified_time']),
                channel['stats']['videos'],
                channel['stats']['users'],
                channel['description'])
-   item_add(ST_VIDEO_LIST, channel['name'], url, poster=poster, info=info)
+   item_add(ST_VIDEO_LIST, channel['name'], url, icon=icon_channels,
+                           poster=poster, info=info)
+
+def group_item_add(group):
+   url = api_base + group['metadata']['connections']['videos']
+   try:
+      poster = [ p['link'] for p in group['pictures'] if p['width'] == 640 ][0]
+   except:
+      poster = None
+   info = u'<title>{}</title><br>' \
+           '<hilight>from</hilight> <i>{}</i><br>' \
+           '<hilight>created</hilight> <i>{}</i><br>' \
+           '<hilight>last update</hilight> <i>{}</i><br>' \
+           '{} videos / {} followers<br>' \
+           '<br>{}'.format(
+               group['name'],
+               group['user']['name'],
+               relative_date(group['created_time']),
+               relative_date(group['modified_time']),
+               group['stats']['videos'],
+               group['stats']['users'],
+               group['description'] or '')
+   item_add(ST_VIDEO_LIST, group['name'], url, icon=icon_groups,
+                           poster=poster, info=info)
+
+def user_item_add(user):
+   url = api_base + user['metadata']['connections']['videos']
+   try:
+      poster = [ p['link'] for p in user['pictures'] if p['width'] == 300 ][0]
+   except:
+      poster = None
+   info = u'<title>{}</title><br>' \
+           '<hilight>registered </hilight> <i>{}</i><br>' \
+           '<hilight>location </hilight> <i>{}</i><br>' \
+           '<br>{}'.format(
+               user['name'],
+               relative_date(user['created_time']),
+               user['location'],
+               user['bio'] or '')
+   item_add(ST_VIDEO_LIST, user['name'], url, icon=icon_users,
+                           poster=poster, info=info)
 
 
 ################################################################################
 # home page
 ################################################################################
 if STATE == ST_HOME:
+   # searches
    item_add(ST_VIDEO_LIST, 'Search videos', 'search', action=ACT_SEARCH)
    item_add(ST_CHANN_LIST, 'Search channels', 'search', action=ACT_SEARCH)
-   item_add(ST_CATEGORIES, 'Browse categories', 'cats', action=ACT_FOLDER)
+   item_add(ST_GROUP_LIST, 'Search groups', 'search', action=ACT_SEARCH)
+   item_add(ST_USERS_LIST, 'Search people', 'search', action=ACT_SEARCH)
+
+   # more followed videos (this do not work... 400:BadRequest)
+   # url = api_base + '/videos?sort=relevant&per_page=%d' % ITEMS_PER_PAGE
+   # item_add(ST_VIDEO_LIST, 'Top videos', url, icon=None, action=ACT_FOLDER)
+
+   # more followed channels
+   url = api_base + '/channels?sort=followers&per_page=%d' % ITEMS_PER_PAGE
+   item_add(ST_CHANN_LIST, 'More followed channels', url,
+                           icon=icon_channels, action=ACT_FOLDER)
+   # more followed groups
+   url = api_base + '/groups?sort=followers&per_page=%d' % ITEMS_PER_PAGE
+   item_add(ST_GROUP_LIST, 'More followed groups', url,
+                           icon=icon_groups, action=ACT_FOLDER)
+   # more relevant users (this do not work... 400:BadRequest)
+   # url = api_base + '/users?sort=relevant&per_page=%d' % ITEMS_PER_PAGE
+   # item_add(ST_USERS_LIST, 'More relevant users', url,
+                           # icon=icon_users, action=ACT_FOLDER)
+   # browse by cats
+   item_add(ST_CATEGORIES, 'Browse videos', '/videos', action=ACT_FOLDER)
+   item_add(ST_CATEGORIES, 'Browse channels', '/channels', action=ACT_FOLDER)
+   item_add(ST_CATEGORIES, 'Browse groups', '/groups', action=ACT_FOLDER)
+   item_add(ST_CATEGORIES, 'Browse users', '/users', action=ACT_FOLDER)
 
 
 ################################################################################
@@ -103,8 +186,8 @@ elif STATE == ST_VIDEO_LIST:
 
    if results['paging']['next']:
       url = api_base + results['paging']['next']
-      text = 'More of the %s results' % results['total']
-      item_add(ST_VIDEO_LIST, text, url, icon='icon/next', action=ACT_MORE)
+      text = 'More of the %s videos' % results['total']
+      item_add(ST_VIDEO_LIST, text, url, action=ACT_MORE)
 
 
 ################################################################################
@@ -121,25 +204,64 @@ elif STATE == ST_CHANN_LIST:
 
    if results['paging']['next']:
       url = api_base + results['paging']['next']
-      text = 'More of the %s results' % results['total']
-      item_add(ST_SEARCH_CHANNELS, text, url, icon='icon/next', action=ACT_MORE)
+      text = 'More of the %s channels' % results['total']
+      item_add(ST_CHANN_LIST, text, url, action=ACT_MORE)
+
+
+################################################################################
+# groups list
+################################################################################
+elif STATE == ST_GROUP_LIST:
+   if URL.startswith(api_base):
+      results = vimeo_api_url(URL)
+   else:
+      results = vimeo_api_call('/groups', query=URL, per_page=ITEMS_PER_PAGE)
+
+   for group in results['data']:
+      group_item_add(group)
+
+   if results['paging']['next']:
+      url = api_base + results['paging']['next']
+      text = 'More of the %s groups' % results['total']
+      item_add(ST_GROUP_LIST, text, url, action=ACT_MORE)
+
+################################################################################
+# users list
+################################################################################
+elif STATE == ST_USERS_LIST:
+   if URL.startswith(api_base):
+      results = vimeo_api_url(URL)
+   else:
+      results = vimeo_api_call('/users', query=URL, per_page=ITEMS_PER_PAGE)
+
+   for user in results['data']:
+      user_item_add(user)
+
+   if results['paging']['next']:
+      url = api_base + results['paging']['next']
+      text = 'More of the %s users' % results['total']
+      item_add(ST_USERS_LIST, text, url, action=ACT_MORE)
 
 
 ################################################################################
 # browse categories and subcategories
 ################################################################################
 elif STATE == ST_CATEGORIES:
-   results = vimeo_api_call('/categories', query=URL, per_page=1000)
+   results = vimeo_api_call('/categories', per_page=1000)
+   if URL == '/videos': NEXT_STATE = ST_VIDEO_LIST
+   elif URL == '/channels': NEXT_STATE = ST_CHANN_LIST
+   elif URL == '/groups': NEXT_STATE = ST_GROUP_LIST
+   elif URL == '/users': NEXT_STATE = ST_USERS_LIST
    
    for cat in results['data']:
       name = cat['name']
-      url = api_base + cat['uri'] + '/videos?per_page=%d' % ITEMS_PER_PAGE
-      item_add(ST_VIDEO_LIST, name, url)
+      url = api_base + cat['uri'] + URL + '?per_page=%d' % ITEMS_PER_PAGE
+      item_add(NEXT_STATE, name, url, icon=icon_categories)
 
       for sub in cat['subcategories']:
          subname = name + ' - ' + sub['name']
-         url = api_base + sub['uri'] + '/videos?per_page=%d' % ITEMS_PER_PAGE
-         item_add(ST_VIDEO_LIST, subname, url)
+         url = api_base + sub['uri'] + URL + '?per_page=%d' % ITEMS_PER_PAGE
+         item_add(NEXT_STATE, subname, url, icon=icon_categories)
 
 
 ################################################################################

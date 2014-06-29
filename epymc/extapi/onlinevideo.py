@@ -18,7 +18,8 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, urllib2, json, subprocess
+import os, sys, urllib2, json, subprocess, re
+from datetime import datetime
 from bs4 import BeautifulSoup
 from urlparse import parse_qs
 from urllib import urlencode
@@ -111,29 +112,43 @@ def seconds_to_duration(seconds):
    else:
       return "%d:%02d" % (m,s)
 
-def translate_iso_date(iso_date):
-   """ Translate an iso date string in a relative date string """
-   from dateutil.parser import parse as date_parse
-   from dateutil.relativedelta import relativedelta
-   import datetime
-   import pytz
+def relative_date(date):
+   """
+   Return a human readable relative date. Date can be a datetime obj or
+   an iso date string (like: "2013-08-14T22:13:52+00:00") with or without the
+   timezone information.
+   """
+   if not isinstance(date, datetime):
+      try:
+         L = map(int, re.split('[^\d]', date))
+         if len(L) > 6: L = L[0:6]
+         date = datetime(*L)
+      except:
+         return date
 
-   dt = date_parse(iso_date)
-   today = datetime.datetime.now(pytz.utc)
-   delta = relativedelta(today, dt)
-
-   if delta.years > 1:
-      return '{} years ago'.format(delta.years)
-   elif delta.years > 0:
+   delta = datetime.now() - date
+   if delta.days > 365 * 2:
+      return '{} years ago'.format(delta.days / 365)
+   elif delta.days > 365:
       return '1 year ago'
-   elif delta.months > 1:
-      return '{} months ago'.format(delta.months)
-   elif delta.months > 0:
+   elif delta.days > 30 * 2:
+      return '{} months ago'.format(delta.days / 30)
+   elif delta.days > 30:
       return '1 month ago'
+   elif delta.days > 7 * 2:
+      return '{} weeks ago'.format(delta.days / 7)
+   elif delta.days > 7:
+      return '1 week ago'
    elif delta.days > 1:
       return '{} days ago'.format(delta.days)
    elif delta.days > 0:
-      return '1 day ago'
+      return 'yesterday'
+   elif delta.seconds > 3600 * 2:
+      return '{} hours ago'.format(delta.seconds / 3600)
+   elif delta.seconds > 3600:
+      return '1 hour ago'
+   elif delta.seconds > 60 * 2:
+      return '{} minutes ago'.format(delta.seconds / 60)
    else:
-      return '{} hours ago'.format(delta.hours)
+      return '1 minute ago'
 

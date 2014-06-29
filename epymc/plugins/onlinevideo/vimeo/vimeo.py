@@ -21,7 +21,7 @@
 
 from epymc.extapi.onlinevideo import api_version, state_get, \
    fetch_url, play_url, item_add, call_ydl, local_resource, \
-   translate_iso_date, seconds_to_duration, url_encode, \
+   relative_date, seconds_to_duration, url_encode, \
    ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 
 
@@ -58,7 +58,7 @@ def video_item_add(video):
                video['name'],
                seconds_to_duration(video['duration']),
                video['user']['name'],
-               translate_iso_date(video['created_time']),
+               relative_date(video['created_time']),
                video['stats']['plays'],
                video['stats']['likes'],
                video['stats']['comments'],

@@ -560,7 +560,7 @@ class ViewList(object):
       if isinstance(poster, tuple):
          (url, dest) = poster
          self.__im.url_set(url, dest)
-      elif poster and poster.startswith('http://'):
+      elif poster and (poster.startswith('http://') or poster.startswith('https://')):
          self.__im.url_set(poster)
       elif poster and (poster.startswith('icon/') or poster.startswith('image/')):
          self.__im.file_set(gui.theme_file, poster)

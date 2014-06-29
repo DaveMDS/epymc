@@ -111,7 +111,6 @@ class StandardItemClass(EmcItemClass):
        return item_data[F_INFO]
 
 
-
 class OnlinevideoModule(EmcModule):
    name = 'onlinevideo'
    label = 'Online Channels'
@@ -262,6 +261,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                # WARNING keep item_data consistent !
                (next_state, label, url, info, icon, poster, action) = \
                      ast.literal_eval(line)
+               if icon is None:
+                  if action == ACT_SEARCH: icon = 'icon/search'
+                  if action == ACT_MORE: icon = 'icon/next'
                item_data = (next_state, label, url, info, icon, poster, action)
                if suggested is not None:
                   suggested.append(item_data)

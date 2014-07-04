@@ -583,8 +583,7 @@ class EmcMenu(Menu):
    """ TODO doc this """
 
    def __init__(self, relto=None):
-      Menu.__init__(self, layout)
-      self.style_set('emc')
+      Menu.__init__(self, layout, style='emc', focus_allow=False)
       if relto:
          # TODO better pos calc
          x, y, w, h = relto.geometry
@@ -595,9 +594,11 @@ class EmcMenu(Menu):
       self.show()
 
    def item_add(self, parent=None, label=None, icon=None, callback=None, *args, **kwargs):
-      item = Menu.item_add(self, parent, label, icon, self._item_selected_cb, callback, *args, **kwargs)
+      item = Menu.item_add(self, parent, label, icon, self._item_selected_cb,
+                           callback, *args, **kwargs)
       if self.selected_item_get() is None:
          item.selected_set(True)
+      return item
 
    def close(self):
       input_events.listener_del("EmcMenu")
@@ -607,7 +608,7 @@ class EmcMenu(Menu):
       input_events.listener_del("EmcMenu")
       if callable(cb):
          cb(menu, item, *args, **kwargs)
-      
+
    def _dismiss_cb(self, menu):
       input_events.listener_del("EmcMenu")
 
@@ -616,7 +617,7 @@ class EmcMenu(Menu):
          item = self.selected_item_get()
          if not item or not item.prev:
             return input_events.EVENT_BLOCK
-         while item.prev and item.prev.is_separator:
+         while item.prev and (item.prev.is_separator or item.prev.disabled):
             item = item.prev
          item.prev.selected_set(True)
          return input_events.EVENT_BLOCK
@@ -625,7 +626,7 @@ class EmcMenu(Menu):
          item = self.selected_item_get()
          if not item or not item.next:
             return input_events.EVENT_BLOCK
-         while item.next and item.next.is_separator:
+         while item.next and (item.next.is_separator or item.next.disabled):
             item = item.next
          item.next.selected_set(True)
          return input_events.EVENT_BLOCK

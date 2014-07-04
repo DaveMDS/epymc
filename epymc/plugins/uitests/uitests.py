@@ -99,8 +99,9 @@ class MyItemClass(EmcItemClass):
 
       # Menu
       elif url == 'uitests://menu':
-         def _cb_menu(menu, item, label):
-            print("Selected item: " + label)
+         def _cb_menu(menu, item, name):
+            print("Selected item: " + name)
+
          m = EmcMenu()
          m.item_add(None, "Item 1", None, _cb_menu, "item1")
          m.item_add(None, "Item 2", None, _cb_menu, "item2")
@@ -109,7 +110,11 @@ class MyItemClass(EmcItemClass):
          m.item_add(None, "Item 4", "clock", _cb_menu, "item4")
          m.item_add(None, "Item 5", "home", _cb_menu, "item5")
          m.item_separator_add()
-         i = m.item_add(None, "Item 6", None, _cb_menu, "item6")
+         it = m.item_add(None, "Disabled", None, _cb_menu, "disabled")
+         it.disabled = True
+         it = m.item_add(None, "Disabled", 'home', _cb_menu, "disabled2")
+         it.disabled = True
+         m.item_add(None, "Item 7", None, _cb_menu, "item7")
 
       # TMDB
       # elif url == 'uitests://tmdb':

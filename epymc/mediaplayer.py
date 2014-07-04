@@ -23,7 +23,7 @@ import os
 from efl import evas, ecore, edje, elementary, emotion
 
 from epymc import utils, ini, gui, input_events, events
-from epymc.gui import EmcFocusManager, EmcDialog, EmcButton, EmcMenu
+from epymc.gui import EmcFocusManager, EmcDialog, EmcButton, EmcMenu, DownloadManager
 from epymc.sdb import EmcDatabase
 
 
@@ -45,6 +45,7 @@ _video_visible = False
 _buffer_dialog = None
 _update_timer = None
 _onair_url = None
+_onair_title = None
 _play_db = None # key: url  data: {'started': 14, 'finished': 0, 'stop_at': 0 }
 
 ### API ###
@@ -75,7 +76,7 @@ def shutdown():
 
 ### mediaplyer API ###
 def play_url(url, only_audio = False, start_from = 0):
-   global _onair_url
+   global _onair_url, _onair_title
 
    if not _emotion:
       if not _init_emotion():
@@ -89,6 +90,7 @@ def play_url(url, only_audio = False, start_from = 0):
       url = 'file://' + url
 
    _onair_url = url
+   _onair_title = None
 
    LOG('dbg', 'play_url: %s' % url)
 
@@ -273,6 +275,9 @@ def poster_set(poster = None, extra_path = None):
       gui.swallow_set("videoplayer.controls.poster", gui.load_image('dvd_cover_blank.png'))
 
 def title_set(title):
+   global _onair_title
+
+   _onair_title = title
    gui.text_set("videoplayer.controls.title", title)
 
 ### internals ###
@@ -329,7 +334,6 @@ def _init_emotion():
    # _emotion.on_frame_decode_add((lambda v: _update_slider()))
 
    return True
-  
 
 def _init_mediaplayer_gui():
    global _fman
@@ -477,6 +481,12 @@ def _cb_btn_video(btn):
          name = "Video track #" + str(n + 1)
       item = menu.item_add(None, name, None, _cb_menu_video_track, n)
 
+   menu.item_separator_add()
+   it = menu.item_add(None, 'Download video', None, _cb_menu_download)
+   if _onair_url.startswith('file://'):
+      it.disabled = True
+
+
 def _cb_menu_audio_track(menu, item, track_num):
    print("TODO: add support in emotion/gstreamer for this")
    print("Change to audio track #" + str(track_num))
@@ -489,6 +499,11 @@ def _cb_menu_video_track(menu, item, track_num):
 
 def _cb_menu_mute(menu, item):
    volume_mute_toggle()
+
+
+def _cb_menu_download(menu, item):
+   DownloadManager().queue_download(_onair_url, _onair_title)
+
 
 def _update_slider():
    if _controls_visible:

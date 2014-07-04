@@ -26,7 +26,7 @@ from efl.elementary.configuration import engine_get, preferred_engine_get
 
 from epymc.modules import EmcModule
 from epymc.gui import EmcDialog, EmcVKeyboard, EmcFolderSelector, \
-   EmcButton, EmcFocusManager, EmcNotify, EmcMenu
+   EmcButton, EmcFocusManager, EmcNotify, EmcMenu, DownloadManager
 
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
@@ -116,6 +116,12 @@ class MyItemClass(EmcItemClass):
          # s = TMDB_WithGui()
          # s.movie_search('alien')
 
+      # Download Manager
+      elif url == 'uitests://dm':
+         DownloadManager().queue_download('http://fredrik.hubbe.net/plugger/xvidtest.avi', 'dm_test1')
+         DownloadManager().queue_download('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4', 'TheMakingOfSuzanneVega')
+         
+
       # Mediaplayer Local Video
       elif url == 'uitests://mpv':
          f = os.path.expanduser('~/Video/testvideo.avi')
@@ -126,6 +132,13 @@ class MyItemClass(EmcItemClass):
       # Mediaplayer Online Video (good)
       # elif url == 'uitests://mpvo':
          # mediaplayer.play_url('http://trailers.apple.com/movies/independent/airracers/airracers-tlr1_h480p.mov')
+
+      # http://samples.mplayerhq.hu/
+      # http://download.wavetlan.com/SVV/Media/HTTP/http-mp4.htm
+      
+      # Mediaplayer Online Video (med)
+      elif url == 'uitests://mpvom':
+         mediaplayer.play_url('http://fredrik.hubbe.net/plugger/xvidtest.avi')
 
       # Mediaplayer Online Video (bad)
       elif url == 'uitests://mpvob':
@@ -369,8 +382,10 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://menu', 'Menu')
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + FocusManager')
       browser.item_add(MyItemClass(), 'uitests://icons', 'Icons gallery')
+      browser.item_add(MyItemClass(), 'uitests://dm', 'Download Manager')
       browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')
       browser.item_add(MyItemClass(), 'uitests://mpvo', 'Mediaplayer - Online Video (good)')
+      browser.item_add(MyItemClass(), 'uitests://mpvom', 'Mediaplayer - Online Video (med)')
       browser.item_add(MyItemClass(), 'uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
       browser.item_add(MyItemClass(), 'uitests://tmdb', 'Themoviedb.org query with gui')
       browser.item_add(MyItemClass(), 'uitests://vkbd', 'Virtual Keyboard')

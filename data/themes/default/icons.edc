@@ -35,6 +35,7 @@ ICON("plus")
 ICON("refresh")
 ICON("exit")
 ICON("search")
+ICON("download")
 
 ICON("arrowR")
 ICON("arrowL")

@@ -97,6 +97,19 @@ def splitpath(path):
    """ Convert a string path in a list of all the components """
    return [p for p in path.split(os.path.sep) if p != '']
 
+def ensure_file_not_exists(fullpath):
+   """ Add a number at the end of the file name to ensure it do not exists """
+   if not os.path.exists(fullpath):
+      return fullpath
+
+   num = 1
+   name, ext = os.path.splitext(fullpath)
+   while True:
+      new = name + '_%03d' % num + ext
+      if not os.path.exists(new):
+         return new
+      num += 1
+
 def natural_sort(l): 
    convert = lambda text: int(text) if text.isdigit() else text.lower() 
    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)] 
@@ -143,29 +156,34 @@ def grab_files(folders, show_hidden=False, recursive=True):
                else:
                   print('Unidentified name %s. It could be a symbolic link' % full_path)
 
-def download_url_async(url, dest = 'tmp', min_size = 0,
-                       complete_cb = None, progress_cb = None,
-                       urlencode = True, *args, **kargs):
-   """
-   Download the given url in async way.
-   url must be a valid url to download
-   If dest is set to a local file name then the download data will
-      be written to that file (created and overwritten if necessary, also
-      the necessary parent directories are created)
-   If dest is omitted (or is 'tmp') than the data will be written
-      to a random new temp file
+def download_url_async(url, dest='tmp', min_size=0,
+                       complete_cb=None, progress_cb=None,
+                       urlencode=True, *args, **kargs):
+   """Download the given url in async way.
 
-   if min_size is set (and > 0) than downloaded files smaller that min_size
-      will be discarted
+   TODO:
+      If dest is set to None than the data will be passed as the dest param
+      in the complete_cb.
 
-   complete_cb, if given, will be called when the download is done
-         def complete_cb(file, status, *args, **kargs):
+   Args:
+      url: must be a valid url to download.
+      dest: If set to a local file name then the download data will be written
+         to that file (created and overwritten if necessary, also the
+         necessary parent directories are created).
+         If dest is omitted (or is 'tmp') than the data will be written
+         to a random new temp file.
+      min_size: if min_size is set (and > 0) than downloaded files smaller that
+         min_size will be discarted.
+      complete_cb: if given, will be called when the download is done.
+         signature: complete_cb(file, status, *args, **kargs)
+      progress_cb: will be called while the download is in progress.
+         signature: progress_cb(file, dltotal, dlnow, *args, **kargs)
+      urlencode: encode the given url (default to True).
+      *args: any other arguments will be passed back in the callbacks.
+      **kargs: any other keyword arguments will be passed back in the callbacks.
 
-   progress_cb will be called while the download is in progress
-         def progress_cb(file, dltotal, dlnow, *args, **kargs):
-
-   TODO If dest is set to None than the data will be passed as the dest param
-      in the complete_cb
+   Returns:
+      The Ecore FileDownload instance
 
    """
 
@@ -220,10 +238,7 @@ def download_url_async(url, dest = 'tmp', min_size = 0,
                   _cb_download_progress, dwl_data = dwl_data, *args, **kargs)
 
 def download_abort(dwl_handler):
-   try:
-      ecore.file_download_abort(dwl_handler)
-   except:
-      ecore.file.download_abort(dwl_handler)
+   ecore.file_download_abort(dwl_handler)
 
 
 class Singleton(object):

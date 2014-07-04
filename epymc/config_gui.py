@@ -254,6 +254,8 @@ def _general_populate(browser, url):
    standard_item_bool_add('general', 'fullscreen', 'Start in fullscreen')
    standard_item_action_add('Adjust interface scale', 'icon/scale', cb = _change_scale)
    standard_item_bool_add('general', 'back_in_lists', 'Show Back item in lists', 'icon/back')
+   standard_item_string_add('general', 'download_folder', 'Download folder', 'icon/download')
+   standard_item_string_add('general', 'max_concurrent_download', 'Max concurrent download', 'icon/download')
 
    L = evas.render_method_list()
    if 'buffer' in L: L.remove('buffer')

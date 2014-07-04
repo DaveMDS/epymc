@@ -1537,3 +1537,147 @@ class EmcScrolledEntry(Entry, Scrollable):
 
       return ecore.ECORE_CALLBACK_RENEW
 
+
+################################################################################
+class DownloadManager(utils.Singleton):
+   """ Manage a queue of urls to download.
+
+   The only function you need is queue_download, the class is a singleton so
+   you must use as:
+   DownloadManager().queue_download(url, ...)
+
+   """
+   def __init__(self):
+      self.handlers = {} # in progress {key:url, data:FileDownload}
+      self.queue = []    # in queue (url, dest)
+
+   def queue_download(self, url, dest_name=None, dest_ext=None, dest_folder=None):
+      """ Put a new url in the download queue.
+
+      Asking the user to confirm the operation, and giving the ability to
+      change destination folder and destination name.
+
+      Args:
+         url: a valid url to download.
+         dest_name: suggested name for the file, without extension.
+         dest_ext: extension for the file, if None it is extracted from the url.
+         dest_folder: where to put the downloaded file.
+
+      """
+      # destination folder
+      if dest_folder is None:
+         dest_folder = ini.get('general', 'download_folder')
+
+      # destination file extension
+      if dest_ext is None:
+         try:
+            # try to get the file extension from the url
+            if '?' in url:
+               dest_ext = url.split('?')[0].split('.')[-1]
+            else:
+               dest_ext = url.split('.')[-1]
+            assert 6 > len(dest_ext) > 1
+         except:
+            dest_ext = 'mp4' # :/
+
+      # destination file name
+      fname = '.'.join((dest_name or 'epymc_download', dest_ext))
+
+      # confirm dialog
+      dia = EmcDialog('Download Manager', text='')
+      dia.data['url'] = url
+      dia.data['dst_folder'] = dest_folder
+      dia.data['dst_name'] = fname
+      dia.button_add('Start download', self._start_cb, dia)
+      dia.button_add('Rename', self._change_name_cb, dia)
+      dia.button_add('Change folder', self._change_folder_cb, dia)
+      self._update_dialog_text(dia)
+
+   # confirmation dialog stuff
+   def _update_dialog_text(self, dia):
+      text = 'File will be downloaded in the folder:<br> <b>{}</b><br>' \
+             '<br>File will be named as:<br> <b>{}</b><br>' \
+             '<br>You can rename the file using the <i>Rename</i> button or ' \
+             'change the destination folder from the main configuration.' \
+             .format(dia.data['dst_folder'], dia.data['dst_name'])
+      dia.text_set(text)
+
+   def _change_name_cb(self, bt, dia):
+      EmcVKeyboard(title='Rename download', text=dia.data['dst_name'],
+                   accept_cb=self._change_name_done_cb, user_data=dia)
+
+   def _change_name_done_cb(self, vkeyb, text, dia):
+      dia.data['dst_name'] = text
+      self._update_dialog_text(dia)
+
+   def _change_folder_cb(self, bt, dia):
+      EmcFolderSelector(title='Change destination folder',
+                        done_cb=self._change_folder_done_cb, cb_data=dia)
+
+   def _change_folder_done_cb(self, folder, dia):
+      dia.data['dst_folder'] = folder.replace('file://', '')
+      self._update_dialog_text(dia)
+
+   def _start_cb(self, bt, dia):
+      url = dia.data['url']
+      fullpath = os.path.join(dia.data['dst_folder'], dia.data['dst_name'])
+      fullpath = utils.ensure_file_not_exists(fullpath)
+
+      # check if the given url is in queue or in progress yet
+      if url in self.handlers or \
+            len([u for u,d in self.queue if u == url]) > 0:
+         text = 'The file %s is in the download queue yet' % dia.data['dst_name']
+         EmcDialog(style='error', text=text)
+         dia.delete()
+         return
+
+      # close the dialog
+      dia.delete()
+
+      # add the download to the queue
+      self.queue.append((url, fullpath))
+      self._process_queue()
+
+   ###
+   def _process_queue(self):
+      # no items in queue, nothing to do
+      if len(self.queue) < 1:
+         return
+
+      # respect the max_concurrent_download option
+      if len(self.handlers) >= ini.get_int('general', 'max_concurrent_download'):
+         return
+
+      # pop an item from the queue and download it
+      url, dest = self.queue.pop(0)
+      LOG('dbg', '************  DOWNLOAD START  ****************')
+      LOG('dbg', 'URL: ' + url)
+      LOG('dbg', 'PAT: ' + dest)
+      handler = utils.download_url_async(url, dest=dest+'.part',
+                                         complete_cb=self._complete_cb,
+                                         # progress_cb=self._progress_cb,
+                                         myurl=url)
+      self.handlers[url] = handler
+
+      # notify
+      text = 'Download started:<br>%s' % os.path.basename(dest)
+      EmcNotify(text, icon='icon/download')
+
+   # def _progress_cb(self, dest, dltotal, dlnow, myurl):
+      # print "PROG (%s) %.2f %.2f" % (dest, dltotal, dlnow)
+      # pass
+
+   def _complete_cb(self, dest, status, myurl):
+      # rename the downloaded file
+      real_dest = dest[:-5] # remove the .part suffix
+      os.rename(dest, real_dest) 
+
+      # notify
+      text = 'Download done:<br>%s' % os.path.basename(real_dest)
+      EmcNotify(text, icon='icon/download')
+
+      # remove the handler from the dict
+      handler = self.handlers.pop(myurl, None)
+
+      # see if other (in queue) download should be started now
+      self._process_queue()

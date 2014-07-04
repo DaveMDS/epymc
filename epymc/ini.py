@@ -18,6 +18,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+
 try:
    import configparser as ConfigParser
 except:
@@ -41,6 +43,10 @@ def setup_defaults():
    add_section(s)
    if not _config.has_option(s, 'show_mature_contents'):
       _config.set(s, 'show_mature_contents', 'False')
+   if not _config.has_option(s, 'download_folder'):
+      _config.set(s, 'download_folder', os.path.expanduser('~/Download'))
+   if not _config.has_option(s, 'max_concurrent_download'):
+      _config.set(s, 'max_concurrent_download', 3)
 
 def add_section(section):
    if not _config.has_section(section):

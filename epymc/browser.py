@@ -79,6 +79,11 @@ class EmcItemClass(Singleton):
       # DBG(('label_get(%s)' % url))
       return 'Unknow'
 
+   def label_end_get(self, url, user_data):
+      """ Called when a view need to show the secondary label of your item.
+          Must return the string to show, or None """
+      return None
+
    def icon_get(self, url, user_data):
       """ Called when a view need to show the icon of your item.
           Must return the name of the icon to use for the given url
@@ -496,6 +501,7 @@ class ViewList(object):
       DBG('_content get(%s)' % url)
 
       text = item_class.label_get(url, user_data)
+      tend = item_class.label_end_get(url, user_data)
       icon = item_class.icon_get(url, user_data)
       iend = item_class.icon_end_get(url, user_data)
 
@@ -507,6 +513,8 @@ class ViewList(object):
       if iend:
          ly.content_set('brower.item.icon_end', gui.load_icon(iend))
          ly.signal_emit('icon_end,show', 'emc')
+      if tend:
+         ly.part_text_set('brower.item.text_end', tend)
 
       label = ly.edje.part_external_object_get('brower.item.label1')
       label.text = text

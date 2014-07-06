@@ -79,9 +79,16 @@ class StdConfigItemBool(object):
          return 'icon/check_on'
       return 'icon/check_off'
 
-   def label_get(self, url, user_data): return self._lbl
-   def icon_get(self, url, user_data): return self._ico
-   def info_get(self, url, user_data): return self._inf
+   def label_get(self, url, user_data):
+      return self._lbl
+
+   def icon_get(self, url, user_data):
+      return self._ico
+
+   def info_get(self, url, user_data):
+      return self._inf
+
+   def label_end_get(self, url, user_data): return None
    def poster_get(self, url, user_data): return None
    def fanart_get(self, url, user_data): return None
 
@@ -108,11 +115,18 @@ class StdConfigItemString(object):
                    accept_cb=self._kbd_accept_cb)
 
    def label_get(self, url, user_data):
-      return '%s  ( %s )' % (self._lbl, ini.get(self._sec, self._opt))
+      return self._lbl
 
-   def icon_get(self, url, user_data): return self._ico
+   def icon_get(self, url, user_data):
+      return self._ico
+
+   def label_end_get(self, url, user_data):
+      return ini.get(self._sec, self._opt)
+
+   def info_get(self, url, user_data):
+      return self._inf
+
    def icon_end_get(self, url, user_data): return None
-   def info_get(self, url, user_data): return self._inf
    def poster_get(self, url, user_data): return None
    def fanart_get(self, url, user_data): return None
 
@@ -147,11 +161,19 @@ class StdConfigItemStringFromList(object):
             dia.list_item_append(string)
 
    def label_get(self, url, user_data):
-      return '%s  ( %s )' % (self._lbl, ini.get(self._sec, self._opt))
+      # return '%s  ( %s )' % (self._lbl, ini.get(self._sec, self._opt))
+      return self._lbl
 
-   def icon_get(self, url, user_data): return self._ico
+   def icon_get(self, url, user_data):
+      return self._ico
+
+   def label_end_get(self, url, user_data):
+      return ini.get(self._sec, self._opt)
+
+   def info_get(self, url, user_data):
+      return self._inf
+
    def icon_end_get(self, url, user_data): return None
-   def info_get(self, url, user_data): return self._inf
    def poster_get(self, url, user_data): return None
    def fanart_get(self, url, user_data): return None
 
@@ -169,10 +191,17 @@ class StdConfigItemAction(object):
       if callable(self._cb):
          self._cb()
 
-   def label_get(self, url, user_data): return self._lbl
-   def icon_get(self, url, user_data): return self._ico
+   def label_get(self, url, user_data):
+      return self._lbl
+
+   def icon_get(self, url, user_data):
+      return self._ico
+
+   def info_get(self, url, user_data):
+      return self._inf
+
+   def label_end_get(self, url, user_data): return None
    def icon_end_get(self, url, user_data): return None
-   def info_get(self, url, user_data): return self._inf
    def poster_get(self, url, user_data): return None
    def fanart_get(self, url, user_data): return None
 

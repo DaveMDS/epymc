@@ -1218,33 +1218,48 @@ collections {
             type: SWALLOW;
             scale: 1;
             description { state: "default" 0.0;
-               fixed: 1 1;
-               min: 1 40;
-               max: 1 40;
+               FIXED_SIZE(1, 40)
                align: 0.0 0.5;
             }
             description { state: "visible" 0.0;
                inherit: "default" 0.0;
-               min: 40 40;
-               max: 40 40;
+               FIXED_SIZE(40, 40)
             }
          }
          part { name: "brower.item.icon_end"; /* API todoc */
             type: SWALLOW;
             scale: 1;
             description { state: "default" 0.0;
-               fixed: 1 1;
-               min: 1 40;
-               max: 1 40;
+               FIXED_SIZE(1, 40)
                align: 1.0 0.5;
             }
             description { state: "visible" 0.0;
                inherit: "default" 0.0;
-               min: 40 40;
-               max: 40 40;
+               FIXED_SIZE(40, 40)
             }
          }
-
+         part { name: "brower.item.text_end"; /* API todoc */
+            type: TEXT;
+            scale: 1;
+            description { state: "default" 0.0;
+               rel1 {
+                  to: "brower.item.icon_end";
+                  relative: 0.0 0.0;
+               }
+               rel2 {
+                  to: "brower.item.icon_end";
+                  relative: 0.0 1.0;
+               }
+               align: 1.0 0.5;
+               color: FN_COL_DISABLE;
+               text {
+                  font: FONT;
+                  size: (FONT_SIZE - 2);
+                  min: 1 0;
+                  ellipsis: -1;
+               }
+            }
+         }
          part { name: "brower.item.label1"; /* API todoc */
             type: EXTERNAL;
             source: "elm/label";
@@ -1258,38 +1273,16 @@ collections {
                   offset: 1  1;
                }
                rel2 {
-                  to_x: "brower.item.icon_end";
+                  to_x: "brower.item.text_end";
                   relative: 0.0  1.0;
                   offset: -1  -1;
                }
             }
          }
-         /* DEBUG START
-         part { name: "TESTING_ICON";
-            type: RECT;
-            description { state: "default" 0.0;
-               color: 80 80 0 80;
-               rel1.to: "brower.item.icon";
-               rel2.to: "brower.item.icon";
-            }
-         }
-         part { name: "TESTING_TEXT";
-            type: RECT;
-            description { state: "default" 0.0;
-               color: 0 80 80 80;
-               rel1.to: "brower.item.label1";
-               rel2.to: "brower.item.label1";
-            }
-         }
-         part { name: "TESTING_END";
-            type: RECT;
-            description { state: "default" 0.0;
-               color: 80 0 80 80;
-               rel1.to: "brower.item.icon_end";
-               rel2.to: "brower.item.icon_end";
-            }
-         }
-         DEBUG END */
+         // DBG_SHOW("brower.item.icon", 80, 80, 0)
+         // DBG_SHOW("brower.item.label1", 0, 80, 80)
+         // DBG_SHOW("brower.item.text_end", 0, 80, 0)
+         // DBG_SHOW("brower.item.icon_end", 80, 0, 80)
       }
       programs {
          program { signal: "icon,show"; source: "emc"; /* API todoc */

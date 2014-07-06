@@ -211,22 +211,22 @@ def root_item_del(name):
       if _name in _root_items_dict:
          del _root_items_dict[_name]
 
-def standard_item_bool_add(section, option, label, icon = None, info = None, cb = None):
+def standard_item_bool_add(section, option, label, icon=None, info=None, cb=None):
    """ TODO doc """
    _browser.item_add(StdConfigItemBool(section, option, label, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
 
-def standard_item_string_add(section, option, label, icon = None, info = None, cb = None):
+def standard_item_string_add(section, option, label, icon=None, info=None, cb=None):
    """ TODO doc """
    _browser.item_add(StdConfigItemString(section, option, label, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
 
-def standard_item_string_from_list(section, option, label, strlist, icon = None, info = None, cb = None):
+def standard_item_string_from_list(section, option, label, strlist, icon=None, info=None, cb=None):
    """ TODO doc """
    _browser.item_add(StdConfigItemStringFromList(section, option, label, strlist, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
 
-def standard_item_action_add(label, icon = None, info = None, cb = None):
+def standard_item_action_add(label, icon=None, info=None, cb=None):
    """ TODO doc """
    _browser.item_add(StdConfigItemAction(label, icon, info, cb),
                      'config://useraction', None)
@@ -269,7 +269,7 @@ def _general_populate(browser, url):
 
    L = ['10', '20', '30', '60', '120']
    standard_item_string_from_list('general', 'fps', 'Frames per second',
-                                  L, 'icon/evas', cb = _change_fps)
+                                  L, 'icon/evas', cb=_change_fps)
 
 def _change_fps():
    gui.fps_set(ini.get_int('general', 'fps'))

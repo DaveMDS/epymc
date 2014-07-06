@@ -46,7 +46,7 @@ def setup_defaults():
    if not _config.has_option(s, 'download_folder'):
       _config.set(s, 'download_folder', os.path.expanduser('~/Download'))
    if not _config.has_option(s, 'max_concurrent_download'):
-      _config.set(s, 'max_concurrent_download', 3)
+      _config.set(s, 'max_concurrent_download', '3')
 
 def add_section(section):
    if not _config.has_section(section):

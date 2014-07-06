@@ -508,15 +508,15 @@ class ViewList(object):
       ly = Layout(gui.win, file=(gui.theme_file, 'emc/browser/list_item/normal'))
 
       if icon:
-         ly.content_set('brower.item.icon', gui.load_icon(icon))
+         ly.content_set('browser.item.icon', gui.load_icon(icon))
          ly.signal_emit('icon,show', 'emc')
       if iend:
-         ly.content_set('brower.item.icon_end', gui.load_icon(iend))
+         ly.content_set('browser.item.icon_end', gui.load_icon(iend))
          ly.signal_emit('icon_end,show', 'emc')
       if tend:
-         ly.part_text_set('brower.item.text_end', tend)
+         ly.part_text_set('browser.item.text_end', tend)
 
-      label = ly.edje.part_external_object_get('brower.item.label1')
+      label = ly.edje.part_external_object_get('browser.item.label1')
       label.text = text
 
       # start the slide now, but should start on item_hilight :(
@@ -535,7 +535,7 @@ class ViewList(object):
    def _cb_item_hilight(self, gl, item):
       DBG("TODO: Start slide") # TODO
       # ly = item.part_content_get('elm.swallow.content')
-      # label = ly.edje.part_external_object_get('brower.item.label1')
+      # label = ly.edje.part_external_object_get('browser.item.label1')
       # label.slide_mode = ELM_LABEL_SLIDE_MODE_AUTO
       # label.slide_go()
 
@@ -547,7 +547,7 @@ class ViewList(object):
    def _cb_item_unhilight(self, gl, item):
       DBG("TODO: Stop slide") # TODO
       # ly = item.part_content_get('elm.swallow.content')
-      # label = ly.edje.part_external_object_get('brower.item.label1')
+      # label = ly.edje.part_external_object_get('browser.item.label1')
       # label.slide_mode = ELM_LABEL_SLIDE_MODE_NONE
 
    def _cb_timer(self, item_data):

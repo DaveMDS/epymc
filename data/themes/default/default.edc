@@ -1214,7 +1214,7 @@ collections {
 /// browser list item
    group { name: "emc/browser/list_item/normal"; /* API todoc */
       parts {
-         part { name: "brower.item.icon"; /* API todoc */
+         part { name: "browser.item.icon"; /* API todoc */
             type: SWALLOW;
             scale: 1;
             description { state: "default" 0.0;
@@ -1226,7 +1226,7 @@ collections {
                FIXED_SIZE(40, 40)
             }
          }
-         part { name: "brower.item.icon_end"; /* API todoc */
+         part { name: "browser.item.icon_end"; /* API todoc */
             type: SWALLOW;
             scale: 1;
             description { state: "default" 0.0;
@@ -1238,16 +1238,16 @@ collections {
                FIXED_SIZE(40, 40)
             }
          }
-         part { name: "brower.item.text_end"; /* API todoc */
+         part { name: "browser.item.text_end"; /* API todoc */
             type: TEXT;
             scale: 1;
             description { state: "default" 0.0;
                rel1 {
-                  to: "brower.item.icon_end";
+                  to: "browser.item.icon_end";
                   relative: 0.0 0.0;
                }
                rel2 {
-                  to: "brower.item.icon_end";
+                  to: "browser.item.icon_end";
                   relative: 0.0 1.0;
                }
                align: 1.0 0.5;
@@ -1260,7 +1260,7 @@ collections {
                }
             }
          }
-         part { name: "brower.item.label1"; /* API todoc */
+         part { name: "browser.item.label1"; /* API todoc */
             type: EXTERNAL;
             source: "elm/label";
             mouse_events: 0;
@@ -1268,30 +1268,30 @@ collections {
 
             description { state: "default" 0.0;
                rel1 {
-                  to_x: "brower.item.icon";
+                  to_x: "browser.item.icon";
                   relative: 1.0  0.0;
                   offset: 1  1;
                }
                rel2 {
-                  to_x: "brower.item.text_end";
+                  to_x: "browser.item.text_end";
                   relative: 0.0  1.0;
                   offset: -1  -1;
                }
             }
          }
-         // DBG_SHOW("brower.item.icon", 80, 80, 0)
-         // DBG_SHOW("brower.item.label1", 0, 80, 80)
-         // DBG_SHOW("brower.item.text_end", 0, 80, 0)
-         // DBG_SHOW("brower.item.icon_end", 80, 0, 80)
+         // DBG_SHOW("browser.item.icon", 80, 80, 0)
+         // DBG_SHOW("browser.item.label1", 0, 80, 80)
+         // DBG_SHOW("browser.item.text_end", 0, 80, 0)
+         // DBG_SHOW("browser.item.icon_end", 80, 0, 80)
       }
       programs {
          program { signal: "icon,show"; source: "emc"; /* API todoc */
             action: STATE_SET "visible" 0.0;
-            target: "brower.item.icon";
+            target: "browser.item.icon";
          }
          program { signal: "icon_end,show"; source: "emc"; /* API todoc */
             action: STATE_SET "visible" 0.0;
-            target: "brower.item.icon_end";
+            target: "browser.item.icon_end";
          }
       }
    }

@@ -57,7 +57,7 @@ class StdConfigItemBool(object):
    # this don't inherit from EmcItemClass to not be a Singleton
    # this class is used by the function standard_item_bool_add(...)
 
-   def __init__(self, section, option, label, icon = None, info = None, cb = None):
+   def __init__(self, section, option, label, icon=None, info=None, cb=None):
       self._sec = section
       self._opt = option
       self._lbl = label
@@ -74,7 +74,6 @@ class StdConfigItemBool(object):
       if callable(self._cb):
          self._cb()
 
-   
    def icon_end_get(self, url, user_data):
       if ini.get(self._sec, self._opt) == "True":
          return 'icon/check_on'
@@ -90,7 +89,7 @@ class StdConfigItemString(object):
    # this don't inherit from EmcItemClass to not be a Singleton
    # this class is used by the function standard_item_string_add(...)
 
-   def __init__(self, section, option, label, icon = None, info = None, cb = None):
+   def __init__(self, section, option, label, icon=None, info=None, cb=None):
       self._sec = section
       self._opt = option
       self._lbl = label
@@ -105,12 +104,11 @@ class StdConfigItemString(object):
          self._cb()
 
    def item_selected(self, url, user_data):
-      EmcVKeyboard(title = self._lbl,
-                   text = ini.get(self._sec, self._opt),
-                   accept_cb = self._kbd_accept_cb)
+      EmcVKeyboard(title=self._lbl, text=ini.get(self._sec, self._opt),
+                   accept_cb=self._kbd_accept_cb)
 
    def label_get(self, url, user_data):
-      return self._lbl + '  ( ' + ini.get(self._sec, self._opt) + ' )'
+      return '%s  ( %s )' % (self._lbl, ini.get(self._sec, self._opt))
 
    def icon_get(self, url, user_data): return self._ico
    def icon_end_get(self, url, user_data): return None
@@ -122,7 +120,7 @@ class StdConfigItemStringFromList(object):
    # this don't inherit from EmcItemClass to not be a Singleton
    # this class is used by the function standard_item_string_add(...)
 
-   def __init__(self, section, option, label, strlist, icon = None, info = None, cb = None):
+   def __init__(self, section, option, label, strlist, icon=None, info=None, cb=None):
       self._sec = section
       self._opt = option
       self._lbl = label
@@ -140,16 +138,16 @@ class StdConfigItemStringFromList(object):
          self._cb()
 
    def item_selected(self, url, user_data):
-      dia = EmcDialog(self._lbl, style = 'list', done_cb = self._dia_list_selected_cb)
+      dia = EmcDialog(self._lbl, style='list', done_cb=self._dia_list_selected_cb)
       for string in self._sli:
          if string == ini.get(self._sec, self._opt):
-            it = dia.list_item_append(string, end = 'icon/check_on')
+            it = dia.list_item_append(string, end='icon/check_on')
             it.selected = True
          else:
             dia.list_item_append(string)
 
    def label_get(self, url, user_data):
-      return self._lbl + '  ( ' + ini.get(self._sec, self._opt) + ' )'
+      return '%s  ( %s )' % (self._lbl, ini.get(self._sec, self._opt))
 
    def icon_get(self, url, user_data): return self._ico
    def icon_end_get(self, url, user_data): return None
@@ -161,7 +159,7 @@ class StdConfigItemAction(object):
    # this don't inherit from EmcItemClass to not be a Singleton
    # this class is used by the function standard_item_action_add(...)
 
-   def __init__(self, label, icon = None, info = None, selected_cb = None):
+   def __init__(self, label, icon=None, info=None, selected_cb=None):
       self._lbl = label
       self._ico = icon
       self._inf = info
@@ -194,7 +192,7 @@ def init():
 def shutdown():
    _browser.delete()
 
-def root_item_add(name, weight, label, icon = None, callback = None):
+def root_item_add(name, weight, label, icon=None, callback=None):
    # search an item with an higer weight
    pos = 0
    for (_name, _label, _weight, _ic, _cb) in _root_items:
@@ -216,17 +214,17 @@ def root_item_del(name):
 def standard_item_bool_add(section, option, label, icon = None, info = None, cb = None):
    """ TODO doc """
    _browser.item_add(StdConfigItemBool(section, option, label, icon, info, cb),
-                     'config://'+section+'/'+option, None)
+                     'config://%s/%s' % (section, option), None)
 
 def standard_item_string_add(section, option, label, icon = None, info = None, cb = None):
    """ TODO doc """
    _browser.item_add(StdConfigItemString(section, option, label, icon, info, cb),
-                     'config://'+section+'/'+option, None)
+                     'config://%s/%s' % (section, option), None)
 
 def standard_item_string_from_list(section, option, label, strlist, icon = None, info = None, cb = None):
    """ TODO doc """
    _browser.item_add(StdConfigItemStringFromList(section, option, label, strlist, icon, info, cb),
-                     'config://'+section+'/'+option, None)
+                     'config://%s/%s' % (section, option), None)
 
 def standard_item_action_add(label, icon = None, info = None, cb = None):
    """ TODO doc """
@@ -252,7 +250,7 @@ def _general_list():
 
 def _general_populate(browser, url):
    standard_item_bool_add('general', 'fullscreen', 'Start in fullscreen')
-   standard_item_action_add('Adjust interface scale', 'icon/scale', cb = _change_scale)
+   standard_item_action_add('Adjust interface scale', 'icon/scale', cb=_change_scale)
    standard_item_bool_add('general', 'back_in_lists', 'Show Back item in lists', 'icon/back')
    standard_item_string_add('general', 'download_folder', 'Download folder', 'icon/download')
    standard_item_string_add('general', 'max_concurrent_download', 'Max concurrent download', 'icon/download')
@@ -284,11 +282,11 @@ def _change_scale():
       d.text_set('Current Value: %s' % (gui.scale_get()))
       ini.set('general', 'scale', str(gui.scale_get()))
 
-   d = EmcDialog(title = 'set scale', style = 'minimal',
-                 text = 'Current Value: %s' % (gui.scale_get()))
-   d.button_add('Bigger', selected_cb = _bigger)
-   d.button_add('Smaller', selected_cb = _smaller)
-   d.button_add('Reset', selected_cb = _reset)
+   d = EmcDialog(title='set scale', style='minimal',
+                 text='Current Value: %s' % (gui.scale_get()))
+   d.button_add('Bigger', selected_cb=_bigger)
+   d.button_add('Smaller', selected_cb=_smaller)
+   d.button_add('Reset', selected_cb=_reset)
    
 ##############  THEMES  #######################################################
 
@@ -314,7 +312,6 @@ class ThemesItemClass(EmcItemClass):
              theme_info['author'],
              theme_info['version'],
              theme_info['info'])
-      
 
 def _themes_list():
    _browser.page_add('config://themes/', 'Themes', None, _themes_populate)
@@ -356,5 +353,4 @@ def _modules_list():
 def _modules_populate(browser, url):
    for mod in sorted(modules.list_get(), key=attrgetter('name')):
       browser.item_add(ModulesItemClass(), mod.name, mod)
-
 

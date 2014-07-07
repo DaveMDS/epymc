@@ -1245,10 +1245,12 @@ collections {
                rel1 {
                   to: "browser.item.icon_end";
                   relative: 0.0 0.0;
+                  offset: -5 0;
                }
                rel2 {
                   to: "browser.item.icon_end";
                   relative: 0.0 1.0;
+                  offset: -6 -1;
                }
                align: 1.0 0.5;
                color: FN_COL_DISABLE;

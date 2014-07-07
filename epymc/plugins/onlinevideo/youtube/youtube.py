@@ -137,7 +137,7 @@ elif STATE in (ST_VIDEO_LIST_JSONC, ST_SEARCH_JSONC):
 
    # STATE 4 = search query in place of the url
    if STATE == ST_SEARCH_JSONC:
-      print "search for:" , URL
+      print("search for: %s" % URL)
       URL = 'http://gdata.youtube.com/feeds/api/videos?q=%s&v=2&alt=jsonc&max-results=%d' % (URL, ITEMS_PER_PAGE)
 
    data = fetch_url(URL, parser='json')

@@ -288,7 +288,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       (next_state, label, url, info, icon, poster, action) = parent_item_data
       if items and action != ACT_MORE:
-         self._browser.page_add(url.encode('ascii'), label, None,
+         self._browser.page_add(url, label, None,
                                 self._populate_requested_page, items)
       else:
          self._populate_requested_page(self._browser, url, items)

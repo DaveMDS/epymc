@@ -18,11 +18,21 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, urllib2, json, subprocess, re
+import os, sys, json, subprocess, re
 from datetime import datetime
 from bs4 import BeautifulSoup
-from urlparse import parse_qs
-from urllib import urlencode
+
+try:
+   # py3
+   import urllib.request as urllib2
+   from urllib.parse import parse_qs
+   from urllib.parse import urlencode
+except:
+   # py2
+   import urllib2
+   from urlparse import parse_qs
+   from urllib import urlencode
+
 
 
 api_version = 4

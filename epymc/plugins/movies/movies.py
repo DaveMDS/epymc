@@ -30,7 +30,7 @@ from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourcesManager, \
    EmcVKeyboard, EmcNotify
-from epymc.themoviedb import TMDBv3, get_poster_filename, \
+from epymc.themoviedb import TMDBv3, CastPanel, get_poster_filename, \
    get_backdrop_filename, get_icon_filename
 
 import epymc.mainmenu as mainmenu
@@ -588,55 +588,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self.tmdb_dialog.delete()
       self.tmdb_dialog = None
       del tmdb
-
-
-class CastPanel(EmcDialog):
-   def __init__(self, pid):
-      self.pid = pid
-      self.info = None
-
-      tmdb = TMDBv3(lang = ini.get('movies', 'info_lang'))
-      tmdb.get_cast_info(self.pid, self._fetch_done_cb)
-      self._dia = EmcDialog(style = 'progress', title = 'Fetching info',
-                            text = 'please wait...')
-
-   def _fetch_done_cb(self, tmdb, result):
-      self.info = result
-      self._dia.delete()
-      del tmdb
-
-      text = '<hilight>%s</><br>' % self.info['name']
-      if self.info['biography']:
-         text += '%s<br><br>' % self.info['biography'].replace('\n', '<br>')
-      if self.info['birthday']:
-         text += '<hilight>Birthday:</> %s<br>' % (self.info['birthday'])
-      if self.info['deathday']:
-         text += '<hilight>Deathday:</> %s<br>' % (self.info['deathday'])
-      if self.info['place_of_birth']:
-         text += '<hilight>Place of birth:</> %s<br>' % (self.info['place_of_birth'])
-
-      image = EmcRemoteImage(self.info['profile_path'])
-      EmcDialog.__init__(self, title = self.info['name'], style = 'panel',
-                               content = image, text = text)
-
-      c = len(self.info['credits']['cast'])
-      self.button_add('Movies (%s)' % c, lambda b: self.movies_dialog())
-      c = len(self.info['images']['profiles'])
-      self.button_add('Photos (%s)' % c, lambda b: self.photos_dialog())
-
-   def photos_dialog(self):
-      dia = EmcDialog(style = 'image_list_horiz', title = self.info['name'])
-      for image in self.info['images']['profiles']:
-         img = EmcRemoteImage(image['file_path'])
-         dia.list_item_append(None, img)
-
-   def movies_dialog(self):
-      dia = EmcDialog(style = 'list', title = self.info['name'])
-      for movie in self.info['credits']['cast']:
-         label = '%s as %s' % (movie['title'], movie['character'])
-         icon = EmcRemoteImage(movie['poster_path'])
-         icon.size_hint_min_set(100, 100) # TODO FIXME
-         dia.list_item_append(label, icon)
 
 
 class BackgroundScanner(ecore.Idler):

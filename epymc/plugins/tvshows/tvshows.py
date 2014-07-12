@@ -28,7 +28,7 @@ from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog, EmcSourcesManager, EmcNotify, EmcRemoteImage
-from epymc.themoviedb import TMDBv3, get_tv_backdrop_filename, \
+from epymc.themoviedb import TMDBv3, CastPanel, get_tv_backdrop_filename, \
    get_tv_poster_filename, get_tv_icon_filename
 
 import epymc.mainmenu as mainmenu
@@ -461,7 +461,7 @@ class InfoPanel(EmcDialog):
                          text = ' ', content = self._image)
       self.button_add('Posters', self._posters_button_cb)
       self.button_add('Backdrops', self._backdrop_button_cb)
-      self.button_add('Actors (TODO)', self._actors_button_cb)
+      self.button_add('Cast', self._cast_button_cb)
       self.button_add('Refresh info', self._refresh_info_button_cb)
       self.update()
 
@@ -544,9 +544,22 @@ class InfoPanel(EmcDialog):
       mod_instance._browser.refresh()
       dia.delete()
 
-   ### actors
-   def _actors_button_cb(self, button):
-      DBG("TODO")
+   ### cast
+   def _cast_button_cb(self, button):
+      dia = EmcDialog(title='Cast', style='list',
+                      done_cb=lambda d, pid: CastPanel(pid))
+      dia.button_add('Info', self._cast_info_cb, dia)
+
+      for person in self._db_data['cast']:
+         label = '%s as %s' % (person['name'], person['character'])
+         icon = EmcRemoteImage(person['profile_path']) # TODO use 'dest' to cache the img
+         icon.size_hint_min_set(100, 100) # TODO FIXME
+         dia.list_item_append(label, icon, None, person['id'])
+
+   def _cast_info_cb(self, button, list_dia):
+      item = list_dia.list_item_selected_get()
+      pid = item.data_get()[0][0]
+      CastPanel(pid)
 
    ### refresh infos
    def _refresh_info_button_cb(self, button):

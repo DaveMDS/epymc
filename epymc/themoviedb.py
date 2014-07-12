@@ -30,6 +30,7 @@ except: # py2
    from urllib import urlencode
 
 import epymc.utils as utils
+from epymc.gui import EmcDialog, EmcRemoteImage
 
 
 def DBG(msg):
@@ -291,15 +292,22 @@ class TMDBv3(object):
    #### get tv info  ##########################################################
    def get_tv_info(self, tid, done_cb, progress_cb=None):
       self.done_cb = done_cb
-      self._api_call(self._tv_info_done, tid, '/tv/%s' % tid)
+      self._api_call(self._tv_info_done, tid,
+                     '/tv/%s' % tid, append_to_response='credits')
 
    def _tv_info_done(self, data, tid=None):
 
       # fallback to english if needed
       if not data['overview'] and self.lang != 'en' and tid != None:
-         self._api_call(self._tv_info_done, None,
-                        '/tv/%s' % tid, language='en')
+         self._api_call(self._tv_info_done, None, '/tv/%s' % tid, 
+                        language='en', append_to_response='credits')
          return
+
+      for person in data['credits']['cast']:
+         person['profile_path'] = self._img_url(person['profile_path'], 'w154')
+
+      for person in data['credits']['crew']:
+         person['profile_path'] = self._img_url(person['profile_path'], 'w154')
 
       # build main tvshow info dict
       self.tv_info = {
@@ -318,6 +326,8 @@ class TMDBv3(object):
          'status': data['status'],
          'vote_average': data['vote_average'],
          'vote_count': data['vote_count'],
+         'cast': data['credits']['cast'],
+         'crew': data['credits']['crew'],
          'seasons': {}
       }
 
@@ -500,3 +510,50 @@ class TMDBv3(object):
 
       done_cb(self, api_data)
 
+
+class CastPanel(EmcDialog):
+   def __init__(self, pid):
+      self.pid = pid
+      self.info = None
+
+      tmdb = TMDBv3()
+      tmdb.get_cast_info(self.pid, self._fetch_done_cb)
+      self._dia = EmcDialog(style='minimal', title='Fetching info',
+                            text='please wait...', spinner=True)
+
+   def _fetch_done_cb(self, tmdb, result):
+      self.info = result
+      self._dia.delete()
+
+      text = '<hilight>%s</><br>' % self.info['name']
+      if self.info['biography']:
+         text += '%s<br><br>' % self.info['biography'].replace('\n', '<br>')
+      if self.info['birthday']:
+         text += '<hilight>Birthday:</> %s<br>' % (self.info['birthday'])
+      if self.info['deathday']:
+         text += '<hilight>Deathday:</> %s<br>' % (self.info['deathday'])
+      if self.info['place_of_birth']:
+         text += '<hilight>Place of birth:</> %s<br>' % (self.info['place_of_birth'])
+
+      image = EmcRemoteImage(self.info['profile_path'])
+      EmcDialog.__init__(self, title=self.info['name'], style='panel',
+                               content=image, text=text)
+
+      c = len(self.info['credits']['cast'])
+      self.button_add('Movies (%s)' % c, lambda b: self.movies_dialog())
+      c = len(self.info['images']['profiles'])
+      self.button_add('Photos (%s)' % c, lambda b: self.photos_dialog())
+
+   def photos_dialog(self):
+      dia = EmcDialog(style='image_list_horiz', title=self.info['name'])
+      for image in self.info['images']['profiles']:
+         img = EmcRemoteImage(image['file_path'])
+         dia.list_item_append(None, img)
+
+   def movies_dialog(self):
+      dia = EmcDialog(style='list', title=self.info['name'])
+      for movie in self.info['credits']['cast']:
+         label = '%s as %s' % (movie['title'], movie['character'])
+         icon = EmcRemoteImage(movie['poster_path'])
+         icon.size_hint_min_set(100, 100) # TODO FIXME
+         dia.list_item_append(label, icon)

@@ -242,16 +242,14 @@ class EpisodeItemClass(EmcItemClass):
          return get_tv_backdrop_filename(e['id'])
 
    def info_get(self, url, episode_data):
-      return '<title>Episode %d: %s</><br>' \
-             '<hilight>Director:</> %s<br>' \
-             '<hilight>Writer:</> %s<br>' \
-             '<hilight>Overview:</> %s</><br>' \
-             '<hilight>First aired: %s</><br>' % \
-               (episode_data['episode_num'], episode_data['title'],
-                ', '.join(episode_data['director']),
-                ', '.join(episode_data['writer']),
-                episode_data['overview'], episode_data['first_aired'],
-               )
+      return u'<title>Episode {}: {}</title><br>' \
+              '<hilight>First aired:</hilight> {}<br>'  \
+              '<hilight>Overview:</hilight> {}</><br>' \
+              .format(
+                  episode_data['episode_num'], episode_data['title'],
+                  episode_data['first_aired'],
+                  episode_data['overview'],
+              )
 
 
 class TvShowsModule(EmcModule):
@@ -468,22 +466,29 @@ class InfoPanel(EmcDialog):
    def update(self):
       if self._db_data:
          d = self._db_data
-         info = '<hilight>First aired: </hilight> %s <br>' \
-                '<hilight>Network:</hilight> %s<br>' \
-                '<hilight>Seasons:</hilight> %s<br>' \
-                '<hilight>Genres:</hilight> %s<br>' \
-                '<hilight>Runtime:</hilight> %s min<br>' \
-                '<hilight>Rating:</hilight> %s<br>' \
-                '<hilight>Status:</hilight> %s<br>' \
-                '<br><hilight>Overview:</hilight><br>%s<br>' \
-                  % (d['first_air_date'],
+         info = u'<hilight>Created by: </hilight> {} <br>' \
+                 '<hilight>Network:</hilight> {}<br>' \
+                 '<hilight>First aired: </hilight> {} <br>' \
+                 '<hilight>Last aired: </hilight> {} <br>' \
+                 '<hilight>Seasons:</hilight> {}<br>' \
+                 '<hilight>Episodes:</hilight> {}<br>' \
+                 '<hilight>Genres:</hilight> {}<br>' \
+                 '<hilight>Runtime:</hilight> {} min<br>' \
+                 '<hilight>Rating:</hilight> {}<br>' \
+                 '<hilight>Status:</hilight> {}<br>' \
+                 '<br><hilight>Overview:</hilight><br>{}<br>' \
+                 .format(
+                     ', '.join(d['created_by']),
                      ', '.join(d['networks']),
-                     len(d['seasons']),
+                     d['first_air_date'],
+                     d['last_air_date'],
+                     d['number_of_seasons'],
+                     d['number_of_episodes'],
                      ', '.join(d['genres']),
                      d['episode_run_time'],
                      d['vote_average'],
                      d['status'], d['overview'],
-                     )
+                  )
          info = info.replace('&', 'AND') # TODO FIXME !!!!!!!!!!!!!!!!!!!
          try:
             self._image.file = get_tv_poster_filename(self._db_data['id'])

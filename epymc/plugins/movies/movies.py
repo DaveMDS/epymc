@@ -30,7 +30,8 @@ from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourcesManager, \
    EmcVKeyboard, EmcNotify
-from epymc.themoviedb import TMDBv3, get_poster_filename, get_backdrop_filename
+from epymc.themoviedb import TMDBv3, get_poster_filename, \
+   get_backdrop_filename, get_icon_filename
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
@@ -113,7 +114,11 @@ class MovieItemClass(EmcItemClass):
          return 'icon/check_off'
 
    def icon_get(self, url, mod):
-      return self.poster_get(url, mod)
+      if mod._movie_db.id_exists(url):
+         e = mod._movie_db.get_data(url)
+         icon = get_icon_filename(e['id'])
+         if os.path.exists(icon):
+            return icon
 
    def poster_get(self, url, mod):
       if mod._movie_db.id_exists(url):

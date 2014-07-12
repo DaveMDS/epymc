@@ -28,6 +28,8 @@ from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog, EmcSourcesManager, EmcNotify, EmcRemoteImage
+from epymc.themoviedb import TMDBv3, get_tv_backdrop_filename, \
+   get_tv_poster_filename, get_tv_icon_filename
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
@@ -39,13 +41,11 @@ import epymc.config_gui as config_gui
 
 
 # debuggin stuff
-from pprint import pprint
 def DBG(msg):
    print('TVSHOWS: %s' % (msg))
    # pass
 
-TVSHOWS_DB_VERSION = 3
-TVDB_API_KEY = 'A5B4979B52BF8797' # Key of the user DaveMDS
+TVSHOWS_DB_VERSION = 4
 DEFAULT_INFO_LANG = 'en'
 DEFAULT_EPISODE_REGEXP = '[Ss]*(?P<season>[0-9]+)[Xx]*[Ee]*(?P<episode>[0-9]+)'
 """ in a more readable form:
@@ -126,7 +126,7 @@ class FolderItemClass(EmcItemClass):
    def fanart_get(self, url, mod):
       if mod_instance._tvshows_db.id_exists(mod._current_serie_name):
          e = mod_instance._tvshows_db.get_data(mod._current_serie_name)
-         return get_backdrop_filename(e['id'])
+         return get_tv_backdrop_filename(e['id'])
 
 
 class SerieItemClass(EmcItemClass):
@@ -147,19 +147,19 @@ class SerieItemClass(EmcItemClass):
    def icon_get(self, url, serie_name):
       if mod_instance._tvshows_db.id_exists(serie_name):
          e = mod_instance._tvshows_db.get_data(serie_name)
-         return get_icon_filename(e['id'])
+         return get_tv_icon_filename(e['id'])
       else:
          return 'icon/folder'
 
    def poster_get(self, url, serie_name):
       if mod_instance._tvshows_db.id_exists(serie_name):
          e = mod_instance._tvshows_db.get_data(serie_name)
-         return get_poster_filename(e['id'])
+         return get_tv_poster_filename(e['id'])
 
    def fanart_get(self, url, serie_name):
       if mod_instance._tvshows_db.id_exists(serie_name):
          e = mod_instance._tvshows_db.get_data(serie_name)
-         return get_backdrop_filename(e['id'])
+         return get_tv_backdrop_filename(e['id'])
 
 
 class SeasonItemClass(EmcItemClass):
@@ -175,11 +175,11 @@ class SeasonItemClass(EmcItemClass):
       if mod_instance._tvshows_db.id_exists(serie_name):
          e = mod_instance._tvshows_db.get_data(serie_name)
 
-         icon_file = get_icon_filename(e['id'], season_num)
+         icon_file = get_tv_icon_filename(e['id'], season_num)
          if os.path.exists(icon_file):
             return icon_file
 
-         icon_file = get_icon_filename(e['id'])
+         icon_file = get_tv_icon_filename(e['id'])
          if os.path.exists(icon_file):
             return icon_file
 
@@ -190,17 +190,17 @@ class SeasonItemClass(EmcItemClass):
       if mod_instance._tvshows_db.id_exists(serie_name):
          e = mod_instance._tvshows_db.get_data(serie_name)
 
-         poster_file = get_poster_filename(e['id'], season_num)
+         poster_file = get_tv_poster_filename(e['id'], season_num)
          if os.path.exists(poster_file):
             return poster_file
 
-         return get_poster_filename(e['id'])
+         return get_tv_poster_filename(e['id'])
 
    def fanart_get(self, url, season_num):
       serie_name = mod_instance._current_serie_name
       if mod_instance._tvshows_db.id_exists(serie_name):
          e = mod_instance._tvshows_db.get_data(serie_name)
-         return get_backdrop_filename(e['id'])
+         return get_tv_backdrop_filename(e['id'])
 
 
 class EpisodeItemClass(EmcItemClass):
@@ -220,27 +220,38 @@ class EpisodeItemClass(EmcItemClass):
 
    def poster_get(self, url, episode_data):
       series_id = episode_data['series_id']
+      season_num = episode_data['season_num']
       episode_id = episode_data['id']
-      return (episode_data['thumb_url'],
-              get_poster_filename(series_id, episode_id=episode_id))
+      if episode_data['thumb_url']:
+         # episode thumb
+         return (episode_data['thumb_url'],
+                 get_tv_poster_filename(series_id, episode_id=episode_id))
+      else:
+         # season poster
+         poster_file = get_tv_poster_filename(series_id, season_num)
+         if os.path.exists(poster_file):
+            return poster_file
+         else:
+            # serie poster
+            return get_tv_poster_filename(series_id)
+         
 
    def fanart_get(self, url, episode_data):
       if mod_instance._tvshows_db.id_exists(mod_instance._current_serie_name):
          e = mod_instance._tvshows_db.get_data(mod_instance._current_serie_name)
-         return get_backdrop_filename(e['id'])
+         return get_tv_backdrop_filename(e['id'])
 
    def info_get(self, url, episode_data):
       return '<title>Episode %d: %s</><br>' \
              '<hilight>Director:</> %s<br>' \
              '<hilight>Writer:</> %s<br>' \
              '<hilight>Overview:</> %s</><br>' \
-             '<hilight>First aired: %s</><br>' \
-             '<hilight>Guest stars: %s</><br>' % \
+             '<hilight>First aired: %s</><br>' % \
                (episode_data['episode_num'], episode_data['title'],
                 ', '.join(episode_data['director']),
                 ', '.join(episode_data['writer']),
                 episode_data['overview'], episode_data['first_aired'],
-                ', '.join(episode_data['guest_stars']))
+               )
 
 
 class TvShowsModule(EmcModule):
@@ -351,7 +362,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          relative = url.replace(self._current_base_path, '')
          (show_name, s_num, e_num) = get_serie_from_relative_url(relative)
          title = "%s. %s" % (e_num, e['seasons'][s_num]['episodes'][e_num]['title'])
-         poster = get_poster_filename(e['id'])
+         poster = get_tv_poster_filename(e['id'])
       except:
          pass
       mediaplayer.title_set(title)
@@ -450,7 +461,6 @@ class InfoPanel(EmcDialog):
                          text = ' ', content = self._image)
       self.button_add('Posters', self._posters_button_cb)
       self.button_add('Backdrops', self._backdrop_button_cb)
-      self.button_add('Banners', self._banners_button_cb)
       self.button_add('Actors (TODO)', self._actors_button_cb)
       self.button_add('Refresh info', self._refresh_info_button_cb)
       self.update()
@@ -466,12 +476,17 @@ class InfoPanel(EmcDialog):
                 '<hilight>Rating:</hilight> %s<br>' \
                 '<hilight>Status:</hilight> %s<br>' \
                 '<br><hilight>Overview:</hilight><br>%s<br>' \
-                '<br><hilight>Actors:</hilight> %s<br>' \
-                  % (d['first_aired'], d['network'], len(d['seasons']),
-                     ', '.join(d['genres']), d['runtime'], d['rating'],
-                     d['status'], d['overview'], ', '.join(d['casts']))
+                  % (d['first_air_date'],
+                     ', '.join(d['networks']),
+                     len(d['seasons']),
+                     ', '.join(d['genres']),
+                     d['episode_run_time'],
+                     d['vote_average'],
+                     d['status'], d['overview'],
+                     )
+         info = info.replace('&', 'AND') # TODO FIXME !!!!!!!!!!!!!!!!!!!
          try:
-            self._image.file = get_poster_filename(self._db_data['id'])
+            self._image.file = get_tv_poster_filename(self._db_data['id'])
          except: pass
          self.text_set(info)
       else:
@@ -481,34 +496,33 @@ class InfoPanel(EmcDialog):
 
    ### images
    def _posters_button_cb(self, button):
-      title = '%s posters found' % len(self._db_data['posters'])
-      dia = EmcDialog(style = 'image_list_horiz', title = title,
-                      done_cb = self._image_choosed_cb)
-      for poster in self._db_data['posters']:
+      tmdb = TMDBv3(lang=ini.get('tvshows', 'info_lang'))
+      tmdb.get_posters(self._db_data['id'], self._posters_cb, tv=True)
+
+   def _posters_cb(self, tmdb, results):
+      title = '%s posters found' % len(results)
+      dia = EmcDialog(style='image_list_horiz', title=title,
+                      done_cb=self._image_choosed_cb)
+      for poster in results:
          icon = EmcRemoteImage(poster['thumb_url'])
-         dia.list_item_append(None, icon, dwnl_url = poster['url'],
-                     dest_path = get_poster_filename(self._db_data['id']),
-                     thumb_url = poster['thumb_url'])
+         dia.list_item_append(None, icon, dwnl_url=poster['url'],
+                     dest_path=get_tv_poster_filename(poster['movie_id']),
+                     icon_url=poster['icon_url'])
 
    def _backdrop_button_cb(self, button):
-      title = '%s backdrops found' % len(self._db_data['backdrops'])
-      dia = EmcDialog(style = 'image_list_vert', title = title,
-                      done_cb = self._image_choosed_cb)
-      for backdrop in self._db_data['backdrops']:
+      tmdb = TMDBv3(lang=ini.get('tvshows', 'info_lang'))
+      tmdb.get_backdrops(self._db_data['id'], self._backdrops_cb, tv=True)
+
+   def _backdrops_cb(self, tmdb, results):
+      title = '%s backdrops found' % len(results)
+      dia = EmcDialog(style='image_list_vert', title=title,
+                      done_cb=self._image_choosed_cb)
+      for backdrop in results:
          icon = EmcRemoteImage(backdrop['thumb_url'])
-         dia.list_item_append(None, icon, dwnl_url = backdrop['url'],
-                     dest_path = get_backdrop_filename(self._db_data['id']))
+         dia.list_item_append(None, icon, dwnl_url=backdrop['url'],
+                     dest_path=get_tv_backdrop_filename(backdrop['movie_id']))
 
-   def _banners_button_cb(self, button):
-      title = '%s banners found' % len(self._db_data['banners'])
-      dia = EmcDialog(style = 'image_list_vert', title = title,
-                      done_cb = self._image_choosed_cb)
-      for banner in self._db_data['banners']:
-         icon = EmcRemoteImage(banner['url'])
-         dia.list_item_append(None, icon, dwnl_url = banner['url'],
-                     dest_path = get_banner_filename(self._db_data['id']))
-
-   def _image_choosed_cb(self, dia, dwnl_url, dest_path, thumb_url=None):
+   def _image_choosed_cb(self, dia, dwnl_url, dest_path, icon_url=None):
       dia.delete()
       dia = EmcDialog(style = 'progress', title = 'Downloading image')
       utils.download_url_async(dwnl_url, dest_path,
@@ -516,10 +530,10 @@ class InfoPanel(EmcDialog):
                                progress_cb = self._cb_image_progress,
                                dia = dia)
       # also download icon for poster
-      if thumb_url and dest_path.endswith('/poster.jpg'):
+      if icon_url and dest_path.endswith('/poster.jpg'):
          icon_path = dest_path.replace('poster.jpg', 'icon.jpg')
-         utils.download_url_async(thumb_url, icon_path)
-                                  
+         utils.download_url_async(icon_url, icon_path)
+
 
    def _cb_image_progress(self, dest, tot, done, dia):
       if tot > 0: dia.progress_set(float(done) / float(tot))
@@ -536,19 +550,26 @@ class InfoPanel(EmcDialog):
 
    ### refresh infos
    def _refresh_info_button_cb(self, button):
-      tvdb = TVDB(lang = ini.get('tvshows', 'info_lang'))
-      tvdb.search_series_by_name(self._serie_name, self._search_done_cb)
+      tmdb = TMDBv3(lang=ini.get('tvshows', 'info_lang'))
+      tmdb.tv_search(self._serie_name, self._search_done_cb)
 
-   def _search_done_cb(self, tvdb, results, status):
-      if status == 200 and len(results) > 0:
+   def _search_done_cb(self, tvdb, results):
+      if len(results) > 0:
          title = 'Found %d results, which one?' % len(results)
-         dia = EmcDialog(style = 'image_list_vert', title = title,
+         dia = EmcDialog(style = 'list', title = title,
                          done_cb = self._result_choosed_cb,
                          user_data = tvdb)
          for item in results:
-            if item['banner']:
-               img = EmcRemoteImage(item['banner'])
-               dia.list_item_append(None, img, serie_id = item['id'])
+            if item['poster_url']:
+               img = EmcRemoteImage(item['poster_url'])
+               img.size_hint_min_set(100, 100) # TODO fixme
+            else:
+               img = None
+            if item['year']:
+               name = '%s (%s)' % (item['name'], item['year'])
+            else:
+               name = item['name']
+            dia.list_item_append(name, img, serie_id=item['tmdb_id'])
       else:
          text = 'The search for "%s" did not make any results.<br>' \
                 'If your show is listed on thetvdb.com please rename ' \
@@ -558,8 +579,8 @@ class InfoPanel(EmcDialog):
          EmcDialog(style = 'minimal', title = 'Nothing found', text = text)
 
    def _result_choosed_cb(self, dia, serie_id):
-      tvdb = dia.data_get()
-      tvdb.fetch_all_data_for_serie(serie_id, self._refresh_done_cb)
+      tmdb = dia.data_get()
+      tmdb.get_tv_info(serie_id, self._refresh_done_cb)
 
       dia.delete()
       # TODO give credits here
@@ -621,33 +642,6 @@ def get_serie_from_relative_dir_url(url):
       return (serie, int(re.findall('\d+', parts[1])[0]))
    except:
       return None
-
-def get_poster_filename(tvshows_id, season_num=None, episode_id=None):
-   if episode_id is not None:
-      return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
-                          episode_id + '.jpg')
-   elif season_num is not None:
-      return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
-                          'poster_s%d.jpg' % season_num)
-   else:
-      return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
-                          'poster.jpg')
-
-def get_icon_filename(tvshows_id, season_num=None):
-   if season_num is not None:
-      return os.path.join(utils.user_conf_dir, 'tvshows', str(tvshows_id),
-                          'icon_s%d.jpg' % season_num)
-   else:
-      return os.path.join(utils.user_conf_dir, 'tvshows',
-                          str(tvshows_id), 'icon.jpg')
-
-def get_backdrop_filename(tvshows_id):
-   return os.path.join(utils.user_conf_dir, 'tvshows',
-                       str(tvshows_id), 'backdrop.jpg')
-
-def get_banner_filename(tvshows_id):
-   return os.path.join(utils.user_conf_dir, 'tvshows',
-                       str(tvshows_id), 'banner.jpg')
 
 
 ###### Config Panel stuff
@@ -738,16 +732,16 @@ class BackgroundScanner(ecore.Idler):
             DBG('I searched "%s" %d seconds ago...skipping' % (serie_name, elapsed))
             return ecore.ECORE_CALLBACK_RENEW
 
-      # perform a tvdb search by title
+      # perform a search by title
       self._current_serie_name = serie_name
       if self._tvdb is None:
-         self._tvdb = TVDB(lang = ini.get('tvshows', 'info_lang'))
-      self._tvdb.search_series_by_name(serie_name, self._search_done_cb)
+         self._tvdb = TMDBv3(lang = ini.get('tvshows', 'info_lang'))
+      self._tvdb.tv_search(serie_name, self._search_done_cb)
       return ecore.ECORE_CALLBACK_RENEW
 
-   def _search_done_cb(self, tvdb, results, status):
-      if status == 200 and len(results) > 0:
-         tvdb.fetch_all_data_for_serie(results[0]['id'], self._fetch_data_done_cb)
+   def _search_done_cb(self, tvdb, results):
+      if len(results) > 0:
+         tvdb.get_tv_info(results[0]['tmdb_id'], self._fetch_data_done_cb)
       else:
          self._fetch_data_done_cb(tvdb, None)
 
@@ -765,7 +759,7 @@ class BackgroundScanner(ecore.Idler):
          # show a cool notification
          text = '<title>Found serie:</><br>%s<br>%s seasons' % \
                 (result['name'], len(result['seasons']))
-         EmcNotify(text, icon=get_icon_filename(result['id']))
+         EmcNotify(text, icon=get_tv_icon_filename(result['id']))
 
          # refresh the browser view
          self._browser.refresh()
@@ -775,339 +769,61 @@ class BackgroundScanner(ecore.Idler):
       self._current_serie_data = None
 
 
-###### thetvdb.com XML api implementation
-import xml.etree.ElementTree as ElementTree
-import zipfile
-
-try:
-   from urllib.parse import quote as urllib_quote
-except:
-   from urllib import quote as urllib_quote
-
-class TVDB(object):
-   """ thetvdb.com XML api implementation
-
-   tvdb = TVDB()
-
-   # to search for a serie by name (return list of matching results):
-   tvdb.search_series_by_name(serie_name, done_cb)
-   def done_cb(tvdb, results, status):
-
-   # to fetch ALL the info for a given series_id:
-   tvdb.fetch_all_data_for_serie(serie_id, done_cb)
-   def done_cb(tvdb, data, status):
-
-   # abort all the current operations:
-   tmdb.abort()
-
-   """
-   def __init__(self, apikey = TVDB_API_KEY, lang = 'en'):
-      self._apikey = apikey
-      self._lang = lang
-      self._base_url = 'http://thetvdb.com/api'
-      self._dwl_handler = None
-      self._done_cb = None
-      self._data = None
-
-   ## abort the current operation
-   def abort(self):
-      if self._dwl_handler:
-         utils.download_abort(self._dwl_handler)
-         self._dwl_handler = None
-
-   ## search series by name
-   def search_series_by_name(self, serie_name, done_cb):
-      self._done_cb = done_cb
-      url = '%s/GetSeries.php?seriesname=%s&language=%s' % \
-            (self._base_url, urllib_quote(serie_name), self._lang)
-      DBG('TVDB: Search serie query: ' + url)
-      self._dwl_handler = utils.download_url_async(url, 'tmp',
-                              urlencode = False,
-                              complete_cb = self._name_search_done_cb)
-
-   def _name_search_done_cb(self, dest, status):
-      self._dwl_handler = None
-      results = []
-      
-      if status == 200:
-         tree = self._parse_xml_file_and_delete_it(dest)
-         for serie in tree.findall('Series'):
-            results.append({
-               'id': serie.findtext('seriesid'),
-               'name': serie.findtext('SeriesName'),
-               'banner': self._build_image_url(serie.findtext('banner')),
-            })
-
-      self._done_cb(self, results, status)
-
-   ## fetch all data for the given serie_id
-   def fetch_all_data_for_serie(self, serie_id, done_cb):
-      self._done_cb = done_cb
-      url = '%s/%s/series/%s/all/%s.zip' % \
-            (self._base_url, self._apikey, serie_id, self._lang)
-      DBG('TVDB: Fetch data query: ' + url)
-
-      self._dwl_handler = utils.download_url_async(url, 'tmp',
-                              urlencode = False,
-                              complete_cb = self._fetch_zip_done_cb)
-
-   def _fetch_zip_done_cb(self, dest, status):
-      self._dwl_handler = None
-
-      if status != 200:
-         self._done_cb(self, None, status)
-         return
-
-      with zipfile.ZipFile(dest, 'r') as Z:
-         # read and parse the <lang>.xml file
-         with Z.open(self._lang + '.xml') as f:
-            self._data = self._parse_general_info(f)
-         # read and parse the banners.xml file
-         with Z.open('banners.xml') as f:
-            (backdrops, posters, banners) = self._parse_banners(f)
-            self._data['backdrops'] = backdrops
-            self._data['posters'] = posters
-            self._data['banners'] = banners
-         # TODO actors.xml
-         
-      # remove the downloaded zip file
-      os.remove(dest)
-
-      # fetch images
-      self._fetch_images()
-
-   def _parse_banners(self, file_obj):
-      # read the XML from the file-like object
-      tree = ElementTree.parse(file_obj)
-
-      backdrops = []
-      posters = []
-      banners = []
-
-      for image in tree.findall('Banner'):
-         banner_type = image.findtext('BannerType')
-         banner_type2 = image.findtext('BannerType2')
-
-         # backdrops
-         if banner_type == 'fanart': 
-            url = self._build_image_url(image.findtext('BannerPath'))
-            thumb_url = self._build_image_url(image.findtext('ThumbnailPath'))
-            backdrops.append({
-               'url': url,
-               'thumb_url': thumb_url,
-               'lang': image.findtext('Language'),
-            })
-
-         # posters (with optionally the season)
-         elif banner_type == 'poster' or \
-              (banner_type == 'season' and banner_type2 == 'season'):
-            url = self._build_image_url(image.findtext('BannerPath'))
-            # UNDOCUMENTED: posters dont have the thumb... guessing one
-            thumb_url = url.replace('banners/', 'banners/_cache/')
-            posters.append({
-               'url': url,
-               'thumb_url': thumb_url,
-               'lang': image.findtext('Language'),
-               'season': image.findtext('Season'),
-            })
-
-         # banners (with optionally the season)
-         elif banner_type == 'series' or \
-             (banner_type == 'season' and banner_type2 == 'seasonwide'):
-            url = self._build_image_url(image.findtext('BannerPath'))
-            # UNDOCUMENTED: banners dont have the thumb... guessing one
-            thumb_url = url.replace('banners/', 'banners/_cache/')
-            banners.append({
-               'url': url,
-               'thumb_url': thumb_url,
-               'lang': image.findtext('Language'),
-               'season': image.findtext('Season'),
-            })
-
-      return (backdrops, posters, banners)
-      
-   def _parse_general_info(self, file_obj):
-      # read the XML from the file-like object
-      tree = ElementTree.parse(file_obj)
-
-      # parse general serie info
-      serie = tree.find('Series')
-      data = {
-         'id': serie.findtext('id'),
-         'name': serie.findtext('SeriesName'),
-         'casts': serie.findtext('Actors').split('|')[1:-1],
-         'first_aired': serie.findtext('FirstAired'),
-         'genres': serie.findtext('Genre').split('|')[1:-1],
-         'network': serie.findtext('Network'),
-         'overview': serie.findtext('Overview'),
-         'rating': serie.findtext('Rating'),
-         'status': serie.findtext('Status'),
-         'banner_url': self._build_image_url(serie.findtext('banner')),
-         'backdrop_url': self._build_image_url(serie.findtext('fanart')),
-         'poster_url': self._build_image_url(serie.findtext('poster')),
-         'runtime': serie.findtext('Runtime'),
-         'seasons': {},
-      }
-
-      # parse seasons/episodes info
-      seasons = {}
-      for episode in tree.findall('Episode'):
-         season_num = int(episode.findtext('SeasonNumber'))
-         episode_num = int(episode.findtext('EpisodeNumber'))
-         
-         if not season_num in seasons:
-            seasons[season_num] = {
-               'season_num': season_num,
-               'episodes': {}
-            }
-
-         seasons[season_num]['episodes'][episode_num] = {
-            'id': episode.findtext('id'),
-            'series_id': data['id'],
-            'title': episode.findtext('EpisodeName'),
-            'season_num': season_num,
-            'episode_num': episode_num,
-            'director': episode.findtext('Director', '||').split('|')[1:-1],
-            'writer': episode.findtext('Writer', '||').split('|')[1:-1],
-            'overview': episode.findtext('Overview'),
-            'first_aired': episode.findtext('FirstAired'),
-            'guest_stars': episode.findtext('GuestStarts', '||').split('|')[1:-1],
-            'thumb_url': self._build_image_url(episode.findtext('filename')),
-         }
-
-      data['seasons'] = seasons
-
-      return data
-
-   ## fetch all the images for the given serie_id
-   def _fetch_images(self):
-      e = self._data
-      self._dwl_h = {}
-      # get backdrop/poster/banner/icon of the serie
-      self._dwl_h['bd'] = utils.download_url_async(e['backdrop_url'],
-                                       get_backdrop_filename(e['id']),
-                                       complete_cb=self._images_done_cb,
-                                       img_key='bd')
-      self._dwl_h['ba'] = utils.download_url_async(e['banner_url'],
-                                       get_banner_filename(e['id']),
-                                       complete_cb=self._images_done_cb,
-                                       img_key='ba')
-      self._dwl_h['po'] = utils.download_url_async(e['poster_url'],
-                                       get_poster_filename(e['id']),
-                                       complete_cb=self._images_done_cb,
-                                       img_key='po')
-      icon_url = e['poster_url'].replace('banners/', 'banners/_cache/')
-      self._dwl_h['ic'] = utils.download_url_async(icon_url,
-                                       get_icon_filename(e['id']),
-                                       complete_cb=self._images_done_cb,
-                                       img_key='ic')
-      # and all the seasons poster+icon
-      for season in e['seasons']:
-         poster_en = None # english
-         poster_la = None # language
-         
-         for poster in e['posters']:
-            if poster['season'] == str(season):
-               if not poster_en and poster['lang'] == 'en':
-                  poster_en = poster
-               if not poster_la and poster['lang'] == self._lang:
-                  poster_la = poster
-         poster = poster_la or poster_en
-
-         if poster:
-            key = 'po' + str(season)
-            self._dwl_h[key] = utils.download_url_async(poster['url'],
-                                          get_poster_filename(e['id'], season),
-                                          complete_cb=self._images_done_cb,
-                                          img_key=key)
-            key = 'ic' + str(season)
-            self._dwl_h[key] = utils.download_url_async(poster['thumb_url'],
-                                          get_icon_filename(e['id'], season),
-                                          complete_cb=self._images_done_cb,
-                                          img_key=key)
-
-   def _images_done_cb(self, dest, status, img_key):
-      del self._dwl_h[img_key]
-      if not self._dwl_h: # dict empty, all downloads done
-         self._done_cb(self, self._data)
-   
-   # utils
-   def _build_image_url(self, final_part):
-      if final_part is not None:
-         return 'http://www.thetvdb.com/banners/' + final_part
-
-   def _parse_xml_file_and_delete_it(self, path):
-      tree = ElementTree.parse(path)
-      os.remove(path)
-      return tree
-
-
 """ idler_db Reference
 {
    MacGyver: {
-      last_search_time: local-timestamp,
-      last_search_success: bool,
-   },
+      last_search_time: local-timestamp
+      last_search_success: bool
+   }
    ...
 }
 """
-
 
 """ tvshows_db Reference
+
 {
    MacGyver: {
-      id: 77847
-      name: MacGyver
-      ...
+      id: 2875
+      name: 'MacGyver'
+      created_by: ['Lee David Zlotoff']
+      country: ['US', 'CA']
+      episode_run_time: '45, 60, 48'
+      first_air_date: '1985-09-29'
+      last_air_date: '1992-05-21'
+      genres: ['Action & Adventure']
+      networks: ['American Broadcasting Company']
+      number_of_episodes: 139
+      number_of_seasons: 7
+      overview: 'blah, blah, blah, ...'
       seasons: {
          1: {
-            season_num: 1,
+            id: 9278
+            season_num: 1
+            first_air_date: '1994-05-14'
+            overview: 'blah, blah, blah, ...'
             episodes: {
                1: {
-                  id: 12345,
-                  series_id: 45678,
-                  title: Pilot,
-                  episode_num: 1,
-                  season_num: 3,
-                  thumb_url: http://...
-                  ...
-               },
-               2: {...},
+                  id: 220169
+                  episode_num: 1
+                  season_num: 1
+                  series_id: 2875
+                  director: ['name', ... ]
+                  writer: ['name', ... ]
+                  first_aired: '1994-05-14'
+                  title: 'Lost Treasure of Atlantis'
+                  overview: 'blah, blah, blah, ...'
+                  thumb_url: 'http://.../1AtgwHTkFWh0VvMM7WyAelbC8NN.jpg'
+               }
+               2: { ... }
+               ...
             }
-         },
-         2: {
-            season_num: 2,
-            episodes: {...}
-         },
+         }
+         2: { ... }
          ...
-      },
-      backdrops: [
-         {
-            url: http://... ,
-            thumb_url: http://... ,
-            lang: en,
-         },
-         ...
-      ],
-      posters: [
-         {
-            url: http://... ,
-            thumb_url: http://... ,
-            lang: en,
-            season: 2 or None
-         },
-         ...
-      ],
-      banners: [
-         {
-            url: http://... ,
-            thumb_url: http://... ,
-            lang: en,
-            season: 2 or None
-         },
-         ...
-      ],
-   },
+      }
+   }
    ...
 }
+
 """
+

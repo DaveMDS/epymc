@@ -443,16 +443,19 @@ class TMDBv3(object):
       self.done_cb(self, self.tv_info)
 
    #### posters list ##########################################################
-   def get_posters(self, tmdb_id, done_cb):
+   def get_posters(self, tmdb_id, done_cb, tv=False):
       langs = '%s,en,null' % self.lang
+      entry_point = 'tv' if tv else 'movie'
       self._api_call(self._poster_list_done, done_cb,
-                     '/movie/%s/images' % tmdb_id, include_image_language=langs)
+                     '/%s/%s/images' % (entry_point, tmdb_id),
+                     include_image_language=langs)
 
    def _poster_list_done(self, api_data, done_cb):
       results = []
       for poster in api_data['posters']:
          results.append({
             'movie_id': api_data['id'],
+            'icon_url': self._img_url(poster['file_path'], 'w92'),
             'thumb_url': self._img_url(poster['file_path'], 'w342'),
             'url': self._img_url(poster['file_path'], 'w500'),
             'lsort': 1 if poster['iso_639_1'] == self.lang else 2
@@ -461,10 +464,12 @@ class TMDBv3(object):
       done_cb(self, results)
 
    #### backdrops list ########################################################
-   def get_backdrops(self, tmdb_id, done_cb):
+   def get_backdrops(self, tmdb_id, done_cb, tv=False):
       langs = '%s,en,null' % self.lang
+      entry_point = 'tv' if tv else 'movie'
       self._api_call(self._backdrops_list_done, done_cb,
-                     '/movie/%s/images' % tmdb_id, include_image_language=langs)
+                     '/%s/%s/images' % (entry_point, tmdb_id),
+                     include_image_language=langs)
 
    def _backdrops_list_done(self, api_data, done_cb):
       results = []

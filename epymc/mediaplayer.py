@@ -58,7 +58,7 @@ def init():
    if not ini.has_option('mediaplayer', 'volume'):
       ini.set('mediaplayer', 'volume', '75')
    if not ini.has_option('mediaplayer', 'backend'):
-      ini.set('mediaplayer', 'backend', 'gstreamer')
+      ini.set('mediaplayer', 'backend', 'gstreamer1')
    _volume = ini.get_int('mediaplayer', 'volume')
 
    # simple db to store the count of played files

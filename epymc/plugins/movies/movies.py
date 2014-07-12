@@ -30,6 +30,7 @@ from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourcesManager, \
    EmcVKeyboard, EmcNotify
+from epymc.themoviedb import TMDBv3, get_poster_filename, get_backdrop_filename
 
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
@@ -444,7 +445,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def _cb_panel_3(self, button):
       if self._movie_db.id_exists(self._current_url):
          movie_info = self._movie_db.get_data(self._current_url)
-         tmdb = TMDBv3()
+         tmdb = TMDBv3(lang=ini.get('movies', 'info_lang'))
          tmdb.get_posters(movie_info['tmdb_id'], self._cb_posters_list_complete)
 
    def _cb_posters_list_complete(self, tmdb, posters):
@@ -536,7 +537,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       if self.tmdb_dialog: self.tmdb_dialog.delete()
       self._do_movie_search(txt, None)
 
-   def _cb_search_done(self, tmdb, results, status):
+   def _cb_search_done(self, tmdb, results):
       if len(results) == 0:
          self.tmdb_dialog.text_append('<br>nothing found, please try with a better name')#TODO explain better the format
       elif len(results) == 1:
@@ -569,7 +570,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       tmdb.get_movie_info(tid, self._cb_info_done, self._cb_info_progress)
       self.tmdb_dialog.text_append('<b>Downloading movie info...</b>')
 
-   def _cb_info_progress(self, tmdb, progress, stage):
+   def _cb_info_progress(self, tmdb, progress):
       self.tmdb_dialog.progress_set(progress)
 
    def _cb_info_done(self, tmdb, movie_info):
@@ -590,12 +591,9 @@ class CastPanel(EmcDialog):
       self.info = None
 
       tmdb = TMDBv3(lang = ini.get('movies', 'info_lang'))
-      tmdb.get_cast_info(self.pid, self._fetch_done_cb, self._fetch_progress_cb)
+      tmdb.get_cast_info(self.pid, self._fetch_done_cb)
       self._dia = EmcDialog(style = 'progress', title = 'Fetching info',
                             text = 'please wait...')
-
-   def _fetch_progress_cb(self, tmdb, progress):
-      self._dia.progress_set(progress)
 
    def _fetch_done_cb(self, tmdb, result):
       self.info = result
@@ -701,8 +699,8 @@ class BackgroundScanner(ecore.Idler):
 
       return ecore.ECORE_CALLBACK_RENEW
 
-   def _search_done_cb(self, tmdb_obj, results, status):
-      if status == 200 and len(results) > 0:
+   def _search_done_cb(self, tmdb_obj, results):
+      if len(results) > 0:
          self._tmdb.get_movie_info(results[0]['tmdb_id'], self._tmdb_complete)
       else:
          # store the current time in the cache db
@@ -738,14 +736,6 @@ class BackgroundScanner(ecore.Idler):
 
 
 ###### UTILS
-def get_poster_filename(tmdb_id):
-   return os.path.join(utils.user_conf_dir, 'movies',
-                       str(tmdb_id), 'poster.jpg')
-
-def get_backdrop_filename(tmdb_id):
-   return os.path.join(utils.user_conf_dir, 'movies',
-                       str(tmdb_id), 'backdrop.jpg')
-
 def get_movie_name_from_url(url):
    # remove path & extension
    movie = os.path.basename(url)
@@ -788,377 +778,3 @@ def populate_config(browser, url):
    config_gui.standard_item_bool_add('movies', 'db_names_in_list',
                                      'Prefer movie titles in lists')
 
-
-###### TMDB API v3 ######
-import json
-try:
-   from urllib.parse import quote as urllib_quote
-except:
-   from urllib import quote as urllib_quote
-
-
-class TMDBv3(object):
-   """ TMDB API v3
-
-   tmdb = TMDBv3()
-
-   # search for a given movie name + year:
-   tmdb.movie_search('Alien', 1979, search_done_cb)
-   def search_done_cb(tmdb_obj, results, status):
-
-   # get movie info + poster + backdrop:
-   tmdb.get_movie_info(tmdb_id, info_done_cb, info_progress_cb)
-   def info_progress_cb(tmdb, progress, stage):
-   def info_done_cb(tmdb, movie_info):
-
-   # get list of all available posters:
-   tmdb.get_posters(tmdb_id, list_complete_cb)
-   def list_complete_cb(tmdb, posters):
-
-   # get list of all available backdrop:
-   tmdb.get_backdrops(tmdb_id, list_complete_cb)
-   def list_complete_cb(tmdb, backdrops):
-
-   # get info for a list of casts
-   tmdb.get_cast_info(cast_ids, cast_done_cb, cast_progress_cb):
-   def cast_progress_cb(tmdb, progress):
-   def cast_done_cb(tmdb, result):
-
-   # abort the current operation:
-   tmdb.abort()
-
-   """
-   def __init__(self, api_key=TMDB_API_KEY, lang='en'):
-      self.key = api_key
-      self.lang = lang
-      self.base_url = 'http://api.themoviedb.org/3'
-      self.dwl_handler = None
-      self.done_cb = None
-      self.progress_cb = None
-      self.download_stage = 0
-
-   # abort the current operation
-   def abort(self):
-      if self.dwl_handler:
-         utils.download_abort(self.dwl_handler)
-         self.dwl_handler = None
-
-   # movie search
-   def movie_search(self, name, year, done_cb):
-      self.done_cb = done_cb
-      self.download_stage = 1
-
-      url = '%s/search/movie?api_key=%s&language=%s&query=%s' % \
-            (self.base_url, self.key, self.lang, urllib_quote(name))
-      if year: url += '&year=%s' % (year)
-      DBG('TMDB Movie search query: ' + url)
-
-      self.dwl_handler = utils.download_url_async(url, 'tmp', urlencode = False,
-                              complete_cb = self._movie_search_done_cb)
-
-   def _movie_search_done_cb(self, dest, status):
-      self.dwl_handler = None
-
-      results = []
-      if status == 200:
-         data = self._read_json_file_and_delete_it(dest)
-         for result in  data['results']:
-            try:
-               results.append({
-                  'tmdb_id': result['id'],
-                  'title': result['title'],
-                  'year': result['release_date'][:4],
-                  'poster_url': self._build_img_url(result['poster_path'], 154)
-               })
-            except: pass
-      self.done_cb(self, results, status)
-
-   # get movie info
-   def get_movie_info(self, tid, done_cb, progress_cb = None):
-      self.done_cb = done_cb
-      self.progress_cb = progress_cb
-      self.download_stage = 2
-      url = '%s/movie/%s?api_key=%s&language=%s&append_to_response=casts' % \
-             (self.base_url, tid, self.key, self.lang)
-      DBG('TMDB Movie query: ' + url)
-      self.dwl_handler = utils.download_url_async(url, 'tmp', urlencode = False,
-                           complete_cb = self._movie_info_done_cb,
-                           progress_cb = self._cb_downloads_progress)
-
-   def _movie_info_done_cb(self, dest, status):
-      self.dwl_handler = None
-      self.download_stage = 3
-
-      if status != 200:
-         # error, go to next step
-         self._movie_poster_done_cb(dest, 200)
-         return
-
-      # store the movie data for parsing later
-      data = self._read_json_file_and_delete_it(dest)
-      self.movie_info = data
-
-      if 'poster_path' in data and data['poster_path'] is not None:
-         dest = get_poster_filename(data['id'])
-         complete_url = self._build_img_url(data['poster_path'], 342)
-         self.dwl_handler = utils.download_url_async(complete_url, dest,
-                              complete_cb = self._movie_poster_done_cb,
-                              progress_cb = self._cb_downloads_progress)
-      else:
-         # no poster found, go to next step
-         self._movie_poster_done_cb(dest, 200)
-
-   def _movie_poster_done_cb(self, dest, status):
-      self.dwl_handler = None
-      self.download_stage = 4
-
-      if 'backdrop_path' in self.movie_info and self.movie_info['backdrop_path'] is not None:
-         dest = get_backdrop_filename(self.movie_info['id'])
-         complete_url = self._build_img_url(self.movie_info['backdrop_path'], 780)
-         self.dwl_handler = utils.download_url_async(complete_url, dest,
-                              complete_cb = self._movie_backdrop_done_cb,
-                              progress_cb = self._cb_downloads_progress)
-      else:
-         # no backdrop found, go to next step
-         self._movie_backdrop_done_cb(dest, 200)
-
-   def _movie_backdrop_done_cb(self, dest, status):
-      self.dwl_handler = None
-      self.download_stage = 0
-
-      # build the movie info dict
-      tmdb = self.movie_info
-
-      try:
-         director = [d['name'] for d in tmdb['casts']['crew'] if d['job'] == 'Director'][0]
-      except:
-         director = 'missing'
-
-      try:
-         country = tmdb['production_countries'][0]['iso_3166_1']
-      except:
-         country = ''
-
-      try:
-         countries = ', '.join([c['iso_3166_1'] for c in tmdb['production_countries']])
-      except:
-         countries = ''
-
-      for person in tmdb['casts']['cast']:
-         person['profile_path'] = self._build_img_url(person['profile_path'], 154)
-
-      for person in tmdb['casts']['crew']:
-         person['profile_path'] = self._build_img_url(person['profile_path'], 154)
-
-      info = {
-         'id':             tmdb['id'],
-         'tmdb_id':        tmdb['id'],
-         'imdb_id':        tmdb['imdb_id'],
-         'title':          tmdb['title'],
-         'adult':          tmdb['adult'],
-         'original_title': tmdb['original_title'],
-         'release_date':   tmdb['release_date'],
-         'budget':         tmdb['budget'],
-         'overview':       tmdb['overview'],
-         'tagline':        tmdb['tagline'],
-         'rating':         tmdb['vote_average'],
-         'country':        country,
-         'countries':      countries,
-         'director':       director,
-         'cast':           tmdb['casts']['cast'],
-         'crew':           tmdb['casts']['crew'],
-      }
-
-      # call the complete callback
-      self.done_cb(self, info)
-
-   def _cb_downloads_progress(self, dest, tot, done):
-      if tot > 0 and self.progress_cb:
-         prog = float(done) / float(tot) / 4.0 + self.download_stage * 0.25
-         self.progress_cb(self, prog, self.download_stage)
-
-   # posters list
-   def get_posters(self, tmdb_id, done_cb):
-      self.done_cb = done_cb
-      url = '%s/movie/%s/images?api_key=%s' % \
-            (self.base_url, tmdb_id, self.key)
-      DBG('TMDB images query: ' + url)
-      self.dwl_handler = utils.download_url_async(url, 'tmp', urlencode = False,
-                              complete_cb = self._poster_list_done_cb)
-
-   def _poster_list_done_cb(self, dest, status):
-      self.dwl_handler = None
-      results = []
-      if status == 200:
-         data = self._read_json_file_and_delete_it(dest)
-         for poster in data['posters']:
-            results.append({
-               'movie_id': data['id'],
-               'thumb_url': self._build_img_url(poster['file_path'], 154),
-               'url': self._build_img_url(poster['file_path'], 500)
-            })
-      self.done_cb(self, results)
-
-   # backdrops list
-   def get_backdrops(self, tmdb_id, done_cb):
-      self.done_cb = done_cb
-      url = '%s/movie/%s/images?api_key=%s' % \
-            (self.base_url, tmdb_id, self.key)
-      DBG('TMDB images query: ' + url)
-      self.dwl_handler = utils.download_url_async(url, 'tmp', urlencode = False,
-                              complete_cb = self._backdrops_list_done_cb)
-
-   def _backdrops_list_done_cb(self, dest, status):
-      self.dwl_handler = None
-      results = []
-      if status == 200:
-         data = self._read_json_file_and_delete_it(dest)
-         for backdrop in data['backdrops']:
-            results.append({
-               'movie_id': data['id'],
-               'thumb_url': self._build_img_url(backdrop['file_path'], 300),
-               'url': self._build_img_url(backdrop['file_path'], 1280)
-            })
-      self.done_cb(self, results)
-
-   # get cast info
-   def get_cast_info(self, cast_id, done_cb, progress_cb):
-      self.done_cb = done_cb
-      self.progress_cb = progress_cb
-
-      url = '%s/person/%s?api_key=%s&language=%s&append_to_response=credits,images' % \
-             (self.base_url, cast_id, self.key, self.lang)
-      DBG('TMDB People query: ' + url)
-      self.dwl_handler = utils.download_url_async(url, 'tmp', urlencode = False,
-                                          complete_cb = self._cast_info_done_cb,
-                                          progress_cb = self._cast_info_progress_cb)
-
-   def _cast_info_progress_cb(self, dest, tot, done):
-      if tot > 0 and self.progress_cb:
-         self.progress_cb(self, float(done) / float(tot))
-
-   def _cast_info_done_cb(self, dest, status):
-      if status != 200:
-         self.done_cb(self, None)
-      else:
-         data = self._read_json_file_and_delete_it(dest)
-         data['profile_path'] = self._build_img_url(data['profile_path'], 185) # ARGHHHH h632
-         for img in data['images']['profiles']:
-            img['file_path'] = self._build_img_url(img['file_path'], 185) # ARGHHHH h632
-         for movie in data['credits']['cast']:
-            movie['poster_path'] = self._build_img_url(movie['poster_path'], 154)
-         for movie in data['credits']['crew']:
-            movie['poster_path'] = self._build_img_url(movie['poster_path'], 154)
-         self.done_cb(self, data)
-      
-   # utils
-   def _build_img_url(self, final_part, size):
-      # TODO base url and sizes should be queryed with: /3/configuration
-      if final_part:
-         return 'http://d3gtl9l2a4fn1j.cloudfront.net/t/p/w' + str(size) + final_part
-
-   def _read_json_file_and_delete_it(self, path):
-      f = open(path, 'r')
-      data = json.loads(f.read())
-      f.close()
-      os.remove(path)
-      return data
-
-
-""" TMDB APIv3 response for the movie Alien (plus casts)
-
-{
- "id": 348,
- "adult": false,
- "title": "Alien",
- "original_title": "Alien",
- "release_date": "1979-05-25",
- "poster_path": "/ytcDmXUXOLhqiXbWOpZOMOAdnz2.jpg",
- "backdrop_path": "/vMNl7mDS57vhbglfth5JV7bAwZp.jpg",
- "budget": 11000000,
- "imdb_id": "tt0078748",
- "homepage": "",
- "popularity": 5.28431392227447,
- "revenue": 104931801,
- "runtime": 117,
- "status": "Released",
- "vote_average": 7.0,
- "vote_count": 1111,
- "tagline": "Nello spazio nessuno può sentirti urlare",
- "overview": "L’astronave Nostromo sbarca su un pianeta da cui proviene un SOS,
-              ma la colonia sembra essere disabitata. I coloni sono stati in
-              realtà sterminati da una razza aliena che ha trasformato la base
-              in una gigantesca covata.",
- "belongs_to_collection":
-  {
-   "id": 8091,
-   "name": "Alien Collection",
-   "poster_path": "/aSIsDu77vYlHjPWPpaOBO3072U8.jpg",
-   "backdrop_path": "/kB0Y3uGe9ohJa59Lk8UO9cUOxGM.jpg"
-  },
- "genres":
-  [
-   {"id": 28, "name": "Azione"},
-   {"id": 27, "name": "Horror"},
-   {"id": 878, "name": "Fantascienza"},
-   {"id": 53, "name": "Thriller"}
-  ],
- "production_companies":
-  [
-   {"name": "20th Century Fox", "id": 25},
-   {"name": "Brandywine Productions Ltd.", "id": 401}
-  ],
- "production_countries":
-  [
-   {"iso_3166_1": "US", "name": "United States of America"},
-   {"iso_3166_1": "GB", "name": "United Kingdom"}
-  ],
- "spoken_languages":
-  [
-   {"iso_639_1": "en", "name": "English"},
-   {"iso_639_1": "es", "name": "Español"}
-  ],
- "casts":
-  {
-   'cast':
-    [
-     {'name': 'Tom Skerritt', 'character': 'Dallas', 'id': 4139, 'cast_id': 3, 'profile_path': '/c0QJNRu6QPKPB2abCNNw70gPVUC.jpg', 'order': 1},
-     {'name': 'Sigourney Weaver', 'character': 'Ripley', 'id': 10205, 'cast_id': 4, 'profile_path': '/uXUxgbWWdHnUDLYFNg4jviTjTnq.jpg', 'order': 0},
-     {'name': 'Veronica Cartwright', 'character': 'Lambert', 'id': 5047, 'cast_id': 5, 'profile_path': '/7LEj6ln5Fq6Hdg2wMKRxsvWoU2z.jpg', 'order': 2},
-     {'name': 'Harry Dean Stanton', 'character': 'Brett', 'id': 5048, 'cast_id': 6, 'profile_path': '/vlfKwhCimC1N42VPNM9iRYBpW0b.jpg', 'order': 3},
-     {'name': 'John Hurt', 'character': 'Kane', 'id': 5049, 'cast_id': 7, 'profile_path': '/zUQ7WL3xg9C532Aa8hftcJUnk9j.jpg', 'order': 4},
-     {'name': 'Ian Holm', 'character': 'Ash', 'id': 65, 'cast_id': 8, 'profile_path': '/yD3bGWErMQPaAe1ZKdzvWi7hLsY.jpg', 'order': 5},
-     {'name': 'Yaphet Kotto', 'character': 'Parker', 'id': 5050, 'cast_id': 9, 'profile_path': '/vjQOWuoig5b2b7JZ8caN4vuFxsg.jpg', 'order': 6},
-     {'name': 'Bolaji Badejo', 'character': 'Alien', 'id': 5051, 'cast_id': 10, 'profile_path': '/83NFKY9rgC5Pnx5hRJtHj0KkpnT.jpg', 'order': 7},
-     {'name': 'Helen Horton', 'character': 'Mother (voice)', 'id': 5052, 'cast_id': 11, 'profile_path': '/90ruMVGVYNS6dUYj6zCa7XIw8eG.jpg', 'order': 8},
-     {'name': 'Eddie Powell', 'character': 'Alien', 'id': 1077325, ucast_id': 30, 'profile_path': None, 'order': 9}
-    ],
-   'crew':
-    [
-     {'department': 'Directing', 'job': 'Director', 'profile_path': '/46XCMVEYedwsqagc3kjrPmvAKmP.jpg', 'id': 578, 'name': 'Ridley Scott'},
-     {'department': 'Writing', 'job': 'Screenplay', 'profile_path': '/slLZWXZ1lmdF763166ATRRI200n.jpg', 'id': 5045, 'name': u"Dan O'Bannon"},
-     {'department': 'Production', 'job': 'Producer', 'profile_path': None, 'id': 5053, 'name': 'Gordon Carroll'},
-     {'department': 'Production', 'job': 'Producer', 'profile_path': None, 'id': 915, 'name': 'David Giler'},
-     {'department': 'Production', 'job': 'Producer', 'profile_path': None, 'id': 1723, 'name': 'Walter Hill'},
-     {'department': 'Production', 'job': 'Producer', 'profile_path': None, 'id': 5054, 'name': 'Ivor Powell'},
-     {'department': 'Production', 'job': 'Executive Producer', 'profile_path': None, 'id': 5046, 'name': 'Ronald Shusett'},
-     {'department': 'Sound', 'job': 'Original Music Composer', ''profile_path': None, 'id': 1760, 'name': 'Jerry Goldsmith'},
-     {'department': 'Camera', 'job': 'Director of Photography', 'profile_path': None, 'id': 5055, 'name': 'Derek Vanlint'},
-     {'department': 'Editing', 'job': 'Editor', 'profile_path': None, 'id': 5056, 'name': 'Terry Rawlings'},
-     {'department': 'Editing', 'job': 'Editor', 'profile_path': None, 'id': 5057, ''name': 'Peter Weatherley'},
-     {'department': 'Art', 'job': 'Production Design', 'profile_path': None, 'id': 4616, 'name': 'Michael Seymour'},
-     {'department': 'Art', 'job': 'Production Design', 'profile_path': None, 'id': 5058, 'name': 'Roger Christian'},
-     {'department': 'Art', 'job': 'Art Direction', 'profile_path': None, 'id': 5058, 'name': 'Roger Christian'},
-     {'department': 'Art', 'job': 'Art Direction', 'profile_path': None, 'id': 5059, 'name': 'Leslie Dilley'},
-     {'department': 'Art', 'job': 'Set Decoration', 'profile_path': None, 'id': 5060, 'name': 'Ian Whittaker'},
-     {'department': 'Costume & Make-Up', 'job': 'Costume Design', 'profile_path': None, 'id': 5061, 'name': 'John Mollo'},
-     {'department': ''Sound', 'job': 'Sound Editor', 'profile_path': None, 'id': 5062, 'name': 'Robert Hathaway'},
-     {'department': 'Art', 'job': 'Production Design', 'profile_path': None, 'id': 9136, 'name': 'H.R. Giger'},
-     {'department': 'Crew', 'job': 'Special Effects', 'profile_path': None, 'id': 9402, 'name': 'Brian Johnson'},
-     {'department': 'Production', 'job': 'Casting', 'profile_path': None, 'id': 23349, 'name': 'Mary Goldberg'},
-     {'department': 'Production', 'job': 'Casting', 'profile_path': None, 'id': 668, 'name': 'Mary Selway'}
-    ]
-  }
-}
-
-"""

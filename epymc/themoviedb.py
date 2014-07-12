@@ -184,7 +184,7 @@ class TMDBv3(object):
       self.progress_cb = progress_cb
 
       self._api_call(self._movie_info_done, None,
-                     '/movie/%s' % tid, append_to_response='casts')
+                     '/movie/%s' % tid, append_to_response='credits')
 
    def _movie_info_done(self, api_data):
 
@@ -204,10 +204,10 @@ class TMDBv3(object):
       except:
          countries = ''
 
-      for person in api_data['casts']['cast']:
+      for person in api_data['credits']['cast']:
          person['profile_path'] = self._img_url(person['profile_path'], 'w154')
 
-      for person in api_data['casts']['crew']:
+      for person in api_data['credits']['crew']:
          person['profile_path'] = self._img_url(person['profile_path'], 'w154')
 
       self.movie_info = {
@@ -225,8 +225,8 @@ class TMDBv3(object):
          'country':        country,
          'countries':      countries,
          'director':       director,
-         'cast':           api_data['casts']['cast'],
-         'crew':           api_data['casts']['crew'],
+         'cast':           api_data['credits']['cast'],
+         'crew':           api_data['credits']['crew'],
       }
 
       # queue backdrop, poster and icon

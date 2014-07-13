@@ -294,7 +294,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       # add an entry in the config gui
       config_gui.root_item_add('tvshows', 51, 'Tv Shows Collection',
-                               icon = 'icon/tv', callback = config_panel_cb)
+                               icon='icon/tv', callback=config_panel_cb)
 
       # create a browser instance
       self._browser = EmcBrowser('TvShows', 'List')
@@ -336,9 +336,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          m = int(pos / 60) % 60
          s = int(pos % 60)
          txt = "Continue from %d:%.2d:%.2d ?" % (h, m, s)
-         EmcDialog(text = txt, style = 'yesno', user_data = url,
-                   done_cb = self._dia_yes_cb,
-                   canc_cb = self._dia_no_cb)
+         EmcDialog(text=txt, style='yesno', user_data=url,
+                   done_cb=self._dia_yes_cb,
+                   canc_cb=self._dia_no_cb)
       else:
          self.play_url_real(url, 0)
 
@@ -352,7 +352,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       dialog.delete()
 
    def play_url_real(self, url, start_from):
-      mediaplayer.play_url(url, start_from = start_from)
+      mediaplayer.play_url(url, start_from=start_from)
       title = os.path.basename(url)
       poster = None
       try: 
@@ -455,8 +455,8 @@ class InfoPanel(EmcDialog):
          self._db_data = None
 
       self._image = Image(gui.win)
-      EmcDialog.__init__(self, style = 'panel', title = serie_name,
-                         text = ' ', content = self._image)
+      EmcDialog.__init__(self, style='panel', title=serie_name,
+                         text=' ', content=self._image)
       self.button_add('Posters', self._posters_button_cb)
       self.button_add('Backdrops', self._backdrop_button_cb)
       self.button_add('Cast', self._cast_button_cb)
@@ -529,11 +529,11 @@ class InfoPanel(EmcDialog):
 
    def _image_choosed_cb(self, dia, dwnl_url, dest_path, icon_url=None):
       dia.delete()
-      dia = EmcDialog(style = 'progress', title = 'Downloading image')
+      dia = EmcDialog(style='progress', title='Downloading image')
       utils.download_url_async(dwnl_url, dest_path,
-                               complete_cb = self._cb_image_done,
-                               progress_cb = self._cb_image_progress,
-                               dia = dia)
+                               complete_cb=self._cb_image_done,
+                               progress_cb=self._cb_image_progress,
+                               dia=dia)
       # also download icon for poster
       if icon_url and dest_path.endswith('/poster.jpg'):
          icon_path = dest_path.replace('poster.jpg', 'icon.jpg')
@@ -576,8 +576,8 @@ class InfoPanel(EmcDialog):
          self._result_choosed_cb(None, results[0]['tmdb_id'])
       elif len(results) > 1:
          title = 'Found %d results, which one?' % len(results)
-         dia = EmcDialog(style = 'list', title = title,
-                         done_cb = self._result_choosed_cb)
+         dia = EmcDialog(style='list', title=title,
+                         done_cb=self._result_choosed_cb)
          for item in results:
             if item['poster_url']:
                img = EmcRemoteImage(item['poster_url'])
@@ -595,7 +595,7 @@ class InfoPanel(EmcDialog):
                 'your folder to match the title on the site.<br>' \
                 'If otherwise it is not in the online database please ' \
                 'contribute and add it yourself.' % self._serie_name
-         EmcDialog(style = 'minimal', title = 'Nothing found', text = text)
+         EmcDialog(style='minimal', title='Nothing found', text=text)
 
    def _result_choosed_cb(self, dia, serie_id):
       tmdb = TMDBv3(lang=ini.get('tvshows', 'info_lang'))
@@ -603,9 +603,9 @@ class InfoPanel(EmcDialog):
 
       if dia: dia.delete()
       # TODO give credits here
-      self._prog_dia = EmcDialog(style = 'minimal', spinner = True,
-                                 title = 'Fetching updated info',
-                                 text = 'Please wait...')
+      self._prog_dia = EmcDialog(style='minimal', spinner=True,
+                                 title='Fetching updated info',
+                                 text='Please wait...')
 
    def _refresh_done_cb(self, tvdb, data):
       self._prog_dia.delete()
@@ -710,7 +710,7 @@ class BackgroundScanner(ecore.Idler):
          EmcNotify("TvShows scanner started")
          sources = ini.get_string_list('tvshows', 'folders', ';')
          folders = [f.replace('file://', '') for f in sources]
-         self._generator = utils.grab_files(folders, recursive = False)
+         self._generator = utils.grab_files(folders, recursive=False)
 
       # get the next filename from the generator
       try:
@@ -754,7 +754,7 @@ class BackgroundScanner(ecore.Idler):
       # perform a search by title
       self._current_serie_name = serie_name
       if self._tvdb is None:
-         self._tvdb = TMDBv3(lang = ini.get('tvshows', 'info_lang'))
+         self._tvdb = TMDBv3(lang=ini.get('tvshows', 'info_lang'))
       self._tvdb.tv_search(serie_name, self._search_done_cb)
       return ecore.ECORE_CALLBACK_RENEW
 

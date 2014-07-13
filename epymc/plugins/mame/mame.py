@@ -160,8 +160,8 @@ and what it need to work well, can also use markup like <title>this</> or
          MameModule._favorites = ini.get_string_list('mame', 'favorites', ',')
 
       # show the spinning dialog
-      self.dialog = EmcDialog(title = 'Searching games, please wait...',
-                              spinner = True, style = 'cancel')
+      self.dialog = EmcDialog(title='Searching games, please wait...',
+                              spinner=True, style='cancel')
 
       # Aquire mame dirs from the command 'mame -showconfig'
       MameModule._rompaths = []
@@ -217,14 +217,14 @@ and what it need to work well, can also use markup like <title>this</> or
             exe.on_del_event_add(self.cb_exe_end_listfull)
          else:
             self.dialog.delete()
-            EmcDialog(title = 'Can\'t get rom path from M.A.M.E.',
-                      text = 'Is your mame well configured?',
-                      style = 'error')
+            EmcDialog(title='Can\'t get rom path from M.A.M.E.',
+                      text='Is your mame well configured?',
+                      style='error')
       else:
          DBG('ERROR: mame not found in PATH')
          self.dialog.delete()
-         EmcDialog(title = 'M.A.M.E not found', style = 'error',
-                   text = '<br>Is mame in your path?')
+         EmcDialog(title='M.A.M.E not found', style='error',
+                   text='<br>Is mame in your path?')
 
    def cb_exe_event_listfull(self, exe, event):
       """ Data from the command 'mame -listfull' received.
@@ -305,8 +305,8 @@ and what it need to work well, can also use markup like <title>this</> or
 
       catver_file = ini.get('mame', 'catver_file')
       if not os.path.exists(catver_file):
-         EmcDialog(title = 'No category file found',style = 'error',
-                   text = 'The category file is not included in mame, you '
+         EmcDialog(title='No category file found',style='error',
+                   text='The category file is not included in mame, you '
                           'need to download a copy from the net. <br>'
                           'The file must be placed in ' + catver_file)
          return False
@@ -378,7 +378,7 @@ class MameGame(object):
                self.buttons)
       else:
          # update of the browser postponed... when_finished...quite an hack :/
-         self._more_game_info(when_finished = (lambda: _instance._browser.refresh()))
+         self._more_game_info(when_finished=(lambda: _instance._browser.refresh()))
          return ''
 
    def file_name_get(self):
@@ -392,7 +392,7 @@ class MameGame(object):
    def dialog_show(self):
       if not self.parsed:
          # postpone the action until info parsed
-         self._more_game_info(when_finished = (lambda: self.dialog_show()))
+         self._more_game_info(when_finished=(lambda: self.dialog_show()))
          return
 
       (local, remote) = self.poster_get()
@@ -412,7 +412,7 @@ class MameGame(object):
               self.driver_emulation, self.driver_color,
               self.driver_sound, self.driver_graphic)
 
-      self.dialog = EmcDialog(self.name, content = image, text = text)
+      self.dialog = EmcDialog(self.name, content=image, text=text)
 
       if self.file_name_get():
          self.dialog.button_add('Play', (lambda btn: self.run()))
@@ -420,9 +420,9 @@ class MameGame(object):
          self.dialog.button_add('Download', (lambda btn: self.download_zip()))
 
       if self.gid in MameModule._favorites:
-         self.dialog.button_add('', self._cb_favorite_button, icon = 'icon/star')
+         self.dialog.button_add('', self._cb_favorite_button, icon='icon/star')
       else:
-         self.dialog.button_add('', self._cb_favorite_button, icon = 'icon/star_off')
+         self.dialog.button_add('', self._cb_favorite_button, icon='icon/star_off')
 
       self.dialog.button_add('History', (lambda btn: self.history_show()))
 
@@ -447,10 +447,10 @@ class MameGame(object):
 
       # history.dat file not found
       if not os.path.exists(history_file):
-         EmcDialog(title = 'No History file found',style = 'error',
-                   text = 'The History file is not included in mame, you '
-                          'should download a copy from arcade-history.com <br>'
-                          'The file must be unzipped and placed in ' + history_file)
+         EmcDialog(title='No History file found',style='error',
+                   text='The History file is not included in mame, you '
+                        'should download a copy from arcade-history.com <br>'
+                        'The file must be unzipped and placed in ' + history_file)
          return
 
       # parse the history file
@@ -488,19 +488,19 @@ class MameGame(object):
          self.history = history
       
       if not self.history:
-         EmcDialog(title = 'Game not found in history file', style = 'error')
+         EmcDialog(title='Game not found in history file', style='error')
          return
 
       # show a scrollable text dialog with the game history
-      EmcDialog(title = self.name, text = self.history, style = 'panel')
+      EmcDialog(title=self.name, text=self.history, style='panel')
 
 ## delete game stuff
    def delete_zip(self):
       def _cb_done(dialog):
          self._delete_zip_real()
          dialog.delete()
-      EmcDialog(title = 'Really delete this game?', style='yesno',
-                done_cb = _cb_done)
+      EmcDialog(title='Really delete this game?', style='yesno',
+                done_cb=_cb_done)
 
    def _delete_zip_real(self):
       done = False
@@ -511,10 +511,10 @@ class MameGame(object):
             done = True
       if done:
          self.dialog.delete()
-         EmcDialog(title = 'Game deleted', style = 'info')
+         EmcDialog(title='Game deleted', style='info')
          _instance._browser.refresh(hard=True)
       else:
-         EmcDialog(text = 'Can not delete game', style = 'error')
+         EmcDialog(text='Can not delete game', style='error')
 
 ## download game stuff
    def download_zip(self):
@@ -524,17 +524,17 @@ class MameGame(object):
          if os.path.isdir(dir) and os.access(dir, os.W_OK):
             dest = dir
       if dest is None:
-         EmcDialog(title = 'Error, can not find a writable rom directory',
-                   text = 'You sould check your mame configuration',
-                   style = 'error')
+         EmcDialog(title='Error, can not find a writable rom directory',
+                   text='You sould check your mame configuration',
+                   style='error')
          return
       dest = os.path.join(dest, self.gid + '.zip')
       DBG('Download to: ' + dest)
 
       # create the new download dialog
       self.dialog.delete()
-      self.dialog = EmcDialog(title = 'Game download', spinner = True,
-                              text = '', style= 'progress')
+      self.dialog = EmcDialog(title='Game download', spinner=True,
+                              text='', style='progress')
       self.dialog.button_add('Close', self.close_dialog)
 
       # Try to download the game from various roms site
@@ -562,10 +562,10 @@ class MameGame(object):
       self.dialog.text_append(title)
       DBG('Download from: ' + url)
       try:
-         self._dwnl_handler = utils.download_url_async(url, dest, min_size = 2000,
-                                 complete_cb = self._cb_multi_download_complete,
-                                 progress_cb = self._cb_multi_download_progress,
-                                 sources = sources)
+         self._dwnl_handler = utils.download_url_async(url, dest, min_size=2000,
+                                 complete_cb=self._cb_multi_download_complete,
+                                 progress_cb=self._cb_multi_download_progress,
+                                 sources=sources)
       except SystemError:
          if sources:
             self._try_download_multi_sources(sources, dest)
@@ -590,7 +590,7 @@ class MameGame(object):
 
 
 ## game info (from mame -listxml <rom>)
-   def _more_game_info(self, when_finished = None):
+   def _more_game_info(self, when_finished=None):
       # do this only once
       if self.parsed: return
       # get game info from the command: mame -listxml <id>

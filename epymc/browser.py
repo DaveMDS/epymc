@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 
 from efl import evas, ecore, elementary
 from efl.elementary.genlist import Genlist, GenlistItem, GenlistItemClass,\
@@ -185,6 +186,11 @@ class EmcBrowser(object):
       to the callback. style can be None to use the default page style,
       usually the plain list.
       """
+
+      # in py2 ensure url is not unicode (shelve will not like unicode as key)
+      if sys.version_info[0] < 3 and isinstance(url, unicode):
+         url = url.encode('utf8')
+
       # choose the style of the new page
       if _memorydb.id_exists(url):
          style = _memorydb.get_data(url)

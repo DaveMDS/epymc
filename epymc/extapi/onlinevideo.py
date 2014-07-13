@@ -34,7 +34,6 @@ except:
    from urllib import urlencode
 
 
-
 api_version = 4
 
 ACT_NONE = 0
@@ -42,6 +41,8 @@ ACT_FOLDER = 1
 ACT_MORE = 2
 ACT_PLAY = 3
 ACT_SEARCH = 4
+
+py3 = (sys.version_info[0] >= 3)
 
 def state_get():
    """ Get the state (and the url) of the current running scraper process """
@@ -53,7 +54,10 @@ def item_add(next_state, label, url, info=None, icon=None, poster=None, action=A
 
 def play_url(url):
    """ Tell EpyMC to start the playback of the given url """
-   print('PLAY!' + url)
+   if py3:
+      print('PLAY!' + url.decode('utf8'))
+   else:
+      print('PLAY!' + url)
 
 def local_resource(_file_, res):
    """ Get the full path of a resouce included with the scraper """
@@ -79,6 +83,9 @@ def fetch_url(url, headers=None, parser=None):
    f = urllib2.urlopen(req)
    data = f.read()
    f.close()
+
+   # in py3 urlopen return a byte obj, so we need to encode it
+   if py3: data = data.decode('utf8')
 
    if parser == 'json':
       data = json.loads(data)

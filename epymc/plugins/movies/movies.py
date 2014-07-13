@@ -532,9 +532,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       else:
          text = '<b>Searching for:</><br>%s<br>' % (name)
 
-      self.tmdb_dialog = EmcDialog(title = 'themoviedb.org',
-                                   style = 'progress', text = text,
-                                   user_data = tmdb)
+      self.tmdb_dialog = EmcDialog(title='themoviedb.org',
+                                   style='progress', text=text,
+                                   user_data=tmdb)
       self.tmdb_dialog.button_add('Change name',
                   lambda b: EmcVKeyboard(text=name, accept_cb=self._vkbd_cb))
 
@@ -552,9 +552,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       else:
          self.tmdb_dialog.text_append('<b>Found %d results</b><br>' % (len(results)))
          title = 'Found %d results, which one?' % (len(results))
-         dialog2 = EmcDialog(title = title, style = 'list',
-                             done_cb = self._cb_list_ok,
-                             canc_cb = self._cb_list_cancel)
+         dialog2 = EmcDialog(title=title, style='list',
+                             done_cb=self._cb_list_ok,
+                             canc_cb=self._cb_list_cancel)
          for res in results:
             icon = EmcRemoteImage(res['poster_url'])
             icon.size_hint_min_set(100, 100) # TODO fixme
@@ -648,7 +648,7 @@ class BackgroundScanner(ecore.Idler):
          self._idler_db.del_data(url)
 
       if emotion.extension_may_play_get(filename):
-         self._tmdb = TMDBv3(lang = ini.get('movies', 'info_lang'))
+         self._tmdb = TMDBv3(lang=ini.get('movies', 'info_lang'))
          name, year = get_movie_name_from_url(url)
          self._tmdb.movie_search(name, year, self._search_done_cb)
          self._current_url = url
@@ -676,7 +676,7 @@ class BackgroundScanner(ecore.Idler):
             self._movie_db.set_data(self._current_url, movie_info)
             text = '<title>Found movie:</><br>%s (%s)' % \
                    (movie_info['title'], movie_info['release_date'][:4])
-            EmcNotify(text, icon = get_poster_filename(movie_info['id']))
+            EmcNotify(text, icon=get_poster_filename(movie_info['id']))
          except:
             pass
 

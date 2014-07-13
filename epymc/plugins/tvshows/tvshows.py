@@ -571,12 +571,13 @@ class InfoPanel(EmcDialog):
       tmdb = TMDBv3(lang=ini.get('tvshows', 'info_lang'))
       tmdb.tv_search(self._serie_name, self._search_done_cb)
 
-   def _search_done_cb(self, tvdb, results):
-      if len(results) > 0:
+   def _search_done_cb(self, tmdb, results):
+      if len(results) == 1:
+         self._result_choosed_cb(None, results[0]['tmdb_id'])
+      elif len(results) > 1:
          title = 'Found %d results, which one?' % len(results)
          dia = EmcDialog(style = 'list', title = title,
-                         done_cb = self._result_choosed_cb,
-                         user_data = tvdb)
+                         done_cb = self._result_choosed_cb)
          for item in results:
             if item['poster_url']:
                img = EmcRemoteImage(item['poster_url'])
@@ -597,10 +598,10 @@ class InfoPanel(EmcDialog):
          EmcDialog(style = 'minimal', title = 'Nothing found', text = text)
 
    def _result_choosed_cb(self, dia, serie_id):
-      tmdb = dia.data_get()
+      tmdb = TMDBv3(lang=ini.get('tvshows', 'info_lang'))
       tmdb.get_tv_info(serie_id, self._refresh_done_cb)
 
-      dia.delete()
+      if dia: dia.delete()
       # TODO give credits here
       self._prog_dia = EmcDialog(style = 'minimal', spinner = True,
                                  title = 'Fetching updated info',

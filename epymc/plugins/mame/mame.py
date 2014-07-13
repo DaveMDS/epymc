@@ -121,6 +121,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def __init__(self):
       global _mod
+      _mod = self
 
       DBG('Init MAME')
       self._snapshoot_dir = None
@@ -128,12 +129,9 @@ and what it need to work well, can also use markup like <title>this</> or
       self._favorites = []
       self._categories = {}
 
-      _mod = self
       self._games = {} # key = game_id<str>  value = <MameGame> instance
       self._browser = EmcBrowser('MAME')
-
       mainmenu.item_add('mame', 50, 'M.A.M.E', 'icon/mame', self.cb_mainmenu)
-
       ini.add_section('mame')
 
    def __shutdown__(self):
@@ -164,11 +162,8 @@ and what it need to work well, can also use markup like <title>this</> or
       # Aquire mame dirs from the command 'mame -showconfig'
       self._rompaths = []
       self._snapshoot_dir = None
-      exe = ecore.Exe(MAME_EXE + ' -showconfig | grep -e snapshot_directory -e rompath',
-                     ecore.ECORE_EXE_PIPE_READ |
-                     ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
-      exe.on_data_event_add(self.cb_exe_event_showconfig)
-      exe.on_del_event_add(self.cb_exe_end_showconfig)
+      EmcExec(MAME_EXE + ' -showconfig', grab_output=True,
+              done_cb=self.cb_showconfig_done)
 
    def count_roms(self):
       tot = 0
@@ -180,60 +175,56 @@ and what it need to work well, can also use markup like <title>this</> or
       return tot
 
 ## async mame stuff
-   def cb_exe_event_showconfig(self, exe, event):
-      """ Data from the command 'mame -showconfig' received.
-         Parse the line and fill the class vars """
-      for l in event.lines:
-         (key, val) = l.split()
-         for dir in val.split(';'):
-            dir_real = dir.replace('$HOME', os.getenv('HOME'))
-            if key == 'rompath':
-               if not os.path.exists(dir_real):
-                  os.makedirs(dir_real)
-               self._rompaths.append(dir_real)
-            elif key == 'snapshot_directory':
-               self._snapshoot_dir = dir_real
-
-   def cb_exe_end_showconfig(self, exe, event):
-      """ The command 'mame -showconfig' is done """
-      if event.exit_code == 0:
-         DBG('mame found')
-         DBG('ROM PATHS: ' + str(self._rompaths))
-         DBG('SNAP PATH: ' + self._snapshoot_dir)
-
-         # build the full list only the first time
-         if self._games:
-            self.cb_exe_end_listfull(None, None)
-            return
-
-         if len(self._rompaths) > 0:
-            # get the list of games now
-            exe = ecore.Exe(MAME_EXE + ' -listfull',
-                           ecore.ECORE_EXE_PIPE_READ |
-                           ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
-            exe.on_data_event_add(self.cb_exe_event_listfull)
-            exe.on_del_event_add(self.cb_exe_end_listfull)
-         else:
-            self.dialog.delete()
-            EmcDialog(title='Can\'t get rom path from M.A.M.E.',
-                      text='Is your mame well configured?',
-                      style='error')
-      else:
-         DBG('ERROR: mame not found in PATH')
+   def cb_showconfig_done(self, output):
+      # mame not found
+      if not output:
          self.dialog.delete()
          EmcDialog(title='M.A.M.E not found', style='error',
-                   text='<br>Is mame in your path?')
+                   text='<br>Is mame installed?')
+         return
+
+      # parse "mame -showconfig" output
+      for l in output.split('\n'):
+         if l.startswith('snapshot_directory ') or l.startswith('rompath '):
+            key, val = l.split()
+            val = val.replace('$HOME', os.getenv('HOME'))
+            if key == 'snapshot_directory':
+               self._snapshoot_dir = val
+            elif key == 'rompath':
+               for d in val.split(';'):
+                  if not os.path.exists(d):
+                     os.makedirs(d)
+                  self._rompaths.append(d)
+
+      DBG('ROM PATHS: %s' % self._rompaths)
+      DBG('SNAP PATH: %s' % self._snapshoot_dir)
+
+      # no path for roms found
+      if len(self._rompaths) < 1:
+         self.dialog.delete()
+         EmcDialog(title='Can\'t get rom path from M.A.M.E.', style='error',
+                   text='Is your mame well configured?')
+         return
+
+      # build the list of ALL the know games (only the first time)
+      if self._games:
+         self.cb_exe_end_listfull(None, None)
+      else:
+         exe = ecore.Exe(MAME_EXE + ' -listfull',
+                         ecore.ECORE_EXE_PIPE_READ |
+                         ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
+         exe.on_data_event_add(self.cb_exe_event_listfull)
+         exe.on_del_event_add(self.cb_exe_end_listfull)
 
    def cb_exe_event_listfull(self, exe, event):
       """ Data from the command 'mame -listfull' received.
-         Parse the line and fill the games list """
-      first = True
+-         Parse the line and fill the games list """
       for l in event.lines:
-         id = l[0:l.find(' ')]
+         gid = l[0:l.find(' ')]
          name = l[l.find('"') + 1:l.rfind('"')]
-         #~ DBG("ID '" + id + "' NAME '"+name+"'")
-         if id != 'Name:': #skip first line
-            self._games[id] = MameGame(id, name)
+         # DBG("ID '" + gid + "' NAME '"+name+"'")
+         if gid != 'Name:': #skip first line
+            self._games[gid] = MameGame(gid, name)
 
    def cb_exe_end_listfull(self, exe, event):
       """ The command 'mame -listfull' is done, create the root page """

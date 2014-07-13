@@ -95,7 +95,7 @@ class GameItemClass(EmcItemClass):
       # return game.short_info_get()
 
    def icon_get(self, url, game):
-      if url in MameModule._favorites:
+      if url in _mod._favorites:
          return 'icon/star'
 
    def poster_get(self, item_url, game):
@@ -119,16 +119,14 @@ class MameModule(EmcModule):
 and what it need to work well, can also use markup like <title>this</> or
 <b>this</>"""
 
-
-   _snapshoot_dir = None
-   _rompaths = []
-   _favorites = []
-   _categories = {}
-
    def __init__(self):
       global _mod
 
       DBG('Init MAME')
+      self._snapshoot_dir = None
+      self._rompaths = []
+      self._favorites = []
+      self._categories = {}
 
       _mod = self
       self._games = {} # key = game_id<str>  value = <MameGame> instance
@@ -142,7 +140,7 @@ and what it need to work well, can also use markup like <title>this</> or
       DBG('Shutdown MAME')
 
       # save favorite games
-      ini.set_string_list('mame', 'favorites', MameModule._favorites, ',')
+      ini.set_string_list('mame', 'favorites', self._favorites, ',')
 
       # clear stuff
       self._browser.delete()
@@ -156,16 +154,16 @@ and what it need to work well, can also use markup like <title>this</> or
       gui.background_set(bg)
 
       # read favorite list from config (just the first time)
-      if not MameModule._favorites:
-         MameModule._favorites = ini.get_string_list('mame', 'favorites', ',')
+      if not self._favorites:
+         self._favorites = ini.get_string_list('mame', 'favorites', ',')
 
       # show the spinning dialog
       self.dialog = EmcDialog(title='Searching games, please wait...',
                               spinner=True, style='cancel')
 
       # Aquire mame dirs from the command 'mame -showconfig'
-      MameModule._rompaths = []
-      MameModule._snapshoot_dir = None
+      self._rompaths = []
+      self._snapshoot_dir = None
       exe = ecore.Exe(MAME_EXE + ' -showconfig | grep -e snapshot_directory -e rompath',
                      ecore.ECORE_EXE_PIPE_READ |
                      ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
@@ -174,7 +172,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def count_roms(self):
       tot = 0
-      for dir in MameModule._rompaths:
+      for dir in self._rompaths:
          if os.path.exists(dir):
             for f in os.listdir(dir):
                if f.endswith('.zip'):
@@ -192,23 +190,23 @@ and what it need to work well, can also use markup like <title>this</> or
             if key == 'rompath':
                if not os.path.exists(dir_real):
                   os.makedirs(dir_real)
-               MameModule._rompaths.append(dir_real)
+               self._rompaths.append(dir_real)
             elif key == 'snapshot_directory':
-               MameModule._snapshoot_dir = dir_real
+               self._snapshoot_dir = dir_real
 
    def cb_exe_end_showconfig(self, exe, event):
       """ The command 'mame -showconfig' is done """
       if event.exit_code == 0:
          DBG('mame found')
-         DBG('ROM PATHS: ' + str(MameModule._rompaths))
-         DBG('SNAP PATH: ' + MameModule._snapshoot_dir)
+         DBG('ROM PATHS: ' + str(self._rompaths))
+         DBG('SNAP PATH: ' + self._snapshoot_dir)
 
          # build the full list only the first time
          if self._games:
             self.cb_exe_end_listfull(None, None)
             return
 
-         if len(MameModule._rompaths) > 0:
+         if len(self._rompaths) > 0:
             # get the list of games now
             exe = ecore.Exe(MAME_EXE + ' -listfull',
                            ecore.ECORE_EXE_PIPE_READ |
@@ -256,7 +254,7 @@ and what it need to work well, can also use markup like <title>this</> or
    def populate_mygames_page(self, browser, page_url):
       """ Create the list of personal games """
       L = list()
-      for dir in MameModule._rompaths:
+      for dir in self._rompaths:
          for rom in os.listdir(dir):
             id = rom.strip('.zip')
             if id and id in self._games:
@@ -273,7 +271,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def populate_favgames_page(self, browser, page_url):
       """ Create the list of favorite games """
-      for gid in MameModule._favorites:
+      for gid in self._favorites:
          if gid in self._games:
             game = self._games[gid]
             self._browser.item_add(GameItemClass(), gid, game)
@@ -295,13 +293,13 @@ and what it need to work well, can also use markup like <title>this</> or
    def populate_categorie_page(self, browser, url):
       """ Create the list of games in a given cat """
       cat_name = url[12:]
-      for gid in MameModule._categories[cat_name]:
+      for gid in self._categories[cat_name]:
          if gid in self._games:
             self._browser.item_add(GameItemClass(), gid, self._games[gid])
 
    def _parse_cats_file(self):
       # just the first time
-      if MameModule._categories: return True
+      if self._categories: return True
 
       catver_file = ini.get('mame', 'catver_file')
       if not os.path.exists(catver_file):
@@ -325,10 +323,10 @@ and what it need to work well, can also use markup like <title>this</> or
                state = 2
             else:
                (game_id, cat) = stripped.split('=')
-               if cat in MameModule._categories:
-                  MameModule._categories[cat].append(game_id)
+               if cat in self._categories:
+                  self._categories[cat].append(game_id)
                else:
-                  MameModule._categories[cat] = [game_id]
+                  self._categories[cat] = [game_id]
          #state2: end
          elif state == 2:
             break
@@ -363,7 +361,7 @@ class MameGame(object):
       ecore.exe_run('%s %s' % (MAME_EXE, self.gid))
 
    def poster_get(self):
-      snap_file = os.path.join(MameModule._snapshoot_dir, self.gid, '0000.png')
+      snap_file = os.path.join(_mod._snapshoot_dir, self.gid, '0000.png')
       snap_url = 'http://www.progettoemma.net/snap/%s/0000.png' % self.gid
       return (snap_file, snap_url)
 
@@ -382,7 +380,7 @@ class MameGame(object):
          return ''
 
    def file_name_get(self):
-      for dir in MameModule._rompaths:
+      for dir in _mod._rompaths:
          f = os.path.join(dir, self.gid + '.zip')
          if (os.access(f, os.R_OK)):
             return f
@@ -419,7 +417,7 @@ class MameGame(object):
       else:
          self.dialog.button_add('Download', (lambda btn: self.download_zip()))
 
-      if self.gid in MameModule._favorites:
+      if self.gid in _mod._favorites:
          self.dialog.button_add('', self._cb_favorite_button, icon='icon/star')
       else:
          self.dialog.button_add('', self._cb_favorite_button, icon='icon/star_off')
@@ -430,11 +428,11 @@ class MameGame(object):
          self.dialog.button_add('Delete', (lambda btn: self.delete_zip()))
 
    def _cb_favorite_button(self, btn):
-      if self.gid in MameModule._favorites:
+      if self.gid in _mod._favorites:
          btn.content_set(gui.load_icon('icon/star_off'))
-         MameModule._favorites.remove(self.gid)
+         _mod._favorites.remove(self.gid)
       else:
-         MameModule._favorites.append(self.gid)
+         _mod._favorites.append(self.gid)
          btn.content_set(gui.load_icon('icon/star'))
       _mod._browser.refresh()
 
@@ -504,7 +502,7 @@ class MameGame(object):
 
    def _delete_zip_real(self):
       done = False
-      for dir in MameModule._rompaths:
+      for dir in _mod._rompaths:
          f = os.path.join(dir, self.gid + '.zip')
          if (os.access(f, os.W_OK)):
             os.remove(f)
@@ -520,7 +518,7 @@ class MameGame(object):
    def download_zip(self):
       # choose a writable folder in rompath
       dest = None
-      for dir in MameModule._rompaths:
+      for dir in _mod._rompaths:
          if os.path.isdir(dir) and os.access(dir, os.W_OK):
             dest = dir
       if dest is None:

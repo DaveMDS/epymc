@@ -40,7 +40,7 @@ def DBG(msg):
    pass
 
 MAME_EXE = 'mame'
-_instance = None
+_mod = None
 
 
 class MyGamesItemClass(EmcItemClass):
@@ -126,11 +126,11 @@ and what it need to work well, can also use markup like <title>this</> or
    _categories = {}
 
    def __init__(self):
-      global _instance
+      global _mod
 
       DBG('Init MAME')
 
-      _instance = self
+      _mod = self
       self._games = {} # key = game_id<str>  value = <MameGame> instance
       self._browser = EmcBrowser('MAME')
 
@@ -378,7 +378,7 @@ class MameGame(object):
                self.buttons)
       else:
          # update of the browser postponed... when_finished...quite an hack :/
-         self._more_game_info(when_finished=(lambda: _instance._browser.refresh()))
+         self._more_game_info(when_finished=(lambda: _mod._browser.refresh()))
          return ''
 
    def file_name_get(self):
@@ -436,7 +436,7 @@ class MameGame(object):
       else:
          MameModule._favorites.append(self.gid)
          btn.content_set(gui.load_icon('icon/star'))
-      _instance._browser.refresh()
+      _mod._browser.refresh()
 
    def history_show(self):
       # get history file from config (or set the default one)
@@ -512,7 +512,7 @@ class MameGame(object):
       if done:
          self.dialog.delete()
          EmcDialog(title='Game deleted', style='info')
-         _instance._browser.refresh(hard=True)
+         _mod._browser.refresh(hard=True)
       else:
          EmcDialog(text='Can not delete game', style='error')
 

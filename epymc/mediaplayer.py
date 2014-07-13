@@ -254,6 +254,7 @@ def video_controls_show():
    gui.signal_emit('videoplayer,controls,show')
    _controls_visible = True
    gui.volume_show()
+   _update_slider()
 
 def video_controls_hide():
    global _controls_visible

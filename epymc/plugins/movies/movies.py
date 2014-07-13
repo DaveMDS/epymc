@@ -222,7 +222,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
        # add an entry in the config gui
       config_gui.root_item_add('movies', 50, 'Movie Collection',
-                               icon = 'icon/movie', callback = config_panel_cb)
+                               icon='icon/movie', callback=config_panel_cb)
 
       # create a browser instance
       self._browser = EmcBrowser('Movies', 'List')
@@ -262,9 +262,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          m = int(pos / 60) % 60
          s = int(pos % 60)
          txt = "Continue from %d:%.2d:%.2d ?" % (h, m, s)
-         EmcDialog(text = txt, style = 'yesno', user_data = url,
-                   done_cb = self._dia_yes_cb,
-                   canc_cb = self._dia_no_cb)
+         EmcDialog(text=txt, style='yesno', user_data=url,
+                   done_cb=self._dia_yes_cb,
+                   canc_cb=self._dia_no_cb)
       else:
          self.play_movie_real(url, 0)
 
@@ -278,7 +278,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       dialog.delete()
 
    def play_movie_real(self, url, start_from):
-      mediaplayer.play_url(url, start_from = start_from)
+      mediaplayer.play_url(url, start_from=start_from)
       if self._movie_db.id_exists(url):
          e = self._movie_db.get_data(url)
          try:
@@ -340,7 +340,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       for fname in files:
          self._browser.item_add(MovieItemClass(), url + '/' + fname, self)
 
-   def _get_cast(self, e, max_num = 999):
+   def _get_cast(self, e, max_num=999):
       cast = ''
       for person in sorted(e['cast'], key=itemgetter('order')):
          cast = cast + (', ' if cast else '') + person['name']
@@ -361,7 +361,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 ###### INFO PANEL STUFF
    def show_movie_info(self, url):
       image = Image(gui.win)
-      dialog = EmcDialog(style = 'panel', text = ' ', content = image)
+      dialog = EmcDialog(style='panel', text=' ', content=image)
 
       self._dialog = dialog
       self._current_url = url
@@ -372,7 +372,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       del self._dialog
 
    def update_movie_info(self, url):
-
       # update buttons
       self._dialog.buttons_clear()
       self._dialog.button_add('Play', self._cb_panel_1)
@@ -430,8 +429,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       if self._movie_db.id_exists(self._current_url):
          movie_info = self._movie_db.get_data(self._current_url)
 
-         dia = EmcDialog(title = 'Cast', style = 'list',
-                         done_cb = lambda d, pid: CastPanel(pid))
+         dia = EmcDialog(title='Cast', style='list',
+                         done_cb=lambda d, pid: CastPanel(pid))
          dia.button_add('Info', self._cb_cast_info, dia)
 
          for person in sorted(movie_info['cast'], key=itemgetter('order')):
@@ -455,25 +454,25 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    def _cb_posters_list_complete(self, tmdb, posters):
       title = '%d posters available' % (len(posters))
-      dialog = EmcDialog(style = 'image_list_horiz', title = title,
-                         done_cb = self._cb_posters_list_ok)
+      dialog = EmcDialog(style='image_list_horiz', title=title,
+                         done_cb=self._cb_posters_list_ok)
       for poster in posters:
          icon = EmcRemoteImage(poster['thumb_url'])
-         dialog.list_item_append(None, icon, poster = poster)
+         dialog.list_item_append(None, icon, poster=poster)
 
    def _cb_posters_list_ok(self, dialog, poster):
       dest = get_poster_filename(poster['movie_id'])
       utils.download_url_async(poster['url'], dest,
-                               complete_cb = self._cb_image_done,
-                               progress_cb = self._cb_image_progress)
+                               complete_cb=self._cb_image_done,
+                               progress_cb=self._cb_image_progress)
 
       # kill the list dialog
       dialog.delete()
       del dialog
 
       # show a progress dialog
-      self._poster_dialog = EmcDialog(title = 'Downloading Image',
-                                      style = 'progress')
+      self._poster_dialog = EmcDialog(title='Downloading Image',
+                                      style='progress')
 
    def _cb_image_progress(self, dest, tot, done):
       if tot > 0: self._poster_dialog.progress_set(float(done) / float(tot))
@@ -497,26 +496,26 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def _cb_backdrops_list_complete(self, tmdb, backdrops):
 
       title = '%d backdrops available' % (len(backdrops))
-      dialog = EmcDialog(style = 'image_list_vert', title = title,
-                         done_cb = self._cb_backdrops_list_ok)
+      dialog = EmcDialog(style='image_list_vert', title=title,
+                         done_cb=self._cb_backdrops_list_ok)
       for backdrop in backdrops:
          img = EmcRemoteImage(backdrop['thumb_url'])
-         dialog.list_item_append(None, img, backdrop = backdrop)
+         dialog.list_item_append(None, img, backdrop=backdrop)
 
    def _cb_backdrops_list_ok(self, dialog, backdrop):
       # download the selected backdrop
       dest = get_backdrop_filename(backdrop['movie_id'])
       utils.download_url_async(backdrop['url'], dest,
-                               complete_cb = self._cb_image_done,
-                               progress_cb = self._cb_image_progress)
+                               complete_cb=self._cb_image_done,
+                               progress_cb=self._cb_image_progress)
 
       # kill the list dialog
       dialog.delete()
       del dialog
 
       # show a progress dialog
-      self._poster_dialog = EmcDialog(title = 'Downloading Image',
-                                      style = 'progress')
+      self._poster_dialog = EmcDialog(title='Downloading Image',
+                                      style='progress')
 
 
 ######## Get movie info from themoviedb.org
@@ -525,7 +524,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       self._do_movie_search(name, year)
 
    def _do_movie_search(self, name, year):
-      tmdb = TMDBv3(lang = ini.get('movies', 'info_lang'))
+      tmdb = TMDBv3(lang=ini.get('movies', 'info_lang'))
       tmdb.movie_search(name, year, self._cb_search_done)
       if year:
          text = '<b>Searching for:</><br>%s (%s)<br>' % (name, year)

@@ -97,7 +97,7 @@ class StandardItemClass(EmcItemClass):
       _mod._request_page(item_data)
 
    def label_get(self, url, item_data):
-      return item_data[F_LABEL]
+      return item_data[F_LABEL].replace('&', '&amp;')
 
    def icon_get(self, url, item_data):
       if not item_data[F_ICON] and item_data[F_ACTION] == ACT_FOLDER:
@@ -108,7 +108,8 @@ class StandardItemClass(EmcItemClass):
       return item_data[F_POSTER] or _mod._current_src['poster']
 
    def info_get(self, url, item_data):
-       return item_data[F_INFO]
+      if item_data[F_INFO]:
+         return item_data[F_INFO].replace('&', '&amp;')
 
 
 class OnlinevideoModule(EmcModule):

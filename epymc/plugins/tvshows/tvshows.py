@@ -489,7 +489,7 @@ class InfoPanel(EmcDialog):
                      d['vote_average'],
                      d['status'], d['overview'],
                   )
-         info = info.replace('&', 'AND') # TODO FIXME !!!!!!!!!!!!!!!!!!!
+         info = info.replace('&', '&amp;')
          try:
             self._image.file = get_tv_poster_filename(self._db_data['id'])
          except: pass

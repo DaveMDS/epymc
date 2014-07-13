@@ -48,7 +48,6 @@ def DBG(msg):
    # pass
 
 MOVIE_DB_VERSION = 1
-TMDB_API_KEY = '19eef197b81231dff0fd1a14a8d5f863' # Key of the user DaveMDS
 DEFAULT_INFO_LANG = 'en'
 DEFAULT_EXTENSIONS = 'avi mpg mpeg ogv mkv' #TODO fill better (uppercase ??)
 DEFAULT_BADWORDS = 'dvdrip AAC x264 cd1 cd2'

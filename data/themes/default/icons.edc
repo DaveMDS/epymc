@@ -14,10 +14,11 @@
          description { state: "default" 0.0; \
             image.normal: "image_"NAME; \
             aspect: (W/H) (W/H); \
-            align: 0.0 0.0; \
+            align: 0.5 0.0; \
             aspect_preference: BOTH; }}}}
 
 IMAGE("dvd_cover_blank.png", 730, 890)
+IMAGE("tmdb_logo.png", 450, 300)
 
 ICON("emc")
 ICON("evas")

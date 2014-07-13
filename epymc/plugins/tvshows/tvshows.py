@@ -539,7 +539,6 @@ class InfoPanel(EmcDialog):
          icon_path = dest_path.replace('poster.jpg', 'icon.jpg')
          utils.download_url_async(icon_url, icon_path)
 
-
    def _cb_image_progress(self, dest, tot, done, dia):
       if tot > 0: dia.progress_set(float(done) / float(tot))
 
@@ -591,22 +590,25 @@ class InfoPanel(EmcDialog):
             dia.list_item_append(name, img, serie_id=item['tmdb_id'])
       else:
          text = 'The search for "%s" did not make any results.<br>' \
-                'If your show is listed on thetvdb.com please rename ' \
+                'If your show is listed on themoviedb.org please rename ' \
                 'your folder to match the title on the site.<br>' \
                 'If otherwise it is not in the online database please ' \
                 'contribute and add it yourself.' % self._serie_name
          EmcDialog(style='minimal', title='Nothing found', text=text)
 
    def _result_choosed_cb(self, dia, serie_id):
-      tmdb = TMDBv3(lang=ini.get('tvshows', 'info_lang'))
-      tmdb.get_tv_info(serie_id, self._refresh_done_cb)
-
       if dia: dia.delete()
-      # TODO give credits here
-      self._prog_dia = EmcDialog(style='minimal', spinner=True,
-                                 title='Fetching updated info',
-                                 text='Please wait...')
 
+      tmdb = TMDBv3(lang=ini.get('tvshows', 'info_lang'))
+      tmdb.get_tv_info(serie_id, self._refresh_done_cb, self._refresh_prog_cb)
+
+      self._prog_dia = EmcDialog(style='progress',
+                                 title='Fetching updated info',
+                                 content=gui.load_image('tmdb_logo.png'))
+
+   def _refresh_prog_cb(self, tvdb, progress):
+      self._prog_dia.progress_set(progress)
+      
    def _refresh_done_cb(self, tvdb, data):
       self._prog_dia.delete()
       if data:

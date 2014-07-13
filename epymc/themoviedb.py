@@ -292,10 +292,25 @@ class TMDBv3(object):
    #### get tv info  ##########################################################
    def get_tv_info(self, tid, done_cb, progress_cb=None):
       self.done_cb = done_cb
+      self.progress_cb = progress_cb
+      self.dqueue_images = []
+      self.dqueue_seasons = []
+      self.dqueue_seasons_fb = []
+      self.dqueue_total = 0
       self._api_call(self._tv_info_done, tid,
                      '/tv/%s' % tid, append_to_response='credits')
 
+   def _tv_info_progress_report(self):
+      if callable(self.progress_cb):
+         if self.dqueue_total > 0:
+            remaining = len(self.dqueue_images) + len(self.dqueue_seasons)
+            prog = 1.0 - (remaining / float(self.dqueue_total))
+            self.progress_cb(self, prog)
+         else:
+            self.progress_cb(self, 0.0)
+
    def _tv_info_done(self, data, tid=None):
+      self._tv_info_progress_report()
 
       # fallback to english if needed
       if not data['overview'] and self.lang != 'en' and tid != None:
@@ -331,22 +346,19 @@ class TMDBv3(object):
          'seasons': {}
       }
 
-      self.dqueue_images = []
-      self.dqueue_seasons = []
-      self.dqueue_seasons_fb = []
-
       # queue backdrop, poster and icon
-      self.dqueue_images.append(
-         (self._img_url(data['backdrop_path'], 'w1280'),
-          get_tv_backdrop_filename(data['id'])))
+      if data['backdrop_path']:
+         self.dqueue_images.append(
+            (self._img_url(data['backdrop_path'], 'w1280'),
+             get_tv_backdrop_filename(data['id'])))
 
-      self.dqueue_images.append(
-         (self._img_url(data['poster_path'], 'w500'),
-          get_tv_poster_filename(data['id'])))
-
-      self.dqueue_images.append(
-         (self._img_url(data['poster_path'], 'w92'),
-          get_tv_icon_filename(data['id'])))
+      if data['poster_path']:
+         self.dqueue_images.append(
+            (self._img_url(data['poster_path'], 'w500'),
+             get_tv_poster_filename(data['id'])))
+         self.dqueue_images.append(
+            (self._img_url(data['poster_path'], 'w92'),
+             get_tv_icon_filename(data['id'])))
 
       for s in data['seasons']:
          # queue posters and icons for each season
@@ -363,10 +375,13 @@ class TMDBv3(object):
          self.dqueue_seasons.append(s['season_number'])
 
       # start the download of all the images and all the seasons info
+      self.dqueue_total = len(self.dqueue_images) + len(self.dqueue_seasons)
       self._tv_multi_img_download(None, None)
       self._tv_multi_season_api(None)
 
    def _tv_multi_season_api(self, data):
+      self._tv_info_progress_report()
+
       if (data is not None) and (len(data['episodes']) > 0):
          missing_translation = False
 
@@ -414,6 +429,7 @@ class TMDBv3(object):
          self._tv_multi_season_fallback_api(None)
 
    def _tv_multi_season_fallback_api(self, data):
+      self._tv_info_progress_report()
       if (data is not None) and (len(data['episodes']) > 0):
          season = self.tv_info['seasons'][data['season_number']]
 
@@ -435,6 +451,7 @@ class TMDBv3(object):
          self._tv_info_all_done()
 
    def _tv_multi_img_download(self, dest, status):
+      self._tv_info_progress_report()
       self.dwl_handler = None
       if len(self.dqueue_images) > 0:
          url, dest = self.dqueue_images.pop(0)
@@ -450,6 +467,7 @@ class TMDBv3(object):
           len(self.dqueue_seasons_fb)) > 0:
          return
 
+      self._tv_info_progress_report()
       self.done_cb(self, self.tv_info)
 
    #### posters list ##########################################################

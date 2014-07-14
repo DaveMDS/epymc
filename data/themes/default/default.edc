@@ -259,23 +259,20 @@ collections {
             description { state: "default" 0.0;
                color: 255 255 255 200;
                rel1 {
-                  to: "topbar.clip";
-                  to_x: "topbar.home_icon";
+                  to: "topbar.home_icon";
                   relative: 1.0 0.0;
                }
                rel2 {
-                  to: "topbar.clip";
+                  to: "topbar.box";
+                  relative: 0.0 1.0;
+                  offset: -6 -1;
                }
                text {
                   font: "Aclonica";
                   size: FONT_SIZE;
                   align: 0.0 1.0;
+                  ellipsis: 1.0;
                }
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               rel1.offset: 60 0;
-               rel2.offset: -1 0;
             }
          }
          part { name: "topbar.box"; /* API */
@@ -283,19 +280,21 @@ collections {
             mouse_events: 1;
             repeat_events: 1;
             description { state: "default" 0.0;
-               max: 200 -1;
-               align: 0.8 0.5;
+               align: 1.0 0.5;
                rel1 {
-                  to: "topbar.title";
-                  offset: 0 4;
+                  to: "topbar.clock";
+                  offset: -10 0;
                }
                rel2 {
                   to: "topbar.clock";
-                  offset: -1 -4;
+                  relative: 0.0 1.0;
+                  offset: -11 -1;
                }
                box {
                   layout: "horizontal";
                   padding: 4 4;
+                  align: 1.0 0.5;
+                  min: 1 0;
                }
             }
          }
@@ -305,17 +304,21 @@ collections {
             scale: 1;
             description { state: "default" 0.0;
                color: FONT_COLOR;
+               align: 1.0 0.5;
                rel1 {
                   to: "topbar.clip";
+                  relative: 1.0 0.0;
+                  offset: -35 0;
                }
                rel2 {
                   to: "topbar.clip";
-                  offset: -40 0;
+                  offset: -36 -1;
                }
                text {
                   font: "Aclonica";
                   size: FONT_SIZE_BIG;
-                  align: 1.0 0.7;
+                  min: 1 1;
+                  ellipsis: -1;
                }
             }
          }

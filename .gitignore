@@ -1,3 +1,4 @@
 build/
 epymc/themes/*.edj
 epymc/locale/it
+data/locale/*.po~

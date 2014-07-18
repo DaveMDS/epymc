@@ -95,7 +95,7 @@ def play_url(url, only_audio = False, start_from = 0):
    LOG('dbg', 'play_url: %s' % url)
 
    if url.startswith('file://') and not os.path.exists(url[7:]):
-      text = '<b>File not found:</b><br>' + str(url)
+      text = _('<b>File not found:</b><br>%s') % url
       EmcDialog(text = text, style = 'error')
       return
 
@@ -296,7 +296,7 @@ def _update_timer_cb():
          _buffer_dialog = None
 
    elif _emotion.buffer_size < 1.0:
-      _buffer_dialog = EmcDialog(title='buffering', style = 'progress',
+      _buffer_dialog = EmcDialog(title=_('buffering'), style = 'progress',
                                  canc_cb = _dialog_canc_cb)
       _emotion.play = False
 
@@ -318,7 +318,7 @@ def _init_emotion():
       except:
          _emotion = emotion.Emotion(gui.layout.evas, module_name=backend)
    except:
-      EmcDialog(style='error', text='Cannot init emotion engine:<br>'+str(backend))
+      EmcDialog(style='error', text=_('Cannot init emotion engine:<br>%s') % backend)
       return False
 
    gui.swallow_set('videoplayer.video', _emotion)
@@ -396,7 +396,7 @@ def _init_mediaplayer_gui():
 
 
    #  submenu audio
-   bt = EmcButton('Audio')
+   bt = EmcButton(_('Audio'))
    bt.callback_clicked_add(_cb_btn_audio)
    bt.data['cb'] = _cb_btn_audio
    _fman.obj_add(bt)
@@ -404,7 +404,7 @@ def _init_mediaplayer_gui():
    _buttons.append(bt)
 
    #  submenu video
-   bt = EmcButton('Video')
+   bt = EmcButton(_('Video'))
    bt.callback_clicked_add(_cb_btn_video)
    bt.data['cb'] = _cb_btn_video
    _fman.obj_add(bt)
@@ -463,13 +463,13 @@ def _cb_btn_audio(btn):
    for n in range(trk_cnt):
       name = _emotion.audio_channel_name_get(n)
       if name:
-         name = "Audio track: " + name
+         name = _('Audio track: %s') % name
       else:
-         name = "Audio track #" + str(n + 1)
+         name = _('Audio track #%d') % (n + 1)
       item = menu.item_add(None, name, None, _cb_menu_audio_track, n)
 
    menu.item_separator_add()
-   item = menu.item_add(None, "Mute", 'clock', _cb_menu_mute)
+   item = menu.item_add(None, _('Mute'), 'clock', _cb_menu_mute)
 
 def _cb_btn_video(btn):
    trk_cnt = _emotion.video_channel_count()
@@ -477,13 +477,13 @@ def _cb_btn_video(btn):
    for n in range(trk_cnt):
       name = _emotion.video_channel_name_get(n)
       if name:
-         name = "Video track: " + name
+         name = _('Video track: %s') % name
       else:
-         name = "Video track #" + str(n + 1)
+         name = _('Video track #%d') % (n + 1)
       item = menu.item_add(None, name, None, _cb_menu_video_track, n)
 
    menu.item_separator_add()
-   it = menu.item_add(None, 'Download video', None, _cb_menu_download)
+   it = menu.item_add(None, _('Download video'), None, _cb_menu_download)
    if _onair_url.startswith('file://'):
       it.disabled = True
 

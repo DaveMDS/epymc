@@ -126,7 +126,7 @@ class BackItemClass(EmcItemClass):
       user_data.back()
 
    def label_get(self, url, user_data):
-      return 'Back'
+      return _('Back')
 
    def icon_get(self, url, user_data):
       return 'icon/back'

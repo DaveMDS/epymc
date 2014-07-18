@@ -115,7 +115,7 @@ def init():
       ret = 2
 
    # configure the win
-   win.title_set('Enlightenment Media Center')
+   win.title_set(_('Enlightenment Media Center'))
    win.callback_delete_request_add(lambda w: ask_to_exit())
    if fullscreen == 'True':
       win.fullscreen_set(1)
@@ -170,10 +170,10 @@ def shutdown():
 
 def get_theme_info(theme):
    D = {}
-   D['name'] = edje.file_data_get(theme, 'theme.name') or 'Unknown'
+   D['name'] = edje.file_data_get(theme, 'theme.name') or _('Unknown')
    D['version'] = edje.file_data_get(theme, 'theme.version') or ''
-   D['author'] = edje.file_data_get(theme, 'theme.author') or 'Unknown'
-   D['info'] = edje.file_data_get(theme, 'theme.info') or 'Unknown'
+   D['author'] = edje.file_data_get(theme, 'theme.author') or _('Unknown')
+   D['info'] = edje.file_data_get(theme, 'theme.info') or _('Unknown')
    return D
 
 def set_theme_file(path):
@@ -251,11 +251,11 @@ def load_image(name, path = None):
 
 def ask_to_exit():
    text = '<center>' + credits.replace('\n', '<br>') + '</center>'
-   d = EmcDialog(title='credits', style='minimal', text=text)
-   d.button_add("Cancel", selected_cb=lambda b: d.delete())
-   d.button_add("Suspend", selected_cb=None)
-   d.button_add("Shutdown", selected_cb=None)
-   d.button_add("Exit", selected_cb=lambda b: elementary.exit())
+   d = EmcDialog(title=_('credits'), style='minimal', text=text)
+   d.button_add(_('Cancel'), selected_cb=lambda b: d.delete())
+   d.button_add(_('Suspend'), selected_cb=None)
+   d.button_add(_('Shutdown'), selected_cb=None)
+   d.button_add(_('Exit'), selected_cb=lambda b: elementary.exit())
    d.autoscroll_enable()
 
 def volume_show(hidein = 0):
@@ -867,18 +867,18 @@ class EmcDialog(edje.Edje):
 
       # buttons
       if style in ('info', 'error', 'warning'):
-         self.button_add('Ok', lambda btn: self.delete())
+         self.button_add(_('Ok'), lambda btn: self.delete())
 
       if style in ('yesno'):
          if self._canc_cb:
-            self.button_add('No', lambda btn: self._canc_cb(self))
+            self.button_add(_('No'), lambda btn: self._canc_cb(self))
          else:
-            self.button_add('No', lambda btn: self.delete())
+            self.button_add(_('No'), lambda btn: self.delete())
 
          if self._done_cb:
-            self.button_add('Yes', lambda btn: self._done_cb(self))
+            self.button_add(_('Yes'), lambda btn: self._done_cb(self))
          else:
-            self.button_add('Yes', lambda btn: self.delete())
+            self.button_add(_('Yes'), lambda btn: self.delete())
 
       # Do we want the cancel button? we have the red-round-close...
       # if style in ('cancel'):
@@ -1125,13 +1125,13 @@ class EmcFolderSelector(EmcDialog):
          Optional user-data to pass back in the done_cb function.
    """
 
-   def __init__(self, title='Source Selector', done_cb=None, cb_data=None):
+   def __init__(self, title=_('Source Selector'), done_cb=None, cb_data=None):
       self._selected_cb = done_cb
       self._selected_cb_data = cb_data
 
       EmcDialog.__init__(self, title, style='list', done_cb=self._btn_browse_cb)
-      b2 = self.button_add('Select', self._btn_select_cb)
-      b1 = self.button_add('Browse', self._btn_browse_cb)
+      b2 = self.button_add(_('Select'), self._btn_select_cb)
+      b1 = self.button_add(_('Browse'), self._btn_browse_cb)
       self.fman.focused_set(b1)
 
       self.populate(os.getenv('HOME'))
@@ -1139,7 +1139,7 @@ class EmcFolderSelector(EmcDialog):
    def populate(self, folder):
       parent_folder = os.path.normpath(os.path.join(folder, '..'))
       if folder != parent_folder:
-         it = self.list_item_append('Parent folder', 'icon/arrowU')
+         it = self.list_item_append(_('Parent folder'), 'icon/arrowU')
          it.data['fullpath'] = parent_folder
       for fname in utils.natural_sort(os.listdir(folder)):
          fullpath = os.path.join(folder, fname)
@@ -1178,13 +1178,13 @@ class EmcSourcesManager(EmcDialog):
          Function called when the user press the 'done' button.
          Signature: cb(new_folders_list)
    """
-   def __init__(self, conf_group, title='Sources Manager', done_cb=None):
+   def __init__(self, conf_group, title=_('Sources Manager'), done_cb=None):
       EmcDialog.__init__(self, title, style='list')
-      self.button_add('Done', icon='icon/ok',
+      self.button_add(_('Done'), icon='icon/ok',
                       selected_cb=self._cb_btn_done)
-      self.button_add('Add', icon='icon/plus',
+      self.button_add(_('Add'), icon='icon/plus',
                       selected_cb=self._cb_btn_add)
-      self.button_add('Remove', icon='icon/minus',
+      self.button_add(_('Remove'), icon='icon/minus',
                       selected_cb=self._cb_btn_remove)
       self._sources = ini.get_string_list(conf_group, 'folders', ';')
       self._conf_group = conf_group
@@ -1198,7 +1198,7 @@ class EmcSourcesManager(EmcDialog):
       self.list_go()
 
    def _cb_btn_add(self, btn):
-      EmcFolderSelector(title='Choose a new source', done_cb=self._cb_selected)
+      EmcFolderSelector(title=_('Choose a new source'), done_cb=self._cb_selected)
 
    def _cb_btn_remove(self, btn):
       it = self.list_item_selected_get()
@@ -1345,7 +1345,7 @@ class EmcVKeyboard(EmcDialog):
       tb.show()
 
       # set dialog title
-      self.part_text_set('emc.text.title', title or 'Insert text')
+      self.part_text_set('emc.text.title', title or _('Insert text'))
 
       # entry (TODO use scrolled_entry instead)
       self.entry = Entry(win, style='vkeyboard', single_line=True,
@@ -1368,16 +1368,16 @@ class EmcVKeyboard(EmcDialog):
       for i, c in enumerate(['u', 'v', 'w', 'x', 'y', 'z', '.', ',', ':', ';']):
          self._pack_btn(tb, i, 4, 1, 1, c, cb=self._default_btn_cb)
 
-      self._pack_btn(tb, 0, 5, 3, 1, 'UPPERCASE', cb=self._uppercase_cb)
-      self._pack_btn(tb, 3, 5, 4, 1, 'SPACE', cb=self._space_cb)
-      self._pack_btn(tb, 7, 5, 3, 1, 'ERASE', cb=self._erase_cb)
+      self._pack_btn(tb, 0, 5, 3, 1, _('UPPERCASE'), cb=self._uppercase_cb)
+      self._pack_btn(tb, 3, 5, 4, 1, _('SPACE'), cb=self._space_cb)
+      self._pack_btn(tb, 7, 5, 3, 1, _('ERASE'), cb=self._erase_cb)
 
-      self._pack_btn(tb, 0, 6, 4, 1, 'Dismiss', 'icon/cancel', self._dismiss_cb)
+      self._pack_btn(tb, 0, 6, 4, 1, _('Dismiss'), 'icon/cancel', self._dismiss_cb)
       self._pack_btn(tb, 4, 6, 1, 1, None, 'icon/arrowL',
                                      lambda b: self.entry.cursor_prev())
       self._pack_btn(tb, 5, 6, 1, 1, None, 'icon/arrowR',
                                      lambda b: self.entry.cursor_next())
-      self._pack_btn(tb, 6, 6, 4, 1, 'Accept',  'icon/ok', self._accept_cb)
+      self._pack_btn(tb, 6, 6, 4, 1, _('Accept'),  'icon/ok', self._accept_cb)
 
       # init the parent EmcDialog class
       EmcDialog.__init__(self, title=title, style='minimal', content=tb)
@@ -1434,10 +1434,10 @@ class EmcVKeyboard(EmcDialog):
          if c and len(c) == 1 and c.isalpha():
             if c.islower():
                btn.text = c.upper()
-               button.text = 'LOWERCASE'
+               button.text = _('LOWERCASE')
             else:
                btn.text = c.lower()
-               button.text = 'UPPERCASE'
+               button.text = _('UPPERCASE')
          elif c and len(c) == 1:
             if   c == '.':  btn.text = '/'
             elif c == '/':  btn.text = '.'
@@ -1585,26 +1585,26 @@ class DownloadManager(utils.Singleton):
       fname = '.'.join((dest_name or 'epymc_download', dest_ext))
 
       # confirm dialog
-      dia = EmcDialog('Download Manager', text='')
+      dia = EmcDialog(_('Download Manager'), text='')
       dia.data['url'] = url
       dia.data['dst_folder'] = dest_folder
       dia.data['dst_name'] = fname
-      dia.button_add('Start download', self._start_cb, dia)
-      dia.button_add('Rename', self._change_name_cb, dia)
-      dia.button_add('Change folder', self._change_folder_cb, dia)
+      dia.button_add(_('Start download'), self._start_cb, dia)
+      dia.button_add(_('Rename'), self._change_name_cb, dia)
+      dia.button_add(_('Change folder'), self._change_folder_cb, dia)
       self._update_dialog_text(dia)
 
    # confirmation dialog stuff
    def _update_dialog_text(self, dia):
-      text = 'File will be downloaded in the folder:<br> <b>{}</b><br>' \
-             '<br>File will be named as:<br> <b>{}</b><br>' \
-             '<br>You can rename the file using the <i>Rename</i> button or ' \
-             'change the destination folder from the main configuration.' \
+      text = _('File will be downloaded in the folder:<br> <b>{}</b><br>' \
+               '<br>File will be named as:<br> <b>{}</b><br>' \
+               '<br>You can rename the file using the <i>Rename</i> button or ' \
+               'change the destination folder from the main configuration.') \
              .format(dia.data['dst_folder'], dia.data['dst_name'])
       dia.text_set(text)
 
    def _change_name_cb(self, bt, dia):
-      EmcVKeyboard(title='Rename download', text=dia.data['dst_name'],
+      EmcVKeyboard(title=_('Rename download'), text=dia.data['dst_name'],
                    accept_cb=self._change_name_done_cb, user_data=dia)
 
    def _change_name_done_cb(self, vkeyb, text, dia):
@@ -1612,7 +1612,7 @@ class DownloadManager(utils.Singleton):
       self._update_dialog_text(dia)
 
    def _change_folder_cb(self, bt, dia):
-      EmcFolderSelector(title='Change destination folder',
+      EmcFolderSelector(title=_('Change destination folder'),
                         done_cb=self._change_folder_done_cb, cb_data=dia)
 
    def _change_folder_done_cb(self, folder, dia):
@@ -1627,7 +1627,7 @@ class DownloadManager(utils.Singleton):
       # check if the given url is in queue or in progress yet
       if url in self.handlers or \
             len([u for u,d in self.queue if u == url]) > 0:
-         text = 'The file %s is in the download queue yet' % dia.data['dst_name']
+         text = _('The file %s is in the download queue yet') % dia.data['dst_name']
          EmcDialog(style='error', text=text)
          dia.delete()
          return
@@ -1661,7 +1661,7 @@ class DownloadManager(utils.Singleton):
       self.handlers[url] = handler
 
       # notify
-      text = 'Download started:<br>%s' % os.path.basename(dest)
+      text = _('Download started:<br>%s') % os.path.basename(dest)
       EmcNotify(text, icon='icon/download')
 
    # def _progress_cb(self, dest, dltotal, dlnow, myurl):
@@ -1674,7 +1674,7 @@ class DownloadManager(utils.Singleton):
       os.rename(dest, real_dest) 
 
       # notify
-      text = 'Download done:<br>%s' % os.path.basename(real_dest)
+      text = _('Download done:<br>%s') % os.path.basename(real_dest)
       EmcNotify(text, icon='icon/download')
 
       # remove the handler from the dict

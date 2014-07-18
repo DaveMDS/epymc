@@ -62,8 +62,8 @@ class EmcDatabase(object):
 
       if (not first_run) and (version is not None) and (self.get_version() != version):
          # the db is outdated
-         text = '<b>The database "%s" is outdated!</b><br><br>The old file has been renamed with a .backup extension and a new (empty) one has been created.<br><br>Sorry for the incovenience.'  % (name)
-         EmcDialog(style = 'warning', title = 'EpyMC Database', text = text)
+         text = _('<b>The database %s is outdated!</b><br><br>The old file has been renamed with a .backup extension and a new (empty) one has been created.<br><br>Sorry for the incovenience.')  % (name)
+         EmcDialog(style = 'warning', title = _('EpyMC Database'), text = text)
 
          # close the shelve
          self._sh.close()

@@ -536,8 +536,8 @@ class CastPanel(EmcDialog):
 
       tmdb = TMDBv3()
       tmdb.get_cast_info(self.pid, self._fetch_done_cb)
-      self._dia = EmcDialog(style='minimal', title='Fetching info',
-                            text='please wait...', spinner=True)
+      self._dia = EmcDialog(style='minimal', title=_('Fetching info'),
+                            text=_('please wait...'), spinner=True)
 
    def _fetch_done_cb(self, tmdb, result):
       self.info = result
@@ -547,20 +547,20 @@ class CastPanel(EmcDialog):
       if self.info['biography']:
          text += '%s<br><br>' % self.info['biography'].replace('\n', '<br>')
       if self.info['birthday']:
-         text += '<hilight>Birthday:</> %s<br>' % (self.info['birthday'])
+         text += _('<hilight>Birthday:</> %s<br>') % (self.info['birthday'])
       if self.info['deathday']:
-         text += '<hilight>Deathday:</> %s<br>' % (self.info['deathday'])
+         text += _('<hilight>Deathday:</> %s<br>') % (self.info['deathday'])
       if self.info['place_of_birth']:
-         text += '<hilight>Place of birth:</> %s<br>' % (self.info['place_of_birth'])
+         text += _('<hilight>Place of birth:</> %s<br>') % (self.info['place_of_birth'])
 
       image = EmcRemoteImage(self.info['profile_path'])
       EmcDialog.__init__(self, title=self.info['name'], style='panel',
                                content=image, text=text)
 
       c = len(self.info['credits']['cast'])
-      self.button_add('Movies (%s)' % c, lambda b: self.movies_dialog())
+      self.button_add(_('Movies (%s)') % c, lambda b: self.movies_dialog())
       c = len(self.info['images']['profiles'])
-      self.button_add('Photos (%s)' % c, lambda b: self.photos_dialog())
+      self.button_add(_('Photos (%s)') % c, lambda b: self.photos_dialog())
 
    def photos_dialog(self):
       dia = EmcDialog(style='image_list_horiz', title=self.info['name'])

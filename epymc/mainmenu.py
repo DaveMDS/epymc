@@ -42,7 +42,7 @@ def init():
    _list = MainmenuList()
    gui.swallow_set('mainmenu.list.swallow', _list)
 
-   item_add('exit', 200, 'Exit', 'icon/exit', lambda: gui.ask_to_exit())
+   item_add('exit', 200, _('Exit'), 'icon/exit', lambda: gui.ask_to_exit())
 
 def show():
    _list.callback_clicked_double_add(_cb_item_selected)

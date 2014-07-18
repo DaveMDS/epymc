@@ -209,14 +209,14 @@ class StdConfigItemAction(object):
 def init():
    global _browser
 
-   mainmenu.item_add('config', 100, 'Config', 'icon/config', _mainmenu_cb)
+   mainmenu.item_add('config', 100, _('Configuration'), 'icon/config', _mainmenu_cb)
 
    # create a browser instance
-   _browser = EmcBrowser('Configuration', 'List') # TODO use a custom style for config ?
+   _browser = EmcBrowser(_('Configuration'), 'List') # TODO use a custom style for config ?
 
-   root_item_add('config://general/', 1, 'General', 'icon/emc', _general_list)
-   root_item_add('config://themes/', 2, 'Themes', 'icon/theme', _themes_list)
-   root_item_add('config://modules/', 3, 'Modules', 'icon/module', _modules_list)
+   root_item_add('config://general/', 1, _('General'), 'icon/emc', _general_list)
+   root_item_add('config://themes/', 2, _('Themes'), 'icon/theme', _themes_list)
+   root_item_add('config://modules/', 3, _('Modules'), 'icon/module', _modules_list)
 
 def shutdown():
    _browser.delete()
@@ -265,7 +265,7 @@ def browser_get():
 
 ### private stuff
 def _mainmenu_cb():
-   _browser.page_add('config://root', 'Configuration', None, _populate_root)
+   _browser.page_add('config://root', _('Configuration'), None, _populate_root)
    _browser.show()
    mainmenu.hide()
 
@@ -275,14 +275,14 @@ def _populate_root(browser, url):
 
 ##############  GENERAL  ######################################################
 def _general_list():
-   _browser.page_add('config://general/', 'General', None, _general_populate)
+   _browser.page_add('config://general/', _('General'), None, _general_populate)
 
 def _general_populate(browser, url):
-   standard_item_bool_add('general', 'fullscreen', 'Start in fullscreen')
-   standard_item_action_add('Adjust interface scale', 'icon/scale', cb=_change_scale)
-   standard_item_bool_add('general', 'back_in_lists', 'Show Back item in lists', 'icon/back')
-   standard_item_string_add('general', 'download_folder', 'Download folder', 'icon/download')
-   standard_item_string_add('general', 'max_concurrent_download', 'Max concurrent download', 'icon/download')
+   standard_item_bool_add('general', 'fullscreen', _('Start in fullscreen'))
+   standard_item_action_add(_('Adjust interface scale'), 'icon/scale', cb=_change_scale)
+   standard_item_bool_add('general', 'back_in_lists', _('Show Back item in lists'), 'icon/back')
+   standard_item_string_add('general', 'download_folder', _('Download folder'), 'icon/download')
+   standard_item_string_add('general', 'max_concurrent_download', _('Max concurrent download'), 'icon/download')
 
    L = evas.render_method_list()
    if 'buffer' in L: L.remove('buffer')
@@ -290,14 +290,14 @@ def _general_populate(browser, url):
    if 'gl_x11' in L:
       L.remove('gl_x11')
       L.append('opengl_x11')
-   standard_item_string_from_list('general', 'evas_engine', 'Rendering engine',
+   standard_item_string_from_list('general', 'evas_engine', _('Rendering engine'),
                                   L, 'icon/evas')
    L = ['vlc', 'gstreamer1', 'gstreamer', 'xine', 'generic']
-   standard_item_string_from_list('mediaplayer', 'backend', 'Multimedia engine',
+   standard_item_string_from_list('mediaplayer', 'backend', _('Multimedia engine'),
                                   L, 'icon/evas')
 
    L = ['10', '20', '30', '60', '120']
-   standard_item_string_from_list('general', 'fps', 'Frames per second',
+   standard_item_string_from_list('general', 'fps', _('Frames per second'),
                                   L, 'icon/evas', cb=_change_fps)
 
 def _change_fps():
@@ -308,14 +308,14 @@ def _change_scale():
    def _smaller(dialog): gui.scale_smaller(); _save()
    def _reset(dialog): gui.scale_set(1.0); _save()
    def _save():
-      d.text_set('Current Value: %s' % (gui.scale_get()))
+      d.text_set(_('Current Value: %s') % (gui.scale_get()))
       ini.set('general', 'scale', str(gui.scale_get()))
 
-   d = EmcDialog(title='set scale', style='minimal',
-                 text='Current Value: %s' % (gui.scale_get()))
-   d.button_add('Bigger', selected_cb=_bigger)
-   d.button_add('Smaller', selected_cb=_smaller)
-   d.button_add('Reset', selected_cb=_reset)
+   d = EmcDialog(title=_('set scale'), style='minimal',
+                 text=_('Current Value: %s') % (gui.scale_get()))
+   d.button_add(_('Bigger'), selected_cb=_bigger)
+   d.button_add(_('Smaller'), selected_cb=_smaller)
+   d.button_add(_('Reset'), selected_cb=_reset)
    
 ##############  THEMES  #######################################################
 
@@ -333,10 +333,10 @@ class ThemesItemClass(EmcItemClass):
          return 'icon/check_on'
 
    def info_get(self, url, theme_info):
-      return '<title>%s</><br>' \
-             '<hilight>author: </>%s<br>' \
-             '<hilight>version: </>%s<br>' \
-             '%s' % (
+      return _('<title>%s</><br>' \
+               '<hilight>Author: </>%s<br>' \
+               '<hilight>Version: </>%s<br>' \
+               '%s') % (
              theme_info['name'],
              theme_info['author'],
              theme_info['version'],
@@ -377,7 +377,7 @@ class ModulesItemClass(EmcItemClass):
       return module.info
 
 def _modules_list():
-   _browser.page_add('config://modules/', 'Modules', None, _modules_populate)
+   _browser.page_add('config://modules/', _('Modules'), None, _modules_populate)
 
 def _modules_populate(browser, url):
    for mod in sorted(modules.list_get(), key=attrgetter('name')):

@@ -22,8 +22,13 @@ import sys, os, gettext
 
 from efl import evas, ecore, edje, elementary, emotion
 
-import epymc.modules as modules
 import epymc.utils as utils
+
+# init gettext, this install the _() func in the main namespace)
+localedir = os.path.join(utils.emc_base_dir, 'locale')
+gettext.install('epymc', localedir=localedir)
+
+import epymc.modules as modules
 import epymc.gui as gui
 import epymc.mainmenu as mainmenu
 import epymc.config_gui as config_gui
@@ -34,10 +39,6 @@ import epymc.browser as browser
 
 
 def start_epymc():
-
-   # init gettext
-   localedir = os.path.join(utils.emc_base_dir, 'locale')
-   gettext.install('epymc', localedir=localedir)
 
    # init elementary
    elementary.init()

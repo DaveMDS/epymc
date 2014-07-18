@@ -5,6 +5,7 @@
 # python setup.py install [--prefix=]
 # python setup.py uninstall [--prefix=]
 # python setup.py build_themes
+# python setup.py build_i18n
 # python setup.py clean --all
 # python setup.py sdist|bdist
 # python setup.py --help
@@ -12,19 +13,20 @@
 # python setup.py --help uninstall
 #
 # distutils reference:
-# http://docs.python.org/distutils/
+#  http://docs.python.org/distutils/
 #
 
 import os, sys, glob, subprocess, shutil, fnmatch
 from distutils.core import setup, Command
 from distutils.log import warn, info, error
-from distutils.dir_util import remove_tree
+from distutils.dir_util import remove_tree, mkpath
+from distutils.file_util import copy_file
 from distutils.command.install_lib import install_lib
 from distutils.command.build import build
-from distutils.dep_util import newer_group
+from distutils.dep_util import newer, newer_group
 
 
-class BuildThemes(Command):
+class build_themes(Command):
    description = 'Compile all the themes found in data/themes using edje_cc'
    user_options = []
    def initialize_options(self): pass
@@ -49,6 +51,54 @@ class BuildThemes(Command):
                shutil.move(edj_name, dst_name)
             else:
                error('Error generating theme: "%s"' % name)
+
+
+class build_i18n(Command):
+   description = 'Prepare all i18n files and update them as needed'
+   user_options = []
+
+   def initialize_options(self):
+      pass
+
+   def finalize_options(self):
+      pass
+
+   def run(self):
+      # build the string of all the source files to be translated
+      sources = ''
+      for dirpath, dirs, files in os.walk('epymc'):
+         for name in fnmatch.filter(files, '*.py'):
+            sources += ' ' + os.path.join(dirpath, name)
+
+      # create the reference pot file
+      cmd = 'xgettext -i --from-code=UTF-8 --force-po --output=ref.pot %s' % (sources)
+      os.system(cmd)
+
+      # create or update all the .po files and compile them to .mo
+      linguas_file = os.path.join('data', 'locale', 'LINGUAS')
+      for lang in open(linguas_file).read().split():
+         po_file = os.path.join('data', 'locale', lang + '.po')
+         mo_file = os.path.join('epymc', 'locale', lang, 'LC_MESSAGES', 'epymc.mo')
+         if os.path.exists(po_file):
+            # update an existing po file
+            info('updating po file: %s' % (po_file))
+            cmd = 'msgmerge -N -U -i -q %s ref.pot' % (po_file)
+            os.system(cmd)
+         else:
+            # create a new po file
+            info('creating po file: %s' % (po_file))
+            mkpath(os.path.dirname(po_file), verbose=False)
+            copy_file('ref.pot', po_file, verbose=False)
+
+         # compile po -> mo
+         mkpath(os.path.dirname(mo_file), verbose=False)
+         if newer(po_file, mo_file):
+            info('compiling po file: %s -> %s' % (po_file, mo_file))
+            cmd = 'msgfmt -o %s -c %s' % (mo_file, po_file)
+            os.system(cmd)
+
+      # delete the reference pot file (no more needed)
+      os.remove('ref.pot')
 
 
 class Uninstall(Command):
@@ -95,6 +145,7 @@ class Uninstall(Command):
 class Build(build):
    def run(self):
       self.run_command("build_themes")
+      self.run_command("build_i18n")
       build.run(self)
 
 
@@ -145,7 +196,7 @@ setup (
    ],
 
    package_data = {
-      'epymc': ['themes/*.edj'],
+      'epymc': ['themes/*.edj', 'locale/*/LC_MESSAGES/*.mo'],
       'epymc.extapi': ['youtube-dl'],
       'epymc.plugins.movies': ['*.png'],
       'epymc.plugins.tvshows': ['*.png'],
@@ -170,9 +221,10 @@ setup (
    ],
 
    cmdclass = {
-      'build_themes': BuildThemes,
-      'uninstall': Uninstall,
-      'install_lib': Install,
+      'build_themes': build_themes,
+      'build_i18n': build_i18n,
       'build': Build,
+      'install_lib': Install,
+      'uninstall': Uninstall,
    },
 )

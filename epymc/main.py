@@ -17,7 +17,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import sys, os
+
+import sys, os, gettext
 
 from efl import evas, ecore, edje, elementary, emotion
 
@@ -33,11 +34,13 @@ import epymc.browser as browser
 
 
 def start_epymc():
-   #init elementary
-   elementary.init()
 
-   # set the base path
-   # utils.base_dir_set(os.path.dirname(__file__))
+   # init gettext
+   localedir = os.path.join(utils.emc_base_dir, 'locale')
+   gettext.install('epymc', localedir=localedir)
+
+   # init elementary
+   elementary.init()
 
    # create config dir if necessary
    if not os.path.exists(utils.user_conf_dir):

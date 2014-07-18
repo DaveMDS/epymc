@@ -1,0 +1,16 @@
+# Traduzione italiana per EpyMC.
+# Copyright (C) 2014 Davide Andreoli <dave@gurumeditation.it>
+# This file is distributed under the same license as the EpyMC package.
+# Davide Andreoli <dave@gurumeditation.it>, 2014.
+#
+msgid   ""
+msgstr  "Project-Id-Version: epymc 1.0\n"
+        "Report-Msgid-Bugs-To: \n"
+        "POT-Creation-Date: 2014-07-18 21:04+0200\n"
+        "PO-Revision-Date: 2014-07-18 20:44+0200\n"
+        "Last-Translator: Davide Androli <dave@gurumeditation.it>\n"
+        "Language-Team: Italian <LL@li.org>\n"
+        "Language: Italian\n"
+        "MIME-Version: 1.0\n"
+        "Content-Type: text/plain; charset=UTF-8\n"
+        "Content-Transfer-Encoding: 8bit\n"

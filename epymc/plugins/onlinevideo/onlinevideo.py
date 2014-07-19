@@ -84,12 +84,12 @@ class ChannelItemClass(EmcItemClass):
       return channel['backdrop']
 
    def info_get(self, url, channel):
-      return '<title>%s</><br>' \
-             '<hilight>version:</> %s<br>' \
-             '<hilight>author:</> %s<br>' \
-             '<br>%s<br>' % \
-             (channel['label'], channel['version'],
-              channel['author'], channel['info'])
+      return _('<title>%s</><br>' \
+               '<hilight>version:</> %s<br>' \
+               '<hilight>author:</> %s<br>' \
+               '<br>%s<br>') % (
+                channel['label'], channel['version'],
+                channel['author'], channel['info'])
 
 
 class StandardItemClass(EmcItemClass):
@@ -114,10 +114,10 @@ class StandardItemClass(EmcItemClass):
 
 class OnlinevideoModule(EmcModule):
    name = 'onlinevideo'
-   label = 'Online Channels'
+   label = _('Online Channels')
    icon = 'icon/olvideo'
-   info = """Long info for the online channels module, explain what it does and what it 
-need to work well, can also use markup like <title>this</> or <b>this</>"""
+   info = _("""Long info for the online channels module, explain what it does and what it 
+need to work well, can also use markup like <title>this</> or <b>this</>""")
 
    _browser = None
    _sources = []
@@ -139,11 +139,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       # add an item in the mainmenu
       img = os.path.join(os.path.dirname(__file__), 'ov_icon.png')
-      mainmenu.item_add('onlinechannels', 15, 'Online Channels',
+      mainmenu.item_add('onlinechannels', 15, _('Online Channels'),
                         img, self.cb_mainmenu)
 
       # create the browser instance
-      self._browser = EmcBrowser('OnlineChannels')
+      self._browser = EmcBrowser(_('Online Channels'))
 
    def __shutdown__(self):
       LOG('dbg', 'Shutdown module')
@@ -181,7 +181,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       return source
 
    def cb_mainmenu(self):
-      self._browser.page_add('olvid://root', 'Channels', None,
+      self._browser.page_add('olvid://root', _('Channels'), None,
                              self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
@@ -223,15 +223,15 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          mediaplayer.title_set(label)
          mediaplayer.poster_set(poster)
       elif action == ACT_SEARCH:
-         EmcVKeyboard(title = 'Search query', user_data = item_data,
-                      accept_cb = self._search_vkeyb_done)
+         EmcVKeyboard(title=_('Search query'), user_data=item_data,
+                      accept_cb=self._search_vkeyb_done)
       else:
          src = self._current_src
          cmd = '%s %d "%s"' % (src['exec'], next_state, url)
          LOG('dbg', 'Executing: ' + cmd)
          EmcExec(cmd, True, self._request_page_done, item_data)
-         self._run_dialog = EmcDialog(title = 'please wait', style = 'cancel',
-                                      text = 'Scraping site...', )
+         self._run_dialog = EmcDialog(title=_('please wait'), style='cancel',
+                                      text=_('Getting info...'), )
 
    def _search_vkeyb_done(self, vkeyb, text, item_data):
       (next_state, label, url, info, icon, poster, action) = item_data
@@ -239,8 +239,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       cmd = '%s %d "%s"' % (src['exec'], next_state, text)
       LOG('dbg', 'ExecutingSearch: ' + cmd)
       EmcExec(cmd, True, self._request_page_done, item_data)
-      self._run_dialog = EmcDialog(title = 'please wait', style = 'cancel',
-                                   text = 'Scraping site...', )
+      self._run_dialog = EmcDialog(title=_('please wait'), style='cancel',
+                                   text=_('Getting info...'), )
 
    def _request_page_done(self, output, parent_item_data):
       # parse the output of the channel execution
@@ -275,13 +275,13 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
                continue
       
       if len(items) < 1 and suggested is None:
-         EmcDialog(text = 'Error executing script', style = 'error')
+         EmcDialog(text=_('Error reading channel'), style='error')
          return
 
       if suggested and len(suggested) > 0:
          # prepare the suggestions dialog that will be shown on PLAYBACK_FINISHED
-         d = EmcDialog(title = 'Suggestions', style = 'list',
-                       done_cb = self._suggestion_selected_cb)
+         d = EmcDialog(title=_('Suggestions'), style='list',
+                       done_cb=self._suggestion_selected_cb)
          d.hide()
          for item in suggested:
             d.list_item_append(item[F_LABEL], item_data=item)

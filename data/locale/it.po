@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-19 18:21+0200\n"
-"PO-Revision-Date: 2014-07-19 18:30+0100\n"
+"POT-Creation-Date: 2014-07-19 18:36+0200\n"
+"PO-Revision-Date: 2014-07-19 18:39+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -354,6 +354,53 @@ msgstr "Traccia video #%d"
 #: epymc/mediaplayer.py:486
 msgid "Download video"
 msgstr "Scarica filmato"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:87
+#, python-format
+msgid ""
+"<title>%s</><br><hilight>version:</> %s<br><hilight>author:</> %s<br><br>"
+"%s<br>"
+msgstr ""
+"<title>%s</><br><hilight>Versione:</> %s<br><hilight>Autore:</> %s<br><br>"
+"%s<br>"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:117
+#: epymc/plugins/onlinevideo/onlinevideo.py:142
+#: epymc/plugins/onlinevideo/onlinevideo.py:146
+msgid "Online Channels"
+msgstr "Canali Online"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:119
+msgid ""
+"Long info for the online channels module, explain what it does and what it \n"
+"need to work well, can also use markup like <title>this</> or <b>this</>"
+msgstr ""
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:184
+msgid "Channels"
+msgstr "Canali"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:226
+msgid "Search query"
+msgstr "Ricerca"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:233
+#: epymc/plugins/onlinevideo/onlinevideo.py:242
+msgid "please wait"
+msgstr "Attendere"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:234
+#: epymc/plugins/onlinevideo/onlinevideo.py:243
+msgid "Getting info..."
+msgstr "Ottengo informazioni..."
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:278
+msgid "Error reading channel"
+msgstr "Errore lettura canale"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:283
+msgid "Suggestions"
+msgstr "Consigliati"
 
 #: epymc/plugins/movies/movies.py:81 epymc/plugins/music/music.py:101
 #: epymc/plugins/tvshows/tvshows.py:71

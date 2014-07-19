@@ -191,7 +191,7 @@ class TMDBv3(object):
 
       # create the movie info dict
       try:
-         director = [d['name'] for d in api_data['casts']['crew'] if d['job'] == 'Director'][0]
+         director = [d['name'] for d in api_data['credits']['crew'] if d['job'] == 'Director'][0]
       except:
          director = 'missing'
 

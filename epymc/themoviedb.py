@@ -571,7 +571,7 @@ class CastPanel(EmcDialog):
    def movies_dialog(self):
       dia = EmcDialog(style='list', title=self.info['name'])
       for movie in self.info['credits']['cast']:
-         label = '%s as %s' % (movie['title'], movie['character'])
+         label = _('%s as %s') % (movie['title'], movie['character'])
          icon = EmcRemoteImage(movie['poster_path'])
          icon.size_hint_min_set(100, 100) # TODO FIXME
          dia.list_item_append(label, icon)

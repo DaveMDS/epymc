@@ -68,7 +68,7 @@ class AddSourceItemClass(EmcItemClass):
       mod_instance._browser.refresh(hard=True)
 
    def label_get(self, url, mod):
-      return 'Manage sources'
+      return _('Manage sources')
 
    def icon_get(self, url, mod):
       return 'icon/plus'
@@ -80,7 +80,7 @@ class RescanItemClass(EmcItemClass):
          mod._scanner = BackgroundScanner(mod._browser, mod._tvshows_db, mod._idler_db)
 
    def label_get(self, url, mod):
-      return 'Rescan library'
+      return _('Rescan library')
 
    def icon_get(self, url, mod):
       return 'icon/refresh'
@@ -91,7 +91,7 @@ class SerieInfoItemClass(EmcItemClass):
       InfoPanel(mod._current_serie_name)
 
    def label_get(self, url, mod):
-      return 'Serie info'
+      return _('Serie info')
 
    def icon_get(self, url, mod):
       return 'icon/tv'
@@ -242,22 +242,20 @@ class EpisodeItemClass(EmcItemClass):
          return get_tv_backdrop_filename(e['id'])
 
    def info_get(self, url, episode_data):
-      return u'<title>Episode {}: {}</title><br>' \
-              '<hilight>First aired:</hilight> {}<br>'  \
-              '<hilight>Overview:</hilight> {}</><br>' \
-              .format(
+      return _('<title>Episode %d: %s</title><br>' \
+               '<hilight>First aired:</hilight> %s<br>'  \
+               '<hilight>Overview:</hilight> %s</><br>') % (
                   episode_data['episode_num'], episode_data['title'],
                   episode_data['first_aired'],
-                  episode_data['overview'],
-              )
+                  episode_data['overview'])
 
 
 class TvShowsModule(EmcModule):
    name = 'tvshows'
-   label = 'Tv Shows'
+   label = _('TV Shows')
    icon = 'icon/tv'
-   info = """Long info for the tvshows module, explain what it does and what it
-need to work well, can also use markup like <title>this</> or <b>this</>"""
+   info = _("""Long info for the tvshows module, explain what it does and what it
+need to work well, can also use markup like <title>this</> or <b>this</>""")
 
    _browser = None            # the Browser widget instance
    _scanner = None            # the BackgroundScanner instance
@@ -290,14 +288,14 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          # ini.set('tvshows', 'db_names_in_list', 'True')
 
       # add an item in the mainmenu
-      mainmenu.item_add('tvshows', 11, 'Tv Shows', 'icon/tv', self.cb_mainmenu)
+      mainmenu.item_add('tvshows', 11, _('TV Shows'), 'icon/tv', self.cb_mainmenu)
 
       # add an entry in the config gui
-      config_gui.root_item_add('tvshows', 51, 'Tv Shows Collection',
+      config_gui.root_item_add('tvshows', 51, _('Tv Shows Collection'),
                                icon='icon/tv', callback=config_panel_cb)
 
       # create a browser instance
-      self._browser = EmcBrowser('TvShows', 'List')
+      self._browser = EmcBrowser(_('TV Shows'), 'List')
 
       # listen to emc events
       events.listener_add('tvshows', self._events_cb)
@@ -335,8 +333,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          h = int(pos / 3600)
          m = int(pos / 60) % 60
          s = int(pos % 60)
-         txt = "Continue from %d:%.2d:%.2d ?" % (h, m, s)
-         EmcDialog(text=txt, style='yesno', user_data=url,
+         EmcDialog(text=_('Continue from %d:%.2d:%.2d ?') % (h, m, s),
+                   style='yesno', user_data=url,
                    done_cb=self._dia_yes_cb,
                    canc_cb=self._dia_no_cb)
       else:
@@ -375,7 +373,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # if not self._folders:
          #TODO alert the user. and instruct how to add folders
 
-      self._browser.page_add('tvshows://root', 'Tv Shows', None, self.populate_root_page)
+      self._browser.page_add('tvshows://root', _('TV Shows'), None, self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
 
@@ -457,27 +455,26 @@ class InfoPanel(EmcDialog):
       self._image = Image(gui.win)
       EmcDialog.__init__(self, style='panel', title=serie_name,
                          text=' ', content=self._image)
-      self.button_add('Posters', self._posters_button_cb)
-      self.button_add('Backdrops', self._backdrop_button_cb)
-      self.button_add('Cast', self._cast_button_cb)
-      self.button_add('Refresh info', self._refresh_info_button_cb)
+      self.button_add(_('Posters'), self._posters_button_cb)
+      self.button_add(_('Backdrops'), self._backdrop_button_cb)
+      self.button_add(_('Cast'), self._cast_button_cb)
+      self.button_add(_('Refresh info'), self._refresh_info_button_cb)
       self.update()
 
    def update(self):
       if self._db_data:
          d = self._db_data
-         info = u'<hilight>Created by: </hilight> {} <br>' \
-                 '<hilight>Network:</hilight> {}<br>' \
-                 '<hilight>First aired: </hilight> {} <br>' \
-                 '<hilight>Last aired: </hilight> {} <br>' \
-                 '<hilight>Seasons:</hilight> {}<br>' \
-                 '<hilight>Episodes:</hilight> {}<br>' \
-                 '<hilight>Genres:</hilight> {}<br>' \
-                 '<hilight>Runtime:</hilight> {} min<br>' \
-                 '<hilight>Rating:</hilight> {}<br>' \
-                 '<hilight>Status:</hilight> {}<br>' \
-                 '<br><hilight>Overview:</hilight><br>{}<br>' \
-                 .format(
+         info = _('<hilight>Created by: </hilight> %s <br>' \
+                  '<hilight>Network:</hilight> %s<br>' \
+                  '<hilight>First aired: </hilight> %s <br>' \
+                  '<hilight>Last aired: </hilight> %s <br>' \
+                  '<hilight>Seasons:</hilight> %s<br>' \
+                  '<hilight>Episodes:</hilight> %s<br>' \
+                  '<hilight>Genres:</hilight> %s<br>' \
+                  '<hilight>Runtime:</hilight> %s min<br>' \
+                  '<hilight>Rating:</hilight> %s/10<br>' \
+                  '<hilight>Status:</hilight> %s<br>' \
+                  '<br><hilight>Overview:</hilight><br>%s<br>') % (
                      ', '.join(d['created_by']),
                      ', '.join(d['networks']),
                      d['first_air_date'],
@@ -495,8 +492,8 @@ class InfoPanel(EmcDialog):
          except: pass
          self.text_set(info)
       else:
-         text = 'No info stored for this serie.<br>' \
-                'Please try the "refresh info" button.'
+         text = _('No info stored for this serie.<br>' \
+                  'Please try the <i>refresh info</i> button.')
          self.text_set(text)
 
    ### images
@@ -505,7 +502,7 @@ class InfoPanel(EmcDialog):
       tmdb.get_posters(self._db_data['id'], self._posters_cb, tv=True)
 
    def _posters_cb(self, tmdb, results):
-      title = '%s posters found' % len(results)
+      title = _('%d posters available') % len(results)
       dia = EmcDialog(style='image_list_horiz', title=title,
                       done_cb=self._image_choosed_cb)
       for poster in results:
@@ -519,7 +516,7 @@ class InfoPanel(EmcDialog):
       tmdb.get_backdrops(self._db_data['id'], self._backdrops_cb, tv=True)
 
    def _backdrops_cb(self, tmdb, results):
-      title = '%s backdrops found' % len(results)
+      title = _('%d backdrops available') % len(results)
       dia = EmcDialog(style='image_list_vert', title=title,
                       done_cb=self._image_choosed_cb)
       for backdrop in results:
@@ -529,7 +526,7 @@ class InfoPanel(EmcDialog):
 
    def _image_choosed_cb(self, dia, dwnl_url, dest_path, icon_url=None):
       dia.delete()
-      dia = EmcDialog(style='progress', title='Downloading image')
+      dia = EmcDialog(style='progress', title=_('Downloading image'))
       utils.download_url_async(dwnl_url, dest_path,
                                complete_cb=self._cb_image_done,
                                progress_cb=self._cb_image_progress,
@@ -550,12 +547,12 @@ class InfoPanel(EmcDialog):
 
    ### cast
    def _cast_button_cb(self, button):
-      dia = EmcDialog(title='Cast', style='list',
+      dia = EmcDialog(title=_('Cast'), style='list',
                       done_cb=lambda d, pid: CastPanel(pid))
-      dia.button_add('Info', self._cast_info_cb, dia)
+      dia.button_add(_('Info'), self._cast_info_cb, dia)
 
       for person in self._db_data['cast']:
-         label = '%s as %s' % (person['name'], person['character'])
+         label = _('%s as %s') % (person['name'], person['character'])
          icon = EmcRemoteImage(person['profile_path']) # TODO use 'dest' to cache the img
          icon.size_hint_min_set(100, 100) # TODO FIXME
          dia.list_item_append(label, icon, None, person['id'])
@@ -574,7 +571,7 @@ class InfoPanel(EmcDialog):
       if len(results) == 1:
          self._result_choosed_cb(None, results[0]['tmdb_id'])
       elif len(results) > 1:
-         title = 'Found %d results, which one?' % len(results)
+         title = _('Found %d results, which one?') % len(results)
          dia = EmcDialog(style='list', title=title,
                          done_cb=self._result_choosed_cb)
          for item in results:
@@ -589,12 +586,12 @@ class InfoPanel(EmcDialog):
                name = item['name']
             dia.list_item_append(name, img, serie_id=item['tmdb_id'])
       else:
-         text = 'The search for "%s" did not make any results.<br>' \
-                'If your show is listed on themoviedb.org please rename ' \
-                'your folder to match the title on the site.<br>' \
-                'If otherwise it is not in the online database please ' \
-                'contribute and add it yourself.' % self._serie_name
-         EmcDialog(style='minimal', title='Nothing found', text=text)
+         text = _('The search for "%s" did not make any results.<br>' \
+                  'If your show is listed on themoviedb.org please rename ' \
+                  'your folder to match the title on the site.<br>' \
+                  'If otherwise it is not in the online database please ' \
+                  'contribute and add it yourself.') % self._serie_name
+         EmcDialog(style='minimal', title=_('Nothing found'), text=text)
 
    def _result_choosed_cb(self, dia, serie_id):
       if dia: dia.delete()
@@ -603,7 +600,7 @@ class InfoPanel(EmcDialog):
       tmdb.get_tv_info(serie_id, self._refresh_done_cb, self._refresh_prog_cb)
 
       self._prog_dia = EmcDialog(style='progress',
-                                 title='Fetching updated info',
+                                 title=_('Fetching updated info'),
                                  content=gui.load_image('tmdb_logo.png'))
 
    def _refresh_prog_cb(self, tvdb, progress):
@@ -668,11 +665,11 @@ def get_serie_from_relative_dir_url(url):
 ###### Config Panel stuff
 def config_panel_cb():
    bro = config_gui.browser_get()
-   bro.page_add('config://tvshows/', 'Tv Shows', None, populate_config)
+   bro.page_add('config://tvshows/', _('TV Shows'), None, populate_config)
 
 def populate_config(browser, url):
    config_gui.standard_item_string_add('tvshows', 'info_lang',
-                                       'Preferred language for contents')
+                                       _('Preferred language for contents'))
 
 
 class BackgroundScanner(ecore.Idler):
@@ -709,7 +706,7 @@ class BackgroundScanner(ecore.Idler):
 
       # the first time create the generator
       if self._generator is None:
-         EmcNotify("TvShows scanner started")
+         EmcNotify(_('TvShows scanner started'))
          sources = ini.get_string_list('tvshows', 'folders', ';')
          folders = [f.replace('file://', '') for f in sources]
          self._generator = utils.grab_files(folders, recursive=False)
@@ -739,7 +736,7 @@ class BackgroundScanner(ecore.Idler):
       try:
          serie_name = self._series_to_update.pop()
       except IndexError:
-         EmcNotify("TvShows scanner done")
+         EmcNotify(_('TvShows scanner done'))
          DBG("scanner done")
          return ecore.ECORE_CALLBACK_CANCEL
 
@@ -777,9 +774,9 @@ class BackgroundScanner(ecore.Idler):
          # store the data into tvshow-db
          self._tvshows_db.set_data(self._current_serie_name, result)
 
-         # show a cool notification
-         text = '<title>Found serie:</><br>%s<br>%s seasons' % \
-                (result['name'], len(result['seasons']))
+         # show a nice notification
+         text = _('<title>Found serie:</><br>%s<br>%s seasons') % \
+                  (result['name'], len(result['seasons']))
          EmcNotify(text, icon=get_tv_icon_filename(result['id']))
 
          # refresh the browser view

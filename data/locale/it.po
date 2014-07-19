@@ -916,27 +916,3 @@ msgstr "Scansioen delle serie completata"
 msgid "<title>Found serie:</><br>%s<br>%s seasons"
 msgstr "<title>Trivata serie:</><br>%s<br>%s stagioni"
 
-#~ msgid ""
-#~ "No info stored for this serie.<br>Please try the <em>refresh info</em> "
-#~ "button."
-#~ msgstr ""
-#~ "Nessuna informazione per questa serie.<br>Prova a premere il bottone "
-#~ "<em>Aggiorna informazioni</em>."
-
-#~ msgid "Tv Shows"
-#~ msgstr "Serie TV"
-
-#~ msgid "TvShows"
-#~ msgstr "Serie TV"
-
-#~ msgid "Downloading Image"
-#~ msgstr "Scaricamento immagine"
-
-#~ msgid ""
-#~ "<b>The database \"%s\" is outdated!</b><br><br>The old file has been "
-#~ "renamed with a .backup extension and a new (empty) one has been created."
-#~ "<br><br>Sorry for the incovenience."
-#~ msgstr ""
-#~ "<b>The database \"%s\" is outdated!</b><br><br>The old file has been "
-#~ "renamed with a .backup extension and a new (empty) one has been created."
-#~ "<br><br>Sorry for the incovenience."

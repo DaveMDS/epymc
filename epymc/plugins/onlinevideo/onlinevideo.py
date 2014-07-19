@@ -138,9 +138,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
       _mod = self
 
       # add an item in the mainmenu
-      img = os.path.join(os.path.dirname(__file__), 'ov_icon.png')
       mainmenu.item_add('onlinechannels', 15, _('Online Channels'),
-                        img, self.cb_mainmenu)
+                        'icon/olvideo', self.cb_mainmenu)
 
       # create the browser instance
       self._browser = EmcBrowser(_('Online Channels'))

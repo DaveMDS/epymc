@@ -444,7 +444,8 @@ class ViewList(object):
          it.selected_set(1)
 
       self.items_count += 1
-      gui.text_set('browser.list.total', '%d items' % (self.items_count))
+      gui.text_set('browser.list.total',
+         ngettext('%d item', '%d items', self.items_count) % (self.items_count))
 
    def show(self):
       """ Show the view """

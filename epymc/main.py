@@ -26,7 +26,7 @@ import epymc.utils as utils
 
 # init gettext, this install the _() func in the main namespace)
 localedir = os.path.join(utils.emc_base_dir, 'locale')
-gettext.install('epymc', localedir=localedir)
+gettext.install('epymc', localedir=localedir, names='ngettext')
 
 import epymc.modules as modules
 import epymc.gui as gui

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-19 19:09+0200\n"
-"PO-Revision-Date: 2014-07-19 19:09+0100\n"
+"POT-Creation-Date: 2014-07-19 19:24+0200\n"
+"PO-Revision-Date: 2014-07-19 19:39+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -16,6 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.4\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: epymc/themoviedb.py:539
 msgid "Fetching info"
@@ -153,6 +154,13 @@ msgstr "Esci"
 #: epymc/browser.py:129
 msgid "Back"
 msgstr "Indietro"
+
+#: epymc/browser.py:448
+#, python-format
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] "%d elemento"
+msgstr[1] "%d elementi"
 
 #: epymc/gui.py:118
 msgid "Enlightenment Media Center"

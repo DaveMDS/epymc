@@ -71,7 +71,7 @@ class build_i18n(Command):
             sources += ' ' + os.path.join(dirpath, name)
 
       # create the reference pot file
-      cmd = 'xgettext -i --from-code=UTF-8 --force-po --output=ref.pot %s' % (sources)
+      cmd = 'xgettext --from-code=UTF-8 --force-po --output=ref.pot %s' % (sources)
       os.system(cmd)
 
       # create or update all the .po files and compile them to .mo
@@ -82,7 +82,7 @@ class build_i18n(Command):
          if os.path.exists(po_file):
             # update an existing po file
             info('updating po file: %s' % (po_file))
-            cmd = 'msgmerge -N -U -i -q %s ref.pot' % (po_file)
+            cmd = 'msgmerge -N -U -q %s ref.pot' % (po_file)
             os.system(cmd)
          else:
             # create a new po file

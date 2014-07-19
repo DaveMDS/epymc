@@ -78,7 +78,7 @@ class AddSourceItemClass(EmcItemClass):
       _mod._browser.refresh(hard=True)
 
    def label_get(self, url, mod):
-      return 'Manage sources'
+      return _('Manage sources')
 
    def icon_get(self, url, mod):
       return 'icon/plus'
@@ -89,7 +89,7 @@ class RescanItemClass(EmcItemClass):
          mod._scanner = BackgroundScanner(mod._browser, mod._movie_db, mod._idler_db)
 
    def label_get(self, url, mod):
-      return 'Rescan library'
+      return _('Rescan library')
 
    def icon_get(self, url, mod):
       return 'icon/refresh'
@@ -136,22 +136,22 @@ class MovieItemClass(EmcItemClass):
    def info_get(self, url, mod):
       if mod._movie_db.id_exists(url):
          e = mod._movie_db.get_data(url)
-         text = '<title>%s (%s %s)</><br>' \
-                '<hilight>Rating:</> %.0f/10<br>' \
-                '<hilight>Director:</> %s<br>' \
-                '<hilight>Cast:</> %s<br>' % \
-                (e['title'], e['country'], e['release_date'][:4],
-                e['rating'], e['director'],
-                mod._get_cast(e, 4))
+         text = _('<title>%s (%s %s)</><br>' \
+                  '<hilight>Rating:</> %.0f/10<br>' \
+                  '<hilight>Director:</> %s<br>' \
+                  '<hilight>Cast:</> %s<br>') % \
+                  (e['title'], e['country'], e['release_date'][:4],
+                   e['rating'], e['director'],
+                   mod._get_cast(e, 4))
       else:
          name, year = get_movie_name_from_url(url)
-         text = '<title>%s</><br>' \
-                '<hilight>Size:</> %s<br>' \
-                '<hilight>Name:</> %s<br>' \
-                '<hilight>Year:</> %s<br>' % \
-                (os.path.basename(url),
-                 utils.hum_size(os.path.getsize(utils.url2path(url))),
-                 name, year if year else 'Unknown')
+         text = _('<title>%s</><br>' \
+                  '<hilight>Size:</> %s<br>' \
+                  '<hilight>Name:</> %s<br>' \
+                  '<hilight>Year:</> %s<br>') % \
+                  (os.path.basename(url),
+                   utils.hum_size(os.path.getsize(utils.url2path(url))),
+                   name, year if year else _('Unknown'))
 
       # return "test1: κόσμε END" # should see the Greek word 'kosme'
       # return text.encode('utf-8')
@@ -170,10 +170,10 @@ class FolderItemClass(EmcItemClass):
 
 class MoviesModule(EmcModule):
    name = 'movies'
-   label = 'Movies'
+   label = _('Movies')
    icon = 'icon/movie'
-   info = """Long info for the movies module, explain what it does and what it
-need to work well, can also use markup like <title>this</> or <b>this</>"""
+   info = _("""Long info for the movies module, explain what it does and what it
+need to work well, can also use markup like <title>this</> or <b>this</>""")
 
    _browser = None     # the browser widget instance
    _exts = None        # list of allowed extensions
@@ -216,15 +216,15 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       subitems = []
       for f in self._folders:
          subitems.append((os.path.basename(f), None, f))
-      mainmenu.item_add('movies', 10, 'Movies', 'icon/movie',
+      mainmenu.item_add('movies', 10, _('Movies'), 'icon/movie',
                         self.cb_mainmenu, subitems)
 
        # add an entry in the config gui
-      config_gui.root_item_add('movies', 50, 'Movie Collection',
+      config_gui.root_item_add('movies', 50, _('Movie Collection'),
                                icon='icon/movie', callback=config_panel_cb)
 
       # create a browser instance
-      self._browser = EmcBrowser('Movies', 'List')
+      self._browser = EmcBrowser(_('Movies'), 'List')
 
       # listen to emc events
       events.listener_add('movies', self._events_cb)
@@ -260,8 +260,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          h = int(pos / 3600)
          m = int(pos / 60) % 60
          s = int(pos % 60)
-         txt = "Continue from %d:%.2d:%.2d ?" % (h, m, s)
-         EmcDialog(text=txt, style='yesno', user_data=url,
+         EmcDialog(text=_('Continue from %d:%.2d:%.2d ?') % (h, m, s),
+                   style='yesno', user_data=url,
                    done_cb=self._dia_yes_cb,
                    canc_cb=self._dia_no_cb)
       else:
@@ -301,7 +301,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
       # start the browser in the wanted page
       if url is None:
-         self._browser.page_add('movies://root', 'Movies', None, self.populate_root_page)
+         self._browser.page_add('movies://root', _('Movies'), None, self.populate_root_page)
       else:
          self._browser.page_add(url, os.path.basename(url), None, self.populate_url)
          
@@ -373,12 +373,12 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
    def update_movie_info(self, url):
       # update buttons
       self._dialog.buttons_clear()
-      self._dialog.button_add('Play', self._cb_panel_1)
+      self._dialog.button_add(_('Play'), self._cb_panel_1)
       if self._movie_db.id_exists(url):
-         self._dialog.button_add('Cast', self._cb_panel_2)
-         self._dialog.button_add('Posters', self._cb_panel_3)
-         self._dialog.button_add('Backdrops', self._cb_panel_4)
-      self._dialog.button_add('Search Info', self._cb_panel_5)
+         self._dialog.button_add(_('Cast'), self._cb_panel_2)
+         self._dialog.button_add(_('Posters'), self._cb_panel_3)
+         self._dialog.button_add(_('Backdrops'), self._cb_panel_4)
+      self._dialog.button_add(_('Search Info'), self._cb_panel_5)
 
       o_image = self._dialog.content_get()
 
@@ -386,15 +386,17 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          e = self._movie_db.get_data(url)
 
          # update text info
+         from pprint import pprint
+         pprint(e)
          self._dialog.title_set(e['title'].replace('&', '&amp;'))
-         info = '<hilight>Director: </hilight> %s <br>' \
-                '<hilight>Cast: </hilight> %s <br>' \
-                '<hilight>Released: </hilight> %s <br>' \
-                '<hilight>Country: </hilight> %s <br>' \
-                '<hilight>Rating: </hilight> %s <br>' \
-                '<br><hilight>Overview:</hilight> %s' \
-                  % (e['director'], self._get_cast(e), e['release_date'],
-                     e['countries'], e['rating'], e['overview'])
+         info = _('<hilight>Director: </hilight> %s <br>' \
+                  '<hilight>Cast: </hilight> %s <br>' \
+                  '<hilight>Released: </hilight> %s <br>' \
+                  '<hilight>Country: </hilight> %s <br>' \
+                  '<hilight>Rating: </hilight> %s <br>' \
+                  '<br><hilight>Overview:</hilight> %s') \
+                   % (e['director'], self._get_cast(e), e['release_date'],
+                      e['countries'], e['rating'], e['overview'])
          # self._dialog.text_set("test2: κόσμε END") # should see the Greek word 'kosme')
          self._dialog.text_set(info.replace('&', '&amp;'))
 
@@ -409,9 +411,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          name, year = get_movie_name_from_url(url)
          self._dialog.title_set(name)
          # TODO print also file size, video len, codecs, streams found, file metadata, etc..
-         msg = 'Media:<br>' + url + '<br><br>' + \
-               'No info stored for this media<br>' + \
-               'Try the Search info button...'
+         msg = _('Media:<br>%s<br><br>' \
+                 'No info stored for this media<br>' \
+                 'Try the Search info button...') % url
          self._dialog.text_set(msg)
          # TODO make thumbnail
          # o_image.file_set('')
@@ -428,12 +430,12 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       if self._movie_db.id_exists(self._current_url):
          movie_info = self._movie_db.get_data(self._current_url)
 
-         dia = EmcDialog(title='Cast', style='list',
+         dia = EmcDialog(title=_('Cast'), style='list',
                          done_cb=lambda d, pid: CastPanel(pid))
-         dia.button_add('Info', self._cb_cast_info, dia)
+         dia.button_add(_('Info'), self._cb_cast_info, dia)
 
          for person in sorted(movie_info['cast'], key=itemgetter('order')):
-            label = '%s as %s' % (person['name'], person['character'])
+            label = _('%s as %s') % (person['name'], person['character'])
             icon = EmcRemoteImage(person['profile_path']) # TODO use 'dest' to cache the img
             icon.size_hint_min_set(100, 100) # TODO FIXME
             dia.list_item_append(label, icon, None, person['id'])
@@ -452,7 +454,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
          tmdb.get_posters(movie_info['tmdb_id'], self._cb_posters_list_complete)
 
    def _cb_posters_list_complete(self, tmdb, posters):
-      title = '%d posters available' % (len(posters))
+      title = _('%d posters available') % (len(posters))
       dialog = EmcDialog(style='image_list_horiz', title=title,
                          done_cb=self._cb_posters_list_ok)
       for poster in posters:
@@ -470,7 +472,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       del dialog
 
       # show a progress dialog
-      self._poster_dialog = EmcDialog(title='Downloading Image',
+      self._poster_dialog = EmcDialog(title=_('Downloading image'),
                                       style='progress')
 
    def _cb_image_progress(self, dest, tot, done):
@@ -494,7 +496,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    def _cb_backdrops_list_complete(self, tmdb, backdrops):
 
-      title = '%d backdrops available' % (len(backdrops))
+      title = _('%d backdrops available') % (len(backdrops))
       dialog = EmcDialog(style='image_list_vert', title=title,
                          done_cb=self._cb_backdrops_list_ok)
       for backdrop in backdrops:
@@ -513,7 +515,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       del dialog
 
       # show a progress dialog
-      self._poster_dialog = EmcDialog(title='Downloading Image',
+      self._poster_dialog = EmcDialog(title=_('Downloading image'),
                                       style='progress')
 
 
@@ -526,14 +528,14 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       tmdb = TMDBv3(lang=ini.get('movies', 'info_lang'))
       tmdb.movie_search(name, year, self._cb_search_done)
       if year:
-         text = '<b>Searching for:</><br>%s (%s)<br>' % (name, year)
+         text = _('<b>Searching for:</><br>%s (%s)<br>') % (name, year)
       else:
-         text = '<b>Searching for:</><br>%s<br>' % (name)
+         text = _('<b>Searching for:</><br>%s<br>') % (name)
 
       self.tmdb_dialog = EmcDialog(title='themoviedb.org',
                                    style='progress', text=text,
                                    user_data=tmdb)
-      self.tmdb_dialog.button_add('Change name',
+      self.tmdb_dialog.button_add(_('Change name'),
                   lambda b: EmcVKeyboard(text=name, accept_cb=self._vkbd_cb))
 
    def _vkbd_cb(self, vkbd, txt):
@@ -542,14 +544,14 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
 
    def _cb_search_done(self, tmdb, results):
       if len(results) == 0:
-         self.tmdb_dialog.text_append('<br>nothing found, please try with a better name')#TODO explain better the format
+         self.tmdb_dialog.text_append(_('<br>nothing found, please try with a better name'))#TODO explain better the format
       elif len(results) == 1:
          tmdb.get_movie_info(results[0]['tmdb_id'],
                              self._cb_info_done, self._cb_info_progress)
-         self.tmdb_dialog.text_append('<b>Downloading movie info...</b>')
+         self.tmdb_dialog.text_append(_('<b>Downloading movie info...</b>'))
       else:
-         self.tmdb_dialog.text_append('<b>Found %d results</b><br>' % (len(results)))
-         title = 'Found %d results, which one?' % (len(results))
+         self.tmdb_dialog.text_append(_('<b>Found %d results</b><br>') % (len(results)))
+         title = _('Found %d results, which one?') % (len(results))
          dialog2 = EmcDialog(title=title, style='list',
                              done_cb=self._cb_list_ok,
                              canc_cb=self._cb_list_cancel)
@@ -571,7 +573,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>"""
       # download selected movie info + images
       tmdb = self.tmdb_dialog.data_get()
       tmdb.get_movie_info(tid, self._cb_info_done, self._cb_info_progress)
-      self.tmdb_dialog.text_append('<b>Downloading movie info...</b>')
+      self.tmdb_dialog.text_append(_('<b>Downloading movie info...</b>'))
 
    def _cb_info_progress(self, tmdb, progress):
       self.tmdb_dialog.progress_set(progress)
@@ -621,13 +623,13 @@ class BackgroundScanner(ecore.Idler):
       if self._generator is None:
          folders = ini.get_string_list('movies', 'folders', ';')
          self._generator = utils.grab_files(folders)
-         EmcNotify("Movies scanner started")
+         EmcNotify(_('Movies scanner started'))
 
       # get the next file from the generator
       try:
          filename = next(self._generator)
       except StopIteration:
-         EmcNotify("Movies scanner done")
+         EmcNotify(_('Movies scanner done'))
          DBG("Movies scanner done")
          self._generator = None
          return ecore.ECORE_CALLBACK_CANCEL
@@ -672,7 +674,7 @@ class BackgroundScanner(ecore.Idler):
          # store the result in movie db
          try:
             self._movie_db.set_data(self._current_url, movie_info)
-            text = '<title>Found movie:</><br>%s (%s)' % \
+            text = _('<title>Found movie:</><br>%s (%s)') % \
                    (movie_info['title'], movie_info['release_date'][:4])
             EmcNotify(text, icon=get_poster_filename(movie_info['id']))
          except:
@@ -719,16 +721,16 @@ def get_movie_name_from_url(url):
 ###### Config Panel stuff ######
 def config_panel_cb():
    bro = config_gui.browser_get()
-   bro.page_add('config://movies/', 'Movie Collection', None, populate_config)
+   bro.page_add('config://movies/', _('Movies Collection'), None, populate_config)
 
 def populate_config(browser, url):
 
    config_gui.standard_item_string_add('movies', 'info_lang',
-                                       'Preferred language for contents')
+                                       _('Preferred language for contents'))
 
    config_gui.standard_item_bool_add('movies', 'enable_scanner',
-                                     'Enable background scanner')
+                                     _('Enable background scanner'))
 
    config_gui.standard_item_bool_add('movies', 'db_names_in_list',
-                                     'Prefer movie titles in lists')
+                                     _('Prefer movie titles in lists'))
 

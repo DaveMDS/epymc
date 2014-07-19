@@ -3,351 +3,459 @@
 # This file is distributed under the same license as the EpyMC package.
 # Davide Andreoli <dave@gurumeditation.it>, 2014.
 #
-msgid   ""
-msgstr  "Project-Id-Version: epymc 1.0\n"
-        "Report-Msgid-Bugs-To: \n"
-        "POT-Creation-Date: 2014-07-18 22:27+0200\n"
-        "PO-Revision-Date: 2014-07-18 22:27+0100\n"
-        "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
-        "Language-Team: \n"
-        "Language: Italiano\n"
-        "MIME-Version: 1.0\n"
-        "Content-Type: text/plain; charset=UTF-8\n"
-        "Content-Transfer-Encoding: 8bit\n"
-        "X-Generator: Poedit 1.5.4\n"
+msgid ""
+msgstr ""
+"Project-Id-Version: epymc 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-07-19 12:41+0200\n"
+"PO-Revision-Date: 2014-07-19 12:46+0100\n"
+"Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
+"Language-Team: \n"
+"Language: Italiano\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
 
 #: epymc/themoviedb.py:539
-msgid   "Fetching info"
-msgstr  "Scaricamento informazioni"
+msgid "Fetching info"
+msgstr "Scaricamento informazioni"
 
 #: epymc/themoviedb.py:540
-msgid   "please wait..."
-msgstr  "Attendere..."
+msgid "please wait..."
+msgstr "Attendere..."
 
 #: epymc/themoviedb.py:550
 #, python-format
-msgid   "<hilight>Birthday:</> %s<br>"
-msgstr  "<hilight>Data di nascita:</> %s<br>"
+msgid "<hilight>Birthday:</> %s<br>"
+msgstr "<hilight>Data di nascita:</> %s<br>"
 
 #: epymc/themoviedb.py:552
 #, python-format
-msgid   "<hilight>Deathday:</> %s<br>"
-msgstr  "<hilight>Data di morte:</> %s<br>"
+msgid "<hilight>Deathday:</> %s<br>"
+msgstr "<hilight>Data di morte:</> %s<br>"
 
 #: epymc/themoviedb.py:554
 #, python-format
-msgid   "<hilight>Place of birth:</> %s<br>"
-msgstr  "<hilight>Luogo di nascita:</> %s<br>"
+msgid "<hilight>Place of birth:</> %s<br>"
+msgstr "<hilight>Luogo di nascita:</> %s<br>"
 
 #: epymc/themoviedb.py:561
 #, python-format
-msgid   "Movies (%s)"
-msgstr  "Film (%s)"
+msgid "Movies (%s)"
+msgstr "Film (%s)"
 
 #: epymc/themoviedb.py:563
 #, python-format
-msgid   "Photos (%s)"
-msgstr  "Foto (%s)"
+msgid "Photos (%s)"
+msgstr "Foto (%s)"
 
 #: epymc/sdb.py:65
 #, python-format
-msgid   "<b>The database %s is outdated!</b><br><br>The old file has been "
-        "renamed with a .backup extension and a new (empty) one has been "
-        "created.<br><br>Sorry for the incovenience."
-msgstr  "<b>Il database %s è obsoleto!</b><br><br>Il vecchio file è stato "
-        "rinominato con l'estensione .backup e un nuovo file (vuoto) è stato "
-        "creato.<br><br>Scusate per il disagio."
+msgid ""
+"<b>The database %s is outdated!</b><br><br>The old file has been renamed "
+"with a .backup extension and a new (empty) one has been created."
+"<br><br>Sorry for the incovenience."
+msgstr ""
+"<b>Il database %s è obsoleto!</b><br><br>Il vecchio file è stato rinominato "
+"con l'estensione .backup e un nuovo file (vuoto) è stato creato."
+"<br><br>Scusate per il disagio."
 
 #: epymc/sdb.py:66
-msgid   "EpyMC Database"
-msgstr  "EpyMC Database"
+msgid "EpyMC Database"
+msgstr "EpyMC Database"
 
 #: epymc/config_gui.py:212 epymc/config_gui.py:215 epymc/config_gui.py:268
-msgid   "Configuration"
-msgstr  "Configurazione"
+msgid "Configuration"
+msgstr "Configurazione"
 
 #: epymc/config_gui.py:217 epymc/config_gui.py:278
-msgid   "General"
-msgstr  "Generale"
+msgid "General"
+msgstr "Generale"
 
 #: epymc/config_gui.py:218
-msgid   "Themes"
-msgstr  "Temi"
+msgid "Themes"
+msgstr "Temi"
 
 #: epymc/config_gui.py:219 epymc/config_gui.py:380
-msgid   "Modules"
-msgstr  "Moduli"
+msgid "Modules"
+msgstr "Moduli"
 
 #: epymc/config_gui.py:281
-msgid   "Start in fullscreen"
-msgstr  "Avvia a schermo intero"
+msgid "Start in fullscreen"
+msgstr "Avvia a schermo intero"
 
 #: epymc/config_gui.py:282
-msgid   "Adjust interface scale"
-msgstr  "Modifica scalatura"
+msgid "Adjust interface scale"
+msgstr "Modifica scalatura"
 
 #: epymc/config_gui.py:283
-msgid   "Show Back item in lists"
-msgstr  "Mostra indietro nelle liste"
+msgid "Show Back item in lists"
+msgstr "Mostra indietro nelle liste"
 
 #: epymc/config_gui.py:284
-msgid   "Download folder"
-msgstr  "Cartella download"
+msgid "Download folder"
+msgstr "Cartella download"
 
 #: epymc/config_gui.py:285
-msgid   "Max concurrent download"
-msgstr  "Download simultanei"
+msgid "Max concurrent download"
+msgstr "Download simultanei"
 
 #: epymc/config_gui.py:293
-msgid   "Rendering engine"
-msgstr  "Motore di rendering"
+msgid "Rendering engine"
+msgstr "Motore di rendering"
 
 #: epymc/config_gui.py:296
-msgid   "Multimedia engine"
-msgstr  "Motore multimediale"
+msgid "Multimedia engine"
+msgstr "Motore multimediale"
 
 #: epymc/config_gui.py:300
-msgid   "Frames per second"
-msgstr  "Frame al secondo"
+msgid "Frames per second"
+msgstr "Frame al secondo"
 
 #: epymc/config_gui.py:311 epymc/config_gui.py:315
 #, python-format
-msgid   "Current Value: %s"
-msgstr  "Valore attuale: %s"
+msgid "Current Value: %s"
+msgstr "Valore attuale: %s"
 
 #: epymc/config_gui.py:314
-msgid   "set scale"
-msgstr  "imposta scalatura"
+msgid "set scale"
+msgstr "imposta scalatura"
 
 #: epymc/config_gui.py:316
-msgid   "Bigger"
-msgstr  "Più grande"
+msgid "Bigger"
+msgstr "Più grande"
 
 #: epymc/config_gui.py:317
-msgid   "Smaller"
-msgstr  "Più piccola"
+msgid "Smaller"
+msgstr "Più piccola"
 
 #: epymc/config_gui.py:318
-msgid   "Reset"
-msgstr  "Reimposta"
+msgid "Reset"
+msgstr "Reimposta"
 
 #: epymc/config_gui.py:336
 #, python-format
-msgid   "<title>%s</><br><hilight>Author: </>%s<br><hilight>Version: </>%s<br>"
-        "%s"
-msgstr  "<title>%s</><br><hilight>Autore: </>%s<br><hilight>Versione: </>"
-        "%s<br>%s"
+msgid "<title>%s</><br><hilight>Author: </>%s<br><hilight>Version: </>%s<br>%s"
+msgstr ""
+"<title>%s</><br><hilight>Autore: </>%s<br><hilight>Versione: </>%s<br>%s"
 
 #: epymc/mainmenu.py:45 epymc/gui.py:258
-msgid   "Exit"
-msgstr  "Esci"
+msgid "Exit"
+msgstr "Esci"
 
 #: epymc/browser.py:129
-msgid   "Back"
-msgstr  "Indietro"
+msgid "Back"
+msgstr "Indietro"
 
 #: epymc/gui.py:118
-msgid   "Enlightenment Media Center"
-msgstr  "Enlightenment Media Center"
+msgid "Enlightenment Media Center"
+msgstr "Enlightenment Media Center"
 
 #: epymc/gui.py:173 epymc/gui.py:175 epymc/gui.py:176
-msgid   "Unknown"
-msgstr  "Sconosciuto"
+msgid "Unknown"
+msgstr "Sconosciuto"
 
 #: epymc/gui.py:254
-msgid   "credits"
-msgstr  "Ringraziamenti"
+msgid "credits"
+msgstr "Ringraziamenti"
 
 #: epymc/gui.py:255
-msgid   "Cancel"
-msgstr  "Annulla"
+msgid "Cancel"
+msgstr "Annulla"
 
 #: epymc/gui.py:256
-msgid   "Suspend"
-msgstr  "Sospendi"
+msgid "Suspend"
+msgstr "Sospendi"
 
 #: epymc/gui.py:257
-msgid   "Shutdown"
-msgstr  "Spegni"
+msgid "Shutdown"
+msgstr "Spegni"
 
 #: epymc/gui.py:870
-msgid   "Ok"
-msgstr  "Ok"
+msgid "Ok"
+msgstr "Ok"
 
 #: epymc/gui.py:874 epymc/gui.py:876
-msgid   "No"
-msgstr  "No"
+msgid "No"
+msgstr "No"
 
 #: epymc/gui.py:879 epymc/gui.py:881
-msgid   "Yes"
-msgstr  "Sì"
+msgid "Yes"
+msgstr "Sì"
 
 #: epymc/gui.py:1128
-msgid   "Source Selector"
-msgstr  "Selettore fonti"
+msgid "Source Selector"
+msgstr "Selettore fonti"
 
 #: epymc/gui.py:1133
-msgid   "Select"
-msgstr  "Seleziona"
+msgid "Select"
+msgstr "Seleziona"
 
 #: epymc/gui.py:1134
-msgid   "Browse"
-msgstr  "Naviga"
+msgid "Browse"
+msgstr "Naviga"
 
 #: epymc/gui.py:1142
-msgid   "Parent folder"
-msgstr  "Cartella precedente"
+msgid "Parent folder"
+msgstr "Cartella precedente"
 
 #: epymc/gui.py:1181
-msgid   "Sources Manager"
-msgstr  "Gestore fonti"
+msgid "Sources Manager"
+msgstr "Gestore fonti"
 
 #: epymc/gui.py:1183
-msgid   "Done"
-msgstr  "Fatto"
+msgid "Done"
+msgstr "Fatto"
 
 #: epymc/gui.py:1185
-msgid   "Add"
-msgstr  "Aggiungi"
+msgid "Add"
+msgstr "Aggiungi"
 
 #: epymc/gui.py:1187
-msgid   "Remove"
-msgstr  "Rimuovi"
+msgid "Remove"
+msgstr "Rimuovi"
 
 #: epymc/gui.py:1201
-msgid   "Choose a new source"
-msgstr  "Seleziona una nuova fonte"
+msgid "Choose a new source"
+msgstr "Seleziona una nuova fonte"
 
 #: epymc/gui.py:1348
-msgid   "Insert text"
-msgstr  "Inserire il testo"
+msgid "Insert text"
+msgstr "Inserire il testo"
 
 #: epymc/gui.py:1371 epymc/gui.py:1440
-msgid   "UPPERCASE"
-msgstr  "MAIUSCOLE"
+msgid "UPPERCASE"
+msgstr "MAIUSCOLE"
 
 #: epymc/gui.py:1372
-msgid   "SPACE"
-msgstr  "SPAZIO"
+msgid "SPACE"
+msgstr "SPAZIO"
 
 #: epymc/gui.py:1373
-msgid   "ERASE"
-msgstr  "CANCELLA"
+msgid "ERASE"
+msgstr "CANCELLA"
 
 #: epymc/gui.py:1375
-msgid   "Dismiss"
-msgstr  "Annulla"
+msgid "Dismiss"
+msgstr "Annulla"
 
 #: epymc/gui.py:1380
-msgid   "Accept"
-msgstr  "Accetta"
+msgid "Accept"
+msgstr "Accetta"
 
 #: epymc/gui.py:1437
-msgid   "LOWERCASE"
-msgstr  "MINUSCOLE"
+msgid "LOWERCASE"
+msgstr "MINUSCOLE"
 
 #: epymc/gui.py:1588
-msgid   "Download Manager"
-msgstr  "Gestore Download"
+msgid "Download Manager"
+msgstr "Gestore Download"
 
 #: epymc/gui.py:1592
-msgid   "Start download"
-msgstr  "Avvia download"
+msgid "Start download"
+msgstr "Avvia download"
 
 #: epymc/gui.py:1593
-msgid   "Rename"
-msgstr  "Rinomina"
+msgid "Rename"
+msgstr "Rinomina"
 
 #: epymc/gui.py:1594
-msgid   "Change folder"
-msgstr  "Cambia cartella"
+msgid "Change folder"
+msgstr "Cambia cartella"
 
 #: epymc/gui.py:1599
-msgid   "File will be downloaded in the folder:<br> <b>{}</b><br><br>File "
-        "will be named as:<br> <b>{}</b><br><br>You can rename the file using "
-        "the <i>Rename</i> button or change the destination folder from the "
-        "main configuration."
-msgstr  "Il file verrà scaricato nella cartella:<br> <b>{}</b><br><br>Il file "
-        "sarà nominato:<br> <b>{}</b><br><br>Puoi rinominare il file con il "
-        "bottone <i>Rinomina</i> o modificare la cartella di destinazione "
-        "dalla configurazione generale."
+msgid ""
+"File will be downloaded in the folder:<br> <b>{}</b><br><br>File will be "
+"named as:<br> <b>{}</b><br><br>You can rename the file using the <i>Rename</"
+"i> button or change the destination folder from the main configuration."
+msgstr ""
+"Il file verrà scaricato nella cartella:<br> <b>{}</b><br><br>Il file sarà "
+"nominato:<br> <b>{}</b><br><br>Puoi rinominare il file con il bottone "
+"<i>Rinomina</i> o modificare la cartella di destinazione dalla "
+"configurazione generale."
 
 #: epymc/gui.py:1607
-msgid   "Rename download"
-msgstr  "Rinomina file"
+msgid "Rename download"
+msgstr "Rinomina file"
 
 #: epymc/gui.py:1615
-msgid   "Change destination folder"
-msgstr  "Modifica cartella"
+msgid "Change destination folder"
+msgstr "Modifica cartella"
 
 #: epymc/gui.py:1630
 #, python-format
-msgid   "The file %s is in the download queue yet"
-msgstr  "Il file %s è già in coda"
+msgid "The file %s is in the download queue yet"
+msgstr "Il file %s è già in coda"
 
 #: epymc/gui.py:1664
 #, python-format
-msgid   "Download started:<br>%s"
-msgstr  "Download avviato:<br>%s"
+msgid "Download started:<br>%s"
+msgstr "Download avviato:<br>%s"
 
 #: epymc/gui.py:1677
 #, python-format
-msgid   "Download done:<br>%s"
-msgstr  "Download completato:<br>%s"
+msgid "Download done:<br>%s"
+msgstr "Download completato:<br>%s"
 
 #: epymc/mediaplayer.py:98
 #, python-format
-msgid   "<b>File not found:</b><br>%s"
-msgstr  "<b>File non trovato:</b><br>%s"
+msgid "<b>File not found:</b><br>%s"
+msgstr "<b>File non trovato:</b><br>%s"
 
 #: epymc/mediaplayer.py:299
-msgid   "buffering"
-msgstr  "buffering"
+msgid "buffering"
+msgstr "buffering"
 
 #: epymc/mediaplayer.py:321
 #, python-format
-msgid   "Cannot init emotion engine:<br>%s"
-msgstr  "Non posso avviare il motore di emotion:<br>%s"
+msgid "Cannot init emotion engine:<br>%s"
+msgstr "Non posso avviare il motore di emotion:<br>%s"
 
 #: epymc/mediaplayer.py:399
-msgid   "Audio"
-msgstr  "Audio"
+msgid "Audio"
+msgstr "Audio"
 
 #: epymc/mediaplayer.py:407
-msgid   "Video"
-msgstr  "Video"
+msgid "Video"
+msgstr "Video"
 
 #: epymc/mediaplayer.py:466
 #, python-format
-msgid   "Audio track: %s"
-msgstr  "Traccia audio: %s"
+msgid "Audio track: %s"
+msgstr "Traccia audio: %s"
 
 #: epymc/mediaplayer.py:468
 #, python-format
-msgid   "Audio track #%d"
-msgstr  "Traccia audio #%d"
+msgid "Audio track #%d"
+msgstr "Traccia audio #%d"
 
 #: epymc/mediaplayer.py:472
-msgid   "Mute"
-msgstr  "Muto"
+msgid "Mute"
+msgstr "Muto"
 
 #: epymc/mediaplayer.py:480
 #, python-format
-msgid   "Video track: %s"
-msgstr  "Traccia video: %s"
+msgid "Video track: %s"
+msgstr "Traccia video: %s"
 
 #: epymc/mediaplayer.py:482
 #, python-format
-msgid   "Video track #%d"
-msgstr  "Traccia video #%d"
+msgid "Video track #%d"
+msgstr "Traccia video #%d"
 
 #: epymc/mediaplayer.py:486
-msgid   "Download video"
-msgstr  "Scarica filmato"
+msgid "Download video"
+msgstr "Scarica filmato"
 
-#~ msgid        "<b>The database \"%s\" is outdated!</b><br><br>The old file "
-#~      "has been renamed with a .backup extension and a new (empty) one has "
-#~      "been created.<br><br>Sorry for the incovenience."
-#~ msgstr       "<b>The database \"%s\" is outdated!</b><br><br>The old file "
-#~      "has been renamed with a .backup extension and a new (empty) one has "
-#~      "been created.<br><br>Sorry for the incovenience."
+#: epymc/plugins/music/music.py:50 epymc/plugins/music/music.py:54
+msgid "OnAir"
+msgstr "In riproduzione"
+
+#: epymc/plugins/music/music.py:61 epymc/plugins/music/music.py:271
+#: epymc/plugins/music/music.py:325
+msgid "Artists"
+msgstr "Artisti"
+
+#: epymc/plugins/music/music.py:65
+#, python-format
+msgid "Artists (%d)"
+msgstr "Artisti (%d)"
+
+#: epymc/plugins/music/music.py:69 epymc/plugins/music/music.py:272
+#: epymc/plugins/music/music.py:327
+msgid "Albums"
+msgstr "Album"
+
+#: epymc/plugins/music/music.py:73
+#, python-format
+msgid "Albums (%d)"
+msgstr "Album (%d)"
+
+#: epymc/plugins/music/music.py:77 epymc/plugins/music/music.py:273
+#: epymc/plugins/music/music.py:329
+msgid "Songs"
+msgstr "Canzoni"
+
+#: epymc/plugins/music/music.py:81
+#, python-format
+msgid "Songs (%d)"
+msgstr "Canzoni (%d)"
+
+#: epymc/plugins/music/music.py:88
+msgid "Rescan library"
+msgstr "Aggiorna libreria"
+
+#: epymc/plugins/music/music.py:101
+msgid "Manage sources"
+msgstr "Gestisci fonti"
+
+#: epymc/plugins/music/music.py:111
+msgid "Play the whole album"
+msgstr "Suona tutto l'album"
+
+#: epymc/plugins/music/music.py:121
+msgid "Play all the songs"
+msgstr "Suona tutte le canzoni"
+
+#: epymc/plugins/music/music.py:163 epymc/plugins/music/music.py:208
+#: epymc/plugins/music/music.py:408
+#, python-format
+msgid "<em>by</em> %s<br>"
+msgstr "<em>di</em> %s<br>"
+
+#: epymc/plugins/music/music.py:165 epymc/plugins/music/music.py:410
+#, python-format
+msgid "<em>from</em> %s<br>"
+msgstr "<em>da</em> %s<br>"
+
+#: epymc/plugins/music/music.py:170
+#, python-format
+msgid "duration: %s<br>"
+msgstr "durata: %s<br>"
+
+#: epymc/plugins/music/music.py:183
+#, python-format
+msgid "%s by %s"
+msgstr "%s di %s"
+
+#: epymc/plugins/music/music.py:214
+#, python-format
+msgid "%d songs, %d min."
+msgstr "%d canzoni, %d min."
+
+#: epymc/plugins/music/music.py:231
+#, python-format
+msgid "%d albums, %d songs"
+msgstr "%d album, %d canzoni"
+
+#: epymc/plugins/music/music.py:237 epymc/plugins/music/music.py:275
+#: epymc/plugins/music/music.py:279 epymc/plugins/music/music.py:323
+msgid "Music"
+msgstr "Musica"
+
+#: epymc/plugins/music/music.py:239
+msgid ""
+"Long info for the <b>Music</b> module, explain what it does\n"
+"and what it need to work well, can also use markup like <title>this</> or\n"
+"<b>this</>"
+msgstr ""
+
+#: epymc/plugins/music/music.py:341
+msgid "<hilight>Rebuilding Database</><br>please wait..."
+msgstr "<hilight>Aggiornamento libreria</><br>attendere..."
+
+#: epymc/plugins/music/music.py:372 epymc/plugins/music/music.py:383
+#: epymc/plugins/music/music.py:396
+#, python-format
+msgid "<hilight>%s</><br>queued"
+msgstr "<hilight>%s</><br>accodato"
+
+#~ msgid ""
+#~ "<b>The database \"%s\" is outdated!</b><br><br>The old file has been "
+#~ "renamed with a .backup extension and a new (empty) one has been created."
+#~ "<br><br>Sorry for the incovenience."
+#~ msgstr ""
+#~ "<b>The database \"%s\" is outdated!</b><br><br>The old file has been "
+#~ "renamed with a .backup extension and a new (empty) one has been created."
+#~ "<br><br>Sorry for the incovenience."

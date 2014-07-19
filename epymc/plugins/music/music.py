@@ -47,45 +47,45 @@ _mod = None
 
 class RootOnAirItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod._browser.page_add('music://onair', 'OnAir', None,
+      mod._browser.page_add('music://onair', _('OnAir'), None,
                             mod.populate_onair_page)
 
    def label_get(self, url, mod):
-      return 'OnAir'
+      return _('OnAir')
 
    def icon_get(self, url, mod):
       return 'icon/home'
 
 class RootArtistsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod._browser.page_add('music://artists', 'Artists', None,
+      mod._browser.page_add('music://artists', _('Artists'), None,
                             mod.populate_artists_page)
 
    def label_get(self, url, mod):
-      return 'Artists (%d)' % (len(mod._artists_db))
+      return _('Artists (%d)') % (len(mod._artists_db))
 
 class RootAlbumsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod._browser.page_add('music://albums', 'Albums', None,
+      mod._browser.page_add('music://albums', _('Albums'), None,
                             mod.populate_albums_page)
 
    def label_get(self, url, mod):
-      return 'Albums (%d)' % (len(mod._albums_db))
+      return _('Albums (%d)') % (len(mod._albums_db))
 
 class RootSongsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod._browser.page_add('music://songs', 'Songs', None,
+      mod._browser.page_add('music://songs', _('Songs'), None,
                             mod.populate_songs_page)
 
    def label_get(self, url, mod):
-      return 'Songs (%d)' % (len(mod._songs_db))
+      return _('Songs (%d)') % (len(mod._songs_db))
 
 class RootRebuildItemClass(EmcItemClass):
    def item_selected(self, url, mod):
       mod.rebuild_db()
 
    def label_get(self, url, mod):
-      return 'Rescan library'
+      return _('Rescan library')
 
    def icon_get(self, url, mod):
       return 'icon/refresh'
@@ -98,7 +98,7 @@ class RootAddSourceItemClass(EmcItemClass):
       _mod._folders = sources
 
    def label_get(self, url, mod):
-      return 'Manage sources'
+      return _('Manage sources')
 
    def icon_get(self, url, mod):
       return 'icon/plus'
@@ -108,7 +108,7 @@ class QueueAlbumItemClass(EmcItemClass):
       _mod.queue_album(album)
 
    def label_get(self, url, album):
-      return 'Play the whole album'
+      return _('Play the whole album')
 
    def icon_get(self, url, album):
       return 'icon/plus'
@@ -118,7 +118,7 @@ class QueueArtistItemClass(EmcItemClass):
       _mod.queue_artist(album)
 
    def label_get(self, url, album):
-      return 'Play all the songs'
+      return _('Play all the songs')
 
    def icon_get(self, url, album):
       return 'icon/plus'
@@ -160,14 +160,14 @@ class SongItemClass(EmcItemClass):
    def info_get(self, url, song):
       text = '<hilight>' + song['title'] + '</><br>'
       if 'artist' in song:
-         text += '<em>by ' + song['artist'] + '</><br>'
+         text += _('<em>by</em> %s<br>') % song['artist']
       if 'album' in song:
-         text += 'from ' + song['album'] + '<br>'
+         text += _('<em>from</em> %s<br>') % song['album']
       if 'length' in song:
          length = int(song['length']) / 1000
          min = length / 60
          sec = length % 60
-         text += 'duration: ' + str(min) + ':' + str(sec)  + '<br>'
+         text += _('duration: %s<br>') % ('%d:%d' % (min,sec))
       return text
 
    def icon_get(self, url, song):
@@ -180,7 +180,7 @@ class AlbumItemClass(EmcItemClass):
                              None, _mod.populate_album_page, album)
 
    def label_get(self, url, album):
-      return album['name'] + '  by ' + album['artist']
+      return _('%s by %s') % (album['name'], album['artist'])
 
    def poster_get(self, url, album):
       # Search cover in first-song-of-album directory:
@@ -205,14 +205,13 @@ class AlbumItemClass(EmcItemClass):
 
    def info_get(self, url, album):
       text = '<hilight>' + album['name'] + '</><br>'
-      text += '<em>by ' + album['artist'] + '</><br>'
-      text += str(len(album['songs'])) + ' songs'
+      text += _('<em>by</em> %s<br>') % album['artist']
       lenght = 0
       for song in album['songs']:
          song_data = _mod._songs_db.get_data(song)
          if 'length' in song_data:
             lenght += int(song_data['length'])
-      text += ', ' + str(lenght / 60000) + ' min.'
+      text += _('%d songs, %d min.') % (len(album['songs']), lenght / 60000)
       return text
 
 class ArtistItemClass(EmcItemClass):
@@ -228,17 +227,18 @@ class ArtistItemClass(EmcItemClass):
       return None
 
    def info_get(self, url, artist):
-      return '<hilight>%s</><br>%d albums, %d songs' % (artist['name'],
-              len(artist['albums']), len(artist['songs']))
+      name = '<hilight>%s</><br>' % artist['name']
+      return name + _('%d albums, %d songs') % (len(artist['albums']),
+                                                len(artist['songs']))
 
 
 class MusicModule(EmcModule):
    name = 'music'
-   label = 'Music'
+   label = _('Music')
    icon = 'icon/music'
-   info = """Long info for the <b>Music</b> module, explain what it does
+   info = _("""Long info for the <b>Music</b> module, explain what it does
 and what it need to work well, can also use markup like <title>this</> or
-<b>this</>"""
+<b>this</>""")
 
    _browser = None        # browser instance
    _rebuild_notify = None # rebuild notification object
@@ -268,15 +268,15 @@ and what it need to work well, can also use markup like <title>this</> or
 
       # add an item in the mainmenu
       subitems = [
-         ('Artists', None, 'music://artists'),
-         ('Albums', None, 'music://albums'),
-         ('Songs', None, 'music://songs'),
+         (_('Artists'), None, 'music://artists'),
+         (_('Albums'), None, 'music://albums'),
+         (_('Songs'), None, 'music://songs'),
       ]
-      mainmenu.item_add('music', 5, 'Music', 'icon/music',
+      mainmenu.item_add('music', 5, _('Music'), 'icon/music',
                         self.cb_mainmenu, subitems)
 
       # create a browser instance
-      self._browser = EmcBrowser('Music')
+      self._browser = EmcBrowser(_('Music'))
 
       # listen to emc events
       events.listener_add('music', self.events_cb)
@@ -320,13 +320,13 @@ and what it need to work well, can also use markup like <title>this</> or
 
       # start the browser in the requested page
       if url is None:
-         self._browser.page_add('music://root', 'Music', None, self.populate_root_page)
+         self._browser.page_add('music://root', _('Music'), None, self.populate_root_page)
       elif url == 'music://artists':
-         self._browser.page_add(url, 'Artists', None, self.populate_artists_page)
+         self._browser.page_add(url, _('Artists'), None, self.populate_artists_page)
       elif url == 'music://albums':
-         self._browser.page_add(url, 'Albums', None, self.populate_albums_page)
+         self._browser.page_add(url, _('Albums'), None, self.populate_albums_page)
       elif url == 'music://songs':
-         self._browser.page_add(url, 'Songs', None, self.populate_songs_page)
+         self._browser.page_add(url, _('Songs'), None, self.populate_songs_page)
 
       self._browser.show()
       mainmenu.hide()
@@ -338,7 +338,7 @@ and what it need to work well, can also use markup like <title>this</> or
       # Update db in a parallel thread
       if self._rebuild_notify is None:
          self._rebuild_notify = EmcNotify(
-                  '<hilight>Rebuilding Database</><br>please wait...', hidein=0)
+               _('<hilight>Rebuilding Database</><br>please wait...'), hidein=0)
 
          thread = UpdateDBThread(self._folders, self._songs_db,
                                  self._albums_db, self._artists_db)
@@ -369,7 +369,7 @@ and what it need to work well, can also use markup like <title>this</> or
       if len(self._play_queue) == 1:
          mediaplayer.play_url(url, only_audio = True)
       else:
-         EmcNotify('<hilight>%s</><br>queued' % (song['title']))
+         EmcNotify(_('<hilight>%s</><br>queued') % (song['title']))
 
    def queue_album(self, album):
 
@@ -380,7 +380,7 @@ and what it need to work well, can also use markup like <title>this</> or
          if len(self._play_queue) > 0:
             mediaplayer.play_url(self._play_queue[0], only_audio = True)
       
-      EmcNotify('<hilight>%s</><br>queued' % (album['name']))
+      EmcNotify(_('<hilight>%s</><br>queued') % (album['name']))
 
    def queue_artist(self, artist):
 
@@ -393,7 +393,7 @@ and what it need to work well, can also use markup like <title>this</> or
          if len(self._play_queue) > 0:
             mediaplayer.play_url(self._play_queue[0], only_audio = True)
       
-      EmcNotify('<hilight>%s</><br>queued' % (artist['name']))
+      EmcNotify(_('<hilight>%s</><br>queued') % (artist['name']))
 
 
    def events_cb(self, event):
@@ -405,9 +405,9 @@ and what it need to work well, can also use markup like <title>this</> or
             song = self._songs_db.get_data(self._play_queue[0])
             text = '<hilight>' + song['title'] + '</><br>'
             if 'artist' in song:
-               text += '<em>by ' + song['artist'] + '</><br>'
+               text += _('<em>by</em> %s<br>') % song['artist']
             if 'album' in song:
-               text += 'from ' + song['album'] + '<br>'
+               text += _('<em>from</em> %s<br>') % song['album']
             gui.audio_controls_show(text = text)
          # update the browser view
          self._browser.refresh()

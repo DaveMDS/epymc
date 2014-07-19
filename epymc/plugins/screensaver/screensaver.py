@@ -36,11 +36,11 @@ def DBG(msg):
 
 class ScreenSaver(EmcModule):
    name = 'screensaver'
-   label = 'Screen Saver'
+   label = _('Screen saver')
    icon = 'icon/evas'
-   info = """Long info for the <b>Screen Saver</b> module, explain what it does
+   info = _("""Long info for the <b>Screen saver</b> module, explain what it does
 and what it need to work well, can also use markup like <title>this</> or
-<b>this</>"""
+<b>this</>""")
 
 
    def __init__(self):
@@ -53,10 +53,10 @@ and what it need to work well, can also use markup like <title>this</> or
 
       # create ini options if not exists (with defaults)
       ini.add_section('screensaver')
-      ini.get('screensaver', 'screensaver_on_after', 'never')
+      ini.get('screensaver', 'screensaver_on_after', _('never'))
       ini.get('screensaver', 'screensaver_on_cmd', 'xset s activate')
       ini.get('screensaver', 'screensaver_off_cmd', 'xset s reset')
-      ini.get('screensaver', 'monitor_off_after', 'never')
+      ini.get('screensaver', 'monitor_off_after', _('never'))
       ini.get('screensaver', 'monitor_off_cmd', 'xset dpms force off')
       ini.get('screensaver', 'monitor_on_cmd', 'xset dpms force on')
       ini.get('screensaver', 'only_in_fs', 'True')
@@ -65,7 +65,7 @@ and what it need to work well, can also use markup like <title>this</> or
       self.parse_config()
 
       # register the config item
-      cgui.root_item_add('ssaver', 10, 'Screen Saver', 'icon/evas', self.config_gui_cb)
+      cgui.root_item_add('ssaver', 10, _('Screen saver'), 'icon/evas', self.config_gui_cb)
 
       # start the timer
       self.timer = Timer(50.0, self.timer_cb)
@@ -175,16 +175,16 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def config_gui_cb(self):
       bro = cgui.browser_get()
-      bro.page_add('config://ssaver/', 'Screen Saveer', None, self.config_gui_populate)
+      bro.page_add('config://ssaver/', _('Screen saver'), None, self.config_gui_populate)
    
    def config_gui_populate(self, browser, url):
-      L = ['never', '1 minute', '5 minutes', '10 minutes', '30 minutes', '60 minutes']
+      L = _('never;1 minute;5 minutes;10 minutes;30 minutes;60 minutes').split(';')
       cgui.standard_item_string_from_list('screensaver', 'screensaver_on_after',
-                                          'Turn on screensaver after', L,
+                                          _('Turn on screensaver after'), L,
                                           cb = self.parse_config)
       cgui.standard_item_string_from_list('screensaver', 'monitor_off_after',
-                                          'Turn off monitor after', L,
+                                          _('Turn off monitor after'), L,
                                           cb = self.parse_config)
       cgui.standard_item_bool_add('screensaver', 'only_in_fs',
-                                  'Manage screensaver only in fullscreen',
+                                  _('Manage screensaver only in fullscreen'),
                                   cb = self.parse_config)

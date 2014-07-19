@@ -65,11 +65,11 @@ _mapping = {
 
 class KeyboardModule(EmcModule):
    name = 'input_keyb'
-   label = 'Input - Keyboard'
+   label = _('Input - Keyboard')
    icon = 'icon/keyboard'
-   info = """Long info for the <b>Keyboard</b> module, explain what it does
+   info = _("""Long info for the <b>Keyboard</b> module, explain what it does
 and what it need to work well, can also use markup like <title>this</> or
-<b>this</>"""
+<b>this</>""")
 
 
    def __init__(self):

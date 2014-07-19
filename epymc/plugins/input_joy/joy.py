@@ -40,11 +40,11 @@ def DBG(msg):
 
 class JoystickModule(EmcModule):
    name = 'input_joy'
-   label = 'Input - Joytick'
+   label = _('Input - Joystick')
    icon = 'icon/joystick'
-   info = """Long info for the <b>Joystick</b> module, explain what it does
+   info = _("""Long info for the <b>Joystick</b> module, explain what it does
 and what it need to work well, can also use markup like <title>this</> or
-<b>this</>"""
+<b>this</>""")
 
    EVENT_BUTTON = 0x01 # button pressed/released 
    EVENT_AXIS = 0x02   # axis moved  
@@ -59,10 +59,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
       # get joystick device from config
       ini.add_section('joystick')
-      if not ini.has_option('joystick', 'device'):
-         # TODO inspect for joystick devices
-         ini.set('joystick', 'device', '/dev/input/js0')
-      self.device = ini.get('joystick', 'device')
+      self.device = ini.get('joystick', 'device', '/dev/input/js0')
 
       # get joystick mapping from config
       try:
@@ -77,8 +74,9 @@ and what it need to work well, can also use markup like <title>this</> or
          # TODO spawn the configurator
 
       # add an entry in the config gui
-      config_gui.root_item_add('joystick', 50, 'Joystick', icon = 'icon/joystick',
-                               callback = self.config_panel_cb)
+      config_gui.root_item_add('joystick', 50, _('Joystick'),
+                               icon='icon/joystick',
+                               callback=self.config_panel_cb)
 
       # open the joystick device
       try:
@@ -152,12 +150,12 @@ and what it need to work well, can also use markup like <title>this</> or
 ### config panel stuff
    def config_panel_cb(self):
       bro = config_gui.browser_get()
-      bro.page_add('config://joystick/', 'Joystick', None, self.populate_joy)
+      bro.page_add('config://joystick/', _('Joystick'), None, self.populate_joy)
 
    def populate_joy(self, browser, url):
-      config_gui.standard_item_string_add('joystick', 'device', 'Device',
-                                 'icon/joystick', cb = self.device_changed_cb)
-      config_gui.standard_item_action_add('Configure buttons', cb = self.start_configurator)
+      config_gui.standard_item_string_add('joystick', 'device', _('Device'),
+                                 'icon/joystick', cb=self.device_changed_cb)
+      config_gui.standard_item_action_add(_('Configure buttons'), cb=self.start_configurator)
 
    def device_changed_cb(self):
       self.__restart__()
@@ -165,8 +163,8 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def check_device(self):
       if not self.dev or not self.fdh:
-         EmcDialog(title = 'No joystick found', style = 'error',
-                   text = 'Try to adjust your joystick device')
+         EmcDialog(title=_('No joystick found'), style='error',
+                   text=_('Try to adjust your joystick device'))
          return False
       return True
 
@@ -179,31 +177,31 @@ and what it need to work well, can also use markup like <title>this</> or
       # wait for the first key
       self.grab_key_func = self.grabbed_key_func
       self.dia_state = 'vert'
-      self.dia = EmcDialog(title = 'Configure joystick', style = 'cancel',
-                      text = 'Press UP', done_cb = self.end_configurator)
+      self.dia = EmcDialog(title=_('Configure joystick'), style='cancel',
+                      text='Press UP', done_cb=self.end_configurator)
 
    def grabbed_key_func(self, number, value):
       # grab vertical axes
       if self.dia_state == 'vert':
          self.axis_v = number
          self.invert_v = value < 0
-         self.dia.text_set('Press RIGHT')
+         self.dia.text_set(_('Press RIGHT'))
          self.dia_state = 'horiz'
       # grab horizontal axes
       elif self.dia_state == 'horiz':
          self.axis_h = number
          self.invert_h = value < 0
-         self.dia.text_set('Press OK')
+         self.dia.text_set(_('Press OK'))
          self.dia_state = 'ok'
       # grab button used as OK
       elif self.dia_state == 'ok':
          self.button_ok = number
-         self.dia.text_set('Press BACK')
+         self.dia.text_set(_('Press BACK'))
          self.dia_state = 'back'
       # grab button used as BACK
       elif self.dia_state == 'back':
          self.button_back = number
-         self.dia.text_set('Config done.')
+         self.dia.text_set(_('Config done.'))
          self.dia_state = 'done'
          # end & save
          self.end_configurator(None)

@@ -39,11 +39,11 @@ def DBG(msg):
 
 class LircModule(EmcModule):
    name = 'input_lirc'
-   label = 'Input - Remote Control'
+   label = _('Input - Remote Control')
    icon = 'icon/remote'
-   info = """Long info for the <b>LIRC</b> module, explain what it does
+   info = _("""Long info for the <b>LIRC</b> module, explain what it does
 and what it need to work well, can also use markup like <title>this</> or
-<b>this</>"""
+<b>this</>""")
 
    DEFAULT_LIRC_SOCKET = '/var/run/lirc/lircd'
    sok = None
@@ -56,13 +56,11 @@ and what it need to work well, can also use markup like <title>this</> or
       
       # get lirc socket from config
       ini.add_section('lirc')
-      if not ini.has_option('lirc', 'device'):
-         ini.set('lirc', 'device', self.DEFAULT_LIRC_SOCKET)
-      self.device = ini.get('lirc', 'device')
+      self.device = ini.get('lirc', 'device', self.DEFAULT_LIRC_SOCKET)
       
       # add an entry in the config section
-      config_gui.root_item_add('lirc', 51, 'Remote', icon = 'icon/remote',
-                               callback = self.config_panel_cb)
+      config_gui.root_item_add('lirc', 51, _('Remote'), icon='icon/remote',
+                               callback=self.config_panel_cb)
 
       # build the lirc_key => emc_input_event mapping from config
       # self.keys => { 'lirc_key': 'emc_event', 'lirc_key': 'emc_event', ... }
@@ -124,11 +122,11 @@ and what it need to work well, can also use markup like <title>this</> or
    class KeyItemClass(EmcItemClass):
       def label_get(self, url, data):
          key, event = data
-         return 'Button: %s  Event: %s' % (key, event)
+         return _('Button: %s  Event: %s') % (key, event)
 
    class AddKeyItemClass(EmcItemClass):
       def label_get(self, url, mod):
-         return 'Add a new key'
+         return _('Add a new key')
 
       def icon_get(self, url, mod):
          return 'icon/plus'
@@ -139,10 +137,10 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def config_panel_cb(self):
       bro = config_gui.browser_get()
-      bro.page_add('config://lirc/', 'Remote', None, self.populate_lirc)
+      bro.page_add('config://lirc/', _('Remote'), None, self.populate_lirc)
 
    def populate_lirc(self, browser, url):
-      config_gui.standard_item_string_add('lirc', 'device', 'Lirc socket',
+      config_gui.standard_item_string_add('lirc', 'device', _('Lirc socket'),
                                  'icon/remote', cb = self.device_changed_cb)
          
       for key, event in self.keys.items():
@@ -156,16 +154,16 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def check_lirc(self):
       if not self.sok or not self.fdh:
-         EmcDialog(style = 'error',
-            text = 'Cannot connect to lirc using socket:<br>' + self.device)
+         EmcDialog(style='error',
+            text=_('Cannot connect to lirc using socket:<br>%s') % self.device)
          return False
       return True
 
    def ask_a_single_key(self):
       self.grab_key_func = self.grabbed_key_func
-      self.dia = EmcDialog(title = 'Configure remote', style = 'cancel',
-                           text = 'Press a key on your remote',
-                           canc_cb = self.ungrab_key)
+      self.dia = EmcDialog(title=_('Configure remote'), style='cancel',
+                           text=_('Press a key on your remote'),
+                           canc_cb=self.ungrab_key)
    
    def ungrab_key(self, dialog):
       self.grab_key_func = None
@@ -186,8 +184,8 @@ and what it need to work well, can also use markup like <title>this</> or
       li.go()
 
       # put the list in a new dialog
-      dialog = EmcDialog(title = 'Choose an event to bind', style = 'minimal',
-                         content = li, done_cb = self.event_choosed_cb)
+      dialog = EmcDialog(title=_('Choose an event to bind'), style='minimal',
+                         content=li, done_cb=self.event_choosed_cb)
       li.callback_clicked_double_add((lambda l,i: self.event_choosed_cb(dialog)))
       self.pressed_key = key
 

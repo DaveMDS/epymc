@@ -45,13 +45,13 @@ sheets = [
 
 class CalibratorModule(EmcModule):
    name = 'calibrator'
-   label = 'Screen calibrator'
+   label = _('Screen calibrator')
    icon = 'icon/calib'
-   info = """Use this module to calibrate your screen parameters."""
+   info = _("""Use this module to calibrate your screen parameters.""")
    path = os.path.dirname(__file__)
 
    def __init__(self):
-      config_gui.root_item_add('calibrator', 60, 'Screen calibrator',
+      config_gui.root_item_add('calibrator', 60, _('Screen calibrator'),
                                icon='icon/calib', callback=self.startup)
 
    def __shutdown__(self):

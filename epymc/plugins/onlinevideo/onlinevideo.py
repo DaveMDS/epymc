@@ -84,12 +84,10 @@ class ChannelItemClass(EmcItemClass):
       return channel['backdrop']
 
    def info_get(self, url, channel):
-      return _('<title>%s</><br>' \
-               '<hilight>version:</> %s<br>' \
-               '<hilight>author:</> %s<br>' \
-               '<br>%s<br>') % (
-                channel['label'], channel['version'],
-                channel['author'], channel['info'])
+      return _('<title>%(label)s</><br>' \
+               '<hilight>Version:</> %(version)s<br>' \
+               '<hilight>Author:</> %(author)s<br>' \
+               '%(info)s') % (channel)
 
 
 class StandardItemClass(EmcItemClass):

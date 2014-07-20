@@ -180,7 +180,7 @@ class AlbumItemClass(EmcItemClass):
                              None, _mod.populate_album_page, album)
 
    def label_get(self, url, album):
-      return _('%s by %s') % (album['name'], album['artist'])
+      return _('%(name)s by %(artist)s') % (album)
 
    def poster_get(self, url, album):
       # Search cover in first-song-of-album directory:
@@ -206,12 +206,18 @@ class AlbumItemClass(EmcItemClass):
    def info_get(self, url, album):
       text = '<hilight>' + album['name'] + '</><br>'
       text += _('<em>by</em> %s<br>') % album['artist']
+      n = len(album['songs'])
+      text += ngettext('%d song', '%d songs', n) % n
+      
       lenght = 0
       for song in album['songs']:
          song_data = _mod._songs_db.get_data(song)
          if 'length' in song_data:
             lenght += int(song_data['length'])
-      text += _('%d songs, %d min.') % (len(album['songs']), lenght / 60000)
+      if lenght > 0:
+         n = lenght / 60000
+         runtime = ngettext('%d minute', '%d minutes', n) % n
+         text += ', ' + runtime
       return text
 
 class ArtistItemClass(EmcItemClass):
@@ -227,9 +233,11 @@ class ArtistItemClass(EmcItemClass):
       return None
 
    def info_get(self, url, artist):
-      name = '<hilight>%s</><br>' % artist['name']
-      return name + _('%d albums, %d songs') % (len(artist['albums']),
-                                                len(artist['songs']))
+      n = len(artist['albums'])
+      albums = ngettext('%d album', '%d albums', n) % n
+      n = len(artist['songs'])
+      songs = ngettext('%d song', '%d songs', n) % n
+      return '<hilight>%s</><br>%s, %s' % (artist['name'], albums, songs)
 
 
 class MusicModule(EmcModule):

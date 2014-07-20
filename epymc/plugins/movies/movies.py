@@ -136,22 +136,30 @@ class MovieItemClass(EmcItemClass):
    def info_get(self, url, mod):
       if mod._movie_db.id_exists(url):
          e = mod._movie_db.get_data(url)
-         text = _('<title>%s (%s %s)</><br>' \
-                  '<hilight>Rating:</> %.0f/10<br>' \
-                  '<hilight>Director:</> %s<br>' \
-                  '<hilight>Cast:</> %s<br>') % \
-                  (e['title'], e['country'], e['release_date'][:4],
-                   e['rating'], e['director'],
-                   mod._get_cast(e, 4))
+         text = _('<title>%(title)s (%(country)s %(year)s)</><br>' \
+                  '<hilight>Rating:</> %(rating)s/10<br>' \
+                  '<hilight>Director:</> %(director)s<br>' \
+                  '<hilight>Cast:</> %(casts)s<br>') % \
+                     {
+                        'title': e['title'],
+                        'country': e['country'],
+                        'year':  e['release_date'][:4],
+                        'rating': e['rating'],
+                        'director': e['director'],
+                        'casts': mod._get_cast(e, 4),
+                     }
       else:
          name, year = get_movie_name_from_url(url)
-         text = _('<title>%s</><br>' \
-                  '<hilight>Size:</> %s<br>' \
-                  '<hilight>Name:</> %s<br>' \
-                  '<hilight>Year:</> %s<br>') % \
-                  (os.path.basename(url),
-                   utils.hum_size(os.path.getsize(utils.url2path(url))),
-                   name, year if year else _('Unknown'))
+         text = _('<title>%(fname)s</><br>' \
+                  '<hilight>Size:</> %(fsize)s<br>' \
+                  '<hilight>Name:</> %(name)s<br>' \
+                  '<hilight>Year:</> %(year)s<br>') % \
+                     {
+                        'fname': os.path.basename(url),
+                        'fsize': utils.hum_size(os.path.getsize(utils.url2path(url))),
+                        'name': name,
+                        'year': year if year else _('Unknown'),
+                     }
 
       # return "test1: κόσμε END" # should see the Greek word 'kosme'
       # return text.encode('utf-8')
@@ -260,7 +268,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
          h = int(pos / 3600)
          m = int(pos / 60) % 60
          s = int(pos % 60)
-         EmcDialog(text=_('Continue from %d:%.2d:%.2d ?') % (h, m, s),
+         time = '%d:%.2d:%.2d' % (h, m, s)
+         EmcDialog(text=_('Continue from %s ?') % (time),
                    style='yesno', user_data=url,
                    done_cb=self._dia_yes_cb,
                    canc_cb=self._dia_no_cb)
@@ -386,17 +395,22 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
          e = self._movie_db.get_data(url)
 
          # update text info
-         from pprint import pprint
-         pprint(e)
          self._dialog.title_set(e['title'].replace('&', '&amp;'))
-         info = _('<hilight>Director: </hilight> %s <br>' \
-                  '<hilight>Cast: </hilight> %s <br>' \
-                  '<hilight>Released: </hilight> %s <br>' \
-                  '<hilight>Country: </hilight> %s <br>' \
-                  '<hilight>Rating: </hilight> %s <br>' \
-                  '<br><hilight>Overview:</hilight> %s') \
-                   % (e['director'], self._get_cast(e), e['release_date'],
-                      e['countries'], e['rating'], e['overview'])
+         info = _('<hilight>Director: </hilight> %(director)s <br>' \
+                  '<hilight>Cast: </hilight> %(casts)s <br>' \
+                  '<hilight>Released: </hilight> %(release_date)s <br>' \
+                  '<hilight>Country: </hilight> %(country)s <br>' \
+                  '<hilight>Rating: </hilight> %(rating)s/10 <br>' \
+                  '<br><hilight>Overview:</hilight> %(overview)s') % \
+                     {
+                        'director': e['director'],
+                        'casts':  self._get_cast(e),
+                        'release_date': e['release_date'],
+                        'country': e['countries'],
+                        'rating': e['rating'],
+                        'overview': e['overview'],
+                     }
+                      
          # self._dialog.text_set("test2: κόσμε END") # should see the Greek word 'kosme')
          self._dialog.text_set(info.replace('&', '&amp;'))
 
@@ -435,7 +449,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
          dia.button_add(_('Info'), self._cb_cast_info, dia)
 
          for person in sorted(movie_info['cast'], key=itemgetter('order')):
-            label = _('%s as %s') % (person['name'], person['character'])
+            label = _('%(name)s as %(character)s') % (person)
             icon = EmcRemoteImage(person['profile_path']) # TODO use 'dest' to cache the img
             icon.size_hint_min_set(100, 100) # TODO FIXME
             dia.list_item_append(label, icon, None, person['id'])
@@ -527,10 +541,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
    def _do_movie_search(self, name, year):
       tmdb = TMDBv3(lang=ini.get('movies', 'info_lang'))
       tmdb.movie_search(name, year, self._cb_search_done)
+      search = _('Searching for')
       if year:
-         text = _('<b>Searching for:</><br>%s (%s)<br>') % (name, year)
+         text = '<b>%s:</b><br>%s (%s)<br>' % (search, name, year)
       else:
-         text = _('<b>Searching for:</><br>%s<br>') % (name)
+         text = '<b>%s:</b><br>%s<br>' % (search, name)
 
       self.tmdb_dialog = EmcDialog(title='themoviedb.org',
                                    style='progress', text=text,
@@ -674,8 +689,9 @@ class BackgroundScanner(ecore.Idler):
          # store the result in movie db
          try:
             self._movie_db.set_data(self._current_url, movie_info)
-            text = _('<title>Found movie:</><br>%s (%s)') % \
-                   (movie_info['title'], movie_info['release_date'][:4])
+            found = _('Found movie')
+            text = '<title>%s</><br>%s (%s)' % \
+                   (found, movie_info['title'], movie_info['release_date'][:4])
             EmcNotify(text, icon=get_poster_filename(movie_info['id']))
          except:
             pass

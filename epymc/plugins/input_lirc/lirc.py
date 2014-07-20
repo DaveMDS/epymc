@@ -122,7 +122,11 @@ and what it need to work well, can also use markup like <title>this</> or
    class KeyItemClass(EmcItemClass):
       def label_get(self, url, data):
          key, event = data
-         return _('Button: %s  Event: %s') % (key, event)
+         return _('Button: %s') % (key)
+
+      def label_end_get(self, url, data):
+         key, event = data
+         return event
 
    class AddKeyItemClass(EmcItemClass):
       def label_get(self, url, mod):

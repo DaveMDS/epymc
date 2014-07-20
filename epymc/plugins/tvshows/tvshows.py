@@ -332,7 +332,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
          m = int(pos / 60) % 60
          s = int(pos % 60)
          time = '%d:%.2d:%.2d' % (h, m, s)
-         EmcDialog(text=_('Continue from  %s?') % time,
+         EmcDialog(text=_('Continue from %s ?') % time,
                    style='yesno', user_data=url,
                    done_cb=self._dia_yes_cb,
                    canc_cb=self._dia_no_cb)

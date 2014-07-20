@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-19 19:24+0200\n"
+"POT-Creation-Date: 2014-07-19 20:15+0200\n"
 "PO-Revision-Date: 2014-07-19 19:39+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
@@ -382,8 +382,8 @@ msgstr ""
 "%s<br>"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:117
-#: epymc/plugins/onlinevideo/onlinevideo.py:142
-#: epymc/plugins/onlinevideo/onlinevideo.py:146
+#: epymc/plugins/onlinevideo/onlinevideo.py:141
+#: epymc/plugins/onlinevideo/onlinevideo.py:145
 msgid "Online Channels"
 msgstr "Canali Online"
 
@@ -393,29 +393,29 @@ msgid ""
 "need to work well, can also use markup like <title>this</> or <b>this</>"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:184
+#: epymc/plugins/onlinevideo/onlinevideo.py:183
 msgid "Channels"
 msgstr "Canali"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:226
+#: epymc/plugins/onlinevideo/onlinevideo.py:225
 msgid "Search query"
 msgstr "Ricerca"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:233
-#: epymc/plugins/onlinevideo/onlinevideo.py:242
+#: epymc/plugins/onlinevideo/onlinevideo.py:232
+#: epymc/plugins/onlinevideo/onlinevideo.py:241
 msgid "please wait"
 msgstr "Attendere"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:234
-#: epymc/plugins/onlinevideo/onlinevideo.py:243
+#: epymc/plugins/onlinevideo/onlinevideo.py:233
+#: epymc/plugins/onlinevideo/onlinevideo.py:242
 msgid "Getting info..."
 msgstr "Ottengo informazioni..."
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:278
+#: epymc/plugins/onlinevideo/onlinevideo.py:277
 msgid "Error reading channel"
 msgstr "Errore lettura canale"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:283
+#: epymc/plugins/onlinevideo/onlinevideo.py:282
 msgid "Suggestions"
 msgstr "Consigliati"
 
@@ -915,4 +915,3 @@ msgstr "Scansioen delle serie completata"
 #, python-format
 msgid "<title>Found serie:</><br>%s<br>%s seasons"
 msgstr "<title>Trivata serie:</><br>%s<br>%s stagioni"
-

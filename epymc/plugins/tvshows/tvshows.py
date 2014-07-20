@@ -45,7 +45,7 @@ def DBG(msg):
    print('TVSHOWS: %s' % (msg))
    # pass
 
-TVSHOWS_DB_VERSION = 4
+TVSHOWS_DB_VERSION = 5
 DEFAULT_INFO_LANG = 'en'
 DEFAULT_EPISODE_REGEXP = '[Ss]*(?P<season>[0-9]+)[Xx]*[Ee]*(?P<episode>[0-9]+)'
 """ in a more readable form:
@@ -242,12 +242,10 @@ class EpisodeItemClass(EmcItemClass):
          return get_tv_backdrop_filename(e['id'])
 
    def info_get(self, url, episode_data):
-      return _('<title>Episode %d: %s</title><br>' \
-               '<hilight>First aired:</hilight> %s<br>'  \
-               '<hilight>Overview:</hilight> %s</><br>') % (
-                  episode_data['episode_num'], episode_data['title'],
-                  episode_data['first_aired'],
-                  episode_data['overview'])
+      return _('<title>Episode %(episode_num)d: %(title)s</title><br>' \
+               '<hilight>First aired:</hilight> %(first_aired)s<br>'  \
+               '<hilight>Overview:</hilight> %(overview)s</><br>') \
+                  % (episode_data)
 
 
 class TvShowsModule(EmcModule):
@@ -333,7 +331,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
          h = int(pos / 3600)
          m = int(pos / 60) % 60
          s = int(pos % 60)
-         EmcDialog(text=_('Continue from %d:%.2d:%.2d ?') % (h, m, s),
+         time = '%d:%.2d:%.2d' % (h, m, s)
+         EmcDialog(text=_('Continue from  %s?') % time,
                    style='yesno', user_data=url,
                    done_cb=self._dia_yes_cb,
                    canc_cb=self._dia_no_cb)
@@ -464,28 +463,19 @@ class InfoPanel(EmcDialog):
    def update(self):
       if self._db_data:
          d = self._db_data
-         info = _('<hilight>Created by: </hilight> %s <br>' \
-                  '<hilight>Network:</hilight> %s<br>' \
-                  '<hilight>First aired: </hilight> %s <br>' \
-                  '<hilight>Last aired: </hilight> %s <br>' \
-                  '<hilight>Seasons:</hilight> %s<br>' \
-                  '<hilight>Episodes:</hilight> %s<br>' \
-                  '<hilight>Genres:</hilight> %s<br>' \
-                  '<hilight>Runtime:</hilight> %s min<br>' \
-                  '<hilight>Rating:</hilight> %s/10<br>' \
-                  '<hilight>Status:</hilight> %s<br>' \
-                  '<br><hilight>Overview:</hilight><br>%s<br>') % (
-                     ', '.join(d['created_by']),
-                     ', '.join(d['networks']),
-                     d['first_air_date'],
-                     d['last_air_date'],
-                     d['number_of_seasons'],
-                     d['number_of_episodes'],
-                     ', '.join(d['genres']),
-                     d['episode_run_time'],
-                     d['vote_average'],
-                     d['status'], d['overview'],
-                  )
+         info = _('<hilight>Created by: </hilight> %(created_by)s <br>' \
+                  '<hilight>Network:</hilight> %(networks)s<br>' \
+                  '<hilight>First aired: </hilight> %(first_air_date)s <br>' \
+                  '<hilight>Last aired: </hilight> %(last_air_date)s <br>' \
+                  '<hilight>Seasons:</hilight> %(number_of_seasons)d<br>' \
+                  '<hilight>Episodes:</hilight> %(number_of_episodes)d<br>' \
+                  '<hilight>Genres:</hilight> %(genres)s<br>' \
+                  '<hilight>Runtime:</hilight> %(episode_run_time)s min.<br>' \
+                  '<hilight>Rating:</hilight> %(vote_average)s/10<br>' \
+                  '<hilight>Status:</hilight> %(status)s<br>' \
+                  '<br><hilight>Overview:</hilight><br>%(overview)s<br>') \
+                     % (self._db_data)
+   
          info = info.replace('&', '&amp;')
          try:
             self._image.file = get_tv_poster_filename(self._db_data['id'])
@@ -552,7 +542,7 @@ class InfoPanel(EmcDialog):
       dia.button_add(_('Info'), self._cast_info_cb, dia)
 
       for person in self._db_data['cast']:
-         label = _('%s as %s') % (person['name'], person['character'])
+         label = _('%(name)s as %(character)s') % (person)
          icon = EmcRemoteImage(person['profile_path']) # TODO use 'dest' to cache the img
          icon.size_hint_min_set(100, 100) # TODO FIXME
          dia.list_item_append(label, icon, None, person['id'])
@@ -775,8 +765,12 @@ class BackgroundScanner(ecore.Idler):
          self._tvshows_db.set_data(self._current_serie_name, result)
 
          # show a nice notification
-         text = _('<title>Found serie:</><br>%s<br>%s seasons') % \
-                  (result['name'], len(result['seasons']))
+         n = result['number_of_seasons']
+         seasons = ngettext('%d season', '%d seasons', n) % n
+         n = result['number_of_episodes']
+         episodes = ngettext('%d episode', '%d episodes', n) % n
+         text = '<title>%s</title><br>%s, %s' % (
+                  _('Found serie:'), seasons, episodes)
          EmcNotify(text, icon=get_tv_icon_filename(result['id']))
 
          # refresh the browser view
@@ -803,13 +797,13 @@ class BackgroundScanner(ecore.Idler):
    MacGyver: {
       id: 2875
       name: 'MacGyver'
-      created_by: ['Lee David Zlotoff']
+      created_by: 'Lee David Zlotoff, ...'
       country: ['US', 'CA']
       episode_run_time: '45, 60, 48'
       first_air_date: '1985-09-29'
       last_air_date: '1992-05-21'
-      genres: ['Action & Adventure']
-      networks: ['American Broadcasting Company']
+      genres: 'Drama, Action & Adventure, ...'
+      networks: 'American Broadcasting Company, ...'
       number_of_episodes: 139
       number_of_seasons: 7
       overview: 'blah, blah, blah, ...'

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-19 20:15+0200\n"
-"PO-Revision-Date: 2014-07-19 19:39+0100\n"
+"POT-Creation-Date: 2014-07-20 15:43+0200\n"
+"PO-Revision-Date: 2014-07-20 15:47+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -52,7 +52,6 @@ msgid "Photos (%s)"
 msgstr "Foto (%s)"
 
 #: epymc/themoviedb.py:574 epymc/plugins/movies/movies.py:438
-#: epymc/plugins/tvshows/tvshows.py:555
 #, python-format
 msgid "%s as %s"
 msgstr "%s nel ruolo di %s"
@@ -558,7 +557,7 @@ msgstr ""
 msgid "Movie Collection"
 msgstr "Collezione dei film"
 
-#: epymc/plugins/movies/movies.py:263 epymc/plugins/tvshows/tvshows.py:336
+#: epymc/plugins/movies/movies.py:263
 #, python-format
 msgid "Continue from %d:%.2d:%.2d ?"
 msgstr "Continuo da %d:%.2d:%.2d ?"
@@ -568,15 +567,15 @@ msgid "Play"
 msgstr "Play"
 
 #: epymc/plugins/movies/movies.py:378 epymc/plugins/movies/movies.py:433
-#: epymc/plugins/tvshows/tvshows.py:460 epymc/plugins/tvshows/tvshows.py:550
+#: epymc/plugins/tvshows/tvshows.py:459 epymc/plugins/tvshows/tvshows.py:540
 msgid "Cast"
 msgstr "Attori"
 
-#: epymc/plugins/movies/movies.py:379 epymc/plugins/tvshows/tvshows.py:458
+#: epymc/plugins/movies/movies.py:379 epymc/plugins/tvshows/tvshows.py:457
 msgid "Posters"
 msgstr "Locandine"
 
-#: epymc/plugins/movies/movies.py:380 epymc/plugins/tvshows/tvshows.py:459
+#: epymc/plugins/movies/movies.py:380 epymc/plugins/tvshows/tvshows.py:458
 msgid "Backdrops"
 msgstr "Sfondi"
 
@@ -604,21 +603,21 @@ msgstr ""
 "Media:<br>%s<br><br>Nessuna informazione disponibile<br>Prova a premere il "
 "bottone <i>Cerca Informazioni</i>..."
 
-#: epymc/plugins/movies/movies.py:435 epymc/plugins/tvshows/tvshows.py:552
+#: epymc/plugins/movies/movies.py:435 epymc/plugins/tvshows/tvshows.py:542
 msgid "Info"
 msgstr "Informazioni"
 
-#: epymc/plugins/movies/movies.py:457 epymc/plugins/tvshows/tvshows.py:505
+#: epymc/plugins/movies/movies.py:457 epymc/plugins/tvshows/tvshows.py:495
 #, python-format
 msgid "%d posters available"
 msgstr "%d locandine disponibili"
 
 #: epymc/plugins/movies/movies.py:475 epymc/plugins/movies/movies.py:518
-#: epymc/plugins/tvshows/tvshows.py:529
+#: epymc/plugins/tvshows/tvshows.py:519
 msgid "Downloading image"
 msgstr "Scaricamento immagine"
 
-#: epymc/plugins/movies/movies.py:499 epymc/plugins/tvshows/tvshows.py:519
+#: epymc/plugins/movies/movies.py:499 epymc/plugins/tvshows/tvshows.py:509
 #, python-format
 msgid "%d backdrops available"
 msgstr "%d sfondi disponibili"
@@ -650,7 +649,7 @@ msgstr "<b>Scaricamento informazioni...</b>"
 msgid "<b>Found %d results</b><br>"
 msgstr "<b>Trovati %d risultati</b><br>"
 
-#: epymc/plugins/movies/movies.py:554 epymc/plugins/tvshows/tvshows.py:574
+#: epymc/plugins/movies/movies.py:554 epymc/plugins/tvshows/tvshows.py:564
 #, python-format
 msgid "Found %d results, which one?"
 msgstr "Trovati %d risultati, quale scelgo?"
@@ -672,7 +671,7 @@ msgstr "<title>Trovato film:</><br>%s (%s)"
 msgid "Movies Collection"
 msgstr "Collezione dei film"
 
-#: epymc/plugins/movies/movies.py:729 epymc/plugins/tvshows/tvshows.py:672
+#: epymc/plugins/movies/movies.py:729 epymc/plugins/tvshows/tvshows.py:662
 msgid "Preferred language for contents"
 msgstr "Lingua preferita per i contenuti"
 
@@ -831,58 +830,71 @@ msgstr "Informazioni serie"
 #: epymc/plugins/tvshows/tvshows.py:245
 #, python-format
 msgid ""
-"<title>Episode %d: %s</title><br><hilight>First aired:</hilight> "
-"%s<br><hilight>Overview:</hilight> %s</><br>"
+"<title>Episode %(episode_num)d: %(title)s</title><br><hilight>First aired:</"
+"hilight> %(first_aired)s<br><hilight>Overview:</hilight> %(overview)s</><br>"
 msgstr ""
-"<title>Episodio %d: %s</title><br><hilight>In onda:</hilight> "
-"%s<br><hilight>Trama:</hilight> %s</><br>"
+"<title>Episodio %(episode_num)d: %(title)s</title><br><hilight>Messa in onda:"
+"</hilight> %(first_aired)s<br><hilight>Trama:</hilight> %(overview)s</><br>"
 
-#: epymc/plugins/tvshows/tvshows.py:255 epymc/plugins/tvshows/tvshows.py:291
-#: epymc/plugins/tvshows/tvshows.py:298 epymc/plugins/tvshows/tvshows.py:376
-#: epymc/plugins/tvshows/tvshows.py:668
+#: epymc/plugins/tvshows/tvshows.py:253 epymc/plugins/tvshows/tvshows.py:289
+#: epymc/plugins/tvshows/tvshows.py:296 epymc/plugins/tvshows/tvshows.py:375
+#: epymc/plugins/tvshows/tvshows.py:658
 msgid "TV Shows"
 msgstr "Serie TV"
 
-#: epymc/plugins/tvshows/tvshows.py:257
+#: epymc/plugins/tvshows/tvshows.py:255
 msgid ""
 "Long info for the tvshows module, explain what it does and what it\n"
 "need to work well, can also use markup like <title>this</> or <b>this</>"
 msgstr ""
 
-#: epymc/plugins/tvshows/tvshows.py:294
+#: epymc/plugins/tvshows/tvshows.py:292
 msgid "Tv Shows Collection"
 msgstr "Collezione delle serie TV"
 
-#: epymc/plugins/tvshows/tvshows.py:461
+#: epymc/plugins/tvshows/tvshows.py:335
+#, python-format
+msgid "Continue from  %s?"
+msgstr "Riprendo la riproduzione da  %s?"
+
+#: epymc/plugins/tvshows/tvshows.py:460
 msgid "Refresh info"
 msgstr "Aggiorna informazioni"
 
-#: epymc/plugins/tvshows/tvshows.py:467
+#: epymc/plugins/tvshows/tvshows.py:466
 #, python-format
 msgid ""
-"<hilight>Created by: </hilight> %s <br><hilight>Network:</hilight> "
-"%s<br><hilight>First aired: </hilight> %s <br><hilight>Last aired: </"
-"hilight> %s <br><hilight>Seasons:</hilight> %s<br><hilight>Episodes:</"
-"hilight> %s<br><hilight>Genres:</hilight> %s<br><hilight>Runtime:</hilight> "
-"%s min<br><hilight>Rating:</hilight> %s/10<br><hilight>Status:</hilight> "
-"%s<br><br><hilight>Overview:</hilight><br>%s<br>"
+"<hilight>Created by: </hilight> %(created_by)s <br><hilight>Network:</"
+"hilight> %(networks)s<br><hilight>First aired: </hilight> %(first_air_date)s "
+"<br><hilight>Last aired: </hilight> %(last_air_date)s <br><hilight>Seasons:</"
+"hilight> %(number_of_seasons)d<br><hilight>Episodes:</hilight> "
+"%(number_of_episodes)d<br><hilight>Genres:</hilight> "
+"%(genres)s<br><hilight>Runtime:</hilight> %(episode_run_time)s min."
+"<br><hilight>Rating:</hilight> %(vote_average)s/10<br><hilight>Status:</"
+"hilight> %(status)s<br><br><hilight>Overview:</hilight><br>%(overview)s<br>"
 msgstr ""
-"<hilight>Creatore: </hilight> %s <br><hilight>Rete:</hilight> "
-"%s<br><hilight>Prima messa in onda: </hilight> %s <br><hilight>Ultima messa "
-"in onda: </hilight> %s <br><hilight>Stagioni:</hilight> "
-"%s<br><hilight>Episodi:</hilight> %s<br><hilight>Generi:</hilight> "
-"%s<br><hilight>Durata:</hilight> %s min<br><hilight>Voto:</hilight> "
-"%s/10<br><hilight>Stato:</hilight> %s<br><br><hilight>Trama:</hilight><br>"
-"%s<br>"
+"<hilight>Ideatore: </hilight> %(created_by)s <br><hilight>Rete:</hilight> "
+"%(networks)s<br><hilight>Prima messa in onda: </hilight> %(first_air_date)s "
+"<br><hilight>Ultima messa in onda: </hilight> %(last_air_date)s "
+"<br><hilight>Stagioni:</hilight> %(number_of_seasons)d<br><hilight>Episodi:</"
+"hilight> %(number_of_episodes)d<br><hilight>Generi:</hilight> "
+"%(genres)s<br><hilight>Durata episodi:</hilight> %(episode_run_time)s min."
+"<br><hilight>Voto:</hilight> %(vote_average)s/10<br><hilight>Stato:</"
+"hilight> %(status)s<br><br><hilight>Trama:</hilight><br>%(overview)s<br>"
 
-#: epymc/plugins/tvshows/tvshows.py:495
+#: epymc/plugins/tvshows/tvshows.py:485
 msgid ""
 "No info stored for this serie.<br>Please try the <i>refresh info</i> button."
 msgstr ""
 "Nessuna informazione per questa serie.<br>Prova a premere il bottone "
 "<i>Aggiorna informazioni</i>."
 
-#: epymc/plugins/tvshows/tvshows.py:589
+#: epymc/plugins/tvshows/tvshows.py:545
+#, python-format
+msgid "%(name)s as %(character)s"
+msgstr "%(name)s nel ruolo di %(character)s"
+
+#: epymc/plugins/tvshows/tvshows.py:579
 #, python-format
 msgid ""
 "The search for \"%s\" did not make any results.<br>If your show is listed on "
@@ -895,23 +907,37 @@ msgstr ""
 "trovato sul sito.<br>Invece, se la serie non è presente online, siete "
 "pregati di contribuire e aggiungerla da voi."
 
-#: epymc/plugins/tvshows/tvshows.py:594
+#: epymc/plugins/tvshows/tvshows.py:584
 msgid "Nothing found"
 msgstr "Nessun risultato trovato"
 
-#: epymc/plugins/tvshows/tvshows.py:603
+#: epymc/plugins/tvshows/tvshows.py:593
 msgid "Fetching updated info"
 msgstr "Scarico informazioni aggiornate"
 
-#: epymc/plugins/tvshows/tvshows.py:709
+#: epymc/plugins/tvshows/tvshows.py:699
 msgid "TvShows scanner started"
 msgstr "Scansione delle serie avviata"
 
-#: epymc/plugins/tvshows/tvshows.py:739
+#: epymc/plugins/tvshows/tvshows.py:729
 msgid "TvShows scanner done"
 msgstr "Scansioen delle serie completata"
 
-#: epymc/plugins/tvshows/tvshows.py:778
+#: epymc/plugins/tvshows/tvshows.py:769
 #, python-format
-msgid "<title>Found serie:</><br>%s<br>%s seasons"
-msgstr "<title>Trivata serie:</><br>%s<br>%s stagioni"
+msgid "%d season"
+msgid_plural "%d seasons"
+msgstr[0] "%d stagione"
+msgstr[1] "%d stagioni"
+
+#: epymc/plugins/tvshows/tvshows.py:771
+#, python-format
+msgid "%d episode"
+msgid_plural "%d episodes"
+msgstr[0] "%d episodio"
+msgstr[1] "%d episodi"
+
+#: epymc/plugins/tvshows/tvshows.py:773
+msgid "Found serie:"
+msgstr "Trovata serie:"
+

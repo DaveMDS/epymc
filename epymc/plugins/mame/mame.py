@@ -49,7 +49,10 @@ class MyGamesItemClass(EmcItemClass):
                             mod.populate_mygames_page)
 
    def label_get(self, url, mod):
-      return 'My Games (%d)' % (mod.count_roms())
+      return _('My Games')
+
+   def label_end_get(self, url, mod):
+      return str(mod.count_roms())
 
 
 class AllGamesItemClass(EmcItemClass):
@@ -58,7 +61,10 @@ class AllGamesItemClass(EmcItemClass):
                             mod.populate_allgames_page)
 
    def label_get(self, url, mod):
-      return 'All Games (%d)' % (len(mod._games))
+      return _('All Games')
+
+   def label_end_get(self, url, mod):
+      return str(len(mod._games))
 
 
 class FavoriteGamesItemClass(EmcItemClass):
@@ -67,7 +73,10 @@ class FavoriteGamesItemClass(EmcItemClass):
                             mod.populate_favgames_page)
 
    def label_get(self, url, mod):
-      return 'Favorite Games (%d)' % (len(mod._favorites))
+      return _('Favorite Games')
+
+   def label_end_get(self, url, mod):
+      return str(len(mod._favorites))
 
 
 class CategoriesItemClass(EmcItemClass):
@@ -76,7 +85,7 @@ class CategoriesItemClass(EmcItemClass):
                             mod.populate_categories_page)
 
    def label_get(self, url, mod):
-      return 'Categories'
+      return _('Categories')
 
 
 class GameItemClass(EmcItemClass):
@@ -113,11 +122,11 @@ class CatItemClass(EmcItemClass):
 
 class MameModule(EmcModule):
    name = 'mame'
-   label = 'M.A.M.E'
+   label = _('M.A.M.E')
    icon = 'icon/mame'
-   info = """Long info for the <b>M.A.M.E</b> module, explain what it does
+   info = _("""Long info for the <b>M.A.M.E</b> module, explain what it does
 and what it need to work well, can also use markup like <title>this</> or
-<b>this</>"""
+<b>this</>""")
 
    def __init__(self):
       global _mod
@@ -131,7 +140,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
       self._games = {} # key = game_id<str>  value = <MameGame> instance
       self._browser = EmcBrowser('MAME')
-      mainmenu.item_add('mame', 50, 'M.A.M.E', 'icon/mame', self.cb_mainmenu)
+      mainmenu.item_add('mame', 50, _('M.A.M.E'), 'icon/mame', self.cb_mainmenu)
       ini.add_section('mame')
 
    def __shutdown__(self):
@@ -156,7 +165,7 @@ and what it need to work well, can also use markup like <title>this</> or
          self._favorites = ini.get_string_list('mame', 'favorites', ',')
 
       # show the spinning dialog
-      self.dialog = EmcDialog(title='Searching games, please wait...',
+      self.dialog = EmcDialog(title=_('Searching games, please wait...'),
                               spinner=True, style='cancel')
 
       # Aquire mame dirs from the command 'mame -showconfig'
@@ -179,8 +188,8 @@ and what it need to work well, can also use markup like <title>this</> or
       # mame not found
       if not output:
          self.dialog.delete()
-         EmcDialog(title='M.A.M.E not found', style='error',
-                   text='<br>Is mame installed?')
+         EmcDialog(title=_('M.A.M.E not found'), style='error',
+                   text=_('Is mame installed?'))
          return
 
       # parse "mame -showconfig" output
@@ -202,8 +211,8 @@ and what it need to work well, can also use markup like <title>this</> or
       # no path for roms found
       if len(self._rompaths) < 1:
          self.dialog.delete()
-         EmcDialog(title='Can\'t get rom path from M.A.M.E.', style='error',
-                   text='Is your mame well configured?')
+         EmcDialog(title=_('Can not get rom path from M.A.M.E.'), style='error',
+                   text=_('Is your mame well configured?'))
          return
 
       # build the list of ALL the know games (only the first time)
@@ -228,7 +237,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def cb_exe_end_listfull(self, exe, event):
       """ The command 'mame -listfull' is done, create the root page """
-      self._browser.page_add('mame://root', 'M.A.M.E', None, self.populate_root_page)
+      self._browser.page_add('mame://root', _('M.A.M.E'), None, self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
       self.dialog.delete()
@@ -294,10 +303,10 @@ and what it need to work well, can also use markup like <title>this</> or
 
       catver_file = ini.get('mame', 'catver_file')
       if not os.path.exists(catver_file):
-         EmcDialog(title='No category file found',style='error',
-                   text='The category file is not included in mame, you '
+         EmcDialog(title=_('No category file found'),style='error',
+                   text=_('The category file is not included in mame, you '
                           'need to download a copy from the net. <br>'
-                          'The file must be placed in ' + catver_file)
+                          'The file must be placed in %s') % (catver_file))
          return False
 
       f = open(catver_file, 'r')
@@ -358,13 +367,18 @@ class MameGame(object):
 
    def short_info_get(self):
       if self.parsed:
-         return '<title>%s</><br>' \
-               '<hilight>Year:</> %s<br>' \
-               '<hilight>Manufacturer:</> %s<br>' \
-               '<hilight>Players:</> %s<br>' \
-               '<hilight>Buttons:</> %s<br>' % \
-               (self.name, self.year, self.manufacturer, self.players,
-               self.buttons)
+         return _('<title>%(name)s</><br>' \
+                  '<hilight>Year:</> %(year)s<br>' \
+                  '<hilight>Manufacturer:</> %(manufacturer)s<br>' \
+                  '<hilight>Players:</> %(players)s<br>' \
+                  '<hilight>Buttons:</> %(buttons)s<br>') % \
+                     {
+                        'name': self.name,
+                        'year': self.year,
+                        'manufacturer': self.manufacturer,
+                        'players': self.players,
+                        'buttons': self.buttons,
+                     }
       else:
          # update of the browser postponed... when_finished...quite an hack :/
          self._more_game_info(when_finished=(lambda: _mod._browser.refresh()))
@@ -386,37 +400,44 @@ class MameGame(object):
 
       (local, remote) = self.poster_get()
       image = EmcRemoteImage(remote, local)
-      text = '<hilight>Year:</> %s<br>' \
-             '<hilight>Manufacturer:</> %s<br>' \
-             '<hilight>Players:</> %s<br>' \
-             '<hilight>Buttons:</> %s<br>' \
-             '<hilight>Savestate:</> %s<br>' \
-             '<hilight>Driver status:</> %s<br>' \
-             '   <hilight>emulation:</> %s<br>' \
-             '   <hilight>color:</> %s<br>' \
-             '   <hilight>sound:</> %s<br>' \
-             '   <hilight>graphic:</> %s<br>' % \
-             (self.year, self.manufacturer, self.players,
-              self.buttons, self.driver_savestate, self.driver_status,
-              self.driver_emulation, self.driver_color,
-              self.driver_sound, self.driver_graphic)
-
+      text = _('<hilight>Year:</> %(year)s<br>' \
+               '<hilight>Manufacturer:</> %(manufacturer)s<br>' \
+               '<hilight>Players:</> %(players)s<br>' \
+               '<hilight>Buttons:</> %(buttons)s<br>' \
+               '<hilight>Savestate:</> %(driver_savestate)s<br>' \
+               '<hilight>Driver status:</> %(driver_status)s<br>' \
+               '   <hilight>emulation:</> %(driver_emulation)s<br>' \
+               '   <hilight>color:</> %(driver_color)s<br>' \
+               '   <hilight>sound:</> %(driver_sound)s<br>' \
+               '   <hilight>graphic:</> %(driver_graphic)s<br>') % \
+               {
+                  'year': self.year,
+                  'manufacturer': self.manufacturer,
+                  'players': self.players,
+                  'buttons': self.buttons,
+                  'driver_savestate': self.driver_savestate,
+                  'driver_status': self.driver_status,
+                  'driver_emulation': self.driver_emulation,
+                  'driver_color': self.driver_color,
+                  'driver_sound': self.driver_sound,
+                  'driver_graphic': self.driver_graphic,
+              }
       self.dialog = EmcDialog(self.name, content=image, text=text)
 
       if self.file_name_get():
-         self.dialog.button_add('Play', (lambda btn: self.run()))
+         self.dialog.button_add(_('Play'), (lambda btn: self.run()))
       else:
-         self.dialog.button_add('Download', (lambda btn: self.download_zip()))
+         self.dialog.button_add(_('Download'), (lambda btn: self.download_zip()))
 
       if self.gid in _mod._favorites:
          self.dialog.button_add('', self._cb_favorite_button, icon='icon/star')
       else:
          self.dialog.button_add('', self._cb_favorite_button, icon='icon/star_off')
 
-      self.dialog.button_add('History', (lambda btn: self.history_show()))
+      self.dialog.button_add(_('History'), (lambda btn: self.history_show()))
 
       if self.file_name_get():
-         self.dialog.button_add('Delete', (lambda btn: self.delete_zip()))
+         self.dialog.button_add(_('Delete'), (lambda btn: self.delete_zip()))
 
    def _cb_favorite_button(self, btn):
       if self.gid in _mod._favorites:
@@ -436,10 +457,10 @@ class MameGame(object):
 
       # history.dat file not found
       if not os.path.exists(history_file):
-         EmcDialog(title='No History file found',style='error',
-                   text='The History file is not included in mame, you '
-                        'should download a copy from arcade-history.com <br>'
-                        'The file must be unzipped and placed in ' + history_file)
+         EmcDialog(title=_('No History file found'), style='error',
+                   text=_('The History file is not included in mame, you '
+                     'should download a copy from arcade-history.com<br>'
+                     'The file must be unzipped and placed in %s') % history_file)
          return
 
       # parse the history file
@@ -477,7 +498,7 @@ class MameGame(object):
          self.history = history
       
       if not self.history:
-         EmcDialog(title='Game not found in history file', style='error')
+         EmcDialog(title=_('Game not found in history file'), style='error')
          return
 
       # show a scrollable text dialog with the game history
@@ -488,7 +509,7 @@ class MameGame(object):
       def _cb_done(dialog):
          self._delete_zip_real()
          dialog.delete()
-      EmcDialog(title='Really delete this game?', style='yesno',
+      EmcDialog(title=_('Really delete this game?'), style='yesno',
                 done_cb=_cb_done)
 
    def _delete_zip_real(self):
@@ -500,10 +521,10 @@ class MameGame(object):
             done = True
       if done:
          self.dialog.delete()
-         EmcDialog(title='Game deleted', style='info')
+         EmcDialog(title=_('Game deleted'), style='info')
          _mod._browser.refresh(hard=True)
       else:
-         EmcDialog(text='Can not delete game', style='error')
+         EmcDialog(text=_('Can not delete game'), style='error')
 
 ## download game stuff
    def download_zip(self):
@@ -513,8 +534,8 @@ class MameGame(object):
          if os.path.isdir(dir) and os.access(dir, os.W_OK):
             dest = dir
       if dest is None:
-         EmcDialog(title='Error, can not find a writable rom directory',
-                   text='You sould check your mame configuration',
+         EmcDialog(title=_('Error, can not find a writable rom directory'),
+                   text=_('You sould check your mame configuration'),
                    style='error')
          return
       dest = os.path.join(dest, self.gid + '.zip')
@@ -522,14 +543,14 @@ class MameGame(object):
 
       # create the new download dialog
       self.dialog.delete()
-      self.dialog = EmcDialog(title='Game download', spinner=True,
+      self.dialog = EmcDialog(title=_('Game download'), spinner=True,
                               text='', style='progress')
-      self.dialog.button_add('Close', self.close_dialog)
+      self.dialog.button_add(_('Close'), self.close_dialog)
 
       # Try to download the game from various roms site
       sources = []
       # freeroms.com
-      title = 'Trying at freeroms.org...<br>'
+      title = _('Trying at freeroms.org...<br>')
       prefix = 'NUM' if self.gid[0].isdigit() else self.gid[0]
       url = 'http://download.freeroms.com/mame_roms/%s/%s.zip' % (prefix, self.gid)
       sources.append((title, url))
@@ -559,7 +580,7 @@ class MameGame(object):
          if sources:
             self._try_download_multi_sources(sources, dest)
          else:
-            self.dialog.text_append('<b>Can not find the game online, sorry.</>')
+            self.dialog.text_append(_('<b>Can not find the game online.</b>'))
       else:
          self.dialog.spinner_start()
 
@@ -567,12 +588,12 @@ class MameGame(object):
       self._dwnl_handler = None
       self.dialog.spinner_stop()
       if status == 200: # no errors
-         self.dialog.text_append('<b>Download done :)</>')
+         self.dialog.text_append(_('<b>Download done :)</b>'))
       else:
          if sources:
             self._try_download_multi_sources(sources, dest)
          else:
-            self.dialog.text_append('<b>Can not find the game online, sorry.</b>')
+            self.dialog.text_append(_('<b>Can not find the game online.</b>'))
 
    def _cb_multi_download_progress(self, dest, tot, done, sources):
       if tot > 0: self.dialog.progress_set(float(done) / float(tot))

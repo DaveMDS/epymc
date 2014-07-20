@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-20 17:03+0200\n"
-"PO-Revision-Date: 2014-07-20 17:03+0100\n"
+"POT-Creation-Date: 2014-07-20 18:24+0200\n"
+"PO-Revision-Date: 2014-07-20 18:24+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -432,6 +432,170 @@ msgid ""
 "<b>this</>"
 msgstr ""
 
+#: epymc/plugins/mame/mame.py:52
+msgid "My Games"
+msgstr "I miei giochi"
+
+#: epymc/plugins/mame/mame.py:64
+msgid "All Games"
+msgstr "Tutti i giochi"
+
+#: epymc/plugins/mame/mame.py:76
+msgid "Favorite Games"
+msgstr "Giochi preferiti"
+
+#: epymc/plugins/mame/mame.py:88
+msgid "Categories"
+msgstr "Categorie"
+
+#: epymc/plugins/mame/mame.py:125 epymc/plugins/mame/mame.py:143
+#: epymc/plugins/mame/mame.py:240
+msgid "M.A.M.E"
+msgstr "M.A.M.E."
+
+#: epymc/plugins/mame/mame.py:127
+msgid ""
+"Long info for the <b>M.A.M.E</b> module, explain what it does\n"
+"and what it need to work well, can also use markup like <title>this</> or\n"
+"<b>this</>"
+msgstr ""
+
+#: epymc/plugins/mame/mame.py:168
+msgid "Searching games, please wait..."
+msgstr "Ricerca giochi, attendere..."
+
+#: epymc/plugins/mame/mame.py:191
+msgid "M.A.M.E not found"
+msgstr "M.A.M.E. non trovato"
+
+#: epymc/plugins/mame/mame.py:192
+msgid "Is mame installed?"
+msgstr "Avete installato mame?"
+
+#: epymc/plugins/mame/mame.py:214
+msgid "Can not get rom path from M.A.M.E."
+msgstr "Non trovo il rom path di M.A.M.E."
+
+#: epymc/plugins/mame/mame.py:215
+msgid "Is your mame well configured?"
+msgstr "Avete configurato bene mame?"
+
+#: epymc/plugins/mame/mame.py:306
+msgid "No category file found"
+msgstr "Non trovo il file categorie"
+
+#: epymc/plugins/mame/mame.py:307
+#, python-format
+msgid ""
+"The category file is not included in mame, you need to download a copy from "
+"the net. <br>The file must be placed in %s"
+msgstr ""
+"Il file delle categorie non è incluso con mame, dovete scaricarne una copia "
+"dalla rete.<br> Il file deve trovarsi in %s"
+
+#: epymc/plugins/mame/mame.py:370
+#, python-format
+msgid ""
+"<title>%(name)s</><br><hilight>Year:</> %(year)s<br><hilight>Manufacturer:</"
+"> %(manufacturer)s<br><hilight>Players:</> %(players)s<br><hilight>Buttons:</"
+"> %(buttons)s<br>"
+msgstr ""
+"<title>%(name)s</><br><hilight>Anno:</> %(year)s<br><hilight>Produttore:</> "
+"%(manufacturer)s<br><hilight>Giocatori:</> %(players)s<br><hilight>Pulsanti:"
+"</> %(buttons)s<br>"
+
+#: epymc/plugins/mame/mame.py:403
+#, python-format
+msgid ""
+"<hilight>Year:</> %(year)s<br><hilight>Manufacturer:</> "
+"%(manufacturer)s<br><hilight>Players:</> %(players)s<br><hilight>Buttons:</> "
+"%(buttons)s<br><hilight>Savestate:</> "
+"%(driver_savestate)s<br><hilight>Driver status:</> %(driver_status)s<br>   "
+"<hilight>emulation:</> %(driver_emulation)s<br>   <hilight>color:</> "
+"%(driver_color)s<br>   <hilight>sound:</> %(driver_sound)s<br>   "
+"<hilight>graphic:</> %(driver_graphic)s<br>"
+msgstr ""
+"<hilight>Anno:</> %(year)s<br><hilight>Produttore:</> "
+"%(manufacturer)s<br><hilight>Giocatori:</> %(players)s<br><hilight>Pulsanti:"
+"</> %(buttons)s<br><hilight>Salvataggio:</> "
+"%(driver_savestate)s<br><hilight>Stato del driver:</> "
+"%(driver_status)s<br>   <hilight>emulazione:</> %(driver_emulation)s<br>   "
+"<hilight>colore:</> %(driver_color)s<br>   <hilight>suono:</> "
+"%(driver_sound)s<br>   <hilight>grafica:</> %(driver_graphic)s<br>"
+
+#: epymc/plugins/mame/mame.py:428 epymc/plugins/movies/movies.py:385
+msgid "Play"
+msgstr "Play"
+
+#: epymc/plugins/mame/mame.py:430
+msgid "Download"
+msgstr "Scarica"
+
+#: epymc/plugins/mame/mame.py:437
+msgid "History"
+msgstr "Storia"
+
+#: epymc/plugins/mame/mame.py:440
+msgid "Delete"
+msgstr "Elimina"
+
+#: epymc/plugins/mame/mame.py:460
+msgid "No History file found"
+msgstr "File history non trovato"
+
+#: epymc/plugins/mame/mame.py:461
+#, python-format
+msgid ""
+"The History file is not included in mame, you should download a copy from "
+"arcade-history.com<br>The file must be unzipped and placed in %s"
+msgstr ""
+"Il file history non è incluso con mame, dovete scaricarne una copia dal sito "
+"arcade-history.com<br>Il file deve essere scompresso e messo in %s"
+
+#: epymc/plugins/mame/mame.py:501
+msgid "Game not found in history file"
+msgstr "Gioco non trovato nel file history"
+
+#: epymc/plugins/mame/mame.py:512
+msgid "Really delete this game?"
+msgstr "Cancello il gioco?"
+
+#: epymc/plugins/mame/mame.py:524
+msgid "Game deleted"
+msgstr "Gioco eliminato"
+
+#: epymc/plugins/mame/mame.py:527
+msgid "Can not delete game"
+msgstr "Non posso eliminare il gioco"
+
+#: epymc/plugins/mame/mame.py:537
+msgid "Error, can not find a writable rom directory"
+msgstr "Errore, non trovo una cartella scrivibile per le rom"
+
+#: epymc/plugins/mame/mame.py:538
+msgid "You sould check your mame configuration"
+msgstr "Dovresti controllare la tua configurazione del mame"
+
+#: epymc/plugins/mame/mame.py:546
+msgid "Game download"
+msgstr "Scarica gioco"
+
+#: epymc/plugins/mame/mame.py:548
+msgid "Close"
+msgstr "Chiudi"
+
+#: epymc/plugins/mame/mame.py:553
+msgid "Trying at freeroms.org...<br>"
+msgstr "Provo da freeroms.org...<br>"
+
+#: epymc/plugins/mame/mame.py:583 epymc/plugins/mame/mame.py:596
+msgid "<b>Can not find the game online.</b>"
+msgstr "<b>Non ho trovato il gioco online.</b>"
+
+#: epymc/plugins/mame/mame.py:591
+msgid "<b>Download done :)</b>"
+msgstr "<b>Download completato :)</b>"
+
 #: epymc/plugins/input_joy/joy.py:43
 msgid "Input - Joystick"
 msgstr "Input - Joystick"
@@ -566,10 +730,6 @@ msgstr "Collezione dei film"
 #, python-format
 msgid "Continue from %s ?"
 msgstr "Riprendo la riproduzione da %s ?"
-
-#: epymc/plugins/movies/movies.py:385
-msgid "Play"
-msgstr "Play"
 
 #: epymc/plugins/movies/movies.py:387 epymc/plugins/movies/movies.py:447
 #: epymc/plugins/tvshows/tvshows.py:459 epymc/plugins/tvshows/tvshows.py:540
@@ -946,4 +1106,3 @@ msgstr[1] "%d episodi"
 #: epymc/plugins/tvshows/tvshows.py:773
 msgid "Found serie:"
 msgstr "Trovata serie:"
-

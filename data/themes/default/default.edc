@@ -13,6 +13,8 @@
 #define FONT_BOLD "AsapBold"
 // #define FONT "Sans"
 // #define FONT_BOLD "Sans:style=Bold"
+#define FONT_SIZE_SMALLER 14
+#define FONT_SIZE_SMALL 18
 #define FONT_SIZE 22
 #define FONT_SIZE_BIG 26
 #define FONT_SIZE_BIGGER 48
@@ -81,14 +83,23 @@ fonts {
 styles {
    style { name: "epymc_default_style";
       base: "font="FONT" font_size="FONT_SIZE" color=#fff wrap=word";
-      tag:  "br" "\n";
-      tag:  "tab" "\t";
-      tag:  "em" "+ font="FONT":style=Oblique";
-      tag:  "b" "+ font="FONT_BOLD;
-      tag:  "title" "+ font="FONT_BOLD" color=#"COLOR_ORANGE_HEX" font_size="FONT_SIZE_BIG;
-      tag:  "hilight" "+ font="FONT_BOLD;
-      tag:  "center" "+ align=center";
-      //~ tag:  "link" "+ color=#800 underline=on underline_color=#8008";
+      tag: "b" "+ font_weight=Bold";
+      tag: "em" "+ font_style=Oblique";
+      tag: "hilight" "+ font_weight=Bold style=glow glow_color=#3399ff80";
+      tag: "link" "+ color=#3399ff underline=on underline_color=#3399ff";
+      tag: "center" "+ align=center";
+      tag: "bigger" "+ font_size="FONT_SIZE_BIGGER;
+      tag: "big" "+ font_size="FONT_SIZE_BIG;
+      tag: "small" "+ font_size="FONT_SIZE_SMALL;
+      tag: "smaller" "+ font_size="FONT_SIZE_SMALLER;
+      tag: "title" "+ font_weight=Bold color=#"COLOR_ORANGE_HEX" font_size="FONT_SIZE_BIG;
+      tag: "subtitle" "+ color=#"COLOR_ORANGE_HEX;
+      tag: "name" "+ color=#888888 font_weight=Bold";
+      tag: "val" "+ color=#ffffff";
+      tag: "info" "+ color=#3399ff style=glow glow_color=#3399ff30";
+      tag: "success" "+ color=#00ff00 style=glow glow_color=#00ff0030";
+      tag: "warning" "+ color=#ff7c00 style=glow glow_color=#ff7c0030";
+      tag: "failure" "+ color=#ff0000 style=glow glow_color=#ff000030";
    }
 
    style { name: "epymc_dialog_title_style";
@@ -98,10 +109,6 @@ styles {
    style { name: "epymc_label_slide_style";
       base:  "font="FONT" font_size="FONT_SIZE" color=#fff wrap=none";
    }
-
-   // font=Sans font_size=10 align=center color=#fff wrap=mixed ellipsis=1.0
-   // font=Sans text_class=fileman_icon wrap=[word,mixed,none] style=soft_shadow shadow_color=#0002
-   // left_margin=4 right_margin=4
 }
 
 color_classes {

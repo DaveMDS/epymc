@@ -54,6 +54,15 @@ Aenean luctus, leo in lacinia pretium, felis odio euismod sapien, eu varius
 ipsum odio sit amet elit.
 """
 
+TEST_STYLE = """
+<center>
+<title>Title</title><br>
+<subtitle>Subtitle</><br>
+<hilight>hilight</> <b>bold</> <i>italic</> <link>link</><br>
+<name>name</> <info>info</> <success>success</> <warning>warning</> <failure>failure</><br>
+<bigger>bigger</> <big>big</> normal <small>small</> <smaller>smaller</>
+</center>
+"""
 
 class MyItemClass(EmcItemClass):
 
@@ -61,17 +70,23 @@ class MyItemClass(EmcItemClass):
       return user_data
 
    def info_get(self, url, user_data):
-      text  = '<title>System info:</><br>'
-      text += '<b>Graphic engine</b> %s (%s)<br>' % (engine_get(), preferred_engine_get())
-      text += '<b>base dir</b> %s<br>' % (utils.emc_base_dir)
-      text += '<b>config dir</b> %s<br>' % (utils.user_conf_dir)
-      try:
-         text += '<b>download available</b> %s<br>' % (ecore.file_download_protocol_available('http://'))
-      except:
-         text += '<b>download available</b> %s<br>' % (ecore.file.download_protocol_available('http://'))
-      text += '<b>theme</b> %s<br>' % (ini.get('general', 'theme'))
-      text += '<b>theme file</b> %s<br>' % (gui.theme_file)
-      return text
+      if url == 'uitests://styles':
+         return TEST_STYLE
+      else:
+         return '<title>System info:</><br>' \
+                '<name>Graphic engine:</name> %s (%s)<br>' \
+                '<name>Download available:</name> %s<br>' \
+                '<name>base dir:</name> %s<br>' \
+                '<name>config dir:</name> %s<br>' \
+                '<name>theme:</name> %s<br>' \
+                '<name>theme file:</name> %s<br>' % (
+                     engine_get(), preferred_engine_get(),
+                     ecore.file_download_protocol_available('http://'),
+                     utils.emc_base_dir,
+                     utils.user_conf_dir,
+                     ini.get('general', 'theme'),
+                     gui.theme_file,
+                  )
 
    def item_selected(self, url, user_data):
       # Events Sniffer
@@ -334,6 +349,10 @@ class MyItemClass(EmcItemClass):
             if group.startswith('icon/'):
                d.list_item_append(group[5:], group)
 
+      # Text style in dialog
+      elif url == 'uitests://styles':
+         EmcDialog(title='Text styles', text=TEST_STYLE)
+   
       # Movie name test
       # elif url == 'uitests://movies_name':
          # urls = [ 'alien.avi',
@@ -387,6 +406,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://menu', 'Menu')
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + FocusManager')
       browser.item_add(MyItemClass(), 'uitests://icons', 'Icons gallery')
+      browser.item_add(MyItemClass(), 'uitests://styles', 'Text styles')
       browser.item_add(MyItemClass(), 'uitests://dm', 'Download Manager')
       browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')
       browser.item_add(MyItemClass(), 'uitests://mpvo', 'Mediaplayer - Online Video (good)')

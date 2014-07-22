@@ -28,7 +28,7 @@ from epymc.extapi.onlinevideo import api_version, state_get, \
 api_base = 'https://api.vimeo.com'
 app_token = '55e9f802ceb814b649ef3c9504d4d38f' # Official token for EpyMC
 headers = { 'Authorization': 'Bearer '+app_token, 'User-Agent': 'EpyMC',
-            'Accept': 'application/vnd.vimeo.*+json;version=3.0' }
+            'Accept': 'application/vnd.vimeo.*+json;version=3.2' }
 
 icon_channels = local_resource(__file__, 'icon_channels.png')
 icon_groups = local_resource(__file__, 'icon_groups.png')
@@ -58,7 +58,7 @@ def vimeo_api_call(endpoint, **kargs):
 
 def video_item_add(video):
    try:
-      poster = [ p['link'] for p in video['pictures'] if p['width'] == 640 ][0]
+      poster = [ p['link'] for p in video['pictures']['sizes'] if p['width'] == 640 ][0]
    except:
       poster = None
    info = _('<title>%(title)s</title> <small>%(duration)s</small><br>' \
@@ -72,18 +72,18 @@ def video_item_add(video):
                   'duration': seconds_to_duration(video['duration']),
                   'user': video['user']['name'],
                   'uploaded': relative_date(video['created_time']),
-                  'plays': video['stats']['plays'],
-                  'likes': video['stats']['likes'],
-                  'comments': video['stats']['comments'],
+                  'plays': video['stats']['plays'] or 0,
+                  'likes': video['metadata']['connections']['likes']['total'],
+                  'comments': video['metadata']['connections']['comments']['total'],
                   'description': video['description'] or '',
                }
    item_add(ST_PLAY, video['name'], video['link'], icon=icon_videos,
                      poster=poster, info=info)
 
 def channel_item_add(channel):
-   url = api_base + channel['metadata']['connections']['videos']
+   url = api_base + channel['metadata']['connections']['videos']['uri']
    try:
-      poster = [ p['link'] for p in channel['pictures'] if p['width'] == 640 ][0]
+      poster = [ p['link'] for p in channel['pictures']['sizes'] if p['width'] == 640 ][0]
    except:
       poster = None
    info = _('<title>%(name)s</title><br>' \
@@ -97,17 +97,17 @@ def channel_item_add(channel):
                   'user': channel['user']['name'],
                   'created': relative_date(channel['created_time']),
                   'modified': relative_date(channel['modified_time']),
-                  'videos': channel['stats']['videos'],
-                  'users': channel['stats']['users'],
+                  'videos': channel['metadata']['connections']['videos']['total'],
+                  'users': channel['metadata']['connections']['users']['total'],
                   'description': channel['description'] or '',
                }
    item_add(ST_VIDEO_LIST, channel['name'], url, icon=icon_channels,
                            poster=poster, info=info)
 
 def group_item_add(group):
-   url = api_base + group['metadata']['connections']['videos']
+   url = api_base + group['metadata']['connections']['videos']['uri']
    try:
-      poster = [ p['link'] for p in group['pictures'] if p['width'] == 640 ][0]
+      poster = [ p['link'] for p in group['pictures']['sizes'] if p['width'] == 640 ][0]
    except:
       poster = None
    info = _('<title>%(name)s</title><br>' \
@@ -121,17 +121,17 @@ def group_item_add(group):
                   'user': group['user']['name'],
                   'created': relative_date(group['created_time']),
                   'modified': relative_date(group['modified_time']),
-                  'videos': group['stats']['videos'],
-                  'users': group['stats']['users'],
+                  'videos': group['metadata']['connections']['videos']['total'],
+                  'users': group['metadata']['connections']['users']['users'],
                   'description': group['description'] or '',
                }
    item_add(ST_VIDEO_LIST, group['name'], url, icon=icon_groups,
                            poster=poster, info=info)
 
 def user_item_add(user):
-   url = api_base + user['metadata']['connections']['videos']
+   url = api_base + user['metadata']['connections']['videos']['uri']
    try:
-      poster = [ p['link'] for p in user['pictures'] if p['width'] == 300 ][0]
+      poster = [ p['link'] for p in user['pictures']['sizes'] if p['width'] == 300 ][0]
    except:
       poster = None
    info = _('<title>%(name)s</title><br>' \
@@ -158,19 +158,23 @@ if STATE == ST_HOME:
    item_add(ST_GROUP_LIST, _('Search groups'), 'search', action=ACT_SEARCH)
    item_add(ST_USERS_LIST, _('Search people'), 'search', action=ACT_SEARCH)
 
-   # more followed videos (this do not work... 400:BadRequest)
-   # url = api_base + '/videos?sort=relevant&per_page=%d' % ITEMS_PER_PAGE
-   # item_add(ST_VIDEO_LIST, 'Top videos', url, icon=None, action=ACT_FOLDER)
+   # more relevant videos
+   url = api_base + '/videos?sort=relevant&per_page=%d&query=' % ITEMS_PER_PAGE
+   item_add(ST_VIDEO_LIST, _('More relevant videos'), url,
+                           icon=icon_videos, action=ACT_FOLDER)
 
-   # more followed channels
-   url = api_base + '/channels?sort=followers&per_page=%d' % ITEMS_PER_PAGE
+   # more followed channels (SORT DO NOT WORK !!!)
+   # url = api_base + '/channels?sort=followers&per_page=%d' % ITEMS_PER_PAGE
+   url = api_base + '/channels?per_page=%d' % ITEMS_PER_PAGE
    item_add(ST_CHANN_LIST, _('More followed channels'), url,
                            icon=icon_channels, action=ACT_FOLDER)
+
    # more followed groups
    url = api_base + '/groups?sort=followers&per_page=%d' % ITEMS_PER_PAGE
    item_add(ST_GROUP_LIST, _('More followed groups'), url,
                            icon=icon_groups, action=ACT_FOLDER)
-   # more relevant users (this do not work... 400:BadRequest)
+
+   # more relevant users (DO NOT WORK)
    # url = api_base + '/users?sort=relevant&per_page=%d' % ITEMS_PER_PAGE
    # item_add(ST_USERS_LIST, 'More relevant users', url,
                            # icon=icon_users, action=ACT_FOLDER)
@@ -256,7 +260,7 @@ elif STATE == ST_USERS_LIST:
 # browse categories and subcategories
 ################################################################################
 elif STATE == ST_CATEGORIES:
-   results = vimeo_api_call('/categories', per_page=1000)
+   results = vimeo_api_call('/categories')
    if URL == '/videos': NEXT_STATE = ST_VIDEO_LIST
    elif URL == '/channels': NEXT_STATE = ST_CHANN_LIST
    elif URL == '/groups': NEXT_STATE = ST_GROUP_LIST

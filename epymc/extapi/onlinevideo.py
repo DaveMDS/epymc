@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, json, subprocess, re
+import os, sys, json, subprocess, re, gettext
 from datetime import datetime
 from bs4 import BeautifulSoup
 
@@ -43,6 +43,12 @@ ACT_PLAY = 3
 ACT_SEARCH = 4
 
 py3 = (sys.version_info[0] >= 3)
+
+
+# install _() and ngettext() in the main namespace
+localedir = os.path.join(os.path.dirname(__file__), '..', 'locale')
+gettext.install('epymc', names='ngettext', localedir=localedir)
+
 
 def state_get():
    """ Get the state (and the url) of the current running scraper process """
@@ -144,28 +150,19 @@ def relative_date(date):
          return date
 
    delta = datetime.now() - date
-   if delta.days > 365 * 2:
-      return '{} years ago'.format(delta.days / 365)
-   elif delta.days > 365:
-      return '1 year ago'
-   elif delta.days > 30 * 2:
-      return '{} months ago'.format(delta.days / 30)
-   elif delta.days > 30:
-      return '1 month ago'
-   elif delta.days > 7 * 2:
-      return '{} weeks ago'.format(delta.days / 7)
-   elif delta.days > 7:
-      return '1 week ago'
-   elif delta.days > 1:
-      return '{} days ago'.format(delta.days)
-   elif delta.days > 0:
-      return 'yesterday'
-   elif delta.seconds > 3600 * 2:
-      return '{} hours ago'.format(delta.seconds / 3600)
-   elif delta.seconds > 3600:
-      return '1 hour ago'
-   elif delta.seconds > 60 * 2:
-      return '{} minutes ago'.format(delta.seconds / 60)
-   else:
-      return '1 minute ago'
-
+   if delta.days > 365:
+      years = delta.days / 365
+      return ngettext('%d year ago', '%d years ago', years) % years
+   if delta.days > 30:
+      months = delta.days / 30
+      return ngettext('%d month ago', '%d months ago', months) % months
+   if delta.days > 7:
+      weeks = delta.days / 7
+      return ngettext('%d week ago', '%d weeks ago', weeks) % weeks
+   if delta.days > 0:
+      return ngettext('%d day ago', '%d days ago', delta.days) % delta.days
+   if delta.seconds > 3600:
+      hours = delta.seconds / 3600
+      return ngettext('%d hour ago', '%d hours ago', hours) % hours
+   minutes = delta.seconds / 60
+   return ngettext('%d minute ago', '%d minutes ago', minutes) % minutes

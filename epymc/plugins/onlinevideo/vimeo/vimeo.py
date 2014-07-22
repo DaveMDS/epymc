@@ -61,19 +61,22 @@ def video_item_add(video):
       poster = [ p['link'] for p in video['pictures'] if p['width'] == 640 ][0]
    except:
       poster = None
-   info = u'<title>{}</title><br>' \
-           '<hilight>Duration</hilight> {}<br>' \
-           'from <i>{}</i>, added <i>{}</i>.<br>' \
-           '{} plays / {} likes / {} comments<br>' \
-           '<br>{}'.format(
-               video['name'],
-               seconds_to_duration(video['duration']),
-               video['user']['name'],
-               relative_date(video['created_time']),
-               video['stats']['plays'],
-               video['stats']['likes'],
-               video['stats']['comments'],
-               video['description'] or '')
+   info = _('<title>%(title)s</title> <small>%(duration)s</small><br>' \
+            '<small><name>from</> %(user)s <name>/ added %(uploaded)s</><br>' \
+            '<success>%(plays)s plays</> <name>/</> ' \
+            '<warning>%(likes)s likes</> <name>/</> ' \
+            '<info>%(comments)s comments</></small><br>' \
+            '%(description)s') % \
+               {
+                  'title': video['name'],
+                  'duration': seconds_to_duration(video['duration']),
+                  'user': video['user']['name'],
+                  'uploaded': relative_date(video['created_time']),
+                  'plays': video['stats']['plays'],
+                  'likes': video['stats']['likes'],
+                  'comments': video['stats']['comments'],
+                  'description': video['description'] or '',
+               }
    item_add(ST_PLAY, video['name'], video['link'], icon=icon_videos,
                      poster=poster, info=info)
 
@@ -83,19 +86,21 @@ def channel_item_add(channel):
       poster = [ p['link'] for p in channel['pictures'] if p['width'] == 640 ][0]
    except:
       poster = None
-   info = u'<title>{}</title><br>' \
-           '<hilight>from</hilight> <i>{}</i><br>' \
-           '<hilight>created</hilight> <i>{}</i><br>' \
-           '<hilight>last update</hilight> <i>{}</i><br>' \
-           '{} videos / {} followers<br>' \
-           '<br>{}'.format(
-               channel['name'],
-               channel['user']['name'],
-               relative_date(channel['created_time']),
-               relative_date(channel['modified_time']),
-               channel['stats']['videos'],
-               channel['stats']['users'],
-               channel['description'])
+   info = _('<title>%(name)s</title><br>' \
+            '<small><name>from</name> %(user)s <name>/ %(created)s</name><br>' \
+            '<name>updated</name> %(modified)s<br>' \
+            '<success>%(videos)s videos</success> <name>/</> ' \
+            '<info>%(users)s followers</info></small><br>' \
+            '%(description)s') % \
+               {
+                  'name': channel['name'],
+                  'user': channel['user']['name'],
+                  'created': relative_date(channel['created_time']),
+                  'modified': relative_date(channel['modified_time']),
+                  'videos': channel['stats']['videos'],
+                  'users': channel['stats']['users'],
+                  'description': channel['description'] or '',
+               }
    item_add(ST_VIDEO_LIST, channel['name'], url, icon=icon_channels,
                            poster=poster, info=info)
 
@@ -105,19 +110,21 @@ def group_item_add(group):
       poster = [ p['link'] for p in group['pictures'] if p['width'] == 640 ][0]
    except:
       poster = None
-   info = u'<title>{}</title><br>' \
-           '<hilight>from</hilight> <i>{}</i><br>' \
-           '<hilight>created</hilight> <i>{}</i><br>' \
-           '<hilight>last update</hilight> <i>{}</i><br>' \
-           '{} videos / {} followers<br>' \
-           '<br>{}'.format(
-               group['name'],
-               group['user']['name'],
-               relative_date(group['created_time']),
-               relative_date(group['modified_time']),
-               group['stats']['videos'],
-               group['stats']['users'],
-               group['description'] or '')
+   info = _('<title>%(name)s</title><br>' \
+            '<small><name>from</name> %(user)s <name>/ %(created)s</name><br>' \
+            '<name>updated</name> %(modified)s<br>' \
+            '<success>%(videos)s videos</success> <name>/</name> '
+            '<info> %(users)s followers</info></small><br>' \
+            '%(description)s') % \
+               {
+                  'name': group['name'],
+                  'user': group['user']['name'],
+                  'created': relative_date(group['created_time']),
+                  'modified': relative_date(group['modified_time']),
+                  'videos': group['stats']['videos'],
+                  'users': group['stats']['users'],
+                  'description': group['description'] or '',
+               }
    item_add(ST_VIDEO_LIST, group['name'], url, icon=icon_groups,
                            poster=poster, info=info)
 
@@ -127,14 +134,16 @@ def user_item_add(user):
       poster = [ p['link'] for p in user['pictures'] if p['width'] == 300 ][0]
    except:
       poster = None
-   info = u'<title>{}</title><br>' \
-           '<hilight>registered </hilight> <i>{}</i><br>' \
-           '<hilight>location </hilight> <i>{}</i><br>' \
-           '<br>{}'.format(
-               user['name'],
-               relative_date(user['created_time']),
-               user['location'],
-               user['bio'] or '')
+   info = _('<title>%(name)s</title><br>' \
+            '<small><name>joined</name> %(created)s<br>' \
+            '<name>location</name> %(location)s</small><br>' \
+            '%(bio)s') % \
+               {
+                  'name': user['name'],
+                  'created': relative_date(user['created_time']),
+                  'location': user['location'],
+                  'bio': user['bio'] or ''
+               }
    item_add(ST_VIDEO_LIST, user['name'], url, icon=icon_users,
                            poster=poster, info=info)
 
@@ -144,10 +153,10 @@ def user_item_add(user):
 ################################################################################
 if STATE == ST_HOME:
    # searches
-   item_add(ST_VIDEO_LIST, 'Search videos', 'search', action=ACT_SEARCH)
-   item_add(ST_CHANN_LIST, 'Search channels', 'search', action=ACT_SEARCH)
-   item_add(ST_GROUP_LIST, 'Search groups', 'search', action=ACT_SEARCH)
-   item_add(ST_USERS_LIST, 'Search people', 'search', action=ACT_SEARCH)
+   item_add(ST_VIDEO_LIST, _('Search videos'), 'search', action=ACT_SEARCH)
+   item_add(ST_CHANN_LIST, _('Search channels'), 'search', action=ACT_SEARCH)
+   item_add(ST_GROUP_LIST, _('Search groups'), 'search', action=ACT_SEARCH)
+   item_add(ST_USERS_LIST, _('Search people'), 'search', action=ACT_SEARCH)
 
    # more followed videos (this do not work... 400:BadRequest)
    # url = api_base + '/videos?sort=relevant&per_page=%d' % ITEMS_PER_PAGE
@@ -155,21 +164,21 @@ if STATE == ST_HOME:
 
    # more followed channels
    url = api_base + '/channels?sort=followers&per_page=%d' % ITEMS_PER_PAGE
-   item_add(ST_CHANN_LIST, 'More followed channels', url,
+   item_add(ST_CHANN_LIST, _('More followed channels'), url,
                            icon=icon_channels, action=ACT_FOLDER)
    # more followed groups
    url = api_base + '/groups?sort=followers&per_page=%d' % ITEMS_PER_PAGE
-   item_add(ST_GROUP_LIST, 'More followed groups', url,
+   item_add(ST_GROUP_LIST, _('More followed groups'), url,
                            icon=icon_groups, action=ACT_FOLDER)
    # more relevant users (this do not work... 400:BadRequest)
    # url = api_base + '/users?sort=relevant&per_page=%d' % ITEMS_PER_PAGE
    # item_add(ST_USERS_LIST, 'More relevant users', url,
                            # icon=icon_users, action=ACT_FOLDER)
    # browse by cats
-   item_add(ST_CATEGORIES, 'Browse videos', '/videos', action=ACT_FOLDER)
-   item_add(ST_CATEGORIES, 'Browse channels', '/channels', action=ACT_FOLDER)
-   item_add(ST_CATEGORIES, 'Browse groups', '/groups', action=ACT_FOLDER)
-   item_add(ST_CATEGORIES, 'Browse users', '/users', action=ACT_FOLDER)
+   item_add(ST_CATEGORIES, _('Browse videos'), '/videos', action=ACT_FOLDER)
+   item_add(ST_CATEGORIES, _('Browse channels'), '/channels', action=ACT_FOLDER)
+   item_add(ST_CATEGORIES, _('Browse groups'), '/groups', action=ACT_FOLDER)
+   item_add(ST_CATEGORIES, _('Browse users'), '/users', action=ACT_FOLDER)
 
 
 ################################################################################
@@ -186,7 +195,7 @@ elif STATE == ST_VIDEO_LIST:
 
    if results['paging']['next']:
       url = api_base + results['paging']['next']
-      text = 'More of the %s videos' % results['total']
+      text = _('Load more results (%d in total)') % results['total']
       item_add(ST_VIDEO_LIST, text, url, action=ACT_MORE)
 
 
@@ -204,7 +213,7 @@ elif STATE == ST_CHANN_LIST:
 
    if results['paging']['next']:
       url = api_base + results['paging']['next']
-      text = 'More of the %s channels' % results['total']
+      text = _('Load more results (%d in total)') % results['total']
       item_add(ST_CHANN_LIST, text, url, action=ACT_MORE)
 
 
@@ -222,7 +231,7 @@ elif STATE == ST_GROUP_LIST:
 
    if results['paging']['next']:
       url = api_base + results['paging']['next']
-      text = 'More of the %s groups' % results['total']
+      text = _('Load more results (%d in total)') % results['total']
       item_add(ST_GROUP_LIST, text, url, action=ACT_MORE)
 
 ################################################################################
@@ -239,7 +248,7 @@ elif STATE == ST_USERS_LIST:
 
    if results['paging']['next']:
       url = api_base + results['paging']['next']
-      text = 'More of the %s users' % results['total']
+      text = _('Load more results (%d in total)') % results['total']
       item_add(ST_USERS_LIST, text, url, action=ACT_MORE)
 
 

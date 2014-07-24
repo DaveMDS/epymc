@@ -262,6 +262,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
                if icon is None:
                   if action == ACT_SEARCH: icon = 'icon/search'
                   if action == ACT_MORE: icon = 'icon/next'
+               if info is not None:
+                  info = info.replace('\n', '<br>')
                item_data = (next_state, label, url, info, icon, poster, action)
                if suggested is not None:
                   suggested.append(item_data)

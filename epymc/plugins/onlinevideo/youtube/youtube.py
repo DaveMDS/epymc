@@ -21,9 +21,9 @@
 import os, sys, re
 from bs4 import BeautifulSoup
 
-from epymc.extapi.onlinevideo import api_version, state_get, \
-   fetch_url, play_url, item_add, call_ydl, local_resource, \
-   ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
+from epymc.extapi.onlinevideo import api_version, state_get, fetch_url, \
+   play_url, item_add, call_ydl, local_resource, seconds_to_duration, \
+   relative_date, ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 
 
 ytb_base = 'http://www.youtube.com'
@@ -43,23 +43,12 @@ ST_CHN_VIDEOS = 12
 STATE, URL = state_get()
 
 
-def seconds_to_time_string(seconds):
-   seconds = int(seconds)
-   h = int(seconds / 3600)
-   m = int(seconds / 60) % 60
-   s = int(seconds % 60)
-   if h > 0:
-      return "%d:%02d:%02d" % (h,m,s)
-   else:
-      return "%d:%02d" % (m,s)
-
-
 # this is the first page, show fixed categories
 if STATE == ST_HOME:
-   item_add(ST_SEARCH_JSONC, 'Search videos', 'search', None, action=ACT_SEARCH)
-   item_add(ST_CHN_CATEGORIES, 'Channels by categories',
+   item_add(ST_SEARCH_JSONC, _('Search videos'), 'search', None, action=ACT_SEARCH)
+   item_add(ST_CHN_CATEGORIES, _('Browse channels'),
             ytb_base+'/channels', None, action=ACT_FOLDER)
-   item_add(ST_VIDEO_LIST_JSONC, 'Top rated',
+   item_add(ST_VIDEO_LIST_JSONC, _('Top rated'),
             api_base+'top_rated?v=2&alt=jsonc&max-results='+str(ITEMS_PER_PAGE),
             None, action=ACT_FOLDER)
 
@@ -77,8 +66,8 @@ elif STATE == ST_CHN_CATEGORIES:
          href = cat.find('a', class_='category-title-link')['href']
          # thumb = cat.find('span', class_='yt-thumb-clip').img['src']
 
-         video_count = cat.find('span', class_='channel-count').string
-         info = u'<title>Channels: </title>{}<br>'.format(video_count)
+         channels_count = cat.find('span', class_='channel-count').string
+         info = _('<title>%s</title><br>%s channels') % (title, channels_count)
 
          item_add(ST_CHN_CHANNELS, title, ytb_base+href, poster=ytb_icon, info=info)
       except:
@@ -96,8 +85,8 @@ elif STATE == ST_CHN_CHANNELS:
          thumb = cha.find('span', class_='yt-thumb-clip').img['src']
 
          description = cha.find('p', class_='description').string.strip()
-         info = u'{}<br>'.format(description)
-         
+         info = '<title>%s</title><br>%s' % (title, description)
+
          item_add(ST_CHN_VIDEOS, title, ytb_base+href+'/videos?flow=list&sort=dd',
                   poster=thumb, info=info)
       except:
@@ -120,7 +109,7 @@ elif STATE == ST_CHN_VIDEOS:
          meta = ''
          for m in metas:
             meta += m.string + '<br>'
-         info = u'{}<br>{}<br>'.format(meta, description)
+         info = '%s<br>%s' % (meta, description)
 
          item_add(ST_PLAY, title, ytb_base+href, poster=thumb, info=info)
       except:
@@ -137,7 +126,6 @@ elif STATE in (ST_VIDEO_LIST_JSONC, ST_SEARCH_JSONC):
 
    # STATE 4 = search query in place of the url
    if STATE == ST_SEARCH_JSONC:
-      print("search for: %s" % URL)
       URL = 'http://gdata.youtube.com/feeds/api/videos?q=%s&v=2&alt=jsonc&max-results=%d' % (URL, ITEMS_PER_PAGE)
 
    data = fetch_url(URL, parser='json')
@@ -145,36 +133,26 @@ elif STATE in (ST_VIDEO_LIST_JSONC, ST_SEARCH_JSONC):
    for item in data['data']['items']:
       try:
          # see https://developers.google.com/youtube/2.0/developers_guide_jsonc
-         author = item['uploader']
          title = item['title']
-         desc = item['description']
-         rat_max = 5
-         rat_avg = item['rating']
-         duration = item['duration']
-         videoid = item['id']
-         viewed = item['viewCount']
-         favorited = item['favoriteCount']
-         likes = item['likeCount']
-         published = item['uploaded']
          url = item['player']['default']
-         # if '1' in item['content']:
-         #    url = item['content']['5']
-         # else:
-         #    url = 'restricted'
-         #    title += '(RES)'
          poster = item['thumbnail']['hqDefault']
-         icon = item['thumbnail']['sqDefault']
 
-         info = '<hilight>Author:</> %s<br>' \
-                '<hilight>Published:</> %s<br>' \
-                '<hilight>Duration:</> %s<br>' \
-                '<hilight>Rating:</> %.1f/%d<br>' \
-                '<hilight>Viewed:</> %s  <hilight>Likes: </>+%s<br>' \
-                '%s' % \
-                (author, published, 
-                 seconds_to_time_string(duration),
-                 rat_avg, rat_max, viewed, likes,
-                 desc.replace('\r\n', '<br>'))
+         info = _('<title>%(title)s</title> <small>%(duration)s</small><br>' \
+                  '<small><name>from</> %(user)s <name>/ added %(uploaded)s</><br>' \
+                  '<success>%(plays)s plays</> <name>/</> ' \
+                  '<warning>%(likes)s likes</> <name>/</> ' \
+                  '<info>%(comments)s comments</></small><br>' \
+                  '%(description)s') % \
+                     {
+                        'title': item['title'],
+                        'duration': seconds_to_duration(item['duration']),
+                        'user': item['uploader'],
+                        'uploaded': relative_date(item['uploaded']),
+                        'plays': item['viewCount'] if 'viewCount' in item else '0',
+                        'likes': item['likeCount'] if 'likeCount' in item else '0',
+                        'comments': item['commentCount'] if 'commentCount' in item else '0',
+                        'description': item['description'],
+                     }
 
          item_add(ST_PLAY, title, url, info=info, icon=None, poster=poster)
 
@@ -189,7 +167,9 @@ elif STATE in (ST_VIDEO_LIST_JSONC, ST_SEARCH_JSONC):
       if 'start-index' in URL:
          URL = re.sub('&start-index=[0-9]+', '', URL)
       URL += '&start-index=%d' % (start_index + ITEMS_PER_PAGE)
-      item_add(ST_VIDEO_LIST_JSONC, 'more of the %d results...' % (total_items), URL, action=ACT_MORE)
+      item_add(ST_VIDEO_LIST_JSONC,
+               _('Load more results (%d in total)') % (total_items),
+               URL, action=ACT_MORE)
 
 
 # play a video using youtube-dl to get the real url   \o/

@@ -143,8 +143,7 @@ def relative_date(date):
    """
    if not isinstance(date, datetime):
       try:
-         L = map(int, re.split('[^\d]', date))
-         if len(L) > 6: L = L[0:6]
+         L = map(int, re.split('[^\d]', date)[0:6])
          date = datetime(*L)
       except:
          return date

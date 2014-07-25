@@ -136,31 +136,23 @@ class MovieItemClass(EmcItemClass):
    def info_get(self, url, mod):
       if mod._movie_db.id_exists(url):
          e = mod._movie_db.get_data(url)
-         text = _('<title>%(title)s (%(country)s %(year)s)</><br>' \
-                  '<hilight>Rating:</> %(rating)s/10<br>' \
-                  '<hilight>Director:</> %(director)s<br>' \
-                  '<hilight>Cast:</> %(casts)s<br>') % \
-                     {
-                        'title': e['title'],
-                        'country': e['country'],
-                        'year':  e['release_date'][:4],
-                        'rating': e['rating'],
-                        'director': e['director'],
-                        'casts': mod._get_cast(e, 4),
-                     }
+         text = '<title>%s (%s %s)</><br>' \
+                '<name>%s:</> %s/10<br>' \
+                '<name>%s:</> %s<br>' \
+                '<name>%s:</> %s<br>' % (
+                  e['title'], e['country'], e['release_date'][:4],
+                  _('Rating'), e['rating'],
+                  _('Director'), e['director'],
+                  _('Cast'), mod._get_cast(e, 4))
       else:
          name, year = get_movie_name_from_url(url)
-         text = _('<title>%(fname)s</><br>' \
-                  '<hilight>Size:</> %(fsize)s<br>' \
-                  '<hilight>Name:</> %(name)s<br>' \
-                  '<hilight>Year:</> %(year)s<br>') % \
-                     {
-                        'fname': os.path.basename(url),
-                        'fsize': utils.hum_size(os.path.getsize(utils.url2path(url))),
-                        'name': name,
-                        'year': year if year else _('Unknown'),
-                     }
-
+         text = '<title>%s</><br><name>%s:</> %s<br>' \
+                '<name>%s:</> %s<br><name>%s:</> %s<br>' % (
+                  os.path.basename(url),
+                  _('File size'),
+                  utils.hum_size(os.path.getsize(utils.url2path(url))),
+                  _('Title'), name,
+                  _('Year'), year or _('Unknown'))
       # return "test1: κόσμε END" # should see the Greek word 'kosme'
       # return text.encode('utf-8')
       return text.replace('&', '&amp;') # :/
@@ -396,20 +388,37 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
 
          # update text info
          self._dialog.title_set(e['title'].replace('&', '&amp;'))
-         info = _('<hilight>Director: </hilight> %(director)s <br>' \
-                  '<hilight>Cast: </hilight> %(casts)s <br>' \
-                  '<hilight>Released: </hilight> %(release_date)s <br>' \
-                  '<hilight>Country: </hilight> %(country)s <br>' \
-                  '<hilight>Rating: </hilight> %(rating)s/10 <br>' \
-                  '<br><hilight>Overview:</hilight> %(overview)s') % \
-                     {
-                        'director': e['director'],
-                        'casts':  self._get_cast(e),
-                        'release_date': e['release_date'],
-                        'country': e['countries'],
-                        'rating': e['rating'],
-                        'overview': e['overview'],
-                     }
+         info = '<name>%s:</> %s<br>' \
+                '<name>%s:</> %s<br>' \
+                '<name>%s: </name> %s<br>' \
+                '<name>%s:</> %s<br>' \
+                '<name>%s:</> %s/10<br>' \
+                '<br><name>%s:</><br>%s' % (
+                  _('Director'), e['director'],
+                  _('Cast'), self._get_cast(e),
+                  _('Released'), e['release_date'],
+                  _('Country'), e['countries'],
+                  _('Rating'), e['rating'],
+                  _('Overview'), e['overview'])
+                  
+                  
+                  
+                  
+                
+         # info = _('<hilight>Director: </hilight> %(director)s <br>' \
+                  # 
+                  # '<hilight>Released: </hilight> %(release_date)s <br>' \
+                  # '<hilight>Country: </hilight> %(country)s <br>' \
+                  # 
+                  # '<br><hilight>Overview:</hilight> %(overview)s') % \
+                     # {
+                        # 'director': e['director'],
+                        # 'casts':  self._get_cast(e),
+                        # 'release_date': e['release_date'],
+                        # 'country': e['countries'],
+                        # 'rating': e['rating'],
+                        # 'overview': e['overview'],
+                     # }
                       
          # self._dialog.text_set("test2: κόσμε END") # should see the Greek word 'kosme')
          self._dialog.text_set(info.replace('&', '&amp;'))
@@ -559,11 +568,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
 
    def _cb_search_done(self, tmdb, results):
       if len(results) == 0:
-         self.tmdb_dialog.text_append(_('<br>nothing found, please try with a better name'))#TODO explain better the format
+         self.tmdb_dialog.text_append('<br>' + _('nothing found, please try with a better name'))#TODO explain better the format
       elif len(results) == 1:
          tmdb.get_movie_info(results[0]['tmdb_id'],
                              self._cb_info_done, self._cb_info_progress)
-         self.tmdb_dialog.text_append(_('<b>Downloading movie info...</b>'))
+         self.tmdb_dialog.text_append('<b>%s</b>' % _('Downloading movie info...'))
       else:
          self.tmdb_dialog.text_append(_('<b>Found %d results</b><br>') % (len(results)))
          title = _('Found %d results, which one?') % (len(results))
@@ -588,7 +597,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
       # download selected movie info + images
       tmdb = self.tmdb_dialog.data_get()
       tmdb.get_movie_info(tid, self._cb_info_done, self._cb_info_progress)
-      self.tmdb_dialog.text_append(_('<b>Downloading movie info...</b>'))
+      self.tmdb_dialog.text_append('<b>%s</b>' % _('Downloading movie info...'))
 
    def _cb_info_progress(self, tmdb, progress):
       self.tmdb_dialog.progress_set(progress)

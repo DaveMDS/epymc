@@ -543,15 +543,15 @@ class CastPanel(EmcDialog):
       self.info = result
       self._dia.delete()
 
-      text = '<hilight>%s</><br>' % self.info['name']
+      text = '<title>%s</><br>' % self.info['name']
       if self.info['biography']:
          text += '%s<br><br>' % self.info['biography'].replace('\n', '<br>')
       if self.info['birthday']:
-         text += _('<hilight>Birthday:</> %s<br>') % (self.info['birthday'])
+         text += '<name>%s:</> %s<br>' % (_('Birthday'), self.info['birthday'])
       if self.info['deathday']:
-         text += _('<hilight>Deathday:</> %s<br>') % (self.info['deathday'])
+         text += '<name>%s:</> %s<br>' % (_('Deathday'), self.info['deathday'])
       if self.info['place_of_birth']:
-         text += _('<hilight>Place of birth:</> %s<br>') % (self.info['place_of_birth'])
+         text += '<name>%s:</> %s<br>' % (_('Place of birth'), self.info['place_of_birth'])
 
       image = EmcRemoteImage(self.info['profile_path'])
       EmcDialog.__init__(self, title=self.info['name'], style='panel',

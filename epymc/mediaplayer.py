@@ -95,7 +95,7 @@ def play_url(url, only_audio = False, start_from = 0):
    LOG('dbg', 'play_url: %s' % url)
 
    if url.startswith('file://') and not os.path.exists(url[7:]):
-      text = _('<b>File not found:</b><br>%s') % url
+      text = '<b>%s:</b><br>%s' % (_('File not found'), url)
       EmcDialog(text = text, style = 'error')
       return
 

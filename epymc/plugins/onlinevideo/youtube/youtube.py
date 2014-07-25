@@ -67,7 +67,9 @@ elif STATE == ST_CHN_CATEGORIES:
          # thumb = cat.find('span', class_='yt-thumb-clip').img['src']
 
          channels_count = cat.find('span', class_='channel-count').string
-         info = _('<title>%s</title><br>%s channels') % (title, channels_count)
+         info = '<title>%s</title><br>%s %s' % (
+                  title, channels_count,
+                  ngettext('channel', 'channels', channels_count))
 
          item_add(ST_CHN_CHANNELS, title, ytb_base+href, poster=ytb_icon, info=info)
       except:
@@ -137,23 +139,21 @@ elif STATE in (ST_VIDEO_LIST_JSONC, ST_SEARCH_JSONC):
          url = item['player']['default']
          poster = item['thumbnail']['hqDefault']
 
-         info = _('<title>%(title)s</title> <small>%(duration)s</small><br>' \
-                  '<small><name>from</> %(user)s <name>/ added %(uploaded)s</><br>' \
-                  '<success>%(plays)s plays</> <name>/</> ' \
-                  '<warning>%(likes)s likes</> <name>/</> ' \
-                  '<info>%(comments)s comments</></small><br>' \
-                  '%(description)s') % \
-                     {
-                        'title': item['title'],
-                        'duration': seconds_to_duration(item['duration']),
-                        'user': item['uploader'],
-                        'uploaded': relative_date(item['uploaded']),
-                        'plays': item['viewCount'] if 'viewCount' in item else '0',
-                        'likes': item['likeCount'] if 'likeCount' in item else '0',
-                        'comments': item['commentCount'] if 'commentCount' in item else '0',
-                        'description': item['description'],
-                     }
-
+         views = int(item['viewCount']) if 'viewCount' in item else 0
+         likes = int(item['likeCount']) if 'likeCount' in item else 0
+         comments = int(item['commentCount']) if 'commentCount' in item else 0
+         info = '<title>%s</> <small>%s</><br>' \
+                '<small><name>%s</> %s <name>/ %s %s</><br>' \
+                '<success>%d %s</> <name>/</> ' \
+                '<warning>%d %s</> <name>/</> ' \
+                '<info>%d %s</></small><br>%s' % (
+                  item['title'], seconds_to_duration(item['duration']),
+                  _('user'), item['uploader'],
+                  _('uploaded'), relative_date(item['uploaded']),
+                  views, ngettext('view', 'views', views),
+                  likes, ngettext('like', 'likes', likes),
+                  comments, ngettext('comment', 'comments', comments),
+                  item['description'])
          item_add(ST_PLAY, title, url, info=info, icon=None, poster=poster)
 
       except:

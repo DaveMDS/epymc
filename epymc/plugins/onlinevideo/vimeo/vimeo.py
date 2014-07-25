@@ -61,22 +61,21 @@ def video_item_add(video):
       poster = [ p['link'] for p in video['pictures']['sizes'] if p['width'] == 640 ][0]
    except:
       poster = None
-   info = _('<title>%(title)s</title> <small>%(duration)s</small><br>' \
-            '<small><name>from</> %(user)s <name>/ added %(uploaded)s</><br>' \
-            '<success>%(plays)s plays</> <name>/</> ' \
-            '<warning>%(likes)s likes</> <name>/</> ' \
-            '<info>%(comments)s comments</></small><br>' \
-            '%(description)s') % \
-               {
-                  'title': video['name'],
-                  'duration': seconds_to_duration(video['duration']),
-                  'user': video['user']['name'],
-                  'uploaded': relative_date(video['created_time']),
-                  'plays': video['stats']['plays'] or 0,
-                  'likes': video['metadata']['connections']['likes']['total'],
-                  'comments': video['metadata']['connections']['comments']['total'],
-                  'description': video['description'] or '',
-               }
+   views = video['stats']['plays'] or 0
+   likes = video['metadata']['connections']['likes']['total'] or 0
+   comments = video['metadata']['connections']['comments']['total'] or 0
+   info = '<title>%s</> <small>%s</small><br>' \
+          '<small><name>%s</> %s <name>/ %s %s</><br>' \
+          '<success>%s %s</> <name>/</> ' \
+          '<warning>%s %s</> <name>/</> ' \
+          '<info>%s %s</></small><br>%s' % (
+            video['name'], seconds_to_duration(video['duration']),
+            _('user'), video['user']['name'],
+            _('uploaded'), relative_date(video['created_time']),
+            views, ngettext('view', 'views', views),
+            likes, ngettext('like', 'likes', likes),
+            comments, ngettext('comment', 'comments', comments),
+            video['description'] or '')
    item_add(ST_PLAY, video['name'], video['link'], icon=icon_videos,
                      poster=poster, info=info)
 
@@ -86,21 +85,21 @@ def channel_item_add(channel):
       poster = [ p['link'] for p in channel['pictures']['sizes'] if p['width'] == 640 ][0]
    except:
       poster = None
-   info = _('<title>%(name)s</title><br>' \
-            '<small><name>from</name> %(user)s <name>/ %(created)s</name><br>' \
-            '<name>updated</name> %(modified)s<br>' \
-            '<success>%(videos)s videos</success> <name>/</> ' \
-            '<info>%(users)s followers</info></small><br>' \
-            '%(description)s') % \
-               {
-                  'name': channel['name'],
-                  'user': channel['user']['name'],
-                  'created': relative_date(channel['created_time']),
-                  'modified': relative_date(channel['modified_time']),
-                  'videos': channel['metadata']['connections']['videos']['total'],
-                  'users': channel['metadata']['connections']['users']['total'],
-                  'description': channel['description'] or '',
-               }
+
+   videos = channel['metadata']['connections']['videos']['total']
+   followers = channel['metadata']['connections']['users']['total']
+   info = '<title>%s</title><br>' \
+          '<small><name>%s</> %s <name>/ %s %s</><br>' \
+          '<name>%s</> %s<br>' \
+          '<success>%d %s</success> <name>/</> ' \
+          '<info>%d %s</info></small><br>%s' % (
+            channel['name'],
+            _('user'), channel['user']['name'],
+            _('created'), relative_date(channel['created_time']),
+            _('updated'), relative_date(channel['modified_time']),
+            videos, ngettext('video', 'videos', videos),
+            followers, ngettext('follower', 'followers', followers),
+            channel['description'] or '')
    item_add(ST_VIDEO_LIST, channel['name'], url, icon=icon_channels,
                            poster=poster, info=info)
 
@@ -110,21 +109,19 @@ def group_item_add(group):
       poster = [ p['link'] for p in group['pictures']['sizes'] if p['width'] == 640 ][0]
    except:
       poster = None
-   info = _('<title>%(name)s</title><br>' \
-            '<small><name>from</name> %(user)s <name>/ %(created)s</name><br>' \
-            '<name>updated</name> %(modified)s<br>' \
-            '<success>%(videos)s videos</success> <name>/</name> '
-            '<info> %(users)s followers</info></small><br>' \
-            '%(description)s') % \
-               {
-                  'name': group['name'],
-                  'user': group['user']['name'],
-                  'created': relative_date(group['created_time']),
-                  'modified': relative_date(group['modified_time']),
-                  'videos': group['metadata']['connections']['videos']['total'],
-                  'users': group['metadata']['connections']['users']['users'],
-                  'description': group['description'] or '',
-               }
+   videos = group['metadata']['connections']['videos']['total'] or 0
+   followers = group['metadata']['connections']['users']['users'] or 0
+   info = '<title>%s</><br>' \
+          '<small><name>%s</> %s <name>/ %s %s</><br>' \
+          '<name>%s</> %s<br>' \
+          '<success>%d %s</> <name>/</> <info>%d %s</></small><br>%s' % (
+            group['name'],
+            _('utente'), group['user']['name'],
+            _('created'), relative_date(group['created_time']),
+            _('updated'), relative_date(group['modified_time']),
+            videos, ngettext('video', 'videos', videos),
+            followers, ngettext('follower', 'followers', followers),
+            group['description'] or '')
    item_add(ST_VIDEO_LIST, group['name'], url, icon=icon_groups,
                            poster=poster, info=info)
 
@@ -134,16 +131,13 @@ def user_item_add(user):
       poster = [ p['link'] for p in user['pictures']['sizes'] if p['width'] == 300 ][0]
    except:
       poster = None
-   info = _('<title>%(name)s</title><br>' \
-            '<small><name>joined</name> %(created)s<br>' \
-            '<name>location</name> %(location)s</small><br>' \
-            '%(bio)s') % \
-               {
-                  'name': user['name'],
-                  'created': relative_date(user['created_time']),
-                  'location': user['location'],
-                  'bio': user['bio'] or ''
-               }
+   info = '<title>%s</><br>' \
+          '<small><name>%s</> %s<br>' \
+          '<name>%s</> %s</small><br>%s' % (
+            user['name'],
+            _('joined'), relative_date(user['created_time']),
+            _('location'), user['location'] or _('Unknown'),
+            user['bio'] or '')
    item_add(ST_VIDEO_LIST, user['name'], url, icon=icon_users,
                            poster=poster, info=info)
 

@@ -158,7 +158,7 @@ class SongItemClass(EmcItemClass):
          return poster
 
    def info_get(self, url, song):
-      text = '<hilight>' + song['title'] + '</><br>'
+      text = '<title>' + song['title'] + '</><br>'
       if 'artist' in song:
          text += _('<em>by</em> %s<br>') % song['artist']
       if 'album' in song:
@@ -204,7 +204,7 @@ class AlbumItemClass(EmcItemClass):
          return poster
 
    def info_get(self, url, album):
-      text = '<hilight>' + album['name'] + '</><br>'
+      text = '<title>' + album['name'] + '</><br>'
       text += _('<em>by</em> %s<br>') % album['artist']
       n = len(album['songs'])
       text += ngettext('%d song', '%d songs', n) % n
@@ -237,7 +237,7 @@ class ArtistItemClass(EmcItemClass):
       albums = ngettext('%d album', '%d albums', n) % n
       n = len(artist['songs'])
       songs = ngettext('%d song', '%d songs', n) % n
-      return '<hilight>%s</><br>%s, %s' % (artist['name'], albums, songs)
+      return '<title>%s</><br>%s, %s' % (artist['name'], albums, songs)
 
 
 class MusicModule(EmcModule):

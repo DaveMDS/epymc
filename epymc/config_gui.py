@@ -333,10 +333,10 @@ class ThemesItemClass(EmcItemClass):
          return 'icon/check_on'
 
    def info_get(self, url, theme_info):
-      return _('<title>%(name)s</><br>' \
-               '<hilight>Author: </>%(author)s<br>' \
-               '<hilight>Version: </>%(version)s<br>' \
-               '%(info)s') % (theme_info)
+      return '<title>%s</><br><name>%s:</> %s<br>' \
+             '<name>%s:</> %s<br>%s' % (
+               theme_info['name'], _('Author'), theme_info['author'],
+               _('Version'), theme_info['version'], theme_info['info'])
 
 def _themes_list():
    _browser.page_add('config://themes/', 'Themes', None, _themes_populate)

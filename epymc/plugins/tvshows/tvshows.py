@@ -242,10 +242,10 @@ class EpisodeItemClass(EmcItemClass):
          return get_tv_backdrop_filename(e['id'])
 
    def info_get(self, url, episode_data):
-      return _('<title>Episode %(episode_num)d: %(title)s</title><br>' \
-               '<hilight>First aired:</hilight> %(first_aired)s<br>'  \
-               '<hilight>Overview:</hilight> %(overview)s</><br>') \
-                  % (episode_data)
+      return '<title>%s %d: %s</><br><name>%s:</> %s<br>%s' % (
+               _('Episode'), episode_data['episode_num'], episode_data['title'],
+               _('First aired'), episode_data['first_aired'],
+               episode_data['overview'])
 
 
 class TvShowsModule(EmcModule):
@@ -463,24 +463,32 @@ class InfoPanel(EmcDialog):
    def update(self):
       if self._db_data:
          d = self._db_data
-         info = _('<hilight>Created by: </hilight> %(created_by)s <br>' \
-                  '<hilight>Network:</hilight> %(networks)s<br>' \
-                  '<hilight>First aired: </hilight> %(first_air_date)s <br>' \
-                  '<hilight>Last aired: </hilight> %(last_air_date)s <br>' \
-                  '<hilight>Seasons:</hilight> %(number_of_seasons)d<br>' \
-                  '<hilight>Episodes:</hilight> %(number_of_episodes)d<br>' \
-                  '<hilight>Genres:</hilight> %(genres)s<br>' \
-                  '<hilight>Runtime:</hilight> %(episode_run_time)s min.<br>' \
-                  '<hilight>Rating:</hilight> %(vote_average)s/10<br>' \
-                  '<hilight>Status:</hilight> %(status)s<br>' \
-                  '<br><hilight>Overview:</hilight><br>%(overview)s<br>') \
-                     % (self._db_data)
-   
-         info = info.replace('&', '&amp;')
+         info = '<name>%s:</> %s<br>' \
+                '<name>%s:</> %s<br>' \
+                '<name>%s:</> %s<br>' \
+                '<name>%s:</> %s<br>' \
+                '<name>%s:</> %d<br>' \
+                '<name>%s:</> %d<br>' \
+                '<name>%s:</> %s<br>' \
+                '<name>%s:</> %s min.<br>' \
+                '<name>%s:</> %s/10<br>' \
+                '<name>%s:</> %s<br>' \
+                '<br><name>%s:</><br>%s' % (
+                     _('Created by'), self._db_data['created_by'],
+                     _('Network'), self._db_data['networks'],
+                     _('First aired'), self._db_data['first_air_date'],
+                     _('Last aired'), self._db_data['last_air_date'],
+                     _('Seasons'), self._db_data['number_of_seasons'],
+                     _('Episodes'), self._db_data['number_of_episodes'],
+                     _('Genres'), self._db_data['genres'],
+                     _('Runtime'), self._db_data['episode_run_time'],
+                     _('Rating'), self._db_data['vote_average'],
+                     _('Status'), self._db_data['status'],
+                     _('Overview'), self._db_data['overview'])
          try:
             self._image.file = get_tv_poster_filename(self._db_data['id'])
          except: pass
-         self.text_set(info)
+         self.text_set(info.replace('&', '&amp;'))
       else:
          text = _('No info stored for this serie.<br>' \
                   'Please try the <i>refresh info</i> button.')

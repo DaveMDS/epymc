@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-24 21:41+0200\n"
-"PO-Revision-Date: 2014-07-24 21:45+0100\n"
+"POT-Creation-Date: 2014-07-25 23:09+0200\n"
+"PO-Revision-Date: 2014-07-25 23:07+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -27,19 +27,16 @@ msgid "please wait..."
 msgstr "Attendere..."
 
 #: epymc/themoviedb.py:550
-#, python-format
-msgid "<hilight>Birthday:</> %s<br>"
-msgstr "<hilight>Data di nascita:</> %s<br>"
+msgid "Birthday"
+msgstr "Data di nascita"
 
 #: epymc/themoviedb.py:552
-#, python-format
-msgid "<hilight>Deathday:</> %s<br>"
-msgstr "<hilight>Data di morte:</> %s<br>"
+msgid "Deathday"
+msgstr "Data di morte"
 
 #: epymc/themoviedb.py:554
-#, python-format
-msgid "<hilight>Place of birth:</> %s<br>"
-msgstr "<hilight>Luogo di nascita:</> %s<br>"
+msgid "Place of birth"
+msgstr "Luogo di nascita"
 
 #: epymc/themoviedb.py:561
 #, python-format
@@ -140,14 +137,13 @@ msgstr "Più piccola"
 msgid "Reset"
 msgstr "Reimposta"
 
-#: epymc/config_gui.py:336
-#, python-format
-msgid ""
-"<title>%(name)s</><br><hilight>Author: </>%(author)s<br><hilight>Version: </>"
-"%(version)s<br>%(info)s"
-msgstr ""
-"<title>%(name)s</><br><hilight>Autore: </>%(author)s<br><hilight>Versione: </"
-">%(version)s<br>%(info)s"
+#: epymc/config_gui.py:338 epymc/plugins/onlinevideo/onlinevideo.py:89
+msgid "Author"
+msgstr "Autore"
+
+#: epymc/config_gui.py:339 epymc/plugins/onlinevideo/onlinevideo.py:88
+msgid "Version"
+msgstr "Versione"
 
 #: epymc/mainmenu.py:45 epymc/gui.py:258
 msgid "Exit"
@@ -169,7 +165,8 @@ msgid "Enlightenment Media Center"
 msgstr "Enlightenment Media Center"
 
 #: epymc/gui.py:173 epymc/gui.py:175 epymc/gui.py:176
-#: epymc/plugins/movies/movies.py:161
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:139
+#: epymc/plugins/movies/movies.py:155
 msgid "Unknown"
 msgstr "Sconosciuto"
 
@@ -189,99 +186,99 @@ msgstr "Sospendi"
 msgid "Shutdown"
 msgstr "Spegni"
 
-#: epymc/gui.py:870
+#: epymc/gui.py:873
 msgid "Ok"
 msgstr "Ok"
 
-#: epymc/gui.py:874 epymc/gui.py:876
+#: epymc/gui.py:877 epymc/gui.py:879
 msgid "No"
 msgstr "No"
 
-#: epymc/gui.py:879 epymc/gui.py:881
+#: epymc/gui.py:882 epymc/gui.py:884
 msgid "Yes"
 msgstr "Sì"
 
-#: epymc/gui.py:1128
+#: epymc/gui.py:1131
 msgid "Source Selector"
 msgstr "Selettore fonti"
 
-#: epymc/gui.py:1133
+#: epymc/gui.py:1136
 msgid "Select"
 msgstr "Seleziona"
 
-#: epymc/gui.py:1134
+#: epymc/gui.py:1137
 msgid "Browse"
 msgstr "Naviga"
 
-#: epymc/gui.py:1142
+#: epymc/gui.py:1145
 msgid "Parent folder"
 msgstr "Cartella precedente"
 
-#: epymc/gui.py:1181
+#: epymc/gui.py:1184
 msgid "Sources Manager"
 msgstr "Gestore fonti"
 
-#: epymc/gui.py:1183
+#: epymc/gui.py:1186
 msgid "Done"
 msgstr "Fatto"
 
-#: epymc/gui.py:1185
+#: epymc/gui.py:1188
 msgid "Add"
 msgstr "Aggiungi"
 
-#: epymc/gui.py:1187
+#: epymc/gui.py:1190
 msgid "Remove"
 msgstr "Rimuovi"
 
-#: epymc/gui.py:1201
+#: epymc/gui.py:1204
 msgid "Choose a new source"
 msgstr "Seleziona una nuova fonte"
 
-#: epymc/gui.py:1348
+#: epymc/gui.py:1351
 msgid "Insert text"
 msgstr "Inserire il testo"
 
-#: epymc/gui.py:1371 epymc/gui.py:1440
+#: epymc/gui.py:1374 epymc/gui.py:1443
 msgid "UPPERCASE"
 msgstr "MAIUSCOLE"
 
-#: epymc/gui.py:1372
+#: epymc/gui.py:1375
 msgid "SPACE"
 msgstr "SPAZIO"
 
-#: epymc/gui.py:1373
+#: epymc/gui.py:1376
 msgid "ERASE"
 msgstr "CANCELLA"
 
-#: epymc/gui.py:1375
+#: epymc/gui.py:1378
 msgid "Dismiss"
 msgstr "Annulla"
 
-#: epymc/gui.py:1380
+#: epymc/gui.py:1383
 msgid "Accept"
 msgstr "Accetta"
 
-#: epymc/gui.py:1437
+#: epymc/gui.py:1440
 msgid "LOWERCASE"
 msgstr "MINUSCOLE"
 
-#: epymc/gui.py:1588
+#: epymc/gui.py:1591
 msgid "Download Manager"
 msgstr "Gestore Download"
 
-#: epymc/gui.py:1592
+#: epymc/gui.py:1595
 msgid "Start download"
 msgstr "Avvia download"
 
-#: epymc/gui.py:1593
+#: epymc/gui.py:1596
 msgid "Rename"
 msgstr "Rinomina"
 
-#: epymc/gui.py:1594
+#: epymc/gui.py:1597
 msgid "Change folder"
 msgstr "Cambia cartella"
 
-#: epymc/gui.py:1599
+#: epymc/gui.py:1602
 msgid ""
 "File will be downloaded in the folder:<br> <b>{}</b><br><br>File will be "
 "named as:<br> <b>{}</b><br><br>You can rename the file using the <i>Rename</"
@@ -292,33 +289,30 @@ msgstr ""
 "<i>Rinomina</i> o modificare la cartella di destinazione dalla "
 "configurazione generale."
 
-#: epymc/gui.py:1607
+#: epymc/gui.py:1610
 msgid "Rename download"
 msgstr "Rinomina file"
 
-#: epymc/gui.py:1615
+#: epymc/gui.py:1618
 msgid "Change destination folder"
 msgstr "Modifica cartella"
 
-#: epymc/gui.py:1630
+#: epymc/gui.py:1633
 #, python-format
 msgid "The file %s is in the download queue yet"
 msgstr "Il file %s è già in coda"
 
-#: epymc/gui.py:1664
-#, python-format
-msgid "Download started:<br>%s"
-msgstr "Download avviato:<br>%s"
+#: epymc/gui.py:1667
+msgid "Download started"
+msgstr "Download avviato"
 
-#: epymc/gui.py:1677
-#, python-format
-msgid "Download done:<br>%s"
-msgstr "Download completato:<br>%s"
+#: epymc/gui.py:1680 epymc/plugins/mame/mame.py:587
+msgid "Download completed"
+msgstr "Download completato"
 
 #: epymc/mediaplayer.py:98
-#, python-format
-msgid "<b>File not found:</b><br>%s"
-msgstr "<b>File non trovato:</b><br>%s"
+msgid "File not found"
+msgstr "File non trovato"
 
 #: epymc/mediaplayer.py:299
 msgid "buffering"
@@ -374,60 +368,51 @@ msgstr "Calibrazione dello schermo"
 msgid "Use this module to calibrate your screen parameters."
 msgstr "Usa questo modulo per aggiustare i settaggi del tuo schermo"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:87
-#, python-format
-msgid ""
-"<title>%(label)s</><br><hilight>Version:</> %(version)s<br><hilight>Author:</"
-"> %(author)s<br>%(info)s"
-msgstr ""
-"<title>%(label)s</><br><hilight>Versione:</> %(version)s<br><hilight>Autore:"
-"</> %(author)s<br>%(info)s"
-
-#: epymc/plugins/onlinevideo/onlinevideo.py:115
-#: epymc/plugins/onlinevideo/onlinevideo.py:139
-#: epymc/plugins/onlinevideo/onlinevideo.py:143
+#: epymc/plugins/onlinevideo/onlinevideo.py:114
+#: epymc/plugins/onlinevideo/onlinevideo.py:138
+#: epymc/plugins/onlinevideo/onlinevideo.py:142
 msgid "Online Channels"
 msgstr "Canali Online"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:117
+#: epymc/plugins/onlinevideo/onlinevideo.py:116
 msgid ""
 "Long info for the online channels module, explain what it does and what it \n"
 "need to work well, can also use markup like <title>this</> or <b>this</>"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:181
+#: epymc/plugins/onlinevideo/onlinevideo.py:180
 msgid "Channels"
 msgstr "Canali"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:223
+#: epymc/plugins/onlinevideo/onlinevideo.py:222
 msgid "Search query"
 msgstr "Ricerca"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:230
-#: epymc/plugins/onlinevideo/onlinevideo.py:239
+#: epymc/plugins/onlinevideo/onlinevideo.py:229
+#: epymc/plugins/onlinevideo/onlinevideo.py:238
 msgid "please wait"
 msgstr "Attendere"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:231
-#: epymc/plugins/onlinevideo/onlinevideo.py:240
+#: epymc/plugins/onlinevideo/onlinevideo.py:230
+#: epymc/plugins/onlinevideo/onlinevideo.py:239
 msgid "Getting info..."
 msgstr "Ottengo informazioni..."
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:275
+#: epymc/plugins/onlinevideo/onlinevideo.py:276
 msgid "Error reading channel"
 msgstr "Errore lettura canale"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:280
+#: epymc/plugins/onlinevideo/onlinevideo.py:281
 msgid "Suggestions"
 msgstr "Consigliati"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:48
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:156
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:150
 msgid "Search videos"
 msgstr "Cerca nei filmati"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:49
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:183
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:177
 msgid "Browse channels"
 msgstr "Sfoglia canali"
 
@@ -435,102 +420,122 @@ msgstr "Sfoglia canali"
 msgid "Top rated"
 msgstr "Più votati"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:70
-#, python-format
-msgid "<title>%s</title><br>%s channels"
-msgstr "<title>%s</title><br>%s canali"
+#: epymc/plugins/onlinevideo/youtube/youtube.py:72
+msgid "channel"
+msgid_plural "channels"
+msgstr[0] "canale"
+msgstr[1] "canali"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:144
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:64
-#, python-format
-msgid ""
-"<title>%(title)s</title> <small>%(duration)s</small><br><small><name>from</> "
-"%(user)s <name>/ added %(uploaded)s</><br><success>%(plays)s plays</> <name>/"
-"</> <warning>%(likes)s likes</> <name>/</> <info>%(comments)s comments</></"
-"small><br>%(description)s"
-msgstr ""
-"<title>%(title)s</title> <small>%(duration)s</small><br><small><name>utente</"
-"> %(user)s <name>/ aggiunto %(uploaded)s</><br><success>%(plays)s plays</> "
-"<name>/</> <warning>%(likes)s likes</> <name>/</> <info>%(comments)s "
-"commenti</></small><br>%(description)s"
+#: epymc/plugins/onlinevideo/youtube/youtube.py:151
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:73
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:97
+msgid "user"
+msgstr "utente"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:175
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:202
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:220
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:238
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:255
+#: epymc/plugins/onlinevideo/youtube/youtube.py:152
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:74
+msgid "uploaded"
+msgstr "caricato"
+
+#: epymc/plugins/onlinevideo/youtube/youtube.py:153
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:75
+msgid "view"
+msgid_plural "views"
+msgstr[0] "vista"
+msgstr[1] "viste"
+
+#: epymc/plugins/onlinevideo/youtube/youtube.py:154
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:76
+msgid "like"
+msgid_plural "likes"
+msgstr[0] "mi piace"
+msgstr[1] "mi piace"
+
+#: epymc/plugins/onlinevideo/youtube/youtube.py:155
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:77
+msgid "comment"
+msgid_plural "comments"
+msgstr[0] "commento"
+msgstr[1] "commenti"
+
+#: epymc/plugins/onlinevideo/youtube/youtube.py:171
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:196
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:214
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:232
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:249
 #, python-format
 msgid "Load more results (%d in total)"
 msgstr "Carica altri risultati (%d in totale)"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:89
-#, python-format
-msgid ""
-"<title>%(name)s</title><br><small><name>from</name> %(user)s <name>/ "
-"%(created)s</name><br><name>updated</name> %(modified)s<br><success>"
-"%(videos)s videos</success> <name>/</> <info>%(users)s followers</info></"
-"small><br>%(description)s"
-msgstr ""
-"<title>%(name)s</title><br><small><name>utente</name> %(user)s <name>/ "
-"%(created)s</name><br><name>aggiornato</name> %(modified)s<br><success>"
-"%(videos)s video</success> <name>/</> <info>%(users)s followers</info></"
-"small><br>%(description)s"
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:98
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:120
+msgid "created"
+msgstr "creato"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:113
-#, python-format
-msgid ""
-"<title>%(name)s</title><br><small><name>from</name> %(user)s <name>/ "
-"%(created)s</name><br><name>updated</name> %(modified)s<br><success>"
-"%(videos)s videos</success> <name>/</name> <info> %(users)s followers</"
-"info></small><br>%(description)s"
-msgstr ""
-"<title>%(name)s</title><br><small><name>utente</name> %(user)s <name>/ "
-"%(created)s</name><br><name>aggiornato</name> %(modified)s<br><success>"
-"%(videos)s video</success> <name>/</name> <info> %(users)s followers</info></"
-"small><br>%(description)s"
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:99
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:121
+msgid "updated"
+msgstr "aggiornato"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:137
-#, python-format
-msgid ""
-"<title>%(name)s</title><br><small><name>joined</name> "
-"%(created)s<br><name>location</name> %(location)s</small><br>%(bio)s"
-msgstr ""
-"<title>%(name)s</title><br><small><name>iscritto</name> "
-"%(created)s<br><name>luogo</name> %(location)s</small><br>%(bio)s"
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:100
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:122
+msgid "video"
+msgid_plural "videos"
+msgstr[0] "filmato"
+msgstr[1] "filmati"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:157
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:101
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:123
+msgid "follower"
+msgid_plural "followers"
+msgstr[0] "iscritto"
+msgstr[1] "iscritti"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:119
+msgid "utente"
+msgstr "utente"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:138
+msgid "joined"
+msgstr "iscritto"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:139
+msgid "location"
+msgstr "luogo"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:151
 msgid "Search channels"
 msgstr "Cerca nei canali"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:158
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:152
 msgid "Search groups"
 msgstr "Cerca nei gruppi"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:159
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:153
 msgid "Search people"
 msgstr "Cerca negli utenti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:163
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:157
 msgid "More relevant videos"
 msgstr "Video più rilevanti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:169
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:163
 msgid "More followed channels"
 msgstr "Canali più seguiti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:174
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:168
 msgid "More followed groups"
 msgstr "Gruppi più seguiti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:182
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:176
 msgid "Browse videos"
 msgstr "Sfoglia filmati"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:184
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:178
 msgid "Browse groups"
 msgstr "Sfoglia gruppi"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:185
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:179
 msgid "Browse users"
 msgstr "Sfoglia utenti"
 
@@ -606,57 +611,68 @@ msgstr ""
 "Il file delle categorie non è incluso con mame, dovete scaricarne una copia "
 "dalla rete.<br> Il file deve trovarsi in %s"
 
-#: epymc/plugins/mame/mame.py:370
-#, python-format
-msgid ""
-"<title>%(name)s</><br><hilight>Year:</> %(year)s<br><hilight>Manufacturer:</"
-"> %(manufacturer)s<br><hilight>Players:</> %(players)s<br><hilight>Buttons:</"
-"> %(buttons)s<br>"
-msgstr ""
-"<title>%(name)s</><br><hilight>Anno:</> %(year)s<br><hilight>Produttore:</> "
-"%(manufacturer)s<br><hilight>Giocatori:</> %(players)s<br><hilight>Pulsanti:"
-"</> %(buttons)s<br>"
+#: epymc/plugins/mame/mame.py:376 epymc/plugins/mame/mame.py:411
+#: epymc/plugins/movies/movies.py:155
+msgid "Year"
+msgstr "Anno"
 
-#: epymc/plugins/mame/mame.py:403
-#, python-format
-msgid ""
-"<hilight>Year:</> %(year)s<br><hilight>Manufacturer:</> "
-"%(manufacturer)s<br><hilight>Players:</> %(players)s<br><hilight>Buttons:</> "
-"%(buttons)s<br><hilight>Savestate:</> "
-"%(driver_savestate)s<br><hilight>Driver status:</> %(driver_status)s<br>   "
-"<hilight>emulation:</> %(driver_emulation)s<br>   <hilight>color:</> "
-"%(driver_color)s<br>   <hilight>sound:</> %(driver_sound)s<br>   "
-"<hilight>graphic:</> %(driver_graphic)s<br>"
-msgstr ""
-"<hilight>Anno:</> %(year)s<br><hilight>Produttore:</> "
-"%(manufacturer)s<br><hilight>Giocatori:</> %(players)s<br><hilight>Pulsanti:"
-"</> %(buttons)s<br><hilight>Salvataggio:</> "
-"%(driver_savestate)s<br><hilight>Stato del driver:</> "
-"%(driver_status)s<br>   <hilight>emulazione:</> %(driver_emulation)s<br>   "
-"<hilight>colore:</> %(driver_color)s<br>   <hilight>suono:</> "
-"%(driver_sound)s<br>   <hilight>grafica:</> %(driver_graphic)s<br>"
+#: epymc/plugins/mame/mame.py:377 epymc/plugins/mame/mame.py:412
+msgid "Manufacturer"
+msgstr "Produttore"
 
-#: epymc/plugins/mame/mame.py:428 epymc/plugins/movies/movies.py:385
+#: epymc/plugins/mame/mame.py:378 epymc/plugins/mame/mame.py:413
+msgid "Players"
+msgstr "Giocatori"
+
+#: epymc/plugins/mame/mame.py:379 epymc/plugins/mame/mame.py:414
+msgid "Buttons"
+msgstr "Pulsanti"
+
+#: epymc/plugins/mame/mame.py:415
+msgid "Save state"
+msgstr "Salvataggio stato"
+
+#: epymc/plugins/mame/mame.py:416
+msgid "Driver status"
+msgstr "Stato del driver"
+
+#: epymc/plugins/mame/mame.py:417
+msgid "Emulation"
+msgstr "Emulazione"
+
+#: epymc/plugins/mame/mame.py:418
+msgid "Color"
+msgstr "Colore"
+
+#: epymc/plugins/mame/mame.py:419
+msgid "Sound"
+msgstr "Suono"
+
+#: epymc/plugins/mame/mame.py:420
+msgid "Graphic"
+msgstr "Grafica"
+
+#: epymc/plugins/mame/mame.py:424 epymc/plugins/movies/movies.py:377
 msgid "Play"
 msgstr "Play"
 
-#: epymc/plugins/mame/mame.py:430
+#: epymc/plugins/mame/mame.py:426
 msgid "Download"
 msgstr "Scarica"
 
-#: epymc/plugins/mame/mame.py:437
+#: epymc/plugins/mame/mame.py:433
 msgid "History"
 msgstr "Storia"
 
-#: epymc/plugins/mame/mame.py:440
+#: epymc/plugins/mame/mame.py:436
 msgid "Delete"
 msgstr "Elimina"
 
-#: epymc/plugins/mame/mame.py:460
+#: epymc/plugins/mame/mame.py:456
 msgid "No History file found"
 msgstr "File history non trovato"
 
-#: epymc/plugins/mame/mame.py:461
+#: epymc/plugins/mame/mame.py:457
 #, python-format
 msgid ""
 "The History file is not included in mame, you should download a copy from "
@@ -665,49 +681,45 @@ msgstr ""
 "Il file history non è incluso con mame, dovete scaricarne una copia dal sito "
 "arcade-history.com<br>Il file deve essere scompresso e messo in %s"
 
-#: epymc/plugins/mame/mame.py:501
+#: epymc/plugins/mame/mame.py:497
 msgid "Game not found in history file"
 msgstr "Gioco non trovato nel file history"
 
-#: epymc/plugins/mame/mame.py:512
+#: epymc/plugins/mame/mame.py:508
 msgid "Really delete this game?"
 msgstr "Cancello il gioco?"
 
-#: epymc/plugins/mame/mame.py:524
+#: epymc/plugins/mame/mame.py:520
 msgid "Game deleted"
 msgstr "Gioco eliminato"
 
-#: epymc/plugins/mame/mame.py:527
+#: epymc/plugins/mame/mame.py:523
 msgid "Can not delete game"
 msgstr "Non posso eliminare il gioco"
 
-#: epymc/plugins/mame/mame.py:537
+#: epymc/plugins/mame/mame.py:533
 msgid "Error, can not find a writable rom directory"
 msgstr "Errore, non trovo una cartella scrivibile per le rom"
 
-#: epymc/plugins/mame/mame.py:538
+#: epymc/plugins/mame/mame.py:534
 msgid "You sould check your mame configuration"
 msgstr "Dovresti controllare la tua configurazione del mame"
 
-#: epymc/plugins/mame/mame.py:546
+#: epymc/plugins/mame/mame.py:542
 msgid "Game download"
 msgstr "Scarica gioco"
 
-#: epymc/plugins/mame/mame.py:548
+#: epymc/plugins/mame/mame.py:544
 msgid "Close"
 msgstr "Chiudi"
 
-#: epymc/plugins/mame/mame.py:553
+#: epymc/plugins/mame/mame.py:549
 msgid "Trying at freeroms.org...<br>"
 msgstr "Provo da freeroms.org...<br>"
 
-#: epymc/plugins/mame/mame.py:583 epymc/plugins/mame/mame.py:596
-msgid "<b>Can not find the game online.</b>"
-msgstr "<b>Non ho trovato il gioco online.</b>"
-
-#: epymc/plugins/mame/mame.py:591
-msgid "<b>Download done :)</b>"
-msgstr "<b>Download completato :)</b>"
+#: epymc/plugins/mame/mame.py:579 epymc/plugins/mame/mame.py:592
+msgid "Can not find the game online."
+msgstr "Non ho trovato il gioco in rete."
 
 #: epymc/plugins/input_joy/joy.py:43
 msgid "Input - Joystick"
@@ -804,77 +816,74 @@ msgstr "Gestisci fonti"
 msgid "Rescan library"
 msgstr "Aggiorna libreria"
 
-#: epymc/plugins/movies/movies.py:139
-#, python-format
-msgid ""
-"<title>%(title)s (%(country)s %(year)s)</><br><hilight>Rating:</> "
-"%(rating)s/10<br><hilight>Director:</> %(director)s<br><hilight>Cast:</> "
-"%(casts)s<br>"
-msgstr ""
-"<title>%(title)s (%(country)s %(year)s)</><br><hilight>Voto:</> "
-"%(rating)s/10<br><hilight>Regia:</> %(director)s<br><hilight>Attori:</> "
-"%(casts)s<br>"
+#: epymc/plugins/movies/movies.py:144 epymc/plugins/movies/movies.py:401
+#: epymc/plugins/tvshows/tvshows.py:485
+msgid "Rating"
+msgstr "Valutazione"
 
-#: epymc/plugins/movies/movies.py:153
-#, python-format
-msgid ""
-"<title>%(fname)s</><br><hilight>Size:</> %(fsize)s<br><hilight>Name:</> "
-"%(name)s<br><hilight>Year:</> %(year)s<br>"
-msgstr ""
-"<title>%(fname)s</><br><hilight>Dimensione:</> %(fsize)s<br><hilight>Nome:</"
-"> %(name)s<br><hilight>Anno:</> %(year)s<br>"
+#: epymc/plugins/movies/movies.py:145 epymc/plugins/movies/movies.py:397
+msgid "Director"
+msgstr "Regia"
 
-#: epymc/plugins/movies/movies.py:181 epymc/plugins/movies/movies.py:227
-#: epymc/plugins/movies/movies.py:235 epymc/plugins/movies/movies.py:313
+#: epymc/plugins/movies/movies.py:146 epymc/plugins/movies/movies.py:379
+#: epymc/plugins/movies/movies.py:398 epymc/plugins/movies/movies.py:456
+#: epymc/plugins/tvshows/tvshows.py:459 epymc/plugins/tvshows/tvshows.py:548
+msgid "Cast"
+msgstr "Attori"
+
+#: epymc/plugins/movies/movies.py:152
+msgid "File size"
+msgstr "Dimensione file"
+
+#: epymc/plugins/movies/movies.py:154
+msgid "Title"
+msgstr "Titolo"
+
+#: epymc/plugins/movies/movies.py:173 epymc/plugins/movies/movies.py:219
+#: epymc/plugins/movies/movies.py:227 epymc/plugins/movies/movies.py:305
 msgid "Movies"
 msgstr "Film"
 
-#: epymc/plugins/movies/movies.py:183
+#: epymc/plugins/movies/movies.py:175
 msgid ""
 "Long info for the movies module, explain what it does and what it\n"
 "need to work well, can also use markup like <title>this</> or <b>this</>"
 msgstr ""
 
-#: epymc/plugins/movies/movies.py:231
+#: epymc/plugins/movies/movies.py:223
 msgid "Movie Collection"
 msgstr "Collezione dei film"
 
-#: epymc/plugins/movies/movies.py:272 epymc/plugins/tvshows/tvshows.py:335
+#: epymc/plugins/movies/movies.py:264 epymc/plugins/tvshows/tvshows.py:335
 #, python-format
 msgid "Continue from %s ?"
 msgstr "Riprendo la riproduzione da %s ?"
 
-#: epymc/plugins/movies/movies.py:387 epymc/plugins/movies/movies.py:447
-#: epymc/plugins/tvshows/tvshows.py:459 epymc/plugins/tvshows/tvshows.py:540
-msgid "Cast"
-msgstr "Attori"
-
-#: epymc/plugins/movies/movies.py:388 epymc/plugins/tvshows/tvshows.py:457
+#: epymc/plugins/movies/movies.py:380 epymc/plugins/tvshows/tvshows.py:457
 msgid "Posters"
 msgstr "Locandine"
 
-#: epymc/plugins/movies/movies.py:389 epymc/plugins/tvshows/tvshows.py:458
+#: epymc/plugins/movies/movies.py:381 epymc/plugins/tvshows/tvshows.py:458
 msgid "Backdrops"
 msgstr "Sfondi"
 
-#: epymc/plugins/movies/movies.py:390
+#: epymc/plugins/movies/movies.py:382
 msgid "Search Info"
 msgstr "Cerca informazioni"
 
 #: epymc/plugins/movies/movies.py:399
-#, python-format
-msgid ""
-"<hilight>Director: </hilight> %(director)s <br><hilight>Cast: </hilight> "
-"%(casts)s <br><hilight>Released: </hilight> %(release_date)s "
-"<br><hilight>Country: </hilight> %(country)s <br><hilight>Rating: </hilight> "
-"%(rating)s/10 <br><br><hilight>Overview:</hilight> %(overview)s"
-msgstr ""
-"<hilight>Regia: </hilight> %(director)s <br><hilight>Attori: </hilight> "
-"%(casts)s <br><hilight>Pubblicato: </hilight> %(release_date)s "
-"<br><hilight>Nazione: </hilight> %(country)s <br><hilight>Voto: </hilight> "
-"%(rating)s/10 <br><br><hilight>Trama:</hilight> %(overview)s"
+msgid "Released"
+msgstr "Pubblicato"
 
-#: epymc/plugins/movies/movies.py:428
+#: epymc/plugins/movies/movies.py:400
+msgid "Country"
+msgstr "Nazione"
+
+#: epymc/plugins/movies/movies.py:402 epymc/plugins/tvshows/tvshows.py:487
+msgid "Overview"
+msgstr "Trama"
+
+#: epymc/plugins/movies/movies.py:437
 #, python-format
 msgid ""
 "Media:<br>%s<br><br>No info stored for this media<br>Try the Search info "
@@ -883,81 +892,81 @@ msgstr ""
 "Media:<br>%s<br><br>Nessuna informazione disponibile<br>Prova a premere il "
 "bottone <i>Cerca Informazioni</i>..."
 
-#: epymc/plugins/movies/movies.py:449 epymc/plugins/tvshows/tvshows.py:542
+#: epymc/plugins/movies/movies.py:458 epymc/plugins/tvshows/tvshows.py:550
 msgid "Info"
 msgstr "Informazioni"
 
-#: epymc/plugins/movies/movies.py:452 epymc/plugins/tvshows/tvshows.py:545
+#: epymc/plugins/movies/movies.py:461 epymc/plugins/tvshows/tvshows.py:553
 #, python-format
 msgid "%(name)s as %(character)s"
 msgstr "%(name)s nel ruolo di %(character)s"
 
-#: epymc/plugins/movies/movies.py:471 epymc/plugins/tvshows/tvshows.py:495
+#: epymc/plugins/movies/movies.py:480 epymc/plugins/tvshows/tvshows.py:503
 #, python-format
 msgid "%d posters available"
 msgstr "%d locandine disponibili"
 
-#: epymc/plugins/movies/movies.py:489 epymc/plugins/movies/movies.py:532
-#: epymc/plugins/tvshows/tvshows.py:519
+#: epymc/plugins/movies/movies.py:498 epymc/plugins/movies/movies.py:541
+#: epymc/plugins/tvshows/tvshows.py:527
 msgid "Downloading image"
 msgstr "Scaricamento immagine"
 
-#: epymc/plugins/movies/movies.py:513 epymc/plugins/tvshows/tvshows.py:509
+#: epymc/plugins/movies/movies.py:522 epymc/plugins/tvshows/tvshows.py:517
 #, python-format
 msgid "%d backdrops available"
 msgstr "%d sfondi disponibili"
 
-#: epymc/plugins/movies/movies.py:544
+#: epymc/plugins/movies/movies.py:553
 msgid "Searching for"
 msgstr "Ricerca di"
 
-#: epymc/plugins/movies/movies.py:553
+#: epymc/plugins/movies/movies.py:562
 msgid "Change name"
 msgstr "Cambia nome"
 
-#: epymc/plugins/movies/movies.py:562
-msgid "<br>nothing found, please try with a better name"
-msgstr "<br>nessun film trovato, prova con un nome migliore"
+#: epymc/plugins/movies/movies.py:571
+msgid "nothing found, please try with a better name"
+msgstr "nessun film trovato, prova con un nome migliore"
 
-#: epymc/plugins/movies/movies.py:566 epymc/plugins/movies/movies.py:591
-msgid "<b>Downloading movie info...</b>"
-msgstr "<b>Scaricamento informazioni...</b>"
+#: epymc/plugins/movies/movies.py:575 epymc/plugins/movies/movies.py:600
+msgid "Downloading movie info..."
+msgstr "Scaricamento informazioni film..."
 
-#: epymc/plugins/movies/movies.py:568
+#: epymc/plugins/movies/movies.py:577
 #, python-format
 msgid "<b>Found %d results</b><br>"
 msgstr "<b>Trovati %d risultati</b><br>"
 
-#: epymc/plugins/movies/movies.py:569 epymc/plugins/tvshows/tvshows.py:564
+#: epymc/plugins/movies/movies.py:578 epymc/plugins/tvshows/tvshows.py:572
 #, python-format
 msgid "Found %d results, which one?"
 msgstr "Trovati %d risultati, quale scelgo?"
 
-#: epymc/plugins/movies/movies.py:641
+#: epymc/plugins/movies/movies.py:650
 msgid "Movies scanner started"
 msgstr "Scansione dei film avviata"
 
-#: epymc/plugins/movies/movies.py:647
+#: epymc/plugins/movies/movies.py:656
 msgid "Movies scanner done"
 msgstr "Scansione dei film completata"
 
-#: epymc/plugins/movies/movies.py:692
+#: epymc/plugins/movies/movies.py:701
 msgid "Found movie"
 msgstr "Trovato film"
 
-#: epymc/plugins/movies/movies.py:740
+#: epymc/plugins/movies/movies.py:749
 msgid "Movies Collection"
 msgstr "Collezione dei film"
 
-#: epymc/plugins/movies/movies.py:745 epymc/plugins/tvshows/tvshows.py:662
+#: epymc/plugins/movies/movies.py:754 epymc/plugins/tvshows/tvshows.py:670
 msgid "Preferred language for contents"
 msgstr "Lingua preferita per i contenuti"
 
-#: epymc/plugins/movies/movies.py:748
+#: epymc/plugins/movies/movies.py:757
 msgid "Enable background scanner"
 msgstr "Abilita scansione in sottofondo"
 
-#: epymc/plugins/movies/movies.py:751
+#: epymc/plugins/movies/movies.py:760
 msgid "Prefer movie titles in lists"
 msgstr "Usa titoli dei film nelle liste"
 
@@ -1116,18 +1125,17 @@ msgstr "<hilight>%s</><br>accodato"
 msgid "Serie info"
 msgstr "Informazioni serie"
 
-#: epymc/plugins/tvshows/tvshows.py:245
-#, python-format
-msgid ""
-"<title>Episode %(episode_num)d: %(title)s</title><br><hilight>First aired:</"
-"hilight> %(first_aired)s<br><hilight>Overview:</hilight> %(overview)s</><br>"
-msgstr ""
-"<title>Episodio %(episode_num)d: %(title)s</title><br><hilight>Messa in onda:"
-"</hilight> %(first_aired)s<br><hilight>Trama:</hilight> %(overview)s</><br>"
+#: epymc/plugins/tvshows/tvshows.py:246
+msgid "Episode"
+msgstr "Episodio"
+
+#: epymc/plugins/tvshows/tvshows.py:247 epymc/plugins/tvshows/tvshows.py:479
+msgid "First aired"
+msgstr "Prima messa in onda"
 
 #: epymc/plugins/tvshows/tvshows.py:253 epymc/plugins/tvshows/tvshows.py:289
 #: epymc/plugins/tvshows/tvshows.py:296 epymc/plugins/tvshows/tvshows.py:375
-#: epymc/plugins/tvshows/tvshows.py:658
+#: epymc/plugins/tvshows/tvshows.py:666
 msgid "TV Shows"
 msgstr "Serie TV"
 
@@ -1145,35 +1153,46 @@ msgstr "Collezione delle serie TV"
 msgid "Refresh info"
 msgstr "Aggiorna informazioni"
 
-#: epymc/plugins/tvshows/tvshows.py:466
-#, python-format
-msgid ""
-"<hilight>Created by: </hilight> %(created_by)s <br><hilight>Network:</"
-"hilight> %(networks)s<br><hilight>First aired: </hilight> %(first_air_date)s "
-"<br><hilight>Last aired: </hilight> %(last_air_date)s <br><hilight>Seasons:</"
-"hilight> %(number_of_seasons)d<br><hilight>Episodes:</hilight> "
-"%(number_of_episodes)d<br><hilight>Genres:</hilight> "
-"%(genres)s<br><hilight>Runtime:</hilight> %(episode_run_time)s min."
-"<br><hilight>Rating:</hilight> %(vote_average)s/10<br><hilight>Status:</"
-"hilight> %(status)s<br><br><hilight>Overview:</hilight><br>%(overview)s<br>"
-msgstr ""
-"<hilight>Ideatore: </hilight> %(created_by)s <br><hilight>Rete:</hilight> "
-"%(networks)s<br><hilight>Prima messa in onda: </hilight> %(first_air_date)s "
-"<br><hilight>Ultima messa in onda: </hilight> %(last_air_date)s "
-"<br><hilight>Stagioni:</hilight> %(number_of_seasons)d<br><hilight>Episodi:</"
-"hilight> %(number_of_episodes)d<br><hilight>Generi:</hilight> "
-"%(genres)s<br><hilight>Durata episodi:</hilight> %(episode_run_time)s min."
-"<br><hilight>Voto:</hilight> %(vote_average)s/10<br><hilight>Stato:</"
-"hilight> %(status)s<br><br><hilight>Trama:</hilight><br>%(overview)s<br>"
+#: epymc/plugins/tvshows/tvshows.py:477
+msgid "Created by"
+msgstr "Ideatore"
 
-#: epymc/plugins/tvshows/tvshows.py:485
+#: epymc/plugins/tvshows/tvshows.py:478
+msgid "Network"
+msgstr "Rete"
+
+#: epymc/plugins/tvshows/tvshows.py:480
+msgid "Last aired"
+msgstr "Ultima messa in onda"
+
+#: epymc/plugins/tvshows/tvshows.py:481
+msgid "Seasons"
+msgstr "Stagioni"
+
+#: epymc/plugins/tvshows/tvshows.py:482
+msgid "Episodes"
+msgstr "Episodi"
+
+#: epymc/plugins/tvshows/tvshows.py:483
+msgid "Genres"
+msgstr "Generi"
+
+#: epymc/plugins/tvshows/tvshows.py:484
+msgid "Runtime"
+msgstr "Durata episodi"
+
+#: epymc/plugins/tvshows/tvshows.py:486
+msgid "Status"
+msgstr "Stato"
+
+#: epymc/plugins/tvshows/tvshows.py:493
 msgid ""
 "No info stored for this serie.<br>Please try the <i>refresh info</i> button."
 msgstr ""
 "Nessuna informazione per questa serie.<br>Prova a premere il bottone "
 "<i>Aggiorna informazioni</i>."
 
-#: epymc/plugins/tvshows/tvshows.py:579
+#: epymc/plugins/tvshows/tvshows.py:587
 #, python-format
 msgid ""
 "The search for \"%s\" did not make any results.<br>If your show is listed on "
@@ -1186,37 +1205,37 @@ msgstr ""
 "trovato sul sito.<br>Invece, se la serie non è presente online, siete "
 "pregati di contribuire e aggiungerla da voi."
 
-#: epymc/plugins/tvshows/tvshows.py:584
+#: epymc/plugins/tvshows/tvshows.py:592
 msgid "Nothing found"
 msgstr "Nessun risultato trovato"
 
-#: epymc/plugins/tvshows/tvshows.py:593
+#: epymc/plugins/tvshows/tvshows.py:601
 msgid "Fetching updated info"
 msgstr "Scarico informazioni aggiornate"
 
-#: epymc/plugins/tvshows/tvshows.py:699
+#: epymc/plugins/tvshows/tvshows.py:707
 msgid "TvShows scanner started"
 msgstr "Scansione delle serie avviata"
 
-#: epymc/plugins/tvshows/tvshows.py:729
+#: epymc/plugins/tvshows/tvshows.py:737
 msgid "TvShows scanner done"
 msgstr "Scansioen delle serie completata"
 
-#: epymc/plugins/tvshows/tvshows.py:769
+#: epymc/plugins/tvshows/tvshows.py:777
 #, python-format
 msgid "%d season"
 msgid_plural "%d seasons"
 msgstr[0] "%d stagione"
 msgstr[1] "%d stagioni"
 
-#: epymc/plugins/tvshows/tvshows.py:771
+#: epymc/plugins/tvshows/tvshows.py:779
 #, python-format
 msgid "%d episode"
 msgid_plural "%d episodes"
 msgstr[0] "%d episodio"
 msgstr[1] "%d episodi"
 
-#: epymc/plugins/tvshows/tvshows.py:773
+#: epymc/plugins/tvshows/tvshows.py:781
 msgid "Found serie:"
 msgstr "Trovata serie:"
 
@@ -1261,3 +1280,4 @@ msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "%d minuto fa"
 msgstr[1] "%d minuti fa"
+

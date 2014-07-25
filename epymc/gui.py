@@ -1664,7 +1664,7 @@ class DownloadManager(utils.Singleton):
       self.handlers[url] = handler
 
       # notify
-      text = _('Download started:<br>%s') % os.path.basename(dest)
+      text = '%s:<br>%s' % (_('Download started'), os.path.basename(dest))
       EmcNotify(text, icon='icon/download')
 
    # def _progress_cb(self, dest, dltotal, dlnow, myurl):
@@ -1677,7 +1677,7 @@ class DownloadManager(utils.Singleton):
       os.rename(dest, real_dest) 
 
       # notify
-      text = _('Download done:<br>%s') % os.path.basename(real_dest)
+      text = '%s:<br>%s' % (_('Download completed'), os.path.basename(real_dest))
       EmcNotify(text, icon='icon/download')
 
       # remove the handler from the dict

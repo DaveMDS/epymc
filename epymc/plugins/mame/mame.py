@@ -367,18 +367,16 @@ class MameGame(object):
 
    def short_info_get(self):
       if self.parsed:
-         return _('<title>%(name)s</><br>' \
-                  '<hilight>Year:</> %(year)s<br>' \
-                  '<hilight>Manufacturer:</> %(manufacturer)s<br>' \
-                  '<hilight>Players:</> %(players)s<br>' \
-                  '<hilight>Buttons:</> %(buttons)s<br>') % \
-                     {
-                        'name': self.name,
-                        'year': self.year,
-                        'manufacturer': self.manufacturer,
-                        'players': self.players,
-                        'buttons': self.buttons,
-                     }
+         return '<title>%s</><br>' \
+                '<name>%s:</> %s<br>' \
+                '<name>%s:</> %s<br>' \
+                '<name>%s:</> %s<br>' \
+                '<name>%s:</> %s<br>' % (
+                  self.name,
+                  _('Year'), self.year,
+                  _('Manufacturer'), self.manufacturer,
+                  _('Players'), self.players,
+                  _('Buttons'), self.buttons)
       else:
          # update of the browser postponed... when_finished...quite an hack :/
          self._more_game_info(when_finished=(lambda: _mod._browser.refresh()))
@@ -400,28 +398,26 @@ class MameGame(object):
 
       (local, remote) = self.poster_get()
       image = EmcRemoteImage(remote, local)
-      text = _('<hilight>Year:</> %(year)s<br>' \
-               '<hilight>Manufacturer:</> %(manufacturer)s<br>' \
-               '<hilight>Players:</> %(players)s<br>' \
-               '<hilight>Buttons:</> %(buttons)s<br>' \
-               '<hilight>Savestate:</> %(driver_savestate)s<br>' \
-               '<hilight>Driver status:</> %(driver_status)s<br>' \
-               '   <hilight>emulation:</> %(driver_emulation)s<br>' \
-               '   <hilight>color:</> %(driver_color)s<br>' \
-               '   <hilight>sound:</> %(driver_sound)s<br>' \
-               '   <hilight>graphic:</> %(driver_graphic)s<br>') % \
-               {
-                  'year': self.year,
-                  'manufacturer': self.manufacturer,
-                  'players': self.players,
-                  'buttons': self.buttons,
-                  'driver_savestate': self.driver_savestate,
-                  'driver_status': self.driver_status,
-                  'driver_emulation': self.driver_emulation,
-                  'driver_color': self.driver_color,
-                  'driver_sound': self.driver_sound,
-                  'driver_graphic': self.driver_graphic,
-              }
+      text = '<name>%s:</> %s<br>' \
+             '<name>%s:</> %s<br>' \
+             '<name>%s:</> %s<br>' \
+             '<name>%s:</> %s<br>' \
+             '<name>%s:</> %s<br>' \
+             '<name>%s:</> %s<br>' \
+             '   <name>%s:</> %s<br>' \
+             '   <name>%s:</> %s<br>' \
+             '   <name>%s:</> %s<br>' \
+             '   <name>%s:</> %s<br>' % (
+               _('Year'), self.year,
+               _('Manufacturer'), self.manufacturer,
+               _('Players'), self.players,
+               _('Buttons'), self.buttons,
+               _('Save state'), self.driver_savestate,
+               _('Driver status'), self.driver_status,
+               _('Emulation'), self.driver_emulation,
+               _('Color'), self.driver_color,
+               _('Sound'), self.driver_sound,
+               _('Graphic'), self.driver_graphic)
       self.dialog = EmcDialog(self.name, content=image, text=text)
 
       if self.file_name_get():
@@ -580,7 +576,7 @@ class MameGame(object):
          if sources:
             self._try_download_multi_sources(sources, dest)
          else:
-            self.dialog.text_append(_('<b>Can not find the game online.</b>'))
+             self.dialog.text_append('<b>%s</b>' % _('Can not find the game online.'))
       else:
          self.dialog.spinner_start()
 
@@ -588,12 +584,12 @@ class MameGame(object):
       self._dwnl_handler = None
       self.dialog.spinner_stop()
       if status == 200: # no errors
-         self.dialog.text_append(_('<b>Download done :)</b>'))
+         self.dialog.text_append('<b>%s</b>' % _('Download completed'))
       else:
          if sources:
             self._try_download_multi_sources(sources, dest)
          else:
-            self.dialog.text_append(_('<b>Can not find the game online.</b>'))
+            self.dialog.text_append('<b>%s</b>' % _('Can not find the game online.'))
 
    def _cb_multi_download_progress(self, dest, tot, done, sources):
       if tot > 0: self.dialog.progress_set(float(done) / float(tot))

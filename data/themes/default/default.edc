@@ -11,10 +11,10 @@
 
 // normal font used everywhere
 #define FONT "Cuprum"
-// font for titles and secondary text
+// font for titles, secondary text and good for numbers
 #define FONT2 "Oswald"
 // font for the mainmenu
-#define FONT3 "Cabin"
+#define FONT3 "Sansation"
 
 #define FONT_SIZE_SMALLER 14
 #define FONT_SIZE_SMALL 18
@@ -75,7 +75,7 @@ images {
 fonts {
    font: "Cuprum.otf" "Cuprum";
    font: "Oswald-Regular.otf" "Oswald";
-   font: "Cabin-Regular.otf" "Cabin";
+   font: "Sansation-Regular.ttf" "Sansation";
 }
 
 styles {

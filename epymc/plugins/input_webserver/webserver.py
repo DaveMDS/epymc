@@ -83,14 +83,16 @@ class WebserverModule(EmcModule):
          self._httpd = HTTPServer(('', int(port)), RequestHandler)
          self._httpd.serve_forever(poll_interval=0.3)
       except:
+         self._httpd = None
          DBG('Error starting server on port')
       else:
          DBG('httpd stopped')
 
    def __shutdown__(self):
       DBG('Shutdown module')
-      self._httpd.shutdown() # is this thread-safe ??
-      self._httpd.socket.close() # is this thread-safe ??
+      if self._httpd is not None:
+         self._httpd.shutdown() # is this thread-safe ??
+         self._httpd.socket.close() # is this thread-safe ??
 
    def queue_timer(self):
       if not input_queue.empty():

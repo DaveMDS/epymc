@@ -572,8 +572,11 @@ class EmcButton(Button):
       self.style_set('emc')
       self.focus_allow_set(False)
       if label: self.text_set(label)
-      if icon: self.content_set(load_icon(icon))
+      if icon: self.icon_set(icon)
       self.show()
+
+   def icon_set(self, icon):
+      self.content_set(load_icon(icon))
 
 ################################################################################
 class EmcMenu(Menu):

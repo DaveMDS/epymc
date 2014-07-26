@@ -47,6 +47,7 @@ _update_timer = None
 _onair_url = None
 _onair_title = None
 _play_db = None # key: url  data: {'started': 14, 'finished': 0, 'stop_at': 0 }
+_play_pause_btn = None
 
 ### API ###
 def init():
@@ -180,6 +181,20 @@ def stop():
    _emotion = None
 
    events.event_emit('PLAYBACK_FINISHED')
+
+def pause():
+   _emotion.play = False
+   _play_pause_btn.icon_set('icon/play')
+
+def unpause():
+   _emotion.play = True
+   _play_pause_btn.icon_set('icon/pause')
+
+def pause_toggle():
+   if _emotion.play is True:
+      pause()
+   else:
+      unpause()
 
 def forward():
    LOG('dbg', 'Forward cb' + str(_emotion.position))
@@ -367,7 +382,7 @@ def _init_mediaplayer_gui():
    _buttons.append(bt)
 
    #  play/pause
-   bt = EmcButton(icon='icon/play')
+   bt = EmcButton(icon='icon/pause')
    bt.callback_clicked_add(_cb_btn_play)
    bt.data['cb'] = _cb_btn_play
    _fman.obj_add(bt)
@@ -377,6 +392,9 @@ def _init_mediaplayer_gui():
    # for some reason in fman mouse_in callback is called once (wrong) on
    # the creation of the obj ...dunno why
    _fman.focused_set(bt)
+   # store a reference to the button so we can change the icon later
+   global _play_pause_btn
+   _play_pause_btn = bt
 
    #  >   forward
    bt = EmcButton(icon='icon/fwd')
@@ -393,7 +411,6 @@ def _init_mediaplayer_gui():
    _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
-
 
    #  submenu audio
    bt = EmcButton(_('Audio'))
@@ -439,7 +456,7 @@ def _cb_frame_resize(vid):
    edje.extern_object_aspect_set(vid, edje.EDJE_ASPECT_CONTROL_BOTH, w, h)
 
 def _cb_btn_play(btn):
-   _emotion.play = not _emotion.play
+   pause_toggle()
 
 def _cb_btn_stop(btn):
    stop()
@@ -544,15 +561,15 @@ def input_event_cb(event):
       return input_events.EVENT_BLOCK
 
    elif event == 'TOGGLE_PAUSE':
-      _emotion.play = not _emotion.play
+      pause_toggle()
       return input_events.EVENT_BLOCK
 
    elif event == 'PLAY':
-      _emotion.play = True
+      unpause()
       return input_events.EVENT_BLOCK
 
    elif event == 'PAUSE':
-      _emotion.play = False
+      pause()
       return input_events.EVENT_BLOCK
 
    elif event == 'STOP':
@@ -591,7 +608,7 @@ def input_event_cb(event):
       if event == 'BACK':
          video_controls_hide()
          return input_events.EVENT_BLOCK
-      if event == 'OK':
+      elif event == 'OK':
          button = _fman.focused_get()
          cb = button.data['cb']
          if callable(cb):
@@ -599,13 +616,13 @@ def input_event_cb(event):
          # TODO TRY THIS INSTEAD:
          ## evas_object_smart_callback_call(obj, 'sig', NULL);
          return input_events.EVENT_BLOCK
-      if event == 'RIGHT':
+      elif event == 'RIGHT':
          _fman.focus_move('r')
          return input_events.EVENT_BLOCK
       elif event == 'LEFT':
          _fman.focus_move('l')
          return input_events.EVENT_BLOCK
-      if event == 'UP':
+      elif event == 'UP':
          _fman.focus_move('u')
          return input_events.EVENT_BLOCK
       elif event == 'DOWN':

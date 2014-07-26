@@ -608,7 +608,7 @@ group { name: "elm/list/h_item/mainmenu";       // Main horizontal list item
             rel1.relative: 0.0 -1.0;
             rel2.relative: 1.0 0.0;
             text {
-               font: FONT;
+               font: FONT3;
                size: FONT_SIZE_BIGGER;
                ellipsis: -1;
                align: 0.5 1.0;
@@ -756,7 +756,7 @@ group { name: "elm/list/item/mainmenu_sublist"; // Sub vertical list item
             color: FONT_COLOR;
             color3: FONT_COLOR3;
             text {
-               font: FONT;
+               font: FONT3;
                size: FONT_SIZE_BIG;
                min: 1 1;
                ellipsis: -1;
@@ -2341,7 +2341,7 @@ group { name: "elm/button/base/emc";
             color_class: "button_text";
             color: FONT_COLOR;
             color3: FONT_COLOR3;
-            text { font: "Asap"; size: FONT_SIZE;
+            text { font: FONT; size: FONT_SIZE;
                align: 0.5 0.5;
                min: 0 0;
                text_class: "button";

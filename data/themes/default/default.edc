@@ -9,10 +9,13 @@
 // #define DBG(...)
 // #endif
 
+// normal font used everywhere
 #define FONT "Cuprum"
-#define FONT_BOLD "AsapBold"
-// #define FONT "Sans"
-// #define FONT_BOLD "Sans:style=Bold"
+// font for titles and secondary text
+#define FONT2 "Oswald"
+// font for the mainmenu
+#define FONT3 "Cabin"
+
 #define FONT_SIZE_SMALLER 14
 #define FONT_SIZE_SMALL 18
 #define FONT_SIZE 22
@@ -71,13 +74,8 @@ images {
 
 fonts {
    font: "Cuprum.otf" "Cuprum";
-   font: "Asap-Regular.otf" "Asap";
-   font: "Asap-Bold.otf" "AsapBold";
-   // font: "Asap-Italic.otf" "AsapItalic";
-   // font: "Asap-BoldItalic.otf" "AsapBoldItalic";
-   
-   font: "CinemaRegular.ttf" "Cinema";
-   font: "Aclonica.ttf" "Aclonica";
+   font: "Oswald-Regular.otf" "Oswald";
+   font: "Cabin-Regular.otf" "Cabin";
 }
 
 styles {
@@ -103,25 +101,11 @@ styles {
    }
 
    style { name: "epymc_dialog_title_style";
-      base: "font=Aclonica align=center font_size="FONT_SIZE_BIG" color=#"COLOR_ORANGE_HEX" wrap=none";
+      base: "font="FONT2" align=center font_size="FONT_SIZE_BIG" color=#"COLOR_ORANGE_HEX" wrap=none";
    }
 
    style { name: "epymc_label_slide_style";
       base:  "font="FONT" font_size="FONT_SIZE" color=#fff wrap=none";
-   }
-}
-
-color_classes {
-   color_class {
-      name:  "button_color";
-      color: 56 171 80 255; //green
-      // color: 240 240 240 255; //white
-      // color: 16 16 16 255; //black
-      // color: 128 62 142 255; //purple
-      // color: 26 143 178 255; //cyan
-      // color: 155 20 29 255; //red
-      color2:  0 0 0 0;
-      color3:  0 0 0 0;
    }
 }
 
@@ -262,9 +246,10 @@ collections {
          part { name: "topbar.title"; /* API */
             type: TEXT;
             scale: 1;
-            effect: GLOW;
+            effect: FAR_SHADOW;
             description { state: "default" 0.0;
                color: 255 255 255 200;
+               color3: FONT_COLOR3;
                rel1 {
                   to: "topbar.home_icon";
                   relative: 1.0 0.0;
@@ -275,8 +260,8 @@ collections {
                   offset: -6 -1;
                }
                text {
-                  font: "Aclonica";
-                  size: FONT_SIZE;
+                  font: FONT2;
+                  size: FONT_SIZE_BIG;
                   align: 0.0 1.0;
                   ellipsis: 1.0;
                }
@@ -319,12 +304,12 @@ collections {
                }
                rel2 {
                   to: "topbar.clip";
-                  offset: -36 -1;
+                  offset: -36 2;
                }
                text {
-                  font: "Aclonica";
+                  font: FONT2;
                   size: FONT_SIZE_BIG;
-                  min: 1 1;
+                  min: 1 0;
                   ellipsis: -1;
                }
             }
@@ -656,7 +641,7 @@ collections {
                rel2.relative: 1.0 0.0;
                rel2.offset: 0 100;
                text {
-                  font: FONT_BOLD;
+                  font: FONT2;
                   size: 40;
                }
             }
@@ -705,20 +690,20 @@ collections {
          }
          part { name: "mainmenu.title";
             type: TEXT;
-            effect: SOFT_SHADOW;
+            effect: FAR_SHADOW;
             scale: 1;
             description { state: "default" 0.0;
                rel1.relative: 0.0 -0.3;
                rel2.relative: 1.0 -0.3;
                align: 0.5 0.0;
-               color: 220 220 220 255;
-               color3: 0 0 0 64;
+               color: 255 255 255 200;
+               color3: FONT_COLOR3;
                text {
                   text: "Emotion Media Center";
-                  font: "Aclonica";
-                  size: (FONT_SIZE_BIG+10);
+                  font: FONT3;
+                  size: FONT_SIZE_BIGGER;
                   ellipsis: -1;
-                  min: 1 1;
+                  min: 0 1;
                }
             }
             description { state: "visible" 0.0;
@@ -956,8 +941,8 @@ collections {
                }
                text {
                   text: "0:00:00";
-                  font: FONT_BOLD;
-                  size: (FONT_SIZE + 2);
+                  font: FONT2;
+                  size: FONT_SIZE;
                   align: 0.0 1.0;
                   min: 1 0;
                   ellipsis: -1;
@@ -1003,8 +988,8 @@ collections {
                }
                text {
                   text: "0:00:00";
-                  font: FONT_BOLD;
-                  size: (FONT_SIZE + 2);
+                  font: FONT2;
+                  size: FONT_SIZE;
                   align: 1.0 1.0;
                   min: 1 0;
                   ellipsis: -1;
@@ -1032,7 +1017,7 @@ collections {
                }
                text {
                   text: "Title";
-                  font: FONT;
+                  font: FONT2;
                   size: FONT_SIZE_BIGGER;
                   align: 0.0 0.0;
                }

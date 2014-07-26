@@ -253,10 +253,10 @@ def ask_to_exit():
    text = '<center>' + credits.replace('\n', '<br>') + '</center>'
    d = EmcDialog(title=_('credits'), style='minimal', text=text)
    d.button_add(_('Cancel'), selected_cb=lambda b: d.delete())
-   d.button_add(_('Suspend'), selected_cb=None)
-   d.button_add(_('Shutdown'), selected_cb=None)
+   # d.button_add(_('Suspend'), selected_cb=None) # TODO
+   # d.button_add(_('Shutdown'), selected_cb=None) # TODO
    d.button_add(_('Exit'), selected_cb=lambda b: elementary.exit())
-   d.autoscroll_enable()
+   d.autoscroll_enable(4.0, 0.0)
 
 def volume_show(hidein = 0):
    global _volume_hide_timer
@@ -395,19 +395,16 @@ credits = """
 
 
 
-programming
+<info>code</>
 DAVIDE ANDREOLI
 
-graphics
+<info>design</>
 DAVIDE ANDREOLI
 
-edc design
-DAVIDE ANDREOLI
-
-python efl
+<info>python efl team</>
 BORIS FAURE
 BRUNO DILLY
-DAVE ANDREOLI
+DAVIDE ANDREOLI
 FABIANO FIDÊNCIO
 GUSTAVO SVERZUT BARBIERI
 JOOST ALBERS
@@ -415,7 +412,7 @@ KAI HUUHKO
 SIMON BUSCH
 TIAGO FALCÃO
 
-efl team
+<info>efl team</>
 ADAM SIMPKINS
 AHARON HILLEL
 ALBIN TONNERRE
@@ -549,13 +546,13 @@ ZBIGNIEW KOSINSKI
 ZIGSMCKENZIE
 
 
-author special thanks
+<info>author special thanks</>
 SARA
 TEODORO
 MONOPOLIO DI STATO
 
 
-license
+<info>license</>
 Copyright © 2010-2014 Davide Andreoli <dave@gurumeditation.it>
 
 EpyMC is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -1015,7 +1012,9 @@ class EmcDialog(edje.Edje):
       elif selected_cb:
          selected_cb(button)
 
-   def autoscroll_enable(self):
+   def autoscroll_enable(self, speed_scale=1.0, start_delay=3.0):
+      self._textentry.autoscroll_start_delay = start_delay
+      self._textentry.autoscroll_speed_scale = speed_scale
       self._textentry.autoscroll = True
 
    def _input_event_cb(self, event):
@@ -1473,6 +1472,8 @@ class EmcScrolledEntry(Entry, Scrollable):
       self._animator = None
       self._timer = None
       self._autoscroll_amount = 0.0
+      self._autoscroll_speed_scale = 1.0
+      self._autoscroll_start_delay = 3.0
       self._autoscroll = autoscroll
       Entry.__init__(self, layout, style='scrolledentry',
                      editable=False, scrollable=True, **kargs)
@@ -1489,6 +1490,22 @@ class EmcScrolledEntry(Entry, Scrollable):
             self._autoscroll_start()
          else:
             self._autoscroll_stop()
+
+   @property
+   def autoscroll_speed_scale(self):
+      return self._autoscroll_speed_scale
+
+   @autoscroll_speed_scale.setter
+   def autoscroll_speed_scale(self, value):
+      self._autoscroll_speed_scale = value
+
+   @property
+   def autoscroll_start_delay(self):
+      return self._autoscroll_start_delay
+
+   @autoscroll_start_delay.setter
+   def autoscroll_start_delay(self, value):
+      self._autoscroll_start_delay = value
 
    def text_set(self, text):
       Entry.text_set(self, text)
@@ -1510,7 +1527,8 @@ class EmcScrolledEntry(Entry, Scrollable):
    def _autoscroll_start(self):
       if self._animator is None:
          self.region_show(0, 0, 10, 10)
-         self._timer = ecore.Timer(3.0, self._delayed_start)
+         self._timer = ecore.Timer(self._autoscroll_start_delay,
+                                   self._delayed_start)
 
    def _autoscroll_stop(self):
       if self._animator is not None:
@@ -1524,7 +1542,8 @@ class EmcScrolledEntry(Entry, Scrollable):
       self._animator = ecore.Animator(self._animator_cb)
 
    def _animator_cb(self):
-      self._autoscroll_amount += ecore.animator_frametime_get() * 15
+      self._autoscroll_amount += ecore.animator_frametime_get() * 15 * \
+                                 self._autoscroll_speed_scale
       x, y, w, h = old_region = self.region
       # print("Animator  ", old_region, self._autoscroll_amount)
 
@@ -1540,7 +1559,6 @@ class EmcScrolledEntry(Entry, Scrollable):
             return ecore.ECORE_CALLBACK_CANCEL
 
       return ecore.ECORE_CALLBACK_RENEW
-
 
 ################################################################################
 class DownloadManager(utils.Singleton):

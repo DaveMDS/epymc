@@ -222,6 +222,14 @@ def shutdown():
    _browser.delete()
 
 def root_item_add(name, weight, label, icon=None, callback=None):
+   """
+      weight used:
+         1, 2, 3: General, Themes, Modules
+         10, 11: movies, tvshows
+         20: screensaver
+         50, 51, 52, 53: keyboard, lirc, joy, webserver
+         100: screen calibrator
+   """
    # search an item with an higer weight
    pos = 0
    for (_name, _label, _weight, _ic, _cb) in _root_items:

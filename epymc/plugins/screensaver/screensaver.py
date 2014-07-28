@@ -65,7 +65,7 @@ and what it need to work well, can also use markup like <title>this</> or
       self.parse_config()
 
       # register the config item
-      cgui.root_item_add('ssaver', 10, _('Screen saver'), 'icon/evas', self.config_gui_cb)
+      cgui.root_item_add('ssaver', 20, _('Screen saver'), 'icon/evas', self.config_gui_cb)
 
       # start the timer
       self.timer = Timer(50.0, self.timer_cb)

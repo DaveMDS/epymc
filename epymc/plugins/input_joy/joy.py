@@ -74,7 +74,7 @@ and what it need to work well, can also use markup like <title>this</> or
          # TODO spawn the configurator
 
       # add an entry in the config gui
-      config_gui.root_item_add('joystick', 50, _('Joystick'),
+      config_gui.root_item_add('joystick', 52, _('Joystick'),
                                icon='icon/joystick',
                                callback=self.config_panel_cb)
 

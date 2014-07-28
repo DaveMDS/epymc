@@ -220,7 +220,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
                         self.cb_mainmenu, subitems)
 
        # add an entry in the config gui
-      config_gui.root_item_add('movies', 50, _('Movie Collection'),
+      config_gui.root_item_add('movies', 10, _('Movie Collection'),
                                icon='icon/movie', callback=config_panel_cb)
 
       # create a browser instance

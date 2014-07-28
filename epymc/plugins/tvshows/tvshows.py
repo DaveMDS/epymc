@@ -289,7 +289,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
       mainmenu.item_add('tvshows', 11, _('TV Shows'), 'icon/tv', self.cb_mainmenu)
 
       # add an entry in the config gui
-      config_gui.root_item_add('tvshows', 51, _('Tv Shows Collection'),
+      config_gui.root_item_add('tvshows', 11, _('Tv Shows Collection'),
                                icon='icon/tv', callback=config_panel_cb)
 
       # create a browser instance

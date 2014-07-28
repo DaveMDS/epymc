@@ -51,7 +51,7 @@ class CalibratorModule(EmcModule):
    path = os.path.dirname(__file__)
 
    def __init__(self):
-      config_gui.root_item_add('calibrator', 60, _('Screen calibrator'),
+      config_gui.root_item_add('calibrator', 100, _('Screen calibrator'),
                                icon='icon/calib', callback=self.startup)
 
    def __shutdown__(self):

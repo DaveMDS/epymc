@@ -211,6 +211,10 @@ setup (
          'zapiks/*',
          'fantasticc/*',
       ],
+      'epymc.plugins.input_webserver': [
+         'default/*',
+         'mobile/*',
+      ]
    },
 
    scripts = ['bin/epymc'],

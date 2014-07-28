@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-28 13:09+0200\n"
-"PO-Revision-Date: 2014-07-28 13:04+0100\n"
+"POT-Creation-Date: 2014-07-28 16:07+0200\n"
+"PO-Revision-Date: 2014-07-28 15:53+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -68,82 +68,134 @@ msgstr ""
 msgid "EpyMC Database"
 msgstr "EpyMC Database"
 
-#: epymc/config_gui.py:212 epymc/config_gui.py:215 epymc/config_gui.py:268
+#: epymc/config_gui.py:213 epymc/config_gui.py:216 epymc/config_gui.py:278
 msgid "Configuration"
 msgstr "Configurazione"
 
-#: epymc/config_gui.py:217 epymc/config_gui.py:278
+#: epymc/config_gui.py:218 epymc/config_gui.py:288
 msgid "General"
 msgstr "Generale"
 
-#: epymc/config_gui.py:218
+#: epymc/config_gui.py:219
 msgid "Themes"
 msgstr "Temi"
 
-#: epymc/config_gui.py:219 epymc/config_gui.py:376
+#: epymc/config_gui.py:220 epymc/config_gui.py:386
 msgid "Modules"
 msgstr "Moduli"
 
-#: epymc/config_gui.py:281
+#: epymc/config_gui.py:221 epymc/config_gui.py:430
+msgid "System info"
+msgstr "Informazioni di sistema"
+
+#: epymc/config_gui.py:291
 msgid "Start in fullscreen"
 msgstr "Avvia a schermo intero"
 
-#: epymc/config_gui.py:282
+#: epymc/config_gui.py:292
 msgid "Adjust interface scale"
 msgstr "Modifica scalatura"
 
-#: epymc/config_gui.py:283
+#: epymc/config_gui.py:293
 msgid "Show Back item in lists"
 msgstr "Mostra indietro nelle liste"
 
-#: epymc/config_gui.py:284
+#: epymc/config_gui.py:294
 msgid "Download folder"
 msgstr "Cartella download"
 
-#: epymc/config_gui.py:285
+#: epymc/config_gui.py:295
 msgid "Max concurrent download"
 msgstr "Download simultanei"
 
-#: epymc/config_gui.py:293
+#: epymc/config_gui.py:303 epymc/config_gui.py:419
 msgid "Rendering engine"
 msgstr "Motore di rendering"
 
-#: epymc/config_gui.py:296
+#: epymc/config_gui.py:306
 msgid "Multimedia engine"
 msgstr "Motore multimediale"
 
-#: epymc/config_gui.py:300
+#: epymc/config_gui.py:310
 msgid "Frames per second"
 msgstr "Frame al secondo"
 
-#: epymc/config_gui.py:311 epymc/config_gui.py:315
+#: epymc/config_gui.py:321 epymc/config_gui.py:325
 #, python-format
 msgid "Current Value: %s"
 msgstr "Valore attuale: %s"
 
-#: epymc/config_gui.py:314
+#: epymc/config_gui.py:324
 msgid "set scale"
 msgstr "imposta scalatura"
 
-#: epymc/config_gui.py:316
+#: epymc/config_gui.py:326
 msgid "Bigger"
 msgstr "Più grande"
 
-#: epymc/config_gui.py:317
+#: epymc/config_gui.py:327
 msgid "Smaller"
 msgstr "Più piccola"
 
-#: epymc/config_gui.py:318
+#: epymc/config_gui.py:328
 msgid "Reset"
 msgstr "Reimposta"
 
-#: epymc/config_gui.py:338 epymc/plugins/onlinevideo/onlinevideo.py:89
+#: epymc/config_gui.py:348 epymc/plugins/onlinevideo/onlinevideo.py:89
 msgid "Author"
 msgstr "Autore"
 
-#: epymc/config_gui.py:339 epymc/plugins/onlinevideo/onlinevideo.py:88
+#: epymc/config_gui.py:349 epymc/plugins/onlinevideo/onlinevideo.py:88
 msgid "Version"
 msgstr "Versione"
+
+#: epymc/config_gui.py:418
+msgid "Core"
+msgstr "Nucleo"
+
+#: epymc/config_gui.py:420
+msgid "Download available"
+msgstr "Download disponibili"
+
+#: epymc/config_gui.py:420
+msgid "yes"
+msgstr "sì"
+
+#: epymc/config_gui.py:420
+msgid "no"
+msgstr "no"
+
+#: epymc/config_gui.py:421
+msgid "Theme"
+msgstr "Tema"
+
+#: epymc/config_gui.py:422
+msgid "Paths"
+msgstr "Percorsi"
+
+#: epymc/config_gui.py:423
+msgid "Base folder"
+msgstr "Cartella base"
+
+#: epymc/config_gui.py:424
+msgid "Config folder"
+msgstr "Cartella configurazioni"
+
+#: epymc/config_gui.py:425
+msgid "Versions"
+msgstr "Versioni"
+
+#: epymc/config_gui.py:426
+msgid "Python"
+msgstr "Python"
+
+#: epymc/config_gui.py:427
+msgid "EpyMC"
+msgstr "EpyMC"
+
+#: epymc/config_gui.py:428
+msgid "EpyMC themes API"
+msgstr "Versione dei temi"
 
 #: epymc/mainmenu.py:45 epymc/gui.py:258
 msgid "Exit"
@@ -165,7 +217,7 @@ msgid "Enlightenment Media Center"
 msgstr "Enlightenment Media Center"
 
 #: epymc/gui.py:173 epymc/gui.py:175 epymc/gui.py:176
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:145
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:146
 #: epymc/plugins/movies/movies.py:155
 msgid "Unknown"
 msgstr "Sconosciuto"
@@ -395,25 +447,25 @@ msgid "Reported error"
 msgstr "Errore riportato"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:258
-#: epymc/plugins/onlinevideo/onlinevideo.py:281
+#: epymc/plugins/onlinevideo/onlinevideo.py:280
 msgid "Error reading channel"
 msgstr "Errore lettura canale"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:282
+#: epymc/plugins/onlinevideo/onlinevideo.py:281
 msgid "No items returned"
 msgstr "Nessun elemento trovato"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:287
+#: epymc/plugins/onlinevideo/onlinevideo.py:286
 msgid "Suggestions"
 msgstr "Consigliati"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:48
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:156
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:157
 msgid "Search videos"
 msgstr "Cerca nei filmati"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:49
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:183
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:184
 msgid "Browse channels"
 msgstr "Sfoglia canali"
 
@@ -428,115 +480,115 @@ msgstr[0] "canale"
 msgstr[1] "canali"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:151
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:79
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:103
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:80
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:104
 msgid "user"
 msgstr "utente"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:152
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:80
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:81
 msgid "uploaded"
 msgstr "caricato"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:153
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:81
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:82
 msgid "view"
 msgid_plural "views"
 msgstr[0] "vista"
 msgstr[1] "viste"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:154
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:82
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:83
 msgid "like"
 msgid_plural "likes"
 msgstr[0] "mi piace"
 msgstr[1] "mi piace"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:155
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:83
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:84
 msgid "comment"
 msgid_plural "comments"
 msgstr[0] "commento"
 msgstr[1] "commenti"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:171
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:202
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:220
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:238
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:255
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:203
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:221
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:239
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:256
 #, python-format
 msgid "Load more results (%d in total)"
 msgstr "Carica altri risultati (%d in totale)"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:104
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:126
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:105
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:127
 msgid "created"
 msgstr "creato"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:105
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:127
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:106
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:128
 msgid "updated"
 msgstr "aggiornato"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:106
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:128
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:107
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:129
 msgid "video"
 msgid_plural "videos"
 msgstr[0] "filmato"
 msgstr[1] "filmati"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:107
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:129
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:108
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:130
 msgid "follower"
 msgid_plural "followers"
 msgstr[0] "iscritto"
 msgstr[1] "iscritti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:125
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:126
 msgid "utente"
 msgstr "utente"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:144
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:145
 msgid "joined"
 msgstr "iscritto"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:145
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:146
 msgid "location"
 msgstr "luogo"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:157
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:158
 msgid "Search channels"
 msgstr "Cerca nei canali"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:158
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:159
 msgid "Search groups"
 msgstr "Cerca nei gruppi"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:159
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:160
 msgid "Search people"
 msgstr "Cerca negli utenti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:163
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:164
 msgid "More relevant videos"
 msgstr "Video più rilevanti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:169
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:170
 msgid "More followed channels"
 msgstr "Canali più seguiti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:174
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:175
 msgid "More followed groups"
 msgstr "Gruppi più seguiti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:182
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:183
 msgid "Browse videos"
 msgstr "Sfoglia filmati"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:184
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:185
 msgid "Browse groups"
 msgstr "Sfoglia gruppi"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:185
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:186
 msgid "Browse users"
 msgstr "Sfoglia utenti"
 

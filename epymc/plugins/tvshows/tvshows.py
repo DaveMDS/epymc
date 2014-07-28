@@ -94,7 +94,7 @@ class SerieInfoItemClass(EmcItemClass):
       return _('Serie info')
 
    def icon_get(self, url, mod):
-      return 'icon/tv'
+      return 'icon/info'
 
 
 class FileItemClass(EmcItemClass):

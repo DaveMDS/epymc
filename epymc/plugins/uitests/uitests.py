@@ -22,7 +22,6 @@ import os, time
 
 from efl import ecore, edje, elementary
 from efl.elementary.box import Box
-from efl.elementary.configuration import engine_get, preferred_engine_get
 
 from epymc.modules import EmcModule
 from epymc.gui import EmcDialog, EmcVKeyboard, EmcFolderSelector, \
@@ -72,21 +71,6 @@ class MyItemClass(EmcItemClass):
    def info_get(self, url, user_data):
       if url == 'uitests://styles':
          return TEST_STYLE
-      else:
-         return '<title>System info:</><br>' \
-                '<name>Graphic engine:</name> %s (%s)<br>' \
-                '<name>Download available:</name> %s<br>' \
-                '<name>base dir:</name> %s<br>' \
-                '<name>config dir:</name> %s<br>' \
-                '<name>theme:</name> %s<br>' \
-                '<name>theme file:</name> %s<br>' % (
-                     engine_get(), preferred_engine_get(),
-                     ecore.file_download_protocol_available('http://'),
-                     utils.emc_base_dir,
-                     utils.user_conf_dir,
-                     ini.get('general', 'theme'),
-                     gui.theme_file,
-                  )
 
    def item_selected(self, url, user_data):
       # Events Sniffer

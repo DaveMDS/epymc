@@ -166,7 +166,7 @@ class Install(install_lib):
 
 setup (
    name = 'EpyMC',
-   version = '0.9',
+   version = '0.9', # don't forget to also update utils.py
    author = 'Davide <davemds> Andreoli',
    author_email = 'dave@gurumeditation.it',
    url = 'http://github.com/DaveMDS/epymc',

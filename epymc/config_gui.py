@@ -18,9 +18,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 from operator import itemgetter, attrgetter
 
-from efl import evas
+from efl import evas, ecore
 
 from epymc import gui, mainmenu, input_events, ini, modules, utils
 from epymc.browser import EmcBrowser, EmcItemClass
@@ -217,6 +218,7 @@ def init():
    root_item_add('config://general/', 1, _('General'), 'icon/emc', _general_list)
    root_item_add('config://themes/', 2, _('Themes'), 'icon/theme', _themes_list)
    root_item_add('config://modules/', 3, _('Modules'), 'icon/module', _modules_list)
+   root_item_add('config://sysinfo/', 4, _('System info'), 'icon/info', _sys_info)
 
 def shutdown():
    _browser.delete()
@@ -386,4 +388,44 @@ def _modules_list():
 def _modules_populate(browser, url):
    for mod in sorted(modules.list_get(), key=attrgetter('name')):
       browser.item_add(ModulesItemClass(), mod.name, mod)
+
+##############  SYS INFO  #####################################################
+
+def _sys_info():
+   from efl.elementary.configuration import engine_get, preferred_engine_get
+   from epymc.gui import _theme_generation
+
+   if sys.version_info[0] < 3:
+      engine = engine_get().encode('utf8')
+      pref_engine = preferred_engine_get().encode('utf8')
+   else:
+      engine = engine_get()
+      pref_engine = preferred_engine_get()
+   
+   downl_avail = ecore.file_download_protocol_available('http://')
+
+   text = '<title>%s</><br>' \
+          '<name>%s:</name> %s - %s<br>' \
+          '<name>%s:</name> %s<br>' \
+          '<name>%s:</name> %s - %s<br>' \
+          '<br><title>%s</><br>' \
+          '<name>%s:</name> %s<br>' \
+          '<name>%s:</name> %s<br>' \
+          '<br><title>%s</><br>' \
+          '<name>%s:</name> %s<br>' \
+          '<name>%s:</name> %s<br>' \
+          '<name>%s:</name> %s<br>' % (
+            _('Core'),
+            _('Rendering engine'), engine, pref_engine,
+            _('Download available'), _('yes') if downl_avail else _('no'),
+            _('Theme'), ini.get('general', 'theme'), gui.theme_file,
+            _('Paths'),
+            _('Base folder'), utils.emc_base_dir,
+            _('Config folder'), utils.user_conf_dir,
+            _('Versions'),
+            _('Python'), sys.version,
+            _('EpyMC'), utils.emc_version,
+            _('EpyMC themes API'), _theme_generation,
+          )
+   EmcDialog(style='panel', title=_('System info'), text=text)
 

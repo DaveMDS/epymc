@@ -270,12 +270,30 @@ elif STATE == ST_CATEGORIES:
    for cat in results['data']:
       name = cat['name']
       url = api_base + cat['uri'] + URL + '?per_page=%d' % ITEMS_PER_PAGE
-      item_add(NEXT_STATE, name, url, icon=icon_categories)
+
+      try:
+         poster = [ c['link'] for c in cat['pictures']['sizes'] if c['width'] == 640 ][0]
+      except:
+         poster = None
+
+      videos = cat['metadata']['connections']['videos']['total']
+      channels = cat['metadata']['connections']['channels']['total']
+      groups = cat['metadata']['connections']['groups']['total']
+      info = '<title>%s</><br>' \
+             '<small><success>%d %s</> <name>/</> ' \
+             '<info>%d %s</> <name>/</> <warning>%d %s</></small>' % (name,
+               videos, ngettext('video', 'videos', videos),
+               channels, ngettext('channel', 'channels', channels),
+               groups, ngettext('group', 'groups', groups))
+      
+      item_add(NEXT_STATE, name, url, icon=icon_categories,
+                           info=info, poster=poster)
 
       for sub in cat['subcategories']:
          subname = name + ' - ' + sub['name']
          url = api_base + sub['uri'] + URL + '?per_page=%d' % ITEMS_PER_PAGE
-         item_add(NEXT_STATE, subname, url, icon=icon_categories)
+         item_add(NEXT_STATE, subname, url, icon=icon_categories,
+                              info=info, poster=poster)
 
 
 ################################################################################

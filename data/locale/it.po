@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-28 16:07+0200\n"
-"PO-Revision-Date: 2014-07-28 15:53+0100\n"
+"POT-Creation-Date: 2014-07-28 18:44+0200\n"
+"PO-Revision-Date: 2014-07-28 18:51+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -474,6 +474,7 @@ msgid "Top rated"
 msgstr "Più votati"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:72
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:286
 msgid "channel"
 msgid_plural "channels"
 msgstr[0] "canale"
@@ -532,6 +533,7 @@ msgstr "aggiornato"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:107
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:129
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:285
 msgid "video"
 msgid_plural "videos"
 msgstr[0] "filmato"
@@ -591,6 +593,12 @@ msgstr "Sfoglia gruppi"
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:186
 msgid "Browse users"
 msgstr "Sfoglia utenti"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:287
+msgid "group"
+msgid_plural "groups"
+msgstr[0] "gruppo"
+msgstr[1] "gruppi"
 
 #: epymc/plugins/input_keyb/keyb.py:68
 msgid "Input - Keyboard"

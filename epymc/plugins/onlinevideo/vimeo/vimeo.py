@@ -19,9 +19,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import sys
 from epymc.extapi.onlinevideo import api_version, state_get, \
-   fetch_url, play_url, item_add, call_ydl, local_resource, \
-   relative_date, seconds_to_duration, url_encode, \
+   fetch_url, play_url, report_error, item_add, call_ydl, local_resource, \
+   relative_date, seconds_to_duration, url_encode, URLError, HTTPError, \
    ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 
 
@@ -50,7 +51,13 @@ STATE, URL = state_get()
 
 
 def vimeo_api_url(url):
-   return fetch_url(url, headers=headers, parser='json')
+   try: 
+      return fetch_url(url, headers=headers, parser='json')
+   except HTTPError as e:
+      report_error('%d: %s' % (e.code, e.reason))
+   except URLError as e:
+      report_error('%s' % (e.reason))
+   sys.exit(1)
 
 def vimeo_api_call(endpoint, **kargs):
    url = api_base + endpoint + '?' + url_encode(kargs)

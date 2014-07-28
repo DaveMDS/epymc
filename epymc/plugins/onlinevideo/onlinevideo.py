@@ -253,6 +253,10 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
             mediaplayer.poster_set(parent_item_data[F_POSTER]) # TODO FIXME
             mediaplayer.title_set(parent_item_data[F_LABEL])
             suggested = [] # from now on every item is a suggestion
+         elif line.startswith('ERR!'):
+            text = '%s:<br><failure>%s</>' % (_('Reported error'), line[4:])
+            EmcDialog(title=_('Error reading channel'), style='error', text=text)
+            return
          else:
             try:
                # WARNING keep item_data consistent !
@@ -273,7 +277,8 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
                continue
       
       if len(items) < 1 and suggested is None:
-         EmcDialog(text=_('Error reading channel'), style='error')
+         EmcDialog(title=_('Error reading channel'), style='error',
+                   text=_('No items returned'))
          return
 
       if suggested and len(suggested) > 0:

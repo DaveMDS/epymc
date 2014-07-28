@@ -24,12 +24,13 @@ from bs4 import BeautifulSoup
 
 try:
    # py3
-   import urllib.request as urllib2
+   from urllib.request import Request, urlopen
+   from urllib.error import HTTPError, URLError
    from urllib.parse import parse_qs
    from urllib.parse import urlencode
 except:
    # py2
-   import urllib2
+   from urllib2 import Request, urlopen, HTTPError, URLError
    from urlparse import parse_qs
    from urllib import urlencode
 
@@ -65,6 +66,9 @@ def play_url(url):
    else:
       print('PLAY!' + url)
 
+def report_error(msg):
+   print('ERR!' + msg)
+
 def local_resource(_file_, res):
    """ Get the full path of a resouce included with the scraper """
    return os.path.join(os.path.dirname(_file_), res)
@@ -80,13 +84,17 @@ def fetch_url(url, headers=None, parser=None):
    Return:
       The downloaded data, optionally parsed if parser is given
 
+   Raise:
+      URLError(reason): in case of generic connection errors
+      HTTPError(code, reason): in case of specific http errors
+
    """
    if headers is not None:
-      req = urllib2.Request(url, headers=headers)
+      req = Request(url, headers=headers)
    else:
-      req = urllib2.Request(url)
+      req = Request(url)
 
-   f = urllib2.urlopen(req)
+   f = urlopen(req)
    data = f.read()
    f.close()
 

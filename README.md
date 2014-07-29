@@ -11,11 +11,9 @@ All the released versions can be obtained from [here](https://github.com/DaveMDS
 ## Documentation ##
 Installation and usage instructions can be found on the  [wiki](https://github.com/DaveMDS/epymc/wiki).
 
+## Contribute ##
+You can contribute to the development of **EpyMC** in a lots of different ways, the simple one is to use the program and report any problem using the integrated [issue](https://github.com/DaveMDS/epymc/issues) tracking of github. 
 
-## Todo ##
+Another important task to be done is the **translation** of the app in your language, making a translation is relly easy and will not take much time, see the [wiki](https://github.com/DaveMDS/epymc/wiki) for detailed instructions.
 
-- Handle remote url (like smb:// and so on)... just by mounting remote stuff?
-- Photo Module (low-priority)
-
-
-
+If, instead,  you are a **developer** and want to contribute with some code just fork the repo and perform some pull requests. If you are going to implement a new feature I strongly suggest to contact me before start any development, so that we can discuss the better way to implement what you have in mind.

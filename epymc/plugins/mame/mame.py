@@ -256,7 +256,7 @@ and what it need to work well, can also use markup like <title>this</> or
       L = list()
       for dir in self._rompaths:
          for rom in os.listdir(dir):
-            id = rom.strip('.zip')
+            id = os.path.splitext(rom)[0]
             if id and id in self._games:
                L.append(self._games[id])
 

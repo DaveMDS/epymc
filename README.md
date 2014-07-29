@@ -5,16 +5,11 @@ The Emotion Media Center
 
 ![01](/doc/ss/emc_01.jpg)
 
-## Features ##
+## Download ##
+All the released versions can be obtained from [here](https://github.com/DaveMDS/epymc/releases).
 
-- The core has a **modular structure**, every activity in the media center is a module that can be enabled/disable at runtime.
-- An abstract **input event system** make the interface controllable by variuos input device, such as mouse, keybord, infrared remote controller and joystick. (more input device can be supported just writing a new module for it)
-- All the application is written in the **python** language to speedup the development and to make the application REALLY **portable**, the same codebase should work (without recompile and friends) on every platform where the efl are supported.
-- Thanks to the use of the EFL the application can run on different graphic backend, usually the super-fast software engine or the OpenGL/ES engine.
-- The UI is **fully scalable** and the scale can be changed from the config section.
-
-
-
+## Documentation ##
+Installation and usage instructions can be found on the  [wiki](https://github.com/DaveMDS/epymc/wiki).
 
 
 ## Todo ##

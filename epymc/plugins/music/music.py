@@ -53,8 +53,11 @@ class RootOnAirItemClass(EmcItemClass):
    def label_get(self, url, mod):
       return _('OnAir')
 
+   def label_end_get(self, url, mod):
+      return str(len(mod._play_queue)) if mod._play_queue else '0'
+
    def icon_get(self, url, mod):
-      return 'icon/home'
+      return 'icon/play'
 
 class RootArtistsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -62,7 +65,10 @@ class RootArtistsItemClass(EmcItemClass):
                             mod.populate_artists_page)
 
    def label_get(self, url, mod):
-      return _('Artists (%d)') % (len(mod._artists_db))
+      return _('Artists')
+
+   def label_end_get(self, url, mod):
+      return str(len(mod._artists_db))
 
 class RootAlbumsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -70,7 +76,10 @@ class RootAlbumsItemClass(EmcItemClass):
                             mod.populate_albums_page)
 
    def label_get(self, url, mod):
-      return _('Albums (%d)') % (len(mod._albums_db))
+      return _('Albums')
+
+   def label_end_get(self, url, mod):
+      return str(len(mod._albums_db))
 
 class RootSongsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -78,7 +87,10 @@ class RootSongsItemClass(EmcItemClass):
                             mod.populate_songs_page)
 
    def label_get(self, url, mod):
-      return _('Songs (%d)') % (len(mod._songs_db))
+      return _('Songs')
+
+   def label_end_get(self, url, mod):
+      return str(len(mod._songs_db))
 
 class RootRebuildItemClass(EmcItemClass):
    def item_selected(self, url, mod):

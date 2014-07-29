@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-28 18:44+0200\n"
+"POT-Creation-Date: 2014-07-29 12:07+0200\n"
 "PO-Revision-Date: 2014-07-28 18:51+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
@@ -867,12 +867,12 @@ msgstr "Spegni il monitor dopo"
 msgid "Manage screensaver only in fullscreen"
 msgstr "Gestisci solo a schermo intero"
 
-#: epymc/plugins/movies/movies.py:81 epymc/plugins/music/music.py:101
+#: epymc/plugins/movies/movies.py:81 epymc/plugins/music/music.py:113
 #: epymc/plugins/tvshows/tvshows.py:71
 msgid "Manage sources"
 msgstr "Gestisci fonti"
 
-#: epymc/plugins/movies/movies.py:92 epymc/plugins/music/music.py:88
+#: epymc/plugins/movies/movies.py:92 epymc/plugins/music/music.py:100
 #: epymc/plugins/tvshows/tvshows.py:83
 msgid "Rescan library"
 msgstr "Aggiorna libreria"
@@ -1080,104 +1080,89 @@ msgstr "Seleziona un evento per il tasto"
 msgid "OnAir"
 msgstr "In riproduzione"
 
-#: epymc/plugins/music/music.py:61 epymc/plugins/music/music.py:279
-#: epymc/plugins/music/music.py:333
+#: epymc/plugins/music/music.py:64 epymc/plugins/music/music.py:68
+#: epymc/plugins/music/music.py:291 epymc/plugins/music/music.py:345
 msgid "Artists"
 msgstr "Artisti"
 
-#: epymc/plugins/music/music.py:65
-#, python-format
-msgid "Artists (%d)"
-msgstr "Artisti (%d)"
-
-#: epymc/plugins/music/music.py:69 epymc/plugins/music/music.py:280
-#: epymc/plugins/music/music.py:335
+#: epymc/plugins/music/music.py:75 epymc/plugins/music/music.py:79
+#: epymc/plugins/music/music.py:292 epymc/plugins/music/music.py:347
 msgid "Albums"
 msgstr "Album"
 
-#: epymc/plugins/music/music.py:73
-#, python-format
-msgid "Albums (%d)"
-msgstr "Album (%d)"
-
-#: epymc/plugins/music/music.py:77 epymc/plugins/music/music.py:281
-#: epymc/plugins/music/music.py:337
+#: epymc/plugins/music/music.py:86 epymc/plugins/music/music.py:90
+#: epymc/plugins/music/music.py:293 epymc/plugins/music/music.py:349
 msgid "Songs"
 msgstr "Canzoni"
 
-#: epymc/plugins/music/music.py:81
-#, python-format
-msgid "Songs (%d)"
-msgstr "Canzoni (%d)"
-
-#: epymc/plugins/music/music.py:111
+#: epymc/plugins/music/music.py:123
 msgid "Play the whole album"
 msgstr "Suona tutto l'album"
 
-#: epymc/plugins/music/music.py:121
+#: epymc/plugins/music/music.py:133
 msgid "Play all the songs"
 msgstr "Suona tutte le canzoni"
 
-#: epymc/plugins/music/music.py:163 epymc/plugins/music/music.py:208
-#: epymc/plugins/music/music.py:416
+#: epymc/plugins/music/music.py:175 epymc/plugins/music/music.py:220
+#: epymc/plugins/music/music.py:428
 #, python-format
 msgid "<em>by</em> %s<br>"
 msgstr "<em>di</em> %s<br>"
 
-#: epymc/plugins/music/music.py:165 epymc/plugins/music/music.py:418
+#: epymc/plugins/music/music.py:177 epymc/plugins/music/music.py:430
 #, python-format
 msgid "<em>from</em> %s<br>"
 msgstr "<em>da</em> %s<br>"
 
-#: epymc/plugins/music/music.py:170
+#: epymc/plugins/music/music.py:182
 #, python-format
 msgid "duration: %s<br>"
 msgstr "durata: %s<br>"
 
-#: epymc/plugins/music/music.py:183
+#: epymc/plugins/music/music.py:195
 #, python-format
 msgid "%(name)s by %(artist)s"
 msgstr "%(name)s di %(artist)s"
 
-#: epymc/plugins/music/music.py:210 epymc/plugins/music/music.py:239
+#: epymc/plugins/music/music.py:222 epymc/plugins/music/music.py:251
 #, python-format
 msgid "%d song"
 msgid_plural "%d songs"
 msgstr[0] "%d canzone"
 msgstr[1] "%d canzoni"
 
-#: epymc/plugins/music/music.py:219
+#: epymc/plugins/music/music.py:231
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minuto"
 msgstr[1] "%d minuti"
 
-#: epymc/plugins/music/music.py:237
+#: epymc/plugins/music/music.py:249
 #, python-format
 msgid "%d album"
 msgid_plural "%d albums"
 msgstr[0] "%d album"
 msgstr[1] "%d album"
 
-#: epymc/plugins/music/music.py:245 epymc/plugins/music/music.py:283
-#: epymc/plugins/music/music.py:287 epymc/plugins/music/music.py:331
+#: epymc/plugins/music/music.py:257 epymc/plugins/music/music.py:295
+#: epymc/plugins/music/music.py:299 epymc/plugins/music/music.py:343
 msgid "Music"
 msgstr "Musica"
 
-#: epymc/plugins/music/music.py:247
+#: epymc/plugins/music/music.py:259
 msgid ""
 "Long info for the <b>Music</b> module, explain what it does\n"
 "and what it need to work well, can also use markup like <title>this</> or\n"
 "<b>this</>"
 msgstr ""
 
-#: epymc/plugins/music/music.py:349
+#: epymc/plugins/music/music.py:361
 msgid "<hilight>Rebuilding Database</><br>please wait..."
 msgstr "<hilight>Aggiornamento libreria</><br>attendere..."
 
-#: epymc/plugins/music/music.py:380 epymc/plugins/music/music.py:391
-#: epymc/plugins/music/music.py:404
+#: epymc/plugins/music/music.py:392 epymc/plugins/music/music.py:403
+#: epymc/plugins/music/music.py:416
 #, python-format
 msgid "<hilight>%s</><br>queued"
 msgstr "<hilight>%s</><br>accodato"
@@ -1341,6 +1326,15 @@ msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "%d minuto fa"
 msgstr[1] "%d minuti fa"
+
+#~ msgid "Albums (%d)"
+#~ msgstr "Album (%d)"
+
+#~ msgid "Songs (%d)"
+#~ msgstr "Canzoni (%d)"
+
+#~ msgid "Artists (%d)"
+#~ msgstr "Artisti (%d)"
 
 #~ msgid "Suspend"
 #~ msgstr "Sospendi"

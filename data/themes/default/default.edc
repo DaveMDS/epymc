@@ -146,8 +146,7 @@ collections {
          part { name: "bg.bg";
             type: IMAGE;
             description { state: "default" 0.0;
-               // min: 1280 720;
-               min: 800 600;
+               min: 960 600;
                image.normal: "background.jpg";
             }
          }

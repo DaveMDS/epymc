@@ -3,6 +3,7 @@ The Emotion Media Center
 
 **EpyMC** is a Media Center application written in python that use the Enlightenemnt Foundation Library as the living base. The software is Open Source and multiplatform, it should work on every platform, as soon as you have installed the EFL and its python bindings. Thus at the moment the target platform is linux as all the delopment and testing is done on it.
 
+![01](/doc/ss/emc_01.jpg)
 
 ## Features ##
 
@@ -12,10 +13,8 @@ The Emotion Media Center
 - Thanks to the use of the EFL the application can run on different graphic backend, usually the super-fast software engine or the OpenGL/ES engine.
 - The UI is **fully scalable** and the scale can be changed from the config section.
 
-![01](/doc/ss/emc_01.png)
-![02](/doc/ss/emc_02.png)
-![03](/doc/ss/emc_03.png)
-![04](/doc/ss/emc_04.png)
+
+
 
 
 ## Todo ##

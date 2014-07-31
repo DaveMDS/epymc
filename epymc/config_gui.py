@@ -394,6 +394,7 @@ def _modules_populate(browser, url):
 def _sys_info():
    from efl.elementary.configuration import engine_get, preferred_engine_get
    from epymc.gui import _theme_generation
+   from epymc import __version__ as emc_version
 
    if sys.version_info[0] < 3:
       engine = engine_get().encode('utf8')
@@ -424,7 +425,7 @@ def _sys_info():
             _('Config folder'), utils.user_conf_dir,
             _('Versions'),
             _('Python'), sys.version,
-            _('EpyMC'), utils.emc_version,
+            _('EpyMC'), emc_version,
             _('EpyMC themes API'), _theme_generation,
           )
    EmcDialog(style='panel', title=_('System info'), text=text)

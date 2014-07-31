@@ -2,3 +2,5 @@ build/
 epymc/themes/*.edj
 epymc/locale/it
 data/locale/*.po~
+epymc/__pycache__/
+epymc/__init__.pyc

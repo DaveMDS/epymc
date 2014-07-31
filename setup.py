@@ -24,6 +24,7 @@ from distutils.file_util import copy_file
 from distutils.command.install_lib import install_lib
 from distutils.command.build import build
 from distutils.dep_util import newer, newer_group
+from epymc import __version__ as emc_version
 
 
 class build_themes(Command):
@@ -166,7 +167,7 @@ class Install(install_lib):
 
 setup (
    name = 'EpyMC',
-   version = '1.0.0-beta0', # don't forget to also update utils.py
+   version = emc_version,
    author = 'Davide <davemds> Andreoli',
    author_email = 'dave@gurumeditation.it',
    url = 'http://github.com/DaveMDS/epymc',

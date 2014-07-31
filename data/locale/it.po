@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-29 12:07+0200\n"
+"POT-Creation-Date: 2014-07-31 09:58+0200\n"
 "PO-Revision-Date: 2014-07-28 18:51+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
@@ -84,7 +84,7 @@ msgstr "Temi"
 msgid "Modules"
 msgstr "Moduli"
 
-#: epymc/config_gui.py:221 epymc/config_gui.py:430
+#: epymc/config_gui.py:221 epymc/config_gui.py:431
 msgid "System info"
 msgstr "Informazioni di sistema"
 
@@ -108,7 +108,7 @@ msgstr "Cartella download"
 msgid "Max concurrent download"
 msgstr "Download simultanei"
 
-#: epymc/config_gui.py:303 epymc/config_gui.py:419
+#: epymc/config_gui.py:303 epymc/config_gui.py:420
 msgid "Rendering engine"
 msgstr "Motore di rendering"
 
@@ -149,51 +149,51 @@ msgstr "Autore"
 msgid "Version"
 msgstr "Versione"
 
-#: epymc/config_gui.py:418
+#: epymc/config_gui.py:419
 msgid "Core"
 msgstr "Nucleo"
 
-#: epymc/config_gui.py:420
+#: epymc/config_gui.py:421
 msgid "Download available"
 msgstr "Download disponibili"
 
-#: epymc/config_gui.py:420
+#: epymc/config_gui.py:421
 msgid "yes"
 msgstr "sì"
 
-#: epymc/config_gui.py:420
+#: epymc/config_gui.py:421
 msgid "no"
 msgstr "no"
 
-#: epymc/config_gui.py:421
+#: epymc/config_gui.py:422
 msgid "Theme"
 msgstr "Tema"
 
-#: epymc/config_gui.py:422
+#: epymc/config_gui.py:423
 msgid "Paths"
 msgstr "Percorsi"
 
-#: epymc/config_gui.py:423
+#: epymc/config_gui.py:424
 msgid "Base folder"
 msgstr "Cartella base"
 
-#: epymc/config_gui.py:424
+#: epymc/config_gui.py:425
 msgid "Config folder"
 msgstr "Cartella configurazioni"
 
-#: epymc/config_gui.py:425
+#: epymc/config_gui.py:426
 msgid "Versions"
 msgstr "Versioni"
 
-#: epymc/config_gui.py:426
+#: epymc/config_gui.py:427
 msgid "Python"
 msgstr "Python"
 
-#: epymc/config_gui.py:427
+#: epymc/config_gui.py:428
 msgid "EpyMC"
 msgstr "EpyMC"
 
-#: epymc/config_gui.py:428
+#: epymc/config_gui.py:429
 msgid "EpyMC themes API"
 msgstr "Versione dei temi"
 

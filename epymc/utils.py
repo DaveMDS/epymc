@@ -34,7 +34,6 @@ def DBG(msg):
    pass
 
 
-emc_version = '1.0.0-beta0'
 emc_base_dir = os.path.dirname(__file__)
 user_conf_dir = os.path.expanduser('~/.config/epymc') # TODO use xdg-stuff
 

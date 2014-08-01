@@ -5,6 +5,9 @@ The Emotion Media Center
 
 ![01](/doc/ss/emc_01.jpg)
 
+More [screenshots](https://github.com/DaveMDS/epymc/wiki/Screenshots) and [screencasts](https://github.com/DaveMDS/epymc/wiki/Screencasts) can be found on the wiki.
+
+
 ## Download ##
 All the released versions can be obtained from [here](https://github.com/DaveMDS/epymc/releases).
 

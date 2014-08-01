@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, os, gettext
+import sys, os, gettext, logging
 
 from efl import evas, ecore, edje, elementary, emotion
 
@@ -41,6 +41,13 @@ import epymc.browser as browser
 
 
 def start_epymc():
+
+   # setup efl logging (you also need to set EINA_LOG_LEVEL=X)
+   l = logging.getLogger("efl")
+   h = logging.StreamHandler()
+   h.setFormatter(logging.Formatter("EFL %(levelname)s %(message)s"))
+   l.addHandler(h)
+   l.setLevel(logging.DEBUG)
 
    # init elementary
    elementary.init()

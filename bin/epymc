@@ -2,17 +2,6 @@
 
 import sys
 
-# Uncomment to enable more debug infos
-# import logging
-# l = logging.getLogger("efl")
-# h = logging.StreamHandler()
-# f = logging.Formatter("%(levelname)s %(message)s")
-# h.setFormatter(f)
-# l.addHandler(h)
-# l.setLevel(logging.INFO)
-
-
 from epymc.main import start_epymc
 
 sys.exit(start_epymc())
-

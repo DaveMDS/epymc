@@ -69,7 +69,7 @@ def LOG(sev, msg):
 
 
 def init():
-   """ return: 0=failed 1=ok 2=fallback_engine"""
+   """ return: False=failed True=ok """
    global win, layout, theme_file
    global _backdrop_im1, _backdrop_im2, _backdrop_curr
 
@@ -89,7 +89,7 @@ def init():
       theme_file = utils.get_resource_file('themes', theme_name, 'default.edj')
       if theme_file is None:
          LOG('err', 'cannot find a working theme file, exiting...')
-         return 0
+         return False
 
    # check the theme generation
    gen = edje.file_data_get(theme_file, 'theme.generation')
@@ -97,25 +97,17 @@ def init():
       LOG('err', "Theme '{}' not in sync with actual code base.\n"
                  "Needed generation: {} - theme: {} .. aborting".format(
                  theme_file, _theme_generation, gen))
-      return 0
+      return False
 
    # custom elementary theme
    set_theme_file(theme_file)
 
    # create the elm window
-   try:
-      preferred_engine_set(evas_engine)
-      win = Window('epymc', ELM_WIN_BASIC)
-      LOG('inf', 'Using evas engine: ' + evas_engine)
-      ret = 1
-   except:
-      preferred_engine_set('software_x11')
-      win = Window('epymc', ELM_WIN_BASIC)
-      LOG('err', 'Falling back to standard_x11')
-      ret = 2
+   preferred_engine_set(evas_engine)
+   LOG('inf', 'Requested evas engine: ' + evas_engine)
 
-   # configure the win
-   win.title_set(_('Enlightenment Media Center'))
+   win = Window('epymc', ELM_WIN_BASIC)
+   win.title_set(_('Emotion Media Center'))
    win.callback_delete_request_add(lambda w: ask_to_exit())
    if fullscreen == 'True':
       win.fullscreen_set(1)
@@ -159,7 +151,7 @@ def init():
    # set efl frames per second
    fps_set(fps)
 
-   return ret
+   return True
 
 def shutdown():
    events.listener_del('gui')

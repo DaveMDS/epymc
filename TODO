@@ -4,7 +4,6 @@ BUGS
 =====
  * mame's favorites got lost from config sometimes
  * video don't keep the right aspect, usually subs get cutted out
- * when the requested evas engine is not found the alert dialog do not show up
 
 MAIN
 =====

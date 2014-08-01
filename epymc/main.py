@@ -67,8 +67,8 @@ def start_epymc():
    # init stuff
    sdb.init()
    browser.init()
-   gui_return = gui.init()
-   if gui_return < 1: return 2
+   if not gui.init():
+      return 1
    mainmenu.init()
    config_gui.init()
    mediaplayer.init()
@@ -79,13 +79,6 @@ def start_epymc():
 
    # show the mainmenu
    mainmenu.show()
-
-   # alert if the evas engine is not the requested one
-   if gui_return == 2:
-      gui.EmcDialog(style = 'warning',
-                    text = 'Cannot initialize the engine:<br>%s<br>' \
-                           'Falling back to standard_x11'  % \
-                           ini.get('general', 'evas_engine'))
 
    # run the main loop
    elementary.run()

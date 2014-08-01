@@ -295,8 +295,8 @@ def _general_populate(browser, url):
    standard_item_string_add('general', 'max_concurrent_download', _('Max concurrent download'), 'icon/download')
 
    L = evas.render_method_list()
-   if 'buffer' in L: L.remove('buffer')
-   if 'software_generic' in L: L.remove('software_generic')
+   for remove in ('buffer', 'software_generic', 'gl_generic'):
+      if remove in L: L.remove(remove)
    if 'gl_x11' in L:
       L.remove('gl_x11')
       L.append('opengl_x11')
@@ -392,21 +392,19 @@ def _modules_populate(browser, url):
 ##############  SYS INFO  #####################################################
 
 def _sys_info():
-   from efl.elementary.configuration import engine_get, preferred_engine_get
+   from efl.elementary.configuration import preferred_engine_get
    from epymc.gui import _theme_generation
    from epymc import __version__ as emc_version
 
    if sys.version_info[0] < 3:
-      engine = engine_get().encode('utf8')
       pref_engine = preferred_engine_get().encode('utf8')
    else:
-      engine = engine_get()
       pref_engine = preferred_engine_get()
    
    downl_avail = ecore.file_download_protocol_available('http://')
 
    text = '<title>%s</><br>' \
-          '<name>%s:</name> %s - %s<br>' \
+          '<name>%s:</name> %s<br>' \
           '<name>%s:</name> %s<br>' \
           '<name>%s:</name> %s - %s<br>' \
           '<br><title>%s</><br>' \
@@ -417,7 +415,7 @@ def _sys_info():
           '<name>%s:</name> %s<br>' \
           '<name>%s:</name> %s<br>' % (
             _('Core'),
-            _('Rendering engine'), engine, pref_engine,
+            _('Rendering engine'), pref_engine,
             _('Download available'), _('yes') if downl_avail else _('no'),
             _('Theme'), ini.get('general', 'theme'), gui.theme_file,
             _('Paths'),

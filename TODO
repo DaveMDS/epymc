@@ -13,6 +13,7 @@ MAIN
 CORE
 =====
  * Add the ability to update youtube-dl from the gui
+ * Add subtitles support, with autodownload from opensubtitles.org
 
 MAME
 =====

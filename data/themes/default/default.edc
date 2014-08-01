@@ -271,6 +271,7 @@ collections {
             mouse_events: 1;
             repeat_events: 1;
             description { state: "default" 0.0;
+               fixed: 1 1;
                align: 1.0 0.5;
                rel1 {
                   to: "topbar.clock";
@@ -294,6 +295,7 @@ collections {
             clip_to: "topbar.clip";
             scale: 1;
             description { state: "default" 0.0;
+               fixed: 1 1;
                color: FONT_COLOR;
                align: 1.0 0.5;
                rel1 {
@@ -694,6 +696,7 @@ collections {
             description { state: "default" 0.0;
                rel1.relative: 0.0 -0.3;
                rel2.relative: 1.0 -0.3;
+               fixed: 1 1;
                align: 0.5 0.0;
                color: 255 255 255 200;
                color3: FONT_COLOR3;
@@ -974,6 +977,7 @@ collections {
             clip_to: "videoplayer.clip";
             effect: FAR_SHADOW;
             description { state: "default" 0.0;
+               fixed: 1 1;
                color: FONT_COLOR;
                color3: FONT_COLOR3;
                align: 1.0 0.0;

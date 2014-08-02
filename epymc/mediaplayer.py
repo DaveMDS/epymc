@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, re
+import os, sys, re, glob
 
 from efl import evas, ecore, edje, elementary, emotion
 
@@ -446,12 +446,12 @@ def _init_mediaplayer_gui():
    _buttons.append(bt)
 
    #  submenu subtitles
-   # bt = EmcButton(_('Subtitles'))
-   # bt.callback_clicked_add(_cb_btn_video)
-   # bt.data['cb'] = _cb_btn_video
-   # _fman.obj_add(bt)
-   # gui.box_append('videoplayer.controls.btn_box2', bt)
-   # _buttons.append(bt)
+   bt = EmcButton(_('Subtitles'))
+   bt.callback_clicked_add(_cb_btn_subtitles)
+   bt.data['cb'] = _cb_btn_subtitles
+   _fman.obj_add(bt)
+   gui.box_append('videoplayer.controls.btn_box2', bt)
+   _buttons.append(bt)
 
    # update emotion position when mouse drag the progress slider
    def _drag_prog(obj, emission, source):
@@ -543,9 +543,29 @@ def _cb_menu_video_track(menu, item, track_num):
 def _cb_menu_mute(menu, item):
    volume_mute_toggle()
 
-
 def _cb_menu_download(menu, item):
    DownloadManager().queue_download(_onair_url, _onair_title)
+
+# subtitles menu
+def _cb_btn_subtitles(btn):
+   menu = EmcMenu(relto=btn)
+   item = menu.item_add(None, _('No subtitles'),
+                        None if _subtitles.current_file else 'arrow_right',
+                        _cb_menu_sub_track, None)
+   for sub in _subtitles.avail_files:
+      item = menu.item_add(None, os.path.basename(sub),
+                     'arrow_right' if sub == _subtitles.current_file else None,
+                     _cb_menu_sub_track, sub)
+
+   menu.item_separator_add()
+   it = menu.item_add(None, _('Download subtitles'), None, _cb_menu_sub_download)
+   it.disabled = True
+
+def _cb_menu_sub_track(menu, item, sub_file):
+   _subtitles.file_set(sub_file)
+
+def _cb_menu_sub_download(menu, item):
+   print("DOWN (TODO)")
 
 
 def _update_slider():
@@ -716,25 +736,41 @@ class SubtitleItem(object):
 
 class Subtitles(object):
    def __init__(self, url):
+      self.avail_files = []
+      self.current_file = None
       self.items = []
       self.current_item = None
       self.timer = None
 
-      srt_file = os.path.splitext(utils.url2path(url))[0] + '.srt'
-      if os.path.exists(srt_file):
-         self.parse_srt(srt_file)
+      name = os.path.splitext(utils.url2path(url))[0]
+      main_srt = name + '.srt'
+      if os.path.exists(main_srt):
+         self.avail_files.append(main_srt)
 
-      if self.items:
-         self.timer = ecore.Timer(0.2, self._timer_cb)
+      for fname in glob.glob(name + '*.srt'):
+         if not fname in self.avail_files:
+            self.avail_files.append(fname)
 
-   def delete(self):
-      self.clear()
+      if len(self.avail_files) > 0:
+         self.file_set(self.avail_files[0])
+
+   def file_set(self, fname):
       if self.timer:
          self.timer.delete()
-         self.timer = None
-      if self.items:
-         del self.items
-         self.items = None
+      self.clear()
+      self.items = []
+      self.current_item = None
+      self.current_file = None
+
+      if fname is not None:
+         self.parse_srt(fname)
+         if self.items:
+            self.current_file = fname
+            self.timer = ecore.Timer(0.2, self._timer_cb)
+
+   def delete(self):
+      self.file_set(None)
+      self.clear()
 
    def parse_srt(self, fname):
       LOG('inf', 'Loading subs from file: %s' % fname)

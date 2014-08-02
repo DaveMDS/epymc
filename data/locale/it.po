@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-02 18:04+0200\n"
-"PO-Revision-Date: 2014-08-02 17:34+0100\n"
+"POT-Creation-Date: 2014-08-02 20:11+0200\n"
+"PO-Revision-Date: 2014-08-02 20:07+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -387,6 +387,10 @@ msgstr "Audio"
 msgid "Video"
 msgstr "Video"
 
+#: epymc/mediaplayer.py:449
+msgid "Subtitles"
+msgstr "Sottotitoli"
+
 #: epymc/mediaplayer.py:508
 #, python-format
 msgid "Audio track: %s"
@@ -414,6 +418,14 @@ msgstr "Traccia video #%d"
 #: epymc/mediaplayer.py:528
 msgid "Download video"
 msgstr "Scarica filmato"
+
+#: epymc/mediaplayer.py:552
+msgid "No subtitles"
+msgstr "Nessun sottotitolo"
+
+#: epymc/mediaplayer.py:561
+msgid "Download subtitles"
+msgstr "Scarica sottotitoli"
 
 #: epymc/plugins/calibrator/calibrator.py:48
 #: epymc/plugins/calibrator/calibrator.py:54
@@ -1343,5 +1355,3 @@ msgid_plural "%d minutes ago"
 msgstr[0] "%d minuto fa"
 msgstr[1] "%d minuti fa"
 
-#~ msgid "Subtitles"
-#~ msgstr "Sottotitoli"

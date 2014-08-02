@@ -20,7 +20,7 @@
 
 import os
 import operator
-from mutagen.easyid3 import EasyID3
+import mutagen
 
 from efl import ecore
 
@@ -41,7 +41,7 @@ def DBG(msg):
    pass
 
 
-_audio_extensions = ['.mp3']
+_audio_extensions = ['.mp3', '.ogg', '.oga', '.flac', '.m4a', '.wav']
 _mod = None
 
 
@@ -400,7 +400,8 @@ and what it need to work well, can also use markup like <title>this</> or
       DBG('GET METADATA FOR: ' + full_path)
 
       try:
-         meta = EasyID3(full_path)
+         meta = mutagen.File(full_path, easy=True)
+         assert meta is not None
       except:
          return
 

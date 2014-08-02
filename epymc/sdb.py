@@ -97,7 +97,7 @@ class EmcDatabase(object):
       else:
          # update the db now
          self._sh[key] = data
-         self._sh.sync() # TODO really sync at every vrite ??
+         self._sh.sync() # TODO really sync at every write ??
 
    def del_data(self, key):
       if key in self._sh:
@@ -146,6 +146,6 @@ def _process_queue():
       count -= 1
       (db, key, data) = _queue.get_nowait()
       db._sh[key] = data
-      self._sh.sync() # TODO really sync at every vrite ??
+      db._sh.sync() # TODO really sync at every write ??
 
    return True

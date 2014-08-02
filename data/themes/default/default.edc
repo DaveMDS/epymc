@@ -1240,6 +1240,7 @@ collections {
             type: TEXT;
             scale: 1;
             description { state: "default" 0.0;
+               fixed: 1 1;
                rel1 {
                   to: "browser.item.icon_end";
                   relative: 0.0 0.0;

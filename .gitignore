@@ -4,3 +4,10 @@ epymc/locale/it
 data/locale/*.po~
 epymc/__pycache__/
 epymc/__init__.pyc
+
+## below files are created by makepkg
+## when building the PKGBUILD
+epymc-*.tar.xz
+packaging/arch/epymc
+packaging/arch/pkg
+packaging/arch/src/

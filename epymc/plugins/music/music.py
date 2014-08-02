@@ -20,7 +20,7 @@
 
 import os
 import operator
-import threading
+from mutagen.easyid3 import EasyID3
 
 from efl import ecore
 
@@ -37,11 +37,11 @@ import epymc.mediaplayer as mediaplayer
 
 
 def DBG(msg):
-   print('MUSIC: ' + msg)
+   # print('MUSIC: ' + msg)
    pass
 
 
-_audio_extensions = ['.mp3', '.MP3']
+_audio_extensions = ['.mp3']
 _mod = None
 
 
@@ -355,29 +355,125 @@ and what it need to work well, can also use markup like <title>this</> or
       # self.rebuild_db()
 
    def rebuild_db(self):
-      # Update db in a parallel thread
       if self._rebuild_notify is None:
-         self._rebuild_notify = EmcNotify(
-               _('<hilight>Rebuilding Database</><br>please wait...'), hidein=0)
+         txt = '<title>%s</title><br>%s' % \
+               (_('Rebuilding database'), _('please wait...'))
+         self._rebuild_notify = EmcNotify(hidein=0, icon='icon/music', text=txt)
 
-         thread = UpdateDBThread(self._folders, self._songs_db,
-                                 self._albums_db, self._artists_db)
-         thread.start()
-         ecore.Timer(2.0, self.check_thread_done, thread)
+         self._rebuild_files = utils.grab_files(self._folders)
+         self._rebuild_timer = ecore.Timer(1.0, self.rebuild_db_timer)
+         self._rebuild_idler = ecore.Idler(self.rebuild_db_idler)
+
+   def rebuild_db_timer(self):
+      self._browser.refresh()
+      return ecore.ECORE_CALLBACK_RENEW
       
-   def check_thread_done(self, thread):
-      if thread.is_alive():
-         self._browser.refresh()
-         return True # renew the timer
+   def rebuild_db_idler(self):
+      try:
+         # get the next file from the generator and read metadata (if needed)
+         full_path = self._rebuild_files.next()
+         (name, ext) = os.path.splitext(full_path)
+         if ext.lower() in _audio_extensions:
+            if self._songs_db.id_exists('file://' + full_path):
+               DBG('FOUND IN DB')
+            else:
+               self.read_file_metadata(full_path)
+         else:
+            DBG('Warning: invalid file extension for file: ' + full_path)
+      except StopIteration:
+         # no more files to process, all done
+         self._rebuild_timer.delete()
+         self._rebuild_idler = None
+         self._rebuild_timer = None
+         self._rebuild_files = None
 
-      # thread done, close the notification
-      self._rebuild_notify.close()
-      self._rebuild_notify = None
+         self._rebuild_notify.close()
+         self._rebuild_notify = None
+         txt = '<title>%s</title><br>%s' % \
+               (_('Rebuilding database'), _('operation completed'))
+         EmcNotify(icon='icon/music', text=txt)
+         return ecore.ECORE_CALLBACK_CANCEL
 
-      # refresh the current page :/
-      self._browser.refresh(hard=True)
+      return ecore.ECORE_CALLBACK_RENEW
 
-      return False # kill the timer
+   def read_file_metadata(self, full_path):
+      DBG('GET METADATA FOR: ' + full_path)
+
+      try:
+         meta = EasyID3(full_path)
+      except:
+         return
+
+      item_data = dict()
+      item_data['url'] = 'file://' + full_path
+
+      if 'title' in meta:
+         item_data['title'] = meta['title'][0].encode('utf-8') # TODO is the encode correct? doesn't evas support unicode now??
+      else:
+         item_data['title'] = os.path.basename(full_path)
+
+      if 'artist' in meta:
+         item_data['artist'] = meta['artist'][0].encode('utf-8')
+
+         # create artist item if necessary
+         if not self._artists_db.id_exists(item_data['artist']):
+            DBG('NEW ARTIST: ' + item_data['artist'])
+            artist_data = dict()
+            artist_data['name'] = item_data['artist']
+            artist_data['albums'] = list()
+            artist_data['songs'] = list()
+         else:
+            DBG('ARTIST EXIST')
+            artist_data = self._artists_db.get_data(item_data['artist'])
+
+         # add song to song list (in artist), only if not exists yet
+         if not full_path in artist_data['songs']:
+            artist_data['songs'].append('file://' + full_path)
+
+         # add album to albums list (in artist), only if not exist yet
+         if 'album' in meta and not meta['album'] in artist_data['albums']:
+            artist_data['albums'].append(meta['album'])
+
+         # write artist to db
+         self._artists_db.set_data(item_data['artist'], artist_data)
+      else:
+         item_data['artist'] = 'Unknow'
+
+      try:
+         if '/' in meta['tracknumber'][0]:
+            tn = int(meta['tracknumber'][0].split('/')[0])
+         else:
+            tn = int(meta['tracknumber'][0])
+         item_data['tracknumber'] = tn
+      except:
+         pass
+
+      if 'length' in meta:
+         item_data['length'] = meta['length'][0].encode('utf-8')
+
+      if 'album' in meta:
+         item_data['album'] = meta['album'][0].encode('utf-8')
+
+         # create album item if necesary
+         if not self._albums_db.id_exists(item_data['album']):
+            DBG('NEW ALBUM: ' + item_data['album'])
+            album_data = dict()
+            album_data['name'] = item_data['album']
+            album_data['artist'] = item_data['artist']
+            album_data['songs'] = list()
+         else:
+            DBG('ALBUM EXIST')
+            album_data = self._albums_db.get_data(item_data['album'])
+
+         # add song to song list (in album), only if not exists yet
+         if not full_path in album_data['songs']:
+            album_data['songs'].append('file://' + full_path)
+
+         # write album to db
+         self._albums_db.set_data(item_data['album'], album_data)
+
+      # write song to db
+      self._songs_db.set_data('file://' + full_path, item_data)
 
    def queue_url(self, url, song = None):
 
@@ -511,128 +607,3 @@ and what it need to work well, can also use markup like <title>this</> or
       # for song in sorted(L, key='tracknumber'):
       for song in L:
          self._browser.item_add(SongItemClass(), song['url'], song)
-
-
-###############################################################################
-from mutagen.easyid3 import EasyID3
-
-class UpdateDBThread(threading.Thread):
-
-   def __init__(self, folders, songs_db, albums_db, artists_db):
-      threading.Thread.__init__(self)
-      self.folders = folders
-      self.songs_db = songs_db
-      self.albums_db = albums_db
-      self.artists_db = artists_db
-
-   def run(self):
-      global _audio_extensions
-
-      print('This is the thread speaking, HALO')
-
-      for folder in self.folders:
-         # strip url
-         if folder.find('://', 0, 16) > 0:
-            folder = folder[folder.find('://')+3:]
-
-         print('Scanning dir ' + folder + ' ...')
-         for root, dirs, files in os.walk(folder):
-            for file in files:
-               (filename, ext) = os.path.splitext(file)
-               if ext in _audio_extensions:
-                  path = os.path.join(root, file)
-
-                  if not self.songs_db.id_exists('file://' + path):
-                     self.read_metadata(path)
-                  else:
-                     print('FOUND IN DB')
-                  # TODO Check also file modification time
-               else:
-                  print('Error: invalid file extension for file: ' + file)
-
-   def read_metadata(self, full_path):
-      DBG('GET METADATA FOR: ' + full_path)
-
-      try:
-         meta = EasyID3(full_path)
-      except:
-         return
-
-      # import pprint
-      # pprint.pprint(meta)
-
-      item_data = dict()
-
-      item_data['url'] = 'file://' + full_path
-
-      if 'title' in meta:
-         item_data['title'] = meta['title'][0].encode('utf-8') # TODO is the encode correct? doesn't evas support unicode now??
-      else:
-         item_data['title'] = full_path # TODO just file name
-
-      if 'artist' in meta:
-         item_data['artist'] = meta['artist'][0].encode('utf-8')
-
-         # create artist item if necessary
-         if not self.artists_db.id_exists(item_data['artist']):
-            DBG('NEW ARTIST: ' + item_data['artist'])
-            artist_data = dict()
-            artist_data['name'] = item_data['artist']
-            artist_data['albums'] = list()
-            artist_data['songs'] = list()
-         else:
-            DBG('ARTIST EXIST')
-            artist_data = self.artists_db.get_data(item_data['artist'])
-
-         # add song to song list (in artist), only if not exists yet
-         if not full_path in artist_data['songs']:
-            artist_data['songs'].append('file://' + full_path)
-
-         # add album to albums list (in artist), only if not exist yet
-         if 'album' in meta and not meta['album'] in artist_data['albums']:
-            artist_data['albums'].append(meta['album'])
-
-         # write artist to db
-         self.artists_db.set_data(item_data['artist'], artist_data,
-                              thread_safe=False) # we should be the only writer
-      else:
-         item_data['artist'] = 'Unknow'
-
-      try:
-         if '/' in meta['tracknumber'][0]:
-            tn = int(meta['tracknumber'][0].split('/')[0])
-         else:
-            tn = int(meta['tracknumber'][0])
-         item_data['tracknumber'] = tn
-      except:
-         pass
-
-      if 'length' in meta:
-         item_data['length'] = meta['length'][0].encode('utf-8')
-
-      if 'album' in meta:
-         item_data['album'] = meta['album'][0].encode('utf-8')
-
-         # create album item if necesary
-         if not self.albums_db.id_exists(item_data['album']):
-            DBG('NEW ALBUM: ' + item_data['album'])
-            album_data = dict()
-            album_data['name'] = item_data['album']
-            album_data['artist'] = item_data['artist']
-            album_data['songs'] = list()
-         else:
-            DBG('ALBUM EXIST')
-            album_data = self.albums_db.get_data(item_data['album'])
-
-         # add song to song list (in album), only if not exists yet
-         if not full_path in album_data['songs']:
-            album_data['songs'].append('file://' + full_path)
-
-         # write album to db
-         self.albums_db.set_data(item_data['album'], album_data,
-                              thread_safe=False) # we should be the only writer
-
-      # write song to db
-      self.songs_db.set_data('file://' + full_path, item_data,
-                             thread_safe=False) # we should be the only writer
-

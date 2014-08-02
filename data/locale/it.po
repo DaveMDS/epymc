@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-01 23:16+0200\n"
-"PO-Revision-Date: 2014-08-01 23:00+0100\n"
+"POT-Creation-Date: 2014-08-02 11:31+0200\n"
+"PO-Revision-Date: 2014-08-02 11:31+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -22,7 +22,7 @@ msgstr ""
 msgid "Fetching info"
 msgstr "Scaricamento informazioni"
 
-#: epymc/themoviedb.py:540
+#: epymc/themoviedb.py:540 epymc/plugins/music/music.py:360
 msgid "please wait..."
 msgstr "Attendere..."
 
@@ -1104,12 +1104,12 @@ msgid "Play all the songs"
 msgstr "Suona tutte le canzoni"
 
 #: epymc/plugins/music/music.py:175 epymc/plugins/music/music.py:220
-#: epymc/plugins/music/music.py:428
+#: epymc/plugins/music/music.py:524
 #, python-format
 msgid "<em>by</em> %s<br>"
 msgstr "<em>di</em> %s<br>"
 
-#: epymc/plugins/music/music.py:177 epymc/plugins/music/music.py:430
+#: epymc/plugins/music/music.py:177 epymc/plugins/music/music.py:526
 #, python-format
 msgid "<em>from</em> %s<br>"
 msgstr "<em>da</em> %s<br>"
@@ -1157,12 +1157,16 @@ msgid ""
 "<b>this</>"
 msgstr ""
 
-#: epymc/plugins/music/music.py:361
-msgid "<hilight>Rebuilding Database</><br>please wait..."
-msgstr "<hilight>Aggiornamento libreria</><br>attendere..."
+#: epymc/plugins/music/music.py:360 epymc/plugins/music/music.py:393
+msgid "Rebuilding database"
+msgstr "Aggiornamento libreria"
 
-#: epymc/plugins/music/music.py:392 epymc/plugins/music/music.py:403
-#: epymc/plugins/music/music.py:416
+#: epymc/plugins/music/music.py:393
+msgid "operation completed"
+msgstr "operazione completata"
+
+#: epymc/plugins/music/music.py:488 epymc/plugins/music/music.py:499
+#: epymc/plugins/music/music.py:512
 #, python-format
 msgid "<hilight>%s</><br>queued"
 msgstr "<hilight>%s</><br>accodato"

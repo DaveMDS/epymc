@@ -19,6 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import re
 
 from efl import evas, ecore, edje, elementary, emotion
 
@@ -48,6 +49,7 @@ _onair_url = None
 _onair_title = None
 _play_db = None # key: url  data: {'started': 14, 'finished': 0, 'stop_at': 0 }
 _play_pause_btn = None
+_subtitles = None # Subtitle class instance
 
 ### API ###
 def init():
@@ -77,7 +79,7 @@ def shutdown():
 
 ### mediaplyer API ###
 def play_url(url, only_audio = False, start_from = 0):
-   global _onair_url, _onair_title
+   global _onair_url, _onair_title, _subtitles
 
    if not _emotion:
       if not _init_emotion():
@@ -128,7 +130,10 @@ def play_url(url, only_audio = False, start_from = 0):
       _play_db.set_data(url, counts)
    LOG('dbg', 'url started: %d finished: %d' %
               (counts['started'], counts['finished']))
-   
+
+   # Try to load subs for this url
+   _subtitles = Subtitles(url)
+
    ## TEST VARIOUS INFO
    # LOG('dbg', 'TITLE: ' + str(_emotion.title_get()))
    # LOG('dbg', 'CHAPTER COUNT: ' + str(_emotion.chapter_count()))
@@ -155,7 +160,7 @@ def play_counts_get(url):
                'stop_at': 0 }  # last play pos
 
 def stop():
-   global _emotion, _onair_url
+   global _emotion, _onair_url, _subtitles
 
    LOG('dbg', 'Stop()')
 
@@ -179,6 +184,11 @@ def stop():
    _emotion.delete()
    del _emotion
    _emotion = None
+
+   # clear the subtitles instance
+   if _subtitles:
+      _subtitles.delete()
+      _subtitles = None
 
    events.event_emit('PLAYBACK_FINISHED')
 
@@ -652,3 +662,96 @@ def input_event_cb(event):
          return input_events.EVENT_BLOCK
 
    return input_events.EVENT_CONTINUE
+
+### subtitles ###
+def srt_time_to_seconds(time):
+   split_time = time.split(',')
+   major, minor = (split_time[0].split(':'), split_time[1])
+   return int(major[0])*1440 + int(major[1])*60 + int(major[2]) + float(minor)/1000
+
+class SubtitleItem(object):
+   def __init__(self, idx, start, end, text):
+      self.idx = idx
+      self.start = srt_time_to_seconds(start)
+      self.end = srt_time_to_seconds(end)
+      self.text = text
+
+   def __str__(self):
+      return '%f -> %f : %s' % (self.start, self.end, self.text)
+
+class Subtitles(object):
+   def __init__(self, url):
+      self.items = []
+      self.current_item = None
+      self.timer = None
+
+      srt_file = os.path.splitext(utils.url2path(url))[0] + '.srt'
+      if os.path.exists(srt_file):
+         self.parse_srt(srt_file)
+
+      if self.items:
+         self.timer = ecore.Timer(0.2, self._timer_cb)
+
+   def delete(self):
+      self.clear()
+      if self.timer:
+         self.timer.delete()
+         self.timer = None
+      if self.items:
+         del self.items
+         self.items = None
+
+   def parse_srt(self, fname):
+      LOG('inf', 'Loading subs from file: %s' % fname)
+      with open(fname, 'r') as f:
+         full_text = f.read()
+         idx = 0
+         for s in re.sub('\r\n', '\n', full_text).split('\n\n'):
+            st = s.split('\n')
+            if len(st) >= 3:
+               split = st[1].split(' --> ')
+               item = SubtitleItem(idx, split[0], split[1], '<br>'.join(st[2:]))
+               self.items.append(item)
+               idx += 1
+
+   def item_apply(self, item):
+      if item != self.current_item:
+         gui.text_set('videoplayer.subs', item.text)
+         self.current_item = item
+
+   def clear(self):
+      gui.text_set('videoplayer.subs', '')
+
+   def _timer_cb(self):
+      if _emotion is None:
+         self.timer = None
+         return ecore.ECORE_CALLBACK_CANCEL
+      pos = _emotion.position
+
+      # current item is still valid ?
+      item = self.current_item
+      if item and item.start < pos < item.end:
+         return ecore.ECORE_CALLBACK_RENEW
+
+      # next item valid ?
+      if item and item.idx < len(self.items):
+         next_item = self.items[item.idx + 1]
+         if item.end < pos < next_item.start:
+            # pause between current and the next
+            self.clear()
+            return ecore.ECORE_CALLBACK_RENEW
+         elif next_item.start < pos < next_item.end:
+            # apply the next
+            self.item_apply(next_item)
+            return ecore.ECORE_CALLBACK_RENEW
+
+      # fallback: search all the items (TODO optimize using a binary search)
+      for item in self.items:
+         if item.start < pos < item.end:
+            self.item_apply(item)
+            return ecore.ECORE_CALLBACK_RENEW
+         if item.end > pos:
+            self.clear()
+            return ecore.ECORE_CALLBACK_RENEW
+
+      return ecore.ECORE_CALLBACK_RENEW

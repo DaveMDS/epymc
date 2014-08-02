@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-02 11:31+0200\n"
+"POT-Creation-Date: 2014-08-02 14:58+0200\n"
 "PO-Revision-Date: 2014-08-02 11:31+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
@@ -354,52 +354,52 @@ msgstr "Download avviato"
 msgid "Download completed"
 msgstr "Download completato"
 
-#: epymc/mediaplayer.py:99
+#: epymc/mediaplayer.py:101
 msgid "File not found"
 msgstr "File non trovato"
 
-#: epymc/mediaplayer.py:314
+#: epymc/mediaplayer.py:324
 msgid "buffering"
 msgstr "buffering"
 
-#: epymc/mediaplayer.py:336
+#: epymc/mediaplayer.py:346
 #, python-format
 msgid "Cannot init emotion engine:<br>%s"
 msgstr "Non posso avviare il motore di emotion:<br>%s"
 
-#: epymc/mediaplayer.py:416
+#: epymc/mediaplayer.py:426
 msgid "Audio"
 msgstr "Audio"
 
-#: epymc/mediaplayer.py:424
+#: epymc/mediaplayer.py:434
 msgid "Video"
 msgstr "Video"
 
-#: epymc/mediaplayer.py:483
+#: epymc/mediaplayer.py:493
 #, python-format
 msgid "Audio track: %s"
 msgstr "Traccia audio: %s"
 
-#: epymc/mediaplayer.py:485
+#: epymc/mediaplayer.py:495
 #, python-format
 msgid "Audio track #%d"
 msgstr "Traccia audio #%d"
 
-#: epymc/mediaplayer.py:489
+#: epymc/mediaplayer.py:499
 msgid "Mute"
 msgstr "Muto"
 
-#: epymc/mediaplayer.py:497
+#: epymc/mediaplayer.py:507
 #, python-format
 msgid "Video track: %s"
 msgstr "Traccia video: %s"
 
-#: epymc/mediaplayer.py:499
+#: epymc/mediaplayer.py:509
 #, python-format
 msgid "Video track #%d"
 msgstr "Traccia video #%d"
 
-#: epymc/mediaplayer.py:503
+#: epymc/mediaplayer.py:513
 msgid "Download video"
 msgstr "Scarica filmato"
 
@@ -1104,12 +1104,12 @@ msgid "Play all the songs"
 msgstr "Suona tutte le canzoni"
 
 #: epymc/plugins/music/music.py:175 epymc/plugins/music/music.py:220
-#: epymc/plugins/music/music.py:524
+#: epymc/plugins/music/music.py:525
 #, python-format
 msgid "<em>by</em> %s<br>"
 msgstr "<em>di</em> %s<br>"
 
-#: epymc/plugins/music/music.py:177 epymc/plugins/music/music.py:526
+#: epymc/plugins/music/music.py:177 epymc/plugins/music/music.py:527
 #, python-format
 msgid "<em>from</em> %s<br>"
 msgstr "<em>da</em> %s<br>"
@@ -1165,8 +1165,8 @@ msgstr "Aggiornamento libreria"
 msgid "operation completed"
 msgstr "operazione completata"
 
-#: epymc/plugins/music/music.py:488 epymc/plugins/music/music.py:499
-#: epymc/plugins/music/music.py:512
+#: epymc/plugins/music/music.py:489 epymc/plugins/music/music.py:500
+#: epymc/plugins/music/music.py:513
 #, python-format
 msgid "<hilight>%s</><br>queued"
 msgstr "<hilight>%s</><br>accodato"

@@ -1,25 +1,25 @@
 #Maintainer nixalot <nixalot at nixalot dot com>
 
-pkgname=epymc-svn
+pkgname=epymc-git
 _pkgname=epymc
 _urlname=EpyMC
-pkgver=750
+pkgver=c2bbfa2
 pkgrel=1
-pkgdesc="Media Center application written in python and built on the Enlightenment Foundation Library - svn"
+pkgdesc="Media Center application written in python and built on the Enlightenment Foundation Library"
 provides=$_pkgname
 arch=(any)
 license=(LGPL3)
-url="https://code.google.com/p/e17mods/wiki/${_urlname}"
-makedepends=('subversion')
-depends=('efl-git' 'elementary-git' 'python-efl-git')
+url="https://github.com/DaveMDS/${_pkgname}"
+makedepends=('git' 'python')
+depends=('efl' 'elementary' 'python-efl')
 optdepends=('lirc: remote control support')
-source=("${_pkgname}::svn+http://e17mods.googlecode.com/svn/trunk/APPS/epymc")
+source=("${_pkgname}::git://github.com/DaveMDS/${_pkgname}.git")
 md5sums=('SKIP')
 
 pkgver() {
     cd "$srcdir/$_pkgname"
     
-    echo "$(svn info | awk '/^Revision:/ {print $2}')"
+    echo "$(git rev-parse --short HEAD)"
 }
 
 package() {

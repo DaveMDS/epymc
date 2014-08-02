@@ -38,6 +38,7 @@ ICON("exit")
 ICON("search")
 ICON("info")
 ICON("download")
+ICON("subs")
 
 ICON("arrowR")
 ICON("arrowL")

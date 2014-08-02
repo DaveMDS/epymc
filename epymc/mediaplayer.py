@@ -18,8 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import re
+import os, sys, re
 
 from efl import evas, ecore, edje, elementary, emotion
 
@@ -58,10 +57,18 @@ def init():
 
    # default config values
    ini.add_section('mediaplayer')
+   ini.add_section('subtitles')
    if not ini.has_option('mediaplayer', 'volume'):
       ini.set('mediaplayer', 'volume', '75')
    if not ini.has_option('mediaplayer', 'backend'):
       ini.set('mediaplayer', 'backend', 'gstreamer1')
+   if not ini.has_option('subtitles', 'lang'):
+      ini.set('subtitles', 'lang', 'en')
+   if not ini.has_option('subtitles', 'encoding'):
+      ini.set('subtitles', 'encoding', 'latin_1')
+   if not ini.has_option('subtitles', 'always_try_utf8'):
+      ini.set('subtitles', 'always_try_utf8', 'True')
+      
    _volume = ini.get_int('mediaplayer', 'volume')
 
    # simple db to store the count of played files
@@ -438,6 +445,14 @@ def _init_mediaplayer_gui():
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
 
+   #  submenu subtitles
+   # bt = EmcButton(_('Subtitles'))
+   # bt.callback_clicked_add(_cb_btn_video)
+   # bt.data['cb'] = _cb_btn_video
+   # _fman.obj_add(bt)
+   # gui.box_append('videoplayer.controls.btn_box2', bt)
+   # _buttons.append(bt)
+
    # update emotion position when mouse drag the progress slider
    def _drag_prog(obj, emission, source):
       (val,val2) = gui.slider_val_get('videoplayer.controls.slider:dragable1')
@@ -669,6 +684,26 @@ def srt_time_to_seconds(time):
    major, minor = (split_time[0].split(':'), split_time[1])
    return int(major[0])*1440 + int(major[1])*60 + int(major[2]) + float(minor)/1000
 
+def srt_read_encoding_py2(fname, encodings):
+   with open(fname, 'r') as f:
+      text = f.read()
+      for enc in encodings:
+         try:
+            LOG('dbg', 'Trying encoding: %s' % enc)
+            return text.decode(encoding=enc, errors='strict')
+         except:
+            pass
+      return text
+
+def srt_read_encoding_py3(fname, encodings):
+   for enc in encodings:
+      try:
+         LOG('dbg', 'Trying encoding: %s' % enc)
+         with open(fname, encoding=enc) as f:
+            return f.read()
+      except:
+         pass
+
 class SubtitleItem(object):
    def __init__(self, idx, start, end, text):
       self.idx = idx
@@ -703,16 +738,25 @@ class Subtitles(object):
 
    def parse_srt(self, fname):
       LOG('inf', 'Loading subs from file: %s' % fname)
-      with open(fname, 'r') as f:
-         full_text = f.read()
-         idx = 0
-         for s in re.sub('\r\n', '\n', full_text).split('\n\n'):
-            st = s.split('\n')
-            if len(st) >= 3:
-               split = st[1].split(' --> ')
-               item = SubtitleItem(idx, split[0], split[1], '<br>'.join(st[2:]))
-               self.items.append(item)
-               idx += 1
+      # read from file using the wanted encoding
+      encodings = []
+      if ini.get_bool('subtitles', 'always_try_utf8'):
+         encodings.append('utf-8')
+      encodings.append(ini.get('subtitles', 'encoding'))
+      if sys.version_info[0] < 3:
+         full_text = srt_read_encoding_py2(fname, encodings)
+      else:
+         full_text = srt_read_encoding_py3(fname, encodings)
+
+      # parse the srt content
+      idx = 0
+      for s in re.sub('\r\n', '\n', full_text).split('\n\n'):
+         st = [ x for x in s.split('\n') if x ] # spit and remove empty lines
+         if len(st) >= 3:
+            split = st[1].split(' --> ')
+            item = SubtitleItem(idx, split[0], split[1], '<br>'.join(st[2:]))
+            self.items.append(item)
+            idx += 1
 
    def item_apply(self, item):
       if item != self.current_item:
@@ -734,7 +778,7 @@ class Subtitles(object):
          return ecore.ECORE_CALLBACK_RENEW
 
       # next item valid ?
-      if item and item.idx < len(self.items):
+      if item and (item.idx + 1) < len(self.items):
          next_item = self.items[item.idx + 1]
          if item.end < pos < next_item.start:
             # pause between current and the next
@@ -754,4 +798,5 @@ class Subtitles(object):
             self.clear()
             return ecore.ECORE_CALLBACK_RENEW
 
+      self.clear()
       return ecore.ECORE_CALLBACK_RENEW

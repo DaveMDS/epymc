@@ -4,10 +4,15 @@ BUGS
 =====
  * mame's favorites got lost from config sometimes
  * video don't keep the right aspect, usually subs get cutted out
+ * youtube search: "ada milea"
 
 MAIN
 =====
  * joy/webserver need a key-repetition handling
+ * an internet radio plugin
+ * a photo plugin
+ * a wikipedia plugin
+ * a simple mail module
 
 CORE
 =====

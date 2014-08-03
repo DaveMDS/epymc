@@ -93,9 +93,8 @@ def shutdown():
 def play_url(url, only_audio = False, start_from = 0):
    global _onair_url, _onair_title, _subtitles
 
-   if not _emotion:
-      if not _init_emotion():
-         return False
+   if not _emotion and not _init_emotion():
+      return False
 
    if not _fman:
       _init_mediaplayer_gui()
@@ -104,15 +103,15 @@ def play_url(url, only_audio = False, start_from = 0):
    if url.find('://', 2, 15) is -1:
       url = 'file://' + url
 
-   _onair_url = url
-   _onair_title = None
-
    LOG('dbg', 'play_url: %s' % url)
 
    if url.startswith('file://') and not os.path.exists(url[7:]):
       text = '<b>%s:</b><br>%s' % (_('File not found'), url)
       EmcDialog(text = text, style = 'error')
       return
+
+   _onair_url = url
+   _onair_title = None
 
    # Do not pass "file://" to emotion. Vlc has a bug somewhere that prevent
    # files with special chars in them to play (the bug don't appear if no
@@ -140,26 +139,9 @@ def play_url(url, only_audio = False, start_from = 0):
    else:
       counts = { 'started': 0, 'finished': 0, 'stop_at': 0 }
       _play_db.set_data(url, counts)
-   LOG('dbg', 'url started: %d finished: %d' %
-              (counts['started'], counts['finished']))
 
    # Try to load subs for this url
    _subtitles = Subtitles(url)
-
-   ## TEST VARIOUS INFO
-   # LOG('dbg', 'TITLE: ' + str(_emotion.title_get()))
-   # LOG('dbg', 'CHAPTER COUNT: ' + str(_emotion.chapter_count()))
-   # LOG('dbg', 'VIDEO CHNS COUNT: ' + str(_emotion.video_channel_count()))
-   # LOG('dbg', 'AUDIO CHNS COUNT: ' + str(_emotion.audio_channel_count()))
-   # LOG('dbg', 'SPU CHNS COUNT: ' + str(_emotion.spu_channel_count()))
-   # LOG('dbg', 'VIDEO CHAN GET: ' + str(_emotion.video_channel_get()))
-   # LOG('dbg', 'AUDIO CHAN GET: ' + str(_emotion.audio_channel_get()))
-   # LOG('dbg', 'SPU CHAN GET: ' + str(_emotion.spu_channel_get()))
-   # LOG('dbg', 'INFO DICT: ' + str(_emotion.meta_info_dict_get()))
-   # LOG('dbg', 'SIZE: ' + str(_emotion.size))
-   # LOG('dbg', 'IMAGE_SIZE: ' + str(_emotion.image_size))
-   # LOG('dbg', 'RATIO: ' + str(_emotion.ratio_get()))
-   ##
 
    return True
 
@@ -172,37 +154,36 @@ def play_counts_get(url):
                'stop_at': 0 }  # last play pos
 
 def stop():
-   global _emotion, _onair_url, _subtitles
+   global _emotion, _onair_url, _onair_title, _subtitles
 
    LOG('dbg', 'Stop()')
-
-   if _emotion is None:
-      return
-
-   counts = _play_db.get_data(_onair_url)
-   if _emotion.position >= _emotion.play_length - 5 or _emotion.position == 0.0: # vlc set the pos at zero when finished :/
-      counts['finished'] += 1
-      counts['stop_at'] = 0
-   else:
-      counts['stop_at'] = _emotion.position
-   _play_db.set_data(_onair_url, counts)
-
-   _onair_url = None
-
-   # delete the emotion object
-   _emotion.play = False
-   _emotion.position = 0.0
-   
-   _emotion.delete()
-   del _emotion
-   _emotion = None
 
    # clear the subtitles instance
    if _subtitles:
       _subtitles.delete()
       _subtitles = None
 
+   if _emotion is not None:
+      # update play counts
+      counts = _play_db.get_data(_onair_url)
+      if _emotion.position >= _emotion.play_length - 5 or _emotion.position == 0.0: # vlc set the pos at zero when finished :/
+         counts['finished'] += 1
+         counts['stop_at'] = 0
+      else:
+         counts['stop_at'] = _emotion.position
+      _play_db.set_data(_onair_url, counts)
+
+      # delete the emotion object
+      _emotion.play = False
+      _emotion.position = 0.0
+   
+      _emotion.delete()
+      del _emotion
+      _emotion = None
+
    events.event_emit('PLAYBACK_FINISHED')
+   _onair_url = None
+   _onair_title = None
 
 def pause():
    _emotion.play = False
@@ -213,29 +194,22 @@ def unpause():
    _play_pause_btn.icon_set('icon/pause')
 
 def pause_toggle():
-   if _emotion.play is True:
-      pause()
-   else:
-      unpause()
+   pause() if _emotion.play is True else unpause()
 
 def forward():
    LOG('dbg', 'Forward cb' + str(_emotion.position))
-   LOG('dbg', 'Seekable: ' + str(_emotion.seekable))
    _emotion.position += 10 #TODO make this configurable
 
 def backward():
    LOG('dbg', 'Backward cb' + str(_emotion.position))
-   LOG('dbg', 'Seekable: ' + str(_emotion.seekable))
    _emotion.position -= 10 #TODO make this configurable
 
 def fforward():
    LOG('dbg', 'FastForward cb' + str(_emotion.position))
-   LOG('dbg', 'Seekable: ' + str(_emotion.seekable))
    _emotion.position += 60 #TODO make this configurable
 
 def fbackward():
    LOG('dbg', 'FastBackward cb' + str(_emotion.position))
-   LOG('dbg', 'Seekable: ' + str(_emotion.seekable))
    _emotion.position -= 60 #TODO make this configurable
 
 def volume_set(vol):
@@ -300,11 +274,8 @@ def video_controls_hide():
    _controls_visible = False
    gui.volume_hide()
 
-def video_controls_toggle():
-   if _controls_visible:
-      video_controls_hide()
-   else:
-      video_controls_show()
+def video_controls_toggle():   
+   video_controls_hide() if _controls_visible else video_controls_show()
 
 def poster_set(poster = None, extra_path = None):
    if poster:
@@ -343,7 +314,7 @@ def _update_timer_cb():
    if _emotion.play == _video_visible == True:
       events.event_emit('KEEP_ALIVE')
 
-   return True # timer renew
+   return ecore.ECORE_CALLBACK_RENEW
 
 def _init_emotion():
    global _emotion
@@ -475,11 +446,9 @@ def _init_mediaplayer_gui():
                                        (lambda a,s,d: video_controls_toggle()))
 
 def _cb_playback_finished(vid):
-
-   stop()
-
    video_player_hide()
    gui.volume_hide()
+   stop()
 
 def _cb_frame_resize(vid):
    (w, h) = vid.image_size
@@ -489,8 +458,8 @@ def _cb_btn_play(btn):
    pause_toggle()
 
 def _cb_btn_stop(btn):
-   stop()
    video_player_hide()
+   stop()
 
 def _cb_btn_forward(btn):
    forward()
@@ -576,7 +545,7 @@ def _cb_menu_sub_download(menu, item):
    Opensubtitles(_onair_url)
 
 def _update_slider():
-   if _controls_visible:
+   if _controls_visible and _emotion is not None:
       pos = _emotion.position
       len = _emotion.play_length
 

@@ -219,6 +219,7 @@ def init():
    root_item_add('config://themes/', 2, _('Themes'), 'icon/theme', _themes_list)
    root_item_add('config://modules/', 3, _('Modules'), 'icon/module', _modules_list)
    root_item_add('config://sysinfo/', 4, _('System info'), 'icon/info', _sys_info)
+   root_item_add('config://subtitles/', 15, _('Subtitles'), 'icon/subs', _subtitles_list)
 
 def shutdown():
    _browser.delete()
@@ -228,6 +229,7 @@ def root_item_add(name, weight, label, icon=None, callback=None):
       weight used:
          1, 2, 3: General, Themes, Modules
          10, 11: movies, tvshows
+         15: subtitles
          20: screensaver
          50, 51, 52, 53: keyboard, lirc, joy, webserver
          100: screen calibrator
@@ -284,9 +286,6 @@ def _populate_root(browser, url):
       browser.item_add(RootItemClass(), item[0], item)
 
 ##############  GENERAL  ######################################################
-subs_encs = ['UTF-8','latin_1','iso8859_2','iso8859_3','iso8859_4','iso8859_5',
-'iso8859_6','iso8859_7','iso8859_8','iso8859_9','iso8859_10','iso8859_13',
-'iso8859_14','iso8859_15','iso8859_16']
 
 def _general_list():
    _browser.page_add('config://general/', _('General'), None, _general_populate)
@@ -295,11 +294,6 @@ def _general_populate(browser, url):
    standard_item_bool_add('general', 'fullscreen', _('Start in fullscreen'))
    standard_item_action_add(_('Adjust interface scale'), 'icon/scale', cb=_change_scale)
    standard_item_bool_add('general', 'back_in_lists', _('Show Back item in lists'), 'icon/back')
-
-   standard_item_string_add('subtitles', 'lang', _('Subtitles download language'), 'icon/subs')
-   standard_item_string_from_list('subtitles', 'encoding', _('Subtitles encoding'), subs_encs, 'icon/subs')
-   standard_item_bool_add('subtitles', 'always_try_utf8', _('Always try UTF-8 first'), 'icon/subs')
-
    standard_item_string_add('general', 'download_folder', _('Download folder'), 'icon/download')
    standard_item_string_add('general', 'max_concurrent_download', _('Max concurrent download'), 'icon/download')
 
@@ -397,6 +391,21 @@ def _modules_list():
 def _modules_populate(browser, url):
    for mod in sorted(modules.list_get(), key=attrgetter('name')):
       browser.item_add(ModulesItemClass(), mod.name, mod)
+
+##############  SUBTITLES  ####################################################
+
+subs_encs = ['UTF-8','latin_1','iso8859_2','iso8859_3','iso8859_4','iso8859_5',
+'iso8859_6','iso8859_7','iso8859_8','iso8859_9','iso8859_10','iso8859_13',
+'iso8859_14','iso8859_15','iso8859_16']
+
+def _subtitles_list():
+   _browser.page_add('config://subtitles/', _('Subtitles'), None, _subtitles_populate)
+
+def _subtitles_populate(browser, url):
+   standard_item_string_add('subtitles', 'lang', _('Subtitles download language'), 'icon/subs')
+   standard_item_string_from_list('subtitles', 'encoding', _('Subtitles encoding'), subs_encs, 'icon/subs')
+   standard_item_bool_add('subtitles', 'always_try_utf8', _('Always try UTF-8 first'), 'icon/subs')
+
 
 ##############  SYS INFO  #####################################################
 

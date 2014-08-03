@@ -55,9 +55,14 @@ def start_epymc():
    # create config dir if necessary
    if not os.path.exists(utils.user_conf_dir):
       os.makedirs(utils.user_conf_dir)
-      os.mkdir(os.path.join(utils.user_conf_dir, 'plugins'))
-      os.mkdir(os.path.join(utils.user_conf_dir, 'themes'))
-      os.mkdir(os.path.join(utils.user_conf_dir, 'channels'))
+   try: os.mkdir(os.path.join(utils.user_conf_dir, 'plugins'))
+   except OSError: pass
+   try: os.mkdir(os.path.join(utils.user_conf_dir, 'themes'))
+   except OSError: pass
+   try: os.mkdir(os.path.join(utils.user_conf_dir, 'channels'))
+   except OSError: pass
+   try: os.mkdir(os.path.join(utils.user_conf_dir, 'subtitles'))
+   except OSError: pass
 
    #TODO add a system dir...but where??
    ini.read_from_files(['epymc.conf',

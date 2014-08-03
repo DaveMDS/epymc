@@ -19,6 +19,7 @@
 
 IMAGE("dvd_cover_blank.png", 730, 890)
 IMAGE("tmdb_logo.png", 450, 300)
+IMAGE("osdo_logo.png", 450, 151)
 
 ICON("emc")
 ICON("evas")

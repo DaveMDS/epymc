@@ -97,12 +97,13 @@ class StdConfigItemString(object):
    # this don't inherit from EmcItemClass to not be a Singleton
    # this class is used by the function standard_item_string_add(...)
 
-   def __init__(self, section, option, label, icon=None, info=None, cb=None):
+   def __init__(self, section, option, label, icon=None, info=None, cb=None, pwd=False):
       self._sec = section
       self._opt = option
       self._lbl = label
       self._ico = icon
       self._inf = info
+      self._pwd = pwd
       self._cb = cb
 
    def _kbd_accept_cb(self, vkeyb, text):
@@ -112,8 +113,8 @@ class StdConfigItemString(object):
          self._cb()
 
    def item_selected(self, url, user_data):
-      EmcVKeyboard(title=self._lbl, text=ini.get(self._sec, self._opt),
-                   accept_cb=self._kbd_accept_cb)
+      EmcVKeyboard(title=self._lbl, accept_cb=self._kbd_accept_cb,
+                   text=ini.get(self._sec, self._opt) if not self._pwd else '')
 
    def label_get(self, url, user_data):
       return self._lbl
@@ -122,7 +123,8 @@ class StdConfigItemString(object):
       return self._ico
 
    def label_end_get(self, url, user_data):
-      return ini.get(self._sec, self._opt)
+      val = ini.get(self._sec, self._opt)
+      return '●●●●●' if self._pwd and val else val
 
    def info_get(self, url, user_data):
       return self._inf
@@ -326,9 +328,9 @@ def standard_item_bool_add(section, option, label, icon=None, info=None, cb=None
    _browser.item_add(StdConfigItemBool(section, option, label, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
 
-def standard_item_string_add(section, option, label, icon=None, info=None, cb=None):
+def standard_item_string_add(section, option, label, icon=None, info=None, cb=None, pwd=False):
    """ TODO doc """
-   _browser.item_add(StdConfigItemString(section, option, label, icon, info, cb),
+   _browser.item_add(StdConfigItemString(section, option, label, icon, info, cb, pwd),
                      'config://%s/%s' % (section, option), None)
 
 def standard_item_string_from_list_add(section, option, label, strlist, icon=None, info=None, cb=None):
@@ -480,6 +482,8 @@ def _subtitles_populate(browser, url):
    standard_item_lang_add('subtitles', 'langs', _('Subtitles preferred languages'), multi=True)
    standard_item_string_from_list_add('subtitles', 'encoding', _('Subtitles encoding'), subs_encs)
    standard_item_bool_add('subtitles', 'always_try_utf8', _('Always try UTF-8 first'))
+   standard_item_string_add('subtitles', 'opensubtitles_user', _('Opensubtitles.org Username'))
+   standard_item_string_add('subtitles', 'opensubtitles_pass', _('Opensubtitles.org Password'), pwd=True)
 
 
 ##############  SYS INFO  #####################################################

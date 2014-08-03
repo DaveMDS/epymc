@@ -69,6 +69,10 @@ def init():
       ini.set('subtitles', 'encoding', 'latin_1')
    if not ini.has_option('subtitles', 'always_try_utf8'):
       ini.set('subtitles', 'always_try_utf8', 'True')
+   if not ini.has_option('subtitles', 'opensubtitles_user'):
+      ini.set('subtitles', 'opensubtitles_user', '')
+   if not ini.has_option('subtitles', 'opensubtitles_pass'):
+      ini.set('subtitles', 'opensubtitles_pass', '')
       
    _volume = ini.get_int('mediaplayer', 'volume')
 
@@ -867,13 +871,13 @@ class Opensubtitles(object):
    OPENSUBTITLES_SERVER = 'http://api.opensubtitles.org/xml-rpc'
    # USER_AGENT = 'Emotion Media Center' + version
    USER_AGENT = 'OS Test User Agent'
-   USER_NAME = ''
-   USER_PASS = ''
 
    def __init__ (self, url):
       self.dialog = None
       self.token = None
       self.results = []
+      self.oso_user = ini.get('subtitles', 'opensubtitles_user')
+      self.oso_pass = ini.get('subtitles', 'opensubtitles_pass')
       self.langs2 = ini.get_string_list('subtitles', 'langs')
       self.langs3 = [ utils.iso639_1_to_3(l) for l in self.langs2 ]
       self.path = utils.url2path(url)
@@ -928,8 +932,9 @@ class Opensubtitles(object):
 
    def perform_login(self):
       try:
-         data = self.xmlrpc.LogIn(self.USER_NAME, self.USER_PASS,
+         data = self.xmlrpc.LogIn(self.oso_user, self.oso_pass,
                                   self.langs2[0], self.USER_AGENT)
+         assert data.get('status').split()[0] == '200'
          self.token = self.get_from_data_or_none(data, 'token')
       except:
          self._thread_error = _('Login failed')

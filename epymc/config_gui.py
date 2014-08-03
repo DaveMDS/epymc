@@ -219,8 +219,8 @@ class StdConfigItemLang(object):
          choosed = [ ini.get(self._sec, self._opt) ]
 
       item = None
-      for code2, (code3, name) in sorted(utils.iso639_table.items(),
-                                         key=lambda x: x[1][1]):
+      for code2, (code3, code5, name) in sorted(utils.iso639_table.items(),
+                                         key=lambda x: x[1][2]):
          if name is not None:
             if code2 in choosed:
                item = dia.list_item_append(name, end='icon/check_on')

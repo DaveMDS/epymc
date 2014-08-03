@@ -879,7 +879,7 @@ class Opensubtitles(object):
       self.oso_user = ini.get('subtitles', 'opensubtitles_user')
       self.oso_pass = ini.get('subtitles', 'opensubtitles_pass')
       self.langs2 = ini.get_string_list('subtitles', 'langs')
-      self.langs3 = [ utils.iso639_1_to_3(l) for l in self.langs2 ]
+      self.langs3 = [ utils.iso639_1_to_5(l) for l in self.langs2 ]
       self.path = utils.url2path(url)
       self.size = os.path.getsize(self.path)
       self.hash = self.calc_hash()

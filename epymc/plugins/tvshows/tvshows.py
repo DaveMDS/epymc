@@ -666,8 +666,8 @@ def config_panel_cb():
    bro.page_add('config://tvshows/', _('TV Shows'), None, populate_config)
 
 def populate_config(browser, url):
-   config_gui.standard_item_string_add('tvshows', 'info_lang',
-                                       _('Preferred language for contents'))
+   config_gui.standard_item_lang_add('tvshows', 'info_lang',
+                                     _('Preferred language for contents'))
 
 
 class BackgroundScanner(ecore.Idler):

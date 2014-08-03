@@ -63,8 +63,8 @@ def init():
       ini.set('mediaplayer', 'volume', '75')
    if not ini.has_option('mediaplayer', 'backend'):
       ini.set('mediaplayer', 'backend', 'gstreamer1')
-   if not ini.has_option('subtitles', 'lang'):
-      ini.set('subtitles', 'lang', 'en')
+   if not ini.has_option('subtitles', 'langs'):
+      ini.set('subtitles', 'langs', 'en')
    if not ini.has_option('subtitles', 'encoding'):
       ini.set('subtitles', 'encoding', 'latin_1')
    if not ini.has_option('subtitles', 'always_try_utf8'):
@@ -874,8 +874,8 @@ class Opensubtitles(object):
       self.dialog = None
       self.token = None
       self.results = []
-      self.lang2 = ini.get('subtitles', 'lang')
-      self.lang3 = utils.iso639_1_to_3(self.lang2)
+      self.langs2 = ini.get_string_list('subtitles', 'langs')
+      self.langs3 = [ utils.iso639_1_to_3(l) for l in self.langs2 ]
       self.path = utils.url2path(url)
       self.size = os.path.getsize(self.path)
       self.hash = self.calc_hash()
@@ -929,7 +929,7 @@ class Opensubtitles(object):
    def perform_login(self):
       try:
          data = self.xmlrpc.LogIn(self.USER_NAME, self.USER_PASS,
-                                  self.lang2, self.USER_AGENT)
+                                  self.langs2[0], self.USER_AGENT)
          self.token = self.get_from_data_or_none(data, 'token')
       except:
          self._thread_error = _('Login failed')
@@ -944,9 +944,9 @@ class Opensubtitles(object):
 
       try:
          data = self.xmlrpc.SearchSubtitles(self.token, [{
-                                            'sublanguageid': 'all', #self.lang3,
-                                            'moviehash': self.hash,
-                                            'moviebytesize': self.size }])
+                                       'sublanguageid': ','.join(self.langs3),
+                                       'moviehash': self.hash,
+                                       'moviebytesize': self.size }])
       except:
          self._thread_error = _('Search failed')
       else:
@@ -972,7 +972,7 @@ class Opensubtitles(object):
                    text=self._thread_error)
       elif not self.results:
          EmcDialog(style='info', title='Opensubtitles.org',
-                   text=_('No results found for language: %s') % self.lang3)
+            text=_('No results found for languages: %s') % ' '.join(self.langs3))
       else:
          self.build_result_dialog()
 

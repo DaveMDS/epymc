@@ -178,6 +178,75 @@ class StdConfigItemStringFromList(object):
    def poster_get(self, url, user_data): return None
    def fanart_get(self, url, user_data): return None
 
+class StdConfigItemLang(object): 
+   # this don't inherit from EmcItemClass to not be a Singleton
+   # this class is used by the function standard_item_lang_add(...)
+
+   def __init__(self, section, option, label, multi=False, icon=None, info=None, cb=None):
+      self._sec = section
+      self._opt = option
+      self._lbl = label
+      self._mul = multi
+      self._ico = icon
+      self._inf = info
+      self._cb = cb
+
+   def _dia_list_selected_cb(self, dia):
+      item = dia.list_item_selected_get()
+      lang = item.data['code2']
+
+      if self._mul:
+         L = ini.get_string_list(self._sec, self._opt)
+         L.remove(lang) if lang in L else L.append(lang)
+         if len(L) < 1: L.append('en')
+         ini.set_string_list(self._sec, self._opt, L)
+      else:
+         ini.set(self._sec, self._opt, lang)
+
+      _browser.refresh()
+      dia.delete()
+      if callable(self._cb):
+         self._cb()
+
+   def item_selected(self, url, user_data):
+      dia = EmcDialog(self._lbl, style='list', done_cb=self._dia_list_selected_cb)
+
+      if self._mul:
+         choosed = ini.get_string_list(self._sec, self._opt)
+      else:
+         choosed = [ ini.get(self._sec, self._opt) ]
+
+      item = None
+      for code2, (code3, name) in sorted(utils.iso639_table.items(),
+                                         key=lambda x: x[1][1]):
+         if name is not None:
+            if code2 in choosed:
+               item = dia.list_item_append(name, end='icon/check_on')
+               item.data['code2'] = code2
+            else:
+               it = dia.list_item_append(name)
+               it.data['code2'] = code2
+
+      if item:
+         item.show()
+         item.selected = True
+
+   def label_get(self, url, user_data):
+      return self._lbl
+
+   def icon_get(self, url, user_data):
+      return self._ico
+   
+   def label_end_get(self, url, user_data):
+      return ini.get(self._sec, self._opt)
+
+   def info_get(self, url, user_data):
+      return self._inf
+
+   def icon_end_get(self, url, user_data): return None
+   def poster_get(self, url, user_data): return None
+   def fanart_get(self, url, user_data): return None
+
 class StdConfigItemAction(object): 
    # this don't inherit from EmcItemClass to not be a Singleton
    # this class is used by the function standard_item_action_add(...)
@@ -266,6 +335,12 @@ def standard_item_string_from_list_add(section, option, label, strlist, icon=Non
    """ TODO doc """
    _browser.item_add(StdConfigItemStringFromList(section, option, label, strlist, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
+
+def standard_item_lang_add(section, option, label, multi=False, icon=None, info=None, cb=None):
+   """ TODO doc """
+   _browser.item_add(StdConfigItemLang(section, option, label, multi, icon, info, cb),
+                     'config://%s/%s' % (section, option), None)
+
 
 def standard_item_action_add(label, icon=None, info=None, cb=None):
    """ TODO doc """
@@ -402,9 +477,9 @@ def _subtitles_list():
    _browser.page_add('config://subtitles/', _('Subtitles'), None, _subtitles_populate)
 
 def _subtitles_populate(browser, url):
-   standard_item_string_add('subtitles', 'lang', _('Subtitles download language'), 'icon/subs')
-   standard_item_string_from_list_add('subtitles', 'encoding', _('Subtitles encoding'), subs_encs, 'icon/subs')
-   standard_item_bool_add('subtitles', 'always_try_utf8', _('Always try UTF-8 first'), 'icon/subs')
+   standard_item_lang_add('subtitles', 'langs', _('Subtitles preferred languages'), multi=True)
+   standard_item_string_from_list_add('subtitles', 'encoding', _('Subtitles encoding'), subs_encs)
+   standard_item_bool_add('subtitles', 'always_try_utf8', _('Always try UTF-8 first'))
 
 
 ##############  SYS INFO  #####################################################

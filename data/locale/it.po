@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-03 18:57+0200\n"
-"PO-Revision-Date: 2014-08-03 18:01+0100\n"
+"POT-Creation-Date: 2014-08-03 21:25+0200\n"
+"PO-Revision-Date: 2014-08-03 21:26+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -68,148 +68,148 @@ msgstr ""
 msgid "EpyMC Database"
 msgstr "EpyMC Database"
 
-#: epymc/config_gui.py:213 epymc/config_gui.py:216 epymc/config_gui.py:280
+#: epymc/config_gui.py:282 epymc/config_gui.py:285 epymc/config_gui.py:355
 msgid "Configuration"
 msgstr "Configurazione"
 
-#: epymc/config_gui.py:218 epymc/config_gui.py:291
+#: epymc/config_gui.py:287 epymc/config_gui.py:366
 msgid "General"
 msgstr "Generale"
 
-#: epymc/config_gui.py:219
+#: epymc/config_gui.py:288
 msgid "Themes"
 msgstr "Temi"
 
-#: epymc/config_gui.py:220 epymc/config_gui.py:389
+#: epymc/config_gui.py:289 epymc/config_gui.py:464
 msgid "Modules"
 msgstr "Moduli"
 
-#: epymc/config_gui.py:221 epymc/config_gui.py:447
+#: epymc/config_gui.py:290 epymc/config_gui.py:522
 msgid "System info"
 msgstr "Informazioni di sistema"
 
-#: epymc/config_gui.py:222 epymc/config_gui.py:402 epymc/mediaplayer.py:450
+#: epymc/config_gui.py:291 epymc/config_gui.py:477 epymc/mediaplayer.py:450
 msgid "Subtitles"
 msgstr "Sottotitoli"
 
-#: epymc/config_gui.py:294
+#: epymc/config_gui.py:369
 msgid "Start in fullscreen"
 msgstr "Avvia a schermo intero"
 
-#: epymc/config_gui.py:295
+#: epymc/config_gui.py:370
 msgid "Adjust interface scale"
 msgstr "Modifica scalatura"
 
-#: epymc/config_gui.py:296
+#: epymc/config_gui.py:371
 msgid "Show Back item in lists"
 msgstr "Mostra indietro nelle liste"
 
-#: epymc/config_gui.py:297
+#: epymc/config_gui.py:372
 msgid "Download folder"
 msgstr "Cartella download"
 
-#: epymc/config_gui.py:298
+#: epymc/config_gui.py:373
 msgid "Max concurrent download"
 msgstr "Download simultanei"
 
-#: epymc/config_gui.py:306 epymc/config_gui.py:436
+#: epymc/config_gui.py:381 epymc/config_gui.py:511
 msgid "Rendering engine"
 msgstr "Motore di rendering"
 
-#: epymc/config_gui.py:309
+#: epymc/config_gui.py:384
 msgid "Multimedia engine"
 msgstr "Motore multimediale"
 
-#: epymc/config_gui.py:313
+#: epymc/config_gui.py:388
 msgid "Frames per second"
 msgstr "Frame al secondo"
 
-#: epymc/config_gui.py:324 epymc/config_gui.py:328
+#: epymc/config_gui.py:399 epymc/config_gui.py:403
 #, python-format
 msgid "Current Value: %s"
 msgstr "Valore attuale: %s"
 
-#: epymc/config_gui.py:327
+#: epymc/config_gui.py:402
 msgid "set scale"
 msgstr "imposta scalatura"
 
-#: epymc/config_gui.py:329
+#: epymc/config_gui.py:404
 msgid "Bigger"
 msgstr "Più grande"
 
-#: epymc/config_gui.py:330
+#: epymc/config_gui.py:405
 msgid "Smaller"
 msgstr "Più piccola"
 
-#: epymc/config_gui.py:331
+#: epymc/config_gui.py:406
 msgid "Reset"
 msgstr "Reimposta"
 
-#: epymc/config_gui.py:351 epymc/plugins/onlinevideo/onlinevideo.py:89
+#: epymc/config_gui.py:426 epymc/plugins/onlinevideo/onlinevideo.py:89
 msgid "Author"
 msgstr "Autore"
 
-#: epymc/config_gui.py:352 epymc/plugins/onlinevideo/onlinevideo.py:88
+#: epymc/config_gui.py:427 epymc/plugins/onlinevideo/onlinevideo.py:88
 msgid "Version"
 msgstr "Versione"
 
-#: epymc/config_gui.py:405
-msgid "Subtitles download language"
-msgstr "Scarica i sottotitoli in lingua"
+#: epymc/config_gui.py:480
+msgid "Subtitles preferred languages"
+msgstr "Lingue preferite per i sottotitoli"
 
-#: epymc/config_gui.py:406
+#: epymc/config_gui.py:481
 msgid "Subtitles encoding"
 msgstr "Encoding dei sottotitoli"
 
-#: epymc/config_gui.py:407
+#: epymc/config_gui.py:482
 msgid "Always try UTF-8 first"
 msgstr "Prova sempre UTF-8 prima"
 
-#: epymc/config_gui.py:435
+#: epymc/config_gui.py:510
 msgid "Core"
 msgstr "Nucleo"
 
-#: epymc/config_gui.py:437
+#: epymc/config_gui.py:512
 msgid "Download available"
 msgstr "Download disponibili"
 
-#: epymc/config_gui.py:437
+#: epymc/config_gui.py:512
 msgid "yes"
 msgstr "sì"
 
-#: epymc/config_gui.py:437
+#: epymc/config_gui.py:512
 msgid "no"
 msgstr "no"
 
-#: epymc/config_gui.py:438
+#: epymc/config_gui.py:513
 msgid "Theme"
 msgstr "Tema"
 
-#: epymc/config_gui.py:439
+#: epymc/config_gui.py:514
 msgid "Paths"
 msgstr "Percorsi"
 
-#: epymc/config_gui.py:440
+#: epymc/config_gui.py:515
 msgid "Base folder"
 msgstr "Cartella base"
 
-#: epymc/config_gui.py:441
+#: epymc/config_gui.py:516
 msgid "Config folder"
 msgstr "Cartella configurazioni"
 
-#: epymc/config_gui.py:442
+#: epymc/config_gui.py:517
 msgid "Versions"
 msgstr "Versioni"
 
-#: epymc/config_gui.py:443
+#: epymc/config_gui.py:518
 msgid "Python"
 msgstr "Python"
 
-#: epymc/config_gui.py:444
+#: epymc/config_gui.py:519
 msgid "EpyMC"
 msgstr "EpyMC"
 
-#: epymc/config_gui.py:445
+#: epymc/config_gui.py:520
 msgid "EpyMC themes API"
 msgstr "Versione dei temi"
 
@@ -441,8 +441,8 @@ msgstr "Ricerca fallita"
 
 #: epymc/mediaplayer.py:975
 #, python-format
-msgid "No results found for language: %s"
-msgstr "Nessun risultato per la lingua: %s"
+msgid "No results found for languages: %s"
+msgstr "Nessun risultato per le lingue: %s"
 
 #: epymc/mediaplayer.py:989 epymc/plugins/mame/mame.py:426
 msgid "Download"
@@ -1383,3 +1383,4 @@ msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "%d minuto fa"
 msgstr[1] "%d minuti fa"
+

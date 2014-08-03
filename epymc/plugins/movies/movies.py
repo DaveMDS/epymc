@@ -750,8 +750,8 @@ def config_panel_cb():
 
 def populate_config(browser, url):
 
-   config_gui.standard_item_string_add('movies', 'info_lang',
-                                       _('Preferred language for contents'))
+   config_gui.standard_item_lang_add('movies', 'info_lang',
+                                     _('Preferred language for contents'))
 
    config_gui.standard_item_bool_add('movies', 'enable_scanner',
                                      _('Enable background scanner'))

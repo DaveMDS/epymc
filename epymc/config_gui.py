@@ -262,7 +262,7 @@ def standard_item_string_add(section, option, label, icon=None, info=None, cb=No
    _browser.item_add(StdConfigItemString(section, option, label, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
 
-def standard_item_string_from_list(section, option, label, strlist, icon=None, info=None, cb=None):
+def standard_item_string_from_list_add(section, option, label, strlist, icon=None, info=None, cb=None):
    """ TODO doc """
    _browser.item_add(StdConfigItemStringFromList(section, option, label, strlist, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
@@ -303,14 +303,14 @@ def _general_populate(browser, url):
    if 'gl_x11' in L:
       L.remove('gl_x11')
       L.append('opengl_x11')
-   standard_item_string_from_list('general', 'evas_engine', _('Rendering engine'),
+   standard_item_string_from_list_add('general', 'evas_engine', _('Rendering engine'),
                                   L, 'icon/evas')
    L = ['vlc', 'gstreamer1', 'gstreamer', 'xine', 'generic']
-   standard_item_string_from_list('mediaplayer', 'backend', _('Multimedia engine'),
+   standard_item_string_from_list_add('mediaplayer', 'backend', _('Multimedia engine'),
                                   L, 'icon/evas')
 
    L = ['10', '20', '30', '60', '120']
-   standard_item_string_from_list('general', 'fps', _('Frames per second'),
+   standard_item_string_from_list_add('general', 'fps', _('Frames per second'),
                                   L, 'icon/evas', cb=_change_fps)
 
 def _change_fps():
@@ -403,7 +403,7 @@ def _subtitles_list():
 
 def _subtitles_populate(browser, url):
    standard_item_string_add('subtitles', 'lang', _('Subtitles download language'), 'icon/subs')
-   standard_item_string_from_list('subtitles', 'encoding', _('Subtitles encoding'), subs_encs, 'icon/subs')
+   standard_item_string_from_list_add('subtitles', 'encoding', _('Subtitles encoding'), subs_encs, 'icon/subs')
    standard_item_bool_add('subtitles', 'always_try_utf8', _('Always try UTF-8 first'), 'icon/subs')
 
 

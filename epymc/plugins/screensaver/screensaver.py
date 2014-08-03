@@ -179,10 +179,10 @@ and what it need to work well, can also use markup like <title>this</> or
    
    def config_gui_populate(self, browser, url):
       L = _('never;1 minute;5 minutes;10 minutes;30 minutes;60 minutes').split(';')
-      cgui.standard_item_string_from_list('screensaver', 'screensaver_on_after',
+      cgui.standard_item_string_from_list_add('screensaver', 'screensaver_on_after',
                                           _('Turn on screensaver after'), L,
                                           cb = self.parse_config)
-      cgui.standard_item_string_from_list('screensaver', 'monitor_off_after',
+      cgui.standard_item_string_from_list_add('screensaver', 'monitor_off_after',
                                           _('Turn off monitor after'), L,
                                           cb = self.parse_config)
       cgui.standard_item_bool_add('screensaver', 'only_in_fs',

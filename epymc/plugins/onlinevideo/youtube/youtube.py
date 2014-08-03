@@ -23,7 +23,8 @@ from bs4 import BeautifulSoup
 
 from epymc.extapi.onlinevideo import api_version, state_get, fetch_url, \
    play_url, item_add, call_ydl, local_resource, seconds_to_duration, \
-   relative_date, ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
+   relative_date, url_encode, \
+   ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 
 
 ytb_base = 'http://www.youtube.com'
@@ -128,7 +129,8 @@ elif STATE in (ST_VIDEO_LIST_JSONC, ST_SEARCH_JSONC):
 
    # STATE 4 = search query in place of the url
    if STATE == ST_SEARCH_JSONC:
-      URL = 'http://gdata.youtube.com/feeds/api/videos?q=%s&v=2&alt=jsonc&max-results=%d' % (URL, ITEMS_PER_PAGE)
+      URL = 'http://gdata.youtube.com/feeds/api/videos?' + url_encode(
+               { 'q':URL, 'v':2, 'alt':'jsonc', 'max-results':ITEMS_PER_PAGE })
 
    data = fetch_url(URL, parser='json')
 

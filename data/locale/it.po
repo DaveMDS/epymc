@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-03 21:59+0200\n"
+"POT-Creation-Date: 2014-08-04 00:45+0200\n"
 "PO-Revision-Date: 2014-08-03 21:59+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
@@ -88,7 +88,7 @@ msgstr "Moduli"
 msgid "System info"
 msgstr "Informazioni di sistema"
 
-#: epymc/config_gui.py:293 epymc/config_gui.py:479 epymc/mediaplayer.py:454
+#: epymc/config_gui.py:293 epymc/config_gui.py:479 epymc/mediaplayer.py:422
 msgid "Subtitles"
 msgstr "Sottotitoli"
 
@@ -240,8 +240,8 @@ msgstr[1] "%d elementi"
 msgid "Emotion Media Center"
 msgstr "Emotion Media Center"
 
-#: epymc/gui.py:165 epymc/gui.py:167 epymc/gui.py:168
-#: epymc/mediaplayer.py:1001 epymc/plugins/onlinevideo/vimeo/vimeo.py:146
+#: epymc/gui.py:165 epymc/gui.py:167 epymc/gui.py:168 epymc/mediaplayer.py:967
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:146
 #: epymc/plugins/movies/movies.py:155
 msgid "Unknown"
 msgstr "Sconosciuto"
@@ -378,93 +378,93 @@ msgstr "Download avviato"
 msgid "Download completed"
 msgstr "Download completato"
 
-#: epymc/mediaplayer.py:113
+#: epymc/mediaplayer.py:109
 msgid "File not found"
 msgstr "File non trovato"
 
-#: epymc/mediaplayer.py:336
+#: epymc/mediaplayer.py:307
 msgid "buffering"
 msgstr "buffering"
 
-#: epymc/mediaplayer.py:358
+#: epymc/mediaplayer.py:326
 #, python-format
 msgid "Cannot init emotion engine:<br>%s"
 msgstr "Non posso avviare il motore di emotion:<br>%s"
 
-#: epymc/mediaplayer.py:438
+#: epymc/mediaplayer.py:406
 msgid "Audio"
 msgstr "Audio"
 
-#: epymc/mediaplayer.py:446
+#: epymc/mediaplayer.py:414
 msgid "Video"
 msgstr "Video"
 
-#: epymc/mediaplayer.py:513
+#: epymc/mediaplayer.py:479
 #, python-format
 msgid "Audio track: %s"
 msgstr "Traccia audio: %s"
 
-#: epymc/mediaplayer.py:515
+#: epymc/mediaplayer.py:481
 #, python-format
 msgid "Audio track #%d"
 msgstr "Traccia audio #%d"
 
-#: epymc/mediaplayer.py:519
+#: epymc/mediaplayer.py:485
 msgid "Mute"
 msgstr "Muto"
 
-#: epymc/mediaplayer.py:527
+#: epymc/mediaplayer.py:493
 #, python-format
 msgid "Video track: %s"
 msgstr "Traccia video: %s"
 
-#: epymc/mediaplayer.py:529
+#: epymc/mediaplayer.py:495
 #, python-format
 msgid "Video track #%d"
 msgstr "Traccia video #%d"
 
-#: epymc/mediaplayer.py:533
+#: epymc/mediaplayer.py:499
 msgid "Download video"
 msgstr "Scarica filmato"
 
-#: epymc/mediaplayer.py:557
+#: epymc/mediaplayer.py:523
 msgid "No subtitles"
 msgstr "Nessun sottotitolo"
 
-#: epymc/mediaplayer.py:570
+#: epymc/mediaplayer.py:536
 msgid "Download subtitles"
 msgstr "Scarica sottotitoli"
 
-#: epymc/mediaplayer.py:888
+#: epymc/mediaplayer.py:854
 msgid "Searching subtitles"
 msgstr "Ricerca sottotitoli"
 
-#: epymc/mediaplayer.py:940
+#: epymc/mediaplayer.py:906
 msgid "Login failed"
 msgstr "Login fallito"
 
-#: epymc/mediaplayer.py:956
+#: epymc/mediaplayer.py:922
 msgid "Search failed"
 msgstr "Ricerca fallita"
 
-#: epymc/mediaplayer.py:980
+#: epymc/mediaplayer.py:946
 #, python-format
 msgid "No results found for languages: %s"
 msgstr "Nessun risultato per le lingue: %s"
 
-#: epymc/mediaplayer.py:994 epymc/plugins/mame/mame.py:426
+#: epymc/mediaplayer.py:960 epymc/plugins/mame/mame.py:426
 msgid "Download"
 msgstr "Scarica"
 
-#: epymc/mediaplayer.py:1011
+#: epymc/mediaplayer.py:977
 msgid "Downloading subtitles"
 msgstr "Scaricamento sottotitoli"
 
-#: epymc/mediaplayer.py:1025
+#: epymc/mediaplayer.py:991
 msgid "Download failed"
 msgstr "Scaricamento fallito"
 
-#: epymc/mediaplayer.py:1041
+#: epymc/mediaplayer.py:1007
 msgid "Decode failed"
 msgstr "Decodifica fallita"
 
@@ -524,60 +524,60 @@ msgstr "Nessun elemento trovato"
 msgid "Suggestions"
 msgstr "Consigliati"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:48
+#: epymc/plugins/onlinevideo/youtube/youtube.py:49
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:157
 msgid "Search videos"
 msgstr "Cerca nei filmati"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:49
+#: epymc/plugins/onlinevideo/youtube/youtube.py:50
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:184
 msgid "Browse channels"
 msgstr "Sfoglia canali"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:51
+#: epymc/plugins/onlinevideo/youtube/youtube.py:52
 msgid "Top rated"
 msgstr "Più votati"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:72
+#: epymc/plugins/onlinevideo/youtube/youtube.py:73
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:286
 msgid "channel"
 msgid_plural "channels"
 msgstr[0] "canale"
 msgstr[1] "canali"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:151
+#: epymc/plugins/onlinevideo/youtube/youtube.py:153
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:80
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:104
 msgid "user"
 msgstr "utente"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:152
+#: epymc/plugins/onlinevideo/youtube/youtube.py:154
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:81
 msgid "uploaded"
 msgstr "caricato"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:153
+#: epymc/plugins/onlinevideo/youtube/youtube.py:155
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:82
 msgid "view"
 msgid_plural "views"
 msgstr[0] "vista"
 msgstr[1] "viste"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:154
+#: epymc/plugins/onlinevideo/youtube/youtube.py:156
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:83
 msgid "like"
 msgid_plural "likes"
 msgstr[0] "mi piace"
 msgstr[1] "mi piace"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:155
+#: epymc/plugins/onlinevideo/youtube/youtube.py:157
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:84
 msgid "comment"
 msgid_plural "comments"
 msgstr[0] "commento"
 msgstr[1] "commenti"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:171
+#: epymc/plugins/onlinevideo/youtube/youtube.py:173
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:203
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:221
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:239

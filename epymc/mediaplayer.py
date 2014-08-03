@@ -321,10 +321,7 @@ def _init_emotion():
 
    backend = ini.get('mediaplayer', 'backend')
    try:
-      try:
-         _emotion = emotion.Emotion(gui.layout.evas, module_filename=backend)
-      except:
-         _emotion = emotion.Emotion(gui.layout.evas, module_name=backend)
+      _emotion = emotion.Emotion(gui.layout.evas, module_name=backend)
    except:
       EmcDialog(style='error', text=_('Cannot init emotion engine:<br>%s') % backend)
       return False

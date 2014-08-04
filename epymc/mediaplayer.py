@@ -23,7 +23,8 @@ import os
 from efl import evas, ecore, edje, elementary, emotion
 
 from epymc import utils, ini, gui, input_events, events
-from epymc.gui import EmcFocusManager, EmcDialog, EmcButton, EmcMenu, DownloadManager
+from epymc.gui import EmcFocusManager, EmcDialog, EmcButton, EmcMenu, \
+                      DownloadManager, EmcNotify
 from epymc.sdb import EmcDatabase
 from epymc.subtitles import Subtitles, Opensubtitles
 
@@ -51,6 +52,8 @@ _onair_title = None
 _play_db = None # key: url  data: {'started': 14, 'finished': 0, 'stop_at': 0 }
 _play_pause_btn = None
 _subtitles = None # Subtitle class instance
+_subs_notify = None # EmcNotify for subtitles delay changes
+
 
 ### API ###
 def init():
@@ -240,6 +243,23 @@ def volume_mute_set(mute):
 
 def volume_mute_toggle():
    volume_mute_set(not _volume_muted)
+
+def subs_delay_more():
+   subs_delay_apply(+100)
+
+def subs_delay_less():
+   subs_delay_apply(-100)
+
+def subs_delay_zero():
+   subs_delay_apply(0)
+
+def subs_delay_apply(diff):
+   if _subtitles is not None:
+      if diff == 0:
+         _subtitles.delay = 0
+      else:
+         _subtitles.delay += diff
+      LOG('inf', 'Subs delay: %d ms' % _subtitles.delay)
 
 ### gui API ###
 def video_player_show():
@@ -530,6 +550,11 @@ def _cb_menu_download(menu, item):
 # subtitles menu
 def _cb_btn_subtitles(btn):
    menu = EmcMenu(relto=btn)
+
+   menu.item_add(None, _('Delay: %d ms') % _subtitles.delay,
+                 None, _cb_menu_subs_delay)
+   menu.item_separator_add()
+
    menu.item_add(None, _('No subtitles'),
                  None if _subtitles.current_file else 'arrow_right',
                  _cb_menu_sub_track, None)
@@ -545,6 +570,18 @@ def _cb_btn_subtitles(btn):
    menu.item_separator_add()
    menu.item_add(None, _('Download subtitles'), None, _cb_menu_sub_download)
 
+def _cb_menu_subs_delay(menu, item):
+   dia = EmcDialog(title=_('Subtitles delay'), style='minimal',
+                   text=_('Delay: %d ms') % _subtitles.delay)
+   dia.button_add(_('+100 ms'), _cb_dia_subs_delay, (dia, +100))
+   dia.button_add(_('Reset'), _cb_dia_subs_delay, (dia, 0))
+   dia.button_add(_('-100 ms'), _cb_dia_subs_delay, (dia, -100))
+
+def _cb_dia_subs_delay(btn, data):
+   dia, offset = data
+   subs_delay_apply(offset)
+   dia.text_set(_('Delay: %d ms') % _subtitles.delay)
+
 def _cb_menu_sub_track(menu, item, sub_file):
    _subtitles.file_set(sub_file)
 
@@ -553,6 +590,23 @@ def _cb_menu_sub_download(menu, item):
 
 def _cb_sub_download_done(dest_file):
    _subtitles.file_set(dest_file)
+
+def _subtitles_delay_notify():
+   global _subs_notify
+
+   txt = '<title>%s</><br>%s' % ( _('Subtitles'),
+         _('Delay: %d ms') % _subtitles.delay)
+   if _subs_notify is None:
+      _subs_notify = EmcNotify(text=txt, icon='icon/subs', hidein=2,
+                              close_cb=_subtitles_delay_notify_cb)
+   else:
+      _subs_notify.text_set(txt)
+      _subs_notify.hidein(2)
+
+def _subtitles_delay_notify_cb():
+   global _subs_notify
+   _subs_notify = None
+
 
 def _update_slider():
    if _controls_visible and _emotion is not None:
@@ -571,6 +625,7 @@ def _update_slider():
          gui.slider_val_set('videoplayer.controls.slider:dragable1', pos / len)
       gui.text_set('videoplayer.controls.position', '%i:%02i:%02i' % (ph,pm,ps))
       gui.text_set('videoplayer.controls.length', '%i:%02i:%02i' % (lh,lm,ls))
+
 
 ### input events ###
 def input_event_cb(event):
@@ -621,6 +676,24 @@ def input_event_cb(event):
 
    elif event == 'FAST_BACKWARD':
       fbackward()
+      return input_events.EVENT_BLOCK
+
+   elif event == 'SUBS_DELAY_MORE':
+      if _subtitles:
+         subs_delay_more()
+         _subtitles_delay_notify()
+      return input_events.EVENT_BLOCK
+
+   elif event == 'SUBS_DELAY_LESS':
+      if _subtitles:
+         subs_delay_less()
+         _subtitles_delay_notify()
+      return input_events.EVENT_BLOCK
+
+   elif event == 'SUBS_DELAY_ZERO':
+      if _subtitles:
+         subs_delay_zero()
+         _subtitles_delay_notify()
       return input_events.EVENT_BLOCK
 
 

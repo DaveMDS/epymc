@@ -61,6 +61,9 @@ _mapping = {
    'x': 'BACKWARD',
    'c': 'FORWARD',
    'v': 'FAST_FORWARD',
+   'q': 'SUBS_DELAY_LESS',
+   'w': 'SUBS_DELAY_MORE',
+   'e': 'SUBS_DELAY_ZERO',
 }
 
 class KeyboardModule(EmcModule):

@@ -45,7 +45,7 @@ def LOG(msg):
    print('SUBTITLES: ' + str(msg))
 
 def DBG(msg):
-   print('SUBTITLES: ' + str(msg))
+   # print('SUBTITLES: ' + str(msg))
    pass
 
 
@@ -124,6 +124,7 @@ class Subtitles(object):
       self.current_file = None
       self.current_item = None
       self.items = []
+      self.delay = 0 # milliseconds
 
       self.encodings = []
       if ini.get_bool('subtitles', 'always_try_utf8'):
@@ -194,6 +195,8 @@ class Subtitles(object):
       # subtitles loaded ?
       if self.current_file is None:
          return
+
+      pos -= self.delay / 1000.0
 
       # current item is still valid ?
       item = self.current_item

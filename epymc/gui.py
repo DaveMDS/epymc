@@ -1075,37 +1075,44 @@ class EmcDialog(edje.Edje):
 class EmcNotify(edje.Edje):
    """ TODO doc this"""
 
-   def __init__(self, text, icon='icon/star', hidein=5.0):
-      group = 'emc/notify/default'
-      edje.Edje.__init__(self, layout.evas, file=theme_file, group=group)
+   def __init__(self, text, icon='icon/star', hidein=5.0, close_cb=None):
+      self.timer = None
+      self.close_cb = close_cb
+
+      edje.Edje.__init__(self, layout.evas, file=theme_file,
+                         group='emc/notify/default')
       self.part_text_set('emc.text.caption', text)
       self._icon = load_image(icon)
       self.part_swallow('emc.swallow.icon', self._icon)
       box_append('notify.box.stack', self)
+
       if hidein > 0.0:
-         self.timer = ecore.Timer(hidein, self.hide_timer_cb)
-      else:
-         self.timer = None
+         self.hidein(hidein)
+
       self.show()
 
-   def hide_timer_cb(self):
+   def hidein(self, hidein):
+      if self.timer:
+         self.timer.delete()
+      self.timer = ecore.Timer(hidein, self._hide_timer_cb)
+
+   def _hide_timer_cb(self):
       box_remove('notify.box.stack', self)
       self._icon.delete()
       self.delete()
+      if callable(self.close_cb):
+         self.close_cb()
       return ecore.ECORE_CALLBACK_CANCEL
 
    def close(self):
       if self.timer:
          self.timer.delete()
-      self.hide_timer_cb()
+      self._hide_timer_cb()
 
    def text_set(self, text):
       self.part_text_set('emc.text.caption', text)
-   
-   def icon_set(self, icon):
-      self.part_text_set('emc.text.caption', text)
-      # TODO need to del the old image ??
-      self._icon = load_image(icon)
+
+
 
 ################################################################################
 class EmcFolderSelector(EmcDialog):

@@ -54,9 +54,12 @@ class RootItemClass(EmcItemClass):
    def icon_end_get(self, url, user_data):
       return 'icon/forward'
 
-class StdConfigItemBool(object): 
-   # this don't inherit from EmcItemClass to not be a Singleton
-   # this class is used by the function standard_item_bool_add(...)
+class StdConfigItemBase(object):
+   """ Base class for all the other StdConfigItem* classes.
+
+   Do not inherit from EmcItemClass to not be a Singleton.
+
+   """
 
    def __init__(self, section, option, label, icon=None, info=None, cb=None):
       self._sec = section
@@ -66,96 +69,88 @@ class StdConfigItemBool(object):
       self._inf = info
       self._cb = cb
 
-   def item_selected(self, url, user_data):
-      if ini.get(self._sec, self._opt) == "True":
-         ini.set(self._sec, self._opt, "False")
-      else:
-         ini.set(self._sec, self._opt, "True")
+   def __done__(self):
       _browser.refresh()
       if callable(self._cb):
          self._cb()
 
-   def icon_end_get(self, url, user_data):
-      if ini.get(self._sec, self._opt) == "True":
-         return 'icon/check_on'
-      return 'icon/check_off'
+   def item_selected(self, url, user_data):
+      self.__done__()
 
    def label_get(self, url, user_data):
       return self._lbl
 
+   def label_end_get(self, url, user_data):
+      return None
+
    def icon_get(self, url, user_data):
       return self._ico
+
+   def icon_end_get(self, url, user_data):
+      return None
 
    def info_get(self, url, user_data):
       return self._inf
 
-   def label_end_get(self, url, user_data): return None
-   def poster_get(self, url, user_data): return None
-   def fanart_get(self, url, user_data): return None
+   def poster_get(self, url, user_data):
+      return None
 
-class StdConfigItemString(object): 
-   # this don't inherit from EmcItemClass to not be a Singleton
-   # this class is used by the function standard_item_string_add(...)
+   def fanart_get(self, url, user_data):
+      return None
 
-   def __init__(self, section, option, label, icon=None, info=None, cb=None, pwd=False):
-      self._sec = section
-      self._opt = option
-      self._lbl = label
-      self._ico = icon
-      self._inf = info
+class StdConfigItemBool(StdConfigItemBase): 
+   """ This class is used by the function standard_item_bool_add(...) """
+
+   def __init__(self, *args):
+      StdConfigItemBase.__init__(self, *args)
+
+   def item_selected(self, url, user_data):
+      if ini.get(self._sec, self._opt) == 'True':
+         ini.set(self._sec, self._opt, 'False')
+      else:
+         ini.set(self._sec, self._opt, 'True')
+      StdConfigItemBase.__done__(self)
+
+   def icon_end_get(self, url, user_data):
+      if ini.get_bool(self._sec, self._opt) is True:
+         return 'icon/check_on'
+      return 'icon/check_off'
+
+class StdConfigItemString(StdConfigItemBase): 
+   """ This class is used by the function standard_item_string_add(...) """
+
+   def __init__(self, pwd=False, *args):
       self._pwd = pwd
-      self._cb = cb
+      StdConfigItemBase.__init__(self, *args)
 
    def _kbd_accept_cb(self, vkeyb, text):
       ini.set(self._sec, self._opt, text)
-      _browser.refresh()
-      if callable(self._cb):
-         self._cb()
+      StdConfigItemBase.__done__(self)
 
    def item_selected(self, url, user_data):
       EmcVKeyboard(title=self._lbl, accept_cb=self._kbd_accept_cb,
                    text=ini.get(self._sec, self._opt) if not self._pwd else '')
 
-   def label_get(self, url, user_data):
-      return self._lbl
-
-   def icon_get(self, url, user_data):
-      return self._ico
-
    def label_end_get(self, url, user_data):
       val = ini.get(self._sec, self._opt)
       return '●●●●●' if self._pwd and val else val
 
-   def info_get(self, url, user_data):
-      return self._inf
+class StdConfigItemStringFromList(StdConfigItemBase): 
+   """ Used by the function standard_item_string_from_list_add(...) """
 
-   def icon_end_get(self, url, user_data): return None
-   def poster_get(self, url, user_data): return None
-   def fanart_get(self, url, user_data): return None
-
-class StdConfigItemStringFromList(object): 
-   # this don't inherit from EmcItemClass to not be a Singleton
-   # this class is used by the function standard_item_string_add(...)
-
-   def __init__(self, section, option, label, strlist, icon=None, info=None, cb=None):
-      self._sec = section
-      self._opt = option
-      self._lbl = label
-      self._ico = icon
-      self._inf = info
+   def __init__(self, strlist, *args):
       self._sli = strlist
-      self._cb = cb
+      StdConfigItemBase.__init__(self, *args)
 
    def _dia_list_selected_cb(self, dia):
       item = dia.list_item_selected_get()
       ini.set(self._sec, self._opt, item.text)
-      _browser.refresh()
       dia.delete()
-      if callable(self._cb):
-         self._cb()
+      StdConfigItemBase.__done__(self)
 
    def item_selected(self, url, user_data):
-      dia = EmcDialog(self._lbl, style='list', done_cb=self._dia_list_selected_cb)
+      dia = EmcDialog(self._lbl, style='list',
+                      done_cb=self._dia_list_selected_cb)
       for string in self._sli:
          if string == ini.get(self._sec, self._opt):
             it = dia.list_item_append(string, end='icon/check_on')
@@ -163,34 +158,15 @@ class StdConfigItemStringFromList(object):
          else:
             dia.list_item_append(string)
 
-   def label_get(self, url, user_data):
-      return self._lbl
-
-   def icon_get(self, url, user_data):
-      return self._ico
-
    def label_end_get(self, url, user_data):
       return ini.get(self._sec, self._opt)
 
-   def info_get(self, url, user_data):
-      return self._inf
+class StdConfigItemLang(StdConfigItemBase): 
+   """ this class is used by the function standard_item_lang_add(...) """
 
-   def icon_end_get(self, url, user_data): return None
-   def poster_get(self, url, user_data): return None
-   def fanart_get(self, url, user_data): return None
-
-class StdConfigItemLang(object): 
-   # this don't inherit from EmcItemClass to not be a Singleton
-   # this class is used by the function standard_item_lang_add(...)
-
-   def __init__(self, section, option, label, multi=False, icon=None, info=None, cb=None):
-      self._sec = section
-      self._opt = option
-      self._lbl = label
+   def __init__(self, multi=False, *args):
       self._mul = multi
-      self._ico = icon
-      self._inf = info
-      self._cb = cb
+      StdConfigItemBase.__init__(self, *args)
 
    def _dia_list_selected_cb(self, dia):
       item = dia.list_item_selected_get()
@@ -204,10 +180,8 @@ class StdConfigItemLang(object):
       else:
          ini.set(self._sec, self._opt, lang)
 
-      _browser.refresh()
       dia.delete()
-      if callable(self._cb):
-         self._cb()
+      StdConfigItemBase.__done__(self)
 
    def item_selected(self, url, user_data):
       dia = EmcDialog(self._lbl, style='list', done_cb=self._dia_list_selected_cb)
@@ -219,7 +193,7 @@ class StdConfigItemLang(object):
 
       item = None
       for code2, (code3, code5, name) in sorted(utils.iso639_table.items(),
-                                         key=lambda x: x[1][2]):
+                                                key=lambda x: x[1][2]):
          if name is not None:
             if code2 in choosed:
                item = dia.list_item_append(name, end='icon/check_on')
@@ -232,25 +206,11 @@ class StdConfigItemLang(object):
          item.show()
          item.selected = True
 
-   def label_get(self, url, user_data):
-      return self._lbl
-
-   def icon_get(self, url, user_data):
-      return self._ico
-   
    def label_end_get(self, url, user_data):
       return ini.get(self._sec, self._opt)
 
-   def info_get(self, url, user_data):
-      return self._inf
-
-   def icon_end_get(self, url, user_data): return None
-   def poster_get(self, url, user_data): return None
-   def fanart_get(self, url, user_data): return None
-
-class StdConfigItemAction(object): 
-   # this don't inherit from EmcItemClass to not be a Singleton
-   # this class is used by the function standard_item_action_add(...)
+class StdConfigItemAction(StdConfigItemBase): 
+   """ This class is used by the function standard_item_action_add(...) """
 
    def __init__(self, label, icon=None, info=None, selected_cb=None):
       self._lbl = label
@@ -262,19 +222,6 @@ class StdConfigItemAction(object):
       if callable(self._cb):
          self._cb()
 
-   def label_get(self, url, user_data):
-      return self._lbl
-
-   def icon_get(self, url, user_data):
-      return self._ico
-
-   def info_get(self, url, user_data):
-      return self._inf
-
-   def label_end_get(self, url, user_data): return None
-   def icon_end_get(self, url, user_data): return None
-   def poster_get(self, url, user_data): return None
-   def fanart_get(self, url, user_data): return None
 
 ### public functions
 def init():
@@ -329,17 +276,17 @@ def standard_item_bool_add(section, option, label, icon=None, info=None, cb=None
 
 def standard_item_string_add(section, option, label, icon=None, info=None, cb=None, pwd=False):
    """ TODO doc """
-   _browser.item_add(StdConfigItemString(section, option, label, icon, info, cb, pwd),
+   _browser.item_add(StdConfigItemString(pwd, section, option, label, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
 
 def standard_item_string_from_list_add(section, option, label, strlist, icon=None, info=None, cb=None):
    """ TODO doc """
-   _browser.item_add(StdConfigItemStringFromList(section, option, label, strlist, icon, info, cb),
+   _browser.item_add(StdConfigItemStringFromList(strlist, section, option, label, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
 
 def standard_item_lang_add(section, option, label, multi=False, icon=None, info=None, cb=None):
    """ TODO doc """
-   _browser.item_add(StdConfigItemLang(section, option, label, multi, icon, info, cb),
+   _browser.item_add(StdConfigItemLang(multi, section, option, label, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
 
 

@@ -70,7 +70,11 @@ def srt_time_to_seconds(time):
    return int(major[0])*1440 + int(major[1])*60 + int(major[2]) + float(minor)/1000
 
 def parse_format_srt(full_text):
-   """ SubRip parser (en.wikipedia.org/wiki/SubRip) """
+   """ SubRip (.srt) parser
+
+   Docs at: en.wikipedia.org/wiki/SubRip)
+
+   """
    DBG('Parsing SRT format')
    idx = 0
    L = []
@@ -81,20 +85,25 @@ def parse_format_srt(full_text):
          L.append(SubtitleItem(idx, srt_time_to_seconds(start_str),
                                     srt_time_to_seconds(end_str),
                                     '<br>'.join(lines[2:])))
-                              
          idx += 1
    DBG('Loaded %d items' % len(L))
    return L
 
 def parse_format_sub(full_text):
+   """ MicroDVD (.sub) format
+
+   Docs at: http://en.wikipedia.org/wiki/MicroDVD
+
+   NOTE: Need framerate or frame number from emotion (not currently implemented)
+
+   """
    raise NotImplementedError()
 
 
 # Supported formats
-FORMATS = ('.srt', '.sub')
+FORMATS = ('.srt')
 PARSERS = {
    '.srt': parse_format_srt,
-   '.sub': parse_format_sub,
 }
 
 class SubtitleItem(object):

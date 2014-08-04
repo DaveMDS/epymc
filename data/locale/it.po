@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-04 00:45+0200\n"
-"PO-Revision-Date: 2014-08-03 21:59+0100\n"
+"POT-Creation-Date: 2014-08-04 10:17+0200\n"
+"PO-Revision-Date: 2014-08-04 10:21+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -68,37 +68,37 @@ msgstr ""
 msgid "EpyMC Database"
 msgstr "EpyMC Database"
 
-#: epymc/config_gui.py:284 epymc/config_gui.py:287 epymc/config_gui.py:357
+#: epymc/config_gui.py:283 epymc/config_gui.py:286 epymc/config_gui.py:356
 msgid "Configuration"
 msgstr "Configurazione"
 
-#: epymc/config_gui.py:289 epymc/config_gui.py:368
+#: epymc/config_gui.py:288 epymc/config_gui.py:367
 msgid "General"
 msgstr "Generale"
 
-#: epymc/config_gui.py:290
+#: epymc/config_gui.py:289
 msgid "Themes"
 msgstr "Temi"
 
-#: epymc/config_gui.py:291 epymc/config_gui.py:466
+#: epymc/config_gui.py:290 epymc/config_gui.py:455
 msgid "Modules"
 msgstr "Moduli"
 
-#: epymc/config_gui.py:292 epymc/config_gui.py:526
+#: epymc/config_gui.py:291 epymc/config_gui.py:515
 msgid "System info"
 msgstr "Informazioni di sistema"
 
-#: epymc/config_gui.py:293 epymc/config_gui.py:479 epymc/mediaplayer.py:422
+#: epymc/config_gui.py:292 epymc/config_gui.py:468 epymc/mediaplayer.py:422
 msgid "Subtitles"
 msgstr "Sottotitoli"
 
-#: epymc/config_gui.py:371
+#: epymc/config_gui.py:370
 msgid "Start in fullscreen"
 msgstr "Avvia a schermo intero"
 
 #: epymc/config_gui.py:372
-msgid "Adjust interface scale"
-msgstr "Modifica scalatura"
+msgid "Interface scale"
+msgstr "Fattore di scala"
 
 #: epymc/config_gui.py:373
 msgid "Show Back item in lists"
@@ -112,7 +112,7 @@ msgstr "Cartella download"
 msgid "Max concurrent download"
 msgstr "Download simultanei"
 
-#: epymc/config_gui.py:383 epymc/config_gui.py:515
+#: epymc/config_gui.py:383 epymc/config_gui.py:504
 msgid "Rendering engine"
 msgstr "Motore di rendering"
 
@@ -124,100 +124,79 @@ msgstr "Motore multimediale"
 msgid "Frames per second"
 msgstr "Frame al secondo"
 
-#: epymc/config_gui.py:401 epymc/config_gui.py:405
-#, python-format
-msgid "Current Value: %s"
-msgstr "Valore attuale: %s"
-
-#: epymc/config_gui.py:404
-msgid "set scale"
-msgstr "imposta scalatura"
-
-#: epymc/config_gui.py:406
-msgid "Bigger"
-msgstr "Più grande"
-
-#: epymc/config_gui.py:407
-msgid "Smaller"
-msgstr "Più piccola"
-
-#: epymc/config_gui.py:408
-msgid "Reset"
-msgstr "Reimposta"
-
-#: epymc/config_gui.py:428 epymc/plugins/onlinevideo/onlinevideo.py:89
+#: epymc/config_gui.py:417 epymc/plugins/onlinevideo/onlinevideo.py:89
 msgid "Author"
 msgstr "Autore"
 
-#: epymc/config_gui.py:429 epymc/plugins/onlinevideo/onlinevideo.py:88
+#: epymc/config_gui.py:418 epymc/plugins/onlinevideo/onlinevideo.py:88
 msgid "Version"
 msgstr "Versione"
 
-#: epymc/config_gui.py:482
+#: epymc/config_gui.py:471
 msgid "Subtitles preferred languages"
 msgstr "Lingue preferite per i sottotitoli"
 
-#: epymc/config_gui.py:483
+#: epymc/config_gui.py:472
 msgid "Subtitles encoding"
 msgstr "Encoding dei sottotitoli"
 
-#: epymc/config_gui.py:484
+#: epymc/config_gui.py:473
 msgid "Always try UTF-8 first"
 msgstr "Prova sempre UTF-8 prima"
 
-#: epymc/config_gui.py:485
+#: epymc/config_gui.py:474
 msgid "Opensubtitles.org Username"
 msgstr "Utente Opensubtitles.org"
 
-#: epymc/config_gui.py:486
+#: epymc/config_gui.py:475
 msgid "Opensubtitles.org Password"
 msgstr "Password Opensubtitles.org"
 
-#: epymc/config_gui.py:514
+#: epymc/config_gui.py:503
 msgid "Core"
 msgstr "Nucleo"
 
-#: epymc/config_gui.py:516
+#: epymc/config_gui.py:505
 msgid "Download available"
 msgstr "Download disponibili"
 
-#: epymc/config_gui.py:516
+#: epymc/config_gui.py:505
 msgid "yes"
 msgstr "sì"
 
-#: epymc/config_gui.py:516
+#: epymc/config_gui.py:505
 msgid "no"
 msgstr "no"
 
-#: epymc/config_gui.py:517
+#: epymc/config_gui.py:506
 msgid "Theme"
 msgstr "Tema"
 
-#: epymc/config_gui.py:518
+#: epymc/config_gui.py:507
 msgid "Paths"
 msgstr "Percorsi"
 
-#: epymc/config_gui.py:519
+#: epymc/config_gui.py:508
 msgid "Base folder"
 msgstr "Cartella base"
 
-#: epymc/config_gui.py:520
+#: epymc/config_gui.py:509
 msgid "Config folder"
 msgstr "Cartella configurazioni"
 
-#: epymc/config_gui.py:521
+#: epymc/config_gui.py:510
 msgid "Versions"
 msgstr "Versioni"
 
-#: epymc/config_gui.py:522
+#: epymc/config_gui.py:511
 msgid "Python"
 msgstr "Python"
 
-#: epymc/config_gui.py:523
+#: epymc/config_gui.py:512
 msgid "EpyMC"
 msgstr "EpyMC"
 
-#: epymc/config_gui.py:524
+#: epymc/config_gui.py:513
 msgid "EpyMC themes API"
 msgstr "Versione dei temi"
 
@@ -1391,3 +1370,4 @@ msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "%d minuto fa"
 msgstr[1] "%d minuti fa"
+

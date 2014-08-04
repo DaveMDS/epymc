@@ -164,7 +164,6 @@ class StdConfigItemStringFromList(object):
             dia.list_item_append(string)
 
    def label_get(self, url, user_data):
-      # return '%s  ( %s )' % (self._lbl, ini.get(self._sec, self._opt))
       return self._lbl
 
    def icon_get(self, url, user_data):
@@ -369,7 +368,8 @@ def _general_list():
 
 def _general_populate(browser, url):
    standard_item_bool_add('general', 'fullscreen', _('Start in fullscreen'))
-   standard_item_action_add(_('Adjust interface scale'), 'icon/scale', cb=_change_scale)
+   L = [ str(x / 10.0) for x in range(5, 21) ]
+   standard_item_string_from_list_add('general', 'scale', _('Interface scale'), L, 'icon/scale', cb=_change_scale)
    standard_item_bool_add('general', 'back_in_lists', _('Show Back item in lists'), 'icon/back')
    standard_item_string_add('general', 'download_folder', _('Download folder'), 'icon/download')
    standard_item_string_add('general', 'max_concurrent_download', _('Max concurrent download'), 'icon/download')
@@ -394,19 +394,8 @@ def _change_fps():
    gui.fps_set(ini.get_int('general', 'fps'))
 
 def _change_scale():
-   def _bigger(dialog): gui.scale_bigger(); _save()
-   def _smaller(dialog): gui.scale_smaller(); _save()
-   def _reset(dialog): gui.scale_set(1.0); _save()
-   def _save():
-      d.text_set(_('Current Value: %s') % (gui.scale_get()))
-      ini.set('general', 'scale', str(gui.scale_get()))
+   gui.scale_set(ini.get_float('general', 'scale'))
 
-   d = EmcDialog(title=_('set scale'), style='minimal',
-                 text=_('Current Value: %s') % (gui.scale_get()))
-   d.button_add(_('Bigger'), selected_cb=_bigger)
-   d.button_add(_('Smaller'), selected_cb=_smaller)
-   d.button_add(_('Reset'), selected_cb=_reset)
-   
 ##############  THEMES  #######################################################
 
 class ThemesItemClass(EmcItemClass):

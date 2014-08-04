@@ -48,10 +48,6 @@ def DBG(msg):
    print('SUBTITLES: ' + str(msg))
    pass
 
-def srt_time_to_seconds(time):
-   split_time = time.split(',')
-   major, minor = (split_time[0].split(':'), split_time[1])
-   return int(major[0])*1440 + int(major[1])*60 + int(major[2]) + float(minor)/1000
 
 def read_file_with_encodings(fname, encodings):
    text = None
@@ -67,11 +63,45 @@ def read_file_with_encodings(fname, encodings):
          break
    return text
 
+def srt_time_to_seconds(time):
+   """ Convert "00:00:10,500" to seconds (float) """
+   split_time = time.split(',')
+   major, minor = (split_time[0].split(':'), split_time[1])
+   return int(major[0])*1440 + int(major[1])*60 + int(major[2]) + float(minor)/1000
+
+def parse_format_srt(full_text):
+   """ SubRip parser (en.wikipedia.org/wiki/SubRip) """
+   DBG('Parsing SRT format')
+   idx = 0
+   L = []
+   for it in re.sub('\r\n', '\n', full_text).split('\n\n'):
+      lines = [ x for x in it.split('\n') if x ] # spit and remove empty lines
+      if len(lines) >= 3:
+         start_str, end_str = lines[1].split(' --> ')
+         L.append(SubtitleItem(idx, srt_time_to_seconds(start_str),
+                                    srt_time_to_seconds(end_str),
+                                    '<br>'.join(lines[2:])))
+                              
+         idx += 1
+   DBG('Loaded %d items' % len(L))
+   return L
+
+def parse_format_sub(full_text):
+   raise NotImplementedError()
+
+
+# Supported formats
+FORMATS = ('.srt', '.sub')
+PARSERS = {
+   '.srt': parse_format_srt,
+   '.sub': parse_format_sub,
+}
+
 class SubtitleItem(object):
    def __init__(self, idx, start, end, text):
       self.idx = idx
-      self.start = srt_time_to_seconds(start)
-      self.end = srt_time_to_seconds(end)
+      self.start = start
+      self.end = end
       self.text = text
 
    def __str__(self):
@@ -100,24 +130,16 @@ class Subtitles(object):
       name = os.path.splitext(self.media_path)[0]
       L = []
 
-      # search main .srt file (same name as the media, with .srt extension)
-      fname = name + '.srt'
-      if os.path.exists(fname):
-         DBG('Found %s' % fname)
-         L.append(fname)
+      # search as /path/to/media/name*.{supported extension}
+      p = name + '*.*'
+      L = [ f for f in glob.glob(p) if f.lower().endswith(FORMATS) ]
+      L.sort(key=len)
 
-      # search other .srt (name_*.srt)
-      for fname in glob.glob(name + '*.srt'):
-         if not fname in L:
-            DBG('Found %s' % fname)
-            L.append(fname) 
+      # search in /userconfig/subtitles/md5_*.{supported extension}
+      p = os.path.join(utils.user_conf_dir, 'subtitles', self.media_md5 + '_*.*')
+      L += [ f for f in glob.glob(p) if f.lower().endswith(FORMATS) ]
 
-      # search in userconfig/subtitles/md5_XXX.srt)
-      p = os.path.join(utils.user_conf_dir, 'subtitles', self.media_md5 + '_*.srt')
-      for fname in glob.glob(p):
-         DBG('Found %s' % fname)
-         L.append(fname)
-
+      for f in L: DBG('Found %s' % f)
       return L
 
    def file_set(self, fname):
@@ -127,7 +149,7 @@ class Subtitles(object):
       self.current_file = None
 
       if fname is not None:
-         self.parse_srt(fname)
+         self.parse_sub(fname)
          if self.items:
             self.current_file = fname
 
@@ -135,7 +157,7 @@ class Subtitles(object):
       DBG('Cleanup')
       self.file_set(None)
 
-   def parse_srt(self, fname):
+   def parse_sub(self, fname):
       LOG('Loading subs from file: %s' % fname)
 
       # read from file using the wanted encoding
@@ -144,15 +166,12 @@ class Subtitles(object):
          LOG('Failed to read the sub: %s' % fname)
          return
 
-      # parse the srt content
-      idx = 0
-      for s in re.sub('\r\n', '\n', full_text).split('\n\n'):
-         st = [ x for x in s.split('\n') if x ] # spit and remove empty lines
-         if len(st) >= 3:
-            split = st[1].split(' --> ')
-            item = SubtitleItem(idx, split[0], split[1], '<br>'.join(st[2:]))
-            self.items.append(item)
-            idx += 1
+      # parse the text using the correct parser
+      name, ext = os.path.splitext(fname)
+      ext = ext.lower()
+      if ext in PARSERS.keys():
+         parser = PARSERS.get(ext)
+         self.items = parser(full_text)
 
    def item_apply(self, item):
       if item != self.current_item:
@@ -297,7 +316,7 @@ class Opensubtitles(object):
          data = self.get_from_data_or_none(data, 'data')
          if data:
             for sub in data:
-               if sub['SubFormat'] != 'srt': continue
+               if '.' + sub['SubFormat'] not in FORMATS: continue
                if 'SubBad' in sub and sub['SubBad'] != '0': continue
                for key in ('SubDownloadsCnt', 'SubRating'):
                   if key in sub and sub[key]:

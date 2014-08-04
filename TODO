@@ -13,6 +13,7 @@ MAIN
  * subtitles font and size configuration
  * try to change the gray color of buttons, it seems disabled now.
  * subtitles upload to opensubtitles.org
+ * when go backward/forward show a slider, like for volume
 
 NEW MODULES
 ===========

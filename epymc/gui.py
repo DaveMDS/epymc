@@ -301,6 +301,8 @@ def background_set(image):
 def fps_set(fps):
    ecore.animator_frametime_set(1.0 / float(fps))
 
+def fullscreen_toggle():
+   win.fullscreen = not win.fullscreen
 
 ### audio info/controls notify
 _audio_notify = None
@@ -363,7 +365,7 @@ def box_remove(part, obj):
 ### Internal functions ###
 def _input_event_cb(event):
    if event == 'TOGGLE_FULLSCREEN':
-      win.fullscreen = not win.fullscreen
+      fullscreen_toggle()
    elif event == 'SCALE_BIGGER':
       scale_bigger()
    elif event == 'SCALE_SMALLER':

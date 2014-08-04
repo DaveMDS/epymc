@@ -470,7 +470,9 @@ def _init_mediaplayer_gui():
 
    # click on video to show/hide the controls
    gui.layout.edje.signal_callback_add("mouse,down,1", "videoplayer.events",
-                                       (lambda a,s,d: video_controls_toggle()))
+                                       lambda a,s,d: video_controls_toggle())
+   gui.layout.edje.signal_callback_add("mouse,down,2", "videoplayer.events",
+                                       lambda a,s,d: gui.fullscreen_toggle())
 
 def _cb_playback_finished(vid):
    video_player_hide()

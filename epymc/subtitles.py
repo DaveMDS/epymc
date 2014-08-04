@@ -53,6 +53,20 @@ def srt_time_to_seconds(time):
    major, minor = (split_time[0].split(':'), split_time[1])
    return int(major[0])*1440 + int(major[1])*60 + int(major[2]) + float(minor)/1000
 
+def read_file_with_encodings(fname, encodings):
+   text = None
+   for enc in encodings:
+      try:
+         DBG('Trying encoding: %s' % enc)
+         with codecs.open(fname, encoding=enc) as f:
+            text = f.read()
+      except Exception as ex:
+         DBG('Decode failed, error: %s' % ex)
+      else:
+         DBG('Decode successful')
+         break
+   return text
+
 class SubtitleItem(object):
    def __init__(self, idx, start, end, text):
       self.idx = idx
@@ -71,6 +85,11 @@ class Subtitles(object):
       self.current_file = None
       self.current_item = None
       self.items = []
+
+      self.encodings = []
+      if ini.get_bool('subtitles', 'always_try_utf8'):
+         self.encodings.append('utf-8')
+      self.encodings.append(ini.get('subtitles', 'encoding'))
 
       availables = self.search_subs()
       if len(availables) > 0:
@@ -120,23 +139,7 @@ class Subtitles(object):
       LOG('Loading subs from file: %s' % fname)
 
       # read from file using the wanted encoding
-      encodings = []
-      if ini.get_bool('subtitles', 'always_try_utf8'):
-         encodings.append('utf-8')
-      encodings.append(ini.get('subtitles', 'encoding'))
-
-      full_text = None
-      for enc in encodings:
-         try:
-            DBG('Trying encoding: %s' % enc)
-            with codecs.open(fname, encoding=enc) as f:
-               full_text = f.read()
-         except Exception as ex:
-            DBG('Decode failed, error: %s' % ex)
-         else:
-            DBG('Decode successful')
-            break
-
+      full_text = read_file_with_encodings(fname, self.encodings)
       if full_text is None:
          LOG('Failed to read the sub: %s' % fname)
          return

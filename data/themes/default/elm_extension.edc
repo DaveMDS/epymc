@@ -2184,6 +2184,7 @@ group { name: "elm/button/base/emc";
    images {
       image: "button_normal.png" COMP;
       image: "button_clicked.png" COMP;
+      image: "button_selected.png" COMP;
    }
 #define ICON     1
 #define LABEL    2
@@ -2201,12 +2202,14 @@ group { name: "elm/button/base/emc";
                set_state(PART:"elm.text", "visible", 0.0);
                set_state(PART:"icon_clip", "default", 0.0);
                set_state(PART:"event", "default", 0.0);
+               set_state(PART:"base", "default", 0.0);
             } else {
                set_state(PART:"elm.swallow.content", "visible", 0.0);
                set_state(PART:"sizer.content", "visible", 0.0);
                set_state(PART:"elm.text", "disabled_visible", 0.0);
                set_state(PART:"icon_clip", "disabled", 0.0);
                set_state(PART:"event", "disabled", 0.0);
+               set_state(PART:"base", "disabled", 0.0);
             }
          } else if (m1 == (ICON)) {
             if (!d) {
@@ -2215,12 +2218,14 @@ group { name: "elm/button/base/emc";
                set_state(PART:"elm.text", "default", 0.0);
                set_state(PART:"icon_clip", "default", 0.0);
                set_state(PART:"event", "default", 0.0);
+               set_state(PART:"base", "default", 0.0);
             } else {
                set_state(PART:"elm.swallow.content", "icononly", 0.0);
                set_state(PART:"sizer.content", "icononly", 0.0);
                set_state(PART:"elm.text", "default", 0.0);
                set_state(PART:"icon_clip", "disabled", 0.0);
                set_state(PART:"event", "disabled", 0.0);
+               set_state(PART:"base", "disabled", 0.0);
             }
          } else if (m1 == (LABEL)) {
             if (!d) {
@@ -2229,12 +2234,14 @@ group { name: "elm/button/base/emc";
                set_state(PART:"elm.text", "textonly", 0.0);
                set_state(PART:"icon_clip", "default", 0.0);
                set_state(PART:"event", "default", 0.0);
+               set_state(PART:"base", "default", 0.0);
             } else {
                set_state(PART:"elm.swallow.content", "default", 0.0);
                set_state(PART:"sizer.content", "default", 0.0);
                set_state(PART:"elm.text", "disabled_textonly", 0.0);
                set_state(PART:"icon_clip", "disabled", 0.0);
                set_state(PART:"event", "disabled", 0.0);
+               set_state(PART:"base", "disabled", 0.0);
             }
          } else {
             set_state(PART:"elm.swallow.content", "default", 0.0);
@@ -2242,6 +2249,7 @@ group { name: "elm/button/base/emc";
             set_state(PART:"elm.text", "default", 0.0);
             set_state(PART:"icon_clip", "default", 0.0);
             set_state(PART:"event", "default", 0.0);
+            set_state(PART:"base", "default", 0.0);
          }
       }
    }
@@ -2249,7 +2257,7 @@ group { name: "elm/button/base/emc";
       part { name: "base"; mouse_events: 1;
          description { state: "default" 0.0;
             min: 50 35;
-            image.normal: "button_normal.png";
+            image.normal: "button_selected.png";
             image.border: 4 4 3 5;
             image.middle: SOLID;
             rel1.offset: -1 0;
@@ -2261,13 +2269,18 @@ group { name: "elm/button/base/emc";
             image.normal: "button_clicked.png";
             image.border: 5 5 4 6;
          }
+         description { state: "disabled" 0.0;
+            inherit: "default" 0.0;
+            image.normal: "button_normal.png";
+            image.border: 4 4 3 5;
+         }
       }
       part { name: "icon_clip"; type: RECT;
          description { state: "default" 0.0;
          }
          description { state: "disabled" 0.0;
             inherit: "default" 0.0;
-            color: 255 255 255 128;
+            // color: 255 255 255 128;
          }
       }
       part { name: "elm.swallow.content"; type: SWALLOW; mouse_events: 0;
@@ -2365,8 +2378,10 @@ group { name: "elm/button/base/emc";
             inherit: "default" 0.0;
             rel1.offset: 2 5;
             color_class: "button_text_disabled";
-            color: FONT_COLOR_NOSEL;
-            color3: FONT_COLOR3_NOSEL;
+            // color: FONT_COLOR_NOSEL;
+            // color3: FONT_COLOR3_NOSEL;
+            color: FONT_COLOR;
+            color3: FONT_COLOR3;
             text.min: 1 1;
             text.ellipsis: -1;
             visible: 1;
@@ -2374,8 +2389,10 @@ group { name: "elm/button/base/emc";
          description { state: "disabled_textonly" 0.0;
             inherit: "default" 0.0;
             color_class: "button_text_disabled";
-            color: FONT_COLOR_NOSEL;
-            color3: FONT_COLOR3_NOSEL;
+            // color: FONT_COLOR_NOSEL;
+            // color3: FONT_COLOR3_NOSEL;
+            color: FONT_COLOR;
+            color3: FONT_COLOR3;
             text.min: 1 1;
             text.ellipsis: -1;
             visible: 1;

@@ -304,17 +304,6 @@ class MyItemClass(EmcItemClass):
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
 
-         # 7 butttons in a row (icons)
-         hbox2 = Box(gui.win)
-         hbox2.horizontal_set(True)
-         hbox2.show()
-         icons = ['icon/star','icon/home','icon/folder']
-         for i in xrange(0,8):
-            b = EmcButton(None, icons[i % len(icons)])
-            fman.obj_add(b)
-            hbox2.pack_end(b)
-         vbox0.pack_end(hbox2)
-
          # mediaplayer buttons
          hbox2 = Box(gui.win)
          hbox2.horizontal_set(True)
@@ -325,6 +314,19 @@ class MyItemClass(EmcItemClass):
             fman.obj_add(b)
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
+
+         # all the icons of the theme in buttons
+         i = 0
+         for group in edje.file_collection_list(gui.theme_file):
+            if group.startswith('icon/'):
+               if i % 12 == 0:
+                  hbox2 = Box(gui.win, horizontal=True)
+                  vbox0.pack_end(hbox2)
+                  hbox2.show()
+               b = EmcButton(None, group)
+               fman.obj_add(b)
+               hbox2.pack_end(b)
+               i += 1
 
       # Icons gallery
       elif url == 'uitests://icons':

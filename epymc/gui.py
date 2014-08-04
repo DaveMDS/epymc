@@ -1001,7 +1001,6 @@ class EmcDialog(edje.Edje):
    def _cb_buttons(self, button):
       selected_cb = button.data['cb']
       cb_data = button.data['cb_data']
-
       if selected_cb and cb_data:
          selected_cb(button, cb_data)
       elif selected_cb:

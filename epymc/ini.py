@@ -105,3 +105,5 @@ def set_string_list(section, option, values, separator = ' '):
    string = separator.join(values)
    set(section, option, string)
 
+def remove_option(section, option):
+   _config.remove_option(section, option)

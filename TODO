@@ -4,18 +4,22 @@ BUGS
 =====
  * mame's favorites got lost from config sometimes
  * video don't keep the right aspect, usually subs get cutted out
+ * change the scale when in the config->General page will randomly segv
+ * text in dialogs wont scale (elm bug, all scrollable entry dont respect scale)
 
 MAIN
 =====
  * joy/webserver need a key-repetition handling
  * subtitles font and size configuration
- * subtitles offset
+ * try to change the gray color of buttons, it seems disabled now.
+ * subtitles upload to opensubtitles.org
 
 NEW MODULES
 ===========
  * internet radio
  * photo
  * wikipedia
+ * weather
  * a simple mail reader
 
 CORE

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-04 19:57+0200\n"
-"PO-Revision-Date: 2014-08-04 19:57+0100\n"
+"POT-Creation-Date: 2014-08-04 21:49+0200\n"
+"PO-Revision-Date: 2014-08-04 21:54+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -279,87 +279,87 @@ msgstr "No"
 msgid "Yes"
 msgstr "Sì"
 
-#: epymc/gui.py:1132
+#: epymc/gui.py:1131
 msgid "Source Selector"
 msgstr "Selettore fonti"
 
-#: epymc/gui.py:1137
+#: epymc/gui.py:1136
 msgid "Select"
 msgstr "Seleziona"
 
-#: epymc/gui.py:1138
+#: epymc/gui.py:1137
 msgid "Browse"
 msgstr "Naviga"
 
-#: epymc/gui.py:1146
+#: epymc/gui.py:1145
 msgid "Parent folder"
 msgstr "Cartella precedente"
 
-#: epymc/gui.py:1185
+#: epymc/gui.py:1184
 msgid "Sources Manager"
 msgstr "Gestore fonti"
 
-#: epymc/gui.py:1187
+#: epymc/gui.py:1186
 msgid "Done"
 msgstr "Fatto"
 
-#: epymc/gui.py:1189
+#: epymc/gui.py:1188
 msgid "Add"
 msgstr "Aggiungi"
 
-#: epymc/gui.py:1191
+#: epymc/gui.py:1190
 msgid "Remove"
 msgstr "Rimuovi"
 
-#: epymc/gui.py:1205
+#: epymc/gui.py:1204
 msgid "Choose a new source"
 msgstr "Seleziona una nuova fonte"
 
-#: epymc/gui.py:1352
+#: epymc/gui.py:1351
 msgid "Insert text"
 msgstr "Inserire il testo"
 
-#: epymc/gui.py:1375 epymc/gui.py:1444
+#: epymc/gui.py:1374 epymc/gui.py:1443
 msgid "UPPERCASE"
 msgstr "MAIUSCOLE"
 
-#: epymc/gui.py:1376
+#: epymc/gui.py:1375
 msgid "SPACE"
 msgstr "SPAZIO"
 
-#: epymc/gui.py:1377
+#: epymc/gui.py:1376
 msgid "ERASE"
 msgstr "CANCELLA"
 
-#: epymc/gui.py:1379
+#: epymc/gui.py:1378
 msgid "Dismiss"
 msgstr "Annulla"
 
-#: epymc/gui.py:1384
+#: epymc/gui.py:1383
 msgid "Accept"
 msgstr "Accetta"
 
-#: epymc/gui.py:1441
+#: epymc/gui.py:1440
 msgid "LOWERCASE"
 msgstr "MINUSCOLE"
 
-#: epymc/gui.py:1611
+#: epymc/gui.py:1610
 msgid "Download Manager"
 msgstr "Gestore Download"
 
-#: epymc/gui.py:1615
+#: epymc/gui.py:1614
 msgid "Start download"
 msgstr "Avvia download"
 
-#: epymc/gui.py:1616
+#: epymc/gui.py:1615
 msgid "Rename"
 msgstr "Rinomina"
 
-#: epymc/gui.py:1617
+#: epymc/gui.py:1616
 msgid "Change folder"
 msgstr "Cambia cartella"
 
-#: epymc/gui.py:1622
+#: epymc/gui.py:1621
 msgid ""
 "File will be downloaded in the folder:<br> <b>{}</b><br><br>File will be "
 "named as:<br> <b>{}</b><br><br>You can rename the file using the <i>Rename</"
@@ -370,24 +370,24 @@ msgstr ""
 "<i>Rinomina</i> o modificare la cartella di destinazione dalla "
 "configurazione generale."
 
-#: epymc/gui.py:1630
+#: epymc/gui.py:1629
 msgid "Rename download"
 msgstr "Rinomina file"
 
-#: epymc/gui.py:1638
+#: epymc/gui.py:1637
 msgid "Change destination folder"
 msgstr "Modifica cartella"
 
-#: epymc/gui.py:1653
+#: epymc/gui.py:1652
 #, python-format
 msgid "The file %s is in the download queue yet"
 msgstr "Il file %s è già in coda"
 
-#: epymc/gui.py:1687
+#: epymc/gui.py:1686
 msgid "Download started"
 msgstr "Download avviato"
 
-#: epymc/gui.py:1700 epymc/plugins/mame/mame.py:587
+#: epymc/gui.py:1699 epymc/plugins/mame/mame.py:587
 msgid "Download completed"
 msgstr "Download completato"
 
@@ -667,16 +667,41 @@ msgid_plural "groups"
 msgstr[0] "gruppo"
 msgstr[1] "gruppi"
 
-#: epymc/plugins/input_keyb/keyb.py:71
+#: epymc/plugins/input_keyb/keyb.py:75
 msgid "Input - Keyboard"
 msgstr "Input - Tastiera"
 
-#: epymc/plugins/input_keyb/keyb.py:73
+#: epymc/plugins/input_keyb/keyb.py:77
 msgid ""
 "Long info for the <b>Keyboard</b> module, explain what it does\n"
 "and what it need to work well, can also use markup like <title>this</> or\n"
 "<b>this</>"
 msgstr ""
+
+#: epymc/plugins/input_keyb/keyb.py:100 epymc/plugins/input_keyb/keyb.py:161
+msgid "Keyboard"
+msgstr "Tastiera"
+
+#: epymc/plugins/input_keyb/keyb.py:131
+msgid "Are you sure you want to remove the mapping?"
+msgstr "Sei sicuro di voler elimare la mappatura?"
+
+#: epymc/plugins/input_keyb/keyb.py:133
+msgid "Remove key"
+msgstr "Elimina tasto"
+
+#: epymc/plugins/input_keyb/keyb.py:164 epymc/plugins/input_keyb/keyb.py:173
+#: epymc/plugins/input_lirc/lirc.py:133
+msgid "Add a new key"
+msgstr "Aggiungi un nuovo tasto"
+
+#: epymc/plugins/input_keyb/keyb.py:174
+msgid "Press a key on your keyboard"
+msgstr "Premi un tasto sulla tastiera"
+
+#: epymc/plugins/input_keyb/keyb.py:188 epymc/plugins/input_lirc/lirc.py:191
+msgid "Choose an event to bind"
+msgstr "Seleziona un evento per il tasto"
 
 #: epymc/plugins/mame/mame.py:52
 msgid "My Games"
@@ -1114,10 +1139,6 @@ msgstr "Telecomando"
 msgid "Button: %s"
 msgstr "Tasto: %s"
 
-#: epymc/plugins/input_lirc/lirc.py:133
-msgid "Add a new key"
-msgstr "Aggiungi un nuovo tasto"
-
 #: epymc/plugins/input_lirc/lirc.py:147
 msgid "Lirc socket"
 msgstr "Lirc socket"
@@ -1134,10 +1155,6 @@ msgstr "Configura telecomando"
 #: epymc/plugins/input_lirc/lirc.py:169
 msgid "Press a key on your remote"
 msgstr "Premi un tasto sul telecomando"
-
-#: epymc/plugins/input_lirc/lirc.py:191
-msgid "Choose an event to bind"
-msgstr "Seleziona un evento per il tasto"
 
 #: epymc/plugins/music/music.py:50 epymc/plugins/music/music.py:54
 msgid "OnAir"

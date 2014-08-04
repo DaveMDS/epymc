@@ -629,7 +629,7 @@ class EmcMenu(Menu):
          cb = args[0]
          if cb and callable(cb):
             cb(self, item, *args[1:], **kwargs)
-         # self.close() # not sure I want this :/
+         self.close()
          return input_events.EVENT_BLOCK
 
       elif event == 'BACK' or event == 'EXIT':

@@ -761,7 +761,7 @@ class EmcDialog(edje.Edje):
    minimal_styles = ['info', 'error', 'warning', 'yesno', 'cancel', 'progress']
    dialogs_counter = 0
    fman = None
-   
+
    def __init__(self, title=None, text=None, content=None, spinner=False,
                 style='panel', done_cb=None, canc_cb=None, user_data=None):
 

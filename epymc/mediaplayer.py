@@ -18,14 +18,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, re, glob
-from operator import itemgetter
+import os
 
 from efl import evas, ecore, edje, elementary, emotion
 
 from epymc import utils, ini, gui, input_events, events
 from epymc.gui import EmcFocusManager, EmcDialog, EmcButton, EmcMenu, DownloadManager
 from epymc.sdb import EmcDatabase
+from epymc.subtitles import Subtitles, Opensubtitles
 
 
 DEBUG = True
@@ -44,7 +44,8 @@ _buttons = list()
 _fman = None
 _video_visible = False
 _buffer_dialog = None
-_update_timer = None
+_update_timer = None # used to update the controls (only on controls visible)
+_subs_timer = None # used to update the subtitles (always on)
 _onair_url = None
 _onair_title = None
 _play_db = None # key: url  data: {'started': 14, 'finished': 0, 'stop_at': 0 }
@@ -91,7 +92,7 @@ def shutdown():
 
 ### mediaplyer API ###
 def play_url(url, only_audio = False, start_from = 0):
-   global _onair_url, _onair_title, _subtitles
+   global _onair_url, _onair_title, _subtitles, _subs_timer
 
    if not _emotion and not _init_emotion():
       return False
@@ -142,6 +143,7 @@ def play_url(url, only_audio = False, start_from = 0):
 
    # Try to load subs for this url
    _subtitles = Subtitles(url)
+   _subs_timer = ecore.Timer(0.2, _update_subs_timer_cb)
 
    return True
 
@@ -154,7 +156,7 @@ def play_counts_get(url):
                'stop_at': 0 }  # last play pos
 
 def stop():
-   global _emotion, _onair_url, _onair_title, _subtitles
+   global _emotion, _onair_url, _onair_title, _subtitles, _subs_timer
 
    LOG('dbg', 'Stop()')
 
@@ -162,6 +164,9 @@ def stop():
    if _subtitles:
       _subtitles.delete()
       _subtitles = None
+   if _subs_timer:
+      _subs_timer.delete()
+      _subs_timer = None
 
    if _emotion is not None:
       # update play counts
@@ -314,6 +319,11 @@ def _update_timer_cb():
    if _emotion.play == _video_visible == True:
       events.event_emit('KEEP_ALIVE')
 
+   return ecore.ECORE_CALLBACK_RENEW
+
+def _update_subs_timer_cb():
+   if _emotion and _subtitles:
+      _subtitles.update(_emotion.position)
    return ecore.ECORE_CALLBACK_RENEW
 
 def _init_emotion():
@@ -523,7 +533,7 @@ def _cb_btn_subtitles(btn):
    menu.item_add(None, _('No subtitles'),
                  None if _subtitles.current_file else 'arrow_right',
                  _cb_menu_sub_track, None)
-   for sub in _subtitles.avail_files:
+   for sub in _subtitles.search_subs():
       if sub.startswith(utils.user_conf_dir):
          name = os.path.basename(sub)[33:]
       else:
@@ -539,7 +549,10 @@ def _cb_menu_sub_track(menu, item, sub_file):
    _subtitles.file_set(sub_file)
 
 def _cb_menu_sub_download(menu, item):
-   Opensubtitles(_onair_url)
+   Opensubtitles(_onair_url, _cb_sub_download_done)
+
+def _cb_sub_download_done(dest_file):
+   _subtitles.file_set(dest_file)
 
 def _update_slider():
    if _controls_visible and _emotion is not None:
@@ -558,7 +571,6 @@ def _update_slider():
          gui.slider_val_set('videoplayer.controls.slider:dragable1', pos / len)
       gui.text_set('videoplayer.controls.position', '%i:%02i:%02i' % (ph,pm,ps))
       gui.text_set('videoplayer.controls.length', '%i:%02i:%02i' % (lh,lm,ls))
-
 
 ### input events ###
 def input_event_cb(event):
@@ -671,353 +683,3 @@ def input_event_cb(event):
 
    return input_events.EVENT_CONTINUE
 
-### subtitles ###
-def srt_time_to_seconds(time):
-   split_time = time.split(',')
-   major, minor = (split_time[0].split(':'), split_time[1])
-   return int(major[0])*1440 + int(major[1])*60 + int(major[2]) + float(minor)/1000
-
-def srt_read_encoding_py2(fname, encodings):
-   with open(fname, 'r') as f:
-      text = f.read()
-      for enc in encodings:
-         try:
-            LOG('dbg', 'Trying encoding: %s' % enc)
-            return text.decode(encoding=enc, errors='strict')
-         except:
-            pass
-      return text
-
-def srt_read_encoding_py3(fname, encodings):
-   for enc in encodings:
-      try:
-         LOG('dbg', 'Trying encoding: %s' % enc)
-         with open(fname, encoding=enc) as f:
-            return f.read()
-      except:
-         pass
-
-class SubtitleItem(object):
-   def __init__(self, idx, start, end, text):
-      self.idx = idx
-      self.start = srt_time_to_seconds(start)
-      self.end = srt_time_to_seconds(end)
-      self.text = text
-
-   def __str__(self):
-      return '%f -> %f : %s' % (self.start, self.end, self.text)
-
-class Subtitles(object):
-   def __init__(self, url):
-      self.avail_files = []
-      self.current_file = None
-      self.items = []
-      self.current_item = None
-      self.timer = None
-
-      name = os.path.splitext(utils.url2path(url))[0]
-      main_srt = name + '.srt'
-      if os.path.exists(main_srt):
-         self.avail_files.append(main_srt)
-
-      for fname in glob.glob(name + '*.srt'):
-         if not fname in self.avail_files:
-            self.avail_files.append(fname)
-
-      md5 = utils.md5(utils.url2path(url))
-      p = os.path.join(utils.user_conf_dir, 'subtitles', md5 + '_*.srt')
-      for fname in glob.glob(p):
-         self.avail_files.append(fname)
-
-      if len(self.avail_files) > 0:
-         self.file_set(self.avail_files[0])
-
-   def file_set(self, fname):
-      if self.timer:
-         self.timer.delete()
-      self.clear()
-      self.items = []
-      self.current_item = None
-      self.current_file = None
-
-      if fname is not None:
-         self.parse_srt(fname)
-         if self.items:
-            self.current_file = fname
-            self.timer = ecore.Timer(0.2, self._timer_cb)
-
-   def delete(self):
-      self.file_set(None)
-      self.clear()
-
-   def parse_srt(self, fname):
-      LOG('inf', 'Loading subs from file: %s' % fname)
-      # read from file using the wanted encoding
-      encodings = []
-      if ini.get_bool('subtitles', 'always_try_utf8'):
-         encodings.append('utf-8')
-      encodings.append(ini.get('subtitles', 'encoding'))
-      if sys.version_info[0] < 3:
-         full_text = srt_read_encoding_py2(fname, encodings)
-      else:
-         full_text = srt_read_encoding_py3(fname, encodings)
-
-      # parse the srt content
-      idx = 0
-      for s in re.sub('\r\n', '\n', full_text).split('\n\n'):
-         st = [ x for x in s.split('\n') if x ] # spit and remove empty lines
-         if len(st) >= 3:
-            split = st[1].split(' --> ')
-            item = SubtitleItem(idx, split[0], split[1], '<br>'.join(st[2:]))
-            self.items.append(item)
-            idx += 1
-
-   def item_apply(self, item):
-      if item != self.current_item:
-         gui.text_set('videoplayer.subs', item.text)
-         self.current_item = item
-
-   def clear(self):
-      gui.text_set('videoplayer.subs', '')
-
-   def _timer_cb(self):
-      if _emotion is None:
-         self.timer = None
-         return ecore.ECORE_CALLBACK_CANCEL
-      pos = _emotion.position
-
-      # current item is still valid ?
-      item = self.current_item
-      if item and item.start < pos < item.end:
-         return ecore.ECORE_CALLBACK_RENEW
-
-      # next item valid ?
-      if item and (item.idx + 1) < len(self.items):
-         next_item = self.items[item.idx + 1]
-         if item.end < pos < next_item.start:
-            # pause between current and the next
-            self.clear()
-            return ecore.ECORE_CALLBACK_RENEW
-         elif next_item.start < pos < next_item.end:
-            # apply the next
-            self.item_apply(next_item)
-            return ecore.ECORE_CALLBACK_RENEW
-
-      # fallback: search all the items (TODO optimize using a binary search)
-      for item in self.items:
-         if item.start < pos < item.end:
-            self.item_apply(item)
-            return ecore.ECORE_CALLBACK_RENEW
-         if item.end > pos:
-            self.clear()
-            return ecore.ECORE_CALLBACK_RENEW
-
-      self.clear()
-      return ecore.ECORE_CALLBACK_RENEW
-
-try:
-   from xmlrpclib import ServerProxy # py2
-except:
-   from xmlrpc.client import ServerProxy # py3
-import struct
-import threading
-import zlib
-import base64
-import codecs
-import hashlib
-
-
-class Opensubtitles(object):
-   """ OpenSubtitles API implementation.
-
-   Check the official API documentation at:
-   http://trac.opensubtitles.org/projects/opensubtitles/wiki/XMLRPC
-
-   """
-   OPENSUBTITLES_SERVER = 'http://api.opensubtitles.org/xml-rpc'
-   # USER_AGENT = 'Emotion Media Center' + version
-   USER_AGENT = 'OS Test User Agent'
-
-   def __init__ (self, url):
-      self.dialog = None
-      self.token = None
-      self.results = []
-      self.oso_user = ini.get('subtitles', 'opensubtitles_user')
-      self.oso_pass = ini.get('subtitles', 'opensubtitles_pass')
-      self.langs2 = ini.get_string_list('subtitles', 'langs')
-      self.langs3 = [ utils.iso639_1_to_5(l) for l in self.langs2 ]
-      self.path = utils.url2path(url)
-      self.size = os.path.getsize(self.path)
-      self.hash = self.calc_hash()
-      self.xmlrpc = ServerProxy(self.OPENSUBTITLES_SERVER, allow_none=True)
-
-      self.build_wait_dialog(_('Searching subtitles'))
-      self.search_in_a_thread()
-
-   def calc_hash(self):
-      """'Original from: http://goo.gl/qqfM0 """
-      longlongformat = 'q' # long long
-      bytesize = struct.calcsize(longlongformat)
-
-      try:
-         f = open(self.path, "rb")
-      except(IOError):
-         return "IOError"
-
-      hash = self.size
-
-      if self.size < 65536 * 2:
-         return "SizeError"
-
-      for x in range(int(65536 / bytesize)):
-         buffer = f.read(bytesize)
-         (l_value, ) = struct.unpack(longlongformat, buffer)
-         hash += l_value
-         hash = hash & 0xFFFFFFFFFFFFFFFF # to remain as 64bit number
-
-      f.seek(max(0, self.size - 65536), 0)
-      for x in range(int(65536 / bytesize)):
-         buffer = f.read(bytesize)
-         (l_value, ) = struct.unpack(longlongformat, buffer)
-         hash += l_value
-         hash = hash & 0xFFFFFFFFFFFFFFFF
-
-      f.close()
-      return "%016x" % hash
-
-   def get_from_data_or_none(self, data, key):
-      if data:
-         status = data.get('status').split()[0]
-         return data.get(key) if status == '200' else None
-
-   def search_in_a_thread(self):
-      self._thread_finished = False
-      self._thread_error = None
-      ecore.Timer(0.1, self.check_search_done)
-      threading.Thread(target=self.perform_search).start()
-
-   def perform_login(self):
-      try:
-         data = self.xmlrpc.LogIn(self.oso_user, self.oso_pass,
-                                  self.langs2[0], self.USER_AGENT)
-         assert data.get('status').split()[0] == '200'
-         self.token = self.get_from_data_or_none(data, 'token')
-      except:
-         self._thread_error = _('Login failed')
-
-   def perform_search(self):
-      if self.token is None:
-         self.perform_login()
-
-      if self.token is None or self.hash is None:
-         self._thread_finished = True
-         return
-
-      try:
-         data = self.xmlrpc.SearchSubtitles(self.token, [{
-                                       'sublanguageid': ','.join(self.langs3),
-                                       'moviehash': self.hash,
-                                       'moviebytesize': self.size }])
-      except:
-         self._thread_error = _('Search failed')
-      else:
-         data = self.get_from_data_or_none(data, 'data')
-         if data:
-            for sub in data:
-               if sub['SubFormat'] != 'srt': continue
-               if 'SubBad' in sub and sub['SubBad'] != '0': continue
-               for key in ('SubDownloadsCnt', 'SubRating'):
-                  if key in sub and sub[key]:
-                     sub[key] = float(sub[key])
-               self.results.append(sub)
-
-      self._thread_finished = True
-
-   def check_search_done(self):
-      if self._thread_finished == False:
-         return ecore.ECORE_CALLBACK_RENEW
-
-      self.dialog.delete()
-      if self._thread_error:
-         EmcDialog(style='error', title='Opensubtitles.org',
-                   text=self._thread_error)
-      elif not self.results:
-         EmcDialog(style='info', title='Opensubtitles.org',
-            text=_('No results found for languages: %s') % ' '.join(self.langs3))
-      else:
-         self.build_result_dialog()
-
-      return ecore.ECORE_CALLBACK_CANCEL
-
-   def build_wait_dialog(self, title):
-      self.dialog = EmcDialog(style='minimal', spinner=True, title=title,
-                              content=gui.load_image('osdo_logo.png'))
-
-   def build_result_dialog(self):
-      txt = '%s<br>Size: %s<br>Hash: %s' % (self.path, self.size, self.hash)
-      self.dialog = EmcDialog(title='Opensubtitles.org', style='list',
-                              done_cb=self.download_in_a_thread)
-      self.dialog.button_add(_('Download'), self.download_in_a_thread,
-                             icon='icon/download')
-
-      for sub in sorted(self.results, reverse=True,
-               key=itemgetter('LanguageName', 'SubRating', 'SubDownloadsCnt')):
-         txt = '[%s] %s, from user: %s, rating: %.1f, downloads: %.0f' % \
-               (sub['SubFormat'].upper(), sub['LanguageName'],
-                sub['UserNickName'] or _('Unknown'), sub['SubRating'],
-                sub['SubDownloadsCnt'])
-         item = self.dialog.list_item_append(txt, 'icon/subs')
-         item.data['sub'] = sub
-
-   def download_in_a_thread(self, btn):
-      item = self.dialog.list_item_selected_get()
-      sub = item.data['sub']
-
-      self.dialog.delete()
-      self.build_wait_dialog(_('Downloading subtitles'))
-
-      self._thread_finished = False
-      self._thread_error = None
-      ecore.Timer(0.1, self.check_download_done)
-      threading.Thread(target=self.perform_download, args=(sub,)).start()
-
-   def perform_download(self, sub):
-      try:
-         res = self.xmlrpc.DownloadSubtitles(self.token,
-                                             [ sub['IDSubtitleFile'] ],
-                                             { 'subencoding':'utf8' } )
-         data = res['data'][0]['data']
-      except:
-         self._thread_error = _('Download failed')
-         self._thread_finished = True
-         return
-
-      try:
-         text = zlib.decompress(base64.b64decode(data), 47)
-         md5 = utils.md5(self.path)
-         fname = '%s_%s_001.%s' % (md5, sub['ISO639'], sub['SubFormat'])
-         full_path = os.path.join(utils.user_conf_dir, 'subtitles', fname)
-         full_path = utils.ensure_file_not_exists(full_path)
-
-         with codecs.open(full_path, 'w', 'utf8') as f:
-            f.write(text.decode('utf8'))
-
-         self._downloaded_path = full_path
-      except:
-         self._thread_error = _('Decode failed')
-
-      self._thread_finished = True
-
-   def check_download_done(self):
-      if self._thread_finished == False:
-         return ecore.ECORE_CALLBACK_RENEW
-
-      self.dialog.delete()
-      if self._thread_error:
-         EmcDialog(style='error', title='Opensubtitles.org',
-                   text=self._thread_error)
-      else:
-         _subtitles.avail_files.append(self._downloaded_path)
-         _subtitles.file_set(self._downloaded_path)
-      
-      return ecore.ECORE_CALLBACK_CANCEL

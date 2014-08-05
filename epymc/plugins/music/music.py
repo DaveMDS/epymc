@@ -486,7 +486,8 @@ and what it need to work well, can also use markup like <title>this</> or
       if len(self._play_queue) == 1:
          mediaplayer.play_url(url, only_audio = True)
       else:
-         EmcNotify(_('<hilight>%s</><br>queued') % (song['title']))
+         EmcNotify('<title>%s</><br>%s' % (song['title'], _('queued')),
+                   icon='icon/music')
 
    def queue_album(self, album):
 
@@ -497,7 +498,8 @@ and what it need to work well, can also use markup like <title>this</> or
          if len(self._play_queue) > 0:
             mediaplayer.play_url(self._play_queue[0], only_audio = True)
       
-      EmcNotify(_('<hilight>%s</><br>queued') % (album['name']))
+      EmcNotify('<title>%s</><br>%s' % (album['name'], _('queued')),
+                icon='icon/music')
 
    def queue_artist(self, artist):
 
@@ -510,7 +512,8 @@ and what it need to work well, can also use markup like <title>this</> or
          if len(self._play_queue) > 0:
             mediaplayer.play_url(self._play_queue[0], only_audio = True)
       
-      EmcNotify(_('<hilight>%s</><br>queued') % (artist['name']))
+      EmcNotify('<title>%s</><br>%s' % (artist['name'], _('queued')),
+                icon='icon/music')
 
 
    def events_cb(self, event):
@@ -520,7 +523,7 @@ and what it need to work well, can also use markup like <title>this</> or
          # update the audio controls
          if len(self._play_queue) > 0:
             song = self._songs_db.get_data(self._play_queue[0])
-            text = '<hilight>' + song['title'] + '</><br>'
+            text = '<title>' + song['title'] + '</><br>'
             if 'artist' in song:
                text += _('<em>by</em> %s<br>') % song['artist']
             if 'album' in song:

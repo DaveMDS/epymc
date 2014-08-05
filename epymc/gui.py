@@ -311,7 +311,7 @@ def audio_controls_show(text=None, icon=None):
    global _audio_notify
    
    if _audio_notify is None:
-      _audio_notify = EmcNotify('', hidein = 0)
+      _audio_notify = EmcNotify('', hidein=0, icon='icon/music')
 
    if text or icon:
        audio_controls_set(text, icon)

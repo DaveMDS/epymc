@@ -704,7 +704,9 @@ class BackgroundScanner(ecore.Idler):
 
       # the first time create the generator
       if self._generator is None:
-         EmcNotify(_('TvShows scanner started'))
+         EmcNotify('<title>%s</title><br>%s' % \
+                   (_('TvShows scanner started'), _('please wait...')),
+                   icon='icon/tv')
          sources = ini.get_string_list('tvshows', 'folders', ';')
          folders = [f.replace('file://', '') for f in sources]
          self._generator = utils.grab_files(folders, recursive=False)
@@ -734,7 +736,8 @@ class BackgroundScanner(ecore.Idler):
       try:
          serie_name = self._series_to_update.pop()
       except IndexError:
-         EmcNotify(_('TvShows scanner done'))
+         EmcNotify('<title>%s</title>' % _('TvShows scanner done'),
+                   icon='icon/tv')
          DBG("scanner done")
          return ecore.ECORE_CALLBACK_CANCEL
 

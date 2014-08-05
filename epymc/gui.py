@@ -1552,11 +1552,12 @@ class EmcScrolledEntry(Entry, Scrollable):
    def _animator_cb(self):
       self._autoscroll_amount += ecore.animator_frametime_get() * 15 * \
                                  self._autoscroll_speed_scale
-      x, y, w, h = old_region = self.region
-      # print("Animator  ", old_region, self._autoscroll_amount)
 
       # at least one pixel to scroll ?
       if self._autoscroll_amount >= 1.0:
+         x, y, w, h = old_region = self.region
+         # print("Animator  ", old_region, self._autoscroll_amount)
+
          self.region_show(0, y + int(self._autoscroll_amount), w, h)
          self._autoscroll_amount = 0.0
 

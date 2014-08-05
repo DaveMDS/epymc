@@ -166,8 +166,7 @@ class MyItemClass(EmcItemClass):
 
       # Dialog - Info
       elif url == 'uitests://dlg-info':
-         text = 'This is an <br><br><b>Info</><br>dialog<br>'
-         EmcDialog(title='Dialog - Info', text=text, style='info')
+         EmcDialog(title='Dialog - Info', text=LOREM, style='info')
 
       # Dialog - Warning
       elif url == 'uitests://dlg-warning':
@@ -192,7 +191,7 @@ class MyItemClass(EmcItemClass):
                    spinner=True)
 
       # Dialog - Progress
-      elif url == 'uitests://dlg-progress':
+      elif url.startswith('uitests://dlg-progress'):
          def _canc_cb(dialog):
             t.delete()
             d.delete()
@@ -206,8 +205,11 @@ class MyItemClass(EmcItemClass):
          text = 'This is a <br><br><b>Progress operation</><br>dialog<br>'
          d = EmcDialog(title='Dialog - Progress', text=text,
                        style='progress', canc_cb=_canc_cb)
+         if url.endswith('btn'):
+            d.button_add("btn1")
+            d.button_add("btn2")
+            d.button_add("btn3")
          self._progress = 0.0
-         d.progress_set(self._progress)
          t = ecore.Timer(0.2, _progress_timer)
 
       # Dialog - List
@@ -217,9 +219,11 @@ class MyItemClass(EmcItemClass):
             print('Selected: ' + str(item))
             # dia.delete()
          d = EmcDialog(title='Dialog - List', style='list', done_cb=_dia_list_cb)
-         d.list_item_append('item 1')
-         d.list_item_append('item 2', 'icon/home')
-         d.list_item_append('item 3', 'icon/star', 'icon/check_on')
+         d.list_item_append('item 1', 'icon/home')
+         d.list_item_append('item 2', 'icon/star', 'icon/check_on')
+         for i in range(3, 101):
+            d.list_item_append('item %d'%i)
+            
 
       # Dialog - Panel full
       elif url == 'uitests://dlg-panel1':
@@ -414,6 +418,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://dlg-yesno', 'Dialog - YesNo')
       browser.item_add(MyItemClass(), 'uitests://dlg-cancel', 'Dialog - Cancel')
       browser.item_add(MyItemClass(), 'uitests://dlg-progress', 'Dialog - Progress')
+      browser.item_add(MyItemClass(), 'uitests://dlg-progress-btn', 'Dialog - Progress with buttons')
       browser.item_add(MyItemClass(), 'uitests://dlg-list', 'Dialog - List')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel1', 'Dialog - Panel full')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel2', 'Dialog - Panel no buttons')

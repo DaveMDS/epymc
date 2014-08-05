@@ -67,6 +67,7 @@ images {
    image: "frame_box_for_bot_shadow.png" COMP;
    image: "frame2.png" COMP;
    image: "frame3.png" COMP;
+   image: "left_shadow.png" COMP;
    image: "mp_controls_bg.png" COMP;
    image: "separator.png" COMP;
    image: "header.png" COMP;
@@ -2063,6 +2064,24 @@ collections {
                rel1 {
                   to: "emc.swallow.icon";
                   offset: -6 0;
+               }
+            }
+         }
+         part { name: "bg.shadow";
+            scale: 1;
+            description { state: "default" 0.0;
+               image {
+                  normal: "left_shadow.png";
+                  border: 12 4 7 7;
+                  middle: NONE;
+               }
+               rel1 {
+                  to: "bg";
+                  offset: -12 -7;
+               }
+               rel2 {
+                  to: "bg";
+                  offset: -1 6;
                }
             }
          }

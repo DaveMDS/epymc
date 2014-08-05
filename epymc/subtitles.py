@@ -63,16 +63,22 @@ def read_file_with_encodings(fname, encodings):
          break
    return text
 
-def srt_time_to_seconds(time):
+def srt_time_to_seconds(timestr):
    """ Convert "00:00:10,500" to seconds (float) """
-   split_time = time.split(',')
-   major, minor = (split_time[0].split(':'), split_time[1])
-   return int(major[0])*1440 + int(major[1])*60 + int(major[2]) + float(minor)/1000
+   time, ms = timestr.split(',')
+   h, m, s = map(int, time.split(':'))
+   return (h * 1440) + (m * 60) + s + (float(ms) / 1000)
 
 def parse_format_srt(full_text):
-   """ SubRip (.srt) parser
+   """ SubRip (.srt) parser (en.wikipedia.org/wiki/SubRip)
 
-   Docs at: en.wikipedia.org/wiki/SubRip)
+   1
+   00:00:10,500 --> 00:00:13,000  X1:63 X2:223 Y1:43 Y2:58
+   Elephant's Dream
+
+   2
+   00:00:15,000 --> 00:00:18,000
+   At the left we can see...
 
    """
    DBG('Parsing SRT format')
@@ -114,7 +120,7 @@ class SubtitleItem(object):
       self.text = text
 
    def __str__(self):
-      return '%f -> %f : %s' % (self.start, self.end, self.text)
+      return '[%d] %f -> %f : %s' % (self.idx, self.start, self.end, self.text)
 
 
 class Subtitles(object):

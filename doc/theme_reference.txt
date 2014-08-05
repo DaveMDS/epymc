@@ -92,13 +92,24 @@ All the icons adn images in icons.edc must be implemented.
 
 ### Volume ###
    * Required parts:
-      "volume.slider" -> edje group -> "emc/slider/default"
+      "volume.slider" -> edje GROUP -> "emc/slider/default"
 
    * Signals received from the application:
       "volume,show" "emc"
       "volume,hide" "emc"
       "volume,mute,on" "emc"
       "volume,mute,off" "emc"
+
+
+### Minipos ###
+   * Required parts:
+      "minipos.position" -> edje TEXT
+      "minipos.slider" -> edje GROUP -> "emc/slider/default"
+      "minipos.length" -> edje TEXT
+
+   * Signals received from the application:
+      "minipos,show" "emc"
+      "minipos,hide" "emc"
 
 
 ### Dialogs box ###

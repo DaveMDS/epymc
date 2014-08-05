@@ -61,6 +61,7 @@ images {
    image: "background.jpg" COMP;
    image: "frame.png" COMP;
    image: "frame_box.png" COMP;
+   image: "frame_box_for_top.png" COMP;
    image: "frame2.png" COMP;
    image: "frame3.png" COMP;
    image: "mp_controls_bg.png" COMP;
@@ -1113,6 +1114,128 @@ collections {
             transition: ACCELERATE 0.4;
             target: "videoplayer.controls.bg";
             target: "videoplayer.controls.poster";
+         }
+
+/// mini position slider
+         part { name: "minipos.bg";
+            type: IMAGE;
+            mouse_events: 0;
+            scale: 1;
+            description { state: "default" 0.0;
+               visible: 0;
+               FIXED_SIZE(500, 40)
+               align: 0.5 1.0;
+               rel2.relative: 1.0 0.0;
+               image.normal: "frame_box_for_top.png";
+               image.border: 1 1 0 1;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               align: 0.5 0.0;
+            }
+         }
+         part { name: "minipos.position"; /* API */
+            type: TEXT;
+            mouse_events: 0;
+            scale: 1;
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               color: FONT_COLOR_NOSEL;
+               color3: FONT_COLOR3_NOSEL;
+               align: 0.0 0.5;
+               fixed: 1 1;
+               rel1 {
+                  to: "minipos.bg";
+                  relative: 0.0 0.0;
+                  offset: 10 0;
+               }
+               rel2 {
+                  to: "minipos.bg";
+                  relative: 0.0 1.0;
+               }
+               text {
+                  text: "0:00:00";
+                  font: FONT2;
+                  size: FONT_SIZE;
+                  min: 1 0;
+                  ellipsis: -1;
+               }
+            }
+         }
+         part { name: "minipos.position.spacer";
+            inherit: "minipos.position";
+            description { state: "default" 0.0;
+               visible: 0;
+               text.text: "0:00:00";
+            }
+         }
+         part { name: "minipos.slider"; /* API */
+            type: GROUP;
+            source: "emc/slider/default";
+            mouse_events: 0;
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1 {
+                  to_x: "minipos.position.spacer";
+                  to_y: "minipos.bg";
+                  relative: 1.0 0.0;
+               }
+               rel2 {
+                  to_x: "minipos.length.spacer";
+                  to_y: "minipos.bg";
+                  relative: 0.0 1.0;
+               }
+            }
+         }
+         part { name: "minipos.length"; /* API */
+            type: TEXT;
+            mouse_events: 0;
+            scale: 1;
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               color: FONT_COLOR_NOSEL;
+               color3: FONT_COLOR3_NOSEL;
+               align: 1.0 0.5;
+               fixed: 1 1;
+               rel1 {
+                  to: "minipos.bg";
+                  relative: 1.0 0.0;
+               }
+               rel2 {
+                  to: "minipos.bg";
+                  offset: -11 -1;
+               }
+               text {
+                  text: "0:00:00";
+                  font: FONT2;
+                  size: FONT_SIZE;
+                  min: 1 0;
+                  ellipsis: -1;
+               }
+            }
+         }
+         part { name: "minipos.length.spacer";
+            inherit: "minipos.length";
+            description { state: "default" 0.0;
+               visible: 0;
+               text.text: "0:00:00";
+            }
+         }
+         program { name: "minipos_show"; /* API */
+            signal: "minipos,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.3;
+            target: "minipos.bg";
+         }
+         program { name: "minipos_hide"; /* API */
+            signal: "minipos,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.3;
+            target: "minipos.bg";
          }
 
 /// volume

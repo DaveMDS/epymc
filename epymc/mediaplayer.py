@@ -40,12 +40,14 @@ def LOG(sev, msg):
 _volume = 0
 _volume_muted = False
 _emotion = None
-_controls_visible = False
 _buttons = list()
 _fman = None
-_video_visible = False
 _buffer_dialog = None
-_update_timer = None # used to update the controls (only on controls visible)
+_video_visible = False
+_controls_visible = False
+_minipos_visible = False
+_update_timer = None # used to update the controls, minipos and buffer dialog
+_minipos_timer = None # used to hide the minipos after some secs
 _subs_timer = None # used to update the subtitles (always on)
 _onair_url = None
 _onair_title = None
@@ -209,23 +211,29 @@ def pause_toggle():
 
 def forward():
    if _emotion is None: return
-   LOG('dbg', 'Forward cb' + str(_emotion.position))
+   LOG('dbg', 'Forward ' + str(_emotion.position))
    _emotion.position += 10 #TODO make this configurable
+   # emotion need some loop to update the position, as minipos_show() call
+   # slider_update(), we need a bit delay to show the updated position.
+   if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
 
 def backward():
    if _emotion is None: return
-   LOG('dbg', 'Backward cb' + str(_emotion.position))
+   LOG('dbg', 'Backward ' + str(_emotion.position))
    _emotion.position -= 10 #TODO make this configurable
+   if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
 
 def fforward():
    if _emotion is None: return
-   LOG('dbg', 'FastForward cb' + str(_emotion.position))
+   LOG('dbg', 'FastForward ' + str(_emotion.position))
    _emotion.position += 60 #TODO make this configurable
+   if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
 
 def fbackward():
    if _emotion is None: return
-   LOG('dbg', 'FastBackward cb' + str(_emotion.position))
+   LOG('dbg', 'FastBackward ' + str(_emotion.position))
    _emotion.position -= 60 #TODO make this configurable
+   if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
 
 def volume_set(vol):
    global _volume
@@ -270,8 +278,7 @@ def subs_delay_apply(diff):
 
 ### gui API ###
 def video_player_show():
-   global _video_visible
-   global _update_timer
+   global _video_visible, _update_timer
 
    gui.signal_emit('videoplayer,show')
    _video_visible = True
@@ -281,10 +288,10 @@ def video_player_show():
    _update_timer = ecore.Timer(1.0, _update_timer_cb)
 
 def video_player_hide():
-   global _video_visible
-   global _update_timer
+   global _video_visible, _update_timer
 
    video_controls_hide()
+   minipos_hide()
    _video_visible = False
    if _update_timer is not None:
       _update_timer.delete()
@@ -294,6 +301,7 @@ def video_player_hide():
 def video_controls_show():
    global _controls_visible
 
+   minipos_hide()
    gui.signal_emit('videoplayer,controls,show')
    _controls_visible = True
    gui.volume_show()
@@ -320,6 +328,34 @@ def title_set(title):
 
    _onair_title = title
    gui.text_set("videoplayer.controls.title", title)
+
+def minipos_show():
+   global _minipos_visible, _minipos_timer
+
+   if _controls_visible:
+      return
+
+   gui.signal_emit('minipos,show')
+   _minipos_visible = True
+   _update_slider()
+
+   if _minipos_timer is None:
+      _minipos_timer = ecore.Timer(2, _minipos_timer_cb)
+   else:
+      _minipos_timer.reset()
+
+def minipos_hide():
+   global _minipos_visible, _minipos_timer
+
+   gui.signal_emit('minipos,hide')
+   _minipos_visible = False
+   if _minipos_timer:
+      _minipos_timer.delete()
+      _minipos_timer = None
+
+def _minipos_timer_cb():
+   minipos_hide()
+   return ecore.ECORE_CALLBACK_RENEW # as it is yet deleted in minipos_hide()
 
 ### internals ###
 def _init_emotion():
@@ -482,22 +518,31 @@ def _update_subs_timer_cb():
    return ecore.ECORE_CALLBACK_RENEW
 
 def _update_slider():
-   if _controls_visible and _emotion is not None:
-      pos = _emotion.position
-      len = _emotion.play_length
+   if _emotion is None:
+      return
 
-      lh = int(len / 3600)
-      lm = int(len / 60) % 60
-      ls = int(len % 60)
+   pos = _emotion.position
+   len = _emotion.play_length
 
-      ph = int(pos / 3600)
-      pm = int(pos / 60) % 60
-      ps = int(pos % 60)
+   lh = int(len / 3600)
+   lm = int(len / 60) % 60
+   ls = int(len % 60)
 
+   ph = int(pos / 3600)
+   pm = int(pos / 60) % 60
+   ps = int(pos % 60)
+
+   if _controls_visible:
       if len > 0:
          gui.slider_val_set('videoplayer.controls.slider:dragable1', pos / len)
       gui.text_set('videoplayer.controls.position', '%i:%02i:%02i' % (ph,pm,ps))
       gui.text_set('videoplayer.controls.length', '%i:%02i:%02i' % (lh,lm,ls))
+
+   if _minipos_visible:
+      if len > 0:
+         gui.slider_val_set('minipos.slider:dragable1', pos / len)
+      gui.text_set('minipos.position', '%i:%02i:%02i' % (ph,pm,ps))
+      gui.text_set('minipos.length', '%i:%02i:%02i' % (lh,lm,ls))
 
 def _subtitles_delay_notify():
    global _subs_notify

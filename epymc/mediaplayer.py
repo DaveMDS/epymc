@@ -194,29 +194,36 @@ def stop():
    _onair_title = None
 
 def pause():
+   if _emotion is None: return
    _emotion.play = False
    _play_pause_btn.icon_set('icon/play')
 
 def unpause():
+   if _emotion is None: return
    _emotion.play = True
    _play_pause_btn.icon_set('icon/pause')
 
 def pause_toggle():
+   if _emotion is None: return
    pause() if _emotion.play is True else unpause()
 
 def forward():
+   if _emotion is None: return
    LOG('dbg', 'Forward cb' + str(_emotion.position))
    _emotion.position += 10 #TODO make this configurable
 
 def backward():
+   if _emotion is None: return
    LOG('dbg', 'Backward cb' + str(_emotion.position))
    _emotion.position -= 10 #TODO make this configurable
 
 def fforward():
+   if _emotion is None: return
    LOG('dbg', 'FastForward cb' + str(_emotion.position))
    _emotion.position += 60 #TODO make this configurable
 
 def fbackward():
+   if _emotion is None: return
    LOG('dbg', 'FastBackward cb' + str(_emotion.position))
    _emotion.position -= 60 #TODO make this configurable
 

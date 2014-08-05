@@ -94,7 +94,7 @@ def shutdown():
    del _play_db
 
 ### mediaplyer API ###
-def play_url(url, only_audio = False, start_from = 0):
+def play_url(url, only_audio=False, start_from=0):
    global _onair_url, _onair_title, _subtitles, _subs_timer
 
    if not _emotion and not _init_emotion():
@@ -111,7 +111,7 @@ def play_url(url, only_audio = False, start_from = 0):
 
    if url.startswith('file://') and not os.path.exists(url[7:]):
       text = '<b>%s:</b><br>%s' % (_('File not found'), url)
-      EmcDialog(text = text, style = 'error')
+      EmcDialog(text=text, style='error')
       return
 
    _onair_url = url
@@ -302,7 +302,7 @@ def video_controls_hide():
 def video_controls_toggle():   
    video_controls_hide() if _controls_visible else video_controls_show()
 
-def poster_set(poster = None, extra_path = None):
+def poster_set(poster=None, extra_path=None):
    if poster:
       gui.swallow_set("videoplayer.controls.poster", gui.load_image(poster, extra_path))
    else:
@@ -315,37 +315,6 @@ def title_set(title):
    gui.text_set("videoplayer.controls.title", title)
 
 ### internals ###
-def _update_timer_cb():
-   global _buffer_dialog
-
-   def _dialog_canc_cb(dia):
-      _buffer_dialog = None
-
-   if _buffer_dialog is not None:
-      _buffer_dialog.progress_set(_emotion.buffer_size)
-      if _emotion.buffer_size >= 1.0:
-         _emotion.play = True
-         _buffer_dialog.delete()
-         _buffer_dialog = None
-
-   elif _emotion.buffer_size < 1.0:
-      _buffer_dialog = EmcDialog(title=_('buffering'), style = 'progress',
-                                 canc_cb = _dialog_canc_cb)
-      _emotion.play = False
-
-   _update_slider()
-
-   # keep the screensaver out while playing videos
-   if _emotion.play == _video_visible == True:
-      events.event_emit('KEEP_ALIVE')
-
-   return ecore.ECORE_CALLBACK_RENEW
-
-def _update_subs_timer_cb():
-   if _emotion and _subtitles:
-      _subtitles.update(_emotion.position)
-   return ecore.ECORE_CALLBACK_RENEW
-
 def _init_emotion():
    global _emotion
 
@@ -434,24 +403,24 @@ def _init_mediaplayer_gui():
 
    #  submenu audio
    bt = EmcButton(_('Audio'))
-   bt.callback_clicked_add(_cb_btn_audio)
-   bt.data['cb'] = _cb_btn_audio
+   bt.callback_clicked_add(_build_audio_menu)
+   bt.data['cb'] = _build_audio_menu
    _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
 
    #  submenu video
    bt = EmcButton(_('Video'))
-   bt.callback_clicked_add(_cb_btn_video)
-   bt.data['cb'] = _cb_btn_video
+   bt.callback_clicked_add(_build_video_menu)
+   bt.data['cb'] = _build_video_menu
    _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
 
    #  submenu subtitles
    bt = EmcButton(_('Subtitles'))
-   bt.callback_clicked_add(_cb_btn_subtitles)
-   bt.data['cb'] = _cb_btn_subtitles
+   bt.callback_clicked_add(_build_subtitles_menu)
+   bt.data['cb'] = _build_subtitles_menu
    _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
@@ -474,141 +443,36 @@ def _init_mediaplayer_gui():
    gui.layout.edje.signal_callback_add("mouse,down,2", "videoplayer.events",
                                        lambda a,s,d: gui.fullscreen_toggle())
 
-def _cb_playback_finished(vid):
-   video_player_hide()
-   gui.volume_hide()
-   stop()
+def _update_timer_cb():
+   global _buffer_dialog
 
-def _cb_frame_resize(vid):
-   (w, h) = vid.image_size
-   edje.extern_object_aspect_set(vid, edje.EDJE_ASPECT_CONTROL_BOTH, w, h)
+   def _dialog_canc_cb(dia):
+      _buffer_dialog = None
 
-def _cb_btn_play(btn):
-   pause_toggle()
+   if _buffer_dialog is not None:
+      _buffer_dialog.progress_set(_emotion.buffer_size)
+      if _emotion.buffer_size >= 1.0:
+         _emotion.play = True
+         _buffer_dialog.delete()
+         _buffer_dialog = None
 
-def _cb_btn_stop(btn):
-   video_player_hide()
-   stop()
+   elif _emotion.buffer_size < 1.0:
+      _buffer_dialog = EmcDialog(title=_('buffering'), style='progress',
+                                 canc_cb=_dialog_canc_cb)
+      _emotion.play = False
 
-def _cb_btn_forward(btn):
-   forward()
+   _update_slider()
 
-def _cb_btn_backward(btn):
-   backward()
+   # keep the screensaver out while playing videos
+   if _emotion.play == _video_visible == True:
+      events.event_emit('KEEP_ALIVE')
 
-def _cb_btn_fforward(btn):
-   fforward()
+   return ecore.ECORE_CALLBACK_RENEW
 
-def _cb_btn_fbackward(btn):
-   fbackward()
-
-def _cb_btn_audio(btn):
-   trk_cnt = _emotion.audio_channel_count()
-   menu = EmcMenu(relto = btn)
-   for n in range(trk_cnt):
-      name = _emotion.audio_channel_name_get(n)
-      if name:
-         name = _('Audio track: %s') % name
-      else:
-         name = _('Audio track #%d') % (n + 1)
-      item = menu.item_add(None, name, None, _cb_menu_audio_track, n)
-
-   menu.item_separator_add()
-   item = menu.item_add(None, _('Mute'), 'clock', _cb_menu_mute)
-
-def _cb_btn_video(btn):
-   trk_cnt = _emotion.video_channel_count()
-   menu = EmcMenu(relto = btn)
-   for n in range(trk_cnt):
-      name = _emotion.video_channel_name_get(n)
-      if name:
-         name = _('Video track: %s') % name
-      else:
-         name = _('Video track #%d') % (n + 1)
-      item = menu.item_add(None, name, None, _cb_menu_video_track, n)
-
-   menu.item_separator_add()
-   it = menu.item_add(None, _('Download video'), None, _cb_menu_download)
-   if _onair_url.startswith('file://'):
-      it.disabled = True
-
-
-def _cb_menu_audio_track(menu, item, track_num):
-   print("TODO: add support in emotion/gstreamer for this")
-   print("Change to audio track #" + str(track_num))
-   _emotion.audio_channel_set(track_num)
-
-def _cb_menu_video_track(menu, item, track_num):
-   print("TODO: add support in emotion/gstreamer for this")
-   print("Change to video track #" + str(track_num))
-   _emotion.video_channel_set(track_num)
-
-def _cb_menu_mute(menu, item):
-   volume_mute_toggle()
-
-def _cb_menu_download(menu, item):
-   DownloadManager().queue_download(_onair_url, _onair_title)
-
-# subtitles menu
-def _cb_btn_subtitles(btn):
-   menu = EmcMenu(relto=btn)
-
-   menu.item_add(None, _('Delay: %d ms') % _subtitles.delay,
-                 None, _cb_menu_subs_delay)
-   menu.item_separator_add()
-
-   menu.item_add(None, _('No subtitles'),
-                 None if _subtitles.current_file else 'arrow_right',
-                 _cb_menu_sub_track, None)
-   for sub in _subtitles.search_subs():
-      if sub.startswith(utils.user_conf_dir):
-         name = os.path.basename(sub)[33:]
-      else:
-         name = os.path.basename(sub)
-      menu.item_add(None, name,
-                    'arrow_right' if sub == _subtitles.current_file else None,
-                    _cb_menu_sub_track, sub)
-
-   menu.item_separator_add()
-   menu.item_add(None, _('Download subtitles'), None, _cb_menu_sub_download)
-
-def _cb_menu_subs_delay(menu, item):
-   dia = EmcDialog(title=_('Subtitles delay'), style='minimal',
-                   text=_('Delay: %d ms') % _subtitles.delay)
-   dia.button_add(_('+100 ms'), _cb_dia_subs_delay, (dia, +100))
-   dia.button_add(_('Reset'), _cb_dia_subs_delay, (dia, 0))
-   dia.button_add(_('-100 ms'), _cb_dia_subs_delay, (dia, -100))
-
-def _cb_dia_subs_delay(btn, data):
-   dia, offset = data
-   subs_delay_apply(offset)
-   dia.text_set(_('Delay: %d ms') % _subtitles.delay)
-
-def _cb_menu_sub_track(menu, item, sub_file):
-   _subtitles.file_set(sub_file)
-
-def _cb_menu_sub_download(menu, item):
-   Opensubtitles(_onair_url, _cb_sub_download_done)
-
-def _cb_sub_download_done(dest_file):
-   _subtitles.file_set(dest_file)
-
-def _subtitles_delay_notify():
-   global _subs_notify
-
-   txt = '<title>%s</><br>%s' % ( _('Subtitles'),
-         _('Delay: %d ms') % _subtitles.delay)
-   if _subs_notify is None:
-      _subs_notify = EmcNotify(text=txt, icon='icon/subs', hidein=2,
-                              close_cb=_subtitles_delay_notify_cb)
-   else:
-      _subs_notify.text_set(txt)
-      _subs_notify.hidein(2)
-
-def _subtitles_delay_notify_cb():
-   global _subs_notify
-   _subs_notify = None
-
+def _update_subs_timer_cb():
+   if _emotion and _subtitles:
+      _subtitles.update(_emotion.position)
+   return ecore.ECORE_CALLBACK_RENEW
 
 def _update_slider():
    if _controls_visible and _emotion is not None:
@@ -628,6 +492,143 @@ def _update_slider():
       gui.text_set('videoplayer.controls.position', '%i:%02i:%02i' % (ph,pm,ps))
       gui.text_set('videoplayer.controls.length', '%i:%02i:%02i' % (lh,lm,ls))
 
+def _subtitles_delay_notify():
+   global _subs_notify
+
+   txt = '<title>%s</><br>%s' % ( _('Subtitles'),
+         _('Delay: %d ms') % _subtitles.delay)
+   if _subs_notify is None:
+      _subs_notify = EmcNotify(text=txt, icon='icon/subs', hidein=2,
+                              close_cb=_subtitles_delay_notify_cb)
+   else:
+      _subs_notify.text_set(txt)
+      _subs_notify.hidein(2)
+
+def _subtitles_delay_notify_cb():
+   global _subs_notify
+   _subs_notify = None
+
+# emotion obj callbacks
+def _cb_playback_finished(vid):
+   video_player_hide()
+   gui.volume_hide()
+   stop()
+
+def _cb_frame_resize(vid):
+   (w, h) = vid.image_size
+   edje.extern_object_aspect_set(vid, edje.EDJE_ASPECT_CONTROL_BOTH, w, h)
+
+# mediaplayer buttons cb
+def _cb_btn_play(btn):
+   pause_toggle()
+
+def _cb_btn_stop(btn):
+   video_player_hide()
+   stop()
+
+def _cb_btn_forward(btn):
+   forward()
+
+def _cb_btn_backward(btn):
+   backward()
+
+def _cb_btn_fforward(btn):
+   fforward()
+
+def _cb_btn_fbackward(btn):
+   fbackward()
+
+# audio menu
+def _build_audio_menu(btn):
+   trk_cnt = _emotion.audio_channel_count()
+   menu = EmcMenu(relto=btn)
+   for n in range(trk_cnt):
+      name = _emotion.audio_channel_name_get(n)
+      if name:
+         name = _('Audio track: %s') % name
+      else:
+         name = _('Audio track #%d') % (n + 1)
+      item = menu.item_add(None, name, None, _cb_menu_audio_track, n)
+
+   menu.item_separator_add()
+   item = menu.item_add(None, _('Mute'), 'clock', _cb_menu_mute)
+
+def _cb_menu_audio_track(menu, item, track_num):
+   print("TODO: add support in emotion/gstreamer for this")
+   print("Change to audio track #" + str(track_num))
+   _emotion.audio_channel_set(track_num)
+
+def _cb_menu_mute(menu, item):
+   volume_mute_toggle()
+
+# video menu
+def _build_video_menu(btn):
+   trk_cnt = _emotion.video_channel_count()
+   menu = EmcMenu(relto=btn)
+   for n in range(trk_cnt):
+      name = _emotion.video_channel_name_get(n)
+      if name:
+         name = _('Video track: %s') % name
+      else:
+         name = _('Video track #%d') % (n + 1)
+      item = menu.item_add(None, name, None, _cb_menu_video_track, n)
+
+   menu.item_separator_add()
+   it = menu.item_add(None, _('Download video'), None, _cb_menu_download)
+   if _onair_url.startswith('file://'):
+      it.disabled = True
+
+def _cb_menu_video_track(menu, item, track_num):
+   print("TODO: add support in emotion/gstreamer for this")
+   print("Change to video track #" + str(track_num))
+   _emotion.video_channel_set(track_num)
+
+def _cb_menu_download(menu, item):
+   DownloadManager().queue_download(_onair_url, _onair_title)
+
+# subtitles menu
+def _build_subtitles_menu(btn):
+   menu = EmcMenu(relto=btn)
+
+   menu.item_add(None, _('Delay: %d ms') % _subtitles.delay,
+                 None, _cb_menu_subs_delay)
+   menu.item_separator_add()
+
+   menu.item_add(None, _('No subtitles'),
+                 None if _subtitles.current_file else 'arrow_right',
+                 _cb_menu_subs_track, None)
+   for sub in _subtitles.search_subs():
+      if sub.startswith(utils.user_conf_dir):
+         name = os.path.basename(sub)[33:]
+      else:
+         name = os.path.basename(sub)
+      menu.item_add(None, name,
+                    'arrow_right' if sub == _subtitles.current_file else None,
+                    _cb_menu_subs_track, sub)
+
+   menu.item_separator_add()
+   menu.item_add(None, _('Download subtitles'), None, _cb_menu_subs_download)
+
+def _cb_menu_subs_delay(menu, item):
+   dia = EmcDialog(title=_('Subtitles delay'), style='minimal',
+                   text=_('Delay: %d ms') % _subtitles.delay)
+   dia.button_add(_('+100 ms'), _cb_dia_subs_delay, (dia, +100))
+   dia.button_add(_('Reset'), _cb_dia_subs_delay, (dia, 0))
+   dia.button_add(_('-100 ms'), _cb_dia_subs_delay, (dia, -100))
+
+def _cb_dia_subs_delay(btn, data):
+   dia, offset = data
+   subs_delay_apply(offset)
+   dia.text_set(_('Delay: %d ms') % _subtitles.delay)
+
+def _cb_menu_subs_track(menu, item, sub_file):
+   _subtitles.file_set(sub_file)
+
+def _cb_menu_subs_download(menu, item):
+   Opensubtitles(_onair_url, _cb_subs_download_done)
+
+def _cb_subs_download_done(dest_file):
+   _subtitles.file_set(dest_file)
 
 ### input events ###
 def input_event_cb(event):

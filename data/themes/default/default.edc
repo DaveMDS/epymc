@@ -62,6 +62,9 @@ images {
    image: "frame.png" COMP;
    image: "frame_box.png" COMP;
    image: "frame_box_for_top.png" COMP;
+   image: "frame_box_for_top_shadow.png" COMP;
+   image: "frame_box_for_bot.png" COMP;
+   image: "frame_box_for_bot_shadow.png" COMP;
    image: "frame2.png" COMP;
    image: "frame3.png" COMP;
    image: "mp_controls_bg.png" COMP;
@@ -1117,6 +1120,23 @@ collections {
          }
 
 /// mini position slider
+         part { name: "minipos.bg.shadow";
+            type: IMAGE;
+            mouse_events: 0;
+            scale: 1;
+            description { state: "default" 0.0;
+               color: 0 0 0 0;
+               rel1.to: "minipos.bg";
+               rel1.offset: -20 0;
+               rel2.to: "minipos.bg";
+               rel2.offset: 20 20;
+               image.normal: "frame_box_for_top_shadow.png";
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               color: 255 255 255 255;
+            }
+         }
          part { name: "minipos.bg";
             type: IMAGE;
             mouse_events: 0;
@@ -1229,6 +1249,7 @@ collections {
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.3;
             target: "minipos.bg";
+            target: "minipos.bg.shadow";
          }
          program { name: "minipos_hide"; /* API */
             signal: "minipos,hide";
@@ -1236,9 +1257,27 @@ collections {
             action: STATE_SET "default" 0.0;
             transition: ACCELERATE 0.3;
             target: "minipos.bg";
+            target: "minipos.bg.shadow";
          }
 
 /// volume
+         part { name: "volume.bg.shadow";
+            type: IMAGE;
+            mouse_events: 0;
+            scale: 1;
+            description { state: "default" 0.0;
+               color: 0 0 0 0;
+               rel1.to: "volume.bg";
+               rel1.offset: -20 -20;
+               rel2.to: "volume.bg";
+               rel2.offset: 20 -1;
+               image.normal: "frame_box_for_bot_shadow.png";
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               color: 255 255 255 255;
+            }
+         }
          part { name: "volume.bg";
             type: IMAGE;
             mouse_events: 1;
@@ -1246,20 +1285,16 @@ collections {
             scale: 1;
             description { state: "default" 0.0;
                visible: 0;
-               min: 400 40;
-               max: 400 40;
-               color: 255 255 255 255;
-               align: 0.5 1.0;
-               rel1.offset: 0 40;
-               rel2.offset: -1 40;
-               image.normal: "frame_box.png";
-               image.border: 5 5 5 5;
+               FIXED_SIZE(400, 40)
+               align: 0.5 0.0;
+               rel1.relative: 0.0 1.0;
+               image.normal: "frame_box_for_bot.png";
+               image.border: 1 1 2 0;
             }
             description { state: "visible" 0.0;
                inherit: "default" 0.0;
                visible: 1;
-               rel1.offset: 0 0;
-               rel2.offset: -1 -1;
+               align: 0.5 1.0;
             }
          }
          part { name: "volume.slider"; /* API */
@@ -1310,6 +1345,7 @@ collections {
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.3;
             target: "volume.bg";
+            target: "volume.bg.shadow";
          }
          program { name: "volume_hide"; /* API */
             signal: "volume,hide";
@@ -1317,6 +1353,7 @@ collections {
             action: STATE_SET "default" 0.0;
             transition: ACCELERATE 0.3;
             target: "volume.bg";
+            target: "volume.bg.shadow";
          }
          program { name: "volume_mute_on"; /* API */
             signal: "volume,mute,on";

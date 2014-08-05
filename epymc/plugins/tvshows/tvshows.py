@@ -325,31 +325,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
          del self._idler_db
 
    def play_url(self, url):
-      counts = mediaplayer.play_counts_get(url)
-      if counts['stop_at'] > 0:
-         pos = counts['stop_at']
-         h = int(pos / 3600)
-         m = int(pos / 60) % 60
-         s = int(pos % 60)
-         time = '%d:%.2d:%.2d' % (h, m, s)
-         EmcDialog(text=_('Continue from %s ?') % time,
-                   style='yesno', user_data=url,
-                   done_cb=self._dia_yes_cb,
-                   canc_cb=self._dia_no_cb)
-      else:
-         self.play_url_real(url, 0)
-
-   def _dia_yes_cb(self, dialog):
-      counts = mediaplayer.play_counts_get(dialog.data_get())
-      self.play_url_real(dialog.data_get(), counts['stop_at'])
-      dialog.delete()
-
-   def _dia_no_cb(self, dialog):
-      self.play_url_real(dialog.data_get(), 0)
-      dialog.delete()
-
-   def play_url_real(self, url, start_from):
-      mediaplayer.play_url(url, start_from=start_from)
+      mediaplayer.play_url(url)
       title = os.path.basename(url)
       poster = None
       try: 

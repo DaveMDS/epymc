@@ -99,32 +99,61 @@ def shutdown():
 def play_url(url, only_audio=False, start_from=0):
    global _onair_url, _onair_title, _subtitles, _subs_timer
 
-   if not _emotion and not _init_emotion():
-      return False
-
-   if not _fman:
-      _init_mediaplayer_gui()
+   # check url
+   if url.startswith('file://') and not os.path.exists(url[7:]):
+      text = '<b>%s:</b><br>%s' % (_('File not found'), url)
+      EmcDialog(text=text, style='error')
+      return
 
    url = str(url) # must be a string not unicode, otherwise it cannot be hashed
    if url.find('://', 2, 15) is -1:
       url = 'file://' + url
 
    LOG('dbg', 'play_url: %s' % url)
-
-   if url.startswith('file://') and not os.path.exists(url[7:]):
-      text = '<b>%s:</b><br>%s' % (_('File not found'), url)
-      EmcDialog(text=text, style='error')
-      return
-
    _onair_url = url
    _onair_title = None
 
+   if only_audio:
+      _play_real(only_audio=True)
+      return
+
+   # resume playback from last position ?
+   counts = play_counts_get(url)
+   if counts['stop_at'] > 0:
+      pos = counts['stop_at']
+      time = '%d:%.2d:%.2d' % \
+             (int(pos / 3600), int(pos / 60) % 60, int(pos % 60))
+      EmcDialog(style='yesno', title=_('Resume playback'),
+                text=_('Continue from %s ?') % (time),
+                done_cb=_resume_yes_cb, canc_cb=_resume_no_cb, user_data=pos)
+   else:
+      _play_real()
+
+def _resume_yes_cb(dia):
+   _play_real(start_from=dia.data_get())
+   dia.delete()
+
+def _resume_no_cb(dia):
+   _play_real()
+   dia.delete()
+
+def _play_real(start_from=0, only_audio=False):
+
+   # init emotion and the gui (if needed)
+   if not _emotion and not _init_emotion():
+      return
+
+   if not _fman:
+      _init_mediaplayer_gui()
+
+   url = _onair_url
    # Do not pass "file://" to emotion. Vlc has a bug somewhere that prevent
    # files with special chars in them to play (the bug don't appear if no
    # "file://" is given. The bug can be seen also using normal vlc from
    # the command line.
    _emotion.file_set(url[7:] if url.startswith('file://') else url)
 
+   # setup the emotion object
    _emotion.position = start_from
    if _emotion.play == False:
       volume_set(_volume)
@@ -132,25 +161,24 @@ def play_url(url, only_audio=False, start_from=0):
       _emotion.audio_mute = _volume_muted
       _emotion.play = True
 
-   events.event_emit('PLAYBACK_STARTED')
-
    if not only_audio:
+      # show the video player object
       video_player_show()
 
-   # keep the counts of played/finished urls
-   if _play_db.id_exists(url):
-      counts = _play_db.get_data(url)
-      counts['started'] += 1
-      _play_db.set_data(url, counts)
-   else:
-      counts = { 'started': 0, 'finished': 0, 'stop_at': 0 }
-      _play_db.set_data(url, counts)
+      # keep the counts of played/finished urls
+      if _play_db.id_exists(url):
+         counts = _play_db.get_data(url)
+         counts['started'] += 1
+         _play_db.set_data(url, counts)
+      else:
+         counts = { 'started': 0, 'finished': 0, 'stop_at': 0 }
+         _play_db.set_data(url, counts)
 
-   # Try to load subs for this url
-   _subtitles = Subtitles(url)
-   _subs_timer = ecore.Timer(0.2, _update_subs_timer_cb)
+      # try to load subtitles
+      _subtitles = Subtitles(url)
+      _subs_timer = ecore.Timer(0.2, _update_subs_timer_cb)
 
-   return True
+   events.event_emit('PLAYBACK_STARTED')
 
 def play_counts_get(url):
    try:

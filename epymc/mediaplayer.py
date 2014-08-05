@@ -541,7 +541,7 @@ def _cb_btn_fbackward(btn):
 # audio menu
 def _build_audio_menu(btn):
    trk_cnt = _emotion.audio_channel_count()
-   menu = EmcMenu(relto=btn)
+   menu = EmcMenu(relto=btn, close_on=('UP',))
    for n in range(trk_cnt):
       name = _emotion.audio_channel_name_get(n)
       if name:
@@ -564,7 +564,7 @@ def _cb_menu_mute(menu, item):
 # video menu
 def _build_video_menu(btn):
    trk_cnt = _emotion.video_channel_count()
-   menu = EmcMenu(relto=btn)
+   menu = EmcMenu(relto=btn, close_on=('UP',))
    for n in range(trk_cnt):
       name = _emotion.video_channel_name_get(n)
       if name:
@@ -588,7 +588,7 @@ def _cb_menu_download(menu, item):
 
 # subtitles menu
 def _build_subtitles_menu(btn):
-   menu = EmcMenu(relto=btn)
+   menu = EmcMenu(relto=btn, close_on=('UP',))
 
    menu.item_add(None, _('Delay: %d ms') % _subtitles.delay,
                  None, _cb_menu_subs_delay)
@@ -709,6 +709,15 @@ def input_event_cb(event):
       video_player_hide()
       gui.volume_hide()
       return input_events.EVENT_BLOCK
+   elif event == 'UP':
+      volume_set(_volume + 5)
+      events.event_emit('VOLUME_CHANGED')
+      return input_events.EVENT_BLOCK
+   elif event == 'DOWN':
+      volume_set(_volume - 5)
+      events.event_emit('VOLUME_CHANGED')
+      return input_events.EVENT_BLOCK
+
 
    if _controls_visible:
       if event == 'BACK':
@@ -728,12 +737,6 @@ def input_event_cb(event):
       elif event == 'LEFT':
          _fman.focus_move('l')
          return input_events.EVENT_BLOCK
-      elif event == 'UP':
-         _fman.focus_move('u')
-         return input_events.EVENT_BLOCK
-      elif event == 'DOWN':
-         _fman.focus_move('d')
-         return input_events.EVENT_BLOCK
    else:
       if event == 'BACK':
          stop()
@@ -747,14 +750,6 @@ def input_event_cb(event):
          return input_events.EVENT_BLOCK
       elif event == 'LEFT':
          backward()
-         return input_events.EVENT_BLOCK
-      elif event == 'UP':
-         volume_set(_volume + 5)
-         events.event_emit('VOLUME_CHANGED')
-         return input_events.EVENT_BLOCK
-      elif event == 'DOWN':
-         volume_set(_volume - 5)
-         events.event_emit('VOLUME_CHANGED')
          return input_events.EVENT_BLOCK
 
    return input_events.EVENT_CONTINUE

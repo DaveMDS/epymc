@@ -576,13 +576,13 @@ class EmcButton(Button):
 class EmcMenu(Menu):
    """ TODO doc this """
 
-   def __init__(self, relto=None):
+   def __init__(self, relto=None, close_on=()):
+      self.close_on = close_on
       Menu.__init__(self, layout, style='emc', focus_allow=False)
       if relto:
          # TODO better pos calc
          x, y, w, h = relto.geometry
          self.move(x, y + h)
-
       input_events.listener_add("EmcMenu", self._input_event_cb)
       self.callback_clicked_add(self._dismiss_cb)
       self.show()
@@ -609,6 +609,9 @@ class EmcMenu(Menu):
    def _input_event_cb(self, event):
       if event == 'UP':
          item = self.selected_item_get()
+         if event in self.close_on and item == self.first_item:
+            self.close()
+            return input_events.EVENT_BLOCK
          if not item or not item.prev:
             return input_events.EVENT_BLOCK
          while item.prev and (item.prev.is_separator or item.prev.disabled):
@@ -619,6 +622,8 @@ class EmcMenu(Menu):
 
       elif event == 'DOWN':
          item = self.selected_item_get()
+         if event in self.close_on and item == self.last_item:
+            self.close()
          if not item or not item.next:
             return input_events.EVENT_BLOCK
          while item.next and (item.next.is_separator or item.next.disabled):

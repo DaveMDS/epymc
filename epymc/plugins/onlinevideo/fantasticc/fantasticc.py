@@ -22,7 +22,7 @@ import sys, urllib2, re
 from bs4 import BeautifulSoup
 
 from epymc.extapi.onlinevideo import api_version, state_get, \
-   fetch_url, play_url, item_add, call_ydl, \
+   fetch_url, play_url, item_add, call_ydl, report_error, \
    ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 
 
@@ -79,11 +79,11 @@ elif STATE == ST_VIDEO_LIST:
          uploaded = info1.split(':')[-1]
          from_ = infos[1]
          tags = ', '.join(infos[2:])
-         info = '<title>Duration: </title>{}<br>' \
-                '<title>Uploaded: </title>{}<br>' \
-                '<title>From: </title>{}<br>' \
-                '<title>Tags: </title>{}'.format(duration, uploaded, from_, tags)
-         info = info
+         info = '<title>%s</title><br>' \
+                '<name>Duration:</name> %s<br>' \
+                '<name>source</name> %s <name>/ uploaded %s</name><br>' \
+                '<name>Tags:</name> %s' % \
+                (title, duration, from_, uploaded, tags)
       except:
          info = None
 
@@ -155,8 +155,10 @@ elif STATE in (ST_SEARCH, ST_SEARCH_RES):
 
       duration = div.find('span', class_='v_lenght').string
       from_ = div.find('span', class_='video_tube').string
-      info = u'<title>Duration: </title>{}<br>' \
-              '<title>From: </title>{}'.format(duration, from_)
+      info = '<title>%s</title><br>' \
+             '<name>Duration: </name>%s<br>' \
+             '<name>Source: </name>%s' % \
+              (title, duration, from_)
 
       item_add(ST_PLAY, title, 'http://fantasti.cc' + url, poster=thumb, info=info)
 
@@ -189,13 +191,6 @@ elif STATE == ST_PLAY:
       fetchurl = re.compile('flv_url=(.+?)&').findall(html)[0]
       play_url(urllib2.unquote(fetchurl))
 
-   elif "pornhub" in URL: # BROKEN
-      match = re.compile('href="([^"]+viewkey[^"]+)"').findall(html)
-      html = fetch_url(match[0])
-      match = re.compile('"video_url":"([^"]+)"').findall(html)
-      fetchurl = urllib2.unquote(match[0])
-      play_url(fetchurl)
-
    elif 'redtube' in URL: # OK
       link = re.compile('(http://www.redtube.com/.+?)"').findall(html)[0]
       html = fetch_url(link)
@@ -221,17 +216,49 @@ elif STATE == ST_PLAY:
       fetchurl = re.compile('"clip":"(.+?)"').findall(html)[0]
       play_url(fetchurl)
 
-   # elif 'hardsextube' in URL: # HardSexTube TODO
+   elif 'tube8' in URL: # OK (youtube-dl)
+      link = re.compile('(http://www.tube8.com/.+?)"').findall(html)[0]
+      play_url(call_ydl(link))
 
-   # elif 'tube8' in URL: # Tube8 TODO
+   elif "pornhub" in URL: # OK (youtube-dl)
+      link = re.compile('(http://www.pornhub.com/view_video.php.+?)"').findall(html)[0]
+      play_url(call_ydl(link))
+
+   elif 'spankwire' in URL: # OK (youtube-dl)
+      link = re.compile('(http://www.spankwire.com/.+?)"').findall(html)[0]
+      link = link.replace('http://', '').replace('//', '/')
+      play_url(call_ydl('http://'+link))
+
+   elif 'empflix' in URL: # OK (youtube-dl)
+      link = re.compile('(http://www.empflix.com/view.php.+?)"').findall(html)[0]
+      play_url(call_ydl(link))
+
+   elif 'keezmovies' in URL: # OK (youtube-dl)
+      link = re.compile('(http://www.keezmovies.com/video/.+?)"').findall(html)[0]
+      play_url(call_ydl(link))
+
+   elif 'xtube' in URL: # OK (youtube-dl)
+      link = re.compile('(http://www.xtube.com/play_re.php.+?)"').findall(html)[0]
+      play_url(call_ydl(link))
+
+   elif 'extremetube' in URL: # OK (youtube-dl)
+      link = re.compile('(http://www.extremetube.com/.+?)"').findall(html)[0]
+      play_url(call_ydl(link))
+
+   else:
+      report_error('Source not supported')
+
+   # elif 'hardsextube' in URL: # HardSexTube TODO
 
    # elif 'madthumbs' in URL: # MadThumbs TODO
 
-   # elif 'spankwire' in URL: # SpankWire TODO
-   
-   # elif 'empflix' in URL: # Empflix TODO
-
    # elif 'drtuber' in URL: # DrTuber TODO
 
-   # elif 'keezmovies' in URL: # KeezMovie TODO
+   # elif 'tnaflix' in URL: # TnaFlix TODO
+   
+   # elif 'deviantclip' in URL: # TnaFlix TODO
+
+   # elif 'bigtits' in URL: # Bigtits TODO
+
+
 

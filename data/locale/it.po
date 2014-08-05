@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-04 21:49+0200\n"
-"PO-Revision-Date: 2014-08-04 21:54+0100\n"
+"POT-Creation-Date: 2014-08-05 13:41+0200\n"
+"PO-Revision-Date: 2014-08-05 13:43+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -18,42 +18,47 @@ msgstr ""
 "X-Generator: Poedit 1.5.4\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-#: epymc/subtitles.py:258
+#: epymc/subtitles.py:167 epymc/config_gui.py:239 epymc/config_gui.py:415
+#: epymc/mediaplayer.py:421 epymc/mediaplayer.py:498
+msgid "Subtitles"
+msgstr "Sottotitoli"
+
+#: epymc/subtitles.py:263
 msgid "Searching subtitles"
 msgstr "Ricerca sottotitoli"
 
-#: epymc/subtitles.py:310
+#: epymc/subtitles.py:315
 msgid "Login failed"
 msgstr "Login fallito"
 
-#: epymc/subtitles.py:326
+#: epymc/subtitles.py:331
 msgid "Search failed"
 msgstr "Ricerca fallita"
 
-#: epymc/subtitles.py:350
+#: epymc/subtitles.py:355
 #, python-format
 msgid "No results found for languages: %s"
 msgstr "Nessun risultato per le lingue: %s"
 
-#: epymc/subtitles.py:364 epymc/plugins/mame/mame.py:426
+#: epymc/subtitles.py:369 epymc/plugins/mame/mame.py:426
 msgid "Download"
 msgstr "Scarica"
 
-#: epymc/subtitles.py:371 epymc/gui.py:165 epymc/gui.py:167 epymc/gui.py:168
+#: epymc/subtitles.py:376 epymc/gui.py:165 epymc/gui.py:167 epymc/gui.py:168
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:146
 #: epymc/plugins/movies/movies.py:155
 msgid "Unknown"
 msgstr "Sconosciuto"
 
-#: epymc/subtitles.py:381
+#: epymc/subtitles.py:386
 msgid "Downloading subtitles"
 msgstr "Scaricamento sottotitoli"
 
-#: epymc/subtitles.py:395
+#: epymc/subtitles.py:400
 msgid "Download failed"
 msgstr "Scaricamento fallito"
 
-#: epymc/subtitles.py:411
+#: epymc/subtitles.py:416
 msgid "Decode failed"
 msgstr "Decodifica fallita"
 
@@ -62,6 +67,7 @@ msgid "Fetching info"
 msgstr "Scaricamento informazioni"
 
 #: epymc/themoviedb.py:540 epymc/plugins/music/music.py:360
+#: epymc/plugins/tvshows/tvshows.py:708
 msgid "please wait..."
 msgstr "Attendere..."
 
@@ -126,11 +132,6 @@ msgstr "Moduli"
 #: epymc/config_gui.py:238 epymc/config_gui.py:462
 msgid "System info"
 msgstr "Informazioni di sistema"
-
-#: epymc/config_gui.py:239 epymc/config_gui.py:415 epymc/mediaplayer.py:452
-#: epymc/mediaplayer.py:597
-msgid "Subtitles"
-msgstr "Sottotitoli"
 
 #: epymc/config_gui.py:317
 msgid "Start in fullscreen"
@@ -267,99 +268,99 @@ msgstr "Ringraziamenti"
 msgid "Cancel"
 msgstr "Annulla"
 
-#: epymc/gui.py:865
+#: epymc/gui.py:874
 msgid "Ok"
 msgstr "Ok"
 
-#: epymc/gui.py:869 epymc/gui.py:871
+#: epymc/gui.py:878 epymc/gui.py:880
 msgid "No"
 msgstr "No"
 
-#: epymc/gui.py:874 epymc/gui.py:876
+#: epymc/gui.py:883 epymc/gui.py:885
 msgid "Yes"
 msgstr "Sì"
 
-#: epymc/gui.py:1131
+#: epymc/gui.py:1138
 msgid "Source Selector"
 msgstr "Selettore fonti"
 
-#: epymc/gui.py:1136
+#: epymc/gui.py:1143
 msgid "Select"
 msgstr "Seleziona"
 
-#: epymc/gui.py:1137
+#: epymc/gui.py:1144
 msgid "Browse"
 msgstr "Naviga"
 
-#: epymc/gui.py:1145
+#: epymc/gui.py:1152
 msgid "Parent folder"
 msgstr "Cartella precedente"
 
-#: epymc/gui.py:1184
+#: epymc/gui.py:1191
 msgid "Sources Manager"
 msgstr "Gestore fonti"
 
-#: epymc/gui.py:1186
+#: epymc/gui.py:1193
 msgid "Done"
 msgstr "Fatto"
 
-#: epymc/gui.py:1188
+#: epymc/gui.py:1195
 msgid "Add"
 msgstr "Aggiungi"
 
-#: epymc/gui.py:1190
+#: epymc/gui.py:1197
 msgid "Remove"
 msgstr "Rimuovi"
 
-#: epymc/gui.py:1204
+#: epymc/gui.py:1211
 msgid "Choose a new source"
 msgstr "Seleziona una nuova fonte"
 
-#: epymc/gui.py:1351
+#: epymc/gui.py:1358
 msgid "Insert text"
 msgstr "Inserire il testo"
 
-#: epymc/gui.py:1374 epymc/gui.py:1443
+#: epymc/gui.py:1381 epymc/gui.py:1450
 msgid "UPPERCASE"
 msgstr "MAIUSCOLE"
 
-#: epymc/gui.py:1375
+#: epymc/gui.py:1382
 msgid "SPACE"
 msgstr "SPAZIO"
 
-#: epymc/gui.py:1376
+#: epymc/gui.py:1383
 msgid "ERASE"
 msgstr "CANCELLA"
 
-#: epymc/gui.py:1378
+#: epymc/gui.py:1385
 msgid "Dismiss"
 msgstr "Annulla"
 
-#: epymc/gui.py:1383
+#: epymc/gui.py:1390
 msgid "Accept"
 msgstr "Accetta"
 
-#: epymc/gui.py:1440
+#: epymc/gui.py:1447
 msgid "LOWERCASE"
 msgstr "MINUSCOLE"
 
-#: epymc/gui.py:1610
+#: epymc/gui.py:1617
 msgid "Download Manager"
 msgstr "Gestore Download"
 
-#: epymc/gui.py:1614
+#: epymc/gui.py:1621
 msgid "Start download"
 msgstr "Avvia download"
 
-#: epymc/gui.py:1615
+#: epymc/gui.py:1622
 msgid "Rename"
 msgstr "Rinomina"
 
-#: epymc/gui.py:1616
+#: epymc/gui.py:1623
 msgid "Change folder"
 msgstr "Cambia cartella"
 
-#: epymc/gui.py:1621
+#: epymc/gui.py:1628
 msgid ""
 "File will be downloaded in the folder:<br> <b>{}</b><br><br>File will be "
 "named as:<br> <b>{}</b><br><br>You can rename the file using the <i>Rename</"
@@ -370,24 +371,24 @@ msgstr ""
 "<i>Rinomina</i> o modificare la cartella di destinazione dalla "
 "configurazione generale."
 
-#: epymc/gui.py:1629
+#: epymc/gui.py:1636
 msgid "Rename download"
 msgstr "Rinomina file"
 
-#: epymc/gui.py:1637
+#: epymc/gui.py:1644
 msgid "Change destination folder"
 msgstr "Modifica cartella"
 
-#: epymc/gui.py:1652
+#: epymc/gui.py:1659
 #, python-format
 msgid "The file %s is in the download queue yet"
 msgstr "Il file %s è già in coda"
 
-#: epymc/gui.py:1686
+#: epymc/gui.py:1693
 msgid "Download started"
 msgstr "Download avviato"
 
-#: epymc/gui.py:1699 epymc/plugins/mame/mame.py:587
+#: epymc/gui.py:1706 epymc/plugins/mame/mame.py:587
 msgid "Download completed"
 msgstr "Download completato"
 
@@ -395,78 +396,78 @@ msgstr "Download completato"
 msgid "File not found"
 msgstr "File non trovato"
 
-#: epymc/mediaplayer.py:332
-msgid "buffering"
-msgstr "buffering"
-
-#: epymc/mediaplayer.py:356
+#: epymc/mediaplayer.py:325
 #, python-format
 msgid "Cannot init emotion engine:<br>%s"
 msgstr "Non posso avviare il motore di emotion:<br>%s"
 
-#: epymc/mediaplayer.py:436
+#: epymc/mediaplayer.py:405
 msgid "Audio"
 msgstr "Audio"
 
-#: epymc/mediaplayer.py:444
+#: epymc/mediaplayer.py:413
 msgid "Video"
 msgstr "Video"
 
-#: epymc/mediaplayer.py:509
-#, python-format
-msgid "Audio track: %s"
-msgstr "Traccia audio: %s"
+#: epymc/mediaplayer.py:460
+msgid "buffering"
+msgstr "buffering"
 
-#: epymc/mediaplayer.py:511
-#, python-format
-msgid "Audio track #%d"
-msgstr "Traccia audio #%d"
-
-#: epymc/mediaplayer.py:515
-msgid "Mute"
-msgstr "Muto"
-
-#: epymc/mediaplayer.py:523
-#, python-format
-msgid "Video track: %s"
-msgstr "Traccia video: %s"
-
-#: epymc/mediaplayer.py:525
-#, python-format
-msgid "Video track #%d"
-msgstr "Traccia video #%d"
-
-#: epymc/mediaplayer.py:529
-msgid "Download video"
-msgstr "Scarica filmato"
-
-#: epymc/mediaplayer.py:554 epymc/mediaplayer.py:575 epymc/mediaplayer.py:583
-#: epymc/mediaplayer.py:598
+#: epymc/mediaplayer.py:499 epymc/mediaplayer.py:593 epymc/mediaplayer.py:614
+#: epymc/mediaplayer.py:622
 #, python-format
 msgid "Delay: %d ms"
 msgstr "Ritardo: %d ms"
 
-#: epymc/mediaplayer.py:558
+#: epymc/mediaplayer.py:548
+#, python-format
+msgid "Audio track: %s"
+msgstr "Traccia audio: %s"
+
+#: epymc/mediaplayer.py:550
+#, python-format
+msgid "Audio track #%d"
+msgstr "Traccia audio #%d"
+
+#: epymc/mediaplayer.py:554
+msgid "Mute"
+msgstr "Muto"
+
+#: epymc/mediaplayer.py:571
+#, python-format
+msgid "Video track: %s"
+msgstr "Traccia video: %s"
+
+#: epymc/mediaplayer.py:573
+#, python-format
+msgid "Video track #%d"
+msgstr "Traccia video #%d"
+
+#: epymc/mediaplayer.py:577
+msgid "Download video"
+msgstr "Scarica filmato"
+
+#: epymc/mediaplayer.py:597
 msgid "No subtitles"
 msgstr "Nessun sottotitolo"
 
-#: epymc/mediaplayer.py:571
+#: epymc/mediaplayer.py:610
 msgid "Download subtitles"
 msgstr "Scarica sottotitoli"
 
-#: epymc/mediaplayer.py:574
+#: epymc/mediaplayer.py:613
 msgid "Subtitles delay"
 msgstr "Ritardo sottotitoli"
 
-#: epymc/mediaplayer.py:576
+#: epymc/mediaplayer.py:615
 msgid "+100 ms"
 msgstr "+100 ms"
 
-#: epymc/mediaplayer.py:577
+#: epymc/mediaplayer.py:616
 msgid "Reset"
 msgstr "Reset"
 
-#: epymc/mediaplayer.py:578
+#: epymc/mediaplayer.py:617
 msgid "-100 ms"
 msgstr "-100 ms"
 
@@ -1184,12 +1185,12 @@ msgid "Play all the songs"
 msgstr "Suona tutte le canzoni"
 
 #: epymc/plugins/music/music.py:175 epymc/plugins/music/music.py:220
-#: epymc/plugins/music/music.py:525
+#: epymc/plugins/music/music.py:528
 #, python-format
 msgid "<em>by</em> %s<br>"
 msgstr "<em>di</em> %s<br>"
 
-#: epymc/plugins/music/music.py:177 epymc/plugins/music/music.py:527
+#: epymc/plugins/music/music.py:177 epymc/plugins/music/music.py:530
 #, python-format
 msgid "<em>from</em> %s<br>"
 msgstr "<em>da</em> %s<br>"
@@ -1245,11 +1246,10 @@ msgstr "Aggiornamento libreria"
 msgid "operation completed"
 msgstr "operazione completata"
 
-#: epymc/plugins/music/music.py:489 epymc/plugins/music/music.py:500
-#: epymc/plugins/music/music.py:513
-#, python-format
-msgid "<hilight>%s</><br>queued"
-msgstr "<hilight>%s</><br>accodato"
+#: epymc/plugins/music/music.py:489 epymc/plugins/music/music.py:501
+#: epymc/plugins/music/music.py:515
+msgid "queued"
+msgstr "accodato"
 
 #: epymc/plugins/tvshows/tvshows.py:94
 msgid "Serie info"
@@ -1343,29 +1343,29 @@ msgstr "Nessun risultato trovato"
 msgid "Fetching updated info"
 msgstr "Scarico informazioni aggiornate"
 
-#: epymc/plugins/tvshows/tvshows.py:707
+#: epymc/plugins/tvshows/tvshows.py:708
 msgid "TvShows scanner started"
 msgstr "Scansione delle serie avviata"
 
-#: epymc/plugins/tvshows/tvshows.py:737
+#: epymc/plugins/tvshows/tvshows.py:739
 msgid "TvShows scanner done"
 msgstr "Scansioen delle serie completata"
 
-#: epymc/plugins/tvshows/tvshows.py:777
+#: epymc/plugins/tvshows/tvshows.py:780
 #, python-format
 msgid "%d season"
 msgid_plural "%d seasons"
 msgstr[0] "%d stagione"
 msgstr[1] "%d stagioni"
 
-#: epymc/plugins/tvshows/tvshows.py:779
+#: epymc/plugins/tvshows/tvshows.py:782
 #, python-format
 msgid "%d episode"
 msgid_plural "%d episodes"
 msgstr[0] "%d episodio"
 msgstr[1] "%d episodi"
 
-#: epymc/plugins/tvshows/tvshows.py:781
+#: epymc/plugins/tvshows/tvshows.py:784
 msgid "Found serie:"
 msgstr "Trovata serie:"
 
@@ -1410,3 +1410,6 @@ msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "%d minuto fa"
 msgstr[1] "%d minuti fa"
+
+#~ msgid "<hilight>%s</><br>queued"
+#~ msgstr "<hilight>%s</><br>accodato"

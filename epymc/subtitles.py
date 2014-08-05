@@ -39,7 +39,7 @@ except:
 from efl import ecore
 
 from epymc import utils, gui, ini
-from epymc.gui import EmcDialog
+from epymc.gui import EmcDialog, EmcNotify
 
 def LOG(msg):
    print('SUBTITLES: ' + str(msg))
@@ -162,6 +162,11 @@ class Subtitles(object):
          self.parse_sub(fname)
          if self.items:
             self.current_file = fname
+
+            name = os.path.basename(fname)
+            txt = '<title>%s</title><br>%s' % (_('Subtitles'),
+                  name[33:] if fname.startswith(utils.user_conf_dir) else name)
+            EmcNotify(txt, icon='icon/subs') 
 
    def delete(self):
       DBG('Cleanup')

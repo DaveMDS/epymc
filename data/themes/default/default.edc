@@ -78,26 +78,29 @@ fonts {
    font: "Sansation-Regular.ttf" "Sansation";
 }
 
+#define COMMON_TAGS \
+tag: "b" "+ font_weight=Bold"; \
+tag: "em" "+ font_style=Oblique"; \
+tag: "hilight" "+ font_weight=Bold style=glow glow_color=#3399ff80"; \
+tag: "link" "+ color=#3399ff underline=on underline_color=#3399ff"; \
+tag: "center" "+ align=center"; \
+tag: "bigger" "+ font_size="FONT_SIZE_BIGGER; \
+tag: "big" "+ font_size="FONT_SIZE_BIG; \
+tag: "small" "+ font_size="FONT_SIZE_SMALL; \
+tag: "smaller" "+ font_size="FONT_SIZE_SMALLER; \
+tag: "info" "+ color=#3399ff style=glow glow_color=#3399ff30"; \
+tag: "success" "+ color=#00ff00 style=glow glow_color=#00ff0030"; \
+tag: "warning" "+ color=#ff7c00 style=glow glow_color=#ff7c0030"; \
+tag: "failure" "+ color=#ff0000 style=glow glow_color=#ff000030";
+
 styles {
    style { name: "epymc_default_style";
       base: "font="FONT" font_size="FONT_SIZE" color=#fff wrap=word";
-      tag: "b" "+ font_weight=Bold";
-      tag: "em" "+ font_style=Oblique";
-      tag: "hilight" "+ font_weight=Bold style=glow glow_color=#3399ff80";
-      tag: "link" "+ color=#3399ff underline=on underline_color=#3399ff";
-      tag: "center" "+ align=center";
-      tag: "bigger" "+ font_size="FONT_SIZE_BIGGER;
-      tag: "big" "+ font_size="FONT_SIZE_BIG;
-      tag: "small" "+ font_size="FONT_SIZE_SMALL;
-      tag: "smaller" "+ font_size="FONT_SIZE_SMALLER;
       tag: "title" "+ font_weight=Bold color=#"COLOR_ORANGE_HEX" font_size="FONT_SIZE_BIG;
       tag: "subtitle" "+ color=#"COLOR_ORANGE_HEX;
       tag: "name" "+ color=#888888 font_weight=Bold";
       tag: "val" "+ color=#ffffff";
-      tag: "info" "+ color=#3399ff style=glow glow_color=#3399ff30";
-      tag: "success" "+ color=#00ff00 style=glow glow_color=#00ff0030";
-      tag: "warning" "+ color=#ff7c00 style=glow glow_color=#ff7c0030";
-      tag: "failure" "+ color=#ff0000 style=glow glow_color=#ff000030";
+      COMMON_TAGS
    }
 
    style { name: "epymc_dialog_title_style";
@@ -109,10 +112,16 @@ styles {
    }
 
    style { name: "epymc_subtitles_style";
-      base: "font="FONT" align=center font_size="FONT_SIZE_BIGGER" color=#FFFFFF wrap=word style=soft_shadow shadow_color=#00000080";
+      base: "font="FONT" align=center font_size="FONT_SIZE_BIGGER" color=#FFF wrap=word style=soft_shadow shadow_color=#00000080";
       tag: "b" "+ font_weight=Bold";
       tag: "i" "+ font_style=Oblique";
-      tag: "u" "+ underline=on underline_color=#FFFFFF";
+      tag: "u" "+ underline=on underline_color=#FFF";
+   }
+
+   style { name: "epymc_notify_style";
+      base: "font="FONT" font_size="FONT_SIZE" color=#000 wrap=none";
+      tag: "title" "+ font_weight=Bold font_size="FONT_SIZE_BIG;
+      COMMON_TAGS
    }
 }
 
@@ -1215,16 +1224,18 @@ collections {
             scale: 1;
             description { state: "default" 0.0;
                align: 1.0 0.0;
+               fixed: 1 1;
                rel1 {
-                  relative: 0.5 1.0;
+                  relative: 1.0 1.0;
                   to_y: "topbar.list.spacer";
-                  offset: 0 25;
+                  offset: 25 25;
                }
+               rel2.offset: -25 0;
                box {
                   layout: "vertical";
                   align: 1.0 0.0;
                   padding: 6 6;
-                  // min: 1 0; # this should be correct, but in some ways break the movie-info-panel :/
+                  min: 1 0;
                }
             }
          }
@@ -1846,48 +1857,46 @@ collections {
 
 /// notify items
    group { name: "emc/notify/default"; /* API todoc  */
-      min: 400 100;
+      min: 250 100;
       parts {
-         part { name: "clipper";
-            type: RECT;
-            scale: 1;
-            description { state: "default" 0.0;
-               color: 255 255 255 255;
-            }
-         }
          part { name: "bg";
-            clip_to: "clipper";
             scale: 1;
             description { state: "default" 0.0;
                image.normal: "frame3.png";
                image.border: 5 5 5 5;
+               rel1 {
+                  to: "emc.swallow.icon";
+                  offset: -6 0;
+               }
             }
          }
          part { name: "emc.swallow.icon";  /* API to doc    */
             type: SWALLOW;
-            clip_to: "clipper";
             scale: 1;
             description { state: "default" 0.0;
-               aspect:1.0 1.0;
-               aspect_preference: VERTICAL;
-               align: 0.0 0.5;
+               ASPECT_FILL(1.0)
+               align: 1.0 0.5;
+               rel1 {
+                  to: "emc.text.caption";
+                  relative: 0.0 0.0;
+               }
+               rel2 {
+                  to: "emc.text.caption";
+                  relative: 0.0 1.0;
+               }
             }
          }
          part { name: "emc.text.caption";  /* API to doc    */
             type: TEXTBLOCK;
-            clip_to: "clipper";
             scale: 1;
             description { state: "default" 0.0;
-               color: 0 0 0 255;
-               rel1 {
-                  relative: 1.0 0.0;
-                  to_x: "emc.swallow.icon";
-                  offset: 5 0;
-               }
+               rel1.offset: 0 5;
+               rel2.offset: -11 -1;
+               align: 1.0 0.0;
                text {
-                  text:"";
-                  // min: 1 1;
-                  style: "epymc_default_style";
+                  min: 1 1;
+                  ellipsis: -1;
+                  style: "epymc_notify_style";
                   align: 0.0 0.0;
                }
             }

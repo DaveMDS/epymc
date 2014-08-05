@@ -84,17 +84,22 @@ class MyItemClass(EmcItemClass):
 
       # Notify
       elif url == 'uitests://notify':
-         EmcNotify('<b>TITLE</b><br>' +
-                   'some informational text ...<br>' +
-                   'This one is without any icon<br>' +
-                    str(time.time()), hidein = 10)
-         EmcNotify('<b>This one with an image</b><br>' +
-                   'some informational text ...<br>' +
-                    str(time.time()), icon = 'dvd_cover_blank.png')
-         EmcNotify('<b>This one with an icon</b><br>' +
-                   'some informational text ...<br>' +
-                   'some informational text ...ljhl<br>' +
-                    str(time.time()), icon = 'icon/movie')
+         EmcNotify('<title>Title 1</><br>' \
+             'Without icon.<br>' \
+             'Will hide in 10 seconds.',
+              hidein=20)
+         EmcNotify('<title>Title 2</><br>' \
+             'This one with an image.',
+              icon = 'dvd_cover_blank.png')
+         EmcNotify('<title>Title 3</><br>' \
+             'This one with an icon',
+              icon = 'icon/movie')
+         EmcNotify('<title>Title 4</><br>' \
+             'Test longer text and tags.<br>' \
+             '<b>bold</b> <i>italic</i> <u>underline</u> <link>link</link> ' \
+             '<info>info</info> <success>success</success> ' \
+             '<warning>warning</warning> <failure>failure</failure>.',
+              icon = 'icon/movie')
 
       # Menu
       elif url == 'uitests://menu':

@@ -1573,6 +1573,7 @@ collections {
          part { name: "title_shadow";
             type: IMAGE;
             clip_to: "clipper";
+            mouse_events: 0;
             scale: 1;
             description { state: "default" 0.0;
                min: 26 26;
@@ -1842,6 +1843,7 @@ collections {
          part { name: "title_shadow";
             type: IMAGE;
             clip_to: "clipper";
+            mouse_events: 0;
             scale: 1;
             description { state: "default" 0.0;
                min: 26 26;

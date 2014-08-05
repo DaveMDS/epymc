@@ -248,7 +248,7 @@ def ask_to_exit():
    # d.button_add(_('Suspend'), selected_cb=None) # TODO
    # d.button_add(_('Shutdown'), selected_cb=None) # TODO
    d.button_add(_('Exit'), selected_cb=lambda b: elementary.exit())
-   d.autoscroll_enable(4.0, 0.0)
+   d.autoscroll_enable(3.0, 0.0)
 
 def volume_show(hidein = 0):
    global _volume_hide_timer
@@ -405,6 +405,16 @@ JOOST ALBERS
 KAI HUUHKO
 SIMON BUSCH
 TIAGO FALCÃO
+
+<info>online sources</>
+themoviedb.org
+opensubtitles.org
+progettoemma.net
+freeroms.com
+youtube.com
+vimeo.com
+zapiks.com
+traileraddict.com
 
 <info>efl team</>
 ADAM SIMPKINS

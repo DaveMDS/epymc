@@ -1219,7 +1219,7 @@ collections {
                }
             }
          }
-         part { name: "notify.box.stack"; /* API todoc*/
+         part { name: "notify.box.stack"; /* API */
             type: BOX;
             scale: 1;
             description { state: "default" 0.0;
@@ -1856,7 +1856,7 @@ collections {
    }
 
 /// notify items
-   group { name: "emc/notify/default"; /* API todoc  */
+   group { name: "emc/notify/default"; /* API */
       min: 250 100;
       parts {
          part { name: "bg";
@@ -1870,7 +1870,7 @@ collections {
                }
             }
          }
-         part { name: "emc.swallow.icon";  /* API to doc    */
+         part { name: "emc.swallow.icon";  /* API */
             type: SWALLOW;
             scale: 1;
             description { state: "default" 0.0;
@@ -1886,7 +1886,7 @@ collections {
                }
             }
          }
-         part { name: "emc.text.caption";  /* API to doc    */
+         part { name: "emc.text.caption";  /* API */
             type: TEXTBLOCK;
             scale: 1;
             description { state: "default" 0.0;

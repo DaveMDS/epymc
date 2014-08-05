@@ -2,8 +2,8 @@
                 EpyMC THEMES REFERENCE
 
 
-Main elementary layout group: "emc/main/layout"
-All the icons in icons.edc must be implemented
+Main elementary layout group: "emc/main/layout".
+All the icons adn images in icons.edc must be implemented.
 
 ### Theme info ###
    * Required data items:
@@ -91,7 +91,6 @@ All the icons in icons.edc must be implemented
 
 
 ### Volume ###
-
    * Required parts:
       "volume.slider" -> edje group -> "emc/slider/default"
 
@@ -103,13 +102,11 @@ All the icons in icons.edc must be implemented
 
 
 ### Dialogs box ###
-
    * Required parts:
       "dialogs.box.stack" -> edje box (usually with "stack" as layout)
 
 
 ### Dialog (panel) ###
-
    * Group: "emc/dialog/panel"
 
    * Required parts:
@@ -132,7 +129,6 @@ All the icons in icons.edc must be implemented
 
 
 ### Dialog (minimal) ###
-
    * Group: "emc/dialog/minimal"
 
    * Required parts:
@@ -150,8 +146,20 @@ All the icons in icons.edc must be implemented
       ...the same as panel dialog
 
 
-### Slider ###
+### Notify box ###
+   * Required parts:
+      "notify.box.stack" -> edje box (by default "vertical" as layout)
 
+
+### Notify items ###
+   * Group: "emc/notify/default"
+
+   * Required parts:
+      "emc.swallow.icon" -> edje swallow
+      "emc.text.caption" -> edje TEXTBLOCK
+
+
+### Slider ###
    * Group: "emc/slider/default"
 
    * Required parts:

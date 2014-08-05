@@ -69,6 +69,8 @@ def init():
       ini.set('mediaplayer', 'volume', '75')
    if not ini.has_option('mediaplayer', 'backend'):
       ini.set('mediaplayer', 'backend', 'gstreamer1')
+   if not ini.has_option('mediaplayer', 'resume_from_last_pos'):
+      ini.set('mediaplayer', 'resume_from_last_pos', '0')
    if not ini.has_option('subtitles', 'langs'):
       ini.set('subtitles', 'langs', 'en')
    if not ini.has_option('subtitles', 'encoding'):
@@ -96,7 +98,7 @@ def shutdown():
    del _play_db
 
 ### mediaplyer API ###
-def play_url(url, only_audio=False, start_from=0):
+def play_url(url, only_audio=False, start_from=None):
    global _onair_url, _onair_title, _subtitles, _subs_timer
 
    # check url
@@ -114,13 +116,29 @@ def play_url(url, only_audio=False, start_from=0):
    _onair_title = None
 
    if only_audio:
-      _play_real(only_audio=True)
+      _play_real(start_from, only_audio)
+      return
+
+   # starting position forced by param
+   if start_from != None:
+      _play_real(start_from, only_audio)
+      return
+
+   # resume_opt: 0=ask, 1=always, 2=never
+   resume_opt = ini.get_int('mediaplayer', 'resume_from_last_pos')
+
+   if resume_opt == 2: # never resume
+      _play_real(0)
       return
 
    # resume playback from last position ?
    counts = play_counts_get(url)
    if counts['stop_at'] > 0:
       pos = counts['stop_at']
+      if resume_opt == 1: # always resume
+         _play_real(pos)
+         return
+      # ask if resume or not
       time = '%d:%.2d:%.2d' % \
              (int(pos / 3600), int(pos / 60) % 60, int(pos % 60))
       EmcDialog(style='yesno', title=_('Resume playback'),

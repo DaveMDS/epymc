@@ -136,7 +136,7 @@ class MyItemClass(EmcItemClass):
       # Mediaplayer Local Video
       elif url == 'uitests://mpv':
          f = os.path.expanduser('~/Video/testvideo.avi')
-         mediaplayer.play_url(f)
+         mediaplayer.play_url(f, start_from=0)
          mediaplayer.title_set('Testing title')
          mediaplayer.poster_set('dvd_cover_blank.png', os.path.dirname(__file__))
 

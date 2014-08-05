@@ -209,6 +209,36 @@ class StdConfigItemLang(StdConfigItemBase):
    def label_end_get(self, url, user_data):
       return ini.get(self._sec, self._opt)
 
+class StdConfigItemIntMeaning(StdConfigItemBase): 
+   """ this class is used by the function standard_item_int_meaning_add(...) """
+
+   def __init__(self, values, *args):
+      self._vals = values
+      StdConfigItemBase.__init__(self, *args)
+
+   def item_selected(self, url, user_data):
+      dia = EmcDialog(self._lbl, style='list',
+                      done_cb=self._dia_list_selected_cb)
+      i = 0
+      for string in self._vals:
+         if i == ini.get_int(self._sec, self._opt):
+            it = dia.list_item_append(string, end='icon/check_on')
+            it.selected = True
+         else:
+            it = dia.list_item_append(string)
+         it.data['i'] = i
+         i += 1
+
+   def _dia_list_selected_cb(self, dia):
+      item = dia.list_item_selected_get()
+      ini.set(self._sec, self._opt, item.data['i'])
+      dia.delete()
+      StdConfigItemBase.__done__(self)
+
+   def label_end_get(self, url, user_data):
+      i = ini.get_int(self._sec, self._opt)
+      return self._vals[i]
+
 class StdConfigItemAction(StdConfigItemBase): 
    """ This class is used by the function standard_item_action_add(...) """
 
@@ -289,6 +319,10 @@ def standard_item_lang_add(section, option, label, multi=False, icon=None, info=
    _browser.item_add(StdConfigItemLang(multi, section, option, label, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
 
+def standard_item_int_meaning_add(section, option, label, values, icon=None, info=None, cb=None):
+   """ TODO doc """
+   _browser.item_add(StdConfigItemIntMeaning(values, section, option, label, icon, info, cb),
+                     'config://%s/%s' % (section, option), None)
 
 def standard_item_action_add(label, icon=None, info=None, cb=None):
    """ TODO doc """
@@ -315,6 +349,11 @@ def _general_list():
 
 def _general_populate(browser, url):
    standard_item_bool_add('general', 'fullscreen', _('Start in fullscreen'))
+
+   vals = (_('Ask'), _('Always'), _('Never'))
+   standard_item_int_meaning_add('mediaplayer', 'resume_from_last_pos',
+                                _('Resume playback'), values=vals)
+   
    L = [ str(x / 10.0) for x in range(5, 21) ]
    standard_item_string_from_list_add('general', 'scale', _('Interface scale'),
                                       L, 'icon/scale', cb=_change_scale)

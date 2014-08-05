@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-06 00:34+0200\n"
-"PO-Revision-Date: 2014-08-06 00:35+0100\n"
+"POT-Creation-Date: 2014-08-06 01:10+0200\n"
+"PO-Revision-Date: 2014-08-06 01:20+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -18,8 +18,8 @@ msgstr ""
 "X-Generator: Poedit 1.5.4\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-#: epymc/subtitles.py:173 epymc/config_gui.py:239 epymc/config_gui.py:425
-#: epymc/mediaplayer.py:494 epymc/mediaplayer.py:580
+#: epymc/subtitles.py:173 epymc/config_gui.py:269 epymc/config_gui.py:464
+#: epymc/mediaplayer.py:510 epymc/mediaplayer.py:596
 msgid "Subtitles"
 msgstr "Sottotitoli"
 
@@ -113,140 +113,156 @@ msgstr ""
 msgid "EpyMC Database"
 msgstr "EpyMC Database"
 
-#: epymc/config_gui.py:230 epymc/config_gui.py:233 epymc/config_gui.py:303
+#: epymc/config_gui.py:260 epymc/config_gui.py:263 epymc/config_gui.py:337
 msgid "Configuration"
 msgstr "Configurazione"
 
-#: epymc/config_gui.py:235 epymc/config_gui.py:314
+#: epymc/config_gui.py:265 epymc/config_gui.py:348
 msgid "General"
 msgstr "Generale"
 
-#: epymc/config_gui.py:236
+#: epymc/config_gui.py:266
 msgid "Themes"
 msgstr "Temi"
 
-#: epymc/config_gui.py:237 epymc/config_gui.py:412
+#: epymc/config_gui.py:267 epymc/config_gui.py:451
 msgid "Modules"
 msgstr "Moduli"
 
-#: epymc/config_gui.py:238 epymc/config_gui.py:472
+#: epymc/config_gui.py:268 epymc/config_gui.py:511
 msgid "System info"
 msgstr "Informazioni di sistema"
 
-#: epymc/config_gui.py:317
+#: epymc/config_gui.py:351
 msgid "Start in fullscreen"
 msgstr "Avvia a schermo intero"
 
-#: epymc/config_gui.py:319
+#: epymc/config_gui.py:353
+msgid "Ask"
+msgstr "Chiedi"
+
+#: epymc/config_gui.py:353
+msgid "Always"
+msgstr "Sempre"
+
+#: epymc/config_gui.py:353
+msgid "Never"
+msgstr "Mai"
+
+#: epymc/config_gui.py:355 epymc/mediaplayer.py:144
+msgid "Resume playback"
+msgstr "Riprendi riproduzione"
+
+#: epymc/config_gui.py:358
 msgid "Interface scale"
 msgstr "Fattore di scala"
 
-#: epymc/config_gui.py:322
+#: epymc/config_gui.py:361
 msgid "Show Back item in lists"
 msgstr "Mostra indietro nelle liste"
 
-#: epymc/config_gui.py:324
+#: epymc/config_gui.py:363
 msgid "Download folder"
 msgstr "Cartella download"
 
-#: epymc/config_gui.py:326
+#: epymc/config_gui.py:365
 msgid "Max concurrent download"
 msgstr "Download simultanei"
 
-#: epymc/config_gui.py:335 epymc/config_gui.py:461
+#: epymc/config_gui.py:374 epymc/config_gui.py:500
 msgid "Rendering engine"
 msgstr "Motore di rendering"
 
-#: epymc/config_gui.py:340
+#: epymc/config_gui.py:379
 msgid "Multimedia engine"
 msgstr "Motore multimediale"
 
-#: epymc/config_gui.py:343
+#: epymc/config_gui.py:382
 msgid "Frames per second"
 msgstr "Frame al secondo"
 
-#: epymc/config_gui.py:347
+#: epymc/config_gui.py:386
 msgid "Restart needed"
 msgstr "Necessario riavvio"
 
-#: epymc/config_gui.py:348
+#: epymc/config_gui.py:387
 msgid "You need to restart the program to apply the new configuration."
 msgstr ""
 "Per applicare la nuova configurazione è necessario riavviare il programma."
 
-#: epymc/config_gui.py:374 epymc/plugins/onlinevideo/onlinevideo.py:89
+#: epymc/config_gui.py:413 epymc/plugins/onlinevideo/onlinevideo.py:89
 msgid "Author"
 msgstr "Autore"
 
-#: epymc/config_gui.py:375 epymc/plugins/onlinevideo/onlinevideo.py:88
+#: epymc/config_gui.py:414 epymc/plugins/onlinevideo/onlinevideo.py:88
 msgid "Version"
 msgstr "Versione"
 
-#: epymc/config_gui.py:428
+#: epymc/config_gui.py:467
 msgid "Subtitles preferred languages"
 msgstr "Lingue preferite per i sottotitoli"
 
-#: epymc/config_gui.py:429
+#: epymc/config_gui.py:468
 msgid "Subtitles encoding"
 msgstr "Encoding dei sottotitoli"
 
-#: epymc/config_gui.py:430
+#: epymc/config_gui.py:469
 msgid "Always try UTF-8 first"
 msgstr "Prova sempre UTF-8 prima"
 
-#: epymc/config_gui.py:431
+#: epymc/config_gui.py:470
 msgid "Opensubtitles.org Username"
 msgstr "Utente Opensubtitles.org"
 
-#: epymc/config_gui.py:432
+#: epymc/config_gui.py:471
 msgid "Opensubtitles.org Password"
 msgstr "Password Opensubtitles.org"
 
-#: epymc/config_gui.py:460
+#: epymc/config_gui.py:499
 msgid "Core"
 msgstr "Nucleo"
 
-#: epymc/config_gui.py:462
+#: epymc/config_gui.py:501
 msgid "Download available"
 msgstr "Download disponibili"
 
-#: epymc/config_gui.py:462
+#: epymc/config_gui.py:501
 msgid "yes"
 msgstr "sì"
 
-#: epymc/config_gui.py:462
+#: epymc/config_gui.py:501
 msgid "no"
 msgstr "no"
 
-#: epymc/config_gui.py:463
+#: epymc/config_gui.py:502
 msgid "Theme"
 msgstr "Tema"
 
-#: epymc/config_gui.py:464
+#: epymc/config_gui.py:503
 msgid "Paths"
 msgstr "Percorsi"
 
-#: epymc/config_gui.py:465
+#: epymc/config_gui.py:504
 msgid "Base folder"
 msgstr "Cartella base"
 
-#: epymc/config_gui.py:466
+#: epymc/config_gui.py:505
 msgid "Config folder"
 msgstr "Cartella configurazioni"
 
-#: epymc/config_gui.py:467
+#: epymc/config_gui.py:506
 msgid "Versions"
 msgstr "Versioni"
 
-#: epymc/config_gui.py:468
+#: epymc/config_gui.py:507
 msgid "Python"
 msgstr "Python"
 
-#: epymc/config_gui.py:469
+#: epymc/config_gui.py:508
 msgid "EpyMC"
 msgstr "EpyMC"
 
-#: epymc/config_gui.py:470
+#: epymc/config_gui.py:509
 msgid "EpyMC themes API"
 msgstr "Versione dei temi"
 
@@ -405,87 +421,83 @@ msgstr "Download completato"
 msgid "File not found"
 msgstr "File non trovato"
 
-#: epymc/mediaplayer.py:128
-msgid "Resume playback"
-msgstr "Riprendi riproduzione"
-
-#: epymc/mediaplayer.py:129
+#: epymc/mediaplayer.py:145
 #, python-format
 msgid "Continue from %s ?"
 msgstr "Continuo la riproduzione da %s ?"
 
-#: epymc/mediaplayer.py:398
+#: epymc/mediaplayer.py:414
 #, python-format
 msgid "Cannot init emotion engine:<br>%s"
 msgstr "Non posso avviare il motore di emotion:<br>%s"
 
-#: epymc/mediaplayer.py:478
+#: epymc/mediaplayer.py:494
 msgid "Audio"
 msgstr "Audio"
 
-#: epymc/mediaplayer.py:486
+#: epymc/mediaplayer.py:502
 msgid "Video"
 msgstr "Video"
 
-#: epymc/mediaplayer.py:533
+#: epymc/mediaplayer.py:549
 msgid "buffering"
 msgstr "buffering"
 
-#: epymc/mediaplayer.py:581 epymc/mediaplayer.py:675 epymc/mediaplayer.py:696
-#: epymc/mediaplayer.py:704
+#: epymc/mediaplayer.py:597 epymc/mediaplayer.py:691 epymc/mediaplayer.py:712
+#: epymc/mediaplayer.py:720
 #, python-format
 msgid "Delay: %d ms"
 msgstr "Ritardo: %d ms"
 
-#: epymc/mediaplayer.py:630
+#: epymc/mediaplayer.py:646
 #, python-format
 msgid "Audio track: %s"
 msgstr "Traccia audio: %s"
 
-#: epymc/mediaplayer.py:632
+#: epymc/mediaplayer.py:648
 #, python-format
 msgid "Audio track #%d"
 msgstr "Traccia audio #%d"
 
-#: epymc/mediaplayer.py:636
+#: epymc/mediaplayer.py:652
 msgid "Mute"
 msgstr "Muto"
 
-#: epymc/mediaplayer.py:653
+#: epymc/mediaplayer.py:669
 #, python-format
 msgid "Video track: %s"
 msgstr "Traccia video: %s"
 
-#: epymc/mediaplayer.py:655
+#: epymc/mediaplayer.py:671
 #, python-format
 msgid "Video track #%d"
 msgstr "Traccia video #%d"
 
-#: epymc/mediaplayer.py:659
+#: epymc/mediaplayer.py:675
 msgid "Download video"
 msgstr "Scarica filmato"
 
-#: epymc/mediaplayer.py:679
+#: epymc/mediaplayer.py:695
 msgid "No subtitles"
 msgstr "Nessun sottotitolo"
 
-#: epymc/mediaplayer.py:692
+#: epymc/mediaplayer.py:708
 msgid "Download subtitles"
 msgstr "Scarica sottotitoli"
 
-#: epymc/mediaplayer.py:695
+#: epymc/mediaplayer.py:711
 msgid "Subtitles delay"
 msgstr "Ritardo sottotitoli"
 
-#: epymc/mediaplayer.py:697
+#: epymc/mediaplayer.py:713
 msgid "+100 ms"
 msgstr "+100 ms"
 
-#: epymc/mediaplayer.py:698
+#: epymc/mediaplayer.py:714
 msgid "Reset"
 msgstr "Reset"
 
-#: epymc/mediaplayer.py:699
+#: epymc/mediaplayer.py:715
 msgid "-100 ms"
 msgstr "-100 ms"
 

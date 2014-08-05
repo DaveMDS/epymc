@@ -5,15 +5,18 @@ BUGS
  * mame's favorites got lost from config sometimes
  * video don't keep the right aspect, usually subs get cutted out
  * change the scale when in the config->General page will randomly segv
- * text in dialogs wont scale (elm bug, all scrollable entry dont respect scale)
+ * text in dialogs dont scale on-the-fly (elm bug)
+ * autoscrolled entry are not constant-speed changing the fps...it was used to work :/
 
-MAIN
+
+CORE
 =====
  * joy/webserver need a key-repetition handling
  * subtitles font and size configuration
- * try to change the gray color of buttons, it seems disabled now.
  * subtitles upload to opensubtitles.org
  * when go backward/forward show a slider, like for volume
+ * Add the ability to update youtube-dl from the gui
+
 
 NEW MODULES
 ===========
@@ -22,12 +25,8 @@ NEW MODULES
  * wikipedia
  * weather
  * a simple mail reader
-
-CORE
-=====
- * Add the ability to update youtube-dl from the gui
- * Add subtitles support, with autodownload from opensubtitles.org
  * Do something like: github.com/midgetspy/Sick-Beard
+
 
 MAME
 =====

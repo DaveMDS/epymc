@@ -316,10 +316,14 @@ def _general_list():
 def _general_populate(browser, url):
    standard_item_bool_add('general', 'fullscreen', _('Start in fullscreen'))
    L = [ str(x / 10.0) for x in range(5, 21) ]
-   standard_item_string_from_list_add('general', 'scale', _('Interface scale'), L, 'icon/scale', cb=_change_scale)
-   standard_item_bool_add('general', 'back_in_lists', _('Show Back item in lists'), 'icon/back')
-   standard_item_string_add('general', 'download_folder', _('Download folder'), 'icon/download')
-   standard_item_string_add('general', 'max_concurrent_download', _('Max concurrent download'), 'icon/download')
+   standard_item_string_from_list_add('general', 'scale', _('Interface scale'),
+                                      L, 'icon/scale', cb=_change_scale)
+   standard_item_bool_add('general', 'back_in_lists',
+                          _('Show Back item in lists'), 'icon/back')
+   standard_item_string_add('general', 'download_folder',
+                            _('Download folder'), 'icon/download')
+   standard_item_string_add('general', 'max_concurrent_download',
+                            _('Max concurrent download'), 'icon/download')
 
    L = evas.render_method_list()
    for remove in ('buffer', 'software_generic', 'gl_generic'):
@@ -327,15 +331,21 @@ def _general_populate(browser, url):
    if 'gl_x11' in L:
       L.remove('gl_x11')
       L.append('opengl_x11')
-   standard_item_string_from_list_add('general', 'evas_engine', _('Rendering engine'),
-                                  L, 'icon/evas')
+   standard_item_string_from_list_add('general', 'evas_engine',
+                                      _('Rendering engine'), L, 'icon/evas',
+                                      cb=_restart_needed)
+
    L = ['vlc', 'gstreamer1', 'gstreamer', 'xine', 'generic']
-   standard_item_string_from_list_add('mediaplayer', 'backend', _('Multimedia engine'),
-                                  L, 'icon/evas')
+   standard_item_string_from_list_add('mediaplayer', 'backend',
+                                      _('Multimedia engine'), L, 'icon/evas')
 
    L = ['10', '20', '30', '60', '120']
    standard_item_string_from_list_add('general', 'fps', _('Frames per second'),
-                                  L, 'icon/evas', cb=_change_fps)
+                                      L, 'icon/evas', cb=_change_fps)
+
+def _restart_needed():
+   EmcDialog(style='info', title=_('Restart needed'),
+      text=_('You need to restart the program to apply the new configuration.'))
 
 def _change_fps():
    gui.fps_set(ini.get_int('general', 'fps'))

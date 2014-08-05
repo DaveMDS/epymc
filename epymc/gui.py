@@ -613,7 +613,8 @@ class EmcMenu(Menu):
             return input_events.EVENT_BLOCK
          while item.prev and (item.prev.is_separator or item.prev.disabled):
             item = item.prev
-         item.prev.selected_set(True)
+         if item and item.prev:
+            item.prev.selected = True
          return input_events.EVENT_BLOCK
 
       elif event == 'DOWN':
@@ -622,7 +623,8 @@ class EmcMenu(Menu):
             return input_events.EVENT_BLOCK
          while item.next and (item.next.is_separator or item.next.disabled):
             item = item.next
-         item.next.selected_set(True)
+         if item and item.next:
+            item.next.selected = True
          return input_events.EVENT_BLOCK
 
       elif event == 'OK':
@@ -1112,8 +1114,6 @@ class EmcNotify(edje.Edje):
 
    def text_set(self, text):
       self.part_text_set('emc.text.caption', text)
-
-
 
 ################################################################################
 class EmcFolderSelector(EmcDialog):

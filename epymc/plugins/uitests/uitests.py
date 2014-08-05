@@ -114,6 +114,8 @@ class MyItemClass(EmcItemClass):
          it = m.item_add(None, "Disabled", 'home', _cb_menu, "disabled2")
          it.disabled = True
          m.item_add(None, "Item 7", None, _cb_menu, "item7")
+         it = m.item_add(None, "Item 8 (disabled)", None, _cb_menu, "item8")
+         it.disabled = True
 
       # TMDB
       # elif url == 'uitests://tmdb':

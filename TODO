@@ -16,6 +16,7 @@ CORE
  * subtitles upload to opensubtitles.org
  * when go backward/forward show a slider, like for volume
  * Add the ability to update youtube-dl from the gui
+ * make the "restart from" dialog configure-disable-able
 
 
 NEW MODULES

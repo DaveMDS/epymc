@@ -176,7 +176,7 @@ setup (
    license = 'GNU GPL v3',
    platforms = 'linux',
 
-   requires = ['efl (>= 1.9.0)', 'beautifulsoup4'],
+   requires = ['efl (>= 1.10.0)', 'beautifulsoup4'],
    provides = ['epymc'],
 
    packages = [

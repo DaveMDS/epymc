@@ -954,35 +954,6 @@ collections {
                }
             }
          }
-         part { name: "videoplayer.controls.position.spacer";
-            /* This part is used as a spacer to avoid the slider
-             * changes it's starting position while the numbers in
-             * the position text changes */
-            type: TEXT;
-            mouse_events: 0;
-            scale: 1;
-            description { state: "default" 0.0;
-               visible: 0;
-               align: 0.0 0.5;
-               fixed: 1 1;
-               rel1 {
-                  to: "videoplayer.controls.container2";
-                  relative: 0.0 0.0;
-               }
-               rel2 {
-                  to: "videoplayer.controls.container2";
-                  relative: 0.0 1.0;
-               }
-               text {
-                  text: "0:00:00";
-                  font: FONT2;
-                  size: FONT_SIZE;
-                  align: 0.0 1.0;
-                  min: 1 0;
-                  ellipsis: -1;
-               }
-            }
-         }
          part { name: "videoplayer.controls.position"; /* API */
             type: TEXT;
             mouse_events: 0;
@@ -1010,6 +981,16 @@ collections {
                   min: 1 0;
                   ellipsis: -1;
                }
+            }
+         }
+         part { name: "videoplayer.controls.position.spacer";
+            inherit: "videoplayer.controls.position";
+            /* This part is used as a spacer to avoid the slider
+             * changes it's starting position while the numbers in
+             * the position text changes */
+            description { state: "default" 0.0;
+               visible: 0;
+               text.text: "0:00:00";
             }
          }
          part { name: "videoplayer.controls.slider"; /* API */

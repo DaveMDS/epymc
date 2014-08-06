@@ -25,6 +25,9 @@ import traceback
 from epymc import ini
 from epymc import utils
 
+# modules enabled by default
+DEFAULT_MODS = 'calibrator input_keyb onlinevideo mame movies music ' \
+   'tvshows screensaver'
 
 class EmcModule(object):
    name = ''
@@ -111,13 +114,11 @@ def init_all():
          _instances[mod.name] = mod()
 
 def init_all_by_config():
-   if ini.has_option('general', 'modules'):
-      to_load = ini.get_string_list('general', 'modules')
-      for modname in to_load:
-         init_by_name(modname)
-   else:
-      init_all()
-      ini.set('general', 'modules', ' '.join(_instances.keys()))
+   if not ini.has_option('general', 'modules'):
+      ini.set('general', 'modules', DEFAULT_MODS)
+
+   for modname in ini.get_string_list('general', 'modules'):
+      init_by_name(modname)
 
 def save_enabled():
    ini.set('general', 'modules', ' '.join(_instances.keys()))

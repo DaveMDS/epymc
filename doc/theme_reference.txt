@@ -110,6 +110,8 @@ All the icons adn images in icons.edc must be implemented.
    * Signals received from the application:
       "minipos,show" "emc"
       "minipos,hide" "emc"
+      "minipos,play,set" "emc"
+      "minipos,pause,set" "emc"
 
 
 ### Dialogs box ###

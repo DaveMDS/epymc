@@ -245,11 +245,15 @@ def pause():
    if _emotion is None: return
    _emotion.play = False
    _play_pause_btn.icon_set('icon/play')
+   gui.signal_emit('minipos,pause,set')
+   minipos_show()
 
 def unpause():
    if _emotion is None: return
    _emotion.play = True
    _play_pause_btn.icon_set('icon/pause')
+   gui.signal_emit('minipos,play,set')
+   minipos_show()
 
 def pause_toggle():
    if _emotion is None: return
@@ -386,7 +390,7 @@ def minipos_show():
    _update_slider()
 
    if _minipos_timer is None:
-      _minipos_timer = ecore.Timer(2, _minipos_timer_cb)
+      _minipos_timer = ecore.Timer(3, _minipos_timer_cb)
    else:
       _minipos_timer.reset()
 

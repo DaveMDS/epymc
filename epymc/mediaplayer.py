@@ -532,10 +532,14 @@ def _init_mediaplayer_gui():
    gui.signal_cb_add('drag', 'volume.slider:dragable1', _drag_vol)
 
    # click on video to show/hide the controls
-   gui.layout.edje.signal_callback_add("mouse,down,1", "videoplayer.events",
-                                       lambda a,s,d: video_controls_toggle())
-   gui.layout.edje.signal_callback_add("mouse,down,2", "videoplayer.events",
-                                       lambda a,s,d: gui.fullscreen_toggle())
+   gui.signal_cb_add('mouse,down,1', 'videoplayer.events',
+                     lambda a,s,d: video_controls_toggle())
+   gui.signal_cb_add('mouse,down,2', 'videoplayer.events',
+                     lambda a,s,d: gui.fullscreen_toggle())
+
+   # click the volume icon to toggle mute
+   gui.signal_cb_add('emc,mute,toggle', '',
+                     lambda a,s,d: volume_mute_toggle())
 
 def _update_timer_cb():
    global _buffer_dialog

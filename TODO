@@ -18,7 +18,6 @@ CORE
  * Add the ability to update youtube-dl from the gui
  * show the status of the downloads in progress (and alert on exit if in progress)
  * use xdg to find config and download folder
- * click on the volume icon to toggle mute
 
 NEW MODULES
 ===========

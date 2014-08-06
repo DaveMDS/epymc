@@ -1387,6 +1387,11 @@ collections {
             action: STATE_SET "default" 0.0;
             target: "volume.icon";
          }
+         program { name: "toggle_mute"; /* API */
+            signal: "mouse,down,1";
+            source: "volume.icon";
+            action: SIGNAL_EMIT "emc,mute,toggle" "";
+         }
 
 /// dialog & notify container boxes
          part { name: "dialogs.box.stack"; /* API */

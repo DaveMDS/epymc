@@ -100,6 +100,9 @@ All the icons adn images in icons.edc must be implemented.
       "volume,mute,on" "emc"
       "volume,mute,off" "emc"
 
+   * Signal that can be sent to the app
+      "emc,mute,toggle" ""
+
 
 ### Minipos ###
    * Required parts:

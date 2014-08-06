@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-06 16:06+0200\n"
-"PO-Revision-Date: 2014-08-06 16:06+0100\n"
+"POT-Creation-Date: 2014-08-06 19:30+0200\n"
+"PO-Revision-Date: 2014-08-06 19:26+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: Italiano\n"
@@ -44,8 +44,8 @@ msgstr "Nessun risultato per le lingue: %s"
 msgid "Download"
 msgstr "Scarica"
 
-#: epymc/subtitles.py:382 epymc/gui.py:165 epymc/gui.py:167 epymc/gui.py:168
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:146
+#: epymc/subtitles.py:382 epymc/utils.py:452 epymc/gui.py:165 epymc/gui.py:167
+#: epymc/gui.py:168 epymc/plugins/onlinevideo/vimeo/vimeo.py:146
 #: epymc/plugins/movies/movies.py:155
 msgid "Unknown"
 msgstr "Sconosciuto"
@@ -54,7 +54,7 @@ msgstr "Sconosciuto"
 msgid "Downloading subtitles"
 msgstr "Scaricamento sottotitoli"
 
-#: epymc/subtitles.py:406
+#: epymc/subtitles.py:406 epymc/gui.py:1722
 msgid "Download failed"
 msgstr "Scaricamento fallito"
 
@@ -270,11 +270,11 @@ msgstr "Versione dei temi"
 msgid "Exit"
 msgstr "Esci"
 
-#: epymc/browser.py:129
+#: epymc/browser.py:130
 msgid "Back"
 msgstr "Indietro"
 
-#: epymc/browser.py:448
+#: epymc/browser.py:455
 #, python-format
 msgid "%d item"
 msgid_plural "%d items"
@@ -413,7 +413,15 @@ msgstr "Il file %s è già in coda"
 msgid "Download started"
 msgstr "Download avviato"
 
-#: epymc/gui.py:1717 epymc/plugins/mame/mame.py:587
+#: epymc/gui.py:1720
+msgid "Cannot download file"
+msgstr "Impossibile scaricare il file"
+
+#: epymc/gui.py:1721
+msgid "Failure code"
+msgstr "Codice errore"
+
+#: epymc/gui.py:1729 epymc/plugins/mame/mame.py:587
 msgid "Download completed"
 msgstr "Download completato"
 
@@ -443,8 +451,8 @@ msgstr "Video"
 msgid "buffering"
 msgstr "buffering"
 
-#: epymc/mediaplayer.py:602 epymc/mediaplayer.py:696 epymc/mediaplayer.py:717
-#: epymc/mediaplayer.py:725
+#: epymc/mediaplayer.py:602 epymc/mediaplayer.py:702 epymc/mediaplayer.py:723
+#: epymc/mediaplayer.py:731
 #, python-format
 msgid "Delay: %d ms"
 msgstr "Ritardo: %d ms"
@@ -477,27 +485,27 @@ msgstr "Traccia video #%d"
 msgid "Download video"
 msgstr "Scarica filmato"
 
-#: epymc/mediaplayer.py:700
+#: epymc/mediaplayer.py:698 epymc/mediaplayer.py:706
 msgid "No subtitles"
 msgstr "Nessun sottotitolo"
 
-#: epymc/mediaplayer.py:713
+#: epymc/mediaplayer.py:719
 msgid "Download subtitles"
 msgstr "Scarica sottotitoli"
 
-#: epymc/mediaplayer.py:716
+#: epymc/mediaplayer.py:722
 msgid "Subtitles delay"
 msgstr "Ritardo sottotitoli"
 
-#: epymc/mediaplayer.py:718
+#: epymc/mediaplayer.py:724
 msgid "+100 ms"
 msgstr "+100 ms"
 
-#: epymc/mediaplayer.py:719
+#: epymc/mediaplayer.py:725
 msgid "Reset"
 msgstr "Reset"
 
-#: epymc/mediaplayer.py:720
+#: epymc/mediaplayer.py:726
 msgid "-100 ms"
 msgstr "-100 ms"
 

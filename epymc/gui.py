@@ -1701,7 +1701,8 @@ class DownloadManager(utils.Singleton):
       self.handlers[url] = handler
 
       # notify
-      text = '%s:<br>%s' % (_('Download started'), os.path.basename(dest))
+      text = '<title>%s</title><br>%s' % (_('Download started'),
+                                          os.path.basename(dest))
       EmcNotify(text, icon='icon/download')
 
    # def _progress_cb(self, dest, dltotal, dlnow, myurl):
@@ -1709,12 +1710,24 @@ class DownloadManager(utils.Singleton):
       # pass
 
    def _complete_cb(self, dest, status, myurl):
+
+      # remove the .part suffix
+      real_dest = dest[:-5]
+
+      # download failed ?
+      if status != 200:
+         text = '<b>%s:</b><br>%s<br><br><failure>%s: %d (%s)</failure>' % \
+               (_('Cannot download file'), os.path.basename(real_dest),
+               _('Failure code'), status, utils.http_error_code_to_str(status))
+         EmcDialog(style='error', title=_('Download failed'), text=text)
+         return
+
       # rename the downloaded file
-      real_dest = dest[:-5] # remove the .part suffix
-      os.rename(dest, real_dest) 
+      os.rename(dest, real_dest)
 
       # notify
-      text = '%s:<br>%s' % (_('Download completed'), os.path.basename(real_dest))
+      text = '<title>%s</title><br>%s' % (_('Download completed'),
+                                          os.path.basename(real_dest))
       EmcNotify(text, icon='icon/download')
 
       # remove the handler from the dict

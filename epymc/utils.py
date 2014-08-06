@@ -436,11 +436,20 @@ def download_url_async(url, dest='tmp', min_size=0,
 
    # start the download
    return FileDownload(encoded, dest, _cb_download_complete,
-                  _cb_download_progress, dwl_data = dwl_data, *args, **kargs)
+                  _cb_download_progress, dwl_data=dwl_data, *args, **kargs)
 
 def download_abort(dwl_handler):
    ecore.file_download_abort(dwl_handler)
 
+def http_error_code_to_str(code):
+   try:
+      import BaseHTTPServer # py2
+   except:
+      import http.server as BaseHTTPServer # py3
+   try:
+      return BaseHTTPServer.BaseHTTPRequestHandler.responses[code][0]
+   except:
+      return _('Unknown')
 
 class Singleton(object):
    __single = None

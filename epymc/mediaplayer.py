@@ -693,6 +693,12 @@ def _cb_menu_download(menu, item):
 def _build_subtitles_menu(btn):
    menu = EmcMenu(relto=btn, close_on=('UP',))
 
+   if not _onair_url.startswith('file://'):
+      # no subs for online videos
+      it = menu.item_add(None, _('No subtitles'))
+      it.disabled = True
+      return
+
    menu.item_add(None, _('Delay: %d ms') % _subtitles.delay,
                  None, _cb_menu_subs_delay)
    menu.item_separator_add()

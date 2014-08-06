@@ -184,81 +184,59 @@ elif STATE == ST_CATEGORIES_LIST:
 elif STATE == ST_PLAY:
 
    html = fetch_url(URL)
+   link = None
 
-   if "xvideos" in URL: # OK
+   if "xvideos" in URL: # OK (youtube-dl)
       link = re.compile('(http://www.xvideos.com/.+?)"').findall(html)[0]
-      html = fetch_url(link)
-      fetchurl = re.compile('flv_url=(.+?)&').findall(html)[0]
-      play_url(urllib2.unquote(fetchurl))
 
-   elif 'redtube' in URL: # OK
+   elif 'redtube' in URL: # OK (youtube-dl)
       link = re.compile('(http://www.redtube.com/.+?)"').findall(html)[0]
-      html = fetch_url(link)
-      fetchurl = re.compile('flv_h264_url=(.+?)"').findall(html)[0]
-      play_url(urllib2.unquote(fetchurl))
 
-   elif "xhamster" in URL: # OK
-      vid = re.compile('xhamster.com/movies/(.+?)/').findall(html)[0]
-      html = fetch_url('http://xhamster.com/xembed.php?video=%s' % vid)
-      srv = re.compile("&srv=(.+?)&").findall(html)[0]
-      fil = re.compile("&file=(.+?)&").findall(html)[0]
-      fetchurl = urllib2.unquote(srv + '/key=' + fil)
-      play_url(fetchurl)
+   elif "xhamster" in URL: # OK (youtube-dl)
+      link = re.compile('(http://xhamster.com/movies/.+?)"').findall(html)[0]
 
-   elif 'you_porn' in URL: # OK
+   elif 'you_porn' in URL: # OK (youtube-dl)
       link = re.compile('(http://www.youporn.com/watch/.+?)"').findall(html)[0]
-      html = fetch_url(link)
-      soup = BeautifulSoup(html)
-      fetchurl = soup.find('video', id='player-html5')['src']
-      play_url(fetchurl)
 
-   elif 'pornotube' in URL: # OK
-      fetchurl = re.compile('"clip":"(.+?)"').findall(html)[0]
-      play_url(fetchurl)
+   elif 'pornotube' in URL: # OK (youtube-dl)
+      link = re.compile('(http://pornotube.com/media.php.+?)"').findall(html)[0]
 
    elif 'tube8' in URL: # OK (youtube-dl)
       link = re.compile('(http://www.tube8.com/.+?)"').findall(html)[0]
-      play_url(call_ydl(link))
 
    elif "pornhub" in URL: # OK (youtube-dl)
       link = re.compile('(http://www.pornhub.com/view_video.php.+?)"').findall(html)[0]
-      play_url(call_ydl(link))
 
    elif 'spankwire' in URL: # OK (youtube-dl)
       link = re.compile('(http://www.spankwire.com/.+?)"').findall(html)[0]
-      link = link.replace('http://', '').replace('//', '/')
-      play_url(call_ydl('http://'+link))
 
    elif 'empflix' in URL: # OK (youtube-dl)
       link = re.compile('(http://www.empflix.com/view.php.+?)"').findall(html)[0]
-      play_url(call_ydl(link))
 
    elif 'keezmovies' in URL: # OK (youtube-dl)
       link = re.compile('(http://www.keezmovies.com/video/.+?)"').findall(html)[0]
-      play_url(call_ydl(link))
 
    elif 'xtube' in URL: # OK (youtube-dl)
       link = re.compile('(http://www.xtube.com/play_re.php.+?)"').findall(html)[0]
-      play_url(call_ydl(link))
 
    elif 'extremetube' in URL: # OK (youtube-dl)
       link = re.compile('(http://www.extremetube.com/.+?)"').findall(html)[0]
-      play_url(call_ydl(link))
+
+   # elif 'hardsextube' in URL: # HardSexTube TODO
+   # elif 'madthumbs' in URL: # MadThumbs TODO
+   # elif 'drtuber' in URL: # DrTuber TODO
+   # elif 'tnaflix' in URL: # TnaFlix TODO
+   # elif 'deviantclip' in URL: # TnaFlix TODO
+   # elif 'bigtits' in URL: # Bigtits TODO
 
    else:
       report_error('Source not supported')
 
-   # elif 'hardsextube' in URL: # HardSexTube TODO
-
-   # elif 'madthumbs' in URL: # MadThumbs TODO
-
-   # elif 'drtuber' in URL: # DrTuber TODO
-
-   # elif 'tnaflix' in URL: # TnaFlix TODO
-   
-   # elif 'deviantclip' in URL: # TnaFlix TODO
-
-   # elif 'bigtits' in URL: # Bigtits TODO
-
-
-
+   if link is not None:
+      # remove double slashes
+      link = 'http://' + link.replace('http://', '').replace('//', '/')
+      url = call_ydl(link)
+      if url:
+         play_url(url)
+      else:
+         report_error('Video not found')

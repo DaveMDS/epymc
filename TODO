@@ -7,7 +7,7 @@ BUGS
  * change the scale when in the config->General page will randomly segv
  * text in dialogs dont scale on-the-fly (elm bug)
  * autoscrolled entry are not constant-speed changing the fps...it was used to work :/
-
+ * minipos visible, go back to zero... stop !
 
 CORE
 =====
@@ -17,20 +17,27 @@ CORE
  * when go backward/forward show a slider, like for volume
  * Add the ability to update youtube-dl from the gui
  * make the "restart from" dialog configure-disable-able
-
+ * show somewhere the status of the downloads in progress
+ * use xdg to find config and download folder
+ * click on the volume icon to toggle mute
 
 NEW MODULES
 ===========
  * internet radio
  * photo
  * wikipedia
+ * torrent (auto)search and download
  * weather
  * a simple mail reader
  * Do something like: github.com/midgetspy/Sick-Beard
 
+TVSHOW
+======
+ * find a way to show special guests on the single episodes
 
 MAME
 =====
  * catver.ini: instead of reading a single file, scan a directory (~/.mame/cats/)
    for *.ini files and create a menu entry for each. The name in the root could
    be the name of the file (minus the extension)
+

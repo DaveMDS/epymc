@@ -99,7 +99,7 @@ def shutdown():
 
 ### mediaplyer API ###
 def play_url(url, only_audio=False, start_from=None):
-   global _onair_url, _onair_title, _subtitles, _subs_timer
+   global _onair_url, _onair_title
 
    # check url
    if url.startswith('file://') and not os.path.exists(url[7:]):
@@ -156,6 +156,7 @@ def _resume_no_cb(dia):
    dia.delete()
 
 def _play_real(start_from=0, only_audio=False):
+   global _subtitles, _subs_timer
 
    # init emotion and the gui (if needed)
    if not _emotion and not _init_emotion():

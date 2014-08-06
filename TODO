@@ -8,16 +8,15 @@ BUGS
  * text in dialogs dont scale on-the-fly (elm bug)
  * autoscrolled entry are not constant-speed changing the fps...it was used to work :/
  * minipos visible, go back to zero... stop !
+ * no way to toggle fs with the mouse
 
 CORE
 =====
  * joy/webserver need a key-repetition handling
  * subtitles font and size configuration
  * subtitles upload to opensubtitles.org
- * when go backward/forward show a slider, like for volume
  * Add the ability to update youtube-dl from the gui
- * make the "restart from" dialog configure-disable-able
- * show somewhere the status of the downloads in progress
+ * show the status of the downloads in progress (and alert on exit if in progress)
  * use xdg to find config and download folder
  * click on the volume icon to toggle mute
 

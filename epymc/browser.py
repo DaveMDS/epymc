@@ -22,7 +22,8 @@ import sys
 
 from efl import evas, ecore, elementary
 from efl.elementary.genlist import Genlist, GenlistItem, GenlistItemClass,\
-   ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS
+   ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS, ELM_GENLIST_ITEM_SCROLLTO_TOP, \
+   ELM_GENLIST_ITEM_SCROLLTO_MIDDLE, ELM_GENLIST_ITEM_SCROLLTO_IN
 from efl.elementary.gengrid import Gengrid, GengridItem, GengridItemClass
 from efl.elementary.layout import Layout
 from efl.elementary.label import Label, ELM_WRAP_NONE, \
@@ -286,6 +287,12 @@ class EmcBrowser(object):
       input_events.listener_del('browser-' + self.name)
       self.current_view.hide()
 
+   def item_bring_in(self, pos='top', animated=True):
+      """ Move the view so that the currently selected item will go on 'pos'
+      pos can be: 'in', ', top', 'mid'
+      """
+      self.current_view.item_bring_in(pos, animated)
+
    # private stuff
    def _populate_page(self, page, is_back=False, is_refresh=False):
       # set topbar title
@@ -476,6 +483,20 @@ class ViewList(object):
       self._cb_timer(item.data_get())
       self._cb_timer2(item.data_get())
 
+   def item_bring_in(self, pos='top', animated=True):
+      try:
+         item = self.current_list.selected_item
+      except: return
+
+      if   pos == 'top':    mode = ELM_GENLIST_ITEM_SCROLLTO_TOP
+      elif pos == 'mid':    mode = ELM_GENLIST_ITEM_SCROLLTO_MIDDLE
+      elif pos == 'in':     mode = ELM_GENLIST_ITEM_SCROLLTO_IN
+
+      if animated:
+         item.bring_in(mode)
+      else:
+         item.show(mode)
+
    def input_event_cb(self, event):
       """ Here you can manage input events for the view """
 
@@ -646,6 +667,20 @@ class ViewGrid(object):
       while item:
          item.update()
          item = item.next_get()
+
+   def item_bring_in(self, pos='top', animated=True):
+      try:
+         item = self.gg.selected_item
+      except: return
+
+      if   pos == 'top':    mode = ELM_GENLIST_ITEM_SCROLLTO_TOP
+      elif pos == 'mid':    mode = ELM_GENLIST_ITEM_SCROLLTO_MIDDLE
+      elif pos == 'in':     mode = ELM_GENLIST_ITEM_SCROLLTO_IN
+
+      if animated:
+         item.bring_in(mode)
+      else:
+         item.show(mode)
 
    def input_event_cb(self, event):
       item = self.gg.selected_item_get()

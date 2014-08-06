@@ -295,15 +295,18 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
          self._browser.page_add(url, label, None,
                                 self._populate_requested_page, items)
       else:
-         self._populate_requested_page(self._browser, url, items)
+         self._populate_requested_page(self._browser, url, items, scroll=True)
 
    def _suggestion_selected_cb(self, dia, item_data):
       self._request_page(item_data)
       dia.delete()
 
-   def _populate_requested_page(self, browser, url, items):
+   def _populate_requested_page(self, browser, url, items, scroll=False):
       for item_data in items:
          (next_state, label, url, info, icon, poster, action) = item_data
          self._browser.item_add(StandardItemClass(), url, item_data)
+
+      if scroll is True:
+         self._browser.item_bring_in(pos='top', animated=True)
 
 

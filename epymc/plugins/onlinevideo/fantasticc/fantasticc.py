@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, urllib2, re
+import sys, re
 from bs4 import BeautifulSoup
 
 from epymc.extapi.onlinevideo import api_version, state_get, \

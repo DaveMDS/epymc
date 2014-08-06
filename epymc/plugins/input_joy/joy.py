@@ -82,7 +82,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
       # open the joystick device
       try:
-         self.dev = open(self.device)
+         self.dev = open(self.device, 'rb')
          self.fdh = ecore.FdHandler(self.dev, ecore.ECORE_FD_READ,
                                     self.joy_event_cb)
       except:

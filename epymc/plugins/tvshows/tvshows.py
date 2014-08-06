@@ -397,8 +397,11 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
          except:
             self._browser.item_add(FolderItemClass(), item_url, self)
 
-      # then populate files
+      # then populate files (only supported extensions)
       for relative in files:
+         name, ext = os.path.splitext(relative)
+         if ext.lower() not in mediaplayer.video_extensions:
+            continue
          item_url = self._current_base_path + relative
          try:
             (show_name, s_num, e_num) = get_serie_from_relative_url(relative)

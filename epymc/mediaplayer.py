@@ -37,6 +37,11 @@ def LOG(sev, msg):
    elif sev == 'dbg' and DEBUG: print('%s: %s' % (DEBUGN, msg))
 
 
+video_extensions = ['.avi','.mpg','.mpeg','.mpe','.ogv','.mkv','.divx','.xvid',
+                    '.mp4','.wmv','.flv','.f4v','.mov','.m4v','.m2v','.mp4v',
+                    '.mpeg4','.dv','.rv','.webm','.vid','.h264','.rm']
+audio_extensions = ['.mp3','.ogg','.oga','.flac','.m4a','.wav']
+
 _volume = 0
 _volume_muted = False
 _emotion = None
@@ -61,6 +66,8 @@ _subs_notify = None # EmcNotify for subtitles delay changes
 def init():
    global _volume
    global _play_db
+   global video_extensions
+   global audio_extensions
 
    # default config values
    ini.add_section('mediaplayer')
@@ -71,6 +78,11 @@ def init():
       ini.set('mediaplayer', 'backend', 'gstreamer1')
    if not ini.has_option('mediaplayer', 'resume_from_last_pos'):
       ini.set('mediaplayer', 'resume_from_last_pos', '0')
+   if not ini.has_option('mediaplayer', 'video_extensions'):
+      ini.set('mediaplayer', 'video_extensions', '')
+   if not ini.has_option('mediaplayer', 'audio_extensions'):
+      ini.set('mediaplayer', 'audio_extensions', '')
+
    if not ini.has_option('subtitles', 'langs'):
       ini.set('subtitles', 'langs', 'en')
    if not ini.has_option('subtitles', 'encoding'):
@@ -81,7 +93,10 @@ def init():
       ini.set('subtitles', 'opensubtitles_user', '')
    if not ini.has_option('subtitles', 'opensubtitles_pass'):
       ini.set('subtitles', 'opensubtitles_pass', '')
-      
+
+   audio_extensions += ini.get_string_list('mediaplayer', 'audio_extensions')
+   video_extensions += ini.get_string_list('mediaplayer', 'video_extensions')
+
    _volume = ini.get_int('mediaplayer', 'volume')
 
    # simple db to store the count of played files

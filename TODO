@@ -18,13 +18,14 @@ CORE
  * Add the ability to update youtube-dl from the gui
  * show the status of the downloads in progress (and alert on exit if in progress)
  * use xdg to find config and download folder
+ * add an option to disable exit confirmation (but show credit somewhere else)
 
 NEW MODULES
 ===========
  * internet radio
  * photo
  * wikipedia
- * torrent (auto)search and download
+ * torrent (auto)search and download ( aria2c frontend? )
  * weather
  * a simple mail reader
  * Do something like: github.com/midgetspy/Sick-Beard

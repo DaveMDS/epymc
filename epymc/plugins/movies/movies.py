@@ -49,7 +49,6 @@ def DBG(msg):
 
 MOVIE_DB_VERSION = 1
 DEFAULT_INFO_LANG = 'en'
-DEFAULT_EXTENSIONS = 'avi mpg mpeg ogv mkv' #TODO fill better (uppercase ??)
 DEFAULT_BADWORDS = 'dvdrip AAC x264 cd1 cd2'
 DEFAULT_BADWORDS_REGEXP = '\[.*?\] {.*?} \. -'
 """ in a more readable form:
@@ -176,7 +175,6 @@ class MoviesModule(EmcModule):
 need to work well, can also use markup like <title>this</> or <b>this</>""")
 
    _browser = None     # the browser widget instance
-   _exts = None        # list of allowed extensions
    _movie_db = None    # key: movie_url  data: dictionary as of the tmdb api
    _idler_db = None    # key: file_url  data: timestamp of the last unsuccessfull tmdb query
    _scanner = None     # BackgroundScanner instance
@@ -191,8 +189,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
       ini.add_section('movies')
       if not ini.has_option('movies', 'enable_scanner'):
          ini.set('movies', 'enable_scanner', 'False')
-      if not ini.has_option('movies', 'extensions'):
-         ini.set('movies', 'extensions', DEFAULT_EXTENSIONS)
       if not ini.has_option('movies', 'badwords'):
          ini.set('movies', 'badwords', DEFAULT_BADWORDS)
       if not ini.has_option('movies', 'badwords_regexp'):
@@ -205,9 +201,6 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
          ini.set('movies', 'info_lang', DEFAULT_INFO_LANG)
       if not ini.has_option('movies', 'db_names_in_list'):
          ini.set('movies', 'db_names_in_list', 'True')
-
-      # get allowed exensions from config
-      self._exts = ini.get_string_list('movies', 'extensions')
 
       # get movies folders from config
       self._folders = ini.get_string_list('movies', 'folders', ';')
@@ -304,17 +297,19 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
 
    def populate_url(self, browser, url):
       dirs, files = [], []
-      for fname in sorted(os.listdir(url[7:]), key=str.lower):
+      for fname in os.listdir(url[7:]):
          if fname[0] != '.':
             if os.path.isdir(os.path.join(url[7:], fname)):
                dirs.append(fname)
             else:
-               files.append(fname)
+               name, ext = os.path.splitext(fname)
+               if ext.lower() in mediaplayer.video_extensions:
+                  files.append(fname)
 
-      for fname in dirs:
-         self._browser.item_add(FolderItemClass(), url + '/' + fname, self)
-      for fname in files:
-         self._browser.item_add(MovieItemClass(), url + '/' + fname, self)
+      for fname in utils.natural_sort(dirs):
+         self._browser.item_add(FolderItemClass(), os.path.join(url, fname), self)
+      for fname in utils.natural_sort(files):
+         self._browser.item_add(MovieItemClass(), os.path.join(url, fname), self)
 
    def _get_cast(self, e, max_num=999):
       cast = ''

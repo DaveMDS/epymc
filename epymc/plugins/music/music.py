@@ -41,7 +41,6 @@ def DBG(msg):
    pass
 
 
-_audio_extensions = ['.mp3', '.ogg', '.oga', '.flac', '.m4a', '.wav']
 _mod = None
 
 
@@ -373,7 +372,7 @@ and what it need to work well, can also use markup like <title>this</> or
          # get the next file from the generator and read metadata (if needed)
          full_path = self._rebuild_files.next()
          (name, ext) = os.path.splitext(full_path)
-         if ext.lower() in _audio_extensions:
+         if ext.lower() in mediaplayer.audio_extensions:
             if self._songs_db.id_exists('file://' + full_path):
                DBG('FOUND IN DB')
             else:

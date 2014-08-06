@@ -294,8 +294,10 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
       if items and action != ACT_MORE:
          self._browser.page_add(url, label, None,
                                 self._populate_requested_page, items)
-      else:
+      elif action == ACT_MORE:
          self._populate_requested_page(self._browser, url, items, scroll=True)
+      else:
+         self._populate_requested_page(self._browser, url, items)
 
    def _suggestion_selected_cb(self, dia, item_data):
       self._request_page(item_data)

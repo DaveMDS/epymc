@@ -34,7 +34,7 @@ import epymc.config_gui as config_gui
 
 
 def DBG(msg):
-   # print('JOY: ' + msg)
+   print('JOY: ' + msg)
    pass
 
 
@@ -56,6 +56,8 @@ and what it need to work well, can also use markup like <title>this</> or
       DBG('Init module')
 
       self.grab_key_func = None
+      self.axis_h = self.axis_v = self.button_ok = self.button_back = None
+      self.invert_h = self.invert_v = False
 
       # get joystick device from config
       ini.add_section('joystick')
@@ -105,12 +107,13 @@ and what it need to work well, can also use markup like <title>this</> or
       # get just the INIT event from the event type 
       init = type & ~event
       signal = None
+      DBG("EVENT RECEIVED: %s %s %s %s" % (time, value, type, number))
 
       # if grabbed request call the grab function and return
       if self.grab_key_func and callable(self.grab_key_func):
          if not init and value != 0:
             self.grab_key_func(number, value)
-            return True # keep tha handler alive
+            return ecore.ECORE_CALLBACK_RENEW # keep tha handler alive
       
       # axis event
       if event == self.EVENT_AXIS and not init: 
@@ -138,14 +141,13 @@ and what it need to work well, can also use markup like <title>this</> or
 
       # init event
       elif init:
-         DBG('INIT %s %s %s' % (number,value,init))
-         pass
+         DBG('EVENT IS INIT %s %s %s' % (number,value,init))
 
       # emit the emc input event
       if signal:
          input_events.event_emit(signal)
       
-      return True # keep tha handler alive
+      return ecore.ECORE_CALLBACK_RENEW # keep tha handler alive
 
 ### config panel stuff
    def config_panel_cb(self):
@@ -178,14 +180,14 @@ and what it need to work well, can also use markup like <title>this</> or
       self.grab_key_func = self.grabbed_key_func
       self.dia_state = 'vert'
       self.dia = EmcDialog(title=_('Configure joystick'), style='cancel',
-                      text='Press UP', done_cb=self.end_configurator)
+                      text=_('Move the stick Up'), done_cb=self.end_configurator)
 
    def grabbed_key_func(self, number, value):
       # grab vertical axes
       if self.dia_state == 'vert':
          self.axis_v = number
          self.invert_v = value < 0
-         self.dia.text_set(_('Press RIGHT'))
+         self.dia.text_set(_('Move the stick Right'))
          self.dia_state = 'horiz'
       # grab horizontal axes
       elif self.dia_state == 'horiz':

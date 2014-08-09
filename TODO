@@ -12,6 +12,7 @@ BUGS
 
 CORE
 =====
+ * DVD playback !!
  * joy/webserver need a key-repetition handling
  * subtitles font and size configuration
  * subtitles upload to opensubtitles.org

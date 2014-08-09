@@ -32,7 +32,7 @@ from efl.elementary.label import Label, ELM_WRAP_NONE, \
 from epymc import gui, mainmenu, input_events, ini
 from epymc.sdb import EmcDatabase
 from epymc.utils import Singleton
-from epymc.gui import EmcRemoteImage, EmcScrolledEntry
+from epymc.gui import EmcRemoteImage, EmcScrolledEntry, EmcButton, EmcFocusManager
 
 def DBG(msg):
    # print('BROWSER: ' + msg)
@@ -42,6 +42,7 @@ def DBG(msg):
 _views = {}       # key=>view_name  value=>view class instance
 _memorydb = None  # EmcDatabase  key=>page_url  value=style_name
 _instances = []   # keep track of EmcBrowser instances. just for dump_all()
+_topbar_fman = None # Topbar buttons EmcFocusManager
 
 ANIM_NONE = 0
 ANIM_BACK = -1
@@ -50,14 +51,34 @@ ANIM_FORWARD = 1
 
 def init():
    global _memorydb
+   global _topbar_fman
 
    _memorydb = EmcDatabase('browser_view_memory')
    if not ini.has_option('general', 'back_in_lists'):
       ini.set('general', 'back_in_lists', 'True')
 
+    # fill buttons box in topbar
+   _topbar_fman = EmcFocusManager('topbar')
+   _topbar_fman.unfocus()
+   topbar_button_add('view_list', 'icon/list', input_events.event_emit, 'VIEW_LIST')
+   topbar_button_add('view_grid', 'icon/grid', input_events.event_emit, 'VIEW_GRID')
+
 def shutdown():
    global _memorydb
    del _memorydb
+
+def topbar_button_add(name, icon, cb_func, *cb_args):
+   bt = EmcButton(icon=icon)
+   bt.callback_clicked_add(_topbar_buttons_cb)
+   bt.data['cb_func'] = cb_func
+   bt.data['cb_args'] = cb_args
+   gui.box_append('topbar.box', bt)
+   _topbar_fman.obj_add(bt)
+   bt.show()
+
+def _topbar_buttons_cb(bt):
+   cb_func, cb_args = bt.data.get('cb_func'), bt.data.get('cb_args')
+   cb_func(*cb_args) if cb_args else cb_func()
 
 def dump_everythings():
    print('*' * 70)
@@ -215,7 +236,6 @@ class EmcBrowser(object):
       # switch to the new page
       self._populate_page(page)
 
-
    def item_add(self, item_class, url, user_data=None):
       """
       Use this method to add an item in the current (last added) page
@@ -270,6 +290,10 @@ class EmcBrowser(object):
 
       # recreate the page
       self.refresh(hard=True)
+
+      # give focus to the new view
+      self.current_view.focus()
+      _topbar_fman.unfocus()
 
    def clear(self):
       """ TODO Function doc """
@@ -336,16 +360,39 @@ class EmcBrowser(object):
       cb(self, url, *args, **kwargs)
 
    def _input_event_cb(self, event):
+      # focus is on top bar:
+      if _topbar_fman.has_focus:
+         if event == 'OK':
+            btn = _topbar_fman.focused_get()
+            _topbar_buttons_cb(btn)
+            return input_events.EVENT_BLOCK
+         elif event == 'DOWN':
+            _topbar_fman.unfocus()
+            self.current_view.focus()
+            return input_events.EVENT_BLOCK
+
+      # focus is on the view (pass the event to view):
+      else:
+         view_ret = self.current_view.input_event_cb(event)
+         if view_ret == input_events.EVENT_BLOCK:
+            return view_ret
+         if event == 'UP':
+            self.current_view.unfocus()
+            _topbar_fman.focus()
+            return input_events.EVENT_BLOCK
+
+      # always:
       if event == 'BACK':
          self.back()
+         return input_events.EVENT_BLOCK
       elif event == 'VIEW_LIST':
          self.change_style('List')
+         return input_events.EVENT_BLOCK
       elif event == 'VIEW_GRID':
          self.change_style('Grid')
-      else:
-         return self.current_view.input_event_cb(event)
+         return input_events.EVENT_BLOCK
 
-      return input_events.EVENT_BLOCK
+      return input_events.EVENT_CONTINUE
 
    def _create_or_get_view(self, view_name):
       if view_name in _views:
@@ -378,6 +425,7 @@ class ViewList(object):
       """
       DBG('Init view: plain list')
 
+      self._last_focused_item = None
       self.timer = self.timer2 = None
       self.items_count = 0;            # This is accessed from the browser
 
@@ -497,6 +545,15 @@ class ViewList(object):
       else:
          item.show(mode)
 
+   def focus(self):
+      """ give focus to the view, selecting an item """
+      item =  self._last_focused_item or self.current_list.first_item
+      item.selected = True
+
+   def unfocus(self):
+      """ remove the focus to the view, unselect the selected item """
+      self.current_list.selected_item.selected = False
+
    def input_event_cb(self, event):
       """ Here you can manage input events for the view """
 
@@ -567,6 +624,7 @@ class ViewList(object):
       # label.slide_mode = ELM_LABEL_SLIDE_MODE_AUTO
       # label.slide_go()
 
+      self._last_focused_item = item
       if self.timer: self.timer.delete()
       if self.timer2: self.timer2.delete()
       self.timer = ecore.timer_add(0.5, self._cb_timer, item.data_get())
@@ -642,6 +700,7 @@ class ViewGrid(object):
       gui.swallow_set('browser.grid.gengrid', gg)
       self.gg = gg
       self.items_count = 0
+      self._last_focused_item = None
 
    def page_show(self, title, anim):
       self.gg.clear()
@@ -682,6 +741,13 @@ class ViewGrid(object):
       else:
          item.show(mode)
 
+   def focus(self):
+      item =  self._last_focused_item or self.gg.first_item
+      item.selected = True
+
+   def unfocus(self):
+      self.gg.selected_item.selected = False
+
    def input_event_cb(self, event):
       item = self.gg.selected_item_get()
       (item_class, url, user_data) = item.data_get()                            # 3 #
@@ -710,9 +776,9 @@ class ViewGrid(object):
                (x2, y2) = prev.pos_get()
             prev.selected_set(1)
             prev.bring_in()
+            return input_events.EVENT_BLOCK
          except:
-            pass
-         return input_events.EVENT_BLOCK
+            return input_events.EVENT_CONTINUE
 
       elif event == 'DOWN':
          try:
@@ -724,9 +790,9 @@ class ViewGrid(object):
                (x2, y2) = next.pos_get()
             next.selected_set(1)
             next.bring_in()
+            return input_events.EVENT_BLOCK
          except:
-            pass
-         return input_events.EVENT_BLOCK
+            return input_events.EVENT_CONTINUE
 
       elif event == 'OK':
          item_class.item_selected(url, user_data)
@@ -757,7 +823,7 @@ class ViewGrid(object):
 
    # gengrid callbacks
    def gg_higlight(self, gg, item, *args, **kwargs):
-      pass
+      self._last_focused_item = item
 
    def gg_selected(self, gg, item, *args, **kwargs):
       (item_class, url, user_data) = item.data_get()                            # 3 #

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-06 19:30+0200\n"
+"POT-Creation-Date: 2014-08-09 11:05+0200\n"
 "PO-Revision-Date: 2014-08-06 19:26+0100\n"
 "Last-Translator: Davide Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: epymc/subtitles.py:173 epymc/config_gui.py:269 epymc/config_gui.py:464
-#: epymc/mediaplayer.py:515 epymc/mediaplayer.py:601
+#: epymc/mediaplayer.py:530 epymc/mediaplayer.py:620
 msgid "Subtitles"
 msgstr "Sottotitoli"
 
@@ -44,9 +44,9 @@ msgstr "Nessun risultato per le lingue: %s"
 msgid "Download"
 msgstr "Scarica"
 
-#: epymc/subtitles.py:382 epymc/utils.py:452 epymc/gui.py:165 epymc/gui.py:167
-#: epymc/gui.py:168 epymc/plugins/onlinevideo/vimeo/vimeo.py:146
-#: epymc/plugins/movies/movies.py:155
+#: epymc/subtitles.py:382 epymc/utils.py:452 epymc/gui.py:154 epymc/gui.py:156
+#: epymc/gui.py:157 epymc/plugins/onlinevideo/vimeo/vimeo.py:146
+#: epymc/plugins/movies/movies.py:154
 msgid "Unknown"
 msgstr "Sconosciuto"
 
@@ -54,7 +54,7 @@ msgstr "Sconosciuto"
 msgid "Downloading subtitles"
 msgstr "Scaricamento sottotitoli"
 
-#: epymc/subtitles.py:406 epymc/gui.py:1722
+#: epymc/subtitles.py:406 epymc/gui.py:1728
 msgid "Download failed"
 msgstr "Scaricamento fallito"
 
@@ -66,8 +66,8 @@ msgstr "Decodifica fallita"
 msgid "Fetching info"
 msgstr "Scaricamento informazioni"
 
-#: epymc/themoviedb.py:540 epymc/plugins/music/music.py:360
-#: epymc/plugins/tvshows/tvshows.py:684
+#: epymc/themoviedb.py:540 epymc/plugins/music/music.py:359
+#: epymc/plugins/tvshows/tvshows.py:687
 msgid "please wait..."
 msgstr "Attendere..."
 
@@ -149,7 +149,7 @@ msgstr "Sempre"
 msgid "Never"
 msgstr "Mai"
 
-#: epymc/config_gui.py:355 epymc/mediaplayer.py:144
+#: epymc/config_gui.py:355 epymc/mediaplayer.py:159
 msgid "Resume playback"
 msgstr "Riprendi riproduzione"
 
@@ -266,15 +266,15 @@ msgstr "EpyMC"
 msgid "EpyMC themes API"
 msgstr "Versione dei temi"
 
-#: epymc/mainmenu.py:45 epymc/gui.py:250
+#: epymc/mainmenu.py:45 epymc/gui.py:239
 msgid "Exit"
 msgstr "Esci"
 
-#: epymc/browser.py:130
+#: epymc/browser.py:151
 msgid "Back"
 msgstr "Indietro"
 
-#: epymc/browser.py:455
+#: epymc/browser.py:503
 #, python-format
 msgid "%d item"
 msgid_plural "%d items"
@@ -285,107 +285,107 @@ msgstr[1] "%d elementi"
 msgid "Emotion Media Center"
 msgstr "Emotion Media Center"
 
-#: epymc/gui.py:246
+#: epymc/gui.py:235
 msgid "credits"
 msgstr "Ringraziamenti"
 
-#: epymc/gui.py:247
+#: epymc/gui.py:236
 msgid "Cancel"
 msgstr "Annulla"
 
-#: epymc/gui.py:884
+#: epymc/gui.py:872
 msgid "Ok"
 msgstr "Ok"
 
-#: epymc/gui.py:888 epymc/gui.py:890
+#: epymc/gui.py:876 epymc/gui.py:878
 msgid "No"
 msgstr "No"
 
-#: epymc/gui.py:893 epymc/gui.py:895
+#: epymc/gui.py:881 epymc/gui.py:883
 msgid "Yes"
 msgstr "Sì"
 
-#: epymc/gui.py:1148
+#: epymc/gui.py:1136
 msgid "Source Selector"
 msgstr "Selettore fonti"
 
-#: epymc/gui.py:1153
+#: epymc/gui.py:1141
 msgid "Select"
 msgstr "Seleziona"
 
-#: epymc/gui.py:1154
+#: epymc/gui.py:1142
 msgid "Browse"
 msgstr "Naviga"
 
-#: epymc/gui.py:1162
+#: epymc/gui.py:1150
 msgid "Parent folder"
 msgstr "Cartella precedente"
 
-#: epymc/gui.py:1201
+#: epymc/gui.py:1189
 msgid "Sources Manager"
 msgstr "Gestore fonti"
 
-#: epymc/gui.py:1203
+#: epymc/gui.py:1191
 msgid "Done"
 msgstr "Fatto"
 
-#: epymc/gui.py:1205
+#: epymc/gui.py:1193
 msgid "Add"
 msgstr "Aggiungi"
 
-#: epymc/gui.py:1207
+#: epymc/gui.py:1195
 msgid "Remove"
 msgstr "Rimuovi"
 
-#: epymc/gui.py:1221
+#: epymc/gui.py:1209
 msgid "Choose a new source"
 msgstr "Seleziona una nuova fonte"
 
-#: epymc/gui.py:1368
+#: epymc/gui.py:1374
 msgid "Insert text"
 msgstr "Inserire il testo"
 
-#: epymc/gui.py:1391 epymc/gui.py:1460
+#: epymc/gui.py:1397 epymc/gui.py:1466
 msgid "UPPERCASE"
 msgstr "MAIUSCOLE"
 
-#: epymc/gui.py:1392
+#: epymc/gui.py:1398
 msgid "SPACE"
 msgstr "SPAZIO"
 
-#: epymc/gui.py:1393
+#: epymc/gui.py:1399
 msgid "ERASE"
 msgstr "CANCELLA"
 
-#: epymc/gui.py:1395
+#: epymc/gui.py:1401
 msgid "Dismiss"
 msgstr "Annulla"
 
-#: epymc/gui.py:1400
+#: epymc/gui.py:1406
 msgid "Accept"
 msgstr "Accetta"
 
-#: epymc/gui.py:1457
+#: epymc/gui.py:1463
 msgid "LOWERCASE"
 msgstr "MINUSCOLE"
 
-#: epymc/gui.py:1628
+#: epymc/gui.py:1634
 msgid "Download Manager"
 msgstr "Gestore Download"
 
-#: epymc/gui.py:1632
+#: epymc/gui.py:1638
 msgid "Start download"
 msgstr "Avvia download"
 
-#: epymc/gui.py:1633
+#: epymc/gui.py:1639
 msgid "Rename"
 msgstr "Rinomina"
 
-#: epymc/gui.py:1634
+#: epymc/gui.py:1640
 msgid "Change folder"
 msgstr "Cambia cartella"
 
-#: epymc/gui.py:1639
+#: epymc/gui.py:1645
 msgid ""
 "File will be downloaded in the folder:<br> <b>{}</b><br><br>File will be "
 "named as:<br> <b>{}</b><br><br>You can rename the file using the <i>Rename</"
@@ -396,116 +396,116 @@ msgstr ""
 "<i>Rinomina</i> o modificare la cartella di destinazione dalla "
 "configurazione generale."
 
-#: epymc/gui.py:1647
+#: epymc/gui.py:1653
 msgid "Rename download"
 msgstr "Rinomina file"
 
-#: epymc/gui.py:1655
+#: epymc/gui.py:1661
 msgid "Change destination folder"
 msgstr "Modifica cartella"
 
-#: epymc/gui.py:1670
+#: epymc/gui.py:1676
 #, python-format
 msgid "The file %s is in the download queue yet"
 msgstr "Il file %s è già in coda"
 
-#: epymc/gui.py:1704
+#: epymc/gui.py:1710
 msgid "Download started"
 msgstr "Download avviato"
 
-#: epymc/gui.py:1720
+#: epymc/gui.py:1726
 msgid "Cannot download file"
 msgstr "Impossibile scaricare il file"
 
-#: epymc/gui.py:1721
+#: epymc/gui.py:1727
 msgid "Failure code"
 msgstr "Codice errore"
 
-#: epymc/gui.py:1729 epymc/plugins/mame/mame.py:587
+#: epymc/gui.py:1735 epymc/plugins/mame/mame.py:587
 msgid "Download completed"
 msgstr "Download completato"
 
-#: epymc/mediaplayer.py:106
+#: epymc/mediaplayer.py:121
 msgid "File not found"
 msgstr "File non trovato"
 
-#: epymc/mediaplayer.py:145
+#: epymc/mediaplayer.py:160
 #, python-format
 msgid "Continue from %s ?"
 msgstr "Continuo la riproduzione da %s ?"
 
-#: epymc/mediaplayer.py:419
+#: epymc/mediaplayer.py:434
 #, python-format
 msgid "Cannot init emotion engine:<br>%s"
 msgstr "Non posso avviare il motore di emotion:<br>%s"
 
-#: epymc/mediaplayer.py:499
+#: epymc/mediaplayer.py:514
 msgid "Audio"
 msgstr "Audio"
 
-#: epymc/mediaplayer.py:507
+#: epymc/mediaplayer.py:522
 msgid "Video"
 msgstr "Video"
 
-#: epymc/mediaplayer.py:554
+#: epymc/mediaplayer.py:573
 msgid "buffering"
 msgstr "buffering"
 
-#: epymc/mediaplayer.py:602 epymc/mediaplayer.py:702 epymc/mediaplayer.py:723
-#: epymc/mediaplayer.py:731
+#: epymc/mediaplayer.py:621 epymc/mediaplayer.py:721 epymc/mediaplayer.py:742
+#: epymc/mediaplayer.py:750
 #, python-format
 msgid "Delay: %d ms"
 msgstr "Ritardo: %d ms"
 
-#: epymc/mediaplayer.py:651
+#: epymc/mediaplayer.py:670
 #, python-format
 msgid "Audio track: %s"
 msgstr "Traccia audio: %s"
 
-#: epymc/mediaplayer.py:653
+#: epymc/mediaplayer.py:672
 #, python-format
 msgid "Audio track #%d"
 msgstr "Traccia audio #%d"
 
-#: epymc/mediaplayer.py:657
+#: epymc/mediaplayer.py:676
 msgid "Mute"
 msgstr "Muto"
 
-#: epymc/mediaplayer.py:674
+#: epymc/mediaplayer.py:693
 #, python-format
 msgid "Video track: %s"
 msgstr "Traccia video: %s"
 
-#: epymc/mediaplayer.py:676
+#: epymc/mediaplayer.py:695
 #, python-format
 msgid "Video track #%d"
 msgstr "Traccia video #%d"
 
-#: epymc/mediaplayer.py:680
+#: epymc/mediaplayer.py:699
 msgid "Download video"
 msgstr "Scarica filmato"
 
-#: epymc/mediaplayer.py:698 epymc/mediaplayer.py:706
+#: epymc/mediaplayer.py:717 epymc/mediaplayer.py:725
 msgid "No subtitles"
 msgstr "Nessun sottotitolo"
 
-#: epymc/mediaplayer.py:719
+#: epymc/mediaplayer.py:738
 msgid "Download subtitles"
 msgstr "Scarica sottotitoli"
 
-#: epymc/mediaplayer.py:722
+#: epymc/mediaplayer.py:741
 msgid "Subtitles delay"
 msgstr "Ritardo sottotitoli"
 
-#: epymc/mediaplayer.py:724
+#: epymc/mediaplayer.py:743
 msgid "+100 ms"
 msgstr "+100 ms"
 
-#: epymc/mediaplayer.py:725
+#: epymc/mediaplayer.py:744
 msgid "Reset"
 msgstr "Reset"
 
-#: epymc/mediaplayer.py:726
+#: epymc/mediaplayer.py:745
 msgid "-100 ms"
 msgstr "-100 ms"
 
@@ -804,7 +804,7 @@ msgstr ""
 "dalla rete.<br> Il file deve trovarsi in %s"
 
 #: epymc/plugins/mame/mame.py:376 epymc/plugins/mame/mame.py:411
-#: epymc/plugins/movies/movies.py:155
+#: epymc/plugins/movies/movies.py:154
 msgid "Year"
 msgstr "Anno"
 
@@ -844,7 +844,7 @@ msgstr "Suono"
 msgid "Graphic"
 msgstr "Grafica"
 
-#: epymc/plugins/mame/mame.py:424 epymc/plugins/movies/movies.py:353
+#: epymc/plugins/mame/mame.py:424 epymc/plugins/movies/movies.py:348
 msgid "Play"
 msgstr "Play"
 
@@ -998,79 +998,79 @@ msgstr "Spegni il monitor dopo"
 msgid "Manage screensaver only in fullscreen"
 msgstr "Gestisci solo a schermo intero"
 
-#: epymc/plugins/movies/movies.py:81 epymc/plugins/music/music.py:113
+#: epymc/plugins/movies/movies.py:80 epymc/plugins/music/music.py:112
 #: epymc/plugins/tvshows/tvshows.py:71
 msgid "Manage sources"
 msgstr "Gestisci fonti"
 
-#: epymc/plugins/movies/movies.py:92 epymc/plugins/music/music.py:100
+#: epymc/plugins/movies/movies.py:91 epymc/plugins/music/music.py:99
 #: epymc/plugins/tvshows/tvshows.py:83
 msgid "Rescan library"
 msgstr "Aggiorna libreria"
 
-#: epymc/plugins/movies/movies.py:144 epymc/plugins/movies/movies.py:377
-#: epymc/plugins/tvshows/tvshows.py:461
+#: epymc/plugins/movies/movies.py:143 epymc/plugins/movies/movies.py:372
+#: epymc/plugins/tvshows/tvshows.py:464
 msgid "Rating"
 msgstr "Valutazione"
 
-#: epymc/plugins/movies/movies.py:145 epymc/plugins/movies/movies.py:373
+#: epymc/plugins/movies/movies.py:144 epymc/plugins/movies/movies.py:368
 msgid "Director"
 msgstr "Regia"
 
-#: epymc/plugins/movies/movies.py:146 epymc/plugins/movies/movies.py:355
-#: epymc/plugins/movies/movies.py:374 epymc/plugins/movies/movies.py:432
-#: epymc/plugins/tvshows/tvshows.py:435 epymc/plugins/tvshows/tvshows.py:524
+#: epymc/plugins/movies/movies.py:145 epymc/plugins/movies/movies.py:350
+#: epymc/plugins/movies/movies.py:369 epymc/plugins/movies/movies.py:427
+#: epymc/plugins/tvshows/tvshows.py:438 epymc/plugins/tvshows/tvshows.py:527
 msgid "Cast"
 msgstr "Attori"
 
-#: epymc/plugins/movies/movies.py:152
+#: epymc/plugins/movies/movies.py:151
 msgid "File size"
 msgstr "Dimensione file"
 
-#: epymc/plugins/movies/movies.py:154
+#: epymc/plugins/movies/movies.py:153
 msgid "Title"
 msgstr "Titolo"
 
-#: epymc/plugins/movies/movies.py:173 epymc/plugins/movies/movies.py:219
-#: epymc/plugins/movies/movies.py:227 epymc/plugins/movies/movies.py:281
+#: epymc/plugins/movies/movies.py:172 epymc/plugins/movies/movies.py:212
+#: epymc/plugins/movies/movies.py:220 epymc/plugins/movies/movies.py:274
 msgid "Movies"
 msgstr "Film"
 
-#: epymc/plugins/movies/movies.py:175
+#: epymc/plugins/movies/movies.py:174
 msgid ""
 "Long info for the movies module, explain what it does and what it\n"
 "need to work well, can also use markup like <title>this</> or <b>this</>"
 msgstr ""
 
-#: epymc/plugins/movies/movies.py:223
+#: epymc/plugins/movies/movies.py:216
 msgid "Movie Collection"
 msgstr "Collezione dei film"
 
-#: epymc/plugins/movies/movies.py:356 epymc/plugins/tvshows/tvshows.py:433
+#: epymc/plugins/movies/movies.py:351 epymc/plugins/tvshows/tvshows.py:436
 msgid "Posters"
 msgstr "Locandine"
 
-#: epymc/plugins/movies/movies.py:357 epymc/plugins/tvshows/tvshows.py:434
+#: epymc/plugins/movies/movies.py:352 epymc/plugins/tvshows/tvshows.py:437
 msgid "Backdrops"
 msgstr "Sfondi"
 
-#: epymc/plugins/movies/movies.py:358
+#: epymc/plugins/movies/movies.py:353
 msgid "Search Info"
 msgstr "Cerca informazioni"
 
-#: epymc/plugins/movies/movies.py:375
+#: epymc/plugins/movies/movies.py:370
 msgid "Released"
 msgstr "Pubblicato"
 
-#: epymc/plugins/movies/movies.py:376
+#: epymc/plugins/movies/movies.py:371
 msgid "Country"
 msgstr "Nazione"
 
-#: epymc/plugins/movies/movies.py:378 epymc/plugins/tvshows/tvshows.py:463
+#: epymc/plugins/movies/movies.py:373 epymc/plugins/tvshows/tvshows.py:466
 msgid "Overview"
 msgstr "Trama"
 
-#: epymc/plugins/movies/movies.py:413
+#: epymc/plugins/movies/movies.py:408
 #, python-format
 msgid ""
 "Media:<br>%s<br><br>No info stored for this media<br>Try the Search info "
@@ -1079,81 +1079,81 @@ msgstr ""
 "Media:<br>%s<br><br>Nessuna informazione disponibile<br>Prova a premere il "
 "bottone <i>Cerca Informazioni</i>..."
 
-#: epymc/plugins/movies/movies.py:434 epymc/plugins/tvshows/tvshows.py:526
+#: epymc/plugins/movies/movies.py:429 epymc/plugins/tvshows/tvshows.py:529
 msgid "Info"
 msgstr "Informazioni"
 
-#: epymc/plugins/movies/movies.py:437 epymc/plugins/tvshows/tvshows.py:529
+#: epymc/plugins/movies/movies.py:432 epymc/plugins/tvshows/tvshows.py:532
 #, python-format
 msgid "%(name)s as %(character)s"
 msgstr "%(name)s nel ruolo di %(character)s"
 
-#: epymc/plugins/movies/movies.py:456 epymc/plugins/tvshows/tvshows.py:479
+#: epymc/plugins/movies/movies.py:451 epymc/plugins/tvshows/tvshows.py:482
 #, python-format
 msgid "%d posters available"
 msgstr "%d locandine disponibili"
 
-#: epymc/plugins/movies/movies.py:474 epymc/plugins/movies/movies.py:517
-#: epymc/plugins/tvshows/tvshows.py:503
+#: epymc/plugins/movies/movies.py:469 epymc/plugins/movies/movies.py:512
+#: epymc/plugins/tvshows/tvshows.py:506
 msgid "Downloading image"
 msgstr "Scaricamento immagine"
 
-#: epymc/plugins/movies/movies.py:498 epymc/plugins/tvshows/tvshows.py:493
+#: epymc/plugins/movies/movies.py:493 epymc/plugins/tvshows/tvshows.py:496
 #, python-format
 msgid "%d backdrops available"
 msgstr "%d sfondi disponibili"
 
-#: epymc/plugins/movies/movies.py:529
+#: epymc/plugins/movies/movies.py:524
 msgid "Searching for"
 msgstr "Ricerca di"
 
-#: epymc/plugins/movies/movies.py:538
+#: epymc/plugins/movies/movies.py:533
 msgid "Change name"
 msgstr "Cambia nome"
 
-#: epymc/plugins/movies/movies.py:547
+#: epymc/plugins/movies/movies.py:542
 msgid "nothing found, please try with a better name"
 msgstr "nessun film trovato, prova con un nome migliore"
 
-#: epymc/plugins/movies/movies.py:551 epymc/plugins/movies/movies.py:576
+#: epymc/plugins/movies/movies.py:546 epymc/plugins/movies/movies.py:571
 msgid "Downloading movie info..."
 msgstr "Scaricamento informazioni film..."
 
-#: epymc/plugins/movies/movies.py:553
+#: epymc/plugins/movies/movies.py:548
 #, python-format
 msgid "<b>Found %d results</b><br>"
 msgstr "<b>Trovati %d risultati</b><br>"
 
-#: epymc/plugins/movies/movies.py:554 epymc/plugins/tvshows/tvshows.py:548
+#: epymc/plugins/movies/movies.py:549 epymc/plugins/tvshows/tvshows.py:551
 #, python-format
 msgid "Found %d results, which one?"
 msgstr "Trovati %d risultati, quale scelgo?"
 
-#: epymc/plugins/movies/movies.py:626
+#: epymc/plugins/movies/movies.py:621
 msgid "Movies scanner started"
 msgstr "Scansione dei film avviata"
 
-#: epymc/plugins/movies/movies.py:632
+#: epymc/plugins/movies/movies.py:627
 msgid "Movies scanner done"
 msgstr "Scansione dei film completata"
 
-#: epymc/plugins/movies/movies.py:677
+#: epymc/plugins/movies/movies.py:672
 msgid "Found movie"
 msgstr "Trovato film"
 
-#: epymc/plugins/movies/movies.py:725
+#: epymc/plugins/movies/movies.py:720
 msgid "Movies Collection"
 msgstr "Collezione dei film"
 
-#: epymc/plugins/movies/movies.py:730 epymc/plugins/tvshows/tvshows.py:646
+#: epymc/plugins/movies/movies.py:725 epymc/plugins/tvshows/tvshows.py:649
 msgid "Preferred language for contents"
 msgstr "Lingua preferita per i contenuti"
 
-#: epymc/plugins/movies/movies.py:733
+#: epymc/plugins/movies/movies.py:728
 msgid "Enable background scanner"
 msgstr "Abilita scansione in sottofondo"
 
-#: epymc/plugins/movies/movies.py:736
+#: epymc/plugins/movies/movies.py:731
 msgid "Prefer movie titles in lists"
 msgstr "Usa titoli dei film nelle liste"
 
@@ -1194,97 +1194,97 @@ msgstr "Configura telecomando"
 msgid "Press a key on your remote"
 msgstr "Premi un tasto sul telecomando"
 
-#: epymc/plugins/music/music.py:50 epymc/plugins/music/music.py:54
+#: epymc/plugins/music/music.py:49 epymc/plugins/music/music.py:53
 msgid "OnAir"
 msgstr "In riproduzione"
 
-#: epymc/plugins/music/music.py:64 epymc/plugins/music/music.py:68
-#: epymc/plugins/music/music.py:291 epymc/plugins/music/music.py:345
+#: epymc/plugins/music/music.py:63 epymc/plugins/music/music.py:67
+#: epymc/plugins/music/music.py:290 epymc/plugins/music/music.py:344
 msgid "Artists"
 msgstr "Artisti"
 
-#: epymc/plugins/music/music.py:75 epymc/plugins/music/music.py:79
-#: epymc/plugins/music/music.py:292 epymc/plugins/music/music.py:347
+#: epymc/plugins/music/music.py:74 epymc/plugins/music/music.py:78
+#: epymc/plugins/music/music.py:291 epymc/plugins/music/music.py:346
 msgid "Albums"
 msgstr "Album"
 
-#: epymc/plugins/music/music.py:86 epymc/plugins/music/music.py:90
-#: epymc/plugins/music/music.py:293 epymc/plugins/music/music.py:349
+#: epymc/plugins/music/music.py:85 epymc/plugins/music/music.py:89
+#: epymc/plugins/music/music.py:292 epymc/plugins/music/music.py:348
 msgid "Songs"
 msgstr "Canzoni"
 
-#: epymc/plugins/music/music.py:123
+#: epymc/plugins/music/music.py:122
 msgid "Play the whole album"
 msgstr "Suona tutto l'album"
 
-#: epymc/plugins/music/music.py:133
+#: epymc/plugins/music/music.py:132
 msgid "Play all the songs"
 msgstr "Suona tutte le canzoni"
 
-#: epymc/plugins/music/music.py:175 epymc/plugins/music/music.py:220
-#: epymc/plugins/music/music.py:528
+#: epymc/plugins/music/music.py:174 epymc/plugins/music/music.py:219
+#: epymc/plugins/music/music.py:527
 #, python-format
 msgid "<em>by</em> %s<br>"
 msgstr "<em>di</em> %s<br>"
 
-#: epymc/plugins/music/music.py:177 epymc/plugins/music/music.py:530
+#: epymc/plugins/music/music.py:176 epymc/plugins/music/music.py:529
 #, python-format
 msgid "<em>from</em> %s<br>"
 msgstr "<em>da</em> %s<br>"
 
-#: epymc/plugins/music/music.py:182
+#: epymc/plugins/music/music.py:181
 #, python-format
 msgid "duration: %s<br>"
 msgstr "durata: %s<br>"
 
-#: epymc/plugins/music/music.py:195
+#: epymc/plugins/music/music.py:194
 #, python-format
 msgid "%(name)s by %(artist)s"
 msgstr "%(name)s di %(artist)s"
 
-#: epymc/plugins/music/music.py:222 epymc/plugins/music/music.py:251
+#: epymc/plugins/music/music.py:221 epymc/plugins/music/music.py:250
 #, python-format
 msgid "%d song"
 msgid_plural "%d songs"
 msgstr[0] "%d canzone"
 msgstr[1] "%d canzoni"
 
-#: epymc/plugins/music/music.py:231
+#: epymc/plugins/music/music.py:230
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minuto"
 msgstr[1] "%d minuti"
 
-#: epymc/plugins/music/music.py:249
+#: epymc/plugins/music/music.py:248
 #, python-format
 msgid "%d album"
 msgid_plural "%d albums"
 msgstr[0] "%d album"
 msgstr[1] "%d album"
 
-#: epymc/plugins/music/music.py:257 epymc/plugins/music/music.py:295
-#: epymc/plugins/music/music.py:299 epymc/plugins/music/music.py:343
+#: epymc/plugins/music/music.py:256 epymc/plugins/music/music.py:294
+#: epymc/plugins/music/music.py:298 epymc/plugins/music/music.py:342
 msgid "Music"
 msgstr "Musica"
 
-#: epymc/plugins/music/music.py:259
+#: epymc/plugins/music/music.py:258
 msgid ""
 "Long info for the <b>Music</b> module, explain what it does\n"
 "and what it need to work well, can also use markup like <title>this</> or\n"
 "<b>this</>"
 msgstr ""
 
-#: epymc/plugins/music/music.py:360 epymc/plugins/music/music.py:393
+#: epymc/plugins/music/music.py:359 epymc/plugins/music/music.py:392
 msgid "Rebuilding database"
 msgstr "Aggiornamento libreria"
 
-#: epymc/plugins/music/music.py:393
+#: epymc/plugins/music/music.py:392
 msgid "operation completed"
 msgstr "operazione completata"
 
-#: epymc/plugins/music/music.py:489 epymc/plugins/music/music.py:501
-#: epymc/plugins/music/music.py:515
+#: epymc/plugins/music/music.py:488 epymc/plugins/music/music.py:500
+#: epymc/plugins/music/music.py:514
 msgid "queued"
 msgstr "accodato"
 
@@ -1296,13 +1296,13 @@ msgstr "Informazioni serie"
 msgid "Episode"
 msgstr "Episodio"
 
-#: epymc/plugins/tvshows/tvshows.py:247 epymc/plugins/tvshows/tvshows.py:455
+#: epymc/plugins/tvshows/tvshows.py:247 epymc/plugins/tvshows/tvshows.py:458
 msgid "First aired"
 msgstr "Prima messa in onda"
 
 #: epymc/plugins/tvshows/tvshows.py:253 epymc/plugins/tvshows/tvshows.py:289
 #: epymc/plugins/tvshows/tvshows.py:296 epymc/plugins/tvshows/tvshows.py:351
-#: epymc/plugins/tvshows/tvshows.py:642
+#: epymc/plugins/tvshows/tvshows.py:645
 msgid "TV Shows"
 msgstr "Serie TV"
 
@@ -1316,50 +1316,50 @@ msgstr ""
 msgid "Tv Shows Collection"
 msgstr "Collezione delle serie TV"
 
-#: epymc/plugins/tvshows/tvshows.py:436
+#: epymc/plugins/tvshows/tvshows.py:439
 msgid "Refresh info"
 msgstr "Aggiorna informazioni"
 
-#: epymc/plugins/tvshows/tvshows.py:453
+#: epymc/plugins/tvshows/tvshows.py:456
 msgid "Created by"
 msgstr "Ideatore"
 
-#: epymc/plugins/tvshows/tvshows.py:454
+#: epymc/plugins/tvshows/tvshows.py:457
 msgid "Network"
 msgstr "Rete"
 
-#: epymc/plugins/tvshows/tvshows.py:456
+#: epymc/plugins/tvshows/tvshows.py:459
 msgid "Last aired"
 msgstr "Ultima messa in onda"
 
-#: epymc/plugins/tvshows/tvshows.py:457
+#: epymc/plugins/tvshows/tvshows.py:460
 msgid "Seasons"
 msgstr "Stagioni"
 
-#: epymc/plugins/tvshows/tvshows.py:458
+#: epymc/plugins/tvshows/tvshows.py:461
 msgid "Episodes"
 msgstr "Episodi"
 
-#: epymc/plugins/tvshows/tvshows.py:459
+#: epymc/plugins/tvshows/tvshows.py:462
 msgid "Genres"
 msgstr "Generi"
 
-#: epymc/plugins/tvshows/tvshows.py:460
+#: epymc/plugins/tvshows/tvshows.py:463
 msgid "Runtime"
 msgstr "Durata episodi"
 
-#: epymc/plugins/tvshows/tvshows.py:462
+#: epymc/plugins/tvshows/tvshows.py:465
 msgid "Status"
 msgstr "Stato"
 
-#: epymc/plugins/tvshows/tvshows.py:469
+#: epymc/plugins/tvshows/tvshows.py:472
 msgid ""
 "No info stored for this serie.<br>Please try the <i>refresh info</i> button."
 msgstr ""
 "Nessuna informazione per questa serie.<br>Prova a premere il bottone "
 "<i>Aggiorna informazioni</i>."
 
-#: epymc/plugins/tvshows/tvshows.py:563
+#: epymc/plugins/tvshows/tvshows.py:566
 #, python-format
 msgid ""
 "The search for \"%s\" did not make any results.<br>If your show is listed on "
@@ -1372,37 +1372,37 @@ msgstr ""
 "trovato sul sito.<br>Invece, se la serie non è presente online, siete "
 "pregati di contribuire e aggiungerla da voi."
 
-#: epymc/plugins/tvshows/tvshows.py:568
+#: epymc/plugins/tvshows/tvshows.py:571
 msgid "Nothing found"
 msgstr "Nessun risultato trovato"
 
-#: epymc/plugins/tvshows/tvshows.py:577
+#: epymc/plugins/tvshows/tvshows.py:580
 msgid "Fetching updated info"
 msgstr "Scarico informazioni aggiornate"
 
-#: epymc/plugins/tvshows/tvshows.py:684
+#: epymc/plugins/tvshows/tvshows.py:687
 msgid "TvShows scanner started"
 msgstr "Scansione delle serie avviata"
 
-#: epymc/plugins/tvshows/tvshows.py:715
+#: epymc/plugins/tvshows/tvshows.py:718
 msgid "TvShows scanner done"
 msgstr "Scansioen delle serie completata"
 
-#: epymc/plugins/tvshows/tvshows.py:756
+#: epymc/plugins/tvshows/tvshows.py:759
 #, python-format
 msgid "%d season"
 msgid_plural "%d seasons"
 msgstr[0] "%d stagione"
 msgstr[1] "%d stagioni"
 
-#: epymc/plugins/tvshows/tvshows.py:758
+#: epymc/plugins/tvshows/tvshows.py:761
 #, python-format
 msgid "%d episode"
 msgid_plural "%d episodes"
 msgstr[0] "%d episodio"
 msgstr[1] "%d episodi"
 
-#: epymc/plugins/tvshows/tvshows.py:760
+#: epymc/plugins/tvshows/tvshows.py:763
 msgid "Found serie:"
 msgstr "Trovata serie:"
 

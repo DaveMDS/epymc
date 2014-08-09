@@ -71,9 +71,9 @@ def start_epymc():
 
    # init stuff
    sdb.init()
-   browser.init()
    if not gui.init():
       return 1
+   browser.init()
    mainmenu.init()
    config_gui.init()
    mediaplayer.init()
@@ -99,8 +99,8 @@ def start_epymc():
    config_gui.shutdown()
    ini.write_to_file(os.path.join(utils.user_conf_dir, 'epymc.conf'))
    mediaplayer.shutdown()
-   gui.shutdown()
    browser.shutdown()
+   gui.shutdown()
    sdb.shutdown()
 
    # shutdown elementary

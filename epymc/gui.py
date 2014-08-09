@@ -133,17 +133,6 @@ def init():
    win.show()
    win.scale_set(float(scale))
 
-   # fill view buttons box in topbar
-   bt = EmcButton(icon = 'icon/list')
-   bt.callback_clicked_add(lambda b: input_events.event_emit('VIEW_LIST'))
-   box_append('topbar.box', bt)
-   bt.show()
-
-   bt = EmcButton(icon = 'icon/grid')
-   bt.callback_clicked_add(lambda b: input_events.event_emit('VIEW_GRID'))
-   box_append('topbar.box', bt)
-   bt.show()
-   
    # listen to events and input_events
    input_events.listener_add('gui', _input_event_cb)
    events.listener_add('gui', _event_cb)
@@ -1250,6 +1239,7 @@ class EmcFocusManager(object):
    def __init__(self, autoeventsname=None):
       self.objs = []
       self.focused = None
+      self.has_focus = True
       self.autoeventsname = autoeventsname
       if autoeventsname is not None:
          input_events.listener_add(autoeventsname, self._input_event_cb)
@@ -1270,7 +1260,7 @@ class EmcFocusManager(object):
       Add an object to the chain, obj must be an evas object that support
       the focus_set() 'interface', usually an elementary obj will do the work.
       """
-      if not self.focused:
+      if self.has_focus and not self.focused:
          self.focused = obj
          # obj.focus_set(True)
          obj.disabled_set(False)
@@ -1328,11 +1318,28 @@ class EmcFocusManager(object):
       """ Get the list of all the objects that was previously added """
       return self.objs
 
+   def focus(self):
+      """ give focus to the manager """
+      self.has_focus = True
+      if not self.focused:
+         self.focused = self.objs[0]
+      self.focused.disabled = False
+
+   def unfocus(self):
+      """ remove focus from the manager, and unselect all childs """
+      self.has_focus = False
+      if self.focused:
+         self.focused.disabled = True
+
    def _mouse_in_cb(self, obj, event):
+      if not self.has_focus:
+         self.focus()
       if self.focused != obj:
          self.focused_set(obj)
 
    def _input_event_cb(self, event):
+      if not self.has_focus:
+         return input_events.EVENT_CONTINUE
       if event == 'LEFT':
          self.focus_move('l')
          return input_events.EVENT_BLOCK

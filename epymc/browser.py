@@ -753,39 +753,35 @@ class ViewGrid(object):
       (item_class, url, user_data) = item.data_get()                            # 3 #
 
       if event == 'RIGHT':
-         next = item.next_get()
-         if next:
-            next.selected_set(1)
+         if item.next:
+            item.next.selected = True
          return input_events.EVENT_BLOCK
 
       elif event == 'LEFT':
-         prev = item.prev_get()
-         if prev:
-            prev.selected_set(1)
+         if item.prev:
+            item.prev.selected = True
          return input_events.EVENT_BLOCK
 
       elif event == 'UP':
          try:
-            prev = item.prev_get()
-            (x1, y1) = item.pos_get()
-            (x2, y2) = prev.pos_get()
+            prev = item.prev
+            (x1, y1), (x2, y2) = item.pos, prev.pos
             while x2 != x1:
-               prev = prev.prev_get()
-               (x2, y2) = prev.pos_get()
-            prev.selected_set(1)
+               prev = prev.prev
+               x2, y2 = prev.pos
+            prev.selected = True
             return input_events.EVENT_BLOCK
          except:
             return input_events.EVENT_CONTINUE
 
       elif event == 'DOWN':
          try:
-            next = item.next_get()
-            (x1, y1) = item.pos_get()
-            (x2, y2) = next.pos_get()
+            next = item.next
+            (x1, y1), (x2, y2) = item.pos, next.pos
             while x2 != x1:
-               next = next.next_get()
-               (x2, y2) = next.pos_get()
-            next.selected_set(1)
+               next = next.next
+               x2, y2 = next.pos
+            next.selected = True
             return input_events.EVENT_BLOCK
          except:
             return input_events.EVENT_CONTINUE

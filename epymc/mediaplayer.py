@@ -170,7 +170,7 @@ def _resume_no_cb(dia):
    _play_real()
    dia.delete()
 
-def _play_real(start_from=0, only_audio=False):
+def _play_real(start_from=None, only_audio=False):
    global _subtitles, _subs_timer
 
    # init emotion and the gui (if needed)
@@ -188,7 +188,7 @@ def _play_real(start_from=0, only_audio=False):
    _emotion.file_set(url[7:] if url.startswith('file://') else url)
 
    # setup the emotion object
-   _emotion.position = start_from
+   _emotion.position = start_from or 0
    if _emotion.play == False:
       volume_set(_volume)
       volume_mute_set(_volume_muted)

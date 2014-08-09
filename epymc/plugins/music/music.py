@@ -483,7 +483,7 @@ and what it need to work well, can also use markup like <title>this</> or
       self._play_queue.append(url)
 
       if len(self._play_queue) == 1:
-         mediaplayer.play_url(url, only_audio = True)
+         mediaplayer.play_url(url, only_audio=True)
       else:
          EmcNotify('<title>%s</><br>%s' % (song['title'], _('queued')),
                    icon='icon/music')

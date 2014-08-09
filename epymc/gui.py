@@ -1062,7 +1062,7 @@ class EmcDialog(edje.Edje):
    
       if event == 'OK':
          if self._buttons:
-            self._cb_buttons(self.fman.focused_get())
+            self._cb_buttons(self.fman.focused_obj_get())
          elif self._done_cb:
             if self._list:
                it = self._list.selected_item
@@ -1140,7 +1140,7 @@ class EmcFolderSelector(EmcDialog):
       EmcDialog.__init__(self, title, style='list', done_cb=self._btn_browse_cb)
       b2 = self.button_add(_('Select'), self._btn_select_cb)
       b1 = self.button_add(_('Browse'), self._btn_browse_cb)
-      self.fman.focused_set(b1)
+      self.fman.focused_obj_set(b1)
 
       self.populate(os.getenv('HOME'))
 
@@ -1238,8 +1238,8 @@ class EmcFocusManager(object):
 
    def __init__(self, autoeventsname=None):
       self.objs = []
-      self.focused = None
       self.has_focus = True
+      self.focused_obj = None
       self.autoeventsname = autoeventsname
       if autoeventsname is not None:
          input_events.listener_add(autoeventsname, self._input_event_cb)
@@ -1260,8 +1260,8 @@ class EmcFocusManager(object):
       Add an object to the chain, obj must be an evas object that support
       the focus_set() 'interface', usually an elementary obj will do the work.
       """
-      if self.has_focus and not self.focused:
-         self.focused = obj
+      if self.has_focus and not self.focused_obj:
+         self.focused_obj = obj
          # obj.focus_set(True)
          obj.disabled_set(False)
       else:
@@ -1270,28 +1270,41 @@ class EmcFocusManager(object):
       obj.on_mouse_in_add(self._mouse_in_cb)
       self.objs.append(obj)
 
-   def focused_set(self, obj):
+   def focus(self):
+      """ give focus to the manager """
+      self.has_focus = True
+      if not self.focused_obj:
+         self.focused_obj = self.objs[0]
+      self.focused_obj.disabled = False
+
+   def unfocus(self):
+      """ remove focus from the manager, and unselect all childs """
+      self.has_focus = False
+      if self.focused_obj:
+         self.focused_obj.disabled = True
+
+   def focused_obj_set(self, obj):
       """ Give focus to the given obj """
       # obj.focus_set(True)
-      if self.focused:
-         self.focused.disabled_set(True)
+      if self.focused_obj:
+         self.focused_obj.disabled_set(True)
       obj.disabled_set(False)
-      self.focused = obj
+      self.focused_obj = obj
 
-   def focused_get(self):
+   def focused_obj_get(self):
       """ Get the object that has focus """
-      return self.focused
+      return self.focused_obj
 
    def focus_move(self, direction):
       """
       Try to move the selection in th given direction.
       direction can be: 'l'eft, 'r'ight, 'u'p or 'd'own
       """
-      x, y = self.focused.center
+      x, y = self.focused_obj.center
       nearest = None
       distance = 99999
       for obj in self.objs:
-         if obj != self.focused:
+         if obj != self.focused_obj:
             ox, oy = obj.center
             # discard objects in the wrong direction
             if   direction == 'l' and ox >= x: continue
@@ -1312,30 +1325,17 @@ class EmcFocusManager(object):
 
       # select the new object if found
       if nearest:
-         self.focused_set(nearest)
+         self.focused_obj_set(nearest)
 
    def all_get(self):
       """ Get the list of all the objects that was previously added """
       return self.objs
 
-   def focus(self):
-      """ give focus to the manager """
-      self.has_focus = True
-      if not self.focused:
-         self.focused = self.objs[0]
-      self.focused.disabled = False
-
-   def unfocus(self):
-      """ remove focus from the manager, and unselect all childs """
-      self.has_focus = False
-      if self.focused:
-         self.focused.disabled = True
-
    def _mouse_in_cb(self, obj, event):
       if not self.has_focus:
          self.focus()
-      if self.focused != obj:
-         self.focused_set(obj)
+      if self.focused_obj != obj:
+         self.focused_obj_set(obj)
 
    def _input_event_cb(self, event):
       if not self.has_focus:
@@ -1476,7 +1476,7 @@ class EmcVKeyboard(EmcDialog):
 
    def input_event_cb(self, event):
       if event == 'OK':
-         btn = self.efm.focused_get()
+         btn = self.efm.focused_obj_get()
          if callable(btn.data['cb']):
             btn.data['cb'](btn)
       elif event == 'EXIT':

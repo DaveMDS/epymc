@@ -489,7 +489,7 @@ def _init_mediaplayer_gui():
    # ARGH this does'n work
    # for some reason in fman mouse_in callback is called once (wrong) on
    # the creation of the obj ...dunno why
-   _fman.focused_set(bt)
+   _fman.focused_obj_set(bt)
    # store a reference to the button so we can change the icon later
    global _play_pause_btn
    _play_pause_btn = bt
@@ -852,7 +852,7 @@ def input_event_cb(event):
          video_controls_hide()
          return input_events.EVENT_BLOCK
       elif event == 'OK':
-         button = _fman.focused_get()
+         button = _fman.focused_obj_get()
          cb = button.data['cb']
          if callable(cb):
             cb(button)

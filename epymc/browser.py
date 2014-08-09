@@ -363,7 +363,7 @@ class EmcBrowser(object):
       # focus is on top bar:
       if _topbar_fman.has_focus:
          if event == 'OK':
-            btn = _topbar_fman.focused_get()
+            btn = _topbar_fman.focused_obj_get()
             _topbar_buttons_cb(btn)
             return input_events.EVENT_BLOCK
          elif event == 'DOWN':

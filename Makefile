@@ -24,6 +24,7 @@ build:
 install:
 	$(PY) setup.py install
 
+
 .PHONY: uninstall
 uninstall:
 	$(PY) setup.py uninstall
@@ -32,5 +33,10 @@ uninstall:
 .PHONY: clean
 clean:
 	$(PY) setup.py clean --all
+
+
+.PHONY: update_po
+update_po:
+	$(PY) setup.py update_po
 
 

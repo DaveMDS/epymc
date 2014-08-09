@@ -6,6 +6,7 @@
 # python setup.py uninstall [--prefix=]
 # python setup.py build_themes
 # python setup.py build_i18n
+# python setup.py update_po
 # python setup.py clean --all
 # python setup.py sdist|bdist
 # python setup.py --help
@@ -55,6 +56,28 @@ class build_themes(Command):
 
 
 class build_i18n(Command):
+   description = 'Compile all the po files'
+   user_options = []
+
+   def initialize_options(self):
+      pass
+
+   def finalize_options(self):
+      pass
+
+   def run(self):
+      linguas_file = os.path.join('data', 'locale', 'LINGUAS')
+      for lang in open(linguas_file).read().split():
+         po_file = os.path.join('data', 'locale', lang + '.po')
+         mo_file = os.path.join('epymc', 'locale', lang, 'LC_MESSAGES', 'epymc.mo')
+         mkpath(os.path.dirname(mo_file), verbose=False)
+         if newer(po_file, mo_file):
+            info('compiling po file: %s -> %s' % (po_file, mo_file))
+            cmd = 'msgfmt -o %s -c %s' % (mo_file, po_file)
+            os.system(cmd)
+
+
+class update_po(Command):
    description = 'Prepare all i18n files and update them as needed'
    user_options = []
 
@@ -75,7 +98,7 @@ class build_i18n(Command):
       cmd = 'xgettext --from-code=UTF-8 --force-po --output=ref.pot %s' % (sources)
       os.system(cmd)
 
-      # create or update all the .po files and compile them to .mo
+      # create or update all the .po files
       linguas_file = os.path.join('data', 'locale', 'LINGUAS')
       for lang in open(linguas_file).read().split():
          po_file = os.path.join('data', 'locale', lang + '.po')
@@ -90,13 +113,6 @@ class build_i18n(Command):
             info('creating po file: %s' % (po_file))
             mkpath(os.path.dirname(po_file), verbose=False)
             copy_file('ref.pot', po_file, verbose=False)
-
-         # compile po -> mo
-         mkpath(os.path.dirname(mo_file), verbose=False)
-         if newer(po_file, mo_file):
-            info('compiling po file: %s -> %s' % (po_file, mo_file))
-            cmd = 'msgfmt -o %s -c %s' % (mo_file, po_file)
-            os.system(cmd)
 
       # delete the reference pot file (no more needed)
       os.remove('ref.pot')
@@ -231,5 +247,6 @@ setup (
       'build': Build,
       'install_lib': Install,
       'uninstall': Uninstall,
+      'update_po': update_po,
    },
 )

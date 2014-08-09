@@ -756,14 +756,12 @@ class ViewGrid(object):
          next = item.next_get()
          if next:
             next.selected_set(1)
-            next.bring_in()
          return input_events.EVENT_BLOCK
 
       elif event == 'LEFT':
          prev = item.prev_get()
          if prev:
             prev.selected_set(1)
-            prev.bring_in()
          return input_events.EVENT_BLOCK
 
       elif event == 'UP':
@@ -775,7 +773,6 @@ class ViewGrid(object):
                prev = prev.prev_get()
                (x2, y2) = prev.pos_get()
             prev.selected_set(1)
-            prev.bring_in()
             return input_events.EVENT_BLOCK
          except:
             return input_events.EVENT_CONTINUE
@@ -789,7 +786,6 @@ class ViewGrid(object):
                next = next.next_get()
                (x2, y2) = next.pos_get()
             next.selected_set(1)
-            next.bring_in()
             return input_events.EVENT_BLOCK
          except:
             return input_events.EVENT_CONTINUE

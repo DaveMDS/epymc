@@ -23,7 +23,7 @@ CORE
 
 NEW MODULES
 ===========
- * internet radio
+ * internet radio (check .pls files)
  * photo
  * wikipedia
  * torrent (auto)search and download ( aria2c frontend? )

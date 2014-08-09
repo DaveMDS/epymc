@@ -162,7 +162,6 @@ collections {
             set_text(PART:"topbar.clock", buf);
          }
       }
-
       parts {
 
 /// main background
@@ -297,11 +296,11 @@ collections {
                fixed: 1 1;
                align: 1.0 0.5;
                rel1 {
-                  to: "topbar.clock";
+                  to: "topbar.clock.spacer";
                   offset: -10 0;
                }
                rel2 {
-                  to: "topbar.clock";
+                  to: "topbar.clock.spacer";
                   relative: 0.0 1.0;
                   offset: -11 -1;
                }
@@ -336,6 +335,15 @@ collections {
                   min: 1 0;
                   ellipsis: -1;
                }
+            }
+         }
+         part { name: "topbar.clock.spacer";
+            inherit: "topbar.clock";
+            /* This part is used as a spacer to avoid the buttons box
+             * changes it's position while the clock changes */
+            description { state: "default" 0.0;
+               visible: 0;
+               text.text: "00:00";
             }
          }
          part { name: "topbar.list.spacer";

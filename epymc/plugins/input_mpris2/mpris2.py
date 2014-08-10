@@ -199,17 +199,36 @@ class Mpris_MediaPlayer2(DBusServiceObjectWithProps):
 
    @dbus_property(PLAYER_IFACE, signature='a{sv}')
    def Metadata(self):
-      return { 'mpris:trackid': '/',
-               'mpris:length': 1000000,
-               'mpris:artUrl': '',
-               'xesam:album': '',
-               'xesam:albumArtist': '',
-               'xesam:artist': '',
-               'xesam:title': '',
-               'xesam:trackNumber': '',
-               'xesam:url': '',
-               'xesam:useCount': '',
-             }
+      """ freedesktop.org/wiki/Specifications/mpris-spec/metadata/ """
+
+      metadata = {}
+      item = mediaplayer.playlist.onair_item
+      if not item:
+         return dbus.Dictionary(metadata, signature='sv', variant_level=1)
+
+      metadata["mpris:trackid"] = dbus.ObjectPath('/org/epymc/pl/trk%d' % \
+                                                  mediaplayer.playlist.cur_idx)
+
+      if 'length' in item.metadata:
+         metadata['mpris:length'] = dbus.Int64(item.metadata['length'] * 1000000)
+
+      if 'poster' in item.metadata and item.metadata['poster']:
+         metadata['mpris:artUrl'] = 'file://' + item.metadata['poster']
+
+      if 'artist' in item.metadata:
+         metadata['xesam:artist'] = [item.metadata['artist']]
+
+      play_count = mediaplayer.play_counts_get(item.url)['finished']
+      metadata['xesam:useCount'] = int(play_count)
+
+      name_map = {'album': 'xesam:album', 'title': 'xesam:title',
+                  'tracknumber': 'xesam:trackNumber', 'url': 'xesam:url'}
+      for mine, xesam in name_map.items():
+         if mine in item.metadata:
+            metadata[xesam] = item.metadata[mine]
+
+      DBG(metadata)
+      return dbus.Dictionary(metadata, signature='sv', variant_level=1)
 
    @dbus_property(PLAYER_IFACE, signature='d', setter='VolumeSet')
    def Volume(self):

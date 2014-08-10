@@ -69,9 +69,31 @@ _subs_notify = None # EmcNotify for subtitles delay changes
 
 
 class PlaylistItem(object):
-   def __init__(self, url, only_audio=True):
+   """ You can pass the metadata right now (using the metadata param),
+       or provide a callback (metadata_cb) to be called when the metadata are
+       really needed.
+       Args:
+         url: the url of the item (mandatory)
+         only_audio: set to False if you want the video player to show up
+         metadata: a dict with the metadata for this item. Supported names:
+            audio: artist, album, tracknumber
+            video: ??
+            both : url, title, length (seconds), poster
+         metadata_cb: metadata can be requested later, when really needed,
+            using this callback. Signature:
+               callback(PlaylistItem) -> metadata_dict
+   """
+   def __init__(self, url, only_audio=True, metadata=None, metadata_cb=None):
       self.url = url
       self.only_audio = only_audio
+      self._metadata = metadata
+      self._metadata_cb = metadata_cb
+
+   @property
+   def metadata(self):
+      if self._metadata is None and callable(self._metadata_cb):
+         self._metadata = self._metadata_cb(self)
+      return self._metadata
 
    def __str__(self):
       return '<PlaylistItem: %s>' % self.url
@@ -81,6 +103,7 @@ class Playlist(object):
    def __init__(self):
       self.items = []
       self.cur_idx = -1
+      self.onair_item = None
 
    def __str__(self):
       return '<Playlist: %d items, current: %d>' % \
@@ -89,8 +112,8 @@ class Playlist(object):
    def __len__(self):
       return len(self.items)
 
-   def append(self, url, only_audio=True):
-      item = PlaylistItem(url, only_audio)
+   def append(self, *args, **kargs):
+      item = PlaylistItem(*args, **kargs)
       self.items.append(item)
 
    def play_next(self):
@@ -111,8 +134,8 @@ class Playlist(object):
          self.cur_idx = 0
 
       # play the new item
-      item = self.items[self.cur_idx]
-      play_url(item.url, only_audio=item.only_audio)
+      self.onair_item = self.items[self.cur_idx]
+      play_url(self.onair_item.url, only_audio=self.onair_item.only_audio)
 
    def clear(self):
       del self.items[:]

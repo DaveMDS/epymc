@@ -23,6 +23,10 @@ import dbus.service
 
 # Why this ?
 #  https://www.libreoffice.org/bugzilla/show_bug.cgi?id=26903
+#
+# Another intresting implementation:
+#  https://github.com/sunng87/Exaile-Soundmenu-Indicator/blob/master/mpris2.py
+#
 
 
 INTROSPECT_DOCTYPE = \

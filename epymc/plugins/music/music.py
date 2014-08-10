@@ -145,28 +145,7 @@ class SongItemClass(EmcItemClass):
          return song['title']
 
    def poster_get(self, url, song):
-      # search "front.jpg"
-      path = os.path.dirname(utils.url2path(url))
-      poster = os.path.join(path, 'front.jpg')
-      if os.path.exists(poster): return poster
-
-      # search "cover.jpg"
-      poster = os.path.join(path, 'cover.jpg')
-      if os.path.exists(poster): return poster
-
-      if not 'artist' in song or not 'album' in song:
-         return None
-
-      # search "<Artist> - <Album>.jpg"
-      poster = os.path.join(path, song['artist'] + ' - ' + song['album'] + '.jpg')
-      if os.path.exists(poster): return poster
-
-      # search in user cover dir:
-      # <config_dir>/music_covers/<Artist> - <Album>.jpg
-      poster = os.path.join(ini.get('music', 'covers_dir'),
-                            song['artist'] + ' - ' + song['album'] + '.jpg')
-      if os.path.exists(poster):
-         return poster
+      return _mod.search_poster_for_song(url, song)
 
    def info_get(self, url, song):
       text = '<title>' + song['title'] + '</><br>'
@@ -178,7 +157,7 @@ class SongItemClass(EmcItemClass):
          length = int(song['length']) / 1000
          min = length / 60
          sec = length % 60
-         text += _('duration: %s<br>') % ('%d:%d' % (min,sec))
+         text += _('duration: %s<br>') % ('%.02d:%.02d' % (min,sec))
       return text
 
    def icon_get(self, url, song):
@@ -194,25 +173,7 @@ class AlbumItemClass(EmcItemClass):
       return _('%(name)s by %(artist)s') % (album)
 
    def poster_get(self, url, album):
-      # Search cover in first-song-of-album directory:
-      #'front.jpg', 'cover.jpg' or '<Artist> - <Album>.jpg'
-      if album['songs']:
-         path = os.path.dirname(album['songs'][0])
-         poster = os.path.join(path, 'front.jpg')
-         if os.path.exists(poster): return poster
-
-         poster = os.path.join(path, 'cover.jpg')
-         if os.path.exists(poster): return poster
-
-         poster = os.path.join(path, album['artist'] + ' - ' + album['name'] + '.jpg')
-         if os.path.exists(poster): return poster
-
-      # Search cover in user dir:
-      # <config_dir>/music_covers/<Artist> - <Album>.jpg
-      poster = os.path.join(ini.get('music', 'covers_dir'),
-                           album['artist'] + ' - ' + album['name'] + '.jpg')
-      if os.path.exists(poster):
-         return poster
+      return _mod.search_poster_for_album(album)
 
    def info_get(self, url, album):
       text = '<title>' + album['name'] + '</><br>'
@@ -240,8 +201,7 @@ class ArtistItemClass(EmcItemClass):
       return artist['name']
 
    def poster_get(self, url, artist):
-      # TODO implement
-      return None
+      return _mod.search_poster_for_artist(artist)
 
    def info_get(self, url, artist):
       n = len(artist['albums'])
@@ -352,6 +312,7 @@ and what it need to work well, can also use markup like <title>this</> or
       # trigger a new scan (DISABLED FOR NOW)
       # self.rebuild_db()
 
+   ### rebuild db stuff
    def rebuild_db(self):
       if self._rebuild_notify is None:
          txt = '<title>%s</title><br>%s' % \
@@ -474,13 +435,65 @@ and what it need to work well, can also use markup like <title>this</> or
       # write song to db
       self._songs_db.set_data('file://' + full_path, item_data)
 
+   ### playlist & metadata stuff
+   def search_poster_for_album(self, album):
+      # search as the first song of the album
+      if 'songs' in album and len(album['songs']) > 0:
+         return self.search_poster_for_song(album['songs'][0])
+      return None
+
+   def search_poster_for_artist(self, artist):
+      # TODO implement
+      return None
+
+   def search_poster_for_song(self, url, song=None):
+      # search "front.jpg" in the song folder
+      path = os.path.dirname(utils.url2path(url))
+      poster = os.path.join(path, 'front.jpg')
+      if os.path.exists(poster):
+         return poster
+
+      # search "cover.jpg" in the song folder
+      poster = os.path.join(path, 'cover.jpg')
+      if os.path.exists(poster):
+         return poster
+
+      if song is None:
+         song = self._songs_db.get_data(url)
+
+      if (not song) or (not 'artist' in song) or (not 'album' in song):
+         return None
+
+      # search "<Artist> - <Album>.jpg"  in the song folder
+      poster = os.path.join(path, song['artist'] + ' - ' + song['album'] + '.jpg')
+      if os.path.exists(poster): return poster
+
+      # <config_dir>/music_covers/<Artist> - <Album>.jpg
+      poster = os.path.join(ini.get('music', 'covers_dir'),
+                            song['artist'] + ' - ' + song['album'] + '.jpg')
+      if os.path.exists(poster):
+         return poster
+
+   def playlist_metadata_cb(self, item, song=None):
+      if song is None:
+         song = self._songs_db.get_data(item.url)
+
+      # build the metadata dict from a shallow copy of the song data
+      metadata = song.copy()
+      metadata['poster'] = self.search_poster_for_song(song['url'], song)
+      if 'length' in metadata:
+         metadata['length'] = int(metadata['length']) / 1000.0
+
+      return metadata
+
    def queue_url(self, url, song=None):
       if song is None:
          song = self._songs_db.get_data(url)
 
-      mediaplayer.playlist.append(url)
+      metadata = self.playlist_metadata_cb(None, song)
+      mediaplayer.playlist.append(url, metadata=metadata)
 
-      if mediaplayer._onair_url is None:
+      if mediaplayer.playlist.onair_item is None:
          mediaplayer.playlist.play_next()
       else:
          EmcNotify('<title>%s</><br>%s' % (song['title'], _('queued')),
@@ -488,7 +501,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def queue_album(self, album):
       for url in album['songs']:
-         mediaplayer.playlist.append(url)
+         mediaplayer.playlist.append(url, metadata_cb=self.playlist_metadata_cb)
 
       if mediaplayer._onair_url is None:
          mediaplayer.playlist.play_next()
@@ -498,7 +511,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def queue_artist(self, artist):
       for url in artist['songs']:
-         mediaplayer.playlist.append(url)
+         mediaplayer.playlist.append(url, metadata_cb=self.playlist_metadata_cb)
 
       if mediaplayer._onair_url is None:
          mediaplayer.playlist.play_next()
@@ -506,7 +519,7 @@ and what it need to work well, can also use markup like <title>this</> or
       EmcNotify('<title>%s</><br>%s' % (artist['name'], _('queued')),
                 icon='icon/music')
 
-
+   ### emc events callback
    def events_cb(self, event):
 
       if event == 'PLAYBACK_STARTED':

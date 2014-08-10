@@ -29,12 +29,18 @@ from epymc.sdb import EmcDatabase
 from epymc.subtitles import Subtitles, Opensubtitles
 
 
+# OLD (deprecated)
 DEBUG = True
 DEBUGN = 'MEDIAPLAYER'
 def LOG(sev, msg):
    if   sev == 'err': print('%s ERROR: %s' % (DEBUGN, msg))
    elif sev == 'inf': print('%s: %s' % (DEBUGN, msg))
    elif sev == 'dbg' and DEBUG: print('%s: %s' % (DEBUGN, msg))
+
+# NEW (use this instead)
+def DBG(msg):
+   print('MEDIAPLAYER: ' + msg)
+   pass
 
 
 video_extensions = ['.avi','.mpg','.mpeg','.mpe','.ogv','.mkv','.divx','.xvid',
@@ -60,6 +66,59 @@ _play_db = None # key: url  data: {'started': 14, 'finished': 0, 'stop_at': 0 }
 _play_pause_btn = None
 _subtitles = None # Subtitle class instance
 _subs_notify = None # EmcNotify for subtitles delay changes
+
+
+class PlaylistItem(object):
+   def __init__(self, url, only_audio=True):
+      self.url = url
+      self.only_audio = only_audio
+
+   def __str__(self):
+      return '<PlaylistItem: %s>' % self.url
+
+
+class Playlist(object):
+   def __init__(self):
+      self.items = []
+      self.cur_idx = -1
+
+   def __str__(self):
+      return '<Playlist: %d items, current: %d>' % \
+             (len(self.items), self.cur_idx)
+
+   def __len__(self):
+      return len(self.items)
+
+   def append(self, url, only_audio=True):
+      item = PlaylistItem(url, only_audio)
+      self.items.append(item)
+
+   def play_next(self):
+      self.play_move(+1)
+
+   def play_prev(self):
+      self.play_move(-1)
+
+   def play_move(self, offset):
+      self.cur_idx += offset
+
+      # start reached
+      if self.cur_idx < 0:
+         self.cur_idx = 0
+
+      # end reached
+      if self.cur_idx >= len(self.items):
+         self.cur_idx = 0
+
+      # play the new item
+      item = self.items[self.cur_idx]
+      play_url(item.url, only_audio=item.only_audio)
+
+   def clear(self):
+      del self.items[:]
+
+# Create the single instance of the Playlist class (everyone must use this one)
+playlist = Playlist()
 
 
 ### API ###
@@ -635,6 +694,7 @@ def _cb_playback_finished(vid):
    video_player_hide()
    gui.volume_hide()
    stop()
+   playlist.play_next()
 
 def _cb_frame_resize(vid):
    (w, h) = vid.image_size
@@ -807,6 +867,14 @@ def input_event_cb(event):
 
    elif event == 'FAST_BACKWARD':
       fbackward()
+      return input_events.EVENT_BLOCK
+
+   elif event == 'PLAYLIST_NEXT':
+      playlist.play_next()
+      return input_events.EVENT_BLOCK
+
+   elif event == 'PLAYLIST_PREV':
+      playlist.play_prev()
       return input_events.EVENT_BLOCK
 
    elif event == 'SUBS_DELAY_MORE':

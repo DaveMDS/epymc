@@ -65,6 +65,8 @@ DEFAULTS = {
    'x': 'BACKWARD',
    'c': 'FORWARD',
    'v': 'FAST_FORWARD',
+   'b': 'PLAYLIST_PREV',
+   'n': 'PLAYLIST_NEXT',
    'q': 'SUBS_DELAY_LESS',
    'w': 'SUBS_DELAY_MORE',
    'e': 'SUBS_DELAY_ZERO',

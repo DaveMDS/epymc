@@ -37,7 +37,7 @@ import epymc.mediaplayer as mediaplayer
 
 
 def DBG(msg):
-   # print('MUSIC: ' + msg)
+   print('MUSIC: ' + msg)
    pass
 
 
@@ -53,7 +53,7 @@ class RootOnAirItemClass(EmcItemClass):
       return _('OnAir')
 
    def label_end_get(self, url, mod):
-      return str(len(mod._play_queue)) if mod._play_queue else '0'
+      return str(len(mediaplayer.playlist))
 
    def icon_get(self, url, mod):
       return 'icon/play'
@@ -261,7 +261,6 @@ and what it need to work well, can also use markup like <title>this</> or
 
    _browser = None        # browser instance
    _rebuild_notify = None # rebuild notification object
-   _play_queue = []       # list of urls to play
 
    _songs_db = None     # key=url           data=dict
    _albums_db = None    # key=album_name    data=dict
@@ -307,7 +306,7 @@ and what it need to work well, can also use markup like <title>this</> or
 
       # stop listen to emc events
       events.listener_del('music')
-      
+
       # delete mainmenu item
       mainmenu.item_del('music')
 
@@ -475,41 +474,34 @@ and what it need to work well, can also use markup like <title>this</> or
       # write song to db
       self._songs_db.set_data('file://' + full_path, item_data)
 
-   def queue_url(self, url, song = None):
-
+   def queue_url(self, url, song=None):
       if song is None:
          song = self._songs_db.get_data(url)
 
-      self._play_queue.append(url)
+      mediaplayer.playlist.append(url)
 
-      if len(self._play_queue) == 1:
-         mediaplayer.play_url(url, only_audio=True)
+      if mediaplayer._onair_url is None:
+         mediaplayer.playlist.play_next()
       else:
          EmcNotify('<title>%s</><br>%s' % (song['title'], _('queued')),
                    icon='icon/music')
 
    def queue_album(self, album):
-
       for url in album['songs']:
-         self._play_queue.append(url)
+         mediaplayer.playlist.append(url)
 
       if mediaplayer._onair_url is None:
-         if len(self._play_queue) > 0:
-            mediaplayer.play_url(self._play_queue[0], only_audio = True)
+         mediaplayer.playlist.play_next()
       
       EmcNotify('<title>%s</><br>%s' % (album['name'], _('queued')),
                 icon='icon/music')
 
    def queue_artist(self, artist):
-
-      DBG(str(artist))
-      
       for url in artist['songs']:
-         self._play_queue.append(url)
+         mediaplayer.playlist.append(url)
 
       if mediaplayer._onair_url is None:
-         if len(self._play_queue) > 0:
-            mediaplayer.play_url(self._play_queue[0], only_audio = True)
+         mediaplayer.playlist.play_next()
       
       EmcNotify('<title>%s</><br>%s' % (artist['name'], _('queued')),
                 icon='icon/music')
@@ -520,29 +512,21 @@ and what it need to work well, can also use markup like <title>this</> or
       if event == 'PLAYBACK_STARTED':
          DBG('PLAYBACK_STARTED')
          # update the audio controls
-         if len(self._play_queue) > 0:
-            song = self._songs_db.get_data(self._play_queue[0])
+         if len(mediaplayer.playlist) > 0:
+            song = self._songs_db.get_data(mediaplayer._onair_url)
             text = '<title>' + song['title'] + '</><br>'
             if 'artist' in song:
                text += _('<em>by</em> %s<br>') % song['artist']
             if 'album' in song:
                text += _('<em>from</em> %s<br>') % song['album']
             gui.audio_controls_show(text = text)
+
          # update the browser view
          self._browser.refresh()
 
       elif event == 'PLAYBACK_FINISHED':
          DBG('PLAYBACK_FINISHED')
-         # remove the finished song from queue
-         if len(self._play_queue) > 0:
-            self._play_queue.pop(0)
-         # play the next songs in queue
-         if len(self._play_queue) > 0:
-            mediaplayer.play_url(self._play_queue[0], only_audio = True)
-         # or hide the audio controls
-         else:
-            gui.audio_controls_hide()
-         # update the browser view
+         gui.audio_controls_hide()
          self._browser.refresh()
 
 ### browser pages
@@ -559,9 +543,9 @@ and what it need to work well, can also use markup like <title>this</> or
 
    def populate_onair_page(self, browser, page_url):
       """ list of songs in the current queue """
-      for url in self._play_queue:
-         song = self._songs_db.get_data(url)
-         self._browser.item_add(SongItemClass(), url, song)
+      for item in mediaplayer.playlist.items:
+         song = self._songs_db.get_data(item.url)
+         self._browser.item_add(SongItemClass(), item.url, song)
 
    def populate_songs_page(self, browser, page_url):
       """ list of all the songs """

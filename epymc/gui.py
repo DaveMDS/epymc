@@ -236,8 +236,11 @@ def ask_to_exit():
    d.button_add(_('Cancel'), selected_cb=lambda b: d.delete())
    # d.button_add(_('Suspend'), selected_cb=None) # TODO
    # d.button_add(_('Shutdown'), selected_cb=None) # TODO
-   d.button_add(_('Exit'), selected_cb=lambda b: elementary.exit())
+   d.button_add(_('Exit'), selected_cb=lambda b: exit_now())
    d.autoscroll_enable(3.0, 0.0)
+
+def exit_now():
+   elementary.exit()
 
 def volume_show(hidein = 0):
    global _volume_hide_timer
@@ -292,6 +295,12 @@ def fps_set(fps):
 
 def fullscreen_toggle():
    win.fullscreen = not win.fullscreen
+
+def win_raise():
+   win.iconified = False
+   win.raise_()
+   win.activate()
+
 
 ### audio info/controls notify
 _audio_notify = None

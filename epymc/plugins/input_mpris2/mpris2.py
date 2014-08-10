@@ -26,6 +26,8 @@ from efl.dbus_mainloop import DBusEcoreMainLoop
 
 from epymc.modules import EmcModule
 import epymc.input_events as input_events
+import epymc.utils as utils
+import epymc.gui as gui
 
 from dbus_helper import DBusServiceObjectWithProps, dbus_property
 
@@ -69,14 +71,55 @@ class Mpris_MediaPlayer2(DBusServiceObjectWithProps):
 
    ### The root interface: org.mpris.MediaPlayer2 #############################
 
-   @dbus_property(ROOT_IFACE, signature='b')
+   ## properties
+   @dbus_property(ROOT_IFACE, signature='b', access='read')
    def CanQuit(self):
-      DBG('CanQuit()')
+      return True
+
+   # @dbus_property(ROOT_IFACE, signature='b', access='readwrite')
+   # def Fullscreen(self):
+      # return True
+
+   @dbus_property(ROOT_IFACE, signature='b', access='read')
+   def CanSetFullscreen(self):
       return False
 
+   @dbus_property(ROOT_IFACE, signature='b', access='read')
+   def CanRaise(self):
+      return True
+
+   @dbus_property(ROOT_IFACE, signature='b', access='read')
+   def CanRaise(self):
+      return True
+
+   @dbus_property(ROOT_IFACE, signature='b', access='read')
+   def HasTrackList(self):
+      return False
+
+   @dbus_property(ROOT_IFACE, signature='s', access='read')
+   def Identity(self):
+      return 'Emotion Media Center'
+
+   @dbus_property(ROOT_IFACE, signature='s', access='read')
+   def DesktopEntry(self):
+      return 'epymc'
+
+   @dbus_property(ROOT_IFACE, signature='as', access='read')
+   def SupportedUriSchemes(self):
+      return utils.supported_uris
+
+   @dbus_property(ROOT_IFACE, signature='as', access='read')
+   def SupportedMimeTypes(self):
+      return utils.supported_mimes
+
+   ## methods
    @dbus.service.method(ROOT_IFACE)
    def Quit(self):
-      DBG('Quit()')
+      gui.exit_now()
+
+   @dbus.service.method(ROOT_IFACE)
+   def Raise(self):
+      gui.win_raise()
 
 
    ### The Player interface: org.mpris.MediaPlayer2.Player ####################

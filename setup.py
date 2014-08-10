@@ -202,6 +202,7 @@ setup (
       'epymc.plugins.input_lirc',
       'epymc.plugins.input_joy',
       'epymc.plugins.input_webserver',
+      'epymc.plugins.input_mpris2',
       'epymc.plugins.screensaver',
       'epymc.plugins.movies',
       'epymc.plugins.tvshows',

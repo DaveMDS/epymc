@@ -23,6 +23,7 @@ IMAGE("osdo_logo.png", 450, 151)
 
 ICON("emc")
 ICON("evas")
+ICON("dbus")
 ICON("home")
 ICON("folder")
 ICON("close")

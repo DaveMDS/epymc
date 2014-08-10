@@ -26,6 +26,7 @@ from efl.dbus_mainloop import DBusEcoreMainLoop
 
 from epymc.modules import EmcModule
 import epymc.input_events as input_events
+import epymc.mediaplayer as mediaplayer
 import epymc.utils as utils
 import epymc.gui as gui
 
@@ -33,7 +34,7 @@ from dbus_helper import DBusServiceObjectWithProps, dbus_property
 
 
 def DBG(msg):
-   print('MPRIS2: ' + msg)
+   print('MPRIS2: %s' % msg)
    pass
 
 
@@ -127,9 +128,14 @@ class Mpris_MediaPlayer2(DBusServiceObjectWithProps):
 
    ### The Player interface: org.mpris.MediaPlayer2.Player ####################
 
+   ## methods
    @dbus.service.method(PLAYER_IFACE)
-   def Play(self):
-      input_events.event_emit('PLAY')
+   def Next(self):
+      input_events.event_emit('PLAYLIST_NEXT')
+
+   @dbus.service.method(PLAYER_IFACE)
+   def Previous(self):
+      input_events.event_emit('PLAYLIST_PREV')
 
    @dbus.service.method(PLAYER_IFACE)
    def Pause(self):
@@ -143,3 +149,115 @@ class Mpris_MediaPlayer2(DBusServiceObjectWithProps):
    def Stop(self):
       input_events.event_emit('STOP')
 
+   @dbus.service.method(PLAYER_IFACE)
+   def Play(self):
+      input_events.event_emit('PLAY')
+
+   @dbus.service.method(PLAYER_IFACE, in_signature='x')
+   def Seek(self, Offset): #microseconds
+      DBG("Seek %d microsecs" % Offset)
+      secs = Offset / 1000000.0
+      mediaplayer.seek(secs)
+
+   @dbus.service.method(PLAYER_IFACE, in_signature='ox')
+   def SetPosition(self, TrackId, Position):
+      # TrackId ignored atm
+      mediaplayer.position_set(Position / 1000000.0)
+
+   @dbus.service.method(PLAYER_IFACE, in_signature='s')
+   def OpenUri(self, Uri):
+      raise NotImplementedError # TODO
+
+   ## properties
+   @dbus_property(PLAYER_IFACE, signature='s')
+   def PlaybackStatus(self):
+      return mediaplayer.play_state_get()
+   
+   @dbus_property(PLAYER_IFACE, signature='s', setter='LoopStatusSet')
+   def LoopStatus(self):
+      return 'Playlist'
+
+   def LoopStatusSet(self, loop):
+      DBG('TODO LoopStatusSet: %s' % loop)
+      raise NotImplementedError # TODO
+
+   @dbus_property(PLAYER_IFACE, signature='d', setter='RateSet')
+   def Rate(self):
+      return 1.0
+
+   def RateSet(self, rate):
+      DBG('TODO RateSet: %s' % rate)
+      raise NotImplementedError # TODO
+
+   @dbus_property(PLAYER_IFACE, signature='d', setter='ShuffleSet')
+   def Shuffle(self):
+      return False
+
+   def ShuffleSet(self, shuffle):
+      DBG('TODO ShuffleSet: %s' % shuffle)
+      raise NotImplementedError # TODO
+
+   @dbus_property(PLAYER_IFACE, signature='a{sv}')
+   def Metadata(self):
+      return { 'mpris:trackid': '/',
+               'mpris:length': 1000000,
+               'mpris:artUrl': '',
+               'xesam:album': '',
+               'xesam:albumArtist': '',
+               'xesam:artist': '',
+               'xesam:title': '',
+               'xesam:trackNumber': '',
+               'xesam:url': '',
+               'xesam:useCount': '',
+             }
+
+   @dbus_property(PLAYER_IFACE, signature='d', setter='VolumeSet')
+   def Volume(self):
+      return mediaplayer.volume_get() / 100.0
+
+   def VolumeSet(self, volume):
+      mediaplayer.volume_set(volume * 100)
+
+   @dbus_property(PLAYER_IFACE, signature='x')
+   def Position(self):
+      return int(mediaplayer.position_get() * 1000000)
+
+   @dbus_property(PLAYER_IFACE, signature='d')
+   def MinimumRate(self):
+      return 1.0
+
+   @dbus_property(PLAYER_IFACE, signature='d')
+   def MaximumRate(self):
+      return 1.0
+
+   @dbus_property(PLAYER_IFACE, signature='b')
+   def CanGoNext(self): # TODO this can be improved
+      if len(mediaplayer.playlist) > 0:
+         return True
+      return False
+
+   @dbus_property(PLAYER_IFACE, signature='b')
+   def CanGoPrevious(self): # TODO this can be improved
+      if len(mediaplayer.playlist) > 0:
+         return True
+      return False
+
+   @dbus_property(PLAYER_IFACE, signature='b')
+   def CanPlay(self):
+      if len(mediaplayer.playlist) > 0:
+         return True
+      return False
+
+   @dbus_property(PLAYER_IFACE, signature='b')
+   def CanPause(self):
+      return True
+
+   @dbus_property(PLAYER_IFACE, signature='b')
+   def CanSeek(self):
+      return mediaplayer.seekable_get()
+
+   @dbus_property(PLAYER_IFACE, signature='b')
+   def CanControl(self):
+      return True
+
+   # TODO implement the Seeked signal

@@ -334,6 +334,14 @@ def pause_toggle():
    if _emotion is None: return
    pause() if _emotion.play is True else unpause()
 
+def play_state_get():
+   """ 'Stopped', 'Paused' or 'Playing' (as per mpris spec, do not change!) """
+   if _emotion is None:
+      return 'Stopped'
+   if _emotion.play:
+      return 'Playing'
+   return 'Paused'
+
 def forward():
    if _emotion is None: return
    LOG('dbg', 'Forward ' + str(_emotion.position))
@@ -360,7 +368,29 @@ def fbackward():
    _emotion.position -= 60 #TODO make this configurable
    if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
 
+def seek(offset):
+   """ offset in seconds (float) """
+   if _emotion is None: return
+   newpos = _emotion.position + offset
+   _emotion.position = newpos if newpos > 0 else 0
+   if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
+
+def seekable_get():
+   return _emotion.seekable if _emotion is not None else False
+
+def position_set(pos):
+   """ pos in seconds (float) """
+   if _emotion is None: return
+   _emotion.position = pos
+   if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
+
+def position_get():
+   """ get position in seconds (float) from the start """
+   if _emotion is None: return
+   return _emotion.position
+   
 def volume_set(vol):
+   """ between 0 and 100 """
    global _volume
 
    _volume = max(0, min(int(vol), 100))

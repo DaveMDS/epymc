@@ -293,6 +293,12 @@ def background_set(image):
 def fps_set(fps):
    ecore.animator_frametime_set(1.0 / float(fps))
 
+def fullscreen_get():
+   return win.fullscreen
+
+def fullscreen_set(full):
+   win.fullscreen = full
+
 def fullscreen_toggle():
    win.fullscreen = not win.fullscreen
 

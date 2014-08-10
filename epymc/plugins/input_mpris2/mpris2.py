@@ -72,43 +72,46 @@ class Mpris_MediaPlayer2(DBusServiceObjectWithProps):
    ### The root interface: org.mpris.MediaPlayer2 #############################
 
    ## properties
-   @dbus_property(ROOT_IFACE, signature='b', access='read')
+   @dbus_property(ROOT_IFACE, signature='b')
    def CanQuit(self):
       return True
 
-   # @dbus_property(ROOT_IFACE, signature='b', access='readwrite')
-   # def Fullscreen(self):
-      # return True
-
-   @dbus_property(ROOT_IFACE, signature='b', access='read')
+   @dbus_property(ROOT_IFACE, signature='b')
    def CanSetFullscreen(self):
-      return False
+      return True
 
-   @dbus_property(ROOT_IFACE, signature='b', access='read')
+   @dbus_property(ROOT_IFACE, signature='b', setter='FullscreenSet')
+   def Fullscreen(self):
+      return gui.fullscreen_get()
+
+   def FullscreenSet(self, value):
+      gui.fullscreen_set(bool(value))
+
+   @dbus_property(ROOT_IFACE, signature='b')
    def CanRaise(self):
       return True
 
-   @dbus_property(ROOT_IFACE, signature='b', access='read')
+   @dbus_property(ROOT_IFACE, signature='b')
    def CanRaise(self):
       return True
 
-   @dbus_property(ROOT_IFACE, signature='b', access='read')
+   @dbus_property(ROOT_IFACE, signature='b')
    def HasTrackList(self):
       return False
 
-   @dbus_property(ROOT_IFACE, signature='s', access='read')
+   @dbus_property(ROOT_IFACE, signature='s')
    def Identity(self):
       return 'Emotion Media Center'
 
-   @dbus_property(ROOT_IFACE, signature='s', access='read')
+   @dbus_property(ROOT_IFACE, signature='s')
    def DesktopEntry(self):
       return 'epymc'
 
-   @dbus_property(ROOT_IFACE, signature='as', access='read')
+   @dbus_property(ROOT_IFACE, signature='as')
    def SupportedUriSchemes(self):
       return utils.supported_uris
 
-   @dbus_property(ROOT_IFACE, signature='as', access='read')
+   @dbus_property(ROOT_IFACE, signature='as')
    def SupportedMimeTypes(self):
       return utils.supported_mimes
 

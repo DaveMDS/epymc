@@ -30,13 +30,14 @@ INTROSPECT_DOCTYPE = \
 '"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">\n'
 
 
-def dbus_property(dbus_interface, signature, access='read'):
+def dbus_property(dbus_interface, signature, setter=None):
    """ TODO doc """
    def decorator(func):
       func._dbus_is_property = True
       func._dbus_interface = dbus_interface
       func._dbus_type = signature
-      func._dbus_access = access
+      func._dbus_setter = setter
+      func._dbus_access = 'readwrite' if setter else 'read'
       return func
 
    return decorator
@@ -96,7 +97,6 @@ class DBusServiceObjectWithProps(dbus.service.Object):
    @dbus.service.method(dbus.PROPERTIES_IFACE,
                         in_signature='s', out_signature='a{sv}')
    def GetAll(self, interface_name):
-      DBG("GetAll")
       try:
          funcs = self._dbus_class_table[self.__class__.__module__ + '.' +
                                         self.__class__.__name__][interface_name]
@@ -114,7 +114,11 @@ class DBusServiceObjectWithProps(dbus.service.Object):
    @dbus.service.method(dbus.PROPERTIES_IFACE,
                         in_signature='ssv')
    def Set(self, interface_name, property_name, new_value):
-      pass
+      func = getattr(self, property_name)
+      setter_name = getattr(func, '_dbus_setter')
+      setter = getattr(self, setter_name)
+      if callable(setter):
+         setter(new_value)
 
    @dbus.service.signal(dbus.PROPERTIES_IFACE,
                         signature='sa{sv}as')

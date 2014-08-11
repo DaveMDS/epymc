@@ -484,11 +484,14 @@ def _sys_info():
       pref_engine = preferred_engine_get()
    
    downl_avail = ecore.file_download_protocol_available('http://')
-
+   win_w, win_h = gui.win.size
+   scr_x, scr_y, scr_w, scr_h = gui.win.screen_size
+   dpi_x, dpi_y = gui.win.screen_dpi
    text = '<title>%s</><br>' \
           '<name>%s:</name> %s<br>' \
           '<name>%s:</name> %s<br>' \
           '<name>%s:</name> %s - %s<br>' \
+          '<name>%s:</> %dx%d <name>%s:</> %dx%d+%d+%d <name>%s:</> %d %d<br>' \
           '<br><title>%s</><br>' \
           '<name>%s:</name> %s<br>' \
           '<name>%s:</name> %s<br>' \
@@ -500,6 +503,9 @@ def _sys_info():
             _('Rendering engine'), pref_engine,
             _('Download available'), _('yes') if downl_avail else _('no'),
             _('Theme'), ini.get('general', 'theme'), gui.theme_file,
+            _('Window size'), win_w, win_h,
+            _('screen'), scr_w, scr_h, scr_x, scr_y,
+            _('dpi'), dpi_x, dpi_y,
             _('Paths'),
             _('Base folder'), utils.emc_base_dir,
             _('Config folder'), utils.user_conf_dir,

@@ -294,8 +294,6 @@ def _play_real(start_from=None, only_audio=False):
       _subtitles = Subtitles(url)
       _subs_timer = ecore.Timer(0.2, _update_subs_timer_cb)
 
-   events.event_emit('PLAYBACK_STARTED')
-
 def play_counts_get(url):
    try:
       return _play_db.get_data(url)
@@ -540,9 +538,9 @@ def _init_emotion():
    _emotion.smooth_scale = True
 
    # _emotion.on_key_down_add(_cb)
-   # _emotion.on_audio_level_change_add(_cb_volume_change)
-   _emotion.on_frame_resize_add(_cb_frame_resize)
-   _emotion.on_playback_finished_add(_cb_playback_finished)
+   _emotion.callback_add('frame_resize', _cb_frame_resize)
+   _emotion.callback_add('playback_started', _cb_playback_started)
+   _emotion.callback_add('playback_finished', _cb_playback_finished)
 
    # Progress doesn't work, use frame_decode instead...but it's TOOO often
    #  yes, too often and not firing while buffering...Used a timer instead
@@ -733,6 +731,9 @@ def _subtitles_delay_notify_cb():
    _subs_notify = None
 
 # emotion obj callbacks
+def _cb_playback_started(vid):
+   events.event_emit('PLAYBACK_STARTED')
+
 def _cb_playback_finished(vid):
    video_player_hide()
    gui.volume_hide()

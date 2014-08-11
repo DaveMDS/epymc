@@ -26,6 +26,7 @@ from efl.dbus_mainloop import DBusEcoreMainLoop
 
 from epymc.modules import EmcModule
 import epymc.input_events as input_events
+import epymc.events as events
 import epymc.mediaplayer as mediaplayer
 import epymc.utils as utils
 import epymc.gui as gui
@@ -37,6 +38,8 @@ def DBG(msg):
    print('MPRIS2: %s' % msg)
    pass
 
+ROOT_IFACE = "org.mpris.MediaPlayer2"
+PLAYER_IFACE = "org.mpris.MediaPlayer2.Player"
 
 class MPRIS2Module(EmcModule):
    name = 'input_mpris2'
@@ -52,18 +55,30 @@ and what it need to work well, can also use markup like <title>this</> or
       DBG('Init module')
       bus = dbus.SessionBus(mainloop=DBusEcoreMainLoop())
       name = dbus.service.BusName(self.BUS_NAME, bus)
-      self.player = Mpris_MediaPlayer2(name)
+      self.mpris2 = Mpris_MediaPlayer2(name)
+      events.listener_add('mpris', self.events_cb)
 
    def __shutdown__(self):
       DBG('Shutdown module')
-      self.player.remove_from_connection()
+      events.listener_del('mpris')
+      self.mpris2.remove_from_connection()
 
+   def events_cb(self, event):
+      if event in ('PLAYBACK_PAUSED', 'PLAYBACK_UNPAUSED'):
+         self.mpris2.emit_properties_changed(PLAYER_IFACE, 'PlaybackStatus')
+      elif event in ('PLAYBACK_STARTED', 'PLAYBACK_FINISHED'):
+         self.mpris2.emit_properties_changed(PLAYER_IFACE, ('PlaybackStatus',
+                        'Metadata', 'CanGoNext', 'CanGoPrevious', 'CanPlay',
+                        'CanPause', 'CanSeek'))
+      elif event == 'PLAYBACK_SEEKED':
+         self.mpris2.emit_properties_changed(PLAYER_IFACE, 'Position')
+         self.mpris2.Seeked(int(mediaplayer.position_get() * 1000000))
+      elif event == 'VOLUME_CHANGED':
+         self.mpris2.emit_properties_changed(PLAYER_IFACE, 'Volume')
 
 
 class Mpris_MediaPlayer2(DBusServiceObjectWithProps):
    PATH = "/org/mpris/MediaPlayer2"
-   ROOT_IFACE = "org.mpris.MediaPlayer2"
-   PLAYER_IFACE = "org.mpris.MediaPlayer2.Player"
 
    def __init__(self, name):
       DBusServiceObjectWithProps.__init__(self, object_path=self.PATH,
@@ -227,7 +242,7 @@ class Mpris_MediaPlayer2(DBusServiceObjectWithProps):
          if mine in item.metadata:
             metadata[xesam] = item.metadata[mine]
 
-      DBG(metadata)
+      # DBG(metadata)
       return dbus.Dictionary(metadata, signature='sv', variant_level=1)
 
    @dbus_property(PLAYER_IFACE, signature='d', setter='VolumeSet')
@@ -279,4 +294,7 @@ class Mpris_MediaPlayer2(DBusServiceObjectWithProps):
    def CanControl(self):
       return True
 
-   # TODO implement the Seeked signal
+   ## signals
+   @dbus.service.signal(PLAYER_IFACE, signature='x')
+   def Seeked(self, Position):
+      pass

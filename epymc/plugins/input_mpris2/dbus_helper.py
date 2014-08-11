@@ -23,6 +23,7 @@ import dbus.service
 
 # Why this ?
 #  https://www.libreoffice.org/bugzilla/show_bug.cgi?id=26903
+#  https://www.libreoffice.org/bugzilla/attachment.cgi?id=98993
 #
 # Another intresting implementation:
 #  https://github.com/sunng87/Exaile-Soundmenu-Indicator/blob/master/mpris2.py
@@ -53,7 +54,7 @@ class DBusServiceObjectWithProps(dbus.service.Object):
    def __init__(self, *args, **kargs):
       dbus.service.Object.__init__(self, *args, **kargs)
 
-   def reflect_on_property(self, func):
+   def _reflect_on_property(self, func):
       return '    <property name="%s" type="%s" access="%s"/>\n' % \
              (func.__name__, func._dbus_type, func._dbus_access)
 
@@ -75,7 +76,7 @@ class DBusServiceObjectWithProps(dbus.service.Object):
             elif getattr(func, '_dbus_is_signal', False):
                reflection_data += self.__class__._reflect_on_signal(func)
             elif getattr(func, '_dbus_is_property', False):
-               reflection_data += self.reflect_on_property(func)
+               reflection_data += self._reflect_on_property(func)
 
          reflection_data += '  </interface>\n'
 
@@ -129,3 +130,10 @@ class DBusServiceObjectWithProps(dbus.service.Object):
    def PropertiesChanged(self, interface_name, changed_properties,
                           invalidated_properties):
       pass
+
+   def emit_properties_changed(self, iface, props, invalidated=[]):
+      if type(props) is tuple:
+         propvals = { prop: getattr(self, prop)() for prop in props }
+      else:
+         propvals = { props: getattr(self, props)() }
+      self.PropertiesChanged(iface, propvals, invalidated)

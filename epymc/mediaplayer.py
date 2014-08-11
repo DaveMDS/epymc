@@ -344,14 +344,16 @@ def pause():
    _emotion.play = False
    _play_pause_btn.icon_set('icon/play')
    gui.signal_emit('minipos,pause,set')
-   minipos_show()
+   minipos_show() # TODO move this inside minipos (listening to PLAYBACK_PAUSED)
+   events.event_emit('PLAYBACK_PAUSED')
 
 def unpause():
    if _emotion is None: return
    _emotion.play = True
    _play_pause_btn.icon_set('icon/pause')
    gui.signal_emit('minipos,play,set')
-   minipos_show()
+   minipos_show() # TODO move this inside minipos (listening to PLAYBACK_UNPAUSED)
+   events.event_emit('PLAYBACK_UNPAUSED')
 
 def pause_toggle():
    if _emotion is None: return
@@ -366,37 +368,22 @@ def play_state_get():
    return 'Paused'
 
 def forward():
-   if _emotion is None: return
-   LOG('dbg', 'Forward ' + str(_emotion.position))
-   _emotion.position += 10 #TODO make this configurable
-   # emotion need some loop to update the position, as minipos_show() call
-   # slider_update(), we need a bit delay to show the updated position.
-   if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
+   seek(+10)
 
 def backward():
-   if _emotion is None: return
-   LOG('dbg', 'Backward ' + str(_emotion.position))
-   _emotion.position -= 10 #TODO make this configurable
-   if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
+   seek(-10)
 
 def fforward():
-   if _emotion is None: return
-   LOG('dbg', 'FastForward ' + str(_emotion.position))
-   _emotion.position += 60 #TODO make this configurable
-   if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
+   seek(+60)
 
 def fbackward():
-   if _emotion is None: return
-   LOG('dbg', 'FastBackward ' + str(_emotion.position))
-   _emotion.position -= 60 #TODO make this configurable
-   if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
+   seek(-60)
 
 def seek(offset):
    """ offset in seconds (float) """
    if _emotion is None: return
    newpos = _emotion.position + offset
-   _emotion.position = newpos if newpos > 0 else 0
-   if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
+   position_set(newpos if newpos > 0 else 0)
 
 def seekable_get():
    return _emotion.seekable if _emotion is not None else False
@@ -405,13 +392,16 @@ def position_set(pos):
    """ pos in seconds (float) """
    if _emotion is None: return
    _emotion.position = pos
+   events.event_emit('PLAYBACK_SEEKED')
+   # emotion need some loop to update the position, as minipos_show() call
+   # slider_update(), we need a bit delay to show the updated position.
    if _video_visible: ecore.Timer(0.05, lambda: minipos_show())
 
 def position_get():
    """ get position in seconds (float) from the start """
    if _emotion is None: return
    return _emotion.position
-   
+
 def volume_set(vol):
    """ between 0 and 100 """
    global _volume

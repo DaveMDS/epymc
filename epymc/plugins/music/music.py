@@ -526,13 +526,14 @@ and what it need to work well, can also use markup like <title>this</> or
          DBG('PLAYBACK_STARTED')
          # update the audio controls
          if len(mediaplayer.playlist) > 0:
-            song = self._songs_db.get_data(mediaplayer._onair_url)
-            text = '<title>' + song['title'] + '</><br>'
-            if 'artist' in song:
-               text += _('<em>by</em> %s<br>') % song['artist']
-            if 'album' in song:
-               text += _('<em>from</em> %s<br>') % song['album']
-            gui.audio_controls_show(text = text)
+            if self._songs_db.id_exists(mediaplayer._onair_url):
+               song = self._songs_db.get_data(mediaplayer._onair_url)
+               text = '<title>' + song['title'] + '</><br>'
+               if 'artist' in song:
+                  text += _('<em>by</em> %s<br>') % song['artist']
+               if 'album' in song:
+                  text += _('<em>from</em> %s<br>') % song['album']
+               gui.audio_controls_show(text = text)
 
          # update the browser view
          self._browser.refresh()

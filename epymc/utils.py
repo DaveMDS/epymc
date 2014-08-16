@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, tempfile, glob, re, hashlib
+import sys, os, tempfile, glob, re, hashlib
 
 try:
    from urllib.parse import quote as urllib_quote
@@ -261,6 +261,9 @@ def iso639_1_to_5(iso1):
    """ Convert ISO 639-1 lanuage code to ISO 639-5 (ex: "it" to "ita") """
    return iso639_table[iso1][1] if iso1 in iso639_table else None
 
+def is_py3():
+   return sys.version_info.major > 2
+
 def get_resource_file(res_type, res_name, default = None):
    """
    This will search the given reasource (the file name) first in user config
@@ -332,7 +335,9 @@ def ensure_file_not_exists(fullpath):
 
 def md5(txt):
    """ calc the md5 of the given str """
-   return hashlib.md5(txt.encode('utf-8')).hexdigest()
+   if is_py3():
+      txt = bytes(txt,'utf-8')
+   return hashlib.md5(txt).hexdigest()
    
 def natural_sort(l): 
    convert = lambda text: int(text) if text.isdigit() else text.lower() 

@@ -115,23 +115,23 @@ class RootAddSourceItemClass(EmcItemClass):
       return 'icon/plus'
 
 class QueueAlbumItemClass(EmcItemClass):
-   def item_selected(self, url, album):
-      _mod.queue_album(album)
+   def item_selected(self, url, songs_list):
+      _mod.queue_album(songs_list)
 
-   def label_get(self, url, album):
+   def label_get(self, url, songs_list):
       return _('Play the whole album')
 
-   def icon_get(self, url, album):
+   def icon_get(self, url, songs_list):
       return 'icon/plus'
 
 class QueueArtistItemClass(EmcItemClass):
-   def item_selected(self, url, album):
-      _mod.queue_artist(album)
+   def item_selected(self, url, songs_list):
+      _mod.queue_artist(songs_list)
 
-   def label_get(self, url, album):
+   def label_get(self, url, songs_list):
       return _('Play all the songs')
 
-   def icon_get(self, url, album):
+   def icon_get(self, url, songs_list):
       return 'icon/plus'
 
 class SongItemClass(EmcItemClass):
@@ -499,23 +499,25 @@ and what it need to work well, can also use markup like <title>this</> or
          EmcNotify('<title>%s</><br>%s' % (song['title'], _('queued')),
                    icon='icon/music')
 
-   def queue_album(self, album):
-      for url in album['songs']:
-         mediaplayer.playlist.append(url, metadata_cb=self.playlist_metadata_cb)
+   def queue_album(self, songs_list):
+      for song in songs_list:
+         mediaplayer.playlist.append(song['url'], metadata_cb=self.playlist_metadata_cb)
 
       if mediaplayer._onair_url is None:
          mediaplayer.playlist.play_next()
-      
+
+      album = self._albums_db.get_data(songs_list[0]['album'])
       EmcNotify('<title>%s</><br>%s' % (album['name'], _('queued')),
                 icon='icon/music')
 
-   def queue_artist(self, artist):
-      for url in artist['songs']:
-         mediaplayer.playlist.append(url, metadata_cb=self.playlist_metadata_cb)
+   def queue_artist(self, songs_list):
+      for song in songs_list:
+         mediaplayer.playlist.append(song['url'], metadata_cb=self.playlist_metadata_cb)
 
       if mediaplayer._onair_url is None:
          mediaplayer.playlist.play_next()
-      
+
+      artist = self._artists_db.get_data(songs_list[0]['artist'])
       EmcNotify('<title>%s</><br>%s' % (artist['name'], _('queued')),
                 icon='icon/music')
 
@@ -564,47 +566,33 @@ and what it need to work well, can also use markup like <title>this</> or
    def populate_songs_page(self, browser, page_url):
       """ list of all the songs """
       L = [self._songs_db.get_data(k) for k in self._songs_db.keys()]
-      for song in sorted(L, key = operator.itemgetter('title')):
+      for song in sorted(L, key=operator.itemgetter('title')):
          self._browser.item_add(SongItemClass(), song['url'], song)
 
    def populate_albums_page(self, browser, page_url):
       """ list of all albums """
       L = [self._albums_db.get_data(k) for k in self._albums_db.keys()]
-      for album in sorted(L, key = operator.itemgetter('name')):
+      for album in sorted(L, key=operator.itemgetter('name')):
          self._browser.item_add(AlbumItemClass(), album['name'], album)
 
    def populate_artists_page(self, browser, page_url):
       """ list of all artists """
       L = [self._artists_db.get_data(k) for k in self._artists_db.keys()]
-      for artist in sorted(L, key = operator.itemgetter('name')):
+      for artist in sorted(L, key=operator.itemgetter('name')):
          self._browser.item_add(ArtistItemClass(), artist['name'], artist)
 
    def populate_artist_page(self, browser, url, artist):
       """ list of all songs for the given artist """
-      self._browser.item_add(QueueArtistItemClass(), url, artist)
-      
-      for song_url in artist['songs']:
-         # TODO order by album/tracknumber/title
-         # ... maybe use genlist group !
-         song = self._songs_db.get_data(song_url)
+      L = [ self._songs_db.get_data(url) for url in artist['songs'] ]
+      L.sort(key=operator.itemgetter('album', 'tracknumber', 'title'))
+      self._browser.item_add(QueueArtistItemClass(), url, L)
+      for song in L:
          self._browser.item_add(SongItemClass(), song['url'], song)
 
    def populate_album_page(self, browser, url, album):
       """ list of all songs in the given album """
-      self._browser.item_add(QueueAlbumItemClass(), url, album)
-      
-      L = []
-      for song_url in album['songs']:
-         song = self._songs_db.get_data(song_url)
-         try:
-            song['label'] = "[%02d] - %s" % (song['tracknumber'], song['title'])
-         except:
-            song['label'] = song['title']
-         L.append(song)
-
-      # TODO sort by label
-      # ...or better don't do the label and sort by tracknumber/label
-      #
-      # for song in sorted(L, key='tracknumber'):
+      L = [ self._songs_db.get_data(url) for url in album['songs'] ]
+      L.sort(key=operator.itemgetter('tracknumber', 'title'))
+      self._browser.item_add(QueueAlbumItemClass(), url, L)
       for song in L:
          self._browser.item_add(SongItemClass(), song['url'], song)

@@ -168,7 +168,7 @@ class EmcBrowser(object):
    TODO doc default_style and style in general
    """
 
-   def __init__(self, name, default_style = 'List'):
+   def __init__(self, name, default_style='List'):
 
       DBG('EmcBrowser __init__')
       _instances.append(self)

@@ -40,6 +40,7 @@ from efl import ecore
 
 from epymc import utils, gui, ini
 from epymc.gui import EmcDialog, EmcNotify
+from epymc import __version__ as emc_version
 
 def LOG(msg):
    print('SUBTITLES: ' + str(msg))
@@ -249,8 +250,8 @@ class Opensubtitles(object):
 
    """
    OPENSUBTITLES_SERVER = 'http://api.opensubtitles.org/xml-rpc'
-   # USER_AGENT = 'Emotion Media Center' + version
-   USER_AGENT = 'OS Test User Agent'
+   # USER_AGENT = 'OS Test User Agent'
+   USER_AGENT = 'Emotion Media Center v' + emc_version
 
    def __init__ (self, url, done_cb=None):
       self.dialog = None

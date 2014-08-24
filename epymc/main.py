@@ -49,6 +49,11 @@ def start_epymc():
    l.addHandler(h)
    l.setLevel(logging.DEBUG)
 
+   # tag for pulse audio... name not working here, icon yes  :/
+   os.environ['PULSE_PROP_media.role'] = 'video'
+   os.environ['PULSE_PROP_application.name'] = 'Emotion Media Center'
+   os.environ['PULSE_PROP_application.icon_name'] = 'epymc'
+   
    # init elementary
    elementary.init()
 
@@ -89,7 +94,7 @@ def start_epymc():
    if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
       mediaplayer.play_url(sys.argv[1], start_from=0)
       mediaplayer.title_set(os.path.basename(sys.argv[1]))
-   
+
    # run the main loop
    elementary.run()
 

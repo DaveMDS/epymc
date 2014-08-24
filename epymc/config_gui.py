@@ -477,6 +477,10 @@ def _sys_info():
    from efl.elementary.configuration import preferred_engine_get
    from epymc.gui import _theme_generation
    from epymc import __version__ as emc_version
+   try:
+      from efl import __version__ as efl_version
+   except:
+      efl_version = _('Unknown')
 
    if sys.version_info[0] < 3:
       pref_engine = preferred_engine_get().encode('utf8')
@@ -496,7 +500,7 @@ def _sys_info():
           '<name>%s:</name> %s<br>' \
           '<name>%s:</name> %s<br>' \
           '<br><title>%s</><br>' \
-          '<name>%s:</name> %s<br>' \
+          '<name>%s:</name> %s <name> %s:</name> %s<br>' \
           '<name>%s:</name> %s<br>' \
           '<name>%s:</name> %s<br>' % (
             _('Core'),
@@ -510,9 +514,9 @@ def _sys_info():
             _('Base folder'), utils.emc_base_dir,
             _('Config folder'), utils.user_conf_dir,
             _('Versions'),
+            _('EpyMC'), emc_version, _('EpyMC themes API'), _theme_generation,
             _('Python'), sys.version,
-            _('EpyMC'), emc_version,
-            _('EpyMC themes API'), _theme_generation,
+            _('Python-EFL'), efl_version,
           )
    EmcDialog(style='panel', title=_('System info'), text=text)
 

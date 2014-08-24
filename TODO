@@ -7,7 +7,6 @@ BUGS
  * change the scale when in the config->General page will randomly segv
  * text in dialogs dont scale on-the-fly (elm bug)
  * autoscrolled entry are not constant-speed changing the fps...it was used to work :/
- * minipos visible, go back to zero... stop !
  * no way to toggle fs with the mouse
 
 CORE
@@ -20,6 +19,14 @@ CORE
  * show the status of the downloads in progress (and alert on exit if in progress)
  * use xdg to find config and download folder
  * add an option to disable exit confirmation (but show credit somewhere else)
+ * apply the volume using a logaritic curve
+ * Redo the evas engine selection/display using the new efl infra
+
+CORE (minor)
+============
+ * Unify the usage of length (change music to use seconds, instead of milliseconds)
+ * CHANGE ALL THE DBG/LOG FUNC TO: print('NAME: %s' % msg)
+ * make volume changes visibile also from mpris, fix the mess there!!
 
 NEW MODULES
 ===========

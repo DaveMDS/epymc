@@ -406,7 +406,7 @@ and what it need to work well, can also use markup like <title>this</> or
             tn = int(meta['tracknumber'][0])
          item_data['tracknumber'] = tn
       except:
-         pass
+         item_data['tracknumber'] = 0
 
       if 'length' in meta:
          item_data['length'] = meta['length'][0].encode('utf-8')

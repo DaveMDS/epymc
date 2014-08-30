@@ -94,8 +94,10 @@ class update_po(Command):
          for name in fnmatch.filter(files, '*.py'):
             sources += ' ' + os.path.join(dirpath, name)
 
-      # create the reference pot file
-      cmd = 'xgettext --from-code=UTF-8 --force-po --output=ref.pot %s' % (sources)
+      # create or update the reference pot file
+      pot_file = os.path.join('data', 'locale', 'epymc.pot')
+      cmd = 'xgettext --from-code=UTF-8 --force-po ' \
+                     '--output=%s %s' % (pot_file, sources)
       os.system(cmd)
 
       # create or update all the .po files
@@ -106,16 +108,13 @@ class update_po(Command):
          if os.path.exists(po_file):
             # update an existing po file
             info('updating po file: %s' % (po_file))
-            cmd = 'msgmerge -N -U -q %s ref.pot' % (po_file)
+            cmd = 'msgmerge -N -U -q %s %s' % (po_file, pot_file)
             os.system(cmd)
          else:
             # create a new po file
             info('creating po file: %s' % (po_file))
             mkpath(os.path.dirname(po_file), verbose=False)
-            copy_file('ref.pot', po_file, verbose=False)
-
-      # delete the reference pot file (no more needed)
-      os.remove('ref.pot')
+            copy_file(pot_file, po_file, verbose=False)
 
 
 class Uninstall(Command):

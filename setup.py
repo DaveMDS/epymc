@@ -96,6 +96,7 @@ class update_po(Command):
 
       # create or update the reference pot file
       pot_file = os.path.join('data', 'locale', 'epymc.pot')
+      info('updating pot file: %s' % (pot_file))
       cmd = 'xgettext --from-code=UTF-8 --force-po ' \
                      '--output=%s %s' % (pot_file, sources)
       os.system(cmd)

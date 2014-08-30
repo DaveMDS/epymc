@@ -530,11 +530,11 @@ class TMDBv3(object):
 
 
 class CastPanel(EmcDialog):
-   def __init__(self, pid):
+   def __init__(self, pid, lang=DEFAULT_INFO_LANG):
       self.pid = pid
       self.info = None
 
-      tmdb = TMDBv3()
+      tmdb = TMDBv3(lang=lang)
       tmdb.get_cast_info(self.pid, self._fetch_done_cb)
       self._dia = EmcDialog(style='minimal', title=_('Fetching info'),
                             text=_('please wait...'), spinner=True)

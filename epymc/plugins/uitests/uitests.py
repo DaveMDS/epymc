@@ -225,7 +225,6 @@ class MyItemClass(EmcItemClass):
          d.list_item_append('item 2', 'icon/star', 'icon/check_on')
          for i in range(3, 101):
             d.list_item_append('item %d'%i)
-            
 
       # Dialog - Panel full
       elif url == 'uitests://dlg-panel1':

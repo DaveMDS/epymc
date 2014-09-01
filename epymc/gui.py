@@ -863,7 +863,7 @@ class EmcDialog(edje.Edje):
       # automatic list
       if style in ['list', 'image_list_horiz', 'image_list_vert']:
          self._list = List(win, focus_allow=False, size_hint_align=FILL_BOTH,
-                           size_hint_weight=EXPAND_BOTH, content=content,
+                           size_hint_weight=EXPAND_BOTH,
                            horizontal=True if style == 'image_list_horiz' else False,
                            style='dialog' if style == 'list' else 'image_list')
          self._list.callback_activated_add(self._list_item_activated_cb)

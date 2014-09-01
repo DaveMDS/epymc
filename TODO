@@ -25,7 +25,6 @@ CORE
 CORE (minor)
 ============
  * Unify the usage of length (change music to use seconds, instead of milliseconds)
- * CHANGE ALL THE DBG/LOG FUNC TO: print('NAME: %s' % msg)
  * make volume changes visibile also from mpris, fix the mess there!!
 
 NEW MODULES

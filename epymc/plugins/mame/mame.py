@@ -38,7 +38,7 @@ import epymc.ini as ini
 
 
 def DBG(msg):
-   print('MAME: ' + str(msg))
+   print('MAME: %s' % msg)
    pass
 
 MAME_EXE = 'mame'

@@ -39,7 +39,7 @@ import epymc.mediaplayer as mediaplayer
 
 
 def DBG(msg):
-   print('MUSIC: ' + msg)
+   print('MUSIC: %s' % msg)
    pass
 
 

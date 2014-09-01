@@ -41,7 +41,7 @@ from __future__ import absolute_import, print_function
 
 
 def DBG(msg):
-   # print('EVENTS: ' + msg)
+   # print('EVENTS: %s' % msg)
    pass
 
 

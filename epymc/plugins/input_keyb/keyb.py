@@ -32,7 +32,7 @@ import epymc.ini as ini
 
 
 def DBG(msg):
-   # print('KEYB: ' + msg)
+   # print('KEYB: %s' % msg)
    pass
 
 

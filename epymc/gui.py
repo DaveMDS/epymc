@@ -62,13 +62,13 @@ EXPAND_HORIZ = evas.EVAS_HINT_EXPAND, 0.0
 FILL_BOTH = evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL
 FILL_HORIZ = evas.EVAS_HINT_FILL, 0.5
 
-DEBUG = False
-DEBUGN = 'GUI'
-def LOG(sev, msg):
-   if   sev == 'err': print('%s ERROR: %s' % (DEBUGN, msg))
-   elif sev == 'inf': print('%s: %s' % (DEBUGN, msg))
-   elif sev == 'dbg' and DEBUG: print('%s: %s' % (DEBUGN, msg))
 
+def LOG(msg):
+   print('MEDIAPLAYER: %s' % msg)
+
+def DBG(msg):
+   # print('MEDIAPLAYER: %s' % msg)
+   pass
 
 def init():
    """ return: False=failed True=ok """
@@ -90,15 +90,15 @@ def init():
          theme_name += '.edj'
       theme_file = utils.get_resource_file('themes', theme_name, 'default.edj')
       if theme_file is None:
-         LOG('err', 'cannot find a working theme file, exiting...')
+         LOG('cannot find a working theme file, exiting...')
          return False
 
    # check the theme generation
    gen = edje.file_data_get(theme_file, 'theme.generation')
    if gen != _theme_generation:
-      LOG('err', "Theme '{}' not in sync with actual code base.\n"
-                 "Needed generation: {} - theme: {} .. aborting".format(
-                 theme_file, _theme_generation, gen))
+      LOG('Theme "{}" not in sync with actual code base.\n'
+          'Needed generation: {} - theme: {} .. aborting'.format(
+            theme_file, _theme_generation, gen))
       return False
 
    # custom elementary theme
@@ -106,7 +106,7 @@ def init():
 
    # create the elm window
    preferred_engine_set(evas_engine)
-   LOG('inf', 'Requested evas engine: ' + evas_engine)
+   LOG('Requested evas engine: ' + evas_engine)
 
    win = Window('epymc', ELM_WIN_BASIC)
    win.title_set(_('Emotion Media Center'))
@@ -162,7 +162,7 @@ def get_theme_info(theme):
 def set_theme_file(path):
    global theme_file
 
-   LOG('inf', 'Using theme: ' + path)
+   LOG('Using theme: ' + path)
    theme_overlay_add(path) # TODO REMOVE ME!!! it's here for buttons, and others
    theme_extension_add(path)
    theme_file = path
@@ -196,26 +196,26 @@ def load_image(name, path = None):
    @return ElmImage
    @example: load_image('my_image.png', os.path.dirname(__file__))
    """
-   LOG('dbg', 'Requested image: ' + str(name))
-   LOG('dbg', 'Extra path: ' + str(path))
+   DBG('Requested image: ' + str(name))
+   DBG('Extra path: ' + str(path))
 
    im = Image(win)
 
    # if it's a full path just load it
    if os.path.exists(name):
-      LOG('dbg', 'Found image:' + name)
+      DBG('Found image:' + name)
       im.file_set(name)
       return im
 
    # try in main theme file (as group: image/$name)
    if edje.file_group_exists(theme_file, 'image/' + name):
-      LOG('dbg', 'Found image in theme group: image/' + name)
+      DBG('Found image in theme group: image/' + name)
       im.file_set(theme_file, 'image/' + name)
       return im
 
    # try in main theme file (as group: $name) (thus you can load 'icon/*')
    if edje.file_group_exists(theme_file, name):
-      LOG('dbg', 'Found image in theme group: ' + name)
+      DBG('Found image in theme group: ' + name)
       im.file_set(theme_file, name)
       return im
 
@@ -225,11 +225,11 @@ def load_image(name, path = None):
    if path:
       full = os.path.join(path, name)
       if os.path.exists(full):
-         LOG('dbg', 'Found image in extra path: image/' + name)
+         DBG('Found image in extra path: image/' + name)
          im.file_set(full)
          return im
 
-   LOG('err', 'Cannot load image: ' + str(name))
+   LOG('Cannot load image: ' + str(name))
    return im
 
 def ask_to_exit():
@@ -1714,9 +1714,9 @@ class DownloadManager(utils.Singleton):
 
       # pop an item from the queue and download it
       url, dest = self.queue.pop(0)
-      LOG('dbg', '************  DOWNLOAD START  ****************')
-      LOG('dbg', 'URL: ' + url)
-      LOG('dbg', 'PAT: ' + dest)
+      DBG('************  DOWNLOAD START  ****************')
+      DBG('URL: ' + url)
+      DBG('PAT: ' + dest)
       handler = utils.download_url_async(url, dest=dest+'.part',
                                          complete_cb=self._complete_cb,
                                          # progress_cb=self._progress_cb,

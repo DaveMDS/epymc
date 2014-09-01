@@ -44,10 +44,10 @@ from epymc.gui import EmcDialog, EmcNotify
 from epymc import __version__ as emc_version
 
 def LOG(msg):
-   print('SUBTITLES: ' + str(msg))
+   print('SUBTITLES: %s' % msg)
 
 def DBG(msg):
-   # print('SUBTITLES: ' + str(msg))
+   # print('SUBTITLES: %s' % msg)
    pass
 
 

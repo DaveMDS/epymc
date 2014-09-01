@@ -27,6 +27,10 @@ import traceback
 from epymc import ini
 from epymc import utils
 
+
+def LOG(msg):
+   print("MODULES: %s" % msg)
+
 # modules enabled by default
 DEFAULT_MODS = 'calibrator input_keyb onlinevideo mame movies music ' \
    'tvshows screensaver'
@@ -54,7 +58,7 @@ _instances = {} # key: module_name   val: EmcModule instance
 def load_all():
 
    def _scan_folder(path):
-      print('Searching for modules in: %s' % path)
+      LOG('Searching for modules in: %s' % path)
       if not path in sys.path:
          sys.path.insert(0, path)
       for root, dirs, files in os.walk(path):
@@ -62,12 +66,12 @@ def load_all():
             f = os.path.join(root, name, '__init__.py')
             if os.path.isfile(f):
                try:
-                  print(' * loading: %s' % name)
+                  LOG(' * loading: %s' % name)
                   mod =  __import__(name)
                except:
-                  print(' * FAILED: %s' % f)
+                  LOG(' * FAILED: %s' % f)
                   traceback.print_exc()
-      print('')
+      LOG('')
 
    # load from the plugins/ dir relative to script position
    _scan_folder(os.path.join(utils.emc_base_dir, 'plugins'))
@@ -131,10 +135,10 @@ def shutdown_by_name(name):
       del _instances[name]
 
 def shutdown_all():
-   print('Shutting down modules:')
+   LOG('Shutting down modules:')
    L = list()
    for mod in _instances:
       L.append(mod)
    for mod in L:
       shutdown_by_name(mod)
-   print('')
+   LOG('')

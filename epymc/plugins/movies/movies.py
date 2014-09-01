@@ -45,8 +45,8 @@ import epymc.config_gui as config_gui
 
 # debuggin stuff
 def DBG(msg):
-   print('MOVIES: %s' % (msg))
-   # pass
+   print('MOVIES: %s' % msg)
+   pass
 
 MOVIE_DB_VERSION = 1
 DEFAULT_INFO_LANG = 'en'

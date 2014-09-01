@@ -37,7 +37,7 @@ from epymc.utils import Singleton
 from epymc.gui import EmcRemoteImage, EmcScrolledEntry, EmcButton, EmcFocusManager
 
 def DBG(msg):
-   # print('BROWSER: ' + msg)
+   # print('BROWSER: %s' % msg)
    pass
 
 

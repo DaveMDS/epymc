@@ -35,7 +35,7 @@ from epymc.gui import EmcDialog, EmcRemoteImage
 
 
 def DBG(msg):
-   print('TMDB: %s' % (msg))
+   print('TMDB: %s' % msg)
    # pass
 
 

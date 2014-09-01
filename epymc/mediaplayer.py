@@ -31,17 +31,11 @@ from epymc.sdb import EmcDatabase
 from epymc.subtitles import Subtitles, Opensubtitles
 
 
-# OLD (deprecated)
-DEBUG = True
-DEBUGN = 'MEDIAPLAYER'
-def LOG(sev, msg):
-   if   sev == 'err': print('%s ERROR: %s' % (DEBUGN, msg))
-   elif sev == 'inf': print('%s: %s' % (DEBUGN, msg))
-   elif sev == 'dbg' and DEBUG: print('%s: %s' % (DEBUGN, msg))
+def LOG(msg):
+   print('MEDIAPLAYER: %s' % msg)
 
-# NEW (use this instead)
 def DBG(msg):
-   print('MEDIAPLAYER: ' + msg)
+   print('MEDIAPLAYER: %s' % msg)
    pass
 
 
@@ -210,7 +204,7 @@ def play_url(url, only_audio=False, start_from=None):
    if url.find('://', 2, 15) is -1:
       url = 'file://' + url
 
-   LOG('dbg', 'play_url: %s' % url)
+   DBG('play_url: %s' % url)
    _onair_url = url
    _onair_title = None
 
@@ -307,7 +301,7 @@ def play_counts_get(url):
 def stop():
    global _emotion, _onair_url, _onair_title, _subtitles, _subs_timer
 
-   LOG('dbg', 'Stop()')
+   DBG('Stop()')
 
    # clear the subtitles instance
    if _subtitles:
@@ -442,7 +436,7 @@ def subs_delay_apply(diff):
          _subtitles.delay = 0
       else:
          _subtitles.delay += diff
-      LOG('inf', 'Subs delay: %d ms' % _subtitles.delay)
+      LOG('Subs delay: %d ms' % _subtitles.delay)
 
 ### gui API ###
 def video_player_show():

@@ -37,7 +37,7 @@ from epymc.gui import EmcDialog
 
 
 def DBG(msg):
-   # print('SDB: ' + msg)
+   # print('SDB: %s' % msg)
    pass
 
 _queue = None

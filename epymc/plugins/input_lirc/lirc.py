@@ -35,7 +35,7 @@ import epymc.config_gui as config_gui
 
 
 def DBG(msg):
-   print('LIRC: ' + msg)
+   print('LIRC: %s' % msg)
    pass
 
 

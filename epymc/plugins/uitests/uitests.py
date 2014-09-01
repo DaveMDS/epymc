@@ -42,7 +42,7 @@ from epymc.browser import EmcBrowser, EmcItemClass
 
 
 def DBG(msg):
-   print('UITESTS: ' + msg)
+   print('UITESTS: %s' % msg)
    pass
 
 

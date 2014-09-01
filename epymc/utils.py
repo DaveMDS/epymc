@@ -32,7 +32,7 @@ from efl.ecore import FileDownload, Exe, ECORE_EXE_PIPE_READ, ECORE_EXE_PIPE_REA
 
 
 def DBG(msg):
-   # print('UTILS: ' + str(msg))
+   # print('UTILS: %s' % msg)
    pass
 
 

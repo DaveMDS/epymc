@@ -36,7 +36,7 @@ import epymc.config_gui as config_gui
 
 
 def DBG(msg):
-   print('JOY: ' + msg)
+   print('JOY: %s' % msg)
    pass
 
 

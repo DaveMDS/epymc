@@ -46,15 +46,9 @@ from epymc.extapi.onlinevideo import ACT_NONE, ACT_FOLDER, ACT_MORE, \
    ACT_PLAY, ACT_SEARCH
 
 
-DEBUG = True
-DEBUGN = 'ONLINEVID'
-def LOG(sev, msg):
-   if   sev == 'err': print('%s ERROR: %s' % (DEBUGN, msg))
-   elif sev == 'inf': print('%s: %s' % (DEBUGN, msg))
-   elif sev == 'dbg' and DEBUG: print('%s: %s' % (DEBUGN, msg))
-if DEBUG:
-   from pprint import pprint
-   import pdb
+def DBG(msg):
+   print('ONLINEVID: %s' % msg)
+   pass
 
 
 F_STATE = 0
@@ -134,7 +128,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
    def __init__(self):
       global _mod
       
-      LOG('dbg', 'Init module')
+      DBG('Init module')
 
       _mod = self
 
@@ -146,7 +140,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
       self._browser = EmcBrowser(_('Online Channels'))
 
    def __shutdown__(self):
-      LOG('dbg', 'Shutdown module')
+      DBG('Shutdown module')
       mainmenu.item_del('onlinechannels')
       self._browser.delete()
 
@@ -228,7 +222,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
       else:
          src = self._current_src
          cmd = '%s %s %d "%s"' % (self._py, src['exec'], next_state, url)
-         LOG('dbg', 'Executing: ' + cmd)
+         DBG('Executing: ' + cmd)
          EmcExec(cmd, True, self._request_page_done, item_data)
          self._run_dialog = EmcDialog(title=_('please wait'), style='cancel',
                                       text=_('Getting info...'), )
@@ -237,7 +231,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
       (next_state, label, url, info, icon, poster, action) = item_data
       src = self._current_src
       cmd = '%s %s %d "%s"' % (self._py, src['exec'], next_state, text)
-      LOG('dbg', 'ExecutingSearch: ' + cmd)
+      DBG('ExecutingSearch: ' + cmd)
       EmcExec(cmd, True, self._request_page_done, item_data)
       self._run_dialog = EmcDialog(title=_('please wait'), style='cancel',
                                    text=_('Getting info...'), )
@@ -249,9 +243,9 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
       items = []
       suggested = None
       for line in lines:
-         LOG('dbg', ' ---' + line)
+         DBG(' ---' + line)
          if line.startswith('PLAY!'):
-            LOG('inf', 'yes sir..' + line)
+            DBG('yes sir..' + line)
             url = line[5:]
             mediaplayer.play_url(url)
             mediaplayer.poster_set(parent_item_data[F_POSTER]) # TODO FIXME
@@ -276,7 +270,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
                   suggested.append(item_data)
                else:
                   items.append(item_data)
-               # LOG('dbg', str(item_data))
+               # DBG(str(item_data))
             except:
                continue
       

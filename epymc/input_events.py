@@ -23,7 +23,7 @@ from __future__ import absolute_import, print_function
 from epymc import events
 
 def DBG(msg):
-   # print('INPUT_EVENTS: ' + msg)
+   # print('INPUT_EVENTS: %s' % msg)
    pass
 
 STANDARD_EVENTS = """

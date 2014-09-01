@@ -40,7 +40,7 @@ except:
    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 def DBG(msg):
-   # print('WEBSERVER: ' + msg)
+   # print('WEBSERVER: %s' % msg)
    pass
 
 

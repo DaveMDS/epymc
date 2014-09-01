@@ -42,7 +42,7 @@ from efl import ecore
 
 
 def DBG(msg):
-   #~ print('DOWNLOADER: ' + msg)
+   #~ print('DOWNLOADER: %s' % msg)
    pass
 
 

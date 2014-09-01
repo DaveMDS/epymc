@@ -434,6 +434,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
             icon = EmcRemoteImage(person['profile_path']) # TODO use 'dest' to cache the img
             icon.size_hint_min_set(100, 100) # TODO FIXME
             dia.list_item_append(label, icon, None, person['id'])
+         dia.list_go()
 
    def _cast_info_done_cb(self, list_dia, pid):
       CastPanel(pid, lang=ini.get('movies', 'info_lang'))
@@ -458,6 +459,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
       for poster in posters:
          icon = EmcRemoteImage(poster['thumb_url'])
          dialog.list_item_append(None, icon, poster=poster)
+      dialog.list_go()
 
    def _cb_posters_list_ok(self, dialog, poster):
       dest = get_poster_filename(poster['movie_id'])
@@ -500,6 +502,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
       for backdrop in backdrops:
          img = EmcRemoteImage(backdrop['thumb_url'])
          dialog.list_item_append(None, img, backdrop=backdrop)
+      dialog.list_go()
 
    def _cb_backdrops_list_ok(self, dialog, backdrop):
       # download the selected backdrop
@@ -559,6 +562,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
             icon.size_hint_min_set(100, 100) # TODO fixme
             label = '%s (%s)' % (res['title'], res['year'])
             dialog2.list_item_append(label, icon, None, res['tmdb_id'])
+         dialog2.list_go()
 
    def _cb_list_cancel(self, dialog2):
       dialog2.delete()

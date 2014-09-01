@@ -568,6 +568,7 @@ class CastPanel(EmcDialog):
       for image in self.info['images']['profiles']:
          img = EmcRemoteImage(image['file_path'])
          dia.list_item_append(None, img)
+      dia.list_go()
 
    def movies_dialog(self):
       dia = EmcDialog(style='list', title=self.info['name'])
@@ -576,3 +577,4 @@ class CastPanel(EmcDialog):
          icon = EmcRemoteImage(movie['poster_path'])
          icon.size_hint_min_set(100, 100) # TODO FIXME
          dia.list_item_append(label, icon)
+      dia.list_go()

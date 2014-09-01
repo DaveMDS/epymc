@@ -385,6 +385,7 @@ class Opensubtitles(object):
                 sub['SubDownloadsCnt'])
          item = self.dialog.list_item_append(txt, 'icon/subs')
          item.data['sub'] = sub
+      self.dialog.list_go()
 
    def download_in_a_thread(self, btn):
       item = self.dialog.list_item_selected_get()

@@ -1171,6 +1171,7 @@ class EmcFolderSelector(EmcDialog):
          if fname[0] != '.' and os.path.isdir(fullpath):
             it = self.list_item_append(fname, 'icon/folder')
             it.data['fullpath'] = fullpath
+      self.list_go()
 
    def _btn_browse_cb(self, btn):
       path = self.list_item_selected_get().data['fullpath']

@@ -286,6 +286,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
          d.hide()
          for item in suggested:
             d.list_item_append(item[F_LABEL], item_data=item)
+         d.list_go()
          events.listener_add_single_shot("PLAYBACK_FINISHED", lambda: d.show())
 
       (next_state, label, url, info, icon, poster, action) = parent_item_data

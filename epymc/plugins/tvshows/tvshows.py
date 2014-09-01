@@ -488,6 +488,7 @@ class InfoPanel(EmcDialog):
          dia.list_item_append(None, icon, dwnl_url=poster['url'],
                      dest_path=get_tv_poster_filename(poster['movie_id']),
                      icon_url=poster['icon_url'])
+      dia.list_go()
 
    def _backdrop_button_cb(self, button):
       tmdb = TMDBv3(lang=ini.get('tvshows', 'info_lang'))
@@ -501,6 +502,7 @@ class InfoPanel(EmcDialog):
          icon = EmcRemoteImage(backdrop['thumb_url'])
          dia.list_item_append(None, icon, dwnl_url=backdrop['url'],
                      dest_path=get_tv_backdrop_filename(backdrop['movie_id']))
+      dia.list_go()
 
    def _image_choosed_cb(self, dia, dwnl_url, dest_path, icon_url=None):
       dia.delete()
@@ -534,6 +536,7 @@ class InfoPanel(EmcDialog):
          icon = EmcRemoteImage(person['profile_path']) # TODO use 'dest' to cache the img
          icon.size_hint_min_set(100, 100) # TODO FIXME
          dia.list_item_append(label, icon, None, person['id'])
+      dia.list_go()
 
    def _cast_info_done_cb(self, list_dia, pid):
       CastPanel(pid, lang=ini.get('tvshows', 'info_lang'))
@@ -566,6 +569,7 @@ class InfoPanel(EmcDialog):
             else:
                name = item['name']
             dia.list_item_append(name, img, serie_id=item['tmdb_id'])
+         dia.list_go()
       else:
          text = _('The search for "%s" did not make any results.<br>' \
                   'If your show is listed on themoviedb.org please rename ' \

@@ -159,6 +159,7 @@ class StdConfigItemStringFromList(StdConfigItemBase):
             it.selected = True
          else:
             dia.list_item_append(string)
+      dia.list_go()
 
    def label_end_get(self, url, user_data):
       return ini.get(self._sec, self._opt)
@@ -203,6 +204,7 @@ class StdConfigItemLang(StdConfigItemBase):
             else:
                it = dia.list_item_append(name)
                it.data['code2'] = code2
+      dia.list_go()
 
       if item:
          item.show()
@@ -230,6 +232,7 @@ class StdConfigItemIntMeaning(StdConfigItemBase):
             it = dia.list_item_append(string)
          it.data['i'] = i
          i += 1
+      dia.list_go()
 
    def _dia_list_selected_cb(self, dia):
       item = dia.list_item_selected_get()

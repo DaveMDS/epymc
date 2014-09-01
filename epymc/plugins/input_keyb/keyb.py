@@ -192,6 +192,7 @@ and what it need to work well, can also use markup like <title>this</> or
                       done_cb=self.event_choosed_cb)
       for event in input_events.STANDARD_EVENTS.split():
          dia.list_item_append(event)
+      dia.list_go()
 
    def event_choosed_cb(self, dia):
       event = str(dia.list_item_selected_get().text_get())

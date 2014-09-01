@@ -225,6 +225,7 @@ class MyItemClass(EmcItemClass):
          d.list_item_append('item 2', 'icon/star', 'icon/check_on')
          for i in range(3, 101):
             d.list_item_append('item %d'%i)
+         d.list_go()
 
       # Dialog - Panel full
       elif url == 'uitests://dlg-panel1':
@@ -346,6 +347,7 @@ class MyItemClass(EmcItemClass):
          for group in sorted(edje.file_collection_list(gui.theme_file)):
             if group.startswith('icon/'):
                d.list_item_append(group[5:], group)
+         d.list_go()
 
       # Text style in dialog
       elif url == 'uitests://styles':

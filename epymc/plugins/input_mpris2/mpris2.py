@@ -18,6 +18,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import absolute_import, print_function
+
 import dbus
 import dbus.service
 
@@ -31,7 +33,7 @@ import epymc.mediaplayer as mediaplayer
 import epymc.utils as utils
 import epymc.gui as gui
 
-from dbus_helper import DBusServiceObjectWithProps, dbus_property
+from .dbus_helper import DBusServiceObjectWithProps, dbus_property
 
 
 def DBG(msg):

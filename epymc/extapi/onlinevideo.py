@@ -18,6 +18,8 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
+# from __future__ import absolute_import, print_function
+
 import os, sys, json, subprocess, re, gettext
 from datetime import datetime
 from bs4 import BeautifulSoup

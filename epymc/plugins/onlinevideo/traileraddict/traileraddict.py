@@ -23,6 +23,7 @@
 #      stacked <stacked.xbmc@gmail.com>
 #  all the credits goes to him...thanks!
 
+from __future__ import absolute_import, print_function
 
 import re, hashlib
 from bs4 import BeautifulSoup

@@ -21,6 +21,8 @@
 # Inspired from the work on:
 # http://www.jezra.net/blog/Python_Joystick_Class_using_Gobject
 
+from __future__ import absolute_import, print_function
+
 import struct
 
 from efl import ecore

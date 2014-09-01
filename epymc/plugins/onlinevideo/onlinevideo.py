@@ -21,6 +21,7 @@
 from __future__ import absolute_import, print_function
 
 import os
+import sys
 import ast
 try:
    import configparser as ConfigParser
@@ -122,6 +123,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
    _sources = []
    _current_src = None
    _run_dialog = None
+   _py = sys.executable or ''
 
    _search_folders = [
       os.path.dirname(__file__),
@@ -225,7 +227,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
                       accept_cb=self._search_vkeyb_done)
       else:
          src = self._current_src
-         cmd = '%s %d "%s"' % (src['exec'], next_state, url)
+         cmd = '%s %s %d "%s"' % (self._py, src['exec'], next_state, url)
          LOG('dbg', 'Executing: ' + cmd)
          EmcExec(cmd, True, self._request_page_done, item_data)
          self._run_dialog = EmcDialog(title=_('please wait'), style='cancel',
@@ -234,7 +236,7 @@ need to work well, can also use markup like <title>this</> or <b>this</>""")
    def _search_vkeyb_done(self, vkeyb, text, item_data):
       (next_state, label, url, info, icon, poster, action) = item_data
       src = self._current_src
-      cmd = '%s %d "%s"' % (src['exec'], next_state, text)
+      cmd = '%s %s %d "%s"' % (self._py, src['exec'], next_state, text)
       LOG('dbg', 'ExecutingSearch: ' + cmd)
       EmcExec(cmd, True, self._request_page_done, item_data)
       self._run_dialog = EmcDialog(title=_('please wait'), style='cancel',

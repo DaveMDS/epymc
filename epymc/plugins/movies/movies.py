@@ -25,6 +25,7 @@ from operator import itemgetter
 
 from efl import ecore, evas, elementary, emotion
 from efl.elementary.image import Image
+from efl.elementary.entry import utf8_to_markup
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
@@ -101,9 +102,9 @@ class MovieItemClass(EmcItemClass):
    def label_get(self, url, mod):
       try:
          assert ini.get('movies', 'db_names_in_list') == 'True'
-         return mod._movie_db.get_data(url)['title']
+         return utf8_to_markup(mod._movie_db.get_data(url)['title'])
       except:
-         return os.path.basename(url)
+         return utf8_to_markup(os.path.basename(url))
 
    def icon_end_get(self, url, mod):
       counts = mediaplayer.play_counts_get(url)
@@ -140,7 +141,7 @@ class MovieItemClass(EmcItemClass):
                 '<name>%s:</> %s/10<br>' \
                 '<name>%s:</> %s<br>' \
                 '<name>%s:</> %s<br>' % (
-                  e['title'], e['country'], e['release_date'][:4],
+                  utf8_to_markup(e['title']), e['country'], e['release_date'][:4],
                   _('Rating'), e['rating'],
                   _('Director'), e['director'],
                   _('Cast'), mod._get_cast(e, 4))
@@ -148,14 +149,12 @@ class MovieItemClass(EmcItemClass):
          name, year = get_movie_name_from_url(url)
          text = '<title>%s</><br><name>%s:</> %s<br>' \
                 '<name>%s:</> %s<br><name>%s:</> %s<br>' % (
-                  os.path.basename(url),
+                  utf8_to_markup(os.path.basename(url)),
                   _('File size'),
                   utils.hum_size(os.path.getsize(utils.url2path(url))),
-                  _('Title'), name,
+                  _('Title'), utf8_to_markup(name),
                   _('Year'), year or _('Unknown'))
-      # return "test1: κόσμε END" # should see the Greek word 'kosme'
-      # return text.encode('utf-8')
-      return text.replace('&', '&amp;') # :/
+      return text
 
 class FolderItemClass(EmcItemClass):
    def item_selected(self, url, mod):

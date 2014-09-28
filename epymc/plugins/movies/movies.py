@@ -171,8 +171,8 @@ class MoviesModule(EmcModule):
    name = 'movies'
    label = _('Movies')
    icon = 'icon/movie'
-   info = _("""Long info for the movies module, explain what it does and what it
-need to work well, can also use markup like <title>this</> or <b>this</>""")
+   info = _('The movies module is used to browse your films collection, '
+            'it is fully integrated with themoviedb.org online database.')
 
    _browser = None     # the browser widget instance
    _movie_db = None    # key: movie_url  data: dictionary as of the tmdb api

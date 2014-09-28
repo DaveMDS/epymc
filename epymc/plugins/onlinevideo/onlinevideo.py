@@ -110,8 +110,7 @@ class OnlinevideoModule(EmcModule):
    name = 'onlinevideo'
    label = _('Online Channels')
    icon = 'icon/olvideo'
-   info = _("""Long info for the online channels module, explain what it does and what it 
-need to work well, can also use markup like <title>this</> or <b>this</>""")
+   info = _('Browse, watch and download videos from your favorite online sources.')
 
    _browser = None
    _sources = []

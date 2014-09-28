@@ -47,9 +47,8 @@ class MPRIS2Module(EmcModule):
    name = 'input_mpris2'
    label = _('Input - MPRIS2')
    icon = 'icon/dbus'
-   info = _("""Long info for the <b>MPRIS2</b> module, explain what it does
-and what it need to work well, can also use markup like <title>this</> or
-<b>this</>""")
+   info = _('Add the ability to control the application from any MPRIS2 '
+            'compatible client.')
 
    BUS_NAME = "org.mpris.MediaPlayer2.epymc"
 

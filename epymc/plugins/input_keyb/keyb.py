@@ -77,9 +77,8 @@ class KeyboardModule(EmcModule):
    name = 'input_keyb'
    label = _('Input - Keyboard')
    icon = 'icon/keyboard'
-   info = _("""Long info for the <b>Keyboard</b> module, explain what it does
-and what it need to work well, can also use markup like <title>this</> or
-<b>this</>""")
+   info = _('The keyboard module lets you control the application using '
+            'your keyboard, or any other device that act as a keyboard.')
 
    def __init__(self):
       DBG('Init module')

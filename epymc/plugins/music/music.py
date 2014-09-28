@@ -217,9 +217,7 @@ class MusicModule(EmcModule):
    name = 'music'
    label = _('Music')
    icon = 'icon/music'
-   info = _("""Long info for the <b>Music</b> module, explain what it does
-and what it need to work well, can also use markup like <title>this</> or
-<b>this</>""")
+   info = _('The music module build a database of all your albums, songs and artist.')
 
    _browser = None        # browser instance
    _rebuild_notify = None # rebuild notification object

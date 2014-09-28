@@ -44,9 +44,8 @@ class JoystickModule(EmcModule):
    name = 'input_joy'
    label = _('Input - Joystick')
    icon = 'icon/joystick'
-   info = _("""Long info for the <b>Joystick</b> module, explain what it does
-and what it need to work well, can also use markup like <title>this</> or
-<b>this</>""")
+   info = _('The joystick module lets you control the application using '
+            'any standard digital joystick or joypad.')
 
    EVENT_BUTTON = 0x01 # button pressed/released 
    EVENT_AXIS = 0x02   # axis moved  

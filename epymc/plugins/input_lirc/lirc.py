@@ -43,9 +43,8 @@ class LircModule(EmcModule):
    name = 'input_lirc'
    label = _('Input - Remote Control')
    icon = 'icon/remote'
-   info = _("""Long info for the <b>LIRC</b> module, explain what it does
-and what it need to work well, can also use markup like <title>this</> or
-<b>this</>""")
+   info = _('This module lets you control the application using any '
+            'LIRC compatible remote controller.')
 
    DEFAULT_LIRC_SOCKET = '/var/run/lirc/lircd'
    sok = None

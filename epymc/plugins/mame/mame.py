@@ -126,9 +126,8 @@ class MameModule(EmcModule):
    name = 'mame'
    label = _('M.A.M.E')
    icon = 'icon/mame'
-   info = _("""Long info for the <b>M.A.M.E</b> module, explain what it does
-and what it need to work well, can also use markup like <title>this</> or
-<b>this</>""")
+   info = _('This module add the ability to browse, download and play games '
+            'using the M.A.M.E. emulator.')
 
    def __init__(self):
       global _mod

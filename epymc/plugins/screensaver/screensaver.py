@@ -40,10 +40,10 @@ class ScreenSaver(EmcModule):
    name = 'screensaver'
    label = _('Screen saver')
    icon = 'icon/evas'
-   info = _("""Long info for the <b>Screen saver</b> module, explain what it does
-and what it need to work well, can also use markup like <title>this</> or
-<b>this</>""")
-
+   info = _('This module manage the X screensaver. It will prevent the '
+            'screensaver to activate while watching videos and can be '
+            'configured to activate the screensaver and/or shutdown your '
+            'monitor after a given amount of time.')
 
    def __init__(self):
       DBG('Init module')

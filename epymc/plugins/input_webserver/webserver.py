@@ -52,12 +52,12 @@ class WebserverModule(EmcModule):
    name = 'input_webserver'
    label = 'Input - Webserver'
    icon = 'icon/keyboard'
-   info = 'This module provide a way to control the application from ' \
-   'your web browser.<br>' \
-   'The server (by default) listen on port 8080, to connect just point ' \
-   'to: <br>http://your_ip:8080<br>' \
-   'You can change listening port and the theme from the configurtion file.'
-
+   info = _('This module provide a way to control the application from '
+            'your web browser.<br>'
+            'The server (by default) listen on port 8080, to connect just point '
+            'to: <br>http://your_ip:8080<br>'
+            'You can change listening port and the theme from the '
+            'configurtion file.')
 
    def __init__(self):
       DBG('Init module')

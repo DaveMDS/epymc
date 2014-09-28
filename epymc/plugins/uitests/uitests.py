@@ -379,7 +379,7 @@ class UiTestsModule(EmcModule):
    name = 'uitests'
    label = 'UI tests'
    icon = 'icon/star'
-   info = """This module serve as test for the various epymc components."""
+   info = 'This module serve as test for the various epymc components.'
    path = os.path.dirname(__file__)
 
    _browser = None

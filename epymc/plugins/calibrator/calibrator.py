@@ -49,7 +49,7 @@ class CalibratorModule(EmcModule):
    name = 'calibrator'
    label = _('Screen calibrator')
    icon = 'icon/calib'
-   info = _("""Use this module to calibrate your screen parameters.""")
+   info = _('Use this module to calibrate your screen parameters.')
    path = os.path.dirname(__file__)
 
    def __init__(self):

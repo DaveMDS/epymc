@@ -253,8 +253,8 @@ class TvShowsModule(EmcModule):
    name = 'tvshows'
    label = _('TV Shows')
    icon = 'icon/tv'
-   info = _("""Long info for the tvshows module, explain what it does and what it
-need to work well, can also use markup like <title>this</> or <b>this</>""")
+   info = _('The Tv Shows module is used to browse your series collection, '
+            'it is fully integrated with themoviedb.org online database.')
 
    _browser = None            # the Browser widget instance
    _scanner = None            # the BackgroundScanner instance

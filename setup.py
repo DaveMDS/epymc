@@ -192,7 +192,7 @@ setup (
    license = 'GNU GPL v3',
    platforms = 'linux',
 
-   requires = ['efl (>= 1.10.0)', 'beautifulsoup4'],
+   requires = ['efl (>= 1.10.0)', 'beautifulsoup4', 'mutagen'],
    provides = ['epymc'],
 
    packages = [

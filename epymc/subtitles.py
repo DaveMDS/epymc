@@ -145,12 +145,13 @@ class Subtitles(object):
 
    def search_subs(self):
       DBG('Searching subs for file %s' % self.media_path)
-      name = os.path.splitext(self.media_path)[0]
+      folder, fname = os.path.split(self.media_path)
+      name = os.path.splitext(fname)[0]
       L = []
 
       # search as /path/to/media/name*.{supported extension}
-      p = name + '*.*'
-      L = [ f for f in glob.glob(p) if f.lower().endswith(FORMATS) ]
+      L = [ os.path.join(folder, f) for f in os.listdir(folder)
+            if f.lower().endswith(FORMATS) and f.startswith(name) ]
       L.sort(key=len)
 
       # search in /userconfig/subtitles/md5_*.{supported extension}

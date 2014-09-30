@@ -194,15 +194,18 @@ def shutdown():
 def play_url(url, only_audio=False, start_from=None):
    global _onair_url, _onair_title
 
+   # must be a string not unicode, otherwise it cannot be hashed
+   url = str(url)
+   
+   # default to 'file://' if not given
+   if url.find('://', 2, 15) is -1:
+      url = 'file://' + url
+
    # check url
    if url.startswith('file://') and not os.path.exists(url[7:]):
       text = '<b>%s:</b><br>%s' % (_('File not found'), url)
       EmcDialog(text=text, style='error')
       return
-
-   url = str(url) # must be a string not unicode, otherwise it cannot be hashed
-   if url.find('://', 2, 15) is -1:
-      url = 'file://' + url
 
    DBG('play_url: %s' % url)
    _onair_url = url

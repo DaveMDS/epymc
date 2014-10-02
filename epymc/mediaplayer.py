@@ -289,9 +289,10 @@ def _play_real(start_from=None, only_audio=False):
          counts = { 'started': 0, 'finished': 0, 'stop_at': 0 }
          _play_db.set_data(url, counts)
 
-      # try to load subtitles
-      _subtitles = Subtitles(url)
-      _subs_timer = ecore.Timer(0.2, _update_subs_timer_cb)
+      # try to load subtitles (only for local files)
+      if url.startswith('file://'):
+         _subtitles = Subtitles(url)
+         _subs_timer = ecore.Timer(0.2, _update_subs_timer_cb)
 
 def play_counts_get(url):
    try:

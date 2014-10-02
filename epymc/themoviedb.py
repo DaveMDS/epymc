@@ -20,7 +20,7 @@
 
 from __future__ import absolute_import, print_function
 
-import os, json
+import os, json, codecs
 from operator import itemgetter
 
 try: # py3
@@ -153,7 +153,7 @@ class TMDBv3(object):
          return self.base_url_img + '/' + size + final_part
 
    def _read_json_file_and_delete_it(self, path):
-      with open(path) as f:
+      with codecs.open(path, encoding='utf8') as f:
          data = json.loads(f.read())
       os.remove(path)
       return data

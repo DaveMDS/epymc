@@ -6,6 +6,7 @@ Changes in version 1.0.1 (to be released)
 
  * Fix the file-not-found dialog when the provided file is not a correct url.
  * Fix playback for file names that ends with a regex pattern.
+ * Fix tmdb query for py3 when reply has non-ascii chars
 
 
 ===============================================================================

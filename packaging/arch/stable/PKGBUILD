@@ -1,0 +1,23 @@
+#Maintainer nixalot <nixalot at nixalot dot com>
+
+pkgname=epymc
+_pkgname=epymc
+_urlname=EpyMC
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Media Center application written in python and built on the Enlightenment Foundation Library"
+provides=$_pkgname
+arch=(any)
+license=(LGPL3)
+url="https://github.com/DaveMDS/${_pkgname}"
+makedepends=('git' 'python2')
+depends=('efl' 'elementary' 'python2-efl' 'python2-beautifulsoup4' 'mutagen')
+optdepends=('lirc: remote control support')
+source=("${_pkgname}.tar.gz::https://github.com/DaveMDS/epymc/archive/v1.0.0.tar.gz")
+md5sums=('SKIP')
+
+package() {
+    cd "$srcdir/${_pkgname}-${pkgver}"
+
+    python2 setup.py install --prefix=$pkgdir/usr
+}

@@ -8,6 +8,10 @@ epymc/__init__.pyc
 ## below files are created by makepkg
 ## when building the PKGBUILD
 epymc-*.tar.xz
-packaging/arch/epymc
-packaging/arch/pkg
-packaging/arch/src/
+epymc.tar.gz
+packaging/arch/stable/epymc
+packaging/arch/stable/pkg
+packaging/arch/stable/src/
+packaging/arch/dev/epymc
+packaging/arch/dev/pkg
+packaging/arch/dev/src

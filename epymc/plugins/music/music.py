@@ -351,6 +351,7 @@ class MusicModule(EmcModule):
          txt = '<title>%s</title><br>%s' % \
                (_('Rebuilding database'), _('operation completed'))
          EmcNotify(icon='icon/music', text=txt)
+         self._browser.refresh()
          return ecore.ECORE_CALLBACK_CANCEL
 
       return ecore.ECORE_CALLBACK_RENEW

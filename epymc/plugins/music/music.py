@@ -447,6 +447,8 @@ class MusicModule(EmcModule):
 
          # write album to db
          self._albums_db.set_data(item_data['album'], album_data)
+      else:
+         item_data['album'] = 'Unknown'
 
       # write song to db
       self._songs_db.set_data('file://' + full_path, item_data)

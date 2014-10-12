@@ -150,7 +150,7 @@ class SongItemClass(EmcItemClass):
       return _mod.search_poster_for_song(url, song)
 
    def info_get(self, url, song):
-      text = '<title>' + song['title'] + '</><br>'
+      text = '<title>{}</><br>'.format(song['title'])
       if 'artist' in song:
          text += _('<em>by</em> %s<br>') % song['artist']
       if 'album' in song:
@@ -330,7 +330,7 @@ class MusicModule(EmcModule):
    def rebuild_db_idler(self):
       try:
          # get the next file from the generator and read metadata (if needed)
-         full_path = self._rebuild_files.next()
+         full_path = next(self._rebuild_files)
          (name, ext) = os.path.splitext(full_path)
          if ext.lower() in mediaplayer.audio_extensions:
             if self._songs_db.id_exists('file://' + full_path):
@@ -364,27 +364,46 @@ class MusicModule(EmcModule):
       except:
          return
 
-      item_data = dict()
-      item_data['url'] = 'file://' + full_path
+      title = artist = album = None
 
       if 'title' in meta:
-         item_data['title'] = meta['title'][0].encode('utf-8') # TODO is the encode correct? doesn't evas support unicode now??
-      else:
-         item_data['title'] = os.path.basename(full_path)
+         if isinstance(meta['title'][0], bytes):
+            title = meta['title'][0].decode('utf-8') 
+         elif utils.is_py3():
+            title = meta['title'][0]
+         else:
+            title = meta['title'][0].encode('utf-8')
 
       if 'artist' in meta:
-         item_data['artist'] = meta['artist'][0].encode('utf-8')
+         if isinstance(meta['title'][0], bytes):
+            artist = meta['artist'][0].decode('utf-8') 
+         elif utils.is_py3():
+            artist = meta['artist'][0]
+         else:
+            artist = meta['artist'][0].encode('utf-8')
+
+      if 'album' in meta:
+         if isinstance(meta['title'][0], bytes):
+            album = meta['album'][0].decode('utf-8') 
+         elif utils.is_py3():
+            album = meta['album'][0]
+         else:
+            album = meta['album'][0].encode('utf-8')
+
+      item_data = dict()
+      item_data['url'] = 'file://' + full_path
+      item_data['title'] = title or os.path.basename(full_path)
+
+      if artist:
+         item_data['artist'] = artist
 
          # create artist item if necessary
-         if not self._artists_db.id_exists(item_data['artist']):
-            DBG('NEW ARTIST: ' + item_data['artist'])
-            artist_data = dict()
-            artist_data['name'] = item_data['artist']
-            artist_data['albums'] = list()
-            artist_data['songs'] = list()
+         if not self._artists_db.id_exists(artist):
+            DBG('NEW ARTIST: {}' .format(artist))
+            artist_data = {'name': artist, 'albums': [], 'songs': []}
          else:
             DBG('ARTIST EXIST')
-            artist_data = self._artists_db.get_data(item_data['artist'])
+            artist_data = self._artists_db.get_data(artist)
 
          # add song to song list (in artist), only if not exists yet
          if not full_path in artist_data['songs']:
@@ -395,9 +414,9 @@ class MusicModule(EmcModule):
             artist_data['albums'].append(meta['album'])
 
          # write artist to db
-         self._artists_db.set_data(item_data['artist'], artist_data)
+         self._artists_db.set_data(artist, artist_data)
       else:
-         item_data['artist'] = 'Unknow'
+         item_data['artist'] = 'Unknown'
 
       try:
          if '/' in meta['tracknumber'][0]:
@@ -411,19 +430,16 @@ class MusicModule(EmcModule):
       if 'length' in meta:
          item_data['length'] = meta['length'][0].encode('utf-8')
 
-      if 'album' in meta:
-         item_data['album'] = meta['album'][0].encode('utf-8')
+      if album:
+         item_data['album'] = album
 
          # create album item if necesary
-         if not self._albums_db.id_exists(item_data['album']):
-            DBG('NEW ALBUM: ' + item_data['album'])
-            album_data = dict()
-            album_data['name'] = item_data['album']
-            album_data['artist'] = item_data['artist']
-            album_data['songs'] = list()
+         if not self._albums_db.id_exists(album):
+            DBG('NEW ALBUM: {}'.format(album))
+            album_data = {'name': album, 'artist': artist, 'songs': []}
          else:
             DBG('ALBUM EXIST')
-            album_data = self._albums_db.get_data(item_data['album'])
+            album_data = self._albums_db.get_data(album)
 
          # add song to song list (in album), only if not exists yet
          if not full_path in album_data['songs']:

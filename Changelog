@@ -9,6 +9,7 @@ Changes in version 1.0.1 (to be released)
  * Fix tmdb query for py3 when reply has non-ascii chars.
  * Fix songs listing when the song do not have the album tag.
  * Fix refresh of the browser when the music scan take less than 1 second.
+ * Fix display of music items with chars that seems tags.
  
  * Music module is now py3 compatible (mutagen 1.25 support py3).
 

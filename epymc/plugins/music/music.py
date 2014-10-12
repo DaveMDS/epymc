@@ -25,6 +25,7 @@ import operator
 import mutagen
 
 from efl import ecore
+from efl.elementary.entry import utf8_to_markup
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
@@ -141,20 +142,21 @@ class SongItemClass(EmcItemClass):
       _mod.queue_url(url, song)
 
    def label_get(self, url, song):
+      title = utf8_to_markup(song['title'])
       try:
-         return "%02d - %s" % (song['tracknumber'], song['title'])
+         return "%02d - %s" % (song['tracknumber'], title)
       except:
-         return song['title']
+         return title
 
    def poster_get(self, url, song):
       return _mod.search_poster_for_song(url, song)
 
    def info_get(self, url, song):
-      text = '<title>{}</><br>'.format(song['title'])
+      text = '<title>{}</><br>'.format(utf8_to_markup(song['title']))
       if 'artist' in song:
-         text += _('<em>by</em> %s<br>') % song['artist']
+         text += _('<em>by</em> %s<br>') % utf8_to_markup(song['artist'])
       if 'album' in song:
-         text += _('<em>from</em> %s<br>') % song['album']
+         text += _('<em>from</em> %s<br>') % utf8_to_markup(song['album'])
       if 'length' in song:
          length = int(song['length']) / 1000
          min = length / 60
@@ -172,14 +174,14 @@ class AlbumItemClass(EmcItemClass):
                              None, _mod.populate_album_page, album)
 
    def label_get(self, url, album):
-      return _('%(name)s by %(artist)s') % (album)
+      return utf8_to_markup(_('%(name)s by %(artist)s') % (album))
 
    def poster_get(self, url, album):
       return _mod.search_poster_for_album(album)
 
    def info_get(self, url, album):
-      text = '<title>' + album['name'] + '</><br>'
-      text += _('<em>by</em> %s<br>') % album['artist']
+      text = '<title>%s</title><br>' % utf8_to_markup(album['name'])
+      text += _('<em>by</em> %s<br>') % utf8_to_markup(album['artist'])
       n = len(album['songs'])
       text += ngettext('%d song', '%d songs', n) % n
       
@@ -200,7 +202,7 @@ class ArtistItemClass(EmcItemClass):
                              None, _mod.populate_artist_page, artist)
 
    def label_get(self, url, artist):
-      return artist['name']
+      return utf8_to_markup(artist['name'])
 
    def poster_get(self, url, artist):
       return _mod.search_poster_for_artist(artist)
@@ -210,7 +212,8 @@ class ArtistItemClass(EmcItemClass):
       albums = ngettext('%d album', '%d albums', n) % n
       n = len(artist['songs'])
       songs = ngettext('%d song', '%d songs', n) % n
-      return '<title>%s</><br>%s, %s' % (artist['name'], albums, songs)
+      name = utf8_to_markup(artist['name'])
+      return '<title>%s</><br>%s, %s' % (name, albums, songs)
 
 
 class MusicModule(EmcModule):

@@ -154,21 +154,21 @@ class FileManagerModule(EmcModule):
          if self.focused == self.list1:
             self.focused = self.focusman
             self.focusman.focus()
-            self.list1.unfocus()
          elif self.focused == self.focusman:
             self.focused = self.list2
             self.list2.focus()
             self.focusman.unfocus()
+            self.list1.unfocus()
 
       if event == 'LEFT':
          if self.focused == self.list2:
             self.focused = self.focusman
             self.focusman.focus()
-            self.list2.unfocus()
          elif self.focused == self.focusman:
             self.focused = self.list1
             self.list1.focus()
             self.focusman.unfocus()
+            self.list2.unfocus()
 
       # elif event in ('BACK', 'EXIT'):
          # self.close()

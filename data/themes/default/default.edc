@@ -704,6 +704,144 @@ collections {
             target: "browser.grid.clip";
          }
 
+/// filemanager
+         part { name: "fileman.clip";
+            type: RECT;
+            description { state: "default" 0.0;
+               color: 0 0 0 0;
+            }
+            description { state: "visible" 0.0;
+               color: 255 255 255 255;
+            }
+         }
+         part { name: "fileman.list1.frame";
+            type: IMAGE;
+            clip_to: "fileman.clip";
+            description { state: "default" 0.0;
+               rel1.offset: 0 10;
+               rel1.to: "topbar.list.spacer";
+               rel1.relative: -0.5 1.0;
+               rel2.relative: 0.0 1.0;
+               rel2.offset: -1 10;
+               image.normal: "frame.png";
+               image.border: 32 32 92 78;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               rel1.relative: 0.0 1.0;
+               rel2.relative: 0.45 1.0;
+            }
+         }
+         part { name: "fileman.list1.swallow"; /* API */
+            type: SWALLOW;
+            clip_to: "fileman.clip";
+            description { state: "default" 0.0;
+               rel1.to: "fileman.list1.frame";
+               rel1.offset: 20 18;
+               rel2.to: "fileman.list1.frame";
+               rel2.offset: -20 -78;
+               color: 200 0 0 100;
+            }
+         }
+         part { name: "fileman.list2.frame";
+            type: IMAGE;
+            clip_to: "fileman.clip";
+            description { state: "default" 0.0;
+               rel1.offset: 0 10;
+               rel1.to: "topbar.list.spacer";
+               rel1.relative: 1.0 1.0;
+               rel2.relative: 1.5 1.0;
+               rel2.offset: -1 10;
+               image.normal: "frame.png";
+               image.border: 32 32 92 78;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               rel1.relative: 0.55 1.0;
+               rel2.relative: 1.0 1.0;
+               rel2.offset: -1 10;
+            }
+         }
+         part { name: "fileman.list2.swallow"; /* API */
+            type: SWALLOW;
+            clip_to: "fileman.clip";
+            description { state: "default" 0.0;
+               rel1.to: "fileman.list2.frame";
+               rel1.offset: 20 18;
+               rel2.to: "fileman.list2.frame";
+               rel2.offset: -20 -78;
+               color: 0 200 0 100;
+            }
+         }
+         part { name: "fileman.buttons.frame";
+            mouse_events: 0;
+            clip_to: "fileman.clip";
+            description { state: "default" 0.0;
+               rel1.to_y: "topbar.list.spacer";
+               rel1.relative: 0.45 1.0;
+               rel1.offset: -17 30;
+               rel2.relative: 0.55 1.0;
+               rel2.offset: 17 -60;
+               image {
+                  normal: "frame2.png";
+                  border: 8 8 8 8;
+               }
+            }
+         }
+         part { name: "fileman.buttons.box"; /* API */
+            type: BOX;
+            clip_to: "fileman.clip";
+            description { state: "default" 0.0;
+               rel1.to: "fileman.buttons.frame";
+               rel1.offset: 5 15;
+               rel2.to: "fileman.buttons.frame";
+               rel2.offset: -6 -15;
+               box {
+                  layout: "vertical";
+                  padding: 4 4;
+                  align: 0.5 0.0;
+                  min: 1 0;
+               }
+            }
+         }
+         part { name: "fileman.buttons.box2"; /* API */
+            type: BOX;
+            clip_to: "fileman.clip";
+            description { state: "default" 0.0;
+               rel1.to: "fileman.buttons.frame";
+               rel1.offset: 5 15;
+               rel2.to: "fileman.buttons.frame";
+               rel2.offset: -6 -15;
+               box {
+                  layout: "vertical";
+                  padding: 4 4;
+                  align: 0.5 1.0;
+                  min: 1 0;
+               }
+            }
+         }
+
+         // DBG_SHOW("fileman.list1.swallow", 200, 0, 0)
+         // DBG_SHOW("fileman.list2.swallow", 0, 200, 0)
+         program { name: "fileman_show"; /* API */
+            signal: "fileman,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.3;
+            target: "fileman.clip";
+            target: "fileman.list1.frame";
+            target: "fileman.list2.frame";
+         }
+         program { name: "fileman_hide"; /* API */
+            signal: "fileman,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: DECELERATE 0.3;
+            target: "fileman.clip";
+            target: "fileman.list1.frame";
+            target: "fileman.list2.frame";
+         }
+
 /// mainmenu
          part { name: "mainmenu.title.bg";
             description { state: "default" 0.0;

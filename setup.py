@@ -211,6 +211,7 @@ setup (
       'epymc.plugins.music',
       'epymc.plugins.uitests',
       'epymc.plugins.calibrator',
+      'epymc.plugins.filemanager',
    ],
 
    package_data = {

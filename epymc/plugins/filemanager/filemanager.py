@@ -28,8 +28,9 @@ from epymc.modules import EmcModule
 from epymc.gui import EXPAND_BOTH, EXPAND_HORIZ, FILL_BOTH, FILL_HORIZ
 import epymc.mainmenu as mainmenu
 import epymc.input_events as input_events
-import epymc.gui as gui
 import epymc.utils as utils
+import epymc.gui as gui
+import epymc.ini as ini
 
 # TODO increment theme generation
 
@@ -37,8 +38,6 @@ def DBG(msg):
    print('FILEMAN: %s' % msg)
    pass
 
-
-fav = ['/home/dave', '/home/dave/Video']
 
 class FilemanList(List):
    def __init__(self):
@@ -71,13 +70,25 @@ class FilemanList(List):
          item = self.selected_item
       if os.path.isdir(item.data['path']):
          self.populate(item.data['path'])
+      elif item.data['path'] == 'fav':
+         gui.EmcSourcesManager('filemanager')
 
-   def populate_root(self):
+   def populate_root(self, favorites):
       self.clear()
-      for path in fav:
-         it = self.item_append(path)
+      for path in favorites:
+         if path.startswith('file://'):
+            path = path[7:]
+         if path == os.path.expanduser('~'):
+            icon = gui.load_icon('icon/home')
+         else:
+            icon = gui.load_icon('icon/folder')
+         it = self.item_append(path, icon)
          it.data['path'] = path
+
+      it = self.item_append(_('Manage favorites'), gui.load_icon('icon/plus'))
+      it.data['path'] = 'fav'
       self.go()
+      self.first_item.selected = True
 
    def populate(self, folder):
       self.clear()
@@ -130,6 +141,11 @@ class FileManagerModule(EmcModule):
       mainmenu.item_add('fileman', 60, _('File Manager'), 'icon/folder',
                         self.cb_mainmenu)
 
+      ini.add_section('filemanager')
+      if not ini.get_string_list('filemanager', 'folders', ';'):
+         favs = ['file://' + os.path.expanduser("~")]
+         ini.set_string_list('filemanager', 'folders', favs, ';')
+
    def __shutdown__(self):
       mainmenu.item_del('fileman')
 
@@ -154,26 +170,34 @@ class FileManagerModule(EmcModule):
       b = gui.EmcButton(_('Rename'), size_hint_align=FILL_HORIZ)
       self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_rename_cb)
+      b.data['cb'] = self.bt_rename_cb
       gui.box_append('fileman.buttons.box', b)
 
       b = gui.EmcButton(_('Delete'), size_hint_align=FILL_HORIZ)
       self.focusman.obj_add(b)
       gui.box_append('fileman.buttons.box', b)
 
+      b = gui.EmcButton(_('Favorites'), size_hint_align=FILL_HORIZ)
+      self.focusman.obj_add(b)
+      b.callback_clicked_add(self.bt_favorites_cb)
+      b.data['cb'] = self.bt_favorites_cb
+      gui.box_append('fileman.buttons.box2', b)
+
       b = gui.EmcButton(_('Close'), size_hint_align=FILL_HORIZ)
       self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_close_cb)
+      b.data['cb'] = self.bt_close_cb
       gui.box_append('fileman.buttons.box2', b)
 
       li = FilemanList() 
       gui.swallow_set('fileman.list1.swallow', li)
-      li.populate_root()
+      li.populate_root(ini.get_string_list('filemanager', 'folders', ';'))
       li.callback_selected_add(self.list_item_selected_cb)
       self.list1 = li
 
       li = FilemanList()
       gui.swallow_set('fileman.list2.swallow', li)
-      li.populate_root()
+      li.populate_root(ini.get_string_list('filemanager', 'folders', ';'))
       li.callback_selected_add(self.list_item_selected_cb)
       self.list2 = li
 
@@ -182,10 +206,13 @@ class FileManagerModule(EmcModule):
       self.focusman.unfocus()
       self.ui_built = True
 
-     
    def bt_rename_cb(self, bt):
       gui.EmcVKeyboard()
-      
+
+   def bt_favorites_cb(self, bt):
+      li = self.list1 if self.list1.selected_item else self.list2
+      li.populate_root(ini.get_string_list('filemanager', 'folders', ';'))
+
    def bt_close_cb(self, bt):
       input_events.listener_del('fileman')
       mainmenu.show()
@@ -213,6 +240,8 @@ class FileManagerModule(EmcModule):
             self.focusman.focus()
          elif self.focused == self.focusman:
             self.list2.focus()
+            self.focusman.unfocus()
+            self.focused = self.list2
 
       elif event == 'LEFT':
          if self.focused == self.list2:
@@ -220,10 +249,18 @@ class FileManagerModule(EmcModule):
             self.focusman.focus()
          elif self.focused == self.focusman:
             self.list1.focus()
+            self.focusman.unfocus()
+            self.focused = self.list1
 
       elif event in ('OK'):
          if self.focused in (self.list1, self.list2):
             self.focused.item_activated_cb()
+         else:
+            bt = self.focusman.focused_obj_get()
+            bt.data['cb'](bt)
+
+      else:
+         return input_events.EVENT_CONTINUE
 
       # elif event in ('BACK', 'EXIT'):
          # self.close()

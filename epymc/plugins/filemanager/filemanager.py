@@ -153,6 +153,8 @@ class FileManagerModule(EmcModule):
       self.build_ui()
       mainmenu.hide()
       gui.signal_emit('fileman,show')
+      gui.signal_emit('topbar,show')
+      gui.text_set('topbar.title', _('File Manager'))
       input_events.listener_add('fileman', self.input_event_cb)
 
    def build_ui(self):
@@ -217,6 +219,7 @@ class FileManagerModule(EmcModule):
       input_events.listener_del('fileman')
       mainmenu.show()
       gui.signal_emit('fileman,hide')
+      gui.signal_emit('topbar,hide')
 
    def list_item_selected_cb(self, li, it):
       if li == self.list1:

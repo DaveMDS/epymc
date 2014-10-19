@@ -161,11 +161,11 @@ class FileManagerModule(EmcModule):
       if self.ui_built:
          return
 
-      b = gui.EmcButton(_('Copy'), size_hint_align=FILL_HORIZ)
+      b = gui.EmcButton(_('Copy (*)'), size_hint_align=FILL_HORIZ)
       self.focusman.obj_add(b)
       gui.box_append('fileman.buttons.box', b)
 
-      b = gui.EmcButton(_('Move'), size_hint_align=FILL_HORIZ)
+      b = gui.EmcButton(_('Move (*)'), size_hint_align=FILL_HORIZ)
       self.focusman.obj_add(b)
       gui.box_append('fileman.buttons.box', b)
 
@@ -175,8 +175,10 @@ class FileManagerModule(EmcModule):
       b.data['cb'] = self.bt_rename_cb
       gui.box_append('fileman.buttons.box', b)
 
-      b = gui.EmcButton(_('Delete'), size_hint_align=FILL_HORIZ)
+      b = gui.EmcButton(_('Delete (*)'), size_hint_align=FILL_HORIZ)
       self.focusman.obj_add(b)
+      b.callback_clicked_add(self.bt_delete_cb)
+      b.data['cb'] = self.bt_delete_cb
       gui.box_append('fileman.buttons.box', b)
 
       b = gui.EmcButton(_('Favorites'), size_hint_align=FILL_HORIZ)
@@ -209,7 +211,25 @@ class FileManagerModule(EmcModule):
       self.ui_built = True
 
    def bt_rename_cb(self, bt):
-      gui.EmcVKeyboard()
+      it = self.list1.selected_item or self.list2.selected_item
+      src = it.data['path']
+      if src and src != it.text and os.access(src, os.W_OK):
+         gui.EmcVKeyboard(title=_('Rename'), text=it.text,
+                          accept_cb=self.rename_vkeyb_cb, user_data=it)
+
+   def rename_vkeyb_cb(self, vkeyb, new_name, it):
+      src = it.data['path']
+      dst = os.path.join(os.path.dirname(src), new_name)
+      try:
+         os.rename(src, dst)
+      except Exception as e:
+         gui.EmcDialog(style='error', title='Cannot rename file', text=str(e))
+      else:
+         it.text = new_name
+         it.data['path'] = dst
+
+   def bt_delete_cb(self, bt):
+      print("TODO")
 
    def bt_favorites_cb(self, bt):
       li = self.list1 if self.list1.selected_item else self.list2

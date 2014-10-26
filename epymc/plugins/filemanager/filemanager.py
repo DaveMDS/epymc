@@ -316,7 +316,7 @@ class FileManagerWorker(object):
       self.op = None
       self.dia = None
       self.block_size = 8388608 # 1024x1024x8 = 8 MB
-      self.progress_queue = queue.Queue() # (byte_done, byte_tot) or 'done'
+      self.progress_queue = queue.Queue() # (cur_name, cur_file, total_files, byte_done, byte_tot) or 'done'
       self.progress_timer = None
 
    def copy(self, src, dst):
@@ -345,8 +345,10 @@ class FileManagerWorker(object):
       DBG('TODO Abort')
       # TODO
 
-   def _dialog_update(self, progress):
-      txt = self.op
+   def _dialog_update(self, fname, cur_file, tot_files, progress):
+      if self.op == 'copy':
+         txt = _('Copying file {0} of {1}:').format(cur_file, tot_files)
+      txt += '<br>' + os.path.basename(fname) + '<br>'
       self.dia.text_set(txt)
       self.dia.progress_set(progress)
 
@@ -361,45 +363,78 @@ class FileManagerWorker(object):
 
       # operation finished ?
       if isinstance(item, str) and item == 'done':
-         self._dialog_update(100)
          self.dia.delete()
          return ecore.ECORE_CALLBACK_CANCEL
 
       # update progress dialog
-      done, tot = item
-      self._dialog_update(done / tot)
+      cur_name, cur_file, tot_files, done_bytes, tot_bytes = item
+      self._dialog_update(cur_name, cur_file, tot_files, done_bytes / tot_bytes)
 
       return ecore.ECORE_CALLBACK_RENEW
 
    def _copy_thread(self):
+
+      total_bytes = 0
+      tobedone = []
+
+      # build tobedone list [(src_file, dst_file), ... ]
       if os.path.isdir(self.src):
-         return # TODO
+         src_folder = self.src
+         base = os.path.dirname(src_folder)
+         dst_folder = self.dst
+         for (path, dirs, files) in os.walk(src_folder):
+            for f in files:
+               src_file = os.path.join(path, f)
+               dst_file = os.path.join(dst_folder, path[len(base)+1:], f)
+               tobedone.append((src_file, dst_file))
+               total_bytes += os.stat(src_file).st_size
       else:
          src_file = self.src
-         dest_file = os.path.join(self.dst, os.path.basename(src_file))
-         total_size = os.stat(src_file).st_size
+         dst_file = os.path.join(self.dst, os.path.basename(src_file))
+         tobedone.append((src_file, dst_file))
+         total_bytes = os.stat(src_file).st_size
 
-      # open
-      fsrc = open(src_file, "rb")
-      fdst = open(dest_file, "wb")
-      cur_pos = 0
+      total_files = len(tobedone)
+      cur_file = 0
+      done_bytes = 0
 
-      while True:
-         print("TH ", cur_pos)
-         # read
-         data = fsrc.read(self.block_size)
-         if not data:
-            self.progress_queue.put('done')
-            break
+      for src_file, dst_file in tobedone:
+         cur_file += 1
 
-         # write
-         fdst.write(data)
-         self.progress_queue.put((cur_pos, total_size))
-         cur_pos += self.block_size
+         # create dest folder if needed
+         dst_folder = os.path.dirname(dst_file)
+         if not os.path.exists(dst_folder):
+            os.makedirs(dst_folder)
 
-      # close
-      fsrc.close()
-      fdst.close()
+         # open
+         fsrc = open(src_file, "rb")
+         fdst = open(dst_file, "wb")
+         cur_pos = 0
+
+         while True:
+            DBG("TH ", src_file, cur_pos)
+
+            # read
+            data = fsrc.read(self.block_size)
+            if not data:
+               break
+
+            # write
+            fdst.write(data)
+
+            # report progress
+            done_bytes += len(data)
+            item = (src_file, cur_file, total_files, done_bytes, total_bytes)
+            self.progress_queue.put(item)
+
+            # advance to next 'block'
+            cur_pos += self.block_size
+
+         # close
+         fsrc.close()
+         fdst.close()
+
+      self.progress_queue.put('done')
 
 
 #def same_partition(f1, f2):

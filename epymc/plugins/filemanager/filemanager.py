@@ -96,6 +96,7 @@ class FilemanList(List):
       it.data['path'] = 'fav'
       self.go()
       self.first_item.selected = True
+      self.current_folder = None
 
    def populate(self, folder):
       self.clear()
@@ -316,22 +317,22 @@ class FileManagerWorker(object):
       self.op = None
       self.dia = None
       self.block_size = 8388608 # 1024x1024x8 = 8 MB
-      self.progress_queue = queue.Queue() # (cur_name, cur_file, total_files, byte_done, byte_tot) or 'done'
-      self.progress_timer = None
+      self.progress_queue = queue.Queue() # (cur_name, cur_file, total_files, bytes_done, bytes_tot) or 'done'
 
    def copy(self, src, dst):
-      DBG('COPY: "%s" -> "%s"' % (src,dst))
+      if not self.check_src_and_dest(src, dst):
+         return
 
+      DBG('COPY: "%s" -> "%s"' % (src,dst))
       self.op, self.src, self.dst = 'copy', src, dst
 
-      self.dia = gui.EmcDialog(style='progress', title='File Manager',
-                               text='Operation is starting...',
+      self.dia = gui.EmcDialog(style='progress', title=_('File Manager'),
+                               text=_('Operation is starting...'),
                                canc_cb=self.abort_operation)
-      
       t = threading.Thread(target=self._copy_thread)
       t.start()
 
-      self.progress_timer = ecore.Timer(0.2, self._progress_timer_cb)
+      ecore.Timer(0.2, self._progress_timer_cb)
 
    def move(self, src, dst):
       DBG('MOVE: %s -> %s' % (src,dst))
@@ -344,6 +345,31 @@ class FileManagerWorker(object):
    def abort_operation(self, dia=None):
       DBG('TODO Abort')
       # TODO
+
+   def check_src_and_dest(self, src, dest):
+      # src must be readable
+      if not os.access(src, os.R_OK):
+         gui.EmcDialog(style='error', text=_('Source is not readable'))
+         return False
+
+      # dest folder must be writable
+      if not os.path.isdir(dest) or not os.access(dest, os.W_OK):
+         gui.EmcDialog(style='error', text=_('Destination folder is not writable'))
+         return False
+
+      # src folder and dest must be different
+      src_folder = os.path.dirname(src)
+      if src_folder == dest:
+         gui.EmcDialog(style='error', text=_('Invalid destination folder'))
+         return False
+
+      # do not overwrite destination
+      dest_name = os.path.join(dest, os.path.basename(src))
+      if os.path.exists(dest_name):
+         gui.EmcDialog(style='error', text=_('Destination already exists'))
+         return False
+
+      return True
 
    def _dialog_update(self, fname, cur_file, tot_files, progress):
       if self.op == 'copy':
@@ -377,7 +403,7 @@ class FileManagerWorker(object):
       total_bytes = 0
       tobedone = []
 
-      # build tobedone list [(src_file, dst_file), ... ]
+      # build tobedone list: [(src_file, dst_file), ... ]
       if os.path.isdir(self.src):
          src_folder = self.src
          base = os.path.dirname(src_folder)
@@ -398,6 +424,7 @@ class FileManagerWorker(object):
       cur_file = 0
       done_bytes = 0
 
+      # copy files one by one
       for src_file, dst_file in tobedone:
          cur_file += 1
 
@@ -412,8 +439,6 @@ class FileManagerWorker(object):
          cur_pos = 0
 
          while True:
-            DBG("TH ", src_file, cur_pos)
-
             # read
             data = fsrc.read(self.block_size)
             if not data:

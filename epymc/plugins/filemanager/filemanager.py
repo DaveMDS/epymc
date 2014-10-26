@@ -21,7 +21,13 @@
 from __future__ import absolute_import, print_function
 
 import os
+import threading
+try:
+   import queue
+except:
+   import Queue as queue
 
+from efl import ecore
 from efl.elementary.list import List
 
 from epymc.modules import EmcModule
@@ -44,6 +50,7 @@ class FilemanList(List):
       # TODO rename style to be more generic
       List.__init__(self, gui.layout, style='fileman', focus_allow=False)
       self.last_focused_item = None
+      self.current_folder = None
       self.callback_activated_add(self.item_activated_cb)
 
    def focus(self):
@@ -124,6 +131,7 @@ class FilemanList(List):
 
       self.go()
       self.first_item.selected = True
+      self.current_folder = folder
 
 
 class FileManagerModule(EmcModule):
@@ -138,6 +146,7 @@ class FileManagerModule(EmcModule):
       self.list2 = None
       self.focused = None
       self.focusman = gui.EmcFocusManager()
+      self.worker = FileManagerWorker()
       mainmenu.item_add('fileman', 60, _('File Manager'), 'icon/folder',
                         self.cb_mainmenu)
 
@@ -163,6 +172,8 @@ class FileManagerModule(EmcModule):
 
       b = gui.EmcButton(_('Copy (*)'), size_hint_align=FILL_HORIZ)
       self.focusman.obj_add(b)
+      b.callback_clicked_add(self.bt_copy_cb)
+      b.data['cb'] = self.bt_copy_cb
       gui.box_append('fileman.buttons.box', b)
 
       b = gui.EmcButton(_('Move (*)'), size_hint_align=FILL_HORIZ)
@@ -228,6 +239,16 @@ class FileManagerModule(EmcModule):
          it.text = new_name
          it.data['path'] = dst
 
+   def bt_copy_cb(self, bt):
+      it = self.list1.selected_item or self.list2.selected_item
+      src = it.data['path']
+      if self.list1.selected_item:
+         dst = self.list2.current_folder
+      else:
+         dst = self.list1.current_folder
+      if src and dst:
+         self.worker.copy(src, dst)
+
    def bt_delete_cb(self, bt):
       print("TODO")
 
@@ -285,8 +306,101 @@ class FileManagerModule(EmcModule):
       else:
          return input_events.EVENT_CONTINUE
 
-      # elif event in ('BACK', 'EXIT'):
-         # self.close()
-         # return input_events.EVENT_CONTINUE
-# 
       return input_events.EVENT_BLOCK
+
+
+class FileManagerWorker(object):
+   def __init__(self):
+      self.src = None
+      self.dst = None
+      self.op = None
+      self.dia = None
+      self.block_size = 8388608 # 1024x1024x8 = 8 MB
+      self.progress_queue = queue.Queue() # (byte_done, byte_tot) or 'done'
+      self.progress_timer = None
+
+   def copy(self, src, dst):
+      DBG('COPY: "%s" -> "%s"' % (src,dst))
+
+      self.op, self.src, self.dst = 'copy', src, dst
+
+      self.dia = gui.EmcDialog(style='progress', title='File Manager',
+                               text='Operation is starting...',
+                               canc_cb=self.abort_operation)
+      
+      t = threading.Thread(target=self._copy_thread)
+      t.start()
+
+      self.progress_timer = ecore.Timer(0.2, self._progress_timer_cb)
+
+   def move(self, src, dst):
+      DBG('MOVE: %s -> %s' % (src,dst))
+      # TODO
+
+   def delete(self, path):
+      DBG('DELETE: %s' % (path))
+      # TODO
+
+   def abort_operation(self, dia=None):
+      DBG('TODO Abort')
+      # TODO
+
+   def _dialog_update(self, progress):
+      txt = self.op
+      self.dia.text_set(txt)
+      self.dia.progress_set(progress)
+
+   def _progress_timer_cb(self):
+      # queue empty, nothing to do
+      if self.progress_queue.empty():
+         return ecore.ECORE_CALLBACK_RENEW
+
+      # get only the LAST item in the queue
+      while not self.progress_queue.empty():
+         item = self.progress_queue.get_nowait()
+
+      # operation finished ?
+      if isinstance(item, str) and item == 'done':
+         self._dialog_update(100)
+         self.dia.delete()
+         return ecore.ECORE_CALLBACK_CANCEL
+
+      # update progress dialog
+      done, tot = item
+      self._dialog_update(done / tot)
+
+      return ecore.ECORE_CALLBACK_RENEW
+
+   def _copy_thread(self):
+      if os.path.isdir(self.src):
+         return # TODO
+      else:
+         src_file = self.src
+         dest_file = os.path.join(self.dst, os.path.basename(src_file))
+         total_size = os.stat(src_file).st_size
+
+      # open
+      fsrc = open(src_file, "rb")
+      fdst = open(dest_file, "wb")
+      cur_pos = 0
+
+      while True:
+         print("TH ", cur_pos)
+         # read
+         data = fsrc.read(self.block_size)
+         if not data:
+            self.progress_queue.put('done')
+            break
+
+         # write
+         fdst.write(data)
+         self.progress_queue.put((cur_pos, total_size))
+         cur_pos += self.block_size
+
+      # close
+      fsrc.close()
+      fdst.close()
+
+
+#def same_partition(f1, f2):
+#   return os.stat(f1).st_dev == os.stat(f2).st_dev

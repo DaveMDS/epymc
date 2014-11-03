@@ -171,7 +171,7 @@ class FileManagerModule(EmcModule):
       if self.ui_built:
          return
 
-      b = gui.EmcButton(_('Copy (*)'), size_hint_align=FILL_HORIZ)
+      b = gui.EmcButton(_('Copy'), size_hint_align=FILL_HORIZ)
       self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_copy_cb)
       b.data['cb'] = self.bt_copy_cb
@@ -187,7 +187,7 @@ class FileManagerModule(EmcModule):
       b.data['cb'] = self.bt_rename_cb
       gui.box_append('fileman.buttons.box', b)
 
-      b = gui.EmcButton(_('Delete (*)'), size_hint_align=FILL_HORIZ)
+      b = gui.EmcButton(_('Delete'), size_hint_align=FILL_HORIZ)
       self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_delete_cb)
       b.data['cb'] = self.bt_delete_cb
@@ -251,7 +251,8 @@ class FileManagerModule(EmcModule):
          self.worker.copy(src, dst)
 
    def bt_delete_cb(self, bt):
-      print("TODO")
+      it = self.list1.selected_item or self.list2.selected_item
+      self.worker.delete(it.data['path'])
 
    def bt_favorites_cb(self, bt):
       li = self.list1 if self.list1.selected_item else self.list2
@@ -322,25 +323,39 @@ class FileManagerWorker(object):
    def copy(self, src, dst):
       if not self.check_src_and_dest(src, dst):
          return
-
       DBG('COPY: "%s" -> "%s"' % (src,dst))
       self.op, self.src, self.dst = 'copy', src, dst
+      self._start_operation_in_thread(self._copy_thread)
 
-      self.dia = gui.EmcDialog(style='progress', title=_('File Manager'),
-                               text=_('Operation is starting...'),
-                               canc_cb=self.abort_operation)
-      t = threading.Thread(target=self._copy_thread)
-      t.start()
+   def delete(self, path):
+      DBG('DELETE: %s' % (path))
+      self.op, self.src = 'delete', path
+      if os.path.isdir(path):
+         txt = _('Are you sure you want to delete the folder?')
+      else:
+         txt = _('Are you sure you want to delete the file?')
+      gui.EmcDialog(style='yesno', title=_('File Manager'),
+                    text=txt + '<br>' + path,
+                    done_cb=self._delete_confirmed)
 
-      ecore.Timer(0.2, self._progress_timer_cb)
+   def _delete_confirmed(self, dia):
+      DBG('DELETE CONFIRMED: %s' % (self.src))
+      dia.delete()
+      self._start_operation_in_thread(self._delete_thread)
+
 
    def move(self, src, dst):
       DBG('MOVE: %s -> %s' % (src,dst))
       # TODO
 
-   def delete(self, path):
-      DBG('DELETE: %s' % (path))
-      # TODO
+   def _start_operation_in_thread(self, func):
+      self.dia = gui.EmcDialog(style='progress', title=_('File Manager'),
+                               text=_('Operation is starting...'),
+                               canc_cb=self.abort_operation)
+      t = threading.Thread(target=func)
+      t.start()
+      ecore.Timer(0.2, self._progress_timer_cb)
+
 
    def abort_operation(self, dia=None):
       DBG('TODO Abort')
@@ -374,6 +389,8 @@ class FileManagerWorker(object):
    def _dialog_update(self, fname, cur_file, tot_files, progress):
       if self.op == 'copy':
          txt = _('Copying file {0} of {1}:').format(cur_file, tot_files)
+      elif self.op == 'delete':
+         txt = _('Deleting file {0} of {1}:').format(cur_file, tot_files)
       txt += '<br>' + os.path.basename(fname) + '<br>'
       self.dia.text_set(txt)
       self.dia.progress_set(progress)
@@ -390,6 +407,7 @@ class FileManagerWorker(object):
       # operation finished ?
       if isinstance(item, str) and item == 'done':
          self.dia.delete()
+         self.dia = self.op = self.src = self.dst = None
          return ecore.ECORE_CALLBACK_CANCEL
 
       # update progress dialog
@@ -397,6 +415,40 @@ class FileManagerWorker(object):
       self._dialog_update(cur_name, cur_file, tot_files, done_bytes / tot_bytes)
 
       return ecore.ECORE_CALLBACK_RENEW
+
+
+   def _delete_thread(self):
+      tobedone = []
+
+      # build tobedone list: [path1, path2, ... ]
+      if os.path.isdir(self.src):
+         for (path, dirs, files) in os.walk(self.src,topdown=False):
+            for f in files:
+               full_path = os.path.join(path, f)
+               tobedone.append(full_path)
+            tobedone.append(path) # also delete the folder after the files
+      else:
+         tobedone.append(self.src)
+
+      total_files = len(tobedone)
+      cur_file = 0
+
+      # delete files one by one
+      for path in tobedone:
+         cur_file += 1
+
+         if os.path.isdir(path):
+            DBG("RMDIR: "+ path)
+            os.rmdir(path)
+         else:
+            DBG("UNLINK: "+ path)
+            os.unlink(path)
+
+         item = (path, cur_file, total_files, cur_file, total_files)
+         self.progress_queue.put(item)
+
+      self.progress_queue.put('done')
+
 
    def _copy_thread(self):
 

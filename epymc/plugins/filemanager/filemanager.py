@@ -171,6 +171,12 @@ class FileManagerModule(EmcModule):
       if self.ui_built:
          return
 
+      b = gui.EmcButton(_('New folder'), size_hint_align=FILL_HORIZ)
+      self.focusman.obj_add(b)
+      b.callback_clicked_add(self.bt_newfolder_cb)
+      b.data['cb'] = self.bt_newfolder_cb
+      gui.box_append('fileman.buttons.box', b)
+
       b = gui.EmcButton(_('Copy'), size_hint_align=FILL_HORIZ)
       self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_copy_cb)
@@ -253,6 +259,18 @@ class FileManagerModule(EmcModule):
    def bt_delete_cb(self, bt):
       it = self.list1.selected_item or self.list2.selected_item
       self.worker.delete(it.data['path'])
+
+   def bt_newfolder_cb(self, bt):
+      li = self.list1 if self.list1.selected_item else self.list2
+      if li and li.current_folder:
+         gui.EmcVKeyboard(title=_('New folder'),
+                          accept_cb=self.newfolder_vkeyb_cb,
+                          user_data=li.current_folder)
+
+   def newfolder_vkeyb_cb(self, vkeyb, new_name, path):
+      full_path = os.path.join(path, new_name)
+      DBG("MKDIR: " + full_path)
+      os.mkdir(full_path)
 
    def bt_favorites_cb(self, bt):
       li = self.list1 if self.list1.selected_item else self.list2

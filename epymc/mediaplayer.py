@@ -303,7 +303,8 @@ def play_counts_get(url):
                'stop_at': 0 }  # last play pos
 
 def stop():
-   global _emotion, _onair_url, _onair_title, _subtitles, _subs_timer
+   global _emotion, _onair_url, _onair_title, _subtitles, _subs_timer, \
+          _buffer_dialog
 
    DBG('Stop()')
 
@@ -332,6 +333,11 @@ def stop():
       _emotion.delete()
       del _emotion
       _emotion = None
+
+   # delete the buffering dialog if visible
+   if _buffer_dialog is not None:
+      _buffer_dialog.delete()
+      _buffer_dialog = None
 
    events.event_emit('PLAYBACK_FINISHED')
    _onair_url = None

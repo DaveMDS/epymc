@@ -94,7 +94,7 @@ def start_epymc():
 
    # if the first arg is a file then play it (must be a video file)
    if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
-      mediaplayer.play_url(sys.argv[1])
+      mediaplayer.play_url(os.path.abspath(sys.argv[1]))
       mediaplayer.title_set(os.path.basename(sys.argv[1]))
 
    # run the main loop

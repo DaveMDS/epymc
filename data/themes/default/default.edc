@@ -2223,6 +2223,89 @@ collections {
          }
       }
    }
+   group { name: "emc/dialog/buffering"; /* API */
+      parts {
+         part { name: "clipper";
+            type: RECT;
+            description { state: "default" 0.0;
+               color: 255 255 255 0;
+            }
+            description { state: "visible" 0.0;
+               color: 255 255 255 255;
+            }
+         }
+         part { name: "base";
+            type: RECT;
+            clip_to: "clipper";
+            scale: 1;
+            description { state: "default" 0.0;
+               rel1.relative: 0.2 0.8;
+               rel2.relative: 0.8 0.8;
+               min: 100 65;
+               color: 200 200 200 10;
+            }
+         }
+         part { name: "emc.text.title"; /* API */
+            type: TEXT;
+            clip_to: "clipper";
+            scale: 1;
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               rel1.to: "base";
+               rel2.to: "base";
+               color: FONT_COLOR;
+               color3: FONT_COLOR3;
+               text {
+                  font: FONT2;
+                  size: FONT_SIZE_BIG;
+                  align: 0.0 0.0;
+               }
+            }
+         }
+         part { name: "emc.dialog.progress"; /* API */
+            type: EXTERNAL;
+            clip_to: "clipper";
+            source: "elm/progressbar";
+            description { state: "default" 0.0;
+               align: 0.5 1.0;
+               rel1 {
+                  to: "base";
+                  relative: 0.0 0.5;
+               }
+               rel2 {
+                  to: "base";
+               }
+               // params {
+                  // string: "style" "buffering";
+               // }
+            }
+         }
+      }
+      programs {
+         program { name: "show"; /* API */
+            signal: "emc,dialog,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.5;
+            target: "clipper";
+            after: "show_done";
+         }
+         program { name: "show_done"; /* API */
+            action: SIGNAL_EMIT "emc,dialog,show,done" "";
+         }
+         program { name: "hide"; /* API */
+            signal: "emc,dialog,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: DECELERATE 0.5;
+            target: "clipper";
+            after: "hide_done";
+         }
+         program { name: "hide_done"; /* API */
+            action: SIGNAL_EMIT "emc,dialog,hide,done" "";
+         }
+      }
+   }
 
 /// notify items
    group { name: "emc/notify/default"; /* API */

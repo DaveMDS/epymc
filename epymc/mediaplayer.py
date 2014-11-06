@@ -676,7 +676,7 @@ def _update_timer_cb():
          _buffer_dialog = None
 
    elif _emotion.buffer_size < 1.0:
-      _buffer_dialog = EmcDialog(title=_('buffering'), style='progress',
+      _buffer_dialog = EmcDialog(title=_('Buffering'), style='buffering',
                                  canc_cb=_dialog_canc_cb)
       _emotion.play = False
 

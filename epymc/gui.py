@@ -779,7 +779,8 @@ class EmcDialog(edje.Edje):
 
    you can also apply special style that perform specific task:
       'info', 'error', 'warning', 'yesno', 'cancel', 'progress',
-      'list', 'image_list_horiz', 'image_list_vert'
+      'list', 'image_list_horiz', 'image_list_vert',
+      'buffering'
    """
 
    minimal_styles = ['info', 'error', 'warning', 'yesno', 'cancel', 'progress']
@@ -792,6 +793,8 @@ class EmcDialog(edje.Edje):
       # load the right edje object
       if style in EmcDialog.minimal_styles or style == 'minimal':
          group = 'emc/dialog/minimal'
+      elif style == 'buffering':
+         group = 'emc/dialog/buffering'
       else:
          group = 'emc/dialog/panel'
       edje.Edje.__init__(self, layout.evas, file=theme_file, group=group,
@@ -906,8 +909,9 @@ class EmcDialog(edje.Edje):
          # else:
             # self.button_add('Cancel', lambda btn: self.delete())
 
-      # listen for input events
-      input_events.listener_add(self._name, self._input_event_cb)
+      # listen for input events (not for the buffering dialog)
+      if style != 'buffering':
+         input_events.listener_add(self._name, self._input_event_cb)
 
       # show
       self.show()

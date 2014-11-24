@@ -503,7 +503,8 @@ class FileManagerWorker(object):
 
       # update progress dialog
       cur_name, cur_file, tot_files, done_bytes, tot_bytes = item
-      self._dialog_update(cur_name, cur_file, tot_files, done_bytes / tot_bytes)
+      self._dialog_update(cur_name, cur_file, tot_files,
+                          float(done_bytes) / float(tot_bytes))
 
       return ecore.ECORE_CALLBACK_RENEW
 

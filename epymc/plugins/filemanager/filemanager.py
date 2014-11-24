@@ -51,6 +51,7 @@ class FilemanList(List):
       List.__init__(self, gui.layout, style='fileman', focus_allow=False)
       self.last_focused_item = None
       self.current_folder = None
+      self.fmonitor = None
       self.callback_activated_add(self.item_activated_cb)
 
    def focus(self):
@@ -80,6 +81,13 @@ class FilemanList(List):
       elif item.data['path'] == 'fav':
          gui.EmcSourcesManager('filemanager')
 
+   def clear(self):
+      self.last_focused_item = None
+      if self.fmonitor is not None:
+         self.fmonitor.delete()
+         self.fmonitor = None
+      List.clear(self)
+
    def populate_root(self, favorites):
       self.clear()
       for path in favorites:
@@ -106,6 +114,7 @@ class FilemanList(List):
       if folder != parent_folder:
          it = self.item_append(_('Parent folder'), gui.load_icon('icon/arrowU'))
          it.data['path'] = parent_folder
+         it.data['isfolder'] = True
 
       # build folders and files lists
       folders = []
@@ -123,6 +132,7 @@ class FilemanList(List):
          name = os.path.basename(fullpath)
          it = self.item_append(name, gui.load_icon('icon/folder'))
          it.data['path'] = fullpath
+         it.data['isfolder'] = True
 
       # populate files
       for fullpath in files:
@@ -130,10 +140,71 @@ class FilemanList(List):
          it = self.item_append(name)
          it.data['path'] = fullpath
 
+      # start the list and select the first item
       self.go()
       self.first_item.selected = True
       self.current_folder = folder
 
+      # keep the folder monitored for changes
+      self.fmonitor = ecore.FileMonitor(folder, self._fmonitor_cb)
+
+   # FileMonitor callback and utils
+   def _fmonitor_cb(self, event, path):
+      if event == ecore.ECORE_FILE_EVENT_CREATED_FILE:
+         self._file_insert_sorted(path)
+
+      elif event == ecore.ECORE_FILE_EVENT_CREATED_DIRECTORY:
+         self._folder_insert_sorted(path)
+
+      elif event == ecore.ECORE_FILE_EVENT_DELETED_FILE or \
+           event == ecore.ECORE_FILE_EVENT_DELETED_DIRECTORY:
+         self._path_remove(path)
+
+      elif event == ecore.ECORE_FILE_EVENT_DELETED_SELF:
+         # TODO... goto up ???
+         pass
+
+   def _file_insert_sorted(self, path):
+      s = self.first_item
+
+      # skip all the folders
+      while s and s.data.get('isfolder', False) is True:
+         s = s.next
+
+      # search ordered position between files
+      while s and utils.natural_cmp(s.data['path'], path) < 0:
+         s = s.next
+
+      # insert the new file before search or at the end
+      name = os.path.basename(path)
+      it = self.item_insert_before(s, name) if s else \
+           self.item_append(name)
+      it.data['path'] = path
+      self.go()
+
+   def _folder_insert_sorted(self, path):
+      s = self.first_item
+      
+      # search ordered position only between folders
+      while s and s.data.get('isfolder', False) is True and \
+            utils.natural_cmp(s.data['path'], path) < 0:
+         s = s.next
+
+      # insert the new folder before search or before the first file
+      name = os.path.basename(path)
+      icon = gui.load_icon('icon/folder')
+      it = self.item_insert_before(s, name, icon) if s else \
+           self.item_append(name, icon)
+      it.data['path'] = path
+      it.data['isfolder'] = True
+      self.go()
+
+   def _path_remove(self, path):
+      s = self.first_item
+      while s and s.data.get('path') != path:
+         s = s.next
+      if s:
+         s.delete()
 
 class FileManagerModule(EmcModule):
    name = 'filemanager'
@@ -158,6 +229,8 @@ class FileManagerModule(EmcModule):
 
    def __shutdown__(self):
       mainmenu.item_del('fileman')
+      if self.list1: self.list1.clear()
+      if self.list2: self.list2.clear()
 
    def cb_mainmenu(self, url=None):
       self.build_ui()

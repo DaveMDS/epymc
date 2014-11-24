@@ -315,9 +315,6 @@ class FileManagerModule(EmcModule):
          os.rename(src, dst)
       except Exception as e:
          gui.EmcDialog(style='error', title='Cannot rename file', text=str(e))
-      else:
-         it.text = new_name
-         it.data['path'] = dst
 
    def bt_copy_cb(self, bt):
       it = self.list1.selected_item or self.list2.selected_item
@@ -349,7 +346,7 @@ class FileManagerModule(EmcModule):
       li = self.list1 if self.list1.selected_item else self.list2
       li.populate_root(ini.get_string_list('filemanager', 'folders', ';'))
 
-   def bt_close_cb(self, bt):
+   def bt_close_cb(self, bt=None):
       input_events.listener_del('fileman')
       mainmenu.show()
       gui.signal_emit('fileman,hide')
@@ -395,6 +392,9 @@ class FileManagerModule(EmcModule):
          else:
             bt = self.focusman.focused_obj_get()
             bt.data['cb'](bt)
+
+      elif event == 'BACK':
+         self.bt_close_cb()
 
       else:
          return input_events.EVENT_CONTINUE

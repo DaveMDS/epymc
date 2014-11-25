@@ -14,6 +14,8 @@ Changes in version 1.0.1 (to be released)
  
  * Music module is now py3 compatible (mutagen 1.25 support py3).
  * Improved buffering dialog, less intrusive now.
+ * Add command line switch to start in the given activity. (ex: --start-music)
+ * Add .desktop Additional Actions to start in the given activity.
 
 
 ===============================================================================

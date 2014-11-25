@@ -92,10 +92,18 @@ def start_epymc():
    # show the mainmenu
    mainmenu.show()
 
-   # if the first arg is a file then play it (must be a video file)
-   if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
-      mediaplayer.play_url(os.path.abspath(sys.argv[1]))
-      mediaplayer.title_set(os.path.basename(sys.argv[1]))
+   # simple argument parsing
+   if len(sys.argv) > 1:
+      arg1 = sys.argv[1]
+
+      # if the first arg is a file then play it (must be a video file)
+      if os.path.exists(arg1):
+         mediaplayer.play_url(os.path.abspath(arg1))
+         mediaplayer.title_set(os.path.basename(arg1))
+
+      # autostart the give activity (ex: --start-movies)
+      elif arg1.startswith('--start-'):
+         mainmenu.item_activate(arg1[8:])
 
    # run the main loop
    elementary.run()

@@ -92,6 +92,13 @@ def _cb_item_selected(li, item):
    else:
       callback()
 
+def item_activate(name):
+   for it in _list.items:
+      if it.data.get('name') == name:
+         _cb_item_selected(_list, it)
+         return
+   print('WARNING: cannot find the requested activity: "%s"' % name)
+
 def item_del(name):
    for item in _list.items:
       if item.data['name'] == name:

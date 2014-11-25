@@ -239,7 +239,12 @@ setup (
 
    data_files = [
       ('share/applications/', ['data/desktop/epymc.desktop']),
-      ('share/icons/', ['data/desktop/epymc.png']),
+      ('share/icons/', ['data/desktop/epymc.png',
+                        'data/desktop/epymc-movies.png',
+                        'data/desktop/epymc-music.png',
+                        'data/desktop/epymc-olvideos.png',
+                        'data/desktop/epymc-tv.png',
+                        'data/desktop/epymc-mame.png']),
    ],
 
    cmdclass = {

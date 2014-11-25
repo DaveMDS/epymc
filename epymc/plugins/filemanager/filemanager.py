@@ -38,7 +38,7 @@ import epymc.utils as utils
 import epymc.gui as gui
 import epymc.ini as ini
 
-# TODO increment theme generation
+# TODO increment theme generation !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 def DBG(msg):
    print('FILEMAN: %s' % msg)
@@ -258,6 +258,8 @@ class FileManagerModule(EmcModule):
 
       b = gui.EmcButton(_('Move (*)'), size_hint_align=FILL_HORIZ)
       self.focusman.obj_add(b)
+      b.callback_clicked_add(self.bt_move_cb)
+      b.data['cb'] = self.bt_move_cb
       gui.box_append('fileman.buttons.box', b)
 
       b = gui.EmcButton(_('Rename'), size_hint_align=FILL_HORIZ)
@@ -311,10 +313,7 @@ class FileManagerModule(EmcModule):
    def rename_vkeyb_cb(self, vkeyb, new_name, it):
       src = it.data['path']
       dst = os.path.join(os.path.dirname(src), new_name)
-      try:
-         os.rename(src, dst)
-      except Exception as e:
-         gui.EmcDialog(style='error', title='Cannot rename file', text=str(e))
+      self.worker.rename(src, dst)
 
    def bt_copy_cb(self, bt):
       it = self.list1.selected_item or self.list2.selected_item
@@ -325,6 +324,16 @@ class FileManagerModule(EmcModule):
          dst = self.list1.current_folder
       if src and dst:
          self.worker.copy(src, dst)
+
+   def bt_move_cb(self, bt):
+      it = self.list1.selected_item or self.list2.selected_item
+      src = it.data['path']
+      if self.list1.selected_item:
+         dst = self.list2.current_folder
+      else:
+         dst = self.list1.current_folder
+      if src and dst:
+         self.worker.move(src, dst)
 
    def bt_delete_cb(self, bt):
       it = self.list1.selected_item or self.list2.selected_item
@@ -411,6 +420,13 @@ class FileManagerWorker(object):
       self.block_size = 8388608 # 1024x1024x8 = 8 MB
       self.progress_queue = queue.Queue() # (cur_name, cur_file, total_files, bytes_done, bytes_tot) or 'done'
 
+   def rename(self, src, dst):
+      DBG('RENAME: "%s" -> "%s"' % (src, dst))
+      try:
+         os.rename(src, dst)
+      except Exception as e:
+         gui.EmcDialog(style='error', title='Cannot rename file', text=str(e))
+
    def copy(self, src, dst):
       if not self.check_src_and_dest(src, dst):
          return
@@ -436,8 +452,15 @@ class FileManagerWorker(object):
 
 
    def move(self, src, dst):
-      DBG('MOVE: %s -> %s' % (src,dst))
-      # TODO
+      if not self.check_src_and_dest(src, dst):
+         return
+      if os.stat(src).st_dev == os.stat(dst).st_dev:
+         DBG('MOVE (same part): %s -> %s' % (src, dst))
+         dst = os.path.join(dst, os.path.basename(src))
+         self.rename(src, dst)
+      else:
+         DBG('MOVE (different part): %s -> %s' % (src, dst))
+         # TODO
 
    def _start_operation_in_thread(self, func):
       self.dia = gui.EmcDialog(style='progress', title=_('File Manager'),
@@ -604,7 +627,3 @@ class FileManagerWorker(object):
          fdst.close()
 
       self.progress_queue.put('done')
-
-
-#def same_partition(f1, f2):
-#   return os.stat(f1).st_dev == os.stat(f2).st_dev

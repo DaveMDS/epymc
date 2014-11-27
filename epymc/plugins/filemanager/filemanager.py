@@ -150,6 +150,9 @@ class FilemanList(List):
 
    # FileMonitor callback and utils
    def _fmonitor_cb(self, event, path):
+      if utils.is_py2():
+         path = path.encode('utf8')
+
       if event == ecore.ECORE_FILE_EVENT_CREATED_FILE:
          self._file_insert_sorted(path)
 

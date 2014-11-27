@@ -266,6 +266,9 @@ def iso639_1_to_5(iso1):
 def is_py3():
    return sys.version_info.major > 2
 
+def is_py2():
+   return sys.version_info.major == 2
+
 def get_resource_file(res_type, res_name, default = None):
    """
    This will search the given reasource (the file name) first in user config

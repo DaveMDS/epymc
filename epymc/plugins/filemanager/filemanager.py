@@ -200,11 +200,13 @@ class FilemanList(List):
       self.go()
 
    def _path_remove(self, path):
-      s = self.first_item
-      while s and s.data.get('path') != path:
-         s = s.next
-      if s:
-         s.delete()
+      item = self.first_item
+      while item and item.data.get('path') != path:
+         item = item.next
+      if item:
+         if item == self.last_focused_item:
+            self.last_focused_item = item.prev
+         item.delete()
 
 class FileManagerModule(EmcModule):
    name = 'filemanager'

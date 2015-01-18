@@ -108,6 +108,12 @@ class SpecialItemClass(EmcItemClass):
       elif url == 'movies://directors':
          return _('Directors')
 
+   def icon_get(self, url, mod):
+      if url == 'movies://actors':
+         return gui.load_icon('icon/head')
+      elif url == 'movies://directors':
+         return gui.load_icon('icon/head')
+
 class ActorItemClass(EmcItemClass):
    def item_selected(self, url, name):
       _mod._browser.page_add(url, name, None, _mod.populate_actor_movies)

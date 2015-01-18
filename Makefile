@@ -20,6 +20,11 @@ build:
 	$(PY) setup.py build
 
 
+.PHONY: themes
+themes:
+	$(PY) setup.py build_themes
+
+
 .PHONY: install
 install:
 	$(PY) setup.py install

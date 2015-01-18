@@ -54,6 +54,7 @@ ICON("grid")
 
 ICON("star")
 ICON("star_off")
+ICON("head")
 
 ICON("module")
 ICON("theme")

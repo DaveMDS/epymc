@@ -54,7 +54,7 @@ data {
    item: "theme.version" "0.8";
    item: "theme.author" "davemds";
    item: "theme.info" "A more long description of the theme";
-   item: "theme.generation" "3";
+   item: "theme.generation" "4";
 }
 
 images {

@@ -38,7 +38,6 @@ import epymc.utils as utils
 import epymc.gui as gui
 import epymc.ini as ini
 
-# TODO increment theme generation !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 def DBG(msg):
    print('FILEMAN: %s' % msg)

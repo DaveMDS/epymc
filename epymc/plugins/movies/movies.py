@@ -95,6 +95,40 @@ class RescanItemClass(EmcItemClass):
    def icon_get(self, url, mod):
       return 'icon/refresh'
 
+class SpecialItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      if url == 'movies://actors':
+         mod._browser.page_add(url, _('Actors'), None, mod.populate_actors_list)
+      elif url == 'movies://directors':
+         mod._browser.page_add(url, _('Actors'), None, mod.populate_directors_list)
+
+   def label_get(self, url, mod):
+      if url == 'movies://actors':
+         return _('Actors')
+      elif url == 'movies://directors':
+         return _('Directors')
+
+class ActorItemClass(EmcItemClass):
+   def item_selected(self, url, name):
+      _mod._browser.page_add(url, name, None, _mod.populate_actor_movies)
+
+   def label_get(self, url, name):
+      return name
+
+   def label_end_get(self, url, name):
+      return str(len(_mod._actors_cache[name]))
+
+class DirectorItemClass(EmcItemClass):
+   def item_selected(self, url, name):
+      _mod._browser.page_add(url, name, None, _mod.populate_director_movies)
+
+   def label_get(self, url, name):
+      return name
+
+   def label_end_get(self, url, name):
+      return str(len(_mod._directors_cache[name]))
+
+
 class MovieItemClass(EmcItemClass):
    def item_selected(self, url, mod):
       mod.show_movie_info(url)
@@ -178,6 +212,8 @@ class MoviesModule(EmcModule):
    _movie_db = None    # key: movie_url  data: dictionary as of the tmdb api
    _idler_db = None    # key: file_url  data: timestamp of the last unsuccessfull tmdb query
    _scanner = None     # BackgroundScanner instance
+   _actors_cache = None    # key: actor name     val: [list of films urls]
+   _directors_cache = None # key: director name  val: [list of films urls]
 
    def __init__(self):
       global _mod
@@ -292,8 +328,10 @@ class MoviesModule(EmcModule):
       for f in self._folders:
          self._browser.item_add(FolderItemClass(), f, self)
 
-      self._browser.item_add(RescanItemClass(), 'movies://rescan_library', self);
-      self._browser.item_add(AddSourceItemClass(), 'movies://add_source', self);
+      self._browser.item_add(SpecialItemClass(), 'movies://directors', self)
+      self._browser.item_add(SpecialItemClass(), 'movies://actors', self)
+      self._browser.item_add(RescanItemClass(), 'movies://rescan_library', self)
+      self._browser.item_add(AddSourceItemClass(), 'movies://add_source', self)
 
    def populate_url(self, browser, url):
       dirs, files = [], []
@@ -310,6 +348,50 @@ class MoviesModule(EmcModule):
          self._browser.item_add(FolderItemClass(), os.path.join(url, fname), self)
       for fname in utils.natural_sort(files):
          self._browser.item_add(MovieItemClass(), os.path.join(url, fname), self)
+
+   def populate_actors_list(self, browser, url):
+      actors = {} # key:actor_name  val:[list of movie urls]
+
+      for url in self._movie_db.keys():
+         movie = self._movie_db.get_data(url)
+         for actor in movie['cast']:
+            name = actor['name']
+            if name in actors:
+               actors[name].append(url)
+            else:
+               actors[name] = [url]
+
+      self._actors_cache = actors
+
+      for name in sorted(self._actors_cache.keys()):
+         self._browser.item_add(ActorItemClass(), 'movies://actors/'+name, name)
+
+   def populate_actor_movies(self, browser, url):
+      name = url.replace('movies://actors/', '')
+      for url in self._actors_cache[name]:
+         self._browser.item_add(MovieItemClass(), url, self)
+
+   def populate_directors_list(self, browser, url):
+      directors = {} # key:director_name  val:[list of movie urls]
+
+      for url in self._movie_db.keys():
+         movie = self._movie_db.get_data(url)
+         name = movie['director']
+         if name in directors:
+            directors[name].append(url)
+         else:
+            directors[name] = [url]
+
+      self._directors_cache = directors
+
+      for name in sorted(self._directors_cache.keys()):
+         self._browser.item_add(DirectorItemClass(),
+                                'movies://directors/'+name, name)
+
+   def populate_director_movies(self, browser, url):
+      name = url.replace('movies://directors/', '')
+      for url in self._directors_cache[name]:
+         self._browser.item_add(MovieItemClass(), url, self)
 
    def _get_cast(self, e, max_num=999):
       cast = ''

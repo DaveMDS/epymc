@@ -1,8 +1,10 @@
 
 
 ===============================================================================
-Changes in version 1.0.1 (to be released)
+Changes in version 1.1.0 (to be released)
 ===============================================================================
+
+Bug fixed:
 
  * Fix the file-not-found dialog when the provided file is not a correct url.
  * Fix playback for file names that ends with a regex pattern.
@@ -11,8 +13,11 @@ Changes in version 1.0.1 (to be released)
  * Fix refresh of the browser when the music scan take less than 1 second.
  * Fix display of music items with chars that seems tags.
  * Fix playback for files given on cmd line without the full path.
+
+New feature:
  
  * Music module is now py3 compatible (mutagen 1.25 support py3).
+ * Added browse by actors and directors in Movies
  * Improved buffering dialog, less intrusive now.
  * Add command line switch to start in the given activity. (ex: --start-music)
  * Add .desktop Additional Actions to start in the given activity.

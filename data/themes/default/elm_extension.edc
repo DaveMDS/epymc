@@ -3,7 +3,7 @@
 group { name: "elm/scroller/base/dialog";     // dialog text scroller
    alias: "elm/list/base/dialog";             // dialog lists
    alias: "elm/list/base/image_list";         // dialog lists (poster/fanart)
-   alias: "elm/list/base/fileman";            // Filemanager lists
+   alias: "elm/list/base/browser";            // Filemanager lists
    alias: "elm/genlist/base/browser";         // browser genlist
    alias: "elm/gengrid/base/browser";         // browser gengrid
    alias: "elm/scroller/entry/scrolledentry"; // EmcScrolledEntry
@@ -1120,7 +1120,7 @@ group { name: "elm/list/item_odd/default";
 }
 
 //// FILEMANAGER LISTS (icon + text) (elm/list/item/default) ///////////////////////
-group { name: "elm/list/item/fileman"; alias: "elm/list/item_odd/fileman";
+group { name: "elm/list/item/browser"; alias: "elm/list/item_odd/browser";
    data.item: "selectraise" "on";
    images {
       image: "vgrad_med_dark.png" COMP;

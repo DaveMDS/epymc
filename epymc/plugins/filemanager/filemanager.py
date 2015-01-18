@@ -46,8 +46,7 @@ def DBG(msg):
 
 class FilemanList(List):
    def __init__(self):
-      # TODO rename style to be more generic
-      List.__init__(self, gui.layout, style='fileman', focus_allow=False)
+      List.__init__(self, gui.layout, style='browser', focus_allow=False)
       self.last_focused_item = None
       self.current_folder = None
       self.fmonitor = None

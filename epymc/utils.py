@@ -266,6 +266,9 @@ def iso639_1_to_5(iso1):
 def is_py3():
    return sys.version_info.major > 2
 
+def is_py2():
+   return sys.version_info.major == 2
+
 def get_resource_file(res_type, res_name, default = None):
    """
    This will search the given reasource (the file name) first in user config
@@ -340,11 +343,19 @@ def md5(txt):
    if is_py3():
       txt = bytes(txt,'utf-8')
    return hashlib.md5(txt).hexdigest()
-   
+
 def natural_sort(l): 
    convert = lambda text: int(text) if text.isdigit() else text.lower() 
    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)] 
    return sorted(l, key=alphanum_key)
+
+def natural_cmp(a, b):
+   convert = lambda text: int(text) if text.isdigit() else text.lower() 
+   x = [ convert(c) for c in re.split('([0-9]+)', a) ]
+   y = [ convert(c) for c in re.split('([0-9]+)', b) ]
+   if x == y:  return 0
+   elif x > y: return 1
+   else:       return -1
 
 def grab_files(folders, show_hidden=False, recursive=True):
    """

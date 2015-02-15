@@ -19,6 +19,7 @@ Bug fixed:
 New feature:
  
  * Music module is now py3 compatible (mutagen 1.25 support py3)
+ * New module: Two panes Filemanager
  * Added browse by actors and directors in Movies
  * Improved buffering dialog, less intrusive now
  * Add command line switch to start in the given activity (ex: --start-music)

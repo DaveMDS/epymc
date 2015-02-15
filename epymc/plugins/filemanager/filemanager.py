@@ -259,7 +259,7 @@ class FileManagerModule(EmcModule):
       b.data['cb'] = self.bt_copy_cb
       gui.box_append('fileman.buttons.box', b)
 
-      b = gui.EmcButton(_('Move (*)'), size_hint_align=FILL_HORIZ)
+      b = gui.EmcButton(_('Move'), size_hint_align=FILL_HORIZ)
       self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_move_cb)
       b.data['cb'] = self.bt_move_cb
@@ -430,11 +430,11 @@ class FileManagerWorker(object):
       except Exception as e:
          gui.EmcDialog(style='error', title='Cannot rename file', text=str(e))
 
-   def copy(self, src, dst):
+   def copy(self, src, dst, is_move=False):
       if not self.check_src_and_dest(src, dst):
          return
       DBG('COPY: "%s" -> "%s"' % (src,dst))
-      self.op, self.src, self.dst = 'copy', src, dst
+      self.op, self.src, self.dst = 'move' if is_move else 'copy', src, dst
       self._start_operation_in_thread(self._copy_thread)
 
    def delete(self, path):
@@ -463,7 +463,7 @@ class FileManagerWorker(object):
          self.rename(src, dst)
       else:
          DBG('MOVE (different part): %s -> %s' % (src, dst))
-         # TODO
+         self.copy(src, dst, is_move=True)
 
    def _start_operation_in_thread(self, func):
       self.dia = gui.EmcDialog(style='progress', title=_('File Manager'),
@@ -504,7 +504,7 @@ class FileManagerWorker(object):
       return True
 
    def _dialog_update(self, fname, cur_file, tot_files, progress):
-      if self.op == 'copy':
+      if self.op in ('copy', 'move'):
          txt = _('Copying file {0} of {1}:').format(cur_file, tot_files)
       elif self.op == 'delete':
          txt = _('Deleting file {0} of {1}:').format(cur_file, tot_files)
@@ -524,7 +524,13 @@ class FileManagerWorker(object):
       # operation finished ?
       if isinstance(item, str) and item == 'done':
          self.dia.delete()
-         self.dia = self.op = self.src = self.dst = None
+         self.dia = None
+         if self.op == 'move':
+            # TODO must be sure the copy ended successfully
+            self.op = 'delete'
+            self._start_operation_in_thread(self._delete_thread)
+         else:
+            self.op = self.src = self.dst = None
          return ecore.ECORE_CALLBACK_CANCEL
 
       # update progress dialog

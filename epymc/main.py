@@ -48,6 +48,8 @@ def start_epymc():
    parser = argparse.ArgumentParser(description='Emotion Media Center')
    parser.add_argument('-a', '--activity',
                        help='start directy in the given activity')
+   parser.add_argument('-f', '--fullscreen', action='store_true',
+                       help='start in fullscreen')
    parser.add_argument('mediafile', nargs='?')
    args = parser.parse_args()
 
@@ -106,6 +108,9 @@ def start_epymc():
    # or autostart the give activity (ex: --activity movies)
    elif args.activity:
       mainmenu.item_activate(args.activity)
+   # fullscreen requested from command line
+   if args.fullscreen:
+      gui.fullscreen_set(True)
 
    # run the main loop
    elementary.run()

@@ -3,7 +3,7 @@ Encoding=UTF-8
 Name=Emotion Media Center
 GenericName=Media Center
 Comment=EFL Media Center Platform
-Exec=epymc
+Exec=epymc %u
 Icon=epymc
 Terminal=false
 Type=Application
@@ -13,26 +13,26 @@ MimeType=application/mxf;application/ogg;application/ram;application/sdp;applica
 Actions=Movies;TvShows;OnlineChannels;Music;Mame;
 
 [Desktop Action Movies]
-Exec=epymc --start-movies
+Exec=epymc --activity movies
 Name=Movies
 Icon=epymc-movies
 
 [Desktop Action Music]
-Exec=epymc --start-music
+Exec=epymc --activity music
 Name=Music
 Icon=epymc-music
 
 [Desktop Action TvShows]
-Exec=epymc --start-tvshows
+Exec=epymc --activity tvshows
 Name=Tv Shows
 Icon=epymc-tv
 
 [Desktop Action OnlineChannels]
-Exec=epymc --start-onlinechannels
+Exec=epymc --activity onlinechannels
 Name=Online Channels
 Icon=epymc-olvideos
 
 [Desktop Action Mame]
-Exec=epymc --start-mame
+Exec=epymc --activity mame
 Name=M.A.M.E.
 Icon=epymc-mame

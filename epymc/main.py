@@ -20,7 +20,7 @@
 
 from __future__ import absolute_import, print_function
 
-import sys, os, gettext, logging
+import sys, os, gettext, logging, argparse
 
 from efl import evas, ecore, edje, elementary, emotion
 
@@ -43,6 +43,13 @@ import epymc.browser as browser
 
 
 def start_epymc():
+
+   # parse command line arguments
+   parser = argparse.ArgumentParser(description='Emotion Media Center')
+   parser.add_argument('-a', '--activity',
+                       help='start directy in the given activity')
+   parser.add_argument('mediafile', nargs='?')
+   args = parser.parse_args()
 
    # setup efl logging (you also need to set EINA_LOG_LEVEL=X)
    l = logging.getLogger("efl")
@@ -92,18 +99,13 @@ def start_epymc():
    # show the mainmenu
    mainmenu.show()
 
-   # simple argument parsing
-   if len(sys.argv) > 1:
-      arg1 = sys.argv[1]
-
-      # if the first arg is a file then play it (must be a video file)
-      if os.path.exists(arg1):
-         mediaplayer.play_url(os.path.abspath(arg1))
-         mediaplayer.title_set(os.path.basename(arg1))
-
-      # autostart the give activity (ex: --start-movies)
-      elif arg1.startswith('--start-'):
-         mainmenu.item_activate(arg1[8:])
+   # if mediafile given on command line play it (must be a video file)
+   if args.mediafile and os.path.exists(args.mediafile):
+      mediaplayer.play_url(os.path.abspath(args.mediafile))
+      mediaplayer.title_set(os.path.basename(args.mediafile))
+   # or autostart the give activity (ex: --activity movies)
+   elif args.activity:
+      mainmenu.item_activate(args.activity)
 
    # run the main loop
    elementary.run()

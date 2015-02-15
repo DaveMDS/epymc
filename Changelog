@@ -6,23 +6,24 @@ Changes in version 1.1.0 (to be released)
 
 Bug fixed:
 
- * Fix the file-not-found dialog when the provided file is not a correct url.
- * Fix playback for file names that ends with a regex pattern.
- * Fix tmdb query for py3 when reply has non-ascii chars.
- * Fix songs listing when the song do not have the album tag.
- * Fix refresh of the browser when the music scan take less than 1 second.
- * Fix display of music items with chars that seems tags.
- * Fix playback for files given on cmd line without the full path.
+ * Fix the file-not-found dialog when the provided file is not a correct url
+ * Fix playback for file names that ends with a regex pattern
+ * Fix tmdb query for py3 when reply has non-ascii chars
+ * Fix songs listing when the song do not have the album tag
+ * Fix refresh of the browser when the music scan take less than 1 second
+ * Fix display of music items with chars that seems tags
+ * Fix playback for files given on cmd line without the full path
  * Redone genlist slide without using elm Labels (elm 1.13 broke Label slide)
  * Fix mainmenu item bring-in for elm 1.13
 
 New feature:
  
- * Music module is now py3 compatible (mutagen 1.25 support py3).
+ * Music module is now py3 compatible (mutagen 1.25 support py3)
  * Added browse by actors and directors in Movies
- * Improved buffering dialog, less intrusive now.
- * Add command line switch to start in the given activity. (ex: --start-music)
- * Add .desktop Additional Actions to start in the given activity.
+ * Improved buffering dialog, less intrusive now
+ * Add command line switch to start in the given activity (ex: --start-music)
+ * Add .desktop Additional Actions to start in the given activity
+ * Remeber last visited url when going back in browser lists
 
 
 ===============================================================================

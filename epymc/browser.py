@@ -179,6 +179,7 @@ class EmcBrowser(object):
 
       self.pages = []
       self.current_view = None
+      self.autoselect_url = None
 
    def __str__(self):
       text  = '=' * 70 + '\n'
@@ -245,12 +246,17 @@ class EmcBrowser(object):
       file:///home/user/some/dir, it MUST be unique in all the browser
       and MUST not contain any strange chars.
       """
-      self.current_view.item_add(item_class, url, user_data)
+      if url == self.autoselect_url:
+         self.current_view.item_add(item_class, url, user_data, True)
+      else:
+         self.current_view.item_add(item_class, url, user_data)
 
    def back(self):
       """ TODO Function doc """
       # discard current page
-      self.pages.pop()
+      old_page = self.pages.pop()
+      self.autoselect_url = old_page['url']
+      del old_page
 
       # no more page to go back, hide the view and return to main menu
       if len(self.pages) == 0:
@@ -486,7 +492,7 @@ class ViewList(object):
       self.current_list.clear()
       self.items_count = 0
 
-   def item_add(self, item_class, url, user_data):
+   def item_add(self, item_class, url, user_data, selected=False):
       """
       Here you must add the item to the current visible page.
       You can use the 'item_class' object to query more info about
@@ -499,8 +505,9 @@ class ViewList(object):
       DBG('item_add(%s)' % (url))
       item_data = (item_class, url, user_data)                                  # Master3 #
       it = self.current_list.item_append(self.itc, item_data)
-      if not self.current_list.selected_item_get():
+      if selected or not self.current_list.selected_item_get():
          it.selected_set(1)
+         it.show()
 
       self.items_count += 1
       gui.text_set('browser.list.total',
@@ -702,11 +709,12 @@ class ViewGrid(object):
       self.gg.clear()
       gui.text_set('browser.grid.title', title)
 
-   def item_add(self, item_class, url, user_data):
+   def item_add(self, item_class, url, user_data, selected=False):
       item_data = (item_class, url, user_data)                                  # 3 #
       it = self.gg.item_append(self.itc, item_data)
-      if not self.gg.selected_item_get():
+      if selected or not self.gg.selected_item_get():
          it.selected_set(True)
+         it.show()
 
    def show(self):
       gui.signal_emit('browser,grid,show')

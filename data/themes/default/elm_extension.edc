@@ -573,22 +573,8 @@ group { name: "elm/list/h_item/mainmenu";       // Main horizontal list item
    data.item: "focusraise" "on";
    
    parts {
-      /* part { name: "dbg.whole_item"; // just for debug
-         type: RECT;
-         description { state: "default" 0.0;
-            color: 0 0 100 50;
-            rel1.to: "base";
-            rel2.to: "base";
-         }
-      } */
-      /* part { name: "dbg.icon_container"; // just for debug
-         type: RECT;
-         description { state: "default" 0.0;
-            color: 0 100 0 50;
-            rel1.to: "icon_container";
-            rel2.to: "icon_container";
-         }
-      } */
+      // DBG_SHOW("base", 0, 0, 100)
+      // DBG_SHOW("icon_container", 0, 100, 0)
       part { name: "base";
          type: SPACER;
          scale: 1;

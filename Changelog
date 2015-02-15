@@ -14,6 +14,7 @@ Bug fixed:
  * Fix display of music items with chars that seems tags.
  * Fix playback for files given on cmd line without the full path.
  * Redone genlist slide without using elm Labels (elm 1.13 broke Label slide)
+ * Fix mainmenu item bring-in for elm 1.13
 
 New feature:
  

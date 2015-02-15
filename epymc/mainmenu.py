@@ -46,7 +46,8 @@ def init():
    item_add('exit', 200, _('Exit'), 'icon/exit', lambda: gui.ask_to_exit())
 
 def show():
-   _list.callback_clicked_double_add(_cb_item_selected)
+   _list.callback_clicked_double_add(_cb_item_activated)
+   _list.callback_selected_add(_cb_item_selected)
    if not _list.selected_item:
       _list.first_item.selected = True
    _list.go()
@@ -54,7 +55,8 @@ def show():
    input_events.listener_add('mainmenu', input_event_cb)
 
 def hide():
-   _list.callback_clicked_double_del(_cb_item_selected)
+   _list.callback_clicked_double_del(_cb_item_activated)
+   _list.callback_selected_del(_cb_item_selected)
    input_events.listener_del('mainmenu')
    gui.signal_emit('mainmenu,hide')
 
@@ -85,6 +87,9 @@ def item_add(name, weight, label, icon, callback, subitems=[]):
    item.data['callback'] = callback
 
 def _cb_item_selected(li, item):
+   item.bring_in()
+
+def _cb_item_activated(li, item):
    callback = item.data['callback']
    subitem = item.data['sublist'].selected_item
    if subitem:
@@ -95,7 +100,7 @@ def _cb_item_selected(li, item):
 def item_activate(name):
    for it in _list.items:
       if it.data.get('name') == name:
-         _cb_item_selected(_list, it)
+         _cb_item_activated(_list, it)
          return
    print('WARNING: cannot find the requested activity: "%s"' % name)
 
@@ -143,7 +148,7 @@ def input_event_cb(event):
          subitem.selected = False
 
    elif event == 'OK':
-      _cb_item_selected(_list, item)
+      _cb_item_activated(_list, item)
       return input_events.EVENT_BLOCK
 
    elif event == 'EXIT':

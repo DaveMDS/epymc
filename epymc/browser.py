@@ -447,8 +447,9 @@ class ViewList(object):
          gl.callback_unselected_add(self._cb_item_unhilight)
 
       # genlist item class
-      self.itc = GenlistItemClass(item_style='full',
-                                  content_get_func=self.__gl_full_content_get)
+      self.itc = GenlistItemClass(item_style='default',
+                                  text_get_func=self.__gl_text_get,
+                                  content_get_func=self.__gl_content_get)
 
       # RemoteImage (poster)
       self.__im = EmcRemoteImage()
@@ -583,36 +584,29 @@ class ViewList(object):
       return input_events.EVENT_CONTINUE
 
    ### GenList Item Class
-   def __gl_full_content_get(self, obj, part, item_data):
+   def __gl_text_get(self, obj, part, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
-      DBG('_content get(%s)' % url)
+      # DBG('_text get({}, {})'.format(part, url))
+      if part == 'elm.text.main':
+         text = item_class.label_get(url, user_data)
+      elif part == 'elm.text.end':
+         text = item_class.label_end_get(url, user_data)
+      else:
+         text = None
 
-      text = item_class.label_get(url, user_data)
-      tend = item_class.label_end_get(url, user_data)
-      icon = item_class.icon_get(url, user_data)
-      iend = item_class.icon_end_get(url, user_data)
+      return text
 
-      ly = Layout(gui.win, file=(gui.theme_file, 'emc/browser/list_item/normal'))
+   def __gl_content_get(self, obj, part, item_data):
+      (item_class, url, user_data) = item_data                                  # 3 #
+      # DBG('_content get({}, {})'.format(part, url))
+      if part == 'elm.swallow.icon':
+         icon = item_class.icon_get(url, user_data)
+      elif part == 'elm.swallow.end':
+         icon = item_class.icon_end_get(url, user_data)
+      else:
+         icon = None
 
-      if icon:
-         ly.content_set('browser.item.icon', gui.load_icon(icon))
-         ly.signal_emit('icon,show', 'emc')
-      if iend:
-         ly.content_set('browser.item.icon_end', gui.load_icon(iend))
-         ly.signal_emit('icon_end,show', 'emc')
-      if tend:
-         ly.part_text_set('browser.item.text_end', tend)
-
-      label = ly.edje.part_external_object_get('browser.item.label1')
-      label.text = text
-
-      # start the slide now, but should start on item_hilight :(
-      label.style = 'slide_short/browser'
-      label.slide_mode = ELM_LABEL_SLIDE_MODE_AUTO # Should be NONE
-      label.slide_speed = 50
-      # label.slide_go()
-
-      return ly
+      return gui.load_icon(icon)
 
    ### GenList Callbacks
    def _cb_item_selected(self, gl, item):
@@ -620,12 +614,6 @@ class ViewList(object):
       item_class.item_selected(url, user_data)
 
    def _cb_item_hilight(self, gl, item):
-      DBG("TODO: Start slide") # TODO
-      # ly = item.part_content_get('elm.swallow.content')
-      # label = ly.edje.part_external_object_get('browser.item.label1')
-      # label.slide_mode = ELM_LABEL_SLIDE_MODE_AUTO
-      # label.slide_go()
-
       self._last_focused_item = item
       if self.timer: self.timer.delete()
       if self.timer2: self.timer2.delete()
@@ -633,10 +621,7 @@ class ViewList(object):
       self.timer2 = ecore.timer_add(1.0, self._cb_timer2, item.data_get())
 
    def _cb_item_unhilight(self, gl, item):
-      DBG("TODO: Stop slide") # TODO
-      # ly = item.part_content_get('elm.swallow.content')
-      # label = ly.edje.part_external_object_get('browser.item.label1')
-      # label.slide_mode = ELM_LABEL_SLIDE_MODE_NONE
+      pass
 
    def _cb_timer(self, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #

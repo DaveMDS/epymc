@@ -54,7 +54,7 @@ data {
    item: "theme.version" "0.8";
    item: "theme.author" "davemds";
    item: "theme.info" "A more long description of the theme";
-   item: "theme.generation" "4";
+   item: "theme.generation" "5";
 }
 
 images {
@@ -114,7 +114,7 @@ styles {
       base: "font="FONT2" align=center font_size="FONT_SIZE_BIG" color=#"COLOR_ORANGE_HEX" wrap=none";
    }
 
-   style { name: "epymc_label_slide_style";
+   style { name: "epymc_browser_slide_style";
       base:  "font="FONT" font_size="FONT_SIZE" color=#fff wrap=none";
    }
 
@@ -1594,94 +1594,6 @@ collections {
             script {
                clock_cb(0);
             }
-         }
-      }
-   }
-
-/// browser list item
-   group { name: "emc/browser/list_item/normal"; /* API todoc */
-      parts {
-         part { name: "browser.item.icon"; /* API todoc */
-            type: SWALLOW;
-            scale: 1;
-            description { state: "default" 0.0;
-               FIXED_SIZE(1, 40)
-               align: 0.0 0.5;
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               FIXED_SIZE(40, 40)
-            }
-         }
-         part { name: "browser.item.icon_end"; /* API todoc */
-            type: SWALLOW;
-            scale: 1;
-            description { state: "default" 0.0;
-               FIXED_SIZE(1, 40)
-               align: 1.0 0.5;
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               FIXED_SIZE(40, 40)
-            }
-         }
-         part { name: "browser.item.text_end"; /* API todoc */
-            type: TEXT;
-            scale: 1;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               rel1 {
-                  to: "browser.item.icon_end";
-                  relative: 0.0 0.0;
-                  offset: -5 0;
-               }
-               rel2 {
-                  to: "browser.item.icon_end";
-                  relative: 0.0 1.0;
-                  offset: -6 -1;
-               }
-               align: 1.0 0.5;
-               color: FN_COL_DISABLE;
-               text {
-                  font: FONT;
-                  size: (FONT_SIZE - 2);
-                  min: 1 0;
-                  ellipsis: -1;
-               }
-            }
-         }
-         part { name: "browser.item.label1"; /* API todoc */
-            type: EXTERNAL;
-            source: "elm/label";
-            mouse_events: 0;
-            scale: 1;
-
-            description { state: "default" 0.0;
-               rel1 {
-                  to_x: "browser.item.icon";
-                  relative: 1.0  0.0;
-                  offset: 1  1;
-               }
-               rel2 {
-                  to_x: "browser.item.text_end";
-                  relative: 0.0  1.0;
-                  offset: -1  -1;
-               }
-            }
-         }
-         // DBG_SHOW("browser.item.icon", 80, 80, 0)
-         // DBG_SHOW("browser.item.label1", 0, 80, 80)
-         // DBG_SHOW("browser.item.text_end", 0, 80, 0)
-         // DBG_SHOW("browser.item.icon_end", 80, 0, 80)
-      }
-      programs {
-         program { signal: "icon,show"; source: "emc"; /* API todoc */
-            action: STATE_SET "visible" 0.0;
-            target: "browser.item.icon";
-         }
-         program { signal: "icon_end,show"; source: "emc"; /* API todoc */
-            action: STATE_SET "visible" 0.0;
-            target: "browser.item.icon_end";
          }
       }
    }

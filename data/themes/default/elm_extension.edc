@@ -1119,7 +1119,7 @@ group { name: "elm/list/item_odd/default";
    }
 }
 
-//// FILEMANAGER LISTS (icon + text) (elm/list/item/default) ///////////////////////
+//// FILEMANAGER LISTS (icon + text) (elm/list/item/default) //////////////////
 group { name: "elm/list/item/browser"; alias: "elm/list/item_odd/browser";
    data.item: "selectraise" "on";
    images {
@@ -1289,16 +1289,76 @@ group { name: "elm/list/item/browser"; alias: "elm/list/item_odd/browser";
    }
 }
 
-//// BROWSER GENLIST ITEM FULL (elm/genlist/item_compress/full/default) ///////
-group { name: "elm/genlist/item_compress/full/browser";
+//// BROWSER GENLIST ITEM (elm/genlist/item_compress/default/default) /////////
+group { name: "elm/genlist/item_compress/default/browser";
    data.item: "selectraise" "on";
-   data.item: "contents" "elm.swallow.content";
-   // data.item: "treesize" 20;
+   data.item: "focusraise" "on";
+   data.item: "texts" "elm.text.main elm.text.end";
+   data.item: "contents" "elm.swallow.icon elm.swallow.end";
+   // data.item: "treesize" 16;
    // data.item: "flips" "elm.text.flip";
    images {
       image: "list_item_sel_bg.png" COMP;
       image: "list_item_sel_fg.png" COMP;
       image: "separator.png" COMP;
+   }
+   script {
+      public g_duration, g_stopslide, g_timer_id, g_anim_id;
+      
+      public calc_duration() {
+         new x, y, h, tw, cw;
+         new Float:duration;
+         new Float:width;
+         get_geometry(PART:"elm.text.main", x, y, tw, h);
+         get_geometry(PART:"text_clip", x, y, cw, h);
+         width = tw - cw;
+         duration = width / 50;
+         set_float(g_duration, duration);
+      }
+      
+      public slide_to_end_anim(val, Float:pos) {
+         new stopflag;
+         new id;
+         stopflag = get_int(g_stopslide);
+         if (stopflag == 1) return;
+         set_tween_state(PART:"elm.text.main", pos, "slide_begin", 0.0, "slide_end", 0.0);
+         if (pos >= 1.0) {
+            id = timer(0.5, "slide_to_begin", 1);
+            set_int(g_timer_id, id);
+         }
+      }
+      public slide_to_begin() {
+         new stopflag;
+         new id;
+         stopflag = get_int(g_stopslide);
+         if (stopflag == 1) return;
+         set_state(PART:"elm.text.main", "slide_begin", 0.0);
+         id = timer(0.5, "slide_to_end", 1);
+         set_int(g_timer_id, id);
+      }
+      public slide_to_end() {
+         new stopflag;
+         new id;
+         stopflag = get_int(g_stopslide);
+         if (stopflag == 1) return;
+         id = anim(get_float(g_duration), "slide_to_end_anim", 1);
+         set_int(g_anim_id, id);
+      }
+      public start_slide() {
+         set_int(g_stopslide, 0);
+         set_state(PART:"elm.text.main", "slide_begin", 0.0);
+         calc_duration();
+         slide_to_end();
+      }
+      public stop_slide() {
+         new id;
+         set_int(g_stopslide, 1);
+         id = get_int(g_anim_id);
+         cancel_anim(id);
+         id = get_int(g_timer_id);
+         cancel_timer(id);
+         set_state(PART:"elm.text.main", "default", 0.0);
+      }
    }
    parts {
       part { name: "event";
@@ -1320,6 +1380,7 @@ group { name: "elm/genlist/item_compress/full/browser";
          clip_to: "disclip";
          mouse_events: 0;
          description { state: "default" 0.0;
+            min: 200 42;
             visible: 0;
             color: 255 255 255 100;
             image {
@@ -1332,13 +1393,99 @@ group { name: "elm/genlist/item_compress/full/browser";
             visible: 1;
          }
       }
-      part { name: "elm.swallow.content";
+      part { name: "elm.swallow.icon";
          type: SWALLOW;
          scale: 1;
          description { state: "default" 0.0;
-            min: 200 42;
+            rel2.relative: 0.0 1.0;
+            align: 0.0 0.5;
+         }
+         // description { state: "default" 0.0;
+         //    FIXED_SIZE(1, 40)
+         //    align: 0.0 0.5;
+         // }
+         // description { state: "visible" 0.0;
+         //    inherit: "default" 0.0;
+         //    FIXED_SIZE(40, 40)
+         // }
+      }
+      part { name: "elm.swallow.end";
+         type: SWALLOW;
+         scale: 1;
+         description { state: "default" 0.0;
+            rel1.relative: 1.0 0.0;
+            align: 1.0 0.5;
          }
       }
+      part { name: "elm.text.end";
+         type: TEXT;
+         scale: 1;
+         description { state: "default" 0.0;
+            fixed: 1 1;
+            rel1 {
+               to: "elm.swallow.end";
+               relative: 0.0 0.0;
+               offset: -5 0;
+            }
+            rel2 {
+               to: "elm.swallow.end";
+               relative: 0.0 1.0;
+               offset: -6 -1;
+            }
+            align: 1.0 0.5;
+            color: FN_COL_DISABLE;
+            text {
+               font: FONT;
+               size: (FONT_SIZE - 2);
+               min: 1 0;
+               ellipsis: -1;
+            }
+         }
+      }
+      part { name: "text_clip";
+         type: RECT;
+         description { state: "default" 0.0;
+            rel1 {
+               to_x: "elm.swallow.icon";
+               relative: 1.0  0.0;
+               offset: 1  1;
+            }
+            rel2 {
+               to_x: "elm.text.end";
+               relative: 0.0  1.0;
+               offset: -1  -1;
+            }
+         }
+      }
+      part { name: "elm.text.main";
+         type: TEXTBLOCK;
+         mouse_events: 0;
+         scale: 1;
+         clip_to: "text_clip";
+         description { state: "default" 0.0;
+            rel1.to: "text_clip";
+            rel2.to: "text_clip";
+            text {
+               style: "epymc_browser_slide_style";
+               min: 1 1;
+               ellipsis: -1;
+               align: 0.0 0.5;
+            }
+            align: 0.0 0.5;
+         }
+         description { state: "slide_begin" 0.0;
+            inherit: "default" 0.0;
+            align: 0.0 0.5;
+         }
+         description { state: "slide_end" 0.0;
+            inherit: "default" 0.0;
+            align: 1.0 0.5;
+         }
+      }
+      // DBG_SHOW("elm.swallow.icon", 80, 80, 0)
+      // DBG_SHOW("elm.swallow.end", 80, 0, 80)
+      // DBG_SHOW("elm.text.end", 0, 80, 0)
+      // DBG_SHOW("text_clip", 0, 80, 80)//DBG_SHOW("elm.text.main", 0, 80, 80)
       part { name: "fg";
          clip_to: "disclip";
          mouse_events: 0;
@@ -1372,19 +1519,29 @@ group { name: "elm/genlist/item_compress/full/browser";
    }
    programs {
       program { name:"go_active";
-         signal:  "elm,state,selected";
-         source:  "elm";
+         signal:  "elm,state,selected"; source:  "elm";
          action:  STATE_SET "selected" 0.0;
          target:  "bg";
          target:  "fg";
       }
       program { name:"go_passive";
-         signal:  "elm,state,unselected";
-         source:  "elm";
+         signal:  "elm,state,unselected"; source:  "elm";
          action:  STATE_SET "default" 0.0;
          target:  "bg";
          target:  "fg";
          transition: LINEAR 0.1;
+      }
+      program { name: "start_slide";
+         signal: "elm,state,selected"; source: "elm";
+         script {
+            start_slide();
+         }
+      }
+      program { name: "stop_slide";
+         signal: "elm,state,unselected"; source: "elm";
+         script {
+            stop_slide();
+         }
       }
       program { name:"go_disabled";
          signal:  "elm,state,disabled";
@@ -1397,123 +1554,6 @@ group { name: "elm/genlist/item_compress/full/browser";
          source:  "elm";
          action:  STATE_SET "default" 0.0;
          target:  "disclip";
-      }
-   }
-}
-
-//// BROWSER FULL ITEM SLIDE LABEL (elm/label/base/slide_short) ///////////////
-group { name: "elm/label/base/slide_short/browser";
-   script {
-      public g_duration, g_stopslide, g_timer_id, g_anim_id;
-
-      public message(Msg_Type:type, id, ...) {
-         if ((type == MSG_FLOAT_SET) && (id == 0)) {
-            new Float:duration;
-            duration = getfarg(2);
-            set_float(g_duration, duration);
-         }
-      }
-      public slide_to_end_anim(val, Float:pos) {
-         new stopflag;
-         new id;
-         stopflag = get_int(g_stopslide);
-         if (stopflag == 1) return;
-         set_tween_state(PART:"elm.text", pos, "slide_begin", 0.0, "slide_end", 0.0);
-         if (pos >= 1.0) {
-            id = timer(0.5, "slide_to_begin", 1);
-            set_int(g_timer_id, id);
-         }
-      }
-      public slide_to_end() {
-         new stopflag;
-         new id;
-         new Float:duration;
-         stopflag = get_int(g_stopslide);
-         if (stopflag == 1) return;
-         duration = get_float(g_duration);
-         id = anim(duration, "slide_to_end_anim", 1);
-         set_int(g_anim_id, id);
-      }
-      public slide_to_begin() {
-         new stopflag;
-         new id;
-         stopflag = get_int(g_stopslide);
-         if (stopflag == 1) return;
-         set_state(PART:"elm.text", "slide_begin", 0.0);
-         id = timer(0.5, "slide_to_end", 1);
-         set_int(g_timer_id, id);
-      }
-      public start_slide() {
-         set_int(g_stopslide, 0);
-         set_state(PART:"elm.text", "slide_begin", 0.0);
-         slide_to_end();
-      }
-      public stop_slide() {
-         new id;
-         set_int(g_stopslide, 1);
-         id = get_int(g_anim_id);
-         cancel_anim(id);
-         id = get_int(g_timer_id);
-         cancel_timer(id);
-         set_state(PART:"elm.text", "default", 0.0);
-      }
-   }
-   parts {
-      part { name: "label.text.clip"; type: RECT;
-         description { state: "default" 0.0;
-         }
-      }
-      part { name: "elm.text"; type: TEXTBLOCK;
-         scale: 1;
-         clip_to: "label.text.clip";
-         description { state: "default" 0.0;
-            rel1.relative: 0.0 0.0;
-            rel2.relative: 1.0 1.0;
-            align: 0.0 0.0;
-            text {
-               // style: "label_style";
-               style: "epymc_label_slide_style";
-               min: 0 1;
-               ellipsis: -1;
-            }
-         }
-         description { state: "slide_end" 0.0;
-            inherit: "default" 0.0;
-            rel1.relative: 1.0 0.0;
-            rel2.relative: 1.0 1.0;
-            align: 1.0 0.0;
-            text {
-               // style: "label_style";
-               style: "epymc_label_slide_style";
-               min: 1 1;
-               ellipsis: -1;
-            }
-         }
-         description { state: "slide_begin" 0.0;
-            inherit: "default" 0.0;
-            rel1.relative: 0.0 0.0;
-            rel2.relative: 0.0 1.0;
-            align: 0.0 0.0;
-            text {
-               // style: "label_style";
-               style: "epymc_label_slide_style";
-               min: 1 1;
-            }
-         }
-      }
-   }
-   programs {
-      program { name: "start_slide";
-         signal: "elm,state,slide,start"; source: "elm";
-         script {
-            start_slide();
-         }
-      }
-      program { name: "stop_slide";
-         signal: "elm,state,slide,stop"; source: "elm";
-         script {
-            stop_slide();
-         }
       }
    }
 }

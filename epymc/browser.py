@@ -445,6 +445,7 @@ class ViewList(object):
          gl.callback_clicked_double_add(self._cb_item_selected)
          gl.callback_selected_add(self._cb_item_hilight)
          gl.callback_unselected_add(self._cb_item_unhilight)
+         gl.callback_realized_add(self._cb_item_realized)
 
       # genlist item class
       self.itc = GenlistItemClass(item_style='default',
@@ -609,6 +610,14 @@ class ViewList(object):
       return gui.load_icon(icon)
 
    ### GenList Callbacks
+   def _cb_item_realized(self, gl, item):
+      # force show/hide of icons, otherwise the genlist cache mechanism will
+      # remember icons from previus usage of the item
+      item.signal_emit('icon,show' if item.part_content_get('elm.swallow.icon') \
+                       else 'icon,hide', 'emc')
+      item.signal_emit('end,show' if item.part_content_get('elm.swallow.end') \
+                       else 'end,hide', 'emc')
+
    def _cb_item_selected(self, gl, item):
       (item_class, url, user_data) = item.data_get()                            # 3 #
       item_class.item_selected(url, user_data)

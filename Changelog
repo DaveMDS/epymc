@@ -13,6 +13,7 @@ Bug fixed:
  * Fix refresh of the browser when the music scan take less than 1 second.
  * Fix display of music items with chars that seems tags.
  * Fix playback for files given on cmd line without the full path.
+ * Redone genlist slide without using elm Labels (elm 1.13 broke Label slide)
 
 New feature:
  

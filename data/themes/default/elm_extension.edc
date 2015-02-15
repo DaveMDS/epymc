@@ -1396,25 +1396,38 @@ group { name: "elm/genlist/item_compress/default/browser";
       part { name: "elm.swallow.icon";
          type: SWALLOW;
          scale: 1;
+         /* This should be enough, but the genlist cache mechanism will remember
+          * the status of icons from previous item usage, so we need to force
+          * the show/hide of icons everytime the item is realized.
+          */
+         // description { state: "default" 0.0;
+         //   rel2.relative: 0.0 1.0;
+         //   align: 0.0 0.5;
+         // }
          description { state: "default" 0.0;
-            rel2.relative: 0.0 1.0;
+            FIXED_SIZE(1, 40)
             align: 0.0 0.5;
          }
-         // description { state: "default" 0.0;
-         //    FIXED_SIZE(1, 40)
-         //    align: 0.0 0.5;
-         // }
-         // description { state: "visible" 0.0;
-         //    inherit: "default" 0.0;
-         //    FIXED_SIZE(40, 40)
-         // }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            FIXED_SIZE(40, 40)
+         }
       }
       part { name: "elm.swallow.end";
          type: SWALLOW;
          scale: 1;
+         /* see note for "elm.swallow.icon" */
+         // description { state: "default" 0.0;
+         //    rel1.relative: 1.0 0.0;
+         //    align: 1.0 0.5;
+         //}
          description { state: "default" 0.0;
-            rel1.relative: 1.0 0.0;
+            FIXED_SIZE(1, 40)
             align: 1.0 0.5;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            FIXED_SIZE(40, 40)
          }
       }
       part { name: "elm.text.end";
@@ -1554,6 +1567,22 @@ group { name: "elm/genlist/item_compress/default/browser";
          source:  "elm";
          action:  STATE_SET "default" 0.0;
          target:  "disclip";
+      }
+      program { signal: "icon,show"; source: "emc";
+         action: STATE_SET "visible" 0.0;
+         target: "elm.swallow.icon";
+      }
+      program { signal: "icon,hide"; source: "emc";
+         action: STATE_SET "default" 0.0;
+         target: "elm.swallow.icon";
+      }
+      program { signal: "end,show"; source: "emc";
+         action: STATE_SET "visible" 0.0;
+         target: "elm.swallow.end";
+      }
+      program { signal: "end,hide"; source: "emc";
+         action: STATE_SET "default" 0.0;
+         target: "elm.swallow.end";
       }
    }
 }

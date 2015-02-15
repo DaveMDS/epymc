@@ -4,6 +4,7 @@ epymc/locale/it
 data/locale/*.po~
 epymc/__pycache__/
 epymc/__init__.pyc
+installed_files*
 
 ## below files are created by makepkg
 ## when building the PKGBUILD

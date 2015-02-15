@@ -118,45 +118,40 @@ class update_po(Command):
             copy_file(pot_file, po_file, verbose=False)
 
 
+RECORD_FILE = "installed_files-%d.%d.txt" % sys.version_info[:2]
 class Uninstall(Command):
-   description = 'attemp an uninstall operation, use the --prefix argument'
-   user_options = [('prefix=', None, 'where the package has been installed')]
+    description = 'remove all the installed files recorded at installation time'
+    user_options = []
 
-   def initialize_options(self):
-      self.prefix = None
+    def initialize_options(self):
+        pass
 
-   def finalize_options(self):
-      if self.prefix is None:
-         self.prefix = '/usr/local'
+    def finalize_options(self):
+        pass
 
-   def remove_file(self, path):
-      if os.path.isfile(path):
-         try:
-            os.unlink(path)
-            info("removing '%s'" % path)
-         except OSError:
-            warn("error removing '%s'" % path)
+    def remove_entry(self, entry):
+        if os.path.isfile(entry):
+            try:
+                info("removing file %s" % entry)
+                os.unlink(entry)
+            except OSError as e:
+                error(e)
 
-   def run(self):
-      info('attemp to uninstall from the prefix: %s' % self.prefix)
-      py = 'python%d.%d' % (sys.version_info.major, sys.version_info.minor)
+            directory = os.path.dirname(entry)
+            while os.listdir(directory) == []:
+                try:
+                    info("removing empty directory %s" % directory)
+                    os.rmdir(directory)
+                except OSError as e:
+                    error(e)
+                directory = os.path.dirname(directory)
 
-      # remove scripts and data files
-      self.remove_file(os.path.join(self.prefix, 'bin', 'epymc'))
-      self.remove_file(os.path.join(self.prefix, 'share', 'applications', 'epymc.desktop'))
-      self.remove_file(os.path.join(self.prefix, 'share', 'icons', 'epymc.png'))
-
-      # remove the module itself
-      for search in ['dist-packages', 'site-packages']:
-         path = os.path.join(self.prefix, 'lib', py, search, 'epymc')
-         if os.path.exists(path) and os.path.isdir(path):
-            remove_tree(path, verbose=1)
-
-      # remove the egg-info file
-      for search in ['dist-packages', 'site-packages']:
-         path = os.path.join(self.prefix, 'lib', py, search, 'EpyMC-*.egg-info')
-         for egg in glob.glob(path):
-            self.remove_file(egg)
+    def run(self):
+        if not os.path.exists(RECORD_FILE):
+            info('ERROR: No %s file found!' % RECORD_FILE)
+        else:
+            for entry in open(RECORD_FILE).read().split():
+                self.remove_entry(entry)
 
 
 class Build(build):
@@ -255,5 +250,8 @@ setup (
       'install_lib': Install,
       'uninstall': Uninstall,
       'update_po': update_po,
+   },
+   command_options = {
+      'install': {'record': ('setup.py', RECORD_FILE)}
    },
 )

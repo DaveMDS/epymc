@@ -24,6 +24,7 @@ New feature:
  * Add command line switch to start in the given activity (ex: --start-music)
  * Add .desktop Additional Actions to start in the given activity
  * Remeber last visited url when going back in browser lists
+ * Better uninstall setup command
 
 
 ===============================================================================

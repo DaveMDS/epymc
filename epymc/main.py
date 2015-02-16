@@ -42,7 +42,7 @@ import epymc.sdb as sdb
 import epymc.browser as browser
 
 
-def start_epymc():
+def start_epymc(standalone=False):
 
    # parse command line arguments
    parser = argparse.ArgumentParser(description='Emotion Media Center')
@@ -50,6 +50,8 @@ def start_epymc():
                        help='start directy in the given activity')
    parser.add_argument('-f', '--fullscreen', action='store_true',
                        help='start in fullscreen')
+   parser.add_argument('--standalone', action='store_true',
+                       help='start in X without a WM (fullscreen)')
    parser.add_argument('mediafile', nargs='?')
    args = parser.parse_args()
 
@@ -111,6 +113,17 @@ def start_epymc():
    # fullscreen requested from command line
    if args.fullscreen:
       gui.fullscreen_set(True)
+
+   # run standalone (inside X without a WM)
+   if standalone or args.standalone:
+      from efl import ecore_x
+      ecore_x.init()
+      # set fullscreen
+      x, y, w, h = gui.win.screen_size
+      gui.win.size = (w, h)
+      # give focus to the win
+      ecore_x_win = ecore_x.Window_from_xid(gui.win.xwindow_xid)
+      ecore_x_win.focus()
 
    # run the main loop
    elementary.run()

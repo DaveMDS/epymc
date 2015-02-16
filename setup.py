@@ -231,10 +231,11 @@ setup (
       ]
    },
 
-   scripts = ['bin/epymc'],
+   scripts = ['bin/epymc', 'bin/epymc_standalone'],
 
    data_files = [
       ('share/applications/', ['data/desktop/epymc.desktop']),
+      ('/usr/share/xsessions/', ['data/desktop/epymc_xsession.desktop']),
       ('share/icons/', ['data/desktop/epymc.png',
                         'data/desktop/epymc-movies.png',
                         'data/desktop/epymc-music.png',

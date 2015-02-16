@@ -27,6 +27,7 @@ New feature:
  * Remeber last visited url when going back in browser lists
  * Better uninstall setup command
  * New cmd line option: -f --fullscreen
+ * Standalone mode (run inside X witout a WM) plus xsession for your dm
 
 
 ===============================================================================

@@ -1,5 +1,5 @@
 # Russian translations for EpyMC package
-# Английские переводы для пакета EoyMC.
+# Английские переводы для пакета EpyMC.
 # Copyright (C) 2015 THE EpyMC'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the EpyMC package.
 # Niko2040 <niko2040@bynets.ru>, 2015.

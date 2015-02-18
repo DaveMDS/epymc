@@ -70,7 +70,7 @@ msgstr "Emotion Media Center"
 
 #: epymc/gui.py:239
 msgid "credits"
-msgstr ""
+msgstr "О программе"
 
 #: epymc/gui.py:240
 msgid "Cancel"
@@ -262,7 +262,7 @@ msgstr "Отображать пункт 'Назад' в списках"
 
 #: epymc/config_gui.py:368
 msgid "Download folder"
-msgstr "Каталог загрузки"
+msgstr "Каталог загрузок"
 
 #: epymc/config_gui.py:370
 msgid "Max concurrent download"
@@ -298,7 +298,7 @@ msgstr "Версия"
 
 #: epymc/config_gui.py:472
 msgid "Subtitles preferred languages"
-msgstr "Предпочитаемые языки субтитров"
+msgstr "Предпочитаемый язык субтитров"
 
 #: epymc/config_gui.py:473
 msgid "Subtitles encoding"
@@ -322,7 +322,7 @@ msgstr "Ядро"
 
 #: epymc/config_gui.py:513
 msgid "Download available"
-msgstr "Доступные загрузки"
+msgstr "Доступно скачивание"
 
 #: epymc/config_gui.py:513
 msgid "yes"
@@ -436,12 +436,12 @@ msgstr "Фильмы (%s)"
 #: epymc/themoviedb.py:564
 #, python-format
 msgid "Photos (%s)"
-msgstr "Фотографии"
+msgstr "Фотографии (%s)"
 
 #: epymc/themoviedb.py:576
 #, python-format
 msgid "%(title)s as %(character)s"
-msgstr "%(title)s as %(character)s"
+msgstr "%(title)s в роли %(character)s"
 
 #: epymc/mediaplayer.py:206
 msgid "File not found"
@@ -450,7 +450,7 @@ msgstr "Файл не найден"
 #: epymc/mediaplayer.py:241
 #, python-format
 msgid "Continue from %s ?"
-msgstr "Продолжить с %s"
+msgstr "Продолжить с %s ?"
 
 #: epymc/mediaplayer.py:540
 #, python-format
@@ -509,7 +509,7 @@ msgstr "Нет субтитров"
 
 #: epymc/mediaplayer.py:848
 msgid "Download subtitles"
-msgstr "Скачать субтитры"
+msgstr "Загрузить субтитры"
 
 #: epymc/mediaplayer.py:851
 msgid "Subtitles delay"
@@ -582,7 +582,7 @@ msgstr "Управление - MPRIS2"
 #: epymc/plugins/input_mpris2/mpris2.py:50
 msgid ""
 "Add the ability to control the application from any MPRIS2 compatible client."
-msgstr "Позволяет управлять программой с любого MPRIS2-совместимого клиента."
+msgstr "Этот модуль позволяет управлять программой с любого MPRIS2-совместимого клиента."
 
 #: epymc/plugins/mame/mame.py:54
 msgid "My Games"
@@ -610,7 +610,7 @@ msgid ""
 "This module add the ability to browse, download and play games using the M.A."
 "M.E. emulator."
 msgstr "Этот модуль добавляет возможность просмотривать, скачивать и играть в "
-"игры используя M.A.M.E. эмулятор."
+"игры, используя M.A.M.E. эмулятор."
 
 #: epymc/plugins/mame/mame.py:169
 msgid "Searching games, please wait..."
@@ -622,7 +622,7 @@ msgstr "M.A.M.E не найден"
 
 #: epymc/plugins/mame/mame.py:193
 msgid "Is mame installed?"
-msgstr "M.A.M.E установлен,"
+msgstr "M.A.M.E установлен?"
 
 #: epymc/plugins/mame/mame.py:215
 msgid "Can not get rom path from M.A.M.E."
@@ -753,12 +753,12 @@ msgstr "Невозможно найти игру в сети."
 
 #: epymc/plugins/music/music.py:52 epymc/plugins/music/music.py:56
 msgid "OnAir"
-msgstr ""
+msgstr "Очередь воспроизведения"
 
 #: epymc/plugins/music/music.py:66 epymc/plugins/music/music.py:70
 #: epymc/plugins/music/music.py:252 epymc/plugins/music/music.py:306
 msgid "Artists"
-msgstr "Исполнитель"
+msgstr "Исполнители"
 
 #: epymc/plugins/music/music.py:77 epymc/plugins/music/music.py:81
 #: epymc/plugins/music/music.py:253 epymc/plugins/music/music.py:308
@@ -791,8 +791,8 @@ msgstr "Воспроизвести все песни"
 #: epymc/plugins/music/music.py:157 epymc/plugins/music/music.py:184
 #: epymc/plugins/music/music.py:557
 #, python-format
-msgid "<em>Испольнитель</em> %s<br>"
-msgstr "<em>by</em> %s<br>"
+msgid "<em>by</em> %s<br>"
+msgstr "<em>Испольнитель</em> %s<br>"
 
 #: epymc/plugins/music/music.py:159 epymc/plugins/music/music.py:559
 #, python-format
@@ -807,7 +807,7 @@ msgstr "длительность: %s<br>"
 #: epymc/plugins/music/music.py:177
 #, python-format
 msgid "%(name)s by %(artist)s"
-msgstr "%(name)s by %(artist)s"
+msgstr "%(artist)s - %(name)s"
 
 #: epymc/plugins/music/music.py:186 epymc/plugins/music/music.py:214
 #, python-format
@@ -840,7 +840,7 @@ msgstr "Музыка"
 
 #: epymc/plugins/music/music.py:223
 msgid "The music module build a database of all your albums, songs and artist."
-msgstr "Модуль музыки создаёт базу всех ваших альбомов, песен и испольнителей."
+msgstr "Этот модуль создаёт базу музыки всех ваших альбомов, песен и испольнителей."
 
 #: epymc/plugins/music/music.py:322 epymc/plugins/music/music.py:355
 msgid "Rebuilding database"
@@ -871,15 +871,15 @@ msgstr "Вышло в эфир"
 #: epymc/plugins/tvshows/tvshows.py:297 epymc/plugins/tvshows/tvshows.py:352
 #: epymc/plugins/tvshows/tvshows.py:653
 msgid "TV Shows"
-msgstr "Телевидение"
+msgstr "Телесериалы"
 
 #: epymc/plugins/tvshows/tvshows.py:256
 msgid ""
 "The Tv Shows module is used to browse your series collection, it is fully "
 "integrated with themoviedb.org online database."
 msgstr ""
-"Модуль Телевидение используется для просмотра вашей коллекции сериалов, "
-"он полностью интегрирован с онлайн-базой themoviedb.org."
+"Этот модуль используется для просмотра Вашей коллекции сериалов. "
+"Он полностью интегрирован с онлайн-базой themoviedb.org."
 
 #: epymc/plugins/tvshows/tvshows.py:293
 msgid "Tv Shows Collection"
@@ -972,7 +972,7 @@ msgstr "Информация"
 #: epymc/plugins/tvshows/tvshows.py:535 epymc/plugins/movies/movies.py:520
 #, python-format
 msgid "%(name)s as %(character)s"
-msgstr "%(name)s как %(character)s"
+msgstr "%(name)s в роли %(character)s"
 
 #: epymc/plugins/tvshows/tvshows.py:558 epymc/plugins/movies/movies.py:643
 #, python-format
@@ -1001,15 +1001,15 @@ msgstr "Получение обновлённой информации"
 
 #: epymc/plugins/tvshows/tvshows.py:657 epymc/plugins/movies/movies.py:820
 msgid "Preferred language for contents"
-msgstr "Предпочитаемый язык для содержания"
+msgstr "Предпочитаемый язык загружаемой информации"
 
 #: epymc/plugins/tvshows/tvshows.py:695
 msgid "TvShows scanner started"
-msgstr "Поиск ТВ"
+msgstr "Поиск телесериалов"
 
 #: epymc/plugins/tvshows/tvshows.py:726
 msgid "TvShows scanner done"
-msgstr "Поиск ТВ завершён"
+msgstr "Поиск телесериалов завершён"
 
 #: epymc/plugins/tvshows/tvshows.py:767
 #, python-format
@@ -1029,7 +1029,7 @@ msgstr[2] "%d серий"
 
 #: epymc/plugins/tvshows/tvshows.py:771
 msgid "Found serie:"
-msgstr ""
+msgstr "Найден сериал:"
 
 #: epymc/plugins/input_lirc/lirc.py:44
 msgid "Input - Remote Control"
@@ -1039,7 +1039,7 @@ msgstr "Управление - Управление пультом"
 msgid ""
 "This module lets you control the application using any LIRC compatible "
 "remote controller."
-msgstr "Этот модуль позволяет вам управлять приложением используя любой "
+msgstr "Этот модуль позволяет Вам управлять приложением используя любой "
 "LIRC-совместимый пульт."
 
 #: epymc/plugins/input_lirc/lirc.py:63 epymc/plugins/input_lirc/lirc.py:145
@@ -1108,7 +1108,7 @@ msgid ""
 "The movies module is used to browse your films collection, it is fully "
 "integrated with themoviedb.org online database."
 msgstr ""
-"Модуль Фильмы позволяет вам просматривать Вашу коллекцию фильмов, он "
+"Этот модуль позволяет Вам просматривать Вашу коллекцию фильмов. Он "
 "полностью интегрирован с онлайн-базой themoviedb.org."
 
 #: epymc/plugins/movies/movies.py:258
@@ -1134,7 +1134,7 @@ msgid ""
 "button..."
 msgstr ""
 "Фильм:<br>%s<br><br>Нет информации об этом фильме.<br>Попробуйте нажать "
-"кнопку <em>Поиск информации</em>"
+"кнопку <em>Поиск информации</em>..."
 
 #: epymc/plugins/movies/movies.py:618
 msgid "Searching for"
@@ -1179,7 +1179,7 @@ msgstr "Включить поиск фильмов в фоне"
 
 #: epymc/plugins/movies/movies.py:826
 msgid "Prefer movie titles in lists"
-msgstr "Предпочитать название фильма в списках"
+msgstr "Отображать название фильма в списках вместо имени файла"
 
 #: epymc/plugins/filemanager/filemanager.py:101
 msgid "Manage favorites"
@@ -1212,7 +1212,7 @@ msgstr "Переместить"
 
 #: epymc/plugins/filemanager/filemanager.py:280
 msgid "Favorites"
-msgstr "Избранное"
+msgstr "Избранные"
 
 #: epymc/plugins/filemanager/filemanager.py:444
 msgid "Are you sure you want to delete the folder?"
@@ -1259,8 +1259,8 @@ msgid ""
 "<br>http://your_ip:8080<br>You can change listening port and the theme from "
 "the configurtion file."
 msgstr ""
-"Этот модуль предоставляет способ управление приложением из вашего веб браузера."
-"<br>Сервер (по умолчанию) слушает порт 8080, чтобы подключиться, просто наберите: "
+"Этот модуль предоставляет Вам способ управления приложением из вашего веб браузера."
+"<br>Сервер (по умолчанию) слушает порт 8080. Чтобы подключиться, просто наберите: "
 "<br>http://ваш_ip:8080<br>Вы можете сменить порт и тему в файле настроек."
 
 #: epymc/plugins/screensaver/screensaver.py:41
@@ -1304,11 +1304,11 @@ msgstr "Управлять хранителем экрана только в п�
 #: epymc/plugins/onlinevideo/onlinevideo.py:135
 #: epymc/plugins/onlinevideo/onlinevideo.py:139
 msgid "Online Channels"
-msgstr "Online каналы"
+msgstr "Online Видео"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:113
 msgid "Browse, watch and download videos from your favorite online sources."
-msgstr "Ищите, смотрите и загружайте видео с ваших избранных интернет-источников."
+msgstr "Ищите, смотрите и загружайте видео с ваших любимых интернет-сервисов."
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:177
 msgid "Channels"
@@ -1339,7 +1339,7 @@ msgstr "Ошибка чтения канала"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:278
 msgid "No items returned"
-msgstr "No items"
+msgstr "Нет результатов"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:283
 msgid "Suggestions"
@@ -1438,32 +1438,32 @@ msgstr "Поиск людей"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:165
 msgid "More relevant videos"
-msgstr ""
+msgstr "Больше соответствующих видео"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:171
 msgid "More followed channels"
-msgstr ""
+msgstr "Больше каналов, на которые я подписан"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:176
 msgid "More followed groups"
-msgstr ""
+msgstr "Больше групп, на которые я подписан"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:184
 msgid "Browse videos"
-msgstr ""
+msgstr "Просмотр видео"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:185
 #: epymc/plugins/onlinevideo/youtube/youtube.py:52
 msgid "Browse channels"
-msgstr ""
+msgstr "Просмотр каналов"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:186
 msgid "Browse groups"
-msgstr ""
+msgstr "Просмотр групп"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:187
 msgid "Browse users"
-msgstr ""
+msgstr "Просмотр пользователей"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:204
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:222
@@ -1472,35 +1472,35 @@ msgstr ""
 #: epymc/plugins/onlinevideo/youtube/youtube.py:175
 #, python-format
 msgid "Load more results (%d in total)"
-msgstr ""
+msgstr "Загрузить больше результатов (%d всего)"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:287
 #: epymc/plugins/onlinevideo/youtube/youtube.py:75
 msgid "channel"
 msgid_plural "channels"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "канал"
+msgstr[1] "канала"
+msgstr[2] "каналов"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:288
 msgid "group"
 msgid_plural "groups"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "группа"
+msgstr[1] "группы"
+msgstr[2] "групп"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:54
 msgid "Top rated"
-msgstr "С высоким рейтингом"
+msgstr "Самые популярные"
 
 #: epymc/plugins/calibrator/calibrator.py:50
 #: epymc/plugins/calibrator/calibrator.py:56
 msgid "Screen calibrator"
-msgstr "Настройка экрана"
+msgstr "Калибровка экрана"
 
 #: epymc/plugins/calibrator/calibrator.py:52
 msgid "Use this module to calibrate your screen parameters."
-msgstr "Используйте этот модуль чтобы настроить параметры экрана"
+msgstr "Этот модуль позволяет откалибровать экран, и так же произвести его настройку."
 
 #: epymc/plugins/input_keyb/keyb.py:78
 msgid "Input - Keyboard"
@@ -1511,8 +1511,7 @@ msgid ""
 "The keyboard module lets you control the application using your keyboard, or "
 "any other device that act as a keyboard."
 msgstr ""
-"Модуль Клавиатура позволяет Вам управлять приложением, используя клавиатуру или "
-"другое устройство, действующее как клавиатура."
+"Этот модуль позволяет Вам указать горячие клавиши для управление с клавиатуры."
 
 #: epymc/plugins/input_keyb/keyb.py:102 epymc/plugins/input_keyb/keyb.py:163
 msgid "Keyboard"
@@ -1524,11 +1523,11 @@ msgstr "Вы уверены, что хотите удалить привязки
 
 #: epymc/plugins/input_keyb/keyb.py:135
 msgid "Remove key"
-msgstr "Удалить привязку кнопки"
+msgstr "Удалить горячюю клавишу"
 
 #: epymc/plugins/input_keyb/keyb.py:176
 msgid "Press a key on your keyboard"
-msgstr "Нажмите кнопку на клавиатуре"
+msgstr "Нажмите клавишу на клавиатуре"
 
 #: epymc/plugins/input_joy/joy.py:45
 msgid "Input - Joystick"
@@ -1539,8 +1538,8 @@ msgid ""
 "The joystick module lets you control the application using any standard "
 "digital joystick or joypad."
 msgstr ""
-"Модуль Джойстик позволяет управлять приложением, используя любой стандартный "
-"цифровой джойстик или геймпад"
+"Этот модуль позволяет управлять приложением, используя любой стандартный "
+"цифровой джойстик или геймпад."
 
 #: epymc/plugins/input_joy/joy.py:80 epymc/plugins/input_joy/joy.py:156
 msgid "Joystick"

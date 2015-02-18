@@ -768,7 +768,7 @@ msgstr "Альбомы"
 #: epymc/plugins/music/music.py:88 epymc/plugins/music/music.py:92
 #: epymc/plugins/music/music.py:254 epymc/plugins/music/music.py:310
 msgid "Songs"
-msgstr "Песни"
+msgstr "Аудиозаписи"
 
 #: epymc/plugins/music/music.py:102 epymc/plugins/tvshows/tvshows.py:84
 #: epymc/plugins/movies/movies.py:93

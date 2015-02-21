@@ -236,7 +236,8 @@ setup (
    data_files = [
       ('share/applications/', ['data/desktop/epymc.desktop']),
       ('/usr/share/xsessions/', ['data/desktop/epymc_xsession.desktop']),
-      ('share/icons/', ['data/desktop/epymc.png',
+      ('share/icons/hicolor/64x64/apps/', [
+                        'data/desktop/epymc.png',
                         'data/desktop/epymc-movies.png',
                         'data/desktop/epymc-music.png',
                         'data/desktop/epymc-olvideos.png',

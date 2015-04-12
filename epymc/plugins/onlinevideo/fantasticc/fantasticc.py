@@ -182,61 +182,10 @@ elif STATE == ST_CATEGORIES_LIST:
 
 # read a page with a single video and play the video
 elif STATE == ST_PLAY:
-
-   html = fetch_url(URL)
-   link = None
-
-   if "xvideos" in URL: # OK (youtube-dl)
-      link = re.compile('(http://www.xvideos.com/.+?)"').findall(html)[0]
-
-   elif 'redtube' in URL: # OK (youtube-dl)
-      link = re.compile('(http://www.redtube.com/.+?)"').findall(html)[0]
-
-   elif "xhamster" in URL: # OK (youtube-dl)
-      link = re.compile('(http://xhamster.com/movies/.+?)"').findall(html)[0]
-
-   elif 'you_porn' in URL: # OK (youtube-dl)
-      link = re.compile('(http://www.youporn.com/watch/.+?)"').findall(html)[0]
-
-   elif 'pornotube' in URL: # OK (youtube-dl)
-      link = re.compile('(http://pornotube.com/media.php.+?)"').findall(html)[0]
-
-   elif 'tube8' in URL: # OK (youtube-dl)
-      link = re.compile('(http://www.tube8.com/.+?)"').findall(html)[0]
-
-   elif "pornhub" in URL: # OK (youtube-dl)
-      link = re.compile('(http://www.pornhub.com/view_video.php.+?)"').findall(html)[0]
-
-   elif 'spankwire' in URL: # OK (youtube-dl)
-      link = re.compile('(http://www.spankwire.com/.+?)"').findall(html)[0]
-
-   elif 'empflix' in URL: # OK (youtube-dl)
-      link = re.compile('(http://www.empflix.com/view.php.+?)"').findall(html)[0]
-
-   elif 'keezmovies' in URL: # OK (youtube-dl)
-      link = re.compile('(http://www.keezmovies.com/video/.+?)"').findall(html)[0]
-
-   elif 'xtube' in URL: # OK (youtube-dl)
-      link = re.compile('(http://www.xtube.com/play_re.php.+?)"').findall(html)[0]
-
-   elif 'extremetube' in URL: # OK (youtube-dl)
-      link = re.compile('(http://www.extremetube.com/.+?)"').findall(html)[0]
-
-   # elif 'hardsextube' in URL: # HardSexTube TODO
-   # elif 'madthumbs' in URL: # MadThumbs TODO
-   # elif 'drtuber' in URL: # DrTuber TODO
-   # elif 'tnaflix' in URL: # TnaFlix TODO
-   # elif 'deviantclip' in URL: # TnaFlix TODO
-   # elif 'bigtits' in URL: # Bigtits TODO
-
+   soup = fetch_url(URL, parser='bs4')
+   link = soup.find('div', class_='video-wrap')['data-origin-source']
+   url = call_ydl(link)
+   if url:
+      play_url(url)
    else:
-      report_error('Source not supported')
-
-   if link is not None:
-      # remove double slashes
-      link = 'http://' + link.replace('http://', '').replace('//', '/')
-      url = call_ydl(link)
-      if url:
-         play_url(url)
-      else:
-         report_error('Video not found')
+      report_error('Video not found')

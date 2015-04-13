@@ -65,10 +65,12 @@ class FilemanList(List):
    def focus_move(self, direction):
       if direction == 'd':
          if self.selected_item.next:
-               self.selected_item.next.selected = True
+            self.selected_item.next.show()
+            self.selected_item.next.selected = True
       elif direction == 'u':
          if self.selected_item.prev:
-               self.selected_item.prev.selected = True
+            self.selected_item.prev.show()
+            self.selected_item.prev.selected = True
       self.last_focused_item = self.selected_item
 
    def item_activated_cb(self, li=None, item=None):

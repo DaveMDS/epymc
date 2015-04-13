@@ -574,15 +574,15 @@ class ViewList(object):
       if event == 'DOWN':
          next = item.next_get()
          if next:
-            next.selected_set(1)
-            next.show()
+            next.selected = True
+            next.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
             return input_events.EVENT_BLOCK
 
       elif event == 'UP':
          prev = item.prev_get()
          if prev:
-            prev.selected_set(1)
-            prev.show()
+            prev.selected = True
+            prev.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
             return input_events.EVENT_BLOCK
 
       elif event == 'OK':
@@ -774,6 +774,7 @@ class ViewGrid(object):
                prev = prev.prev
                x2, y2 = prev.pos
             prev.selected = True
+            prev.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
             return input_events.EVENT_BLOCK
          except:
             return input_events.EVENT_CONTINUE
@@ -786,6 +787,7 @@ class ViewGrid(object):
                next = next.next
                x2, y2 = next.pos
             next.selected = True
+            next.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
             return input_events.EVENT_BLOCK
          except:
             return input_events.EVENT_CONTINUE

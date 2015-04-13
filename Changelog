@@ -28,6 +28,8 @@ New feature:
  * Better uninstall setup command
  * New cmd line option: -f --fullscreen
  * Standalone mode (run inside X witout a WM) plus xsession for your dm
+ * Animate the list scrolling in dialogs
+ * Keep the selected item in browser in the middle of the view
 
 
 ===============================================================================

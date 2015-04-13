@@ -1066,7 +1066,7 @@ class EmcDialog(edje.Edje):
                new_it = item.prev_get()
             if new_it:
                new_it.selected = True
-               new_it.show()
+               new_it.bring_in()
                return input_events.EVENT_BLOCK
 
       # try to scroll the text entry

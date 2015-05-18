@@ -32,12 +32,13 @@ from epymc.extapi.onlinevideo import api_version, state_get, fetch_url, \
 ytb_base = 'http://www.youtube.com'
 api_base = 'http://gdata.youtube.com/feeds/api/standardfeeds/'
 ytb_icon = local_resource(__file__, 'youtube.png')
-ITEMS_PER_PAGE = 50
+# ITEMS_PER_PAGE = 50
 
 ST_HOME = 0
 ST_PLAY = 1
-ST_VIDEO_LIST_JSONC = 2
-ST_SEARCH_JSONC = 3
+# ST_VIDEO_LIST_JSONC = 2
+ST_SEARCH = 3
+
 ST_CHN_CATEGORIES = 10
 ST_CHN_CHANNELS = 11
 ST_CHN_VIDEOS = 12
@@ -48,17 +49,58 @@ STATE, URL = state_get()
 
 # this is the first page, show fixed categories
 if STATE == ST_HOME:
-   item_add(ST_SEARCH_JSONC, _('Search videos'), 'search', None, action=ACT_SEARCH)
-   item_add(ST_CHN_CATEGORIES, _('Browse channels'),
-            ytb_base+'/channels', None, action=ACT_FOLDER)
-   item_add(ST_VIDEO_LIST_JSONC, _('Top rated'),
-            api_base+'top_rated?v=2&alt=jsonc&max-results='+str(ITEMS_PER_PAGE),
-            None, action=ACT_FOLDER)
+   item_add(ST_SEARCH, _('Search videos'), 'search', None, action=ACT_SEARCH)
+   # item_add(ST_CHN_CATEGORIES, _('Browse channels'),
+            # ytb_base+'/channels', None, action=ACT_FOLDER)
+   # item_add(ST_VIDEO_LIST_JSONC, _('Top rated'),
+            # api_base+'top_rated?v=2&alt=jsonc&max-results='+str(ITEMS_PER_PAGE),
+            # None, action=ACT_FOLDER)
 
 
 ###############################################################################
 ### youtube site scraper ######################################################
 ###############################################################################
+
+# 0. search results
+if STATE == ST_SEARCH:
+   if not URL.startswith(ytb_base):
+      # first page, URL is the search query entered by the user
+      URL = ytb_base + '/results?' + url_encode(
+            {'search_query': URL, 'filters': 'video'})
+   
+   soup = fetch_url(URL, parser='bs4')
+   for div in soup.findAll('div', class_='yt-lockup-video'):
+      id = div['data-context-item-id']
+      title = div.find('h3', class_='yt-lockup-title').find('a')['title']
+      url = ytb_base + '/watch?v=' + id
+      poster = 'http://i.ytimg.com/vi/' + id + '/hqdefault.jpg'
+
+      duration = div.find('span', class_='video-time').string
+      user = div.find('div', class_='yt-lockup-byline').find('a').string
+      descr = div.find('div', class_='yt-lockup-description')
+      meta = div.find('ul', class_='yt-lockup-meta-info')
+      uploaded = meta.contents[0].string
+      views = meta.contents[1].string
+      
+      
+      info = '<title>%s</> <small>%s</><br>' \
+             '<small><name>%s</> %s <name>/ %s %s</><br>' \
+             '<success>%s</></small>' \
+             '<br>%s' % (
+               title, duration,
+               _('user'), user,
+               _('uploaded'), uploaded,
+               views, descr or '')
+
+      item_add(ST_PLAY, title, url, info=info, poster=poster)
+
+   # more items...
+   try:
+      url = ytb_base + soup.find('a', attrs={'data-link-type': 'next'})['href']
+      item_add(ST_SEARCH, _('More items...'), url, icon='icon/next', action=ACT_MORE)
+   except:
+      pass
+
 
 # 1. show the list of channels categories
 elif STATE == ST_CHN_CATEGORIES:
@@ -121,11 +163,19 @@ elif STATE == ST_CHN_VIDEOS:
          pass
 
 
+
+# play a video using youtube-dl to get the real url   \o/
+elif STATE == ST_PLAY:
+   play_url(call_ydl(URL))
+   
+
+
+
 ###############################################################################
 ### youtube api v2 (old and deprecated) #######################################
 # https://developers.google.com/youtube/2.0/developers_guide_protocol
 ###############################################################################
-
+"""
 # parse a list of video (jsonc)
 elif STATE in (ST_VIDEO_LIST_JSONC, ST_SEARCH_JSONC):
 
@@ -174,11 +224,8 @@ elif STATE in (ST_VIDEO_LIST_JSONC, ST_SEARCH_JSONC):
       item_add(ST_VIDEO_LIST_JSONC,
                _('Load more results (%d in total)') % (total_items),
                URL, action=ACT_MORE)
+"""
 
-
-# play a video using youtube-dl to get the real url   \o/
-elif STATE == ST_PLAY:
-   play_url(call_ydl(URL))
 
 
 """

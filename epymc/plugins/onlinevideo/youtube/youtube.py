@@ -30,13 +30,10 @@ from epymc.extapi.onlinevideo import api_version, state_get, fetch_url, \
 
 
 ytb_base = 'http://www.youtube.com'
-api_base = 'http://gdata.youtube.com/feeds/api/standardfeeds/'
 ytb_icon = local_resource(__file__, 'youtube.png')
-# ITEMS_PER_PAGE = 50
 
 ST_HOME = 0
 ST_PLAY = 1
-# ST_VIDEO_LIST_JSONC = 2
 ST_SEARCH = 3
 
 ST_CHN_CATEGORIES = 10
@@ -50,8 +47,8 @@ STATE, URL = state_get()
 # this is the first page, show fixed categories
 if STATE == ST_HOME:
    item_add(ST_SEARCH, _('Search videos'), 'search', None, action=ACT_SEARCH)
-   # item_add(ST_CHN_CATEGORIES, _('Browse channels'),
-            # ytb_base+'/channels', None, action=ACT_FOLDER)
+   item_add(ST_CHN_CATEGORIES, _('Browse channels'),
+            ytb_base+'/channels', None, action=ACT_FOLDER)
    # item_add(ST_VIDEO_LIST_JSONC, _('Top rated'),
             # api_base+'top_rated?v=2&alt=jsonc&max-results='+str(ITEMS_PER_PAGE),
             # None, action=ACT_FOLDER)
@@ -67,7 +64,7 @@ if STATE == ST_SEARCH:
       # first page, URL is the search query entered by the user
       URL = ytb_base + '/results?' + url_encode(
             {'search_query': URL, 'filters': 'video'})
-   
+
    soup = fetch_url(URL, parser='bs4')
    for div in soup.findAll('div', class_='yt-lockup-video'):
       id = div['data-context-item-id']
@@ -81,8 +78,7 @@ if STATE == ST_SEARCH:
       meta = div.find('ul', class_='yt-lockup-meta-info')
       uploaded = meta.contents[0].string
       views = meta.contents[1].string
-      
-      
+
       info = '<title>%s</> <small>%s</><br>' \
              '<small><name>%s</> %s <name>/ %s %s</><br>' \
              '<success>%s</></small>' \
@@ -109,14 +105,15 @@ elif STATE == ST_CHN_CATEGORIES:
       try:
          title = cat.find('span', class_='category-title').string
          href = cat.find('a', class_='category-title-link')['href']
-         # thumb = cat.find('span', class_='yt-thumb-clip').img['src']
+         thumb = cat.find('img', role='contentinfo')['src']
+         thumb = os.path.dirname(os.path.dirname(thumb)) + '/'
 
          channels_count = cat.find('span', class_='channel-count').string
          info = '<title>%s</title><br>%s %s' % (
                   title, channels_count,
                   ngettext('channel', 'channels', channels_count))
 
-         item_add(ST_CHN_CHANNELS, title, ytb_base+href, poster=ytb_icon, info=info)
+         item_add(ST_CHN_CHANNELS, title, ytb_base+href, poster=thumb, info=info)
       except:
          pass
 
@@ -130,9 +127,12 @@ elif STATE == ST_CHN_CHANNELS:
          href = title_span.a['href']
          title = title_span.a.string
          thumb = cha.find('span', class_='yt-thumb-clip').img['src']
+         thumb = os.path.dirname(os.path.dirname(thumb)) + '/'
+         subscribers = cha.find('span', class_='yt-subscription-button-subscriber-count-branded-horizontal')['title']
 
          description = cha.find('p', class_='description').string.strip()
-         info = '<title>%s</title><br>%s' % (title, description)
+         info = '<title>%s</title><br><success>%s</success><br>%s' % (
+                title, subscribers, description)
 
          item_add(ST_CHN_VIDEOS, title, ytb_base+href+'/videos?flow=list&sort=dd',
                   poster=thumb, info=info)
@@ -143,24 +143,26 @@ elif STATE == ST_CHN_CHANNELS:
 # 3. show a list of videos in a given channel
 elif STATE == ST_CHN_VIDEOS:
    soup = fetch_url(URL, parser='bs4')
-   for item in soup.findAll('li', class_='channels-browse-content-list-item'):
-      try:
-         title_h3 = item.find('h3', class_='yt-lockup-title')
-         href = title_h3.a['href']
-         title = title_h3.a['title']
-         thumb = 'http:' + item.find('span', class_='yt-thumb-clip').img['data-thumb']
+   for div in soup.findAll('div', class_='yt-lockup-video'):
+      id = div['data-context-item-id']
+      title = div.find('h3', class_='yt-lockup-title').find('a')['title']
+      url = ytb_base + '/watch?v=' + id
+      poster = 'http://i.ytimg.com/vi/' + id + '/hqdefault.jpg'
+      duration = div.find('span', class_='video-time').string
+      descr = div.find('div', class_='yt-lockup-description')
+      meta = div.find('ul', class_='yt-lockup-meta-info')
+      li = meta.find('li')
+      uploaded = li.string
+      views = li.next_sibling.string
+      info = '<title>%s</title> <small>%s</small><br>' \
+             '<small><name>%s %s</name><br>' \
+             '<success>%s</success></small>' \
+             '<br>%s' % (
+               title, duration,
+               _('uploaded'), uploaded,
+               views, descr)# or '')
 
-         description = item.find('div', class_='yt-lockup-description')
-         description = ''.join([s for s in description.stripped_strings])
-         metas = item.find('div', class_='yt-lockup-meta').findAll('li')
-         meta = ''
-         for m in metas:
-            meta += m.string + '<br>'
-         info = '%s<br>%s' % (meta, description)
-
-         item_add(ST_PLAY, title, ytb_base+href, poster=thumb, info=info)
-      except:
-         pass
+      item_add(ST_PLAY, title, url, info=info, poster=poster)
 
 
 

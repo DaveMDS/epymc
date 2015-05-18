@@ -162,26 +162,14 @@ elif STATE == ST_CHN_VIDEOS:
 
 # 99. play a video using youtube-dl to get the real url   \o/
 elif STATE == ST_PLAY:
+   # play the video using ytdl
    play_url(call_ydl(URL))
    
-
-"""
-   # now make the list of related videos
-   print "ADSASDASDAS"
-   url = 'http://gdata.youtube.com/feeds/api/videos/%s/related?v=2&alt=jsonc' % (video_id)
-   # print url
-   data = fetch_url(url, parser='json')
-   for item in data['data']['items']:
-      # print item
-      # item_add(2, 'sug1', 'url')
-      author = item['uploader']
-      title = item['title']
-      desc = item['description']
-      duration = item['duration']
-      videoid = item['id']
-      url = item['player']['default']
-      poster = item['thumbnail']['hqDefault']
-      icon = item['thumbnail']['sqDefault']
-
-      item_add(3, title, url, poster=poster)
-"""
+   # and scrape the list of related videos
+   soup = fetch_url(URL, parser='bs4')
+   for item in soup.find_all('li', class_='related-list-item'):
+      id = item.find('a', class_='thumb-link').span['data-vid']
+      thumb = 'http://i.ytimg.com/vi/' + id + '/mqdefault.jpg'
+      url = ytb_base + '/watch?v=' + id
+      title = item.find('a', class_='content-link')['title']
+      item_add(ST_PLAY, title, url, poster=thumb)

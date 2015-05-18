@@ -35,11 +35,9 @@ ytb_icon = local_resource(__file__, 'youtube.png')
 ST_HOME = 0
 ST_PLAY = 1
 ST_SEARCH = 3
-
 ST_CHN_CATEGORIES = 10
 ST_CHN_CHANNELS = 11
 ST_CHN_VIDEOS = 12
-
 
 STATE, URL = state_get()
 
@@ -49,9 +47,6 @@ if STATE == ST_HOME:
    item_add(ST_SEARCH, _('Search videos'), 'search', None, action=ACT_SEARCH)
    item_add(ST_CHN_CATEGORIES, _('Browse channels'),
             ytb_base+'/channels', None, action=ACT_FOLDER)
-   # item_add(ST_VIDEO_LIST_JSONC, _('Top rated'),
-            # api_base+'top_rated?v=2&alt=jsonc&max-results='+str(ITEMS_PER_PAGE),
-            # None, action=ACT_FOLDER)
 
 
 ###############################################################################
@@ -165,70 +160,10 @@ elif STATE == ST_CHN_VIDEOS:
       item_add(ST_PLAY, title, url, info=info, poster=poster)
 
 
-
-# play a video using youtube-dl to get the real url   \o/
+# 99. play a video using youtube-dl to get the real url   \o/
 elif STATE == ST_PLAY:
    play_url(call_ydl(URL))
    
-
-
-
-###############################################################################
-### youtube api v2 (old and deprecated) #######################################
-# https://developers.google.com/youtube/2.0/developers_guide_protocol
-###############################################################################
-"""
-# parse a list of video (jsonc)
-elif STATE in (ST_VIDEO_LIST_JSONC, ST_SEARCH_JSONC):
-
-   # STATE 4 = search query in place of the url
-   if STATE == ST_SEARCH_JSONC:
-      URL = 'http://gdata.youtube.com/feeds/api/videos?' + url_encode(
-               { 'q':URL, 'v':2, 'alt':'jsonc', 'max-results':ITEMS_PER_PAGE })
-
-   data = fetch_url(URL, parser='json')
-
-   for item in data['data']['items']:
-      try:
-         # see https://developers.google.com/youtube/2.0/developers_guide_jsonc
-         title = item['title']
-         url = item['player']['default']
-         poster = item['thumbnail']['hqDefault']
-
-         views = int(item['viewCount']) if 'viewCount' in item else 0
-         likes = int(item['likeCount']) if 'likeCount' in item else 0
-         comments = int(item['commentCount']) if 'commentCount' in item else 0
-         info = '<title>%s</> <small>%s</><br>' \
-                '<small><name>%s</> %s <name>/ %s %s</><br>' \
-                '<success>%d %s</> <name>/</> ' \
-                '<warning>%d %s</> <name>/</> ' \
-                '<info>%d %s</></small><br>%s' % (
-                  item['title'], seconds_to_duration(item['duration']),
-                  _('user'), item['uploader'],
-                  _('uploaded'), relative_date(item['uploaded']),
-                  views, ngettext('view', 'views', views),
-                  likes, ngettext('like', 'likes', likes),
-                  comments, ngettext('comment', 'comments', comments),
-                  item['description'])
-         item_add(ST_PLAY, title, url, info=info, icon=None, poster=poster)
-
-      except:
-         item_add(ST_HOME, 'error parsing data', None)
-
-   total_items = data['data']['totalItems']
-   start_index = data['data']['startIndex']
-
-   # more items
-   if start_index + ITEMS_PER_PAGE < total_items:
-      if 'start-index' in URL:
-         URL = re.sub('&start-index=[0-9]+', '', URL)
-      URL += '&start-index=%d' % (start_index + ITEMS_PER_PAGE)
-      item_add(ST_VIDEO_LIST_JSONC,
-               _('Load more results (%d in total)') % (total_items),
-               URL, action=ACT_MORE)
-"""
-
-
 
 """
    # now make the list of related videos

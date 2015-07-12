@@ -15,6 +15,9 @@ Bug fixed:
  * Fix playback for files given on cmd line without the full path
  * Redone genlist slide without using elm Labels (elm 1.13 broke Label slide)
  * Fix mainmenu item bring-in for elm 1.13
+ * Fix youtube scraper to work again after yt apiV2 dismission
+ * Fix display of tvshows with special characters in title/description
+
 
 New feature:
  

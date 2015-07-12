@@ -24,6 +24,7 @@ import os, re, time
 
 from efl import ecore, evas
 from efl.elementary.image import Image
+from efl.elementary.entry import utf8_to_markup
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
@@ -138,12 +139,13 @@ class SerieItemClass(EmcItemClass):
                                      None, mod_instance.populate_url)
 
    def label_get(self, url, serie_name):
-      return serie_name
+      return utf8_to_markup(serie_name)
 
    def info_get(self, url, serie_name):
       if mod_instance._tvshows_db.id_exists(serie_name):
          e = mod_instance._tvshows_db.get_data(serie_name)
-         return '<title>%s</><br>%s' % (e['name'], e['overview'])
+         return '<title>%s</><br>%s' % (utf8_to_markup(e['name']), 
+                                        utf8_to_markup(e['overview']))
 
    def icon_get(self, url, serie_name):
       if mod_instance._tvshows_db.id_exists(serie_name):
@@ -432,7 +434,7 @@ class InfoPanel(EmcDialog):
          self._db_data = None
 
       self._image = Image(gui.win)
-      EmcDialog.__init__(self, style='panel', title=serie_name,
+      EmcDialog.__init__(self, style='panel', title=utf8_to_markup(serie_name),
                          text=' ', content=self._image)
       self.button_add(_('Posters'), self._posters_button_cb)
       self.button_add(_('Backdrops'), self._backdrop_button_cb)

@@ -19,4 +19,4 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # follow semver.org specs (ex: '1.0.0' and '1.0.0-beta1')
-__version__ = '1.0.0'
+__version__ = '1.1.0-beta1'

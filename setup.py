@@ -207,6 +207,7 @@ setup (
       'epymc.plugins.uitests',
       'epymc.plugins.calibrator',
       'epymc.plugins.filemanager',
+      'epymc.plugins.photos',
    ],
 
    package_data = {
@@ -243,6 +244,7 @@ setup (
                         'data/desktop/epymc-olvideos.png',
                         'data/desktop/epymc-tv.png',
                         'data/desktop/epymc-mame.png']),
+                        # TODO: add photo !!
    ],
 
    cmdclass = {

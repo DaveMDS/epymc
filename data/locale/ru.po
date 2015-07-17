@@ -737,8 +737,8 @@ msgid "Close"
 msgstr "Закрыть"
 
 #: epymc/plugins/mame/mame.py:550
-msgid "Trying at freeroms.org...<br>"
-msgstr "Попытка загрузки на freeroms.org...<br>"
+msgid "Trying at freeroms.com...<br>"
+msgstr "Попытка загрузки на freeroms.com...<br>"
 
 #: epymc/plugins/mame/mame.py:580 epymc/plugins/mame/mame.py:593
 msgid "Can not find the game online."

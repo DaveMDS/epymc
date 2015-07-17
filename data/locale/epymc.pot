@@ -716,7 +716,7 @@ msgid "Close"
 msgstr ""
 
 #: epymc/plugins/mame/mame.py:550
-msgid "Trying at freeroms.org...<br>"
+msgid "Trying at freeroms.com...<br>"
 msgstr ""
 
 #: epymc/plugins/mame/mame.py:580 epymc/plugins/mame/mame.py:593

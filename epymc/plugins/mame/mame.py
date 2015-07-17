@@ -547,7 +547,7 @@ class MameGame(object):
       # Try to download the game from various roms site
       sources = []
       # freeroms.com
-      title = _('Trying at freeroms.org...<br>')
+      title = _('Trying at freeroms.com...<br>')
       prefix = 'NUM' if self.gid[0].isdigit() else self.gid[0]
       url = 'http://download.freeroms.com/mame_roms/%s/%s.zip' % (prefix, self.gid)
       sources.append((title, url))

@@ -29,7 +29,7 @@ import os
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 # from epymc.gui import EmcDialog, EmcSourcesManager, EmcNotify, EmcRemoteImage
-from epymc.gui import EmcSourcesManager
+from epymc.gui import EmcSourcesManager, EmcSlideshow
 
 import epymc.mainmenu as mainmenu
 import epymc.ini as ini
@@ -44,8 +44,6 @@ def DBG(msg):
    print('PHOTOS: %s' % msg)
    pass
 
-
-IMG_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.gif')
 
 mod_instance = None
 
@@ -66,8 +64,8 @@ class AddSourceItemClass(EmcItemClass):
 
 
 class PhotoItemClass(EmcItemClass):
-   # def item_selected(self, url, mod):
-      # mod_instance.play_url(url)
+   def item_selected(self, url, mod):
+      mod_instance.slideshow_start(url)
 
    def label_get(self, url, mod):
       return os.path.basename(url)
@@ -89,7 +87,6 @@ class FolderItemClass(EmcItemClass):
 
    def icon_get(self, url, mod):
       return 'icon/folder'
-
 
 
 class PhotosModule(EmcModule):
@@ -169,13 +166,17 @@ class PhotosModule(EmcModule):
             dirs.append(fname)
          else:
             name, ext = os.path.splitext(fname)
-            if ext.lower() in IMG_EXTENSIONS:
+            if ext.lower() in utils.supported_images:
                files.append(fname)
 
       for fname in utils.natural_sort(dirs):
          self._browser.item_add(FolderItemClass(), os.path.join(url, fname), self)
       for fname in utils.natural_sort(files):
          self._browser.item_add(PhotoItemClass(), os.path.join(url, fname), self)
+
+###### SLIDESHOW
+   def slideshow_start(self, url=None):
+      EmcSlideshow(url)
 
    """
    def _events_cb(self, event):
@@ -186,6 +187,7 @@ class PhotosModule(EmcModule):
          if self._browser is not None:
             self._browser.refresh()
    """
+
 
 
 """

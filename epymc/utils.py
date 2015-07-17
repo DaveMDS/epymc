@@ -66,6 +66,8 @@ supported_mimes = ['application/mxf','application/ogg','application/ram',
 'video/x-theora+ogg','video/x-totem-stream','x-content/video-dvd','x-content/video-vcd', 
 'x-content/video-svcd']
 
+supported_images = ['.jpg', '.jpeg', '.png', '.gif']
+
 iso639_table = {
 #  'iso639-1': ('639-3', '639-5 / opensubtitles', 'Name')
 # en.wikipedia.org/wiki/List_of_ISO_639-2_codes

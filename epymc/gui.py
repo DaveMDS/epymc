@@ -1142,6 +1142,81 @@ class EmcNotify(edje.Edje):
       self.part_text_set('emc.text.caption', text)
 
 ################################################################################
+
+from efl.elementary.slideshow import Slideshow, SlideshowItemClass
+class EmcSlideshow(Slideshow):
+   """ TODO: doc this """
+
+   def __init__(self, url):
+      Slideshow.__init__(self, layout, loop=True, transition='fade')
+      self.itc = SlideshowItemClass(self._item_get_func)
+      self.folder = utils.url2path(url)
+      self.first_file = None
+      
+      if not os.path.isdir(self.folder):
+         self.folder, self.first_file = os.path.split(self.folder)
+
+      self.populate()
+      self.resize(700,500)
+      self.show()
+      self.timeout = 4.0
+      
+      # listen to emc input events
+      input_events.listener_add('EmcSlideShow', self._input_event_cb)
+
+   def delete(self):
+      input_events.listener_del('EmcSlideShow')
+      Slideshow.delete(self)
+
+   def populate(self):
+      for fname in utils.natural_sort(os.listdir(self.folder)):
+         name, ext = os.path.splitext(fname)
+         if fname[0] != '.' and ext.lower() in utils.supported_images:
+            fullpath = os.path.join(self.folder, fname)
+            print(fullpath)
+            it = self.item_add(self.itc, fullpath)
+            if fname == self.first_file:
+               it.show()
+            # it = self.list_item_append(fname, 'icon/folder')
+            # it.data['fullpath'] = fullpath
+
+   def _item_get_func(self, obj, item_data):
+      print("GET " + item_data)
+      img = Image(self)
+      img.file_set(item_data)
+      return img
+   
+   def _input_event_cb(self, event):
+      # TODO: check that we are active and visible
+      #       atm, this is fired also when a song end...etc...
+      print(event)
+      if event in ('RIGHT', 'OK'):
+         self.next()
+         return input_events.EVENT_BLOCK
+      
+      if event == 'LEFT':
+         self.previous()
+         return input_events.EVENT_BLOCK
+      
+      if event == 'TOGGLE_PAUSE':
+         if self.timeout != 0.0:
+            self.timeout = 0.0
+         else:
+            self.timeout = 4.0
+         return input_events.EVENT_BLOCK
+      
+      if event in ('EXIT', 'BACK'):
+         self.delete()
+         return input_events.EVENT_BLOCK
+
+      if event in ('UP', 'DOWN'):
+         return input_events.EVENT_BLOCK
+      else:
+         return input_events.EVENT_CONTINUE
+      
+      
+      
+################################################################################
 class EmcFolderSelector(EmcDialog):
    """
    Open a dialog that allow the user to choose a path on the filesystem.

@@ -19,7 +19,7 @@ Bug fixed:
  * Fix display of tvshows with special characters in title/description
 
 
-New feature:
+New features:
  
  * Music module is now py3 compatible (mutagen 1.25 support py3)
  * New module: Two panes Filemanager
@@ -33,6 +33,11 @@ New feature:
  * Standalone mode (run inside X witout a WM) plus xsession for your dm
  * Animate the list scrolling in dialogs
  * Keep the selected item in browser in the middle of the view
+
+
+New Translations:
+ * German
+ * Russian
 
 
 ===============================================================================

@@ -124,7 +124,7 @@ def group_item_add(group):
           '<name>%s</> %s<br>' \
           '<success>%d %s</> <name>/</> <info>%d %s</></small><br>%s' % (
             group['name'],
-            _('utente'), group['user']['name'],
+            _('user'), group['user']['name'],
             _('created'), relative_date(group['created_time']),
             _('updated'), relative_date(group['modified_time']),
             videos, ngettext('video', 'videos', videos),

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-13 19:34+0200\n"
+"POT-Creation-Date: 2015-07-17 20:19+0200\n"
 "PO-Revision-Date: 2015-02-18 07:19+0300\n"
 "Last-Translator: Niko2040 <niko2040@bynets.ru>\n"
 "Language-Team: Russian\n"
@@ -955,6 +955,7 @@ msgstr "Рекомендуемое"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:81
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:105
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:127
 #: epymc/plugins/onlinevideo/youtube/youtube.py:82
 msgid "user"
 msgstr "пользователь"
@@ -1012,10 +1013,6 @@ msgid_plural "followers"
 msgstr[0] "подписчик"
 msgstr[1] "подписчика"
 msgstr[2] "подписчиков"
-
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:127
-msgid "utente"
-msgstr "пользователь"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:146
 msgid "joined"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-13 19:34+0200\n"
+"POT-Creation-Date: 2015-07-17 20:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -929,6 +929,7 @@ msgstr ""
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:81
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:105
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:127
 #: epymc/plugins/onlinevideo/youtube/youtube.py:82
 msgid "user"
 msgstr ""
@@ -981,10 +982,6 @@ msgid "follower"
 msgid_plural "followers"
 msgstr[0] ""
 msgstr[1] ""
-
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:127
-msgid "utente"
-msgstr ""
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:146
 msgid "joined"

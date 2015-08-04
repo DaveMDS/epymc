@@ -125,6 +125,17 @@ def start_epymc(standalone=False):
       ecore_x_win = ecore_x.Window_from_xid(gui.win.xwindow_xid)
       ecore_x_win.focus()
 
+   # alert if run from python < 3 (lots of translation issue with 2.7)
+   if utils.is_py2():
+      print('')
+      print('##########################################################')
+      print('PYTHON 2.X WARNING:')
+      print('You are using python2! It is old! EpyMC works much better')
+      print('with py3, even more if you are not using the english texts.')
+      print('WE HIGHLY SUGGEST TO SWITCH TO PYTHON 3 !!!')
+      print('##########################################################')
+      print('')
+
    # run the main loop
    elementary.run()
 

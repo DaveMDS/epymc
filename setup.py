@@ -257,3 +257,15 @@ setup (
       'install': {'record': ('setup.py', RECORD_FILE)}
    },
 )
+
+
+# alert if run from python < 3 (lots of translation issue with 2.7)
+if sys.version_info.major == 2:
+   print('')
+   print('##########################################################')
+   print('PYTHON 2.X WARNING:')
+   print('You are using python2! It is old! EpyMC works much better')
+   print('with py3, even more if you are not using the english texts.')
+   print('WE HIGHLY SUGGEST TO SWITCH TO PYTHON 3 !!!')
+   print('##########################################################')
+   print('')

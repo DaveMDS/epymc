@@ -67,6 +67,7 @@ def vimeo_api_call(endpoint, **kargs):
 def video_item_add(video):
    try:
       poster = [ p['link'] for p in video['pictures']['sizes'] if p['width'] == 640 ][0]
+      if '?' in poster: poster = poster.split('?')[0]
    except:
       poster = None
    views = video['stats']['plays'] or 0

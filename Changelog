@@ -7,6 +7,7 @@ Changes in version 1.2.0 (TO BE RELEASED)
 Bug fixed:
 
  * Fixed poster hiding (and console errors) for efl >= 1.16
+ * Fixed posters for the vimeo channel
 
 
 New features:

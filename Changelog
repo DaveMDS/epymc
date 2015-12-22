@@ -9,6 +9,11 @@ Bug fixed:
  * Fixed poster hiding (and console errors) for efl >= 1.16
 
 
+New features:
+
+ * Automatically download and update youtube-dl
+
+
 ===============================================================================
 Changes in version 1.1.0
 ===============================================================================

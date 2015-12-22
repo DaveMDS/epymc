@@ -112,10 +112,13 @@ def fetch_url(url, headers=None, parser=None):
 
    return data
 
+def ydl_executable():
+   return os.path.expanduser('~/.cache/epymc/youtube-dl')
+
 def call_ydl(url):
    """ Call youtube-dl with the given url and return the direct video url """
-   ydl = os.path.join(os.path.dirname(__file__), 'youtube-dl')
-   p = subprocess.Popen([ydl, '--get-url', url], stdout=subprocess.PIPE)
+   p = subprocess.Popen([ydl_executable(), '--get-url', url],
+                        stdout=subprocess.PIPE)
    out, err = p.communicate()
    return out
 

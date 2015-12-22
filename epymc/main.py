@@ -71,6 +71,8 @@ def start_epymc(standalone=False):
    elementary.init()
 
    # create config dir if necessary
+   if not os.path.exists(utils.user_cache_dir):
+      os.makedirs(utils.user_cache_dir)
    if not os.path.exists(utils.user_conf_dir):
       os.makedirs(utils.user_conf_dir)
    try: os.mkdir(os.path.join(utils.user_conf_dir, 'plugins'))

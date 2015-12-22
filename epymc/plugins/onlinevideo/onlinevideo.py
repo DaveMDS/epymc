@@ -32,7 +32,7 @@ from efl import evas, elementary
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
-from epymc.utils import EmcExec
+from epymc.utils import EmcExec, download_url_async
 from epymc.gui import EmcDialog, EmcVKeyboard
 
 import epymc.mainmenu as mainmenu
@@ -43,7 +43,7 @@ import epymc.ini as ini
 import epymc.events as events
 
 from epymc.extapi.onlinevideo import ACT_NONE, ACT_FOLDER, ACT_MORE, \
-   ACT_PLAY, ACT_SEARCH
+   ACT_PLAY, ACT_SEARCH, ydl_executable
 
 
 def DBG(msg):
@@ -178,6 +178,7 @@ class OnlinevideoModule(EmcModule):
                              self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
+      self.youtubedl_check_update()
 
    def populate_root_page(self, browser, url):
       if not self._sources:
@@ -185,7 +186,47 @@ class OnlinevideoModule(EmcModule):
       for ch in self._sources:
          self._browser.item_add(ChannelItemClass(), ch['name'], ch)
 
+###### YOUTUBE-DL DOWNLOAD AND UPDATE
+   def youtubedl_check_update(self):
+      ydl = ydl_executable()
+      if not os.path.exists(ydl):
+         self._ydl_download_latest()
+      else:
+         EmcExec(ydl + ' --version', True, self._ydo_local_version_done)
 
+   def _ydl_download_latest(self):
+      dia = EmcDialog(title=_('please wait'), style='progress',
+                      text=_('Updating the helper program <b>youtube-dl</b> to the latest version.<br><br>For info please visit:<br>rg3.github.io/youtube-dl/'))
+      download_url_async('http://youtube-dl.org/latest/youtube-dl',
+                         dest=ydl_executable(),
+                         complete_cb=self._ydl_complete_cb,
+                         progress_cb=self._ydl_progress_cb,
+                         dia=dia)
+      
+   def _ydl_progress_cb(self, dest, dltotal, dlnow, dia):
+      dia.progress_set((float(dlnow) / dltotal) if dltotal > 0 else 0)
+
+   def _ydl_complete_cb(self, dest, status, dia):
+      os.chmod(dest, 484) # 0o0744 (make it executable)
+      dia.delete()
+
+   def _ydo_local_version_done(self, version):
+      if version:
+         download_url_async('http://youtube-dl.org/latest/version',
+                            complete_cb=self._ydo_remote_version_done,
+                            version=version.strip())
+
+   def _ydo_remote_version_done(self, dest, status, version):
+      if status == 200:
+         with open(dest) as f:
+            available = f.read().strip()
+         os.remove(dest)
+         if available != version:
+            self._ydl_download_latest()
+         else:
+            DBG('youtube-dl is up-to-date (%s)' % version)
+
+   
 ###### SOURCES STUFF
    def build_sources_list(self):
       # search all the source.ini files in all the subdirs of _search_folders

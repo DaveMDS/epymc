@@ -38,6 +38,7 @@ def DBG(msg):
 
 emc_base_dir = os.path.dirname(__file__)
 user_conf_dir = os.path.expanduser('~/.config/epymc') # TODO use xdg-stuff
+user_cache_dir = os.path.expanduser('~/.cache/epymc') # TODO use xdg-stuff
 
 supported_uris = ['file','http','https']
 supported_mimes = ['application/mxf','application/ogg','application/ram', 

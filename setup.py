@@ -222,6 +222,7 @@ setup (
          'vimeo/*',
          'zapiks/*',
          'fantasticc/*',
+         'southparkstudios/*',
       ],
       'epymc.plugins.input_webserver': [
          'default/*',

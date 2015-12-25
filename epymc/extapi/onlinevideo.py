@@ -20,7 +20,13 @@
 
 # from __future__ import absolute_import, print_function
 
-import os, sys, json, subprocess, re, gettext
+import os
+import sys
+import json
+import subprocess
+import re
+import gettext
+import locale
 from datetime import datetime
 from bs4 import BeautifulSoup
 
@@ -51,6 +57,9 @@ py3 = (sys.version_info[0] >= 3)
 # install _() and ngettext() in the main namespace
 localedir = os.path.join(os.path.dirname(__file__), '..', 'locale')
 gettext.install('epymc', names='ngettext', localedir=localedir)
+
+# set locale from the system config (used fe by strftime)
+locale.setlocale(locale.LC_ALL, '')
 
 
 def state_get():
@@ -178,3 +187,12 @@ def relative_date(date):
       return ngettext('%d hour ago', '%d hours ago', hours) % hours
    minutes = delta.seconds / 60
    return ngettext('%d minute ago', '%d minutes ago', minutes) % minutes
+
+def format_date(date):
+   """
+   Return a localized date string (fe. 25/12/2015).
+   Date can be a datetime obj or an integer timestamp.
+   """
+   if isinstance(date, int):
+      date = datetime.fromtimestamp(date)
+   return date.strftime('%x')

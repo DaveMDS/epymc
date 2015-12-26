@@ -8,6 +8,7 @@ Bug fixed:
 
  * Fixed poster hiding (and console errors) for efl >= 1.16
  * Fixed posters for the vimeo channel
+ * Removed broken traileraddict channel (use the new tmdb instead)
 
 
 New features:
@@ -53,6 +54,7 @@ New features:
 
 
 New Translations:
+
  * German
  * Russian
 

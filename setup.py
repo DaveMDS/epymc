@@ -217,7 +217,6 @@ setup (
       'epymc.plugins.uitests': ['*.png'],
       'epymc.plugins.calibrator': ['*.jpg', '*.png'],
       'epymc.plugins.onlinevideo': [ '*.png',
-         'traileraddict/*', #TODO REMOVEME
          'themoviedb/*',
          'youtube/*',
          'vimeo/*',

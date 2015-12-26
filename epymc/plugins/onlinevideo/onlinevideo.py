@@ -237,6 +237,7 @@ class OnlinevideoModule(EmcModule):
                   source = self.parse_source_ini_file(os.path.join(top, f))
                   if source:
                      self._sources.append(source)
+      self._sources.sort(key=lambda k: k['name'])
 
    def get_source_by_name(self, src_name):
       for s in self._sources:

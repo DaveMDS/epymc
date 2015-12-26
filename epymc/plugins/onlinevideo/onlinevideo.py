@@ -42,8 +42,8 @@ import epymc.gui as gui
 import epymc.ini as ini
 import epymc.events as events
 
-from epymc.extapi.onlinevideo import ACT_NONE, ACT_FOLDER, ACT_MORE, \
-   ACT_PLAY, ACT_SEARCH, ydl_executable
+from epymc.extapi.onlinevideo import ACT_DEFAULT, ACT_NONE, ACT_FOLDER, \
+   ACT_MORE, ACT_PLAY, ACT_SEARCH, ydl_executable
 
 
 def DBG(msg):
@@ -246,7 +246,7 @@ class OnlinevideoModule(EmcModule):
    def _request_index(self):
       # request the index page from the channel
       src = self._current_src
-      item_data = (0, src['label'], 'index', None, None, None, 0)
+      item_data = (0, src['label'], 'index', None, None, None, ACT_DEFAULT)
       self._request_page(item_data)
 
    def _request_page(self, item_data):
@@ -259,7 +259,7 @@ class OnlinevideoModule(EmcModule):
       elif action == ACT_SEARCH:
          EmcVKeyboard(title=_('Search query'), user_data=item_data,
                       accept_cb=self._search_vkeyb_done)
-      else:
+      elif action != ACT_NONE:
          src = self._current_src
          cmd = '%s %s %d "%s"' % (self._py, src['exec'], next_state, url)
          DBG('Executing: ' + cmd)

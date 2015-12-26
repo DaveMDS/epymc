@@ -45,11 +45,13 @@ except:
 
 api_version = 4
 
-ACT_NONE = 0
-ACT_FOLDER = 1
-ACT_MORE = 2
-ACT_PLAY = 3
-ACT_SEARCH = 4
+ACT_DEFAULT = 0
+ACT_NONE = 1
+ACT_FOLDER = 2
+ACT_MORE = 3
+ACT_PLAY = 4
+ACT_SEARCH = 5
+
 
 py3 = (sys.version_info[0] >= 3)
 
@@ -66,7 +68,7 @@ def state_get():
    """ Get the state (and the url) of the current running scraper process """
    return int(sys.argv[1]), sys.argv[2]
 
-def item_add(next_state, label, url, info=None, icon=None, poster=None, action=ACT_NONE):
+def item_add(next_state, label, url, info=None, icon=None, poster=None, action=ACT_DEFAULT):
    """ Add an item to the current page """
    print((next_state, label, url, info, icon, poster, action))
 

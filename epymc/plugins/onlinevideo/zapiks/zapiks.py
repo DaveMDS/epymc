@@ -18,14 +18,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, unicode_literals, division
 
-import os, urllib2, traceback
+import os
+import traceback
 from bs4 import BeautifulSoup
 
-
 from epymc.extapi.onlinevideo import api_version, state_get, \
-   fetch_url, play_url, item_add, call_ydl, \
+   fetch_url, play_url, item_add, call_ydl, relative_date, \
    ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 
 
@@ -43,6 +43,7 @@ if STATE == ST_HOME:
    b = base
    u = '/popular_1.php'
    d = os.path.dirname(__file__)
+   item_add(ST_VIDEO_LIST, 'Brand New Videos', b+'p_', action=ACT_FOLDER)
    item_add(ST_VIDEO_LIST, 'Surf', b+'surf_'+u, poster=os.path.join(d,'surf.png'), action=ACT_FOLDER)
    item_add(ST_VIDEO_LIST, 'Snowboard', b+'snowboard_'+u, poster=os.path.join(d,'snowboard.png'), action=ACT_FOLDER)
    item_add(ST_VIDEO_LIST, 'Mountain Bike', b+'mountainbike_'+u, poster=os.path.join(d,'vtt.png'), action=ACT_FOLDER)
@@ -56,20 +57,42 @@ if STATE == ST_HOME:
 
 # the page for each category
 elif STATE == ST_VIDEO_LIST:
-   soup = fetch_url(URL, parser='bs4')
+   # soup = fetch_url(URL, parser='bs4') # this line work, but:
+   # the zapiks page have an erroneous auto closing div tag
+   # so wee need this hack to let bs4 correctly parse the html
+   html = fetch_url(URL)
+   soup = BeautifulSoup(html.replace('/>', '>'))
 
    videos = soup.findAll('a', class_='teaser-video-content')
    for video in videos:
       try:
          url = 'http://www.zapiks.com' + video['href']
-         name  = video['title'].replace('Video - ', '')
+         title = video.find('span', class_='teaser-title').string.strip()
          thumb = video.find('div', class_='teaser-thumbnail')['style']
          thumb = thumb.replace("background-image : url('", '').replace("')", '')
+         intro = video.find('div', class_='teaser-intro').string
+         user = video.find('span', class_='teaser-user').string.strip().replace('from ', '')
+         uploaded = video.find('span', class_='teaser-date')['datetime']
+         views = list(video.find('span', class_='teaser-counter').strings)[0]
+         views = views.strip().replace('Views', '').replace(' ', '')
+         try:
+            likes = video.find('span', class_='teaser-counter-likes').string.strip()
+         except:
+            likes = 0
+         info = '<title>{}</title><br>' \
+                '<small><name>{}</name> {} <name>/ {} {}</name></small><br>' \
+                '<small><success>{} {}</success> <name>/</> ' \
+                '<warning>{} {}</warning></small><br>' \
+                '{}'.format(title,
+                   _('user'), user, _('uploaded'), relative_date(uploaded),
+                   views, ngettext('view', 'views', views),
+                   likes, ngettext('like', 'likes', likes),
+                   intro.replace('&amp;', '&') if intro else '')
          
-         item_add(ST_PLAY, name, url, poster=thumb)
+         item_add(ST_PLAY, title, url, poster=thumb, info=info, icon='icon/play')
       except:
          traceback.print_exc()
-         pass
+
    try:
       cur_page = soup.find('li', class_='active')
       next_page = cur_page.next_sibling.a['href']

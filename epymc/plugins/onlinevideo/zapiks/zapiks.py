@@ -82,7 +82,7 @@ elif STATE == ST_VIDEO_LIST:
          info = '<title>{}</title><br>' \
                 '<small><name>{}</name> {} <name>/ {} {}</name></small><br>' \
                 '<small><success>{} {}</success> <name>/</> ' \
-                '<warning>{} {}</warning></small><br>' \
+                '<info>{} {}</info></small><br>' \
                 '{}'.format(title,
                    _('user'), user, _('uploaded'), relative_date(uploaded),
                    views, ngettext('view', 'views', views),

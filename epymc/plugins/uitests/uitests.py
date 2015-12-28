@@ -291,6 +291,16 @@ class MyItemClass(EmcItemClass):
          d.button_add('Two')
          d.button_add('Tree')
 
+      # Dialog - Panel full more
+      elif url == 'uitests://dlg-panel4':
+         text = LOREM*8
+         
+         d = EmcDialog(title='Dialog - Panel full', text=text, style='panel',
+                       spinner=False, content=gui.load_image('dvd_cover_blank.png'))
+         d.button_add('One')
+         d.button_add('Two')
+         d.button_add('Tree')
+
       # Dialog - Panel no buttons
       elif url == 'uitests://dlg-panel2':
          text = LOREM
@@ -489,6 +499,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://dlg-progress-btn', 'Dialog - Progress with buttons')
       browser.item_add(MyItemClass(), 'uitests://dlg-list', 'Dialog - List')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel1', 'Dialog - Panel full')
+      browser.item_add(MyItemClass(), 'uitests://dlg-panel4', 'Dialog - Panel full more')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel2', 'Dialog - Panel no buttons')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel3', 'Dialog - Panel no title')
       browser.item_add(MyItemClass(), 'uitests://brdump', 'Dump Browser pages')

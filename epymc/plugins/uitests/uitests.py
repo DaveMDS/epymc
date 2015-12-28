@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, unicode_literals
 
 import os, time
 
@@ -64,6 +64,56 @@ TEST_STYLE = """
 <bigger>bigger</> <big>big</> normal <small>small</> <smaller>smaller</>
 </center>
 """
+
+_mod = None # global module class instance
+
+
+class EncodingItemClass(EmcItemClass):
+   TMDB_API_KEY = '19eef197b81231dff0fd1a14a8d5f863'
+
+   def label_get(self, url, user_data):
+      return(user_data)
+
+   def info_get(self, url, user_data):
+      from epymc.extapi.onlinevideo import fetch_url, call_ydl, url_encode
+      
+      if url == 'test1': # tmdb.org json parser
+         try:
+            url = 'http://api.themoviedb.org/3/movie/129?api_key={}&language=it'.format(self.TMDB_API_KEY)
+            data = fetch_url(url, parser='json')
+            info = 'Test 1 OK<br>Title: {}<br>Original: {}'.format(data['title'], data['original_title'])
+            return info
+         except Exception as e:
+            return repr(e)
+
+      if url == 'test2': # tmdb.org url encode
+         try:
+            url = 'http://api.themoviedb.org/3/search/movie/?{}'.format(
+                   url_encode({'query':'la città incantata',
+                               'api_key':self.TMDB_API_KEY,
+                               'language': 'it'}))
+            data = fetch_url(url, parser='json')['results'][0]
+            info = 'Test 2 OK<br>Title: {}<br>Original: {}'.format(data['title'], data['original_title'])
+            return info
+         except Exception as e:
+            return repr(e)
+
+      if url == 'test3': # tmdb.org virtual keyboard
+         def _done_cb(keyb, text):
+            try:
+               url = 'http://api.themoviedb.org/3/search/movie/?{}'.format(
+                      url_encode({'query':text,
+                                  'api_key':self.TMDB_API_KEY,
+                                  'language': 'it'}))
+               data = fetch_url(url, parser='json')['results'][0]
+               info = 'Test 3 OK<br>Title: {}<br>Original: {}'.format(data['title'], data['original_title'])
+               EmcDialog(title='test3 result', text=info)
+            except Exception as e:
+               EmcDialog(title='test3 result', text=repr(e))
+
+         EmcVKeyboard(title='Just press Accept!', text='千と千尋の神隠し',
+                      accept_cb=_done_cb)
+
 
 class MyItemClass(EmcItemClass):
 
@@ -374,7 +424,12 @@ class MyItemClass(EmcItemClass):
             # t += '<hilight>URL:</> ' + u + '<br>'
             # t += '<hilight>name/year:</> ' + str(get_movie_name_from_url(u)) + '<br><br>'
          # EmcDialog(title = 'Movie name test', text = t)
-         
+
+      elif url == 'uitests://encoding':
+         _mod._browser.page_add('uitests://encoding', 'Encoding tests', None,
+                                _mod.populate_encoding_page)
+
+
 class UiTestsModule(EmcModule):
    name = 'uitests'
    label = 'UI tests'
@@ -389,6 +444,9 @@ class UiTestsModule(EmcModule):
       mainmenu.item_add('uitests', 3, 'UI tests', img, self.cb_mainmenu)
       self._browser = EmcBrowser('UI tests', 'List')
 
+      global _mod
+      _mod = self
+
    def __shutdown__(self):
       mainmenu.item_del('uitests')
       self._browser.delete()
@@ -399,6 +457,7 @@ class UiTestsModule(EmcModule):
       self._browser.show()
 
    def populate_root(self, browser, url):
+      browser.item_add(MyItemClass(), 'uitests://encoding', 'Various string encoding tests')
       browser.item_add(MyItemClass(), 'uitests://movies_name', 'Movies name test')
       browser.item_add(MyItemClass(), 'uitests://sniffer', 'Event Sniffer')
       browser.item_add(MyItemClass(), 'uitests://ev_emit', 'Event Emit')
@@ -427,3 +486,8 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://dlg-panel2', 'Dialog - Panel no buttons')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel3', 'Dialog - Panel no title')
       browser.item_add(MyItemClass(), 'uitests://brdump', 'Dump Browser pages')
+
+   def populate_encoding_page(self, browser, url):
+      _mod._browser.item_add(EncodingItemClass(), 'test1', 'Test 1: tmdb.org json parser')
+      _mod._browser.item_add(EncodingItemClass(), 'test2', 'Test 2: tmdb.org url encode')
+      _mod._browser.item_add(EncodingItemClass(), 'test3', 'Test 3: tmdb.org virtual keyboard')

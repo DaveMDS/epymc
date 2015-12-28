@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with EpyMC. If not, see <http://www.gnu.org/licenses/>.
 
-# from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, unicode_literals, division
 
 import os
 import sys
@@ -42,6 +42,10 @@ except:
    from urlparse import parse_qs
    from urllib import urlencode
 
+try:
+  basestring # py2
+except NameError:
+  basestring = str #py3
 
 api_version = 4
 
@@ -134,8 +138,10 @@ def call_ydl(url):
    return out
 
 def url_encode(params):
-   """
-   Encode a dictionary as an url query str.
+   """ UTF-8 safe urlencode version.
+
+   Encode a dictionary as an url query str. All strings in the dict must
+   be 'unicode' in py2 and 'str' in py3, as they will be utf8 encoded.
 
    Args:
       params: dictionary of key/values to encode
@@ -146,7 +152,11 @@ def url_encode(params):
       ex: "page=2&filter=myfilter"
 
    """
+   for k,v in params.items():
+      if isinstance(v, basestring):
+         params[k] = v.encode('utf-8')
    return urlencode(params)
+
 
 def seconds_to_duration(seconds):
    """Convert the number of seconds in a readable duration """
@@ -174,20 +184,20 @@ def relative_date(date):
 
    delta = datetime.now() - date
    if delta.days > 365:
-      years = delta.days / 365
+      years = delta.days // 365
       return ngettext('%d year ago', '%d years ago', years) % years
    if delta.days > 30:
-      months = delta.days / 30
+      months = delta.days // 30
       return ngettext('%d month ago', '%d months ago', months) % months
    if delta.days > 7:
-      weeks = delta.days / 7
+      weeks = delta.days // 7
       return ngettext('%d week ago', '%d weeks ago', weeks) % weeks
    if delta.days > 0:
       return ngettext('%d day ago', '%d days ago', delta.days) % delta.days
    if delta.seconds > 3600:
-      hours = delta.seconds / 3600
+      hours = delta.seconds // 3600
       return ngettext('%d hour ago', '%d hours ago', hours) % hours
-   minutes = delta.seconds / 60
+   minutes = delta.seconds // 60
    return ngettext('%d minute ago', '%d minutes ago', minutes) % minutes
 
 def format_date(date):

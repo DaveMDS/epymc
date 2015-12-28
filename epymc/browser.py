@@ -327,9 +327,8 @@ class EmcBrowser(object):
 
    # private stuff
    def _populate_page(self, page, is_back=False, is_refresh=False):
-      # set topbar title
-      full = '> ' + ''.join([p['title'] + ' > ' for p in self.pages])
-      gui.text_set('topbar.title', full[0:-3])
+      full = ' > '.join([p['title'] for p in self.pages])
+      gui.text_set('topbar.title', full)
 
       view = page['view']
       if (view == self.current_view):

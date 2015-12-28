@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, unicode_literals, division
 
 
 from epymc.extapi.onlinevideo import api_version, state_get, \
@@ -44,7 +44,7 @@ STATE, URL = state_get()
 
 def v3_request(url):
    if not '?' in url: url += '?'
-   url = API_BASE + url + '&api_key=' + API_KEY #+ '&language=it' # FIXME LANG !!!
+   url = API_BASE + url + '&api_key=' + API_KEY # + '&language=it' # FIXME LANG !!!
    print("URL " + url)
    return fetch_url(url, parser='json')
 
@@ -116,7 +116,7 @@ elif STATE == ST_MOVIE_INFO:
    title = data['title']
    poster = full_img_url(data['poster_path'])
    try:
-      overview = data['overview'].encode('utf8')  # TODO CHECK PY3
+      overview = data['overview']
    except:
       overview = ''
 

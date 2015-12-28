@@ -18,9 +18,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, unicode_literals, division
 
 import sys
+
 from epymc.extapi.onlinevideo import api_version, state_get, \
    fetch_url, play_url, report_error, item_add, call_ydl, local_resource, \
    relative_date, seconds_to_duration, url_encode, URLError, HTTPError, \
@@ -92,6 +93,7 @@ def channel_item_add(channel):
    url = api_base + channel['metadata']['connections']['videos']['uri']
    try:
       poster = [ p['link'] for p in channel['pictures']['sizes'] if p['width'] == 640 ][0]
+      if '?' in poster: poster = poster.split('?')[0]
    except:
       poster = None
 
@@ -116,6 +118,7 @@ def group_item_add(group):
    url = api_base + group['metadata']['connections']['videos']['uri']
    try:
       poster = [ p['link'] for p in group['pictures']['sizes'] if p['width'] == 640 ][0]
+      if '?' in poster: poster = poster.split('?')[0]
    except:
       poster = None
    videos = group['metadata']['connections']['videos']['total'] or 0
@@ -138,6 +141,7 @@ def user_item_add(user):
    url = api_base + user['metadata']['connections']['videos']['uri']
    try:
       poster = [ p['link'] for p in user['pictures']['sizes'] if p['width'] == 300 ][0]
+      if '?' in poster: poster = poster.split('?')[0]
    except:
       poster = None
    info = '<title>%s</><br>' \
@@ -156,19 +160,18 @@ def user_item_add(user):
 ################################################################################
 if STATE == ST_HOME:
    # searches
-   item_add(ST_VIDEO_LIST, _('Search videos'), 'search', action=ACT_SEARCH)
-   item_add(ST_CHANN_LIST, _('Search channels'), 'search', action=ACT_SEARCH)
-   item_add(ST_GROUP_LIST, _('Search groups'), 'search', action=ACT_SEARCH)
-   item_add(ST_USERS_LIST, _('Search people'), 'search', action=ACT_SEARCH)
+   item_add(ST_VIDEO_LIST, _('Search videos'), 'search1', action=ACT_SEARCH)
+   item_add(ST_CHANN_LIST, _('Search channels'), 'search2', action=ACT_SEARCH)
+   item_add(ST_GROUP_LIST, _('Search groups'), 'search3', action=ACT_SEARCH)
+   item_add(ST_USERS_LIST, _('Search people'), 'search4', action=ACT_SEARCH)
 
-   # more relevant videos
-   url = api_base + '/videos?sort=relevant&per_page=%d&query=' % ITEMS_PER_PAGE
-   item_add(ST_VIDEO_LIST, _('More relevant videos'), url,
-                           icon=icon_videos, action=ACT_FOLDER)
+   # more relevant videos (THIS DO NOT WORK, need to find another api)
+   # url = api_base + '/videos?sort=relevant&per_page=%d' % ITEMS_PER_PAGE
+   # item_add(ST_VIDEO_LIST, _('More relevant videos'), url,
+                           # icon=icon_videos, action=ACT_FOLDER)
 
-   # more followed channels (SORT DO NOT WORK !!!)
-   # url = api_base + '/channels?sort=followers&per_page=%d' % ITEMS_PER_PAGE
-   url = api_base + '/channels?per_page=%d' % ITEMS_PER_PAGE
+   # more followed channels
+   url = api_base + '/channels?sort=followers&per_page=%d' % ITEMS_PER_PAGE
    item_add(ST_CHANN_LIST, _('More followed channels'), url,
                            icon=icon_channels, action=ACT_FOLDER)
 
@@ -275,6 +278,7 @@ elif STATE == ST_CATEGORIES:
 
       try:
          poster = [ c['link'] for c in cat['pictures']['sizes'] if c['width'] == 640 ][0]
+         if '?' in poster: poster = poster.split('?')[0]
       except:
          poster = None
 

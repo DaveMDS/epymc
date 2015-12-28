@@ -129,14 +129,12 @@ def start_epymc(standalone=False):
 
    # alert if run from python < 3 (lots of translation issue with 2.7)
    if utils.is_py2():
-      print('')
-      print('##########################################################')
-      print('PYTHON 2.X WARNING:')
-      print('You are using python2! It is old! EpyMC works much better')
-      print('with py3, even more if you are not using the english texts.')
-      print('WE HIGHLY SUGGEST TO SWITCH TO PYTHON 3 !!!')
-      print('##########################################################')
-      print('')
+      txt = '<b>PYTHON 2 IS NOT SUPPORTED ANYMORE!</b><br><br>' \
+            'You are using python2, it is old!<br>' \
+            'EpyMC works much better with py3, even more if you are not ' \
+            'using the english language.<br><br>' \
+            '<b>YOU MUST SWITCH TO PYTHON 3 !!!</b>'
+      gui.EmcDialog(style='warning', text=txt)
 
    # run the main loop
    elementary.run()

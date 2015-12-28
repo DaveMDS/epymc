@@ -729,6 +729,7 @@ class EmcRemoteImage(Image):
       self.on_move_add(self._cb_move_resize)
       self.on_resize_add(self._cb_move_resize)
       self._spinner = Progressbar(self, style='wheel', pulse_mode=True)
+      self._url = None
       if url: self.url_set(url, dest)
 
    def show(self):
@@ -741,10 +742,11 @@ class EmcRemoteImage(Image):
    def url_set(self, url, dest=None):
       if dest and os.path.exists(dest):
          self.file_set(dest)
-      else:
+      elif url != self._url:
          try:
             utils.download_url_async(url, dest if dest else 'tmp',
-                                     complete_cb=self._cb_download_complete)
+                                     complete_cb=self._cb_download_complete,
+                                     original_url=url)
          except:
             return # TODO show a dummy image
          self.start_spin()
@@ -765,11 +767,12 @@ class EmcRemoteImage(Image):
       if self._spinner.clip != self.clip:
          self._spinner.clip = self.clip
 
-   def _cb_download_complete(self, dest, status):
+   def _cb_download_complete(self, dest, status, original_url):
       if self.is_deleted(): return
       self.stop_spin()
       if status == 200: # Successfull HTTP code
          self.file_set(dest)
+         self._url = original_url
       else:
          # TODO show a dummy image
          self.file_set('')

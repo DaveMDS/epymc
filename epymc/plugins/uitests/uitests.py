@@ -225,6 +225,11 @@ class MyItemClass(EmcItemClass):
          text = 'This is an <br><br><b>Warning</><br>dialog<br>'
          EmcDialog(title='Dialog - Warning', text=text, style='warning')
 
+      # Dialog - Warning (no title)
+      elif url == 'uitests://dlg-warning2':
+         text = 'This is an <br><br><b>Warning</><br>dialog<br>'
+         EmcDialog(text=text, style='warning')
+
       # Dialog - Error
       elif url == 'uitests://dlg-error':
          text = 'This is an <br><br><b>Error</><br>dialog<br>'
@@ -476,6 +481,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://sselector', 'Source Selector')
       browser.item_add(MyItemClass(), 'uitests://dlg-info', 'Dialog - Info')
       browser.item_add(MyItemClass(), 'uitests://dlg-warning', 'Dialog - Warning')
+      browser.item_add(MyItemClass(), 'uitests://dlg-warning2', 'Dialog - Warning (no title)')
       browser.item_add(MyItemClass(), 'uitests://dlg-error', 'Dialog - Error')
       browser.item_add(MyItemClass(), 'uitests://dlg-yesno', 'Dialog - YesNo')
       browser.item_add(MyItemClass(), 'uitests://dlg-cancel', 'Dialog - Cancel')

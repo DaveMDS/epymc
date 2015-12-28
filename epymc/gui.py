@@ -775,7 +775,7 @@ class EmcRemoteImage(Image):
          self.file_set('')
 
 ################################################################################
-class EmcDialog(edje.Edje):
+class EmcDialog(Layout):
    """ TODO doc this
    style can be 'panel' or 'minimal'
 
@@ -799,8 +799,8 @@ class EmcDialog(edje.Edje):
          group = 'emc/dialog/buffering'
       else:
          group = 'emc/dialog/panel'
-      edje.Edje.__init__(self, layout.evas, file=theme_file, group=group,
-                         size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH)
+      Layout.__init__(self, layout, file=(theme_file, group),
+                      size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH)
       self.signal_callback_add('emc,dialog,close', '', self._close_pressed)
       self.signal_callback_add('emc,dialog,hide,done', '',
                                (lambda a,s,d: self._delete_real()))
@@ -831,21 +831,21 @@ class EmcDialog(edje.Edje):
          self.signal_emit('emc,dialog,title,show', 'emc')
 
       # vbox
-      self._vbox = Box(win, horizontal=False, size_hint_align=FILL_HORIZ,
+      self._vbox = Box(self, horizontal=False, size_hint_align=FILL_HORIZ,
                        size_hint_weight=EXPAND_HORIZ)
       self._vbox.show()
-      self.part_swallow('emc.swallow.content', self._vbox)
+      self.content_set('emc.swallow.content', self._vbox)
 
       # if both text and content given then put them side by side
       if text and content:
-         hbox = Box(win, horizontal=True, size_hint_align=FILL_BOTH,
+         hbox = Box(self, horizontal=True, size_hint_align=FILL_BOTH,
                     size_hint_weight=EXPAND_BOTH)
          hbox.show()
          self._vbox.pack_end(hbox)
 
       # text entry
       if text is not None:
-         self._textentry = EmcScrolledEntry(text=text,
+         self._textentry = EmcScrolledEntry(parent=self, text=text,
                                             size_hint_weight=EXPAND_BOTH,
                                             size_hint_align=FILL_BOTH)
          self._textentry.show()
@@ -857,7 +857,7 @@ class EmcDialog(edje.Edje):
 
       # user content
       if content is not None:
-         frame = Frame(win, style='pad_small', size_hint_align=FILL_BOTH,
+         frame = Frame(self, style='pad_small', size_hint_align=FILL_BOTH,
                        size_hint_weight=EXPAND_BOTH, content=content)
          frame.show()
          if text is not None:
@@ -867,7 +867,7 @@ class EmcDialog(edje.Edje):
 
       # automatic list
       if style in ['list', 'image_list_horiz', 'image_list_vert']:
-         self._list = List(win, focus_allow=False, size_hint_align=FILL_BOTH,
+         self._list = List(self, focus_allow=False, size_hint_align=FILL_BOTH,
                            size_hint_weight=EXPAND_BOTH,
                            horizontal=True if style == 'image_list_horiz' else False,
                            style='dialog' if style == 'list' else 'image_list')
@@ -877,7 +877,7 @@ class EmcDialog(edje.Edje):
 
       # spinner
       if spinner:
-         self._spinner = Progressbar(win, style='wheel', pulse_mode=True)
+         self._spinner = Progressbar(self, style='wheel', pulse_mode=True)
          self._spinner.pulse(True)
          self._spinner.show()
          self._vbox.pack_end(self._spinner)
@@ -930,12 +930,11 @@ class EmcDialog(edje.Edje):
    def _delete_real(self):
       if self._textentry:
          self._textentry.delete()
-      if self.part_swallow_get('emc.swallow.content'):
-         self.part_swallow_get('emc.swallow.content').delete()
       for b in self._buttons:
          b.delete()
+      self.content_unset('emc.swallow.content').delete()
       box_remove('dialogs.box.stack', self)
-      edje.Edje.delete(self)
+      Layout.delete(self)
       del self
 
    def _close_pressed(self, a, s, d):
@@ -959,7 +958,7 @@ class EmcDialog(edje.Edje):
       b.data['cb_data'] = cb_data
       b.callback_clicked_add(self._cb_buttons)
       self.fman.obj_add(b)
-      self.part_box_prepend('emc.box.buttons', b)
+      self.box_prepend('emc.box.buttons', b)
       self._buttons.append(b)
       return b
 
@@ -1026,7 +1025,7 @@ class EmcDialog(edje.Edje):
       self._spinner.hide()
 
    def progress_set(self, val):
-      self.part_external_object_get('emc.dialog.progress').value_set(val)
+      self.edje.part_external_object_get('emc.dialog.progress').value_set(val)
 
    def _cb_buttons(self, button):
       selected_cb = button.data['cb']
@@ -1516,14 +1515,14 @@ class EmcVKeyboard(EmcDialog):
 ################################################################################
 class EmcScrolledEntry(Entry, Scrollable):
    """ A non editable, multiline text entry, with autoscroll ability. """
-   def __init__(self, autoscroll=False, **kargs):
+   def __init__(self, parent=None, autoscroll=False, **kargs):
       self._animator = None
       self._timer = None
       self._autoscroll_amount = 0.0
       self._autoscroll_speed_scale = 1.0
       self._autoscroll_start_delay = 3.0
       self._autoscroll = autoscroll
-      Entry.__init__(self, layout, style='scrolledentry',
+      Entry.__init__(self, parent or layout, style='scrolledentry',
                      editable=False, scrollable=True, **kargs)
 
    @property

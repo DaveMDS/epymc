@@ -73,6 +73,9 @@ def start_epymc(standalone=False):
    # create config dir if necessary
    if not os.path.exists(utils.user_cache_dir):
       os.makedirs(utils.user_cache_dir)
+   try: os.mkdir(os.path.join(utils.user_cache_dir, 'remoteimgs'))
+   except OSError: pass
+
    if not os.path.exists(utils.user_conf_dir):
       os.makedirs(utils.user_conf_dir)
    try: os.mkdir(os.path.join(utils.user_conf_dir, 'plugins'))

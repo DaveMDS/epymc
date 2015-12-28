@@ -24,6 +24,7 @@ New features:
  * New South Park Studios online video channel
  * New themoviedb.org online video channel (with movie trailers)
  * Better zapiks video schannel
+ * Cache to file remote images for faster reloading
 
 
 ===============================================================================

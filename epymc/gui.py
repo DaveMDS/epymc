@@ -175,7 +175,7 @@ def load_icon(icon):
    """
    if not icon:
       return None
-   if type(icon) in (Icon, Image, EmcRemoteImage, EmcRemoteImage2):
+   if type(icon) in (Icon, Image, EmcRemoteImage):
       return icon
    ic = Icon(win)
    if icon[0] == '/':
@@ -668,42 +668,48 @@ class EmcMenu(Menu):
       return input_events.EVENT_CONTINUE
 
 ################################################################################
-class EmcRemoteImage2(Image):
-   """ THIS ONE USE Image remote url feature that is 1.8 only !!
-       not used atm, waiting to drop 1.7 support
-       also waiting for a "dest" suppoort in Image
+class EmcRemoteImage(Image):
+   """ An image object with support for remote url, with optional
+       saving of the downloaded image to a local destination and a simple
+       cache-to-file mechanism to avoid re-downloading the image again.
+
+      Params:
+         url: The url to load the image from.
+         dest: Local path to save the image once the download is completed.
+               If the dest path already exists the image will not be downloaded,
+               but directly loaded from dest.
    """
 
    def __init__(self, url=None, dest=None):
-      Image.__init__(self, layout)
-      self.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      self.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      
-      self.on_move_add(self._cb_move_resize)
-      self.on_resize_add(self._cb_move_resize)
-      self._spinner = Progressbar(self)
-      self._spinner.style_set('wheel')
-      self._spinner.pulse = True
-      self.callback_download_start_add(lambda o: self.start_spin())
-      self.callback_download_done_add(lambda o: self.stop_spin())
-      self.callback_download_error_add(lambda o: self.stop_spin())# TODO show a dummy img
-      if url: self.url_set(url, dest)
-
-   def show(self):
-      Image.show(self)
-
-   def hide(self):
-      self._spinner.hide()
-      Image.hide(self)
+      self._spinner = None
+      Image.__init__(self, layout, size_hint_expand=EXPAND_BOTH,
+                     size_hint_fill=FILL_BOTH)
+      self.callback_download_start_add(self._download_start_cb)
+      self.callback_download_done_add(self._download_done_cb)
+      self.callback_download_error_add(self._download_error_cb)
+      if url:
+         self.url_set(url, dest)
 
    def url_set(self, url, dest=None):
+      self._url = url
+      self._dest = dest
+
       if dest and os.path.exists(dest):
          self.file_set(dest)
-      else:
-         self.file_set(url)
+         return
+
+      cache_path = self.cache_path_get(url)
+      if os.path.exists(cache_path):
+         self.file_set(cache_path)
+         return
+
+      self.file_set(url)
 
    def start_spin(self):
-      self.show()
+      if self._spinner is None:
+         self._spinner = Progressbar(self, style='wheel', pulse_mode=True)
+         self.on_move_add(self._move_resize_cb)
+         self.on_resize_add(self._move_resize_cb)
       self._spinner.show()
       self._spinner.pulse(True)
 
@@ -711,71 +717,36 @@ class EmcRemoteImage2(Image):
       self._spinner.hide()
       self._spinner.pulse(False)
 
-   def _cb_move_resize(self, obj):
+   def cache_path_get(self, url):
+      return os.path.join(utils.user_cache_dir, 'remoteimgs',
+                          utils.md5(url) + '.jpg')
+
+   def _move_resize_cb(self, obj):
       (x, y, w, h) = self.geometry_get()
       self._spinner.resize(w, h)
       self._spinner.move(x, y)
       if self._spinner.clip != self.clip:
          self._spinner.clip = self.clip
 
-class EmcRemoteImage(Image):
-   """ TODO documentation """
-   """ TODO on image_set abort the download ? """
+   def _download_start_cb(self, obj):
+      self.start_spin()
 
-   def __init__(self, url=None, dest=None):
-      Image.__init__(self, layout)
-      self.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      self.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      self.on_move_add(self._cb_move_resize)
-      self.on_resize_add(self._cb_move_resize)
-      self._spinner = Progressbar(self, style='wheel', pulse_mode=True)
-      self._url = None
-      if url: self.url_set(url, dest)
-
-   def show(self):
-      Image.show(self)
-
-   def hide(self):
-      self._spinner.hide()
-      Image.hide(self)
-
-   def url_set(self, url, dest=None):
-      if dest and os.path.exists(dest):
-         self.file_set(dest)
-      elif url != self._url:
-         try:
-            utils.download_url_async(url, dest if dest else 'tmp',
-                                     complete_cb=self._cb_download_complete,
-                                     original_url=url)
-         except:
-            return # TODO show a dummy image
-         self.start_spin()
-
-   def start_spin(self):
-      self.show()
-      self._spinner.show()
-      self._spinner.pulse(True)
-
-   def stop_spin(self):
-      self._spinner.hide()
-      self._spinner.pulse(False)
-
-   def _cb_move_resize(self, obj):
-      (x, y, w, h) = self.geometry_get()
-      self._spinner.resize(w, h)
-      self._spinner.move(x, y)
-      if self._spinner.clip != self.clip:
-         self._spinner.clip = self.clip
-
-   def _cb_download_complete(self, dest, status, original_url):
-      if self.is_deleted(): return
+   def _download_done_cb(self, obj):
       self.stop_spin()
-      if status == 200: # Successfull HTTP code
-         self.file_set(dest)
-         self._url = original_url
+      if self._dest is not None:
+         path = os.path.dirname(self._dest)
+         if not os.path.exists(path):
+            os.makedirs(path)
+         self.object.save(self._dest)
       else:
-         # TODO show a dummy image
-         self.file_set('')
+         cache_path = self.cache_path_get(self._url)
+         self.object.save(cache_path)
+
+   def _download_error_cb(self, obj, error_info):
+      self.stop_spin()
+      self._url = None
+      self._dest = None
+      # TODO show a dummy img ?
 
 ################################################################################
 class EmcDialog(Layout):

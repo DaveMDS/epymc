@@ -2036,6 +2036,7 @@ collections {
             type: BOX;
             clip_to: "clipper";
             description { state: "default" 0.0;
+               fixed: 1 1;
                box {
                   layout: "horizontal";
                   padding: 0 4;

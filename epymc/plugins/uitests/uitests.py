@@ -261,7 +261,7 @@ class MyItemClass(EmcItemClass):
 
          text = 'This is a <br><br><b>Progress operation</><br>dialog<br>'
          d = EmcDialog(title='Dialog - Progress', text=text,
-                       style='progress', canc_cb=_canc_cb)
+                       style='progress', done_cb=_canc_cb, canc_cb=_canc_cb)
          if url.endswith('btn'):
             d.button_add("btn1")
             d.button_add("btn2")

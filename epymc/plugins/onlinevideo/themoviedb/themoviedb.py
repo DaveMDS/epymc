@@ -22,7 +22,7 @@ from __future__ import absolute_import, print_function, unicode_literals, divisi
 
 
 from epymc.extapi.onlinevideo import api_version, state_get, \
-   fetch_url, play_url, item_add, call_ydl, url_encode, \
+   fetch_url, play_url, item_add, call_ydl, url_encode, language_get, \
    ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 
 
@@ -40,11 +40,12 @@ ST_PLAY_YOUTUBE = 10
 
 
 STATE, URL = state_get()
+LANG = language_get()
 
 
 def v3_request(url):
    if not '?' in url: url += '?'
-   url = API_BASE + url + '&api_key=' + API_KEY # + '&language=it' # FIXME LANG !!!
+   url = API_BASE + url + '&api_key=' + API_KEY + '&language=' + LANG
    print("URL " + url)
    return fetch_url(url, parser='json')
 

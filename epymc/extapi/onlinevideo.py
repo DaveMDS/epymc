@@ -72,6 +72,10 @@ def state_get():
    """ Get the state (and the url) of the current running scraper process """
    return int(sys.argv[1]), sys.argv[2]
 
+def language_get():
+   """ Get the preferred language for contents (ex: "it") """
+   return sys.argv[3]
+
 def item_add(next_state, label, url, info=None, icon=None, poster=None, action=ACT_DEFAULT):
    """ Add an item to the current page """
    print((next_state, label, url, info, icon, poster, action))

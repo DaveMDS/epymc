@@ -262,7 +262,8 @@ class OnlinevideoModule(EmcModule):
                       accept_cb=self._search_vkeyb_done)
       elif action != ACT_NONE:
          src = self._current_src
-         cmd = '%s %s %d "%s"' % (self._py, src['exec'], next_state, url)
+         lang = ini.get_string('movies', 'info_lang') or 'en'
+         cmd = '%s %s %d "%s" "%s"' % (self._py, src['exec'], next_state, url, lang)
          DBG('Executing: ' + cmd)
          EmcExec(cmd, True, self._request_page_done, item_data)
          self._run_dialog = EmcDialog(title=_('please wait'), style='cancel',

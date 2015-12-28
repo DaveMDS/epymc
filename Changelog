@@ -15,6 +15,7 @@ Bug fixed:
  * Fixed poster hiding (and console errors) for efl >= 1.16
  * Fixed posters for the vimeo channel
  * Fixed tmdb language selector in config
+ * Fixed (hopefully) subs decoding
 
 
 New features:

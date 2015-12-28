@@ -419,7 +419,8 @@ class Opensubtitles(object):
          full_path = utils.ensure_file_not_exists(full_path)
 
          with codecs.open(full_path, 'w', 'utf8') as f:
-            f.write(text.decode('utf8'))
+            f.write(text.decode(sub['SubEncoding']))
+
 
          self._downloaded_path = full_path
       except:

@@ -103,11 +103,5 @@ elif STATE == ST_VIDEO_LIST:
 
 # extract the video link from the video page
 elif STATE == ST_PLAY:
-   soup = fetch_url(URL, parser='bs4')
-   vid = soup.find('div', class_='video')
-   vid = vid['data-media-id']
-
-   url2 = 'http://www.zapiks.com/view/index.php?file=' + vid
-   soup = fetch_url(url2, parser='bs4')
-   video_url = soup.find('file').string
+   video_url = call_ydl(URL)
    play_url(video_url)

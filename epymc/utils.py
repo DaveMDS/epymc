@@ -253,7 +253,6 @@ iso639_table = {
    'ae': ('ave', 'ave', 'Avestan'),
    'ab': ('abk', 'abk', 'Abkhazian'),
    'aa': ('aar', 'aar', 'Afar'),
-   None: (None, None, None)
 }
 
 def iso639_1_to_3(iso1):

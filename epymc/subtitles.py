@@ -423,6 +423,8 @@ class Opensubtitles(object):
 
          self._downloaded_path = full_path
       except:
+         if os.path.exists(full_path):
+            os.unlink(full_path)
          self._thread_error = _('Decode failed')
 
       self._thread_finished = True

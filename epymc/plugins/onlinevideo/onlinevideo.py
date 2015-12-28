@@ -41,6 +41,7 @@ import epymc.utils as utils
 import epymc.gui as gui
 import epymc.ini as ini
 import epymc.events as events
+import epymc.config_gui as cgui
 
 from epymc.extapi.onlinevideo import ACT_DEFAULT, ACT_NONE, ACT_FOLDER, \
    ACT_MORE, ACT_PLAY, ACT_SEARCH, ydl_executable
@@ -131,8 +132,16 @@ class OnlinevideoModule(EmcModule):
 
       _mod = self
 
+      # create ini options if not exists (with defaults)
+      ini.add_section('videochannels')
+      ini.get('videochannels', 'autoupdate_ytdl', 'True')
+
+      # register the config-gui item
+      cgui.root_item_add('videochannels', 12, _('Video Channels'), 'icon/olvideo',
+                         self.config_gui_cb)
+
       # add an item in the mainmenu
-      mainmenu.item_add('onlinechannels', 15, _('Online Channels'),
+      mainmenu.item_add('videochannels', 15, _('Online Channels'),
                         'icon/olvideo', self.cb_mainmenu)
 
       # create the browser instance
@@ -140,7 +149,8 @@ class OnlinevideoModule(EmcModule):
 
    def __shutdown__(self):
       DBG('Shutdown module')
-      mainmenu.item_del('onlinechannels')
+      mainmenu.item_del('videochannels')
+      cgui.root_item_del('videochannels')
       self._browser.delete()
 
    def parse_source_ini_file(self, path):
@@ -178,7 +188,8 @@ class OnlinevideoModule(EmcModule):
                              self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
-      self.youtubedl_check_update()
+      if ini.get_bool('videochannels', 'autoupdate_ytdl') == True:
+         self.youtubedl_check_update()
 
    def populate_root_page(self, browser, url):
       if not self._sources:
@@ -353,3 +364,12 @@ class OnlinevideoModule(EmcModule):
          self._browser.item_bring_in(pos='top', animated=True)
 
 
+###### CONFIGURATION GUI STUFF
+   def config_gui_cb(self):
+      bro = cgui.browser_get()
+      bro.page_add('config://videochannels/', _('Video Channels'), None,
+                   self.config_gui_populate)
+   
+   def config_gui_populate(self, browser, url):
+      cgui.standard_item_bool_add('videochannels', 'autoupdate_ytdl',
+                                  _('Automatically update youtube-dl'))

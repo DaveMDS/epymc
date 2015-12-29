@@ -193,13 +193,17 @@ def load_icon(icon):
 def load_image(name, path = None):
    """
    @name include the ext but not the path (es 'my_image.png')
-   @name can also be a full_path
+   @name can also be a full_path or a complete url
    @path is searched if the image is not found in the theme
    @return ElmImage
    @example: load_image('my_image.png', os.path.dirname(__file__))
    """
    DBG('Requested image: ' + str(name))
    DBG('Extra path: ' + str(path))
+
+   # remote urls
+   if name.startswith(('http://', 'https://')):
+      return EmcRemoteImage(name)
 
    im = Image(win)
 

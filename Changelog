@@ -25,6 +25,7 @@ New features:
  * New themoviedb.org online video channel (with movie trailers)
  * Better zapiks video schannel
  * Cache to file remote images for faster reloading
+ * Support remote urls also in the mediaplayer cover image
 
 
 ===============================================================================

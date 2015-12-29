@@ -489,11 +489,10 @@ def video_controls_hide():
 def video_controls_toggle():   
    video_controls_hide() if _controls_visible else video_controls_show()
 
-def poster_set(poster=None, extra_path=None):
-   if poster:
-      gui.swallow_set("videoplayer.controls.poster", gui.load_image(poster, extra_path))
-   else:
-      gui.swallow_set("videoplayer.controls.poster", gui.load_image('dvd_cover_blank.png'))
+def poster_set(poster=None):
+   img = gui.load_image(poster or 'dvd_cover_blank.png')
+   img.size_hint_align = (0.5, 0.0)
+   gui.swallow_set("videoplayer.controls.poster", img)
 
 def title_set(title):
    global _onair_title

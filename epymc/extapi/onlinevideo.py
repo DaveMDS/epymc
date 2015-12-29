@@ -82,13 +82,10 @@ def item_add(next_state, label, url, info=None, icon=None, poster=None, action=A
 
 def play_url(url):
    """ Tell EpyMC to start the playback of the given url """
-   if py3:
-      print('PLAY!' + url.decode('utf8'))
-   else:
-      print('PLAY!' + url)
+   print('PLAY!{}'.format(url))
 
 def report_error(msg):
-   print('ERR!' + msg)
+   print('ERR!{}'.format(msg))
 
 def local_resource(_file_, res):
    """ Get the full path of a resouce included with the scraper """
@@ -119,8 +116,8 @@ def fetch_url(url, headers=None, parser=None):
    data = f.read()
    f.close()
 
-   # in py3 urlopen return a byte obj, so we need to encode it
-   if py3: data = data.decode('utf8')
+   if isinstance(data, bytes):
+      data = data.decode('utf8')
 
    if parser == 'json':
       data = json.loads(data)
@@ -139,7 +136,7 @@ def call_ydl(url):
    p = subprocess.Popen([ydl_executable(), '--get-url', url],
                         stdout=subprocess.PIPE)
    out, err = p.communicate()
-   return out
+   return out.decode('utf8') if isinstance(out, bytes) else out
 
 def url_encode(params):
    """ UTF-8 safe urlencode version.
@@ -158,7 +155,7 @@ def url_encode(params):
    """
    for k,v in params.items():
       if isinstance(v, basestring):
-         params[k] = v.encode('utf-8')
+         params[k] = v.encode('utf8')
    return urlencode(params)
 
 

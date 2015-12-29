@@ -29,7 +29,7 @@ from epymc.extapi.onlinevideo import api_version, state_get, \
 ST_HOME = 0
 ST_EPISODES_LIST = 1
 ST_ACTS_LIST = 2
-ST_PLAY = 4
+ST_NONE = 4
 
 base = 'http://southpark.cc.com/'
 json_base = 'http://southpark.cc.com/feeds/carousel/video/6154fc40-b7a3-4387-94cc-fc42fc47376e/30/1/json/!airdate/'
@@ -61,14 +61,10 @@ elif STATE == ST_EPISODES_LIST:
                poster=poster)
 
 
-# show the acts for a single episode
+# show the list of acts for a single episode (can be played directly)
 elif STATE == ST_ACTS_LIST:
    urls = call_ydl(URL).splitlines()
    for i, act_url in enumerate(urls, start=1):
       act_icon = local_resource(__file__, 'act{}.jpg'.format(i))
-      item_add(ST_PLAY, 'Act #{}'.format(i), act_url, icon=act_icon)
+      item_add(ST_NONE, 'Act #{}'.format(i), act_url, icon=act_icon, action=ACT_PLAY)
 
-
-# and finally play the act
-elif STATE == ST_PLAY:
-   play_url(URL)

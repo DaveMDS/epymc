@@ -206,6 +206,7 @@ setup (
       'epymc.plugins.uitests',
       'epymc.plugins.calibrator',
       'epymc.plugins.filemanager',
+      'epymc.plugins.watchdog',
    ],
 
    package_data = {
@@ -230,7 +231,8 @@ setup (
       ]
    },
 
-   scripts = ['bin/epymc', 'bin/epymc_standalone'],
+   scripts = ['bin/epymc', 'bin/epymc_standalone',
+              'epymc/plugins/watchdog/epymc_watchdog'],
 
    data_files = [
       ('share/applications/', ['data/desktop/epymc.desktop']),

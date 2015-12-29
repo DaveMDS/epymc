@@ -26,6 +26,7 @@ New features:
  * Better zapiks video schannel
  * Cache to file remote images for faster reloading
  * Support remote urls also in the mediaplayer cover image
+ * New watchdog module (sadly gstreamer1 continue to hang the mainloop for me)
 
 
 ===============================================================================

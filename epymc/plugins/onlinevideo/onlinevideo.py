@@ -96,11 +96,14 @@ class StandardItemClass(EmcItemClass):
 
    def icon_get(self, url, item_data):
       if not item_data[F_ICON] and item_data[F_ACTION] == ACT_FOLDER:
-            return 'icon/folder'
+         return 'icon/folder'
       return item_data[F_ICON]
    
    def poster_get(self, url, item_data):
       return item_data[F_POSTER] or _mod._current_src['poster']
+
+   def fanart_get(self, url, channel):
+      return _mod._current_src['backdrop']
 
    def info_get(self, url, item_data):
       if item_data[F_INFO]:

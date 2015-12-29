@@ -511,24 +511,17 @@ class MoviesModule(EmcModule):
    def _cb_panel_2(self, button):
       if self._movie_db.id_exists(self._current_url):
          movie_info = self._movie_db.get_data(self._current_url)
-
          dia = EmcDialog(title=_('Cast'), style='list',
                          done_cb=self._cast_info_done_cb)
-         dia.button_add(_('Info'), self._cast_info_btn_cb, dia)
 
          for person in sorted(movie_info['cast'], key=itemgetter('order')):
             label = _('%(name)s as %(character)s') % (person)
-            icon = EmcRemoteImage(person['profile_path']) # TODO use 'dest' to cache the img
+            icon = EmcRemoteImage(person['profile_path'])
             icon.size_hint_min_set(100, 100) # TODO FIXME
             dia.list_item_append(label, icon, None, person['id'])
          dia.list_go()
 
    def _cast_info_done_cb(self, list_dia, pid):
-      CastPanel(pid, lang=ini.get('movies', 'info_lang'))
-      
-   def _cast_info_btn_cb(self, button, list_dia):
-      item = list_dia.list_item_selected_get()
-      pid = item.data_get()[0][0]
       CastPanel(pid, lang=ini.get('movies', 'info_lang'))
 
 

@@ -531,21 +531,15 @@ class InfoPanel(EmcDialog):
    def _cast_button_cb(self, button):
       dia = EmcDialog(title=_('Cast'), style='list',
                       done_cb=self._cast_info_done_cb)
-      dia.button_add(_('Info'), self._cast_info_btn_cb, dia)
 
       for person in self._db_data['cast']:
          label = _('%(name)s as %(character)s') % (person)
-         icon = EmcRemoteImage(person['profile_path']) # TODO use 'dest' to cache the img
+         icon = EmcRemoteImage(person['profile_path'])
          icon.size_hint_min_set(100, 100) # TODO FIXME
          dia.list_item_append(label, icon, None, person['id'])
       dia.list_go()
 
    def _cast_info_done_cb(self, list_dia, pid):
-      CastPanel(pid, lang=ini.get('tvshows', 'info_lang'))
-
-   def _cast_info_btn_cb(self, button, list_dia):
-      item = list_dia.list_item_selected_get()
-      pid = item.data_get()[0][0]
       CastPanel(pid, lang=ini.get('tvshows', 'info_lang'))
 
    ### refresh infos

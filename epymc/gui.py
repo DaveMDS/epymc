@@ -607,6 +607,7 @@ class EmcMenu(Menu):
    def item_add(self, parent=None, label=None, icon=None, callback=None, *args, **kwargs):
       item = Menu.item_add(self, parent, label, icon, self._item_selected_cb,
                            callback, *args, **kwargs)
+      item.data['_user_cb_data_'] = (callback, args, kwargs)
       if self.selected_item_get() is None:
          item.selected_set(True)
       return item
@@ -651,10 +652,9 @@ class EmcMenu(Menu):
 
       elif event == 'OK':
          item = self.selected_item_get()
-         args, kwargs = self.selected_item_get().data_get()
-         cb = args[0]
-         if cb and callable(cb):
-            cb(self, item, *args[1:], **kwargs)
+         cb, args, kwargs = self.selected_item_get().data['_user_cb_data_']
+         if callable(cb):
+            cb(self, item, *args, **kwargs)
          self.close()
          return input_events.EVENT_BLOCK
 
@@ -968,7 +968,8 @@ class EmcDialog(Layout):
       if self._list:
          if icon: icon = load_icon(icon)
          if end: end = load_icon(end)
-         it = self._list.item_append(label, icon, end, None, *args, **kwargs)
+         it = self._list.item_append(label, icon, end, None)
+         it.data['_user_item_data_'] = (args, kwargs)
          if not self._list.selected_item_get():
             it.selected = True
          return it
@@ -985,7 +986,7 @@ class EmcDialog(Layout):
 
    def _list_item_activated_cb(self, li, it):
       if self._done_cb:
-         args, kwargs = it.data_get()
+         args, kwargs = it.data['_user_item_data_']
          self._done_cb(self, *args, **kwargs)
       else:
          self.delete()

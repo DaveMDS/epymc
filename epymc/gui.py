@@ -805,10 +805,11 @@ class EmcDialog(Layout):
          self.signal_emit('emc,dialog,title,show', 'emc')
 
       # vbox
-      self._vbox = Box(self, horizontal=False, size_hint_align=FILL_HORIZ,
-                       size_hint_weight=EXPAND_HORIZ)
-      self._vbox.show()
-      self.content_set('emc.swallow.content', self._vbox)
+      if style != 'buffering':
+         self._vbox = Box(self, horizontal=False, size_hint_align=FILL_HORIZ,
+                          size_hint_weight=EXPAND_HORIZ)
+         self._vbox.show()
+         self.content_set('emc.swallow.content', self._vbox)
 
       # if both text and content given then put them side by side
       if text and content:
@@ -906,7 +907,9 @@ class EmcDialog(Layout):
          self._textentry.delete()
       for b in self._buttons:
          b.delete()
-      self.content_unset('emc.swallow.content').delete()
+      content = self.content_unset('emc.swallow.content')
+      if content:
+         content.delete()
       box_remove('dialogs.box.stack', self)
       Layout.delete(self)
       del self

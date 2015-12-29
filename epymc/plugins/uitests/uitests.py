@@ -312,6 +312,21 @@ class MyItemClass(EmcItemClass):
          text = LOREM
          d = EmcDialog(text=text, style='panel', spinner=True)
 
+      # Dialog - Buffering
+      elif url == 'uitests://dlg-buffering':
+         def _progress_timer2():
+            self._progress += 0.05
+            d.progress_set(self._progress)
+            if self._progress >= 1.0:
+               d.delete()
+               return False # stop the timer
+            else:
+               return True # renew the callback
+
+         d = EmcDialog(style='buffering', title=_('Buffering'))
+         self._progress = 0.0
+         ecore.Timer(0.2, _progress_timer2)
+
       # Browser Dump
       elif url == 'uitests://brdump':
          DBG('Dumping Browser')
@@ -502,6 +517,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://dlg-panel4', 'Dialog - Panel full more')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel2', 'Dialog - Panel no buttons')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel3', 'Dialog - Panel no title')
+      browser.item_add(MyItemClass(), 'uitests://dlg-buffering', 'Dialog - Buffering')
       browser.item_add(MyItemClass(), 'uitests://brdump', 'Dump Browser pages')
 
    def populate_encoding_page(self, browser, url):

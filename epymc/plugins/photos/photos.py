@@ -22,6 +22,14 @@ from __future__ import absolute_import, print_function
 
 import os
 
+try:
+   from PIL import Image as PILImage
+   from PIL.ExifTags import TAGS as PILTags
+except ImportError:
+   pil_available = False
+else:
+   pil_available = True
+
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.gui import EmcSourcesManager, EmcSlideshow
@@ -32,6 +40,7 @@ import epymc.utils as utils
 import epymc.config_gui as cgui
 
 
+
 # debuggin stuff
 def DBG(msg):
    print('PHOTOS: %s' % msg)
@@ -39,6 +48,24 @@ def DBG(msg):
 
 
 mod_instance = None
+
+
+def extract_usefull_exif(pil_image):
+   ret = {}
+   info = pil_image._getexif()
+   if info is not None:
+      for tag, val in info.items():
+         name = PILTags.get(tag, tag)
+         print(name, repr(val))
+         if name in ('DateTime','Flash', 'ISOSpeedRatings', 'Make', 'Model', 'Orientation'):
+            ret[name] = val
+         elif name == 'ExposureTime':
+            ret[name] = '%.3f (%d/%d)' % ((val[0] / val[1]), val[0], val[1])
+         elif name == 'FNumber':
+            ret[name] = 'f%.1f' % (val[0] / val[1])
+         elif name == 'ApertureValue':
+            ret[name] = '%.1f mm' % (val[0] / val[1])
+   return ret
 
 
 class AddSourceItemClass(EmcItemClass):
@@ -69,6 +96,36 @@ class PhotoItemClass(EmcItemClass):
    
    def poster_get(self, url, mod):
       return utils.url2path(url)
+
+   def info_get(self, url, mod):
+      path = utils.url2path(url)
+      file_size = utils.hum_size(os.path.getsize(path))
+      basic = '<title>{}</title><br>' \
+              '<name>{}:</name> {}<br>'.format(os.path.basename(path),
+                                               _('File size'), file_size)
+      if pil_available:
+         i = PILImage.open(path)
+         # basic image info
+         pil = '<name>{}:</name> {} x {} pixel<br>' \
+               '<name>{}:</name> {} ({})<br>'.format(
+                  _('Dimensions'), i.size[0], i.size[1],
+                  _('Format'), i.format, i.mode)
+
+         # exif info
+         exif_dict = extract_usefull_exif(i)
+         exif = []
+         for name, value in exif_dict.items():
+            exif.append('<small><name>{}:</name> {}</small>'.format(name, value))
+         if len(exif) > 0:
+            exif = '<br>'.join(exif)
+         else:
+            exif = ''
+      else:
+         exif = ''
+         pil = '<small>{}</small>'.format(
+                _('Please install PIL to read image metadata.'))
+
+      return basic + pil + exif
 
 
 class FolderItemClass(EmcItemClass):

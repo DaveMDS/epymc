@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-13 19:34+0200\n"
-"PO-Revision-Date: 2015-07-13 19:37+0100\n"
+"POT-Creation-Date: 2015-12-25 10:11+0100\n"
+"PO-Revision-Date: 2015-12-25 10:13+0100\n"
 "Last-Translator: Dave Andreoli <dave@gurumeditation.it>\n"
 "Language-Team: \n"
 "Language: it\n"
@@ -38,8 +38,8 @@ msgid "Emotion Media Center"
 msgstr "Emotion Media Center"
 
 #: epymc/gui.py:156 epymc/gui.py:158 epymc/gui.py:159 epymc/subtitles.py:385
-#: epymc/config_gui.py:488 epymc/utils.py:493
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:147
+#: epymc/config_gui.py:488 epymc/utils.py:494
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:148
 #: epymc/plugins/movies/movies.py:196
 msgid "Unknown"
 msgstr "Sconosciuto"
@@ -520,49 +520,49 @@ msgstr "Python-EFL"
 msgid "Back"
 msgstr "Indietro"
 
-#: epymc/browser.py:514
+#: epymc/browser.py:513
 #, python-format
 msgid "%d item"
 msgid_plural "%d items"
 msgstr[0] "%d elemento"
 msgstr[1] "%d elementi"
 
-#: epymc/extapi/onlinevideo.py:164
+#: epymc/extapi/onlinevideo.py:177
 #, python-format
 msgid "%d year ago"
 msgid_plural "%d years ago"
 msgstr[0] "%d anno fa"
 msgstr[1] "%d anni fa"
 
-#: epymc/extapi/onlinevideo.py:167
+#: epymc/extapi/onlinevideo.py:180
 #, python-format
 msgid "%d month ago"
 msgid_plural "%d months ago"
 msgstr[0] "%d mese fa"
 msgstr[1] "%d mesi fa"
 
-#: epymc/extapi/onlinevideo.py:170
+#: epymc/extapi/onlinevideo.py:183
 #, python-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"
 msgstr[0] "%d settimana fa"
 msgstr[1] "%d settimane fa"
 
-#: epymc/extapi/onlinevideo.py:172
+#: epymc/extapi/onlinevideo.py:185
 #, python-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] "%d giorno fa"
 msgstr[1] "%d giorni fa"
 
-#: epymc/extapi/onlinevideo.py:175
+#: epymc/extapi/onlinevideo.py:188
 #, python-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] "%d ora fa"
 msgstr[1] "%d ore fa"
 
-#: epymc/extapi/onlinevideo.py:177
+#: epymc/extapi/onlinevideo.py:190
 #, python-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
@@ -730,8 +730,8 @@ msgid "Close"
 msgstr "Chiudi"
 
 #: epymc/plugins/mame/mame.py:550
-msgid "Trying at freeroms.org...<br>"
-msgstr "Provo da freeroms.org...<br>"
+msgid "Trying at freeroms.com...<br>"
+msgstr "Provo da freeroms.com...<br>"
 
 #: epymc/plugins/mame/mame.py:580 epymc/plugins/mame/mame.py:593
 msgid "Can not find the game online."
@@ -916,166 +916,187 @@ msgstr "Naviga, guarda e scarica filmati dai vostri siti online preferiti."
 msgid "Channels"
 msgstr "Canali"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:219
-msgid "Search query"
-msgstr "Ricerca"
-
-#: epymc/plugins/onlinevideo/onlinevideo.py:226
-#: epymc/plugins/onlinevideo/onlinevideo.py:235
+#: epymc/plugins/onlinevideo/onlinevideo.py:198
+#: epymc/plugins/onlinevideo/onlinevideo.py:267
+#: epymc/plugins/onlinevideo/onlinevideo.py:276
 msgid "please wait"
 msgstr "Attendere"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:227
-#: epymc/plugins/onlinevideo/onlinevideo.py:236
+#: epymc/plugins/onlinevideo/onlinevideo.py:199
+msgid ""
+"Updating the helper program <b>youtube-dl</b> to the latest version."
+"<br><br>For info please visit:<br>rg3.github.io/youtube-dl/"
+msgstr ""
+"Aggiornamento di <b>youtube-dl</b> all'ultima versione "
+"disponibile<br><br>Per informazioni visitare:<br>rg3.github.io/youtube-dl/"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:260
+msgid "Search query"
+msgstr "Ricerca"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:268
+#: epymc/plugins/onlinevideo/onlinevideo.py:277
 msgid "Getting info..."
 msgstr "Ottengo informazioni..."
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:254
+#: epymc/plugins/onlinevideo/onlinevideo.py:295
 msgid "Reported error"
 msgstr "Errore riportato"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:255
-#: epymc/plugins/onlinevideo/onlinevideo.py:277
+#: epymc/plugins/onlinevideo/onlinevideo.py:296
+#: epymc/plugins/onlinevideo/onlinevideo.py:318
 msgid "Error reading channel"
 msgstr "Errore lettura canale"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:278
+#: epymc/plugins/onlinevideo/onlinevideo.py:319
 msgid "No items returned"
 msgstr "Nessun elemento trovato"
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:283
+#: epymc/plugins/onlinevideo/onlinevideo.py:324
 msgid "Suggestions"
 msgstr "Consigliati"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:81
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:105
+#: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:42
+#, python-brace-format
+msgid "Season {0}"
+msgstr "Stagione {0}"
+
+#: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:56
+#, python-brace-format
+msgid "Episode {0}"
+msgstr "Episodio {0}"
+
+#: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:57
+#: epymc/plugins/tvshows/tvshows.py:250 epymc/plugins/tvshows/tvshows.py:461
+msgid "First aired"
+msgstr "Prima messa in onda"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:82
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:106
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:128
 #: epymc/plugins/onlinevideo/youtube/youtube.py:82
 msgid "user"
 msgstr "utente"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:82
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:83
 #: epymc/plugins/onlinevideo/youtube/youtube.py:83
 #: epymc/plugins/onlinevideo/youtube/youtube.py:157
 msgid "uploaded"
 msgstr "caricato"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:83
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:84
 msgid "view"
 msgid_plural "views"
 msgstr[0] "vista"
 msgstr[1] "viste"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:84
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:85
 msgid "like"
 msgid_plural "likes"
 msgstr[0] "mi piace"
 msgstr[1] "mi piace"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:85
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:86
 msgid "comment"
 msgid_plural "comments"
 msgstr[0] "commento"
 msgstr[1] "commenti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:106
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:128
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:107
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:129
 msgid "created"
 msgstr "creato"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:107
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:129
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:108
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:130
 msgid "updated"
 msgstr "aggiornato"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:108
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:130
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:286
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:109
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:131
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:287
 msgid "video"
 msgid_plural "videos"
 msgstr[0] "filmato"
 msgstr[1] "filmati"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:109
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:131
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:110
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:132
 msgid "follower"
 msgid_plural "followers"
 msgstr[0] "iscritto"
 msgstr[1] "iscritti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:127
-msgid "utente"
-msgstr "utente"
-
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:146
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:147
 msgid "joined"
 msgstr "iscritto"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:147
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:148
 msgid "location"
 msgstr "luogo"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:158
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:159
 #: epymc/plugins/onlinevideo/youtube/youtube.py:47
 msgid "Search videos"
 msgstr "Cerca nei filmati"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:159
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:160
 msgid "Search channels"
 msgstr "Cerca nei canali"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:160
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:161
 msgid "Search groups"
 msgstr "Cerca nei gruppi"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:161
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:162
 msgid "Search people"
 msgstr "Cerca negli utenti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:165
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:166
 msgid "More relevant videos"
 msgstr "Video più rilevanti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:171
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:172
 msgid "More followed channels"
 msgstr "Canali più seguiti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:176
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:177
 msgid "More followed groups"
 msgstr "Gruppi più seguiti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:184
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:185
 msgid "Browse videos"
 msgstr "Sfoglia filmati"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:185
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:186
 #: epymc/plugins/onlinevideo/youtube/youtube.py:48
 msgid "Browse channels"
 msgstr "Sfoglia canali"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:186
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:187
 msgid "Browse groups"
 msgstr "Sfoglia gruppi"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:187
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:188
 msgid "Browse users"
 msgstr "Sfoglia utenti"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:204
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:222
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:240
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:257
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:205
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:223
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:241
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:258
 #, python-format
 msgid "Load more results (%d in total)"
 msgstr "Carica altri risultati (%d in totale)"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:287
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:288
 #: epymc/plugins/onlinevideo/youtube/youtube.py:109
 msgid "channel"
 msgid_plural "channels"
 msgstr[0] "canale"
 msgstr[1] "canali"
 
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:288
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:289
 msgid "group"
 msgid_plural "groups"
 msgstr[0] "gruppo"
@@ -1434,10 +1455,6 @@ msgstr "Informazioni serie"
 #: epymc/plugins/tvshows/tvshows.py:249
 msgid "Episode"
 msgstr "Episodio"
-
-#: epymc/plugins/tvshows/tvshows.py:250 epymc/plugins/tvshows/tvshows.py:461
-msgid "First aired"
-msgstr "Prima messa in onda"
 
 #: epymc/plugins/tvshows/tvshows.py:256 epymc/plugins/tvshows/tvshows.py:292
 #: epymc/plugins/tvshows/tvshows.py:299 epymc/plugins/tvshows/tvshows.py:354

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 #
-# Copyright (C) 2010-2014 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2010-2015 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of EpyMC, an EFL based Media Center written in Python.
 #
@@ -71,6 +71,11 @@ def start_epymc(standalone=False):
    elementary.init()
 
    # create config dir if necessary
+   if not os.path.exists(utils.user_cache_dir):
+      os.makedirs(utils.user_cache_dir)
+   try: os.mkdir(os.path.join(utils.user_cache_dir, 'remoteimgs'))
+   except OSError: pass
+
    if not os.path.exists(utils.user_conf_dir):
       os.makedirs(utils.user_conf_dir)
    try: os.mkdir(os.path.join(utils.user_conf_dir, 'plugins'))
@@ -124,6 +129,15 @@ def start_epymc(standalone=False):
       # give focus to the win
       ecore_x_win = ecore_x.Window_from_xid(gui.win.xwindow_xid)
       ecore_x_win.focus()
+
+   # alert if run from python < 3 (lots of translation issue with 2.7)
+   if utils.is_py2():
+      txt = '<b>PYTHON 2 IS NOT SUPPORTED ANYMORE!</b><br><br>' \
+            'You are using python2, it is old!<br>' \
+            'EpyMC works much better with py3, even more if you are not ' \
+            'using the english language.<br><br>' \
+            '<b>YOU MUST SWITCH TO PYTHON 3 !!!</b>'
+      gui.EmcDialog(style='warning', text=txt)
 
    # run the main loop
    elementary.run()

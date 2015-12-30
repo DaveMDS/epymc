@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 #
-# Copyright (C) 2010-2014 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2010-2015 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of EpyMC, an EFL based Media Center written in Python.
 #
@@ -18,8 +18,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, re
-from bs4 import BeautifulSoup
+from __future__ import absolute_import, print_function, unicode_literals, division
+
+import re
 
 from epymc.extapi.onlinevideo import api_version, state_get, \
    fetch_url, play_url, item_add, call_ydl, report_error, \

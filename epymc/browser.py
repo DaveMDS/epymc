@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 #
-# Copyright (C) 2010-2014 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2010-2015 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of EpyMC, an EFL based Media Center written in Python.
 #
@@ -327,9 +327,8 @@ class EmcBrowser(object):
 
    # private stuff
    def _populate_page(self, page, is_back=False, is_refresh=False):
-      # set topbar title
-      full = '> ' + ''.join([p['title'] + ' > ' for p in self.pages])
-      gui.text_set('topbar.title', full[0:-3])
+      full = ' > '.join([p['title'] for p in self.pages])
+      gui.text_set('topbar.title', full)
 
       view = page['view']
       if (view == self.current_view):
@@ -459,8 +458,7 @@ class ViewList(object):
                                   content_get_func=self.__gl_content_get)
 
       # RemoteImage (poster)
-      self.__im = EmcRemoteImage()
-      gui.swallow_set('browser.list.poster', self.__im)
+      self.__im = None
 
       # AutoScrolledEntry (info)
       self._ase = EmcScrolledEntry(autoscroll=True)
@@ -515,6 +513,9 @@ class ViewList(object):
 
    def show(self):
       """ Show the view """
+      if self.__im:
+         self.__im.delete()
+         self.__im = None
       gui.signal_emit('browser,list,show')
 
    def hide(self):
@@ -522,6 +523,7 @@ class ViewList(object):
       if self.timer: self.timer.delete()
       if self.timer2: self.timer2.delete()
       gui.signal_emit('browser,list,hide')
+      gui.signal_emit('browser,list,info,hide')
       self._ase.autoscroll = False
 
    def clear(self):
@@ -654,15 +656,23 @@ class ViewList(object):
 
       # Ask for the item poster and show (or auto-download) it
       poster = item_class.poster_get(url, user_data)
-      if isinstance(poster, tuple):
-         (url, dest) = poster
-         self.__im.url_set(url, dest)
-      elif poster and (poster.startswith('http://') or poster.startswith('https://')):
-         self.__im.url_set(poster)
-      elif poster and (poster.startswith('icon/') or poster.startswith('image/')):
-         self.__im.file_set(gui.theme_file, poster)
+      if poster is None:
+         if self.__im:
+            self.__im.delete()
+            self.__im = None
       else:
-         self.__im.file_set(poster if poster else '')
+         if self.__im is None:
+            self.__im = EmcRemoteImage()
+            gui.swallow_set('browser.list.poster', self.__im)
+         if isinstance(poster, tuple):
+            (url, dest) = poster
+            self.__im.url_set(url, dest)
+         elif poster and poster.startswith(('http://', 'https://')):
+            self.__im.url_set(poster)
+         elif poster and poster.startswith(('icon/', 'image/')):
+            self.__im.file_set(gui.theme_file, poster)
+         else:
+            self.__im.file_set(poster)
 
       return False # don't repeat the timer
 

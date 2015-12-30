@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 #
-# Copyright (C) 2010-2014 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2010-2015 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of EpyMC, an EFL based Media Center written in Python.
 #
@@ -32,7 +32,7 @@ from efl import evas, elementary
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
-from epymc.utils import EmcExec
+from epymc.utils import EmcExec, download_url_async
 from epymc.gui import EmcDialog, EmcVKeyboard
 
 import epymc.mainmenu as mainmenu
@@ -41,9 +41,10 @@ import epymc.utils as utils
 import epymc.gui as gui
 import epymc.ini as ini
 import epymc.events as events
+import epymc.config_gui as cgui
 
-from epymc.extapi.onlinevideo import ACT_NONE, ACT_FOLDER, ACT_MORE, \
-   ACT_PLAY, ACT_SEARCH
+from epymc.extapi.onlinevideo import ACT_DEFAULT, ACT_NONE, ACT_FOLDER, \
+   ACT_MORE, ACT_PLAY, ACT_SEARCH, ydl_executable
 
 
 def DBG(msg):
@@ -95,11 +96,14 @@ class StandardItemClass(EmcItemClass):
 
    def icon_get(self, url, item_data):
       if not item_data[F_ICON] and item_data[F_ACTION] == ACT_FOLDER:
-            return 'icon/folder'
+         return 'icon/folder'
       return item_data[F_ICON]
    
    def poster_get(self, url, item_data):
       return item_data[F_POSTER] or _mod._current_src['poster']
+
+   def fanart_get(self, url, channel):
+      return _mod._current_src['backdrop']
 
    def info_get(self, url, item_data):
       if item_data[F_INFO]:
@@ -131,8 +135,16 @@ class OnlinevideoModule(EmcModule):
 
       _mod = self
 
+      # create ini options if not exists (with defaults)
+      ini.add_section('videochannels')
+      ini.get('videochannels', 'autoupdate_ytdl', 'True')
+
+      # register the config-gui item
+      cgui.root_item_add('videochannels', 12, _('Video Channels'), 'icon/olvideo',
+                         self.config_gui_cb)
+
       # add an item in the mainmenu
-      mainmenu.item_add('onlinechannels', 15, _('Online Channels'),
+      mainmenu.item_add('videochannels', 15, _('Online Channels'),
                         'icon/olvideo', self.cb_mainmenu)
 
       # create the browser instance
@@ -140,7 +152,8 @@ class OnlinevideoModule(EmcModule):
 
    def __shutdown__(self):
       DBG('Shutdown module')
-      mainmenu.item_del('onlinechannels')
+      mainmenu.item_del('videochannels')
+      cgui.root_item_del('videochannels')
       self._browser.delete()
 
    def parse_source_ini_file(self, path):
@@ -178,6 +191,8 @@ class OnlinevideoModule(EmcModule):
                              self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
+      if ini.get_bool('videochannels', 'autoupdate_ytdl') == True:
+         self.youtubedl_check_update()
 
    def populate_root_page(self, browser, url):
       if not self._sources:
@@ -185,7 +200,47 @@ class OnlinevideoModule(EmcModule):
       for ch in self._sources:
          self._browser.item_add(ChannelItemClass(), ch['name'], ch)
 
+###### YOUTUBE-DL DOWNLOAD AND UPDATE
+   def youtubedl_check_update(self):
+      ydl = ydl_executable()
+      if not os.path.exists(ydl):
+         self._ydl_download_latest()
+      else:
+         EmcExec(ydl + ' --version', True, self._ydo_local_version_done)
 
+   def _ydl_download_latest(self):
+      dia = EmcDialog(title=_('please wait'), style='progress',
+                      text=_('Updating the helper program <b>youtube-dl</b> to the latest version.<br><br>For info please visit:<br>rg3.github.io/youtube-dl/'))
+      download_url_async('http://youtube-dl.org/latest/youtube-dl',
+                         dest=ydl_executable(),
+                         complete_cb=self._ydl_complete_cb,
+                         progress_cb=self._ydl_progress_cb,
+                         dia=dia)
+      
+   def _ydl_progress_cb(self, dest, dltotal, dlnow, dia):
+      dia.progress_set((float(dlnow) / dltotal) if dltotal > 0 else 0)
+
+   def _ydl_complete_cb(self, dest, status, dia):
+      os.chmod(dest, 484) # 0o0744 (make it executable)
+      dia.delete()
+
+   def _ydo_local_version_done(self, version):
+      if version:
+         download_url_async('http://youtube-dl.org/latest/version',
+                            complete_cb=self._ydo_remote_version_done,
+                            version=version.strip())
+
+   def _ydo_remote_version_done(self, dest, status, version):
+      if status == 200:
+         with open(dest) as f:
+            available = f.read().strip()
+         os.remove(dest)
+         if available != version:
+            self._ydl_download_latest()
+         else:
+            DBG('youtube-dl is up-to-date (%s)' % version)
+
+   
 ###### SOURCES STUFF
    def build_sources_list(self):
       # search all the source.ini files in all the subdirs of _search_folders
@@ -196,6 +251,7 @@ class OnlinevideoModule(EmcModule):
                   source = self.parse_source_ini_file(os.path.join(top, f))
                   if source:
                      self._sources.append(source)
+      self._sources.sort(key=lambda k: k['name'])
 
    def get_source_by_name(self, src_name):
       for s in self._sources:
@@ -205,7 +261,7 @@ class OnlinevideoModule(EmcModule):
    def _request_index(self):
       # request the index page from the channel
       src = self._current_src
-      item_data = (0, src['label'], 'index', None, None, None, 0)
+      item_data = (0, src['label'], 'index', None, None, None, ACT_DEFAULT)
       self._request_page(item_data)
 
    def _request_page(self, item_data):
@@ -218,9 +274,10 @@ class OnlinevideoModule(EmcModule):
       elif action == ACT_SEARCH:
          EmcVKeyboard(title=_('Search query'), user_data=item_data,
                       accept_cb=self._search_vkeyb_done)
-      else:
+      elif action != ACT_NONE:
          src = self._current_src
-         cmd = '%s %s %d "%s"' % (self._py, src['exec'], next_state, url)
+         lang = ini.get_string('movies', 'info_lang') or 'en'
+         cmd = '%s %s %d "%s" "%s"' % (self._py, src['exec'], next_state, url, lang)
          DBG('Executing: ' + cmd)
          EmcExec(cmd, True, self._request_page_done, item_data)
          self._run_dialog = EmcDialog(title=_('please wait'), style='cancel',
@@ -310,3 +367,12 @@ class OnlinevideoModule(EmcModule):
          self._browser.item_bring_in(pos='top', animated=True)
 
 
+###### CONFIGURATION GUI STUFF
+   def config_gui_cb(self):
+      bro = cgui.browser_get()
+      bro.page_add('config://videochannels/', _('Video Channels'), None,
+                   self.config_gui_populate)
+   
+   def config_gui_populate(self, browser, url):
+      cgui.standard_item_bool_add('videochannels', 'autoupdate_ytdl',
+                                  _('Automatically update youtube-dl'))

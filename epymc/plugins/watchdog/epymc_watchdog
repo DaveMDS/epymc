@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+# This Python file uses the following encoding: utf-8
+#
+# Copyright (C) 2010-2015 Davide Andreoli <dave@gurumeditation.it>
+#
+# This file is part of EpyMC, an EFL based Media Center written in Python.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import absolute_import, print_function, division, unicode_literals
+
+import os
+import sys
+import time
+import atexit
+import signal
+import fcntl
+
+
+# lock file to run a single instance of this process
+LOCK_FILE = '/tmp/epymc_watchdog.lock'
+
+# target for the DBG() function
+LOG_FILE = '/tmp/epymc_watchdog.log'
+
+# this is the core file of the wd. Epymc will update the modtime every 5
+# seconds. If we found that the file is older than 30 seconds we will kill -9
+# and restart the media center.
+WD_FILE = '/tmp/epymc_watchdog'
+
+
+def DBG(msg):
+   # with open(LOG_FILE, 'a') as fp:
+   #    fp.write('WATCHDOG: %s\n' % msg)
+   pass
+
+
+def ensure_single_instance():
+
+   # create the lock file
+   umask_original = os.umask(0)
+   try:
+      fp = os.open(LOCK_FILE, os.O_WRONLY | os.O_CREAT, 0o666)
+   finally:
+      os.umask(umask_original)
+
+   # acquire an unique lock on the file
+   try:
+      fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
+   except OSError:
+      DBG('another instance is running!')
+      sys.exit(2)
+
+
+
+def kill_and_respawn():
+   DBG('RESPAWN !!!!!')
+   os.system('killall -9 epymc')
+   os.system('epymc &')
+   time.sleep(7)
+
+
+def signal_func(signal, stack):
+   sys.exit(0)
+
+def atexit_do():
+   try:
+      os.unlink(LOCK_FILE)
+   except:
+      pass
+   DBG('exiting.')
+
+if __name__ == '__main__':
+
+   # do not run more than one watchdog process at the same time
+   ensure_single_instance()
+
+   # epymc will send a TERM signal to shutdown the deamon (this script)
+   signal.signal(signal.SIGTERM, signal_func)
+
+   # cleanup on exit
+   atexit.register(atexit_do)
+
+   DBG('startup.')
+   while 1:
+      time.sleep(3)
+      try:
+         # get wd file mod-time
+         mtime = os.path.getmtime(WD_FILE)
+      except:
+         # epymc not running ??
+         kill_and_respawn()
+      finally:
+         # if the mod-time is older than 30 secs restart epymc
+         delta = time.time() - mtime
+         DBG('epymc pinged %.3f seconds ago' % delta)
+         if delta > 30:
+            kill_and_respawn()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 #
-# Copyright (C) 2010-2014 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2010-2015 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of EpyMC, an EFL based Media Center written in Python.
 #
@@ -175,7 +175,7 @@ def load_icon(icon):
    """
    if not icon:
       return None
-   if type(icon) in (Icon, Image, EmcRemoteImage, EmcRemoteImage2):
+   if type(icon) in (Icon, Image, EmcRemoteImage):
       return icon
    ic = Icon(win)
    if icon[0] == '/':
@@ -193,13 +193,17 @@ def load_icon(icon):
 def load_image(name, path = None):
    """
    @name include the ext but not the path (es 'my_image.png')
-   @name can also be a full_path
+   @name can also be a full_path or a complete url
    @path is searched if the image is not found in the theme
    @return ElmImage
    @example: load_image('my_image.png', os.path.dirname(__file__))
    """
    DBG('Requested image: ' + str(name))
    DBG('Extra path: ' + str(path))
+
+   # remote urls
+   if name.startswith(('http://', 'https://')):
+      return EmcRemoteImage(name)
 
    im = Image(win)
 
@@ -564,7 +568,7 @@ MONOPOLIO DI STATO
 
 
 <info>license</>
-Copyright © 2010-2014 Davide Andreoli <dave@gurumeditation.it>
+Copyright © 2010-2015 Davide Andreoli <dave@gurumeditation.it>
 
 EpyMC is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
@@ -607,6 +611,7 @@ class EmcMenu(Menu):
    def item_add(self, parent=None, label=None, icon=None, callback=None, *args, **kwargs):
       item = Menu.item_add(self, parent, label, icon, self._item_selected_cb,
                            callback, *args, **kwargs)
+      item.data['_user_cb_data_'] = (callback, args, kwargs)
       if self.selected_item_get() is None:
          item.selected_set(True)
       return item
@@ -651,10 +656,9 @@ class EmcMenu(Menu):
 
       elif event == 'OK':
          item = self.selected_item_get()
-         args, kwargs = self.selected_item_get().data_get()
-         cb = args[0]
-         if cb and callable(cb):
-            cb(self, item, *args[1:], **kwargs)
+         cb, args, kwargs = self.selected_item_get().data['_user_cb_data_']
+         if callable(cb):
+            cb(self, item, *args, **kwargs)
          self.close()
          return input_events.EVENT_BLOCK
 
@@ -668,42 +672,48 @@ class EmcMenu(Menu):
       return input_events.EVENT_CONTINUE
 
 ################################################################################
-class EmcRemoteImage2(Image):
-   """ THIS ONE USE Image remote url feature that is 1.8 only !!
-       not used atm, waiting to drop 1.7 support
-       also waiting for a "dest" suppoort in Image
+class EmcRemoteImage(Image):
+   """ An image object with support for remote url, with optional
+       saving of the downloaded image to a local destination and a simple
+       cache-to-file mechanism to avoid re-downloading the image again.
+
+      Params:
+         url: The url to load the image from.
+         dest: Local path to save the image once the download is completed.
+               If the dest path already exists the image will not be downloaded,
+               but directly loaded from dest.
    """
 
    def __init__(self, url=None, dest=None):
-      Image.__init__(self, layout)
-      self.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      self.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      
-      self.on_move_add(self._cb_move_resize)
-      self.on_resize_add(self._cb_move_resize)
-      self._spinner = Progressbar(self)
-      self._spinner.style_set('wheel')
-      self._spinner.pulse = True
-      self.callback_download_start_add(lambda o: self.start_spin())
-      self.callback_download_done_add(lambda o: self.stop_spin())
-      self.callback_download_error_add(lambda o: self.stop_spin())# TODO show a dummy img
-      if url: self.url_set(url, dest)
-
-   def show(self):
-      Image.show(self)
-
-   def hide(self):
-      self._spinner.hide()
-      Image.hide(self)
+      self._spinner = None
+      Image.__init__(self, layout, size_hint_expand=EXPAND_BOTH,
+                     size_hint_fill=FILL_BOTH)
+      self.callback_download_start_add(self._download_start_cb)
+      self.callback_download_done_add(self._download_done_cb)
+      self.callback_download_error_add(self._download_error_cb)
+      if url:
+         self.url_set(url, dest)
 
    def url_set(self, url, dest=None):
+      self._url = url
+      self._dest = dest
+
       if dest and os.path.exists(dest):
          self.file_set(dest)
-      else:
-         self.file_set(url)
+         return
+
+      cache_path = self.cache_path_get(url)
+      if os.path.exists(cache_path):
+         self.file_set(cache_path)
+         return
+
+      self.file_set(url)
 
    def start_spin(self):
-      self.show()
+      if self._spinner is None:
+         self._spinner = Progressbar(self, style='wheel', pulse_mode=True)
+         self.on_move_add(self._move_resize_cb)
+         self.on_resize_add(self._move_resize_cb)
       self._spinner.show()
       self._spinner.pulse(True)
 
@@ -711,71 +721,39 @@ class EmcRemoteImage2(Image):
       self._spinner.hide()
       self._spinner.pulse(False)
 
-   def _cb_move_resize(self, obj):
+   def cache_path_get(self, url):
+      return os.path.join(utils.user_cache_dir, 'remoteimgs',
+                          utils.md5(url) + '.jpg')
+
+   def _move_resize_cb(self, obj):
       (x, y, w, h) = self.geometry_get()
       self._spinner.resize(w, h)
       self._spinner.move(x, y)
       if self._spinner.clip != self.clip:
          self._spinner.clip = self.clip
 
-class EmcRemoteImage(Image):
-   """ TODO documentation """
-   """ TODO on image_set abort the download ? """
+   def _download_start_cb(self, obj):
+      self.start_spin()
 
-   def __init__(self, url=None, dest=None):
-      Image.__init__(self, layout)
-      self.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      self.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      self.on_move_add(self._cb_move_resize)
-      self.on_resize_add(self._cb_move_resize)
-      self._spinner = Progressbar(self, style='wheel', pulse_mode=True)
-      if url: self.url_set(url, dest)
-
-   def show(self):
-      Image.show(self)
-
-   def hide(self):
-      self._spinner.hide()
-      Image.hide(self)
-
-   def url_set(self, url, dest=None):
-      if dest and os.path.exists(dest):
-         self.file_set(dest)
-      else:
-         try:
-            utils.download_url_async(url, dest if dest else 'tmp',
-                                     complete_cb=self._cb_download_complete)
-         except:
-            return # TODO show a dummy image
-         self.start_spin()
-
-   def start_spin(self):
-      self.show()
-      self._spinner.show()
-      self._spinner.pulse(True)
-
-   def stop_spin(self):
-      self._spinner.hide()
-      self._spinner.pulse(False)
-
-   def _cb_move_resize(self, obj):
-      (x, y, w, h) = self.geometry_get()
-      self._spinner.resize(w, h)
-      self._spinner.move(x, y)
-      if self._spinner.clip != self.clip:
-         self._spinner.clip = self.clip
-
-   def _cb_download_complete(self, dest, status):
-      if self.is_deleted(): return
+   def _download_done_cb(self, obj):
       self.stop_spin()
-      if status == 200: # Successfull HTTP code
-         self.file_set(dest)
+      if self._dest is not None:
+         path = os.path.dirname(self._dest)
+         if not os.path.exists(path):
+            os.makedirs(path)
+         self.object.save(self._dest)
       else:
-         # TODO show a dummy image
-         self.file_set('')
+         cache_path = self.cache_path_get(self._url)
+         self.object.save(cache_path)
+
+   def _download_error_cb(self, obj, error_info):
+      self.stop_spin()
+      self._url = None
+      self._dest = None
+      # TODO show a dummy img ?
 
 ################################################################################
-class EmcDialog(edje.Edje):
+class EmcDialog(Layout):
    """ TODO doc this
    style can be 'panel' or 'minimal'
 
@@ -799,8 +777,8 @@ class EmcDialog(edje.Edje):
          group = 'emc/dialog/buffering'
       else:
          group = 'emc/dialog/panel'
-      edje.Edje.__init__(self, layout.evas, file=theme_file, group=group,
-                         size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH)
+      Layout.__init__(self, layout, file=(theme_file, group),
+                      size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH)
       self.signal_callback_add('emc,dialog,close', '', self._close_pressed)
       self.signal_callback_add('emc,dialog,hide,done', '',
                                (lambda a,s,d: self._delete_real()))
@@ -831,21 +809,22 @@ class EmcDialog(edje.Edje):
          self.signal_emit('emc,dialog,title,show', 'emc')
 
       # vbox
-      self._vbox = Box(win, horizontal=False, size_hint_align=FILL_HORIZ,
-                       size_hint_weight=EXPAND_HORIZ)
-      self._vbox.show()
-      self.part_swallow('emc.swallow.content', self._vbox)
+      if style != 'buffering':
+         self._vbox = Box(self, horizontal=False, size_hint_align=FILL_HORIZ,
+                          size_hint_weight=EXPAND_HORIZ)
+         self._vbox.show()
+         self.content_set('emc.swallow.content', self._vbox)
 
       # if both text and content given then put them side by side
       if text and content:
-         hbox = Box(win, horizontal=True, size_hint_align=FILL_BOTH,
+         hbox = Box(self, horizontal=True, size_hint_align=FILL_BOTH,
                     size_hint_weight=EXPAND_BOTH)
          hbox.show()
          self._vbox.pack_end(hbox)
 
       # text entry
       if text is not None:
-         self._textentry = EmcScrolledEntry(text=text,
+         self._textentry = EmcScrolledEntry(parent=self, text=text,
                                             size_hint_weight=EXPAND_BOTH,
                                             size_hint_align=FILL_BOTH)
          self._textentry.show()
@@ -857,7 +836,7 @@ class EmcDialog(edje.Edje):
 
       # user content
       if content is not None:
-         frame = Frame(win, style='pad_small', size_hint_align=FILL_BOTH,
+         frame = Frame(self, style='pad_small', size_hint_align=FILL_BOTH,
                        size_hint_weight=EXPAND_BOTH, content=content)
          frame.show()
          if text is not None:
@@ -867,7 +846,7 @@ class EmcDialog(edje.Edje):
 
       # automatic list
       if style in ['list', 'image_list_horiz', 'image_list_vert']:
-         self._list = List(win, focus_allow=False, size_hint_align=FILL_BOTH,
+         self._list = List(self, focus_allow=False, size_hint_align=FILL_BOTH,
                            size_hint_weight=EXPAND_BOTH,
                            horizontal=True if style == 'image_list_horiz' else False,
                            style='dialog' if style == 'list' else 'image_list')
@@ -877,7 +856,7 @@ class EmcDialog(edje.Edje):
 
       # spinner
       if spinner:
-         self._spinner = Progressbar(win, style='wheel', pulse_mode=True)
+         self._spinner = Progressbar(self, style='wheel', pulse_mode=True)
          self._spinner.pulse(True)
          self._spinner.show()
          self._vbox.pack_end(self._spinner)
@@ -930,12 +909,13 @@ class EmcDialog(edje.Edje):
    def _delete_real(self):
       if self._textentry:
          self._textentry.delete()
-      if self.part_swallow_get('emc.swallow.content'):
-         self.part_swallow_get('emc.swallow.content').delete()
       for b in self._buttons:
          b.delete()
+      content = self.content_unset('emc.swallow.content')
+      if content:
+         content.delete()
       box_remove('dialogs.box.stack', self)
-      edje.Edje.delete(self)
+      Layout.delete(self)
       del self
 
    def _close_pressed(self, a, s, d):
@@ -959,7 +939,7 @@ class EmcDialog(edje.Edje):
       b.data['cb_data'] = cb_data
       b.callback_clicked_add(self._cb_buttons)
       self.fman.obj_add(b)
-      self.part_box_prepend('emc.box.buttons', b)
+      self.box_prepend('emc.box.buttons', b)
       self._buttons.append(b)
       return b
 
@@ -995,7 +975,8 @@ class EmcDialog(edje.Edje):
       if self._list:
          if icon: icon = load_icon(icon)
          if end: end = load_icon(end)
-         it = self._list.item_append(label, icon, end, None, *args, **kwargs)
+         it = self._list.item_append(label, icon, end, None)
+         it.data['_user_item_data_'] = (args, kwargs)
          if not self._list.selected_item_get():
             it.selected = True
          return it
@@ -1012,7 +993,7 @@ class EmcDialog(edje.Edje):
 
    def _list_item_activated_cb(self, li, it):
       if self._done_cb:
-         args, kwargs = it.data_get()
+         args, kwargs = it.data['_user_item_data_']
          self._done_cb(self, *args, **kwargs)
       else:
          self.delete()
@@ -1026,7 +1007,7 @@ class EmcDialog(edje.Edje):
       self._spinner.hide()
 
    def progress_set(self, val):
-      self.part_external_object_get('emc.dialog.progress').value_set(val)
+      self.edje.part_external_object_get('emc.dialog.progress').value_set(val)
 
    def _cb_buttons(self, button):
       selected_cb = button.data['cb']
@@ -1591,14 +1572,14 @@ class EmcVKeyboard(EmcDialog):
 ################################################################################
 class EmcScrolledEntry(Entry, Scrollable):
    """ A non editable, multiline text entry, with autoscroll ability. """
-   def __init__(self, autoscroll=False, **kargs):
+   def __init__(self, parent=None, autoscroll=False, **kargs):
       self._animator = None
       self._timer = None
       self._autoscroll_amount = 0.0
       self._autoscroll_speed_scale = 1.0
       self._autoscroll_start_delay = 3.0
       self._autoscroll = autoscroll
-      Entry.__init__(self, layout, style='scrolledentry',
+      Entry.__init__(self, parent or layout, style='scrolledentry',
                      editable=False, scrollable=True, **kargs)
 
    @property

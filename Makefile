@@ -12,7 +12,7 @@
 #
 
 
-PY = python
+PY = python3
 
 
 .PHONY: build

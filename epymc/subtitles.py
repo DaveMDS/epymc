@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 #
-# Copyright (C) 2010-2014 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2010-2015 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of EpyMC, an EFL based Media Center written in Python.
 #
@@ -419,10 +419,13 @@ class Opensubtitles(object):
          full_path = utils.ensure_file_not_exists(full_path)
 
          with codecs.open(full_path, 'w', 'utf8') as f:
-            f.write(text.decode('utf8'))
+            f.write(text.decode(sub['SubEncoding']))
+
 
          self._downloaded_path = full_path
       except:
+         if os.path.exists(full_path):
+            os.unlink(full_path)
          self._thread_error = _('Decode failed')
 
       self._thread_finished = True

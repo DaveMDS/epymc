@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 #
-# Copyright (C) 2010-2014 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2010-2015 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of EpyMC, an EFL based Media Center written in Python.
 #
@@ -19,4 +19,4 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # follow semver.org specs (ex: '1.0.0' and '1.0.0-beta1')
-__version__ = '1.1.0-beta1'
+__version__ = '1.1.0'

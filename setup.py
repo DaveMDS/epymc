@@ -163,8 +163,7 @@ class Build(build):
 
 class Install(install_lib):
    executables = [
-      '*/onlinevideo/*/*.py',
-      '*/extapi/youtube-dl',
+      '*/onlinevideo/*/*.py'
    ]
    def run(self):
       install_lib.run(self)
@@ -208,11 +207,11 @@ setup (
       'epymc.plugins.calibrator',
       'epymc.plugins.filemanager',
       'epymc.plugins.photos',
+      'epymc.plugins.watchdog',
    ],
 
    package_data = {
       'epymc': ['themes/*.edj', 'locale/*/LC_MESSAGES/*.mo'],
-      'epymc.extapi': ['youtube-dl'],
       'epymc.plugins.movies': ['*.png'],
       'epymc.plugins.tvshows': ['*.png'],
       'epymc.plugins.mame': ['*.png', '*.jpg'],
@@ -220,11 +219,12 @@ setup (
       'epymc.plugins.uitests': ['*.png'],
       'epymc.plugins.calibrator': ['*.jpg', '*.png'],
       'epymc.plugins.onlinevideo': [ '*.png',
-         'traileraddict/*',
+         'themoviedb/*',
          'youtube/*',
          'vimeo/*',
          'zapiks/*',
          'fantasticc/*',
+         'southparkstudios/*',
       ],
       'epymc.plugins.input_webserver': [
          'default/*',
@@ -232,7 +232,8 @@ setup (
       ]
    },
 
-   scripts = ['bin/epymc', 'bin/epymc_standalone'],
+   scripts = ['bin/epymc', 'bin/epymc_standalone',
+              'epymc/plugins/watchdog/epymc_watchdog'],
 
    data_files = [
       ('share/applications/', ['data/desktop/epymc.desktop']),
@@ -259,3 +260,15 @@ setup (
       'install': {'record': ('setup.py', RECORD_FILE)}
    },
 )
+
+
+# alert if run from python < 3 (lots of translation issue with 2.7)
+if sys.version_info.major == 2:
+   print('')
+   print('##########################################################')
+   print('PYTHON 2.X IS NOT SUPPORTED ANYMORE')
+   print('You are using python2! It is old! EpyMC works much better')
+   print('with py3, even more if you are not using the english texts.')
+   print('YOU MUST SWITCH TO PYTHON 3 !!!')
+   print('##########################################################')
+   print('')

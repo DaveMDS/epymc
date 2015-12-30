@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 #
-# Copyright (C) 2010-2014 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2010-2015 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of EpyMC, an EFL based Media Center written in Python.
 #
@@ -38,6 +38,7 @@ def DBG(msg):
 
 emc_base_dir = os.path.dirname(__file__)
 user_conf_dir = os.path.expanduser('~/.config/epymc') # TODO use xdg-stuff
+user_cache_dir = os.path.expanduser('~/.cache/epymc') # TODO use xdg-stuff
 
 supported_uris = ['file','http','https']
 supported_mimes = ['application/mxf','application/ogg','application/ram', 
@@ -254,7 +255,6 @@ iso639_table = {
    'ae': ('ave', 'ave', 'Avestan'),
    'ab': ('abk', 'abk', 'Abkhazian'),
    'aa': ('aar', 'aar', 'Afar'),
-   None: (None, None, None)
 }
 
 def iso639_1_to_3(iso1):

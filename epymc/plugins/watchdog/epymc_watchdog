@@ -41,8 +41,8 @@ WD_FILE = '/tmp/epymc_watchdog'
 
 
 def DBG(msg):
-   with open(LOG_FILE, 'a') as fp:
-      fp.write('WATCHDOG: %s\n' % msg)
+   # with open(LOG_FILE, 'a') as fp:
+   #    fp.write('WATCHDOG: %s\n' % msg)
    pass
 
 

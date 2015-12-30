@@ -206,6 +206,7 @@ setup (
       'epymc.plugins.uitests',
       'epymc.plugins.calibrator',
       'epymc.plugins.filemanager',
+      'epymc.plugins.photos',
       'epymc.plugins.watchdog',
    ],
 
@@ -243,7 +244,8 @@ setup (
                         'data/desktop/epymc-music.png',
                         'data/desktop/epymc-olvideos.png',
                         'data/desktop/epymc-tv.png',
-                        'data/desktop/epymc-mame.png']),
+                        'data/desktop/epymc-mame.png',
+                        'data/desktop/epymc-photos.png']),
    ],
 
    cmdclass = {

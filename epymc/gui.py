@@ -352,6 +352,9 @@ def signal_emit(sig, src='emc'):
 def signal_cb_add(emission, source, cb):
    layout.signal_callback_add(emission, source, cb)
 
+def signal_cb_del(emission, source, cb):
+   layout.signal_callback_del(emission, source, cb)
+
 def text_set(part, text):
    layout.part_text_set(part, text)
 
@@ -372,6 +375,9 @@ def box_prepend(part, obj):
 
 def box_remove(part, obj):
    layout.box_remove(part, obj)
+
+def box_remove_all(part, clear=True):
+   layout.box_remove_all(part, clear)
 
 
 ### Internal functions ###
@@ -1121,6 +1127,166 @@ class EmcNotify(edje.Edje):
 
    def text_set(self, text):
       self.part_text_set('emc.text.caption', text)
+
+################################################################################
+
+from efl.elementary.slideshow import Slideshow, SlideshowItemClass
+class EmcSlideshow(Slideshow):
+   """ Fullscreen slideshow widget, with controls.
+
+   Params:
+      url: The folder to show. If it is a file than all the files in the
+           parent folder will be show, starting from the given file.
+   """
+
+   def __init__(self, url, delay=4, show_controls=False):
+      Slideshow.__init__(self, layout, loop=True, transition='fade',
+                         focus_allow=False)
+      self.callback_changed_add(self._photo_changed_cb)
+
+      self._itc = SlideshowItemClass(self._item_get_func)
+      self._timeout = delay
+      self._first_file = None
+      self._controls_visible = False
+      self._show_controls_on_start = show_controls
+      self._num_images = 0
+      self._folder = utils.url2path(url)
+      if not os.path.isdir(self._folder):
+         self._folder, self._first_file = os.path.split(self._folder)
+
+      # listen to emc input events
+      input_events.listener_add('EmcSlideShow', self._input_event_cb)
+
+      # swallow the slideshow in the main layout
+      swallow_set('slideshow.swallow', self)
+      signal_cb_add('emc,slideshow,show,done', '', self._show_done_signal_cb)
+      signal_cb_add('emc,slideshow,hide,done', '', self._hide_done_signal_cb)
+      signal_cb_add('mouse,down,1', 'slideshow.swallow', self._click_signal_cb)
+      signal_emit('slideshow,show')
+
+      # fill the controls bar with buttons
+      bt = EmcButton(icon='icon/prev')
+      bt.callback_clicked_add(lambda b: self.previous())
+      box_append('slideshow.controls.btn_box', bt)
+
+      bt = EmcButton(icon='icon/pause')
+      bt.callback_clicked_add(lambda b: self.pause_toggle())
+      box_append('slideshow.controls.btn_box', bt)
+      self._pause_btn = bt
+
+      bt = EmcButton(icon='icon/next')
+      bt.callback_clicked_add(lambda b: self.next())
+      box_append('slideshow.controls.btn_box', bt)
+
+      # fill the widget with all the items
+      self._populate()
+
+   def delete(self):
+      self.pause()
+      signal_emit('slideshow,hide')
+      signal_emit('slideshow,controls,hide')
+
+   def _delete_real(self):
+      input_events.listener_del('EmcSlideShow')
+      signal_cb_del('emc,slideshow,show,done', '', self._show_done_signal_cb)
+      signal_cb_del('emc,slideshow,hide,done', '', self._hide_done_signal_cb)
+      signal_cb_del('mouse,down,1', 'slideshow.swallow', self._click_signal_cb)
+      box_remove_all('slideshow.controls.btn_box')
+      Slideshow.delete(self)
+
+   def pause(self):
+      self.timeout = 0
+      self._pause_btn.icon_set('icon/play')
+
+   def unpause(self):
+      self.timeout = self._timeout
+      self._pause_btn.icon_set('icon/pause')
+
+   def pause_toggle(self):
+      self.unpause() if self.timeout == 0 else self.pause()
+
+   def controls_show(self):
+      signal_emit('slideshow,controls,show')
+      self._controls_visible = True
+
+   def controls_hide(self):
+      signal_emit('slideshow,controls,hide')
+      self._controls_visible = False
+
+   def controls_toggle(self):
+      self.controls_hide() if self._controls_visible else self.controls_show()
+
+   ## edje signal callbacks
+   def _click_signal_cb(self, obj, signal, src):
+      self.controls_toggle()
+
+   def _show_done_signal_cb(self, obj, signal, src):
+      self.unpause()
+      if self._show_controls_on_start:
+         self.controls_show()
+
+   def _hide_done_signal_cb(self, obj, signal, src):
+      self._delete_real()
+
+   ## widget smart callbacks
+   def _photo_changed_cb(self, obj, item):
+      num, fname = item.data
+      text_set('slideshow.controls.text',
+               'Image {0} of {1}'.format(num, self._num_images))
+
+   ## internals
+   def _populate(self):
+      num = 1
+      items = []
+      for fname in utils.natural_sort(os.listdir(self._folder)):
+         name, ext = os.path.splitext(fname)
+         if fname[0] != '.' and ext.lower() in utils.supported_images:
+            item_data = (num, fname)
+            items.append(item_data)
+            num += 1
+      self._num_images = num
+
+      for item_data in items:
+         it = self.item_add(self._itc, item_data)
+         if item_data[1] == self._first_file:
+            it.show()
+
+   def _item_get_func(self, obj, item_data):
+      print("GET " + str(item_data))
+      num, fname = item_data
+      fullpath = os.path.join(self._folder, fname)
+      img = Image(self, file=fullpath)
+      return img
+   
+   def _input_event_cb(self, event):
+      print(event)
+      if event == 'OK':
+         self.controls_toggle()
+         return input_events.EVENT_BLOCK
+
+      if event == 'RIGHT':
+         self.next()
+         return input_events.EVENT_BLOCK
+      
+      if event == 'LEFT':
+         self.previous()
+         return input_events.EVENT_BLOCK
+      
+      if event == 'TOGGLE_PAUSE':
+         self.pause_toggle()
+         return input_events.EVENT_BLOCK
+      
+      if event in ('EXIT', 'BACK'):
+         if self._controls_visible:
+            self.controls_hide()
+         else:
+            self.delete()
+         return input_events.EVENT_BLOCK
+
+      if event in ('UP', 'DOWN'):
+         return input_events.EVENT_BLOCK
+      else:
+         return input_events.EVENT_CONTINUE
 
 ################################################################################
 class EmcFolderSelector(EmcDialog):

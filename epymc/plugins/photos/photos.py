@@ -22,21 +22,14 @@ from __future__ import absolute_import, print_function
 
 import os
 
-# from efl import ecore, evas
-# from efl.elementary.image import Image
-# from efl.elementary.entry import utf8_to_markup
-
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
-# from epymc.gui import EmcDialog, EmcSourcesManager, EmcNotify, EmcRemoteImage
 from epymc.gui import EmcSourcesManager, EmcSlideshow
 
 import epymc.mainmenu as mainmenu
 import epymc.ini as ini
-import epymc.gui as gui
 import epymc.utils as utils
-# import epymc.events as events
-# import epymc.config_gui as config_gui
+import epymc.config_gui as cgui
 
 
 # debuggin stuff
@@ -65,13 +58,14 @@ class AddSourceItemClass(EmcItemClass):
 
 class PhotoItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod_instance.slideshow_start(url)
+      EmcSlideshow(url, delay=ini.get_int('photos', 'slideshow_delay'),
+               show_controls=ini.get_bool('photos', 'slideshow_show_controls'))
 
    def label_get(self, url, mod):
       return os.path.basename(url)
 
    def icon_get(self, url, mod):
-      print("ICON", url)
+      return 'icon/photo'
    
    def poster_get(self, url, mod):
       return utils.url2path(url)
@@ -93,48 +87,41 @@ class PhotosModule(EmcModule):
    name = 'phptos'
    label = _('Photos')
    icon = 'icon/photo'
-   info = _('A module to browse your photos collection.')
+   info = _('A module to watch your photos.')
 
-   _browser = None            # the Browser widget instance
+   _browser = None
 
 
    def __init__(self):
       DBG('Init module')
 
+      # keep a global instance reference (to be accessed from the item classes)
       global mod_instance
       mod_instance = self
 
       # create config ini section if not exists, with defaults
       ini.add_section('photos')
-      # if not ini.has_option('tvshows', 'episode_regexp'):
-         # ini.set('tvshows', 'episode_regexp', DEFAULT_EPISODE_REGEXP)
-      # if not ini.has_option('tvshows', 'info_lang'):
-         # ini.set('tvshows', 'info_lang', DEFAULT_INFO_LANG)
+      ini.get('photos', 'slideshow_delay', 4)
+      ini.get('photos', 'slideshow_show_controls', 'True')
 
       # add an item in the mainmenu
       mainmenu.item_add('photos', 15, _('Photos'), 'icon/photo', self.cb_mainmenu)
 
       # add an entry in the config gui
-      # config_gui.root_item_add('photos', 11, _('Tv Shows Collection'),
-                               # icon='icon/tv', callback=config_panel_cb)
+      cgui.root_item_add('photos', 14, _('Photos'), icon='icon/photo',
+                         callback=self.config_panel_cb)
 
       # create a browser instance
       self._browser = EmcBrowser(_('Photos'), 'List')
 
-      # listen to emc events
-      # events.listener_add('photos', self._events_cb)
-
    def __shutdown__(self):
       DBG('Shutdown module')
-
-      # stop listening for events
-      # events.listener_del('photos')
 
       # delete mainmenu item
       mainmenu.item_del('photos')
 
       # delete config menu item
-      # config_gui.root_item_del('photos')
+      cgui.root_item_del('photos')
 
       # delete browser
       self._browser.delete()
@@ -174,29 +161,16 @@ class PhotosModule(EmcModule):
       for fname in utils.natural_sort(files):
          self._browser.item_add(PhotoItemClass(), os.path.join(url, fname), self)
 
-###### SLIDESHOW
-   def slideshow_start(self, url=None):
-      EmcSlideshow(url)
 
-   """
-   def _events_cb(self, event):
-      # TODO: check that we are active and visible
-      #       atm, this is fired also when a song end...
-      if event == 'PLAYBACK_FINISHED':
-         # refresh the page (maybe an unwatched movie becomes watched)
-         if self._browser is not None:
-            self._browser.refresh()
-   """
-
-
-
-"""
 ###### Config Panel stuff
-def config_panel_cb():
-   bro = config_gui.browser_get()
-   bro.page_add('config://tvshows/', _('TV Shows'), None, populate_config)
+   def config_panel_cb(self):
+      bro = cgui.browser_get()
+      bro.page_add('config://photos/', _('Photos'), None, self.populate_config)
 
-def populate_config(browser, url):
-   config_gui.standard_item_lang_add('tvshows', 'info_lang',
-                                     _('Preferred language for contents'))
-"""
+   def populate_config(self, browser, url):
+      cgui.standard_item_bool_add('photos', 'slideshow_show_controls',
+                                  _('Show slideshow controls on start'))
+      L = '3 4 5 10 15 20 30 60'.split()
+      cgui.standard_item_string_from_list_add('photos', 'slideshow_delay',
+                                              _('Slideshow delay'), L)
+

@@ -1139,15 +1139,16 @@ class EmcSlideshow(Slideshow):
            parent folder will be show, starting from the given file.
    """
 
-   def __init__(self, url):
+   def __init__(self, url, delay=4, show_controls=False):
       Slideshow.__init__(self, layout, loop=True, transition='fade',
                          focus_allow=False)
       self.callback_changed_add(self._photo_changed_cb)
 
       self._itc = SlideshowItemClass(self._item_get_func)
-      self._timeout = 4.0
+      self._timeout = delay
       self._first_file = None
       self._controls_visible = False
+      self._show_controls_on_start = show_controls
       self._num_images = 0
       self._folder = utils.url2path(url)
       if not os.path.isdir(self._folder):
@@ -1221,7 +1222,8 @@ class EmcSlideshow(Slideshow):
 
    def _show_done_signal_cb(self, obj, signal, src):
       self.unpause()
-      self.controls_show()
+      if self._show_controls_on_start:
+         self.controls_show()
 
    def _hide_done_signal_cb(self, obj, signal, src):
       self._delete_real()

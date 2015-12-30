@@ -309,18 +309,18 @@ def hum_size(bytes):
    bytes = float(bytes)
    if bytes >= 1099511627776:
       terabytes = bytes / 1099511627776
-      size = '%.2fT' % terabytes
+      size = '%.3fT' % terabytes
    elif bytes >= 1073741824:
       gigabytes = bytes / 1073741824
       size = '%.2fG' % gigabytes
    elif bytes >= 1048576:
       megabytes = bytes / 1048576
-      size = '%.2fM' % megabytes
+      size = '%.1fM' % megabytes
    elif bytes >= 1024:
       kilobytes = bytes / 1024
-      size = '%.2fK' % kilobytes
+      size = '%.0fK' % kilobytes
    else:
-      size = '%.2fb' % bytes
+      size = '%.0fb' % bytes
    return size
 
 def splitpath(path):

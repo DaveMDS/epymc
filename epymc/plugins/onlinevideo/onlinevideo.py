@@ -140,7 +140,7 @@ class OnlinevideoModule(EmcModule):
       ini.get('videochannels', 'autoupdate_ytdl', 'True')
 
       # register the config-gui item
-      cgui.root_item_add('videochannels', 12, _('Video Channels'), 'icon/olvideo',
+      cgui.root_item_add('videochannels', 15, _('Video Channels'), 'icon/olvideo',
                          self.config_gui_cb)
 
       # add an item in the mainmenu

@@ -162,10 +162,10 @@ class PhotosModule(EmcModule):
       ini.get('photos', 'slideshow_show_controls', 'True')
 
       # add an item in the mainmenu
-      mainmenu.item_add('photos', 15, _('Photos'), 'icon/photo', self.cb_mainmenu)
+      mainmenu.item_add('photos', 20, _('Photos'), 'icon/photo', self.cb_mainmenu)
 
       # add an entry in the config gui
-      cgui.root_item_add('photos', 14, _('Photos'), icon='icon/photo',
+      cgui.root_item_add('photos', 20, _('Photos'), icon='icon/photo',
                          callback=self.config_panel_cb)
 
       # create a browser instance

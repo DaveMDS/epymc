@@ -271,7 +271,7 @@ def init():
    root_item_add('config://themes/', 2, _('Themes'), 'icon/theme', _themes_list)
    root_item_add('config://modules/', 3, _('Modules'), 'icon/module', _modules_list)
    root_item_add('config://sysinfo/', 4, _('System info'), 'icon/info', _sys_info)
-   root_item_add('config://subtitles/', 15, _('Subtitles'), 'icon/subs', _subtitles_list)
+   root_item_add('config://subtitles/', 30, _('Subtitles'), 'icon/subs', _subtitles_list)
 
 def shutdown():
    _browser.delete()

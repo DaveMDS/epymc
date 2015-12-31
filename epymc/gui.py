@@ -686,78 +686,64 @@ class EmcRemoteImage(Image):
 
       Params:
          url: The url to load the image from.
-         dest: Local path to save the image once the download is completed.
-               If the dest path already exists the image will not be downloaded,
-               but directly loaded from dest.
+         dest: Local path to save the image to. If the dest path already exists
+               the image will not be downloaded, but directly loaded from dest.
+               If dest is None the downloaded file will be saved in cache.
    """
 
    def __init__(self, url=None, dest=None):
       self._spinner = None
       Image.__init__(self, layout, size_hint_expand=EXPAND_BOTH,
                      size_hint_fill=FILL_BOTH)
-      self.callback_download_start_add(self._download_start_cb)
-      self.callback_download_done_add(self._download_done_cb)
-      self.callback_download_error_add(self._download_error_cb)
-      if url:
+      self.on_move_add(self._move_resize_cb)
+      self.on_resize_add(self._move_resize_cb)
+      if url is not None:
          self.url_set(url, dest)
 
    def url_set(self, url, dest=None):
-      self._url = url
-      self._dest = dest
+      if dest is None:
+         dest = self.cache_path_get(url)
 
-      if dest and os.path.exists(dest):
+      if os.path.exists(dest):
          self.file_set(dest)
-         return
-
-      cache_path = self.cache_path_get(url)
-      if os.path.exists(cache_path):
-         self.file_set(cache_path)
-         return
-
-      self.file_set(url)
+      else:
+         try:
+            utils.download_url_async(url, dest, complete_cb=self._complete_cb)
+            self.start_spin()
+         except:
+            pass # TODO show a dummy image
 
    def start_spin(self):
       if self._spinner is None:
          self._spinner = Progressbar(self, style='wheel', pulse_mode=True)
-         self.on_move_add(self._move_resize_cb)
-         self.on_resize_add(self._move_resize_cb)
-      self._spinner.show()
+         
       self._spinner.pulse(True)
+      self._spinner.show()
+      self._move_resize_cb(self)
 
    def stop_spin(self):
-      self._spinner.hide()
       self._spinner.pulse(False)
+      self._spinner.hide()
 
    def cache_path_get(self, url):
       return os.path.join(utils.user_cache_dir, 'remoteimgs',
-                          utils.md5(url) + '.jpg')
+                          utils.md5(url) + '.jpg') # TODO correct extension !
+
+   def _complete_cb(self, dest, status):
+      if self.is_deleted(): return
+      self.stop_spin()
+      if status == 200:
+         self.file_set(dest)
+      else:
+         pass # TODO show a dummy image
 
    def _move_resize_cb(self, obj):
-      (x, y, w, h) = self.geometry_get()
-      self._spinner.resize(w, h)
-      self._spinner.move(x, y)
-      if self._spinner.clip != self.clip:
-         self._spinner.clip = self.clip
-
-   def _download_start_cb(self, obj):
-      self.start_spin()
-
-   def _download_done_cb(self, obj):
-      self.stop_spin()
-      if self._dest is not None:
-         path = os.path.dirname(self._dest)
-         if not os.path.exists(path):
-            os.makedirs(path)
-         self.object.save(self._dest)
-      else:
-         cache_path = self.cache_path_get(self._url)
-         self.object.save(cache_path)
-
-   def _download_error_cb(self, obj, error_info):
-      self.stop_spin()
-      self._url = None
-      self._dest = None
-      # TODO show a dummy img ?
+      if self._spinner:
+         (x, y, w, h) = self.geometry_get()
+         self._spinner.resize(w, h)
+         self._spinner.move(x, y)
+         if self._spinner.clip != self.clip:
+            self._spinner.clip = self.clip
 
 ################################################################################
 class EmcDialog(Layout):

@@ -120,6 +120,7 @@ class OnlinevideoModule(EmcModule):
    _sources = []
    _current_src = None
    _run_dialog = None
+   _update_dialog = None
    _py = sys.executable or ''
 
    _search_folders = [
@@ -201,8 +202,15 @@ class OnlinevideoModule(EmcModule):
          self._browser.item_add(ChannelItemClass(), ch['name'], ch)
 
 ###### YOUTUBE-DL DOWNLOAD AND UPDATE
-   def youtubedl_check_update(self):
+   def youtubedl_check_update(self, verbose=False):
       ydl = ydl_executable()
+      if verbose:
+         self._update_dialog = EmcDialog(style='info',
+                                         title=_('Checking for updates'),
+                                         text=_('please wait...')+'<br>')
+      else:
+         self._update_dialog = None
+
       if not os.path.exists(ydl):
          self._ydl_download_latest()
       else:
@@ -221,24 +229,36 @@ class OnlinevideoModule(EmcModule):
       dia.progress_set((float(dlnow) / dltotal) if dltotal > 0 else 0)
 
    def _ydl_complete_cb(self, dest, status, dia):
-      os.chmod(dest, 484) # 0o0744 (make it executable)
+      os.chmod(dest, 0o0744 ) # (make it executable)
       dia.delete()
+      if self._update_dialog:
+         self._update_dialog.text_append(_('Updated to the latest version'))
 
    def _ydo_local_version_done(self, version):
       if version:
          download_url_async('http://youtube-dl.org/latest/version',
                             complete_cb=self._ydo_remote_version_done,
                             version=version.strip())
+         if self._update_dialog:
+            txt = '<name>{}:</name> {}<br>'.format(_('Current version'), version)
+            self._update_dialog.text_set(txt)
 
    def _ydo_remote_version_done(self, dest, status, version):
       if status == 200:
          with open(dest) as f:
             available = f.read().strip()
          os.remove(dest)
+
+         if self._update_dialog:
+            txt = '<name>{}:</name> {}<br>'.format(_('Upstream version'), available)
+            self._update_dialog.text_append(txt)
+
          if available != version:
             self._ydl_download_latest()
          else:
             DBG('youtube-dl is up-to-date (%s)' % version)
+            if self._update_dialog:
+               self._update_dialog.text_append(_('No update available.'))
 
    
 ###### SOURCES STUFF
@@ -375,4 +395,6 @@ class OnlinevideoModule(EmcModule):
    
    def config_gui_populate(self, browser, url):
       cgui.standard_item_bool_add('videochannels', 'autoupdate_ytdl',
-                                  _('Automatically update youtube-dl'))
+                                  _('Automatically keep youtube-dl updated'))
+      cgui.standard_item_action_add(_('Check for youtube-dl update now'),
+                                    cb=lambda:self.youtubedl_check_update(True))

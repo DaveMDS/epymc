@@ -34,7 +34,8 @@ from efl.elementary.label import Label, ELM_WRAP_NONE, \
 from epymc import gui, mainmenu, input_events, ini
 from epymc.sdb import EmcDatabase
 from epymc.utils import Singleton
-from epymc.gui import EmcRemoteImage, EmcScrolledEntry, EmcButton, EmcFocusManager
+from epymc.gui import EmcRemoteImage, EmcScrolledEntry, EmcButton, \
+   EmcFocusManager, EXPAND_BOTH, FILL_BOTH
 
 def DBG(msg):
    # print('BROWSER: %s' % msg)
@@ -693,27 +694,20 @@ class ViewGrid(object):
    def __init__(self):
       """ TODO Function doc """
       DBG('Init view: grid')
-
+      self.items_count = 0
+      self._last_focused_item = None
+      self._timer = None
       self.itc = GengridItemClass(item_style='default',
                                   text_get_func=self.gg_label_get,
                                   content_get_func=self.gg_icon_get,
                                   state_get_func=self.gg_state_get,
                                   del_func=self.gg_del)
-      gg = Gengrid(gui.win)
-      gg.style_set('browser')
-      gg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
-      gg.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-      gg.focus_allow_set(False)
-      gg.horizontal_set(False)
-      gg.bounce_set(False, True)
-      gg.item_size_set(150, 150)
-      gg.align_set(0.5, 0.0)
-      gg.callback_selected_add(self.gg_higlight)
-      gg.callback_clicked_double_add(self.gg_selected)
-      gui.swallow_set('browser.grid.gengrid', gg)
-      self.gg = gg
-      self.items_count = 0
-      self._last_focused_item = None
+      self.gg = Gengrid(gui.win, style='browser', focus_allow=False,
+                        item_size=(150, 150), align=(0.5, 0.0),
+                        size_hint_expand=EXPAND_BOTH, size_hint_fill=FILL_BOTH)
+      self.gg.callback_selected_add(self.gg_higlight)
+      self.gg.callback_clicked_double_add(self.gg_selected)
+      gui.swallow_set('browser.grid.gengrid', self.gg)
 
    def page_show(self, title, anim):
       self.gg.clear()
@@ -723,7 +717,7 @@ class ViewGrid(object):
       item_data = (item_class, url, user_data)                                  # 3 #
       it = self.gg.item_append(self.itc, item_data)
       if selected or not self.gg.selected_item_get():
-         it.selected_set(True)
+         it.selected = True
          it.show()
 
    def show(self):
@@ -736,19 +730,16 @@ class ViewGrid(object):
       self.gg.clear()
 
    def refresh(self):
-      item = self.gg.first_item_get()
-      while item:
-         item.update()
-         item = item.next_get()
+      self.gg.realized_items_update()
 
    def item_bring_in(self, pos='top', animated=True):
       try:
          item = self.gg.selected_item
       except: return
 
-      if   pos == 'top':    mode = ELM_GENLIST_ITEM_SCROLLTO_TOP
-      elif pos == 'mid':    mode = ELM_GENLIST_ITEM_SCROLLTO_MIDDLE
-      elif pos == 'in':     mode = ELM_GENLIST_ITEM_SCROLLTO_IN
+      if   pos == 'top': mode = ELM_GENLIST_ITEM_SCROLLTO_TOP
+      elif pos == 'mid': mode = ELM_GENLIST_ITEM_SCROLLTO_MIDDLE
+      elif pos == 'in':  mode = ELM_GENLIST_ITEM_SCROLLTO_IN
 
       if animated:
          item.bring_in(mode)
@@ -767,13 +758,15 @@ class ViewGrid(object):
       (item_class, url, user_data) = item.data_get()                            # 3 #
 
       if event == 'RIGHT':
-         if item.next:
+         try:
             item.next.selected = True
+         except: pass
          return input_events.EVENT_BLOCK
 
       elif event == 'LEFT':
-         if item.prev:
+         try:
             item.prev.selected = True
+         except: pass
          return input_events.EVENT_BLOCK
 
       elif event == 'UP':
@@ -832,7 +825,19 @@ class ViewGrid(object):
    # gengrid callbacks
    def gg_higlight(self, gg, item, *args, **kwargs):
       self._last_focused_item = item
+      if self._timer:
+         self._timer.delete()
+      self._timer = ecore.timer_add(1.0, self._backdrop_timer_cb, item.data_get())
 
    def gg_selected(self, gg, item, *args, **kwargs):
       (item_class, url, user_data) = item.data_get()                            # 3 #
       item_class.item_selected(url, user_data)
+
+   def _backdrop_timer_cb(self, item_data):
+      (item_class, url, user_data) = item_data                                  # 3 #
+
+      # Ask for the item fanart
+      fanart = item_class.fanart_get(url, user_data)
+      if fanart: gui.background_set(fanart)
+
+      return ecore.ECORE_CALLBACK_CANCEL

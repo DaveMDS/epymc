@@ -38,6 +38,7 @@ from efl.elementary.list import List
 from efl.elementary.table import Table
 from efl.elementary.genlist import Genlist, GenlistItemClass, \
    ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS
+from efl.elementary.slideshow import Slideshow, SlideshowItemClass
 from efl.elementary.theme import theme_overlay_add, theme_extension_add
 from efl.elementary.configuration import preferred_engine_set
 from efl.elementary.configuration import scale_set as elm_scale_set
@@ -1129,8 +1130,6 @@ class EmcNotify(edje.Edje):
       self.part_text_set('emc.text.caption', text)
 
 ################################################################################
-
-from efl.elementary.slideshow import Slideshow, SlideshowItemClass
 class EmcSlideshow(Slideshow):
    """ Fullscreen slideshow widget, with controls.
 
@@ -1144,7 +1143,7 @@ class EmcSlideshow(Slideshow):
                          focus_allow=False)
       self.callback_changed_add(self._photo_changed_cb)
 
-      self._itc = SlideshowItemClass(self._item_get_func)
+      self._itc = SlideshowItemClass(self._item_get_func, self._item_del_func)
       self._timeout = delay
       self._first_file = None
       self._controls_visible = False
@@ -1251,15 +1250,18 @@ class EmcSlideshow(Slideshow):
          if item_data[1] == self._first_file:
             it.show()
 
+   ## slideshow items class
    def _item_get_func(self, obj, item_data):
-      print("GET " + str(item_data))
       num, fname = item_data
       fullpath = os.path.join(self._folder, fname)
       img = Image(self, file=fullpath)
       return img
-   
+
+   def _item_del_func(self, obj, item_data):
+      obj.delete()
+
+   ## emc events
    def _input_event_cb(self, event):
-      print(event)
       if event == 'OK':
          self.controls_toggle()
          return input_events.EVENT_BLOCK

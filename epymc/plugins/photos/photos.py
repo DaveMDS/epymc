@@ -56,7 +56,6 @@ def extract_usefull_exif(pil_image):
    if info is not None:
       for tag, val in info.items():
          name = PILTags.get(tag, tag)
-         print(name, repr(val))
          if name in ('DateTime','Flash', 'ISOSpeedRatings', 'Make', 'Model', 'Orientation'):
             ret[name] = val
          elif name == 'ExposureTime':
@@ -115,9 +114,9 @@ class PhotoItemClass(EmcItemClass):
          exif_dict = extract_usefull_exif(i)
          exif = []
          for name, value in exif_dict.items():
-            exif.append('<small><name>{}:</name> {}</small>'.format(name, value))
+            exif.append('<name>{}:</name> <value>{}</value>'.format(name, value))
          if len(exif) > 0:
-            exif = '<br>'.join(exif)
+            exif = '<small>' + '<br>'.join(exif) + '</small>'
          else:
             exif = ''
       else:

@@ -198,6 +198,9 @@ def load_image(name, path = None):
    @path is searched if the image is not found in the theme
    @return ElmImage
    @example: load_image('my_image.png', os.path.dirname(__file__))
+
+   DEPRECATED: use EmcRemoteImage instead !!!
+
    """
    DBG('Requested image: ' + str(name))
    DBG('Extra path: ' + str(path))
@@ -685,33 +688,46 @@ class EmcRemoteImage(Image):
        cache-to-file mechanism to avoid re-downloading the image again.
 
       Params:
-         url: The url to load the image from.
+         url: The url to load the image from, or a local fullpath, or an
+              'icon/*' from the app theme (also image/* are supported)
          dest: Local path to save the image to. If the dest path already exists
                the image will not be downloaded, but directly loaded from dest.
                If dest is None the downloaded file will be saved in cache.
    """
 
-   def __init__(self, url=None, dest=None):
+   def __init__(self, url=None, dest=None, aspect_fixed=True, fill_outside=False):
       self._spinner = None
-      Image.__init__(self, layout, size_hint_expand=EXPAND_BOTH,
-                     size_hint_fill=FILL_BOTH)
+      Image.__init__(self, layout, aspect_fixed=aspect_fixed, fill_outside=fill_outside,
+                     size_hint_expand=EXPAND_BOTH, size_hint_fill=FILL_BOTH)
       self.on_move_add(self._move_resize_cb)
       self.on_resize_add(self._move_resize_cb)
       if url is not None:
          self.url_set(url, dest)
 
    def url_set(self, url, dest=None):
-      if dest is None:
-         dest = self.cache_path_get(url)
 
-      if os.path.exists(dest):
-         self.file_set(dest)
-      else:
-         try:
-            utils.download_url_async(url, dest, complete_cb=self._complete_cb)
-            self.start_spin()
-         except:
-            pass # TODO show a dummy image
+      # a local path ?
+      if os.path.exists(url):
+         self.file_set(url)
+         return
+      
+      # an icon from the theme ?
+      if url.startswith(('icon/', 'image/')):
+         self.file_set(theme_file, url)
+         return
+
+      # a remote url ?
+      if url.startswith(('http://', 'https://')):
+         if dest is None:
+            dest = self.cache_path_get(url)
+         if os.path.exists(dest):
+            self.file_set(dest)
+         else:
+            try:
+               utils.download_url_async(url, dest, complete_cb=self._complete_cb)
+               self.start_spin()
+            except:
+               pass # TODO show a dummy image
 
    def start_spin(self):
       if self._spinner is None:
@@ -744,6 +760,16 @@ class EmcRemoteImage(Image):
          self._spinner.move(x, y)
          if self._spinner.clip != self.clip:
             self._spinner.clip = self.clip
+
+################################################################################
+class EmcBlankPoster(Layout):
+   def __init__(self, text=None, style='bd'):
+      group = 'emc/poster/' + style
+      Layout.__init__(self, layout, file=(theme_file, group),
+                      size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH)
+      if text:
+         self.text_set('emc.text', text)
+
 
 ################################################################################
 class EmcDialog(Layout):

@@ -63,7 +63,6 @@ All the icons adn images in icons.edc must be implemented.
 ### Browser: Grid View ###
    * Required parts:
       "browser.grid.gengrid" -> edje swallow
-      "browser.grid.title" -> edje text part
 
    * Signals received from the application:
       "browser,grid,show" "emc"

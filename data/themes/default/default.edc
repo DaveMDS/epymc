@@ -105,15 +105,15 @@ tag: "smaller" "+ font_size="FONT_SIZE_SMALLER; \
 tag: "info" "+ color=#3399ff style=glow glow_color=#3399ff30"; \
 tag: "success" "+ color=#00ff00 style=glow glow_color=#00ff0030"; \
 tag: "warning" "+ color=#ff7c00 style=glow glow_color=#ff7c0030"; \
-tag: "failure" "+ color=#ff0000 style=glow glow_color=#ff000030";
+tag: "failure" "+ color=#ff0000 style=glow glow_color=#ff000030"; \
+tag: "title" "+ font_weight=Bold color=#"COLOR_ORANGE_HEX" font_size="FONT_SIZE_BIG; \
+tag: "subtitle" "+ color=#"COLOR_ORANGE_HEX; \
+tag: "name" "+ color=#888888 font_weight=Bold"; \
+tag: "val" "+ color=#ffffff";
 
 styles {
    style { name: "epymc_default_style";
       base: "font="FONT" font_size="FONT_SIZE" color=#fff wrap=word";
-      tag: "title" "+ font_weight=Bold color=#"COLOR_ORANGE_HEX" font_size="FONT_SIZE_BIG;
-      tag: "subtitle" "+ color=#"COLOR_ORANGE_HEX;
-      tag: "name" "+ color=#888888 font_weight=Bold";
-      tag: "val" "+ color=#ffffff";
       COMMON_TAGS
    }
 
@@ -123,6 +123,14 @@ styles {
 
    style { name: "epymc_browser_slide_style";
       base:  "font="FONT" font_size="FONT_SIZE" color=#fff wrap=none";
+   }
+
+   style { name: "epymc_browser_grid_style";
+      base:  "font="FONT" font_size="FONT_SIZE" color=#fff align=center wrap=mixed ellipsis=1.0";
+   }
+
+   style { name: "epymc_bd_cover_style";
+      base:  "font="FONT" font_size="FONT_SIZE" color=#222 align=center wrap=mixed ellipsis=1.0";
    }
 
    style { name: "epymc_subtitles_style";
@@ -661,30 +669,6 @@ collections {
          }
 
 /// browser view: grid
-         part { name: "browser.grid.gengrid"; /* API */
-            type: SWALLOW;
-            clip_to: "browser.grid.clip";
-            description { state: "default" 0.0;
-               color: 255 255 255 100;
-               rel1.offset: 0 100;
-            }
-         }
-         part { name: "browser.grid.title"; /* API */
-            type: TEXT;
-            clip_to: "browser.grid.clip";
-            effect: FAR_SOFT_SHADOW;
-            description { state: "default" 0.0;
-               color: 200 200 200 255;
-               color3: 50 50 50 100;
-               rel1.offset: 0 40;
-               rel2.relative: 1.0 0.0;
-               rel2.offset: 0 100;
-               text {
-                  font: FONT2;
-                  size: 40;
-               }
-            }
-         }
          part { name: "browser.grid.clip";
             type: RECT;
             description { state: "default" 0.0;
@@ -696,6 +680,35 @@ collections {
                visible: 1;
             }
          }
+         part { name: "browser.grid.grid_frame";
+            type: IMAGE;
+            clip_to: "browser.grid.clip";
+            description { state: "default" 0.0;
+               rel1.offset: 0 10;
+               rel1.to: "topbar.list.spacer";
+               rel1.relative: 0.0 1.0;
+               rel2.relative: 0.65 1.0;
+               rel2.offset: -1 10;
+               image.normal: "frame.png";
+               image.border: 32 32 92 78;
+            }
+         }
+         part { name: "browser.grid.gengrid"; /* API */
+            type: SWALLOW;
+            clip_to: "browser.grid.clip";
+            description { state: "default" 0.0;
+               rel1 {
+                  to: "browser.grid.grid_frame";
+                  offset: 26 10;
+               }
+               rel2 {
+                  to: "browser.grid.grid_frame";
+                  offset: -20 -79;
+               }
+            }
+         }
+         // SHOW("browser.grid.gengrid")
+
          program { name: "browser_grid_show"; /* API */
             signal: "browser,grid,show";
             source: "emc";
@@ -2548,5 +2561,44 @@ collections {
       }
    }
 
+/// EmcBlankPoster, in various styles (bd, folder, etc)
+   group { name: "emc/poster/bd";
+      images {
+         image: "image_bd_cover_blank.png" COMP;
+      }
+      parts {
+         part { name: "image"; type: IMAGE;
+            description { state: "default" 0.0;
+               image.normal: "image_bd_cover_blank.png";
+            }
+         }
+         part { name: "emc.text"; type: TEXTBLOCK;
+            description { state: "default" 0.0;
+               rel1.relative: 0.03 0.08;
+               rel2.relative: 0.97 0.98;
+               text.style: "epymc_bd_cover_style";
+            }
+         }
+      }
+   }
+   group { name: "emc/poster/folder";
+      images {
+         image: "image_folder_vert.png" COMP;
+      }
+      parts {
+         part { name: "image"; type: IMAGE;
+            description { state: "default" 0.0;
+               image.normal: "image_folder_vert.png";
+            }
+         }
+         part { name: "emc.text"; type: TEXTBLOCK;
+            description { state: "default" 0.0;
+               rel1.relative: 0.03 0.03;
+               rel2.relative: 0.90 0.97;
+               text.style: "epymc_bd_cover_style";
+            }
+         }
+      }
+   }
 }
 

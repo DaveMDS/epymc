@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import, print_function
 
+import os
 import sys
 
 from efl import evas, ecore, elementary
@@ -35,7 +36,7 @@ from epymc import gui, mainmenu, input_events, ini
 from epymc.sdb import EmcDatabase
 from epymc.utils import Singleton
 from epymc.gui import EmcRemoteImage, EmcScrolledEntry, EmcButton, \
-   EmcFocusManager, EXPAND_BOTH, FILL_BOTH
+   EmcFocusManager, EmcBlankPoster, EXPAND_BOTH, FILL_BOTH
 
 def DBG(msg):
    # print('BROWSER: %s' % msg)
@@ -155,6 +156,24 @@ class BackItemClass(EmcItemClass):
 
    def icon_get(self, url, user_data):
       return 'icon/back'
+
+   def poster_get(self, url, user_data):
+      return 'icon/back' # TODO a better image
+
+
+class FolderItemClass(EmcItemClass):
+   """ Base item class to be subclassed for ALL folder items """
+   def item_selected(self, url, user_data):
+      raise NotImplementedError
+
+   def label_get(self, url, user_data):
+      return os.path.basename(url)
+
+   def icon_get(self, url, user_data):
+      return 'icon/folder'
+
+   def poster_get(self, url, user_data):
+      return EmcBlankPoster(os.path.basename(url), style='folder')
 
 
 class EmcBrowser(object):
@@ -703,7 +722,7 @@ class ViewGrid(object):
                                   state_get_func=self.gg_state_get,
                                   del_func=self.gg_del)
       self.gg = Gengrid(gui.win, style='browser', focus_allow=False,
-                        item_size=(150, 150), align=(0.5, 0.0),
+                        item_size=(150, 225), align=(0.5, 0.0),
                         size_hint_expand=EXPAND_BOTH, size_hint_fill=FILL_BOTH)
       self.gg.callback_selected_add(self.gg_higlight)
       self.gg.callback_clicked_double_add(self.gg_selected)
@@ -711,7 +730,6 @@ class ViewGrid(object):
 
    def page_show(self, title, anim):
       self.gg.clear()
-      gui.text_set('browser.grid.title', title)
 
    def item_add(self, item_class, url, user_data, selected=False):
       item_data = (item_class, url, user_data)                                  # 3 #
@@ -783,17 +801,20 @@ class ViewGrid(object):
             return input_events.EVENT_CONTINUE
 
       elif event == 'DOWN':
+         y1 = y2 = next = 0
          try:
             next = item.next
             (x1, y1), (x2, y2) = item.pos, next.pos
             while x2 != x1:
                next = next.next
                x2, y2 = next.pos
+         except:
+            if y2 > y1:
+               next = self.gg.last_item
+         if next:
             next.selected = True
             next.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
-            return input_events.EVENT_BLOCK
-         except:
-            return input_events.EVENT_CONTINUE
+         return input_events.EVENT_BLOCK
 
       elif event == 'OK':
          item_class.item_selected(url, user_data)
@@ -804,17 +825,26 @@ class ViewGrid(object):
    # gengrid model
    def gg_label_get(self, obj, part, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
-      return item_class.label_get(url, user_data)
+      # label only for the back item
+      if isinstance(item_class, BackItemClass):
+         return item_class.label_get(url, user_data)
 
    def gg_icon_get(self, obj, part, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
-      icon = None
+
       if part == 'elm.swallow.icon':
-         icon = item_class.icon_get(url, user_data)
+         poster = item_class.poster_get(url, user_data)
+         if isinstance(poster, evas.Object):
+            return poster
+         if poster:
+            return EmcRemoteImage(poster, fill_outside=True)
+         else:
+            text = item_class.label_get(url, user_data)
+            return EmcBlankPoster(text)
+
       elif part == 'elm.swallow.end':
          icon = item_class.icon_end_get(url, user_data)
-      if icon:
-         return gui.load_icon(icon)
+         return gui.load_icon(icon) if icon else None
 
    def gg_state_get(self, obj, part, item_data):
       return False
@@ -840,4 +870,5 @@ class ViewGrid(object):
       fanart = item_class.fanart_get(url, user_data)
       if fanart: gui.background_set(fanart)
 
+      self._timer = None
       return ecore.ECORE_CALLBACK_CANCEL

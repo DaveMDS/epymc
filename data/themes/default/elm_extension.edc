@@ -1591,6 +1591,7 @@ group { name: "elm/gengrid/item/default/browser";
             color: 0 0 0 0;
          }
       }
+      // DBG_SHOW("event", 0, 0, 100)
       part { name: "bg";
          clip_to: "disclip";
          mouse_events: 0;
@@ -1635,7 +1636,7 @@ group { name: "elm/gengrid/item/default/browser";
                offset:   0    -10;
             }
             rel2 {
-     to_y: "elm.text";
+               to_y: "elm.text";
                relative: 0.0  0.0;
                offset:   -1   -1;
             }
@@ -1645,59 +1646,45 @@ group { name: "elm/gengrid/item/default/browser";
          clip_to: "disclip";
          type: SWALLOW;
          description { state: "default" 0.0;
-            fixed: 1 0;
-            align: 0.5 0.5;
-            rel1 {
-               relative: 0.0  0.0;
-               offset:   -1    4;
-            }
-            rel2 {
-               to_y: "elm.swallow.pad";
-               relative: 1.0  0.0;
-               offset:   -1   -5;
-            }
+            fixed: 1 1;
+            rel1.offset: 6 6;
+            rel2.offset: -7 -7;
          }
       }
       part { name: "elm.swallow.end";
          clip_to: "disclip";
          type: SWALLOW;
          description { state: "default" 0.0;
-            aspect: 1.0 1.0;
-            aspect_preference: HORIZONTAL;
-            rel1.relative: 0.5 0.5;
-
+            rel1.relative: 0.5 0.7;
+            align: 1.0 1.0;
          }
       }
       part { name: "elm.text";
          clip_to: "disclip";
-         type: TEXT;
+         type: TEXTBLOCK;
          effect: SOFT_SHADOW;
          mouse_events: 0;
          scale: 1;
          description { state: "default" 0.0;
             rel1 {
-               relative: 0.0  1.0;
-               offset: 0 0;
+               to: "elm.swallow.icon";
+               relative: 0.0  0.5;
             }
             rel2 {
-               relative: 1.0  1.0;
-               offset: 0 -20;
+               to: "elm.swallow.icon";
             }
             color: FONT_COLOR;
-            color3: 0 0 0 0;
+            color3: FONT_COLOR3;
             text {
-               font: FONT;
-               size: FONT_SIZE;
-               min: 0 1;
-               align: 0.5 0.0;
+               style: "epymc_browser_grid_style";
+               align: 0.5 1.0;
             }
          }
          description { state: "selected" 0.0;
             inherit: "default" 0.0;
-            color: FONT_COLOR;
-            color3: FONT_COLOR3;
          }
       }
+      // DBG_SHOW("elm.text", 0, 200, 0)
       part { name: "fg1";
          clip_to: "disclip";
          mouse_events: 0;

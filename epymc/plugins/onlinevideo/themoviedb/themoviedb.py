@@ -43,10 +43,10 @@ STATE, URL = state_get()
 LANG = language_get()
 
 
-def v3_request(url):
+def v3_request(url, lang=None):
    if not '?' in url: url += '?'
-   url = API_BASE + url + '&api_key=' + API_KEY + '&language=' + LANG
-   print("URL " + url)
+   url = API_BASE + url + '&api_key=' + API_KEY + '&language=' + (lang or LANG)
+   # print("API REQUEST: " + url)
    return fetch_url(url, parser='json')
 
 def full_img_url(img, size='w500'):
@@ -112,14 +112,14 @@ elif STATE == ST_MOVIES_LIST:
 ################################################################################
 elif STATE == ST_MOVIE_INFO:
    data = v3_request(URL)
+   if not data['overview'] or not data['videos']['results']:
+      fallback = v3_request(URL, lang='en')
 
    # movie info
    title = data['title']
+   original = data['original_title']
    poster = full_img_url(data['poster_path'])
-   try:
-      overview = data['overview']
-   except:
-      overview = ''
+   overview = data['overview'] or fallback['overview'] or ''
 
    try:
       genres = ', '.join([ g['name'] for g in data['genres'] ])
@@ -150,11 +150,13 @@ elif STATE == ST_MOVIE_INFO:
           '<small><name>{}:</name> {}</small><br>' \
           '<small><name>{}:</name> {}</small><br>' \
           '<small><name>{}:</name> {}</small><br>' \
+          '<small><name>{}:</name> {}</small><br>' \
           '<small><name>{}:</name> {}/10 ({} {})</small><br>' \
           '<small><name>{}:</name> {}</small><br>' \
           '{}'.format(title, country, year,
              _('Director'), ', '.join(directors),
              _('Cast'), ', '.join(casts),
+             _('Original title'), original,
              _('Genres'), genres,
              _('Rating'), data['vote_average'], data['vote_count'], _('votes'),
              _('Released'), data['release_date'],
@@ -163,19 +165,24 @@ elif STATE == ST_MOVIE_INFO:
             info=info, icon='icon/info', action=ACT_NONE)
 
    # trailers
-   for video in data['videos']['results']:
-      if video['site'] == 'YouTube':
-         url = 'https://www.youtube.com/watch?v=%s' % video['key']
-         info = '<title>{}</title><br>' \
-                '<name>{}:</name> <value>{}</value><br>' \
-                '<name>{}:</name> <value>{}</value><br>' \
-                '<name>{}:</name> <value>{}</value>'.format(
-                   video['name'],
-                   _('Language'), video['iso_639_1'],
-                   _('Source'), video['site'],
-                   _('Resolution'), video['size'])
-         item_add(ST_PLAY_YOUTUBE, video['name'], url,
-                  info=info,poster=poster, icon='icon/play')
+   L = data['videos']['results'] + fallback['videos']['results']
+   if len(L) > 0:
+      for video in L:
+         if video['site'] == 'YouTube':
+            url = 'https://www.youtube.com/watch?v=%s' % video['key']
+            info = '<title>{}</title><br>' \
+                   '<name>{}:</name> <value>{}</value><br>' \
+                   '<name>{}:</name> <value>{}</value><br>' \
+                   '<name>{}:</name> <value>{}p</value>'.format(
+                      video['name'],
+                      _('Language'), video['iso_639_1'],
+                      _('Source'), video['site'],
+                      _('Quality'), video['size'])
+            item_add(ST_PLAY_YOUTUBE, video['name'], url,
+                     info=info,poster=poster, icon='icon/play')
+   else:
+      item_add(ST_NONE, _('No trailers available'), None,
+               poster=poster, icon='icon/play', action=ACT_NONE)
 
    # cast
    item_add(ST_CAST_LIST, _('Cast'), '/movie/%d/credits' % data['id'],

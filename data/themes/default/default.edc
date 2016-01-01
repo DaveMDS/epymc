@@ -604,7 +604,7 @@ collections {
             signal: "browser,list,info,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
-            transition: DECELERATE 0.35;
+            transition: ACCELERATE 0.35;
             target: "browser.list.info_bg";
          }
          program { name: "browser_list_flip_left"; /* API */
@@ -750,8 +750,47 @@ collections {
                }
             }
          }
-         // SHOW("browser.grid.gengrid")
-
+         part { name: "browser.grid.info_bg";
+            type: IMAGE;
+            clip_to: "browser.grid.clip";
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               image {
+                  normal: "frame2.png";
+                  border: 8 8 8 8;
+               }
+               rel1 {
+                  to_y: "browser.grid.gengrid";
+                  relative: (0.65 + 0.40) 0.5;
+                  offset: -7 -7;
+               }
+               rel2 {
+                  relative: (1.0 + 0.40) 1.0;
+                  offset: -20 -9;
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               rel1.relative: (0.65 + 0.0) 0.5;
+               rel2.relative: (1.0 + 0.0) 1.0;
+            }
+         }
+         part { name: "browser.grid.info"; /* API */
+            type: SWALLOW;
+            clip_to: "browser.grid.clip";
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1 {
+                  to: "browser.grid.info_bg";
+                  offset: 15 9;
+               }
+               rel2 {
+                  to: "browser.grid.info_bg";
+                  offset: -12 -10;
+               }
+            }
+         }
          program { name: "browser_grid_show"; /* API */
             signal: "browser,grid,show";
             source: "emc";
@@ -766,7 +805,20 @@ collections {
             transition: LINEAR 0.5;
             target: "browser.grid.clip";
          }
-
+         program { name: "browser_grid_info_show"; /* API */
+            signal: "browser,grid,info,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.35;
+            target: "browser.grid.info_bg";
+         }
+         program { name: "browser_grid_info_hide"; /* API */
+            signal: "browser,grid,info,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.35;
+            target: "browser.grid.info_bg";
+         }
 /// filemanager
          part { name: "fileman.clip";
             type: RECT;

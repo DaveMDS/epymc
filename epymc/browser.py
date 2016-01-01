@@ -717,7 +717,10 @@ class ViewPosterGrid(object):
       DBG('Init view: grid')
       self.items_count = 0
       self._last_focused_item = None
-      self._timer = None
+      self._timer1 = None
+      self._timer2 = None
+
+      # Gengrid
       self.itc = GengridItemClass(item_style='default',
                                   content_get_func=self.gg_content_get)
       self.gg = Gengrid(gui.win, style='browser', focus_allow=False,
@@ -727,6 +730,10 @@ class ViewPosterGrid(object):
       self.gg.callback_selected_add(self.gg_higlight)
       self.gg.callback_clicked_double_add(self.gg_selected)
       gui.swallow_set('browser.grid.gengrid', self.gg)
+
+      # AutoScrolledEntry (info)
+      self._ase = EmcScrolledEntry(autoscroll=True)
+      gui.swallow_set('browser.grid.info', self._ase)
 
    def page_show(self, title, anim):
       self.gg.clear()
@@ -747,11 +754,15 @@ class ViewPosterGrid(object):
       gui.signal_emit('browser,grid,show')
 
    def hide(self):
+      if self.timer1: self.timer1.delete()
+      if self.timer2: self.timer2.delete()
       gui.signal_emit('browser,grid,hide')
 
    def clear(self):
-      self.gg.clear()
+      if self.timer1: self.timer1.delete()
+      if self.timer2: self.timer2.delete()
       self.items_count = 0
+      self.gg.clear()
 
    def refresh(self):
       self.gg.realized_items_update()
@@ -848,13 +859,30 @@ class ViewPosterGrid(object):
    # gengrid callbacks
    def gg_higlight(self, gg, item, *args, **kwargs):
       self._last_focused_item = item
-      if self._timer:
-         self._timer.delete()
-      self._timer = ecore.timer_add(1.0, self._backdrop_timer_cb, item.data_get())
+      if self._timer1: self._timer1.delete()
+      if self._timer2: self._timer2.delete()
+      self._timer1 = ecore.timer_add(0.5, self._info_timer_cb, item.data_get())
+      self._timer2 = ecore.timer_add(1.0, self._backdrop_timer_cb, item.data_get())
 
    def gg_selected(self, gg, item, *args, **kwargs):
       (item_class, url, user_data) = item.data_get()                            # 3 #
       item_class.item_selected(url, user_data)
+
+   def _info_timer_cb(self, item_data):
+      (item_class, url, user_data) = item_data                                  # 3 #
+
+      # Fill the textblock with item info
+      text = item_class.info_get(url, user_data)
+      if text:
+         self._ase.text_set(text)
+         self._ase.autoscroll = True
+         gui.signal_emit('browser,grid,info,show')
+      else:
+         self._ase.autoscroll = False
+         gui.signal_emit('browser,grid,info,hide')
+
+      self._timer1 = None
+      return ecore.ECORE_CALLBACK_CANCEL
 
    def _backdrop_timer_cb(self, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
@@ -863,5 +891,5 @@ class ViewPosterGrid(object):
       fanart = item_class.fanart_get(url, user_data)
       if fanart: gui.background_set(fanart)
 
-      self._timer = None
+      self._timer2 = None
       return ecore.ECORE_CALLBACK_CANCEL

@@ -27,7 +27,7 @@ from efl.elementary.image import Image
 from efl.elementary.entry import utf8_to_markup
 
 from epymc.modules import EmcModule
-from epymc.browser import EmcBrowser, EmcItemClass
+from epymc.browser import EmcBrowser, EmcItemClass, FolderItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog, EmcSourcesManager, EmcNotify, EmcRemoteImage
 from epymc.themoviedb import TMDBv3, CastPanel, get_tv_backdrop_filename, \
@@ -113,17 +113,14 @@ class FileItemClass(EmcItemClass):
       if counts['stop_at'] > 0:
          return 'icon/check_off'
 
+   def poster_get(self, url, mod):
+      return 'special/bd/' + os.path.basename(url)
 
-class FolderItemClass(EmcItemClass):
+
+class FolderItemClass(FolderItemClass):
    def item_selected(self, url, mod):
       mod_instance._browser.page_add(url, os.path.basename(url),
                                      None, mod_instance.populate_url)
-
-   def label_get(self, url, mod):
-      return os.path.basename(url)
-
-   def icon_get(self, url, mod):
-      return 'icon/folder'
 
    def fanart_get(self, url, mod):
       if mod_instance._tvshows_db.id_exists(mod._current_serie_name):
@@ -136,7 +133,8 @@ class SerieItemClass(EmcItemClass):
       mod_instance._current_serie_name = serie_name
       mod_instance._current_base_path = os.path.split(url)[0]
       mod_instance._browser.page_add(url, serie_name,
-                                     None, mod_instance.populate_url)
+                                     mod_instance._styles_for_folders,
+                                     mod_instance.populate_url)
 
    def label_get(self, url, serie_name):
       return utf8_to_markup(serie_name)
@@ -158,6 +156,8 @@ class SerieItemClass(EmcItemClass):
       if mod_instance._tvshows_db.id_exists(serie_name):
          e = mod_instance._tvshows_db.get_data(serie_name)
          return get_tv_poster_filename(e['id'])
+      else:
+         return 'special/bd/' + serie_name
 
    def fanart_get(self, url, serie_name):
       if mod_instance._tvshows_db.id_exists(serie_name):
@@ -167,8 +167,8 @@ class SerieItemClass(EmcItemClass):
 
 class SeasonItemClass(EmcItemClass):
    def item_selected(self, url, season_num):
-      mod_instance._browser.page_add(url, os.path.basename(url),
-                                     None, mod_instance.populate_url)
+      mod_instance._browser.page_add(url, os.path.basename(url), None,
+                                     mod_instance.populate_url)
 
    def label_get(self, url, season_num):
       return os.path.basename(url)
@@ -192,12 +192,11 @@ class SeasonItemClass(EmcItemClass):
       serie_name = mod_instance._current_serie_name
       if mod_instance._tvshows_db.id_exists(serie_name):
          e = mod_instance._tvshows_db.get_data(serie_name)
-
          poster_file = get_tv_poster_filename(e['id'], season_num)
          if os.path.exists(poster_file):
             return poster_file
-
          return get_tv_poster_filename(e['id'])
+      return 'special/bd/' + os.path.basename(url)
 
    def fanart_get(self, url, season_num):
       serie_name = mod_instance._current_serie_name
@@ -207,7 +206,6 @@ class SeasonItemClass(EmcItemClass):
 
 
 class EpisodeItemClass(EmcItemClass):
-   
    def item_selected(self, url, episode_data):
       mod_instance.play_url(url)
 
@@ -237,6 +235,7 @@ class EpisodeItemClass(EmcItemClass):
          else:
             # serie poster
             return get_tv_poster_filename(series_id)
+      return 'special/bd/' + os.path.basename(url)
          
 
    def fanart_get(self, url, episode_data):
@@ -264,6 +263,7 @@ class TvShowsModule(EmcModule):
    _idler_db = None           # key: show_name  data: dict
    _current_base_path = None  # the current base folder (the user source dir)
    _current_serie_name = None # the current show name
+   _styles_for_folders = ('List', 'PosterGrid')
 
    def __init__(self):
       DBG('Init module')
@@ -351,7 +351,8 @@ class TvShowsModule(EmcModule):
       # if not self._folders:
          #TODO alert the user. and instruct how to add folders
 
-      self._browser.page_add('tvshows://root', _('TV Shows'), None, self.populate_root_page)
+      self._browser.page_add('tvshows://root', _('TV Shows'),
+                             self._styles_for_folders, self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
 

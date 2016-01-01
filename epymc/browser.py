@@ -159,9 +159,6 @@ class BackItemClass(EmcItemClass):
    def icon_get(self, url, user_data):
       return 'icon/back'
 
-   def poster_get(self, url, user_data):
-      return 'icon/back' # TODO a better image
-
 
 class FolderItemClass(EmcItemClass):
    """ Base item class to be subclassed for ALL folder items """
@@ -829,16 +826,23 @@ class ViewPosterGrid(object):
 
    # gengrid model
    def gg_label_get(self, obj, part, item_data):
-      (item_class, url, user_data) = item_data                                  # 3 #
+      # (item_class, url, user_data) = item_data                                  # 3 #
       # label only for the back item
-      if isinstance(item_class, BackItemClass):
-         return item_class.label_get(url, user_data)
+      # if isinstance(item_class, BackItemClass):
+         # return item_class.label_get(url, user_data)
+      return None
 
    def gg_icon_get(self, obj, part, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
       if part == 'elm.swallow.icon':
-         return EmcRemoteImage(item_class.poster_get(url, user_data),
-                               fill_outside=True)
+         poster = item_class.poster_get(url, user_data)
+         if poster:
+            return EmcRemoteImage(poster, fill_outside=True)
+         else:
+            label = item_class.label_get(url, user_data)
+            icon = item_class.icon_get(url, user_data)
+            return EmcRemoteImage('special/icon/' + label, icon=icon)
+
       if part == 'elm.swallow.end':
          return EmcRemoteImage(item_class.icon_end_get(url, user_data))
 

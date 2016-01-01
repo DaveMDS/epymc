@@ -120,6 +120,10 @@ class ImagesItemClass(EmcItemClass):
    def label_get(self, url, user_data):
       return(user_data)
 
+   def icon_get(self, url, user_data):
+      if url == 'special_icon':
+         return 'icon/home'
+
    def poster_get(self, url, user_data):
       if url == 'local_path':
          return os.path.join(self.path, 'menu_bg.png')
@@ -136,7 +140,6 @@ class ImagesItemClass(EmcItemClass):
                 + TEST_STYLE
       elif url == 'special_null':
          return None
-
       #TODO failure for local and remote
 
 class MyItemClass(EmcItemClass):
@@ -149,8 +152,18 @@ class MyItemClass(EmcItemClass):
          return TEST_STYLE
 
    def item_selected(self, url, user_data):
+      
+      if url == 'uitests://encoding':
+         _mod._browser.page_add('uitests://encoding', 'Encoding tests', None,
+                                _mod.populate_encoding_page)
+
+      elif url == 'uitests://images':
+         _mod._browser.page_add('uitests://images', 'Image tests',
+                                ('List', 'PosterGrid'),
+                                _mod.populate_image_page)
+
       # Events Sniffer
-      if url == 'uitests://sniffer':
+      elif url == 'uitests://sniffer':
          events.listener_add('sniffer', lambda ev: EmcNotify('<title>Event sniffer</><br>' + ev))
          n = EmcNotify('Sniffer enabled.', hidein = 2)
 
@@ -479,14 +492,6 @@ class MyItemClass(EmcItemClass):
             # t += '<hilight>name/year:</> ' + str(get_movie_name_from_url(u)) + '<br><br>'
          # EmcDialog(title = 'Movie name test', text = t)
 
-      elif url == 'uitests://encoding':
-         _mod._browser.page_add('uitests://encoding', 'Encoding tests', None,
-                                _mod.populate_encoding_page)
-
-      elif url == 'uitests://images':
-         _mod._browser.page_add('uitests://images', 'Image tests', None,
-                                _mod.populate_image_page)
-
 
 class UiTestsModule(EmcModule):
    name = 'uitests'
@@ -560,5 +565,6 @@ class UiTestsModule(EmcModule):
       _mod._browser.item_add(ImagesItemClass(), 'remote_url_cache', 'From a remote url (with auto cache)')
       _mod._browser.item_add(ImagesItemClass(), 'special_folder', 'Special Folder')
       _mod._browser.item_add(ImagesItemClass(), 'special_bd', 'Special Blu-ray')
+      _mod._browser.item_add(ImagesItemClass(), 'special_icon', 'Special Icon (in PosterGrid view)')
       _mod._browser.item_add(ImagesItemClass(), 'special_null', 'Special Null (transparent)')
 

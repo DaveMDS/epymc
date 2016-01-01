@@ -695,24 +695,28 @@ class EmcRemoteImage(Image):
                * 'icon/*' to load an icon (aspect 1:1) from the theme
                * 'image/*' to load an image from the theme
                * 'special/style/text' to create a "special" image, supported
-                 styles are: 'folder', 'bd'.
+                 styles are: 'folder', 'bd', 'icon'
                  The text will be inserted in the image.
                * None to "unset" the image
          dest: Local path to save the image to. If the dest path already exists
                the image will not be downloaded, but directly loaded from dest.
                If dest is None the downloaded file will be saved in cache.
+         icon: For the special style 'icon', you can here specify the icon
+               to swallow inside the special image.
    """
 
-   def __init__(self, url=None, dest=None, aspect_fixed=True, fill_outside=False):
+   def __init__(self, url=None, dest=None, icon=None, aspect_fixed=True, fill_outside=False):
       self._spinner = None
+      self._icon_obj = None
       Image.__init__(self, layout, aspect_fixed=aspect_fixed, fill_outside=fill_outside,
                      size_hint_expand=EXPAND_BOTH, size_hint_fill=FILL_BOTH)
       self.on_move_add(self._move_resize_cb)
       self.on_resize_add(self._move_resize_cb)
+      self.on_del_add(self._del_cb)
       if url is not None:
-         self.url_set(url, dest)
+         self.url_set(url, dest, icon)
 
-   def url_set(self, url, dest=None):
+   def url_set(self, url, dest=None, icon=None):
       # None to "unset" the image
       if url is None:
          self.file_set(theme_file,  'emc/image/null')
@@ -737,6 +741,9 @@ class EmcRemoteImage(Image):
          _, style, text = url.split('/', maxsplit=2)
          self.file_set(theme_file,  'emc/image/' + style)
          self.object.part_text_set('emc.text', text)
+         if icon:
+            self._icon_obj = EmcRemoteImage(icon)
+            self.object.part_swallow('emc.icon', self._icon_obj)
          return
 
       # a remote url ?
@@ -783,6 +790,10 @@ class EmcRemoteImage(Image):
          self._spinner.move(x, y)
          if self._spinner.clip != self.clip:
             self._spinner.clip = self.clip
+
+   def _del_cb(self, obj):
+      if self._icon_obj: self._icon_obj.delete()
+      if self._spinner: self._spinner.delete()
 
 ################################################################################
 class EmcDialog(Layout):

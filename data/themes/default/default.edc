@@ -134,6 +134,10 @@ styles {
       COMMON_TAGS
    }
 
+   style { name: "epymc_special_icon_style";
+      base:  "font="FONT" font_size="FONT_SIZE" color=#fff align=center wrap=mixed ellipsis=1.0";
+   }
+
    style { name: "epymc_subtitles_style";
       base: "font="FONT" align=center font_size="FONT_SIZE_BIGGER" color=#FFF wrap=word style=soft_shadow shadow_color=#00000080";
       tag: "b" "+ font_weight=Bold";
@@ -2570,12 +2574,14 @@ collections {
       parts {
          part { name: "image"; type: IMAGE;
             description { state: "default" 0.0;
+               fixed: 1 1;
                image.normal: "image_bd_cover_blank.png";
                aspect_preference: SOURCE;
             }
          }
          part { name: "emc.text"; type: TEXTBLOCK;  /* API */
             description { state: "default" 0.0;
+               fixed: 1 1;
                rel1.to: "image";
                rel2.to: "image";
                rel1.relative: 0.03 0.08;
@@ -2592,12 +2598,14 @@ collections {
       parts {
          part { name: "image"; type: IMAGE;
             description { state: "default" 0.0;
+               fixed: 1 1;
                image.normal: "image_folder_vert.png";
                aspect_preference: SOURCE;
             }
          }
          part { name: "emc.text"; type: TEXTBLOCK;  /* API */
             description { state: "default" 0.0;
+               fixed: 1 1;
                rel1.to: "image";
                rel2.to: "image";
                rel1.relative: 0.03 0.03;
@@ -2607,10 +2615,36 @@ collections {
          }
       }
    }
+   group { name: "emc/image/icon";  /* API */
+      parts {
+         part { name: "bg"; type: RECT;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               color: 0 0 0 200;
+            }
+         }
+         part { name: "emc.icon"; type: SWALLOW;  /* API */
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel2.relative: 1.0 0.7;
+            }
+         }
+         part { name: "emc.text"; type: TEXTBLOCK;  /* API */
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.relative: 0.0 0.7;
+               rel1.offset: 4 0;
+               rel2.offset: -5 -1;
+               text.style: "epymc_special_icon_style";
+            }
+         }
+      }
+   }
    group { name: "emc/image/null";  /* API */
       parts {
          part { name: "null"; type: RECT;
             description { state: "default" 0.0;
+               fixed: 1 1;
                visible: 0;
             }
          }

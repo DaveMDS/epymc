@@ -56,7 +56,7 @@ _backdrop_im2 = None
 _backdrop_curr = None
 
 _volume_hide_timer = None
-_theme_generation = "5"
+_theme_generation = '6'
 
 EXPAND_BOTH = evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND
 EXPAND_HORIZ = evas.EVAS_HINT_EXPAND, 0.0

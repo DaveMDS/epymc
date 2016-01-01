@@ -98,9 +98,11 @@ class RescanItemClass(EmcItemClass):
 class SpecialItemClass(EmcItemClass):
    def item_selected(self, url, mod):
       if url == 'movies://actors':
-         mod._browser.page_add(url, _('Actors'), None, mod.populate_actors_list)
+         mod._browser.page_add(url, _('Actors'), mod._styles_for_folders,
+                               mod.populate_actors_list)
       elif url == 'movies://directors':
-         mod._browser.page_add(url, _('Actors'), None, mod.populate_directors_list)
+         mod._browser.page_add(url, _('Actors'), mod._styles_for_folders,
+                               mod.populate_directors_list)
 
    def label_get(self, url, mod):
       if url == 'movies://actors':
@@ -125,6 +127,9 @@ class ActorItemClass(EmcItemClass):
    def label_end_get(self, url, name):
       return str(len(_mod._actors_cache[name]))
 
+   def icon_get(self, url, mod):
+      return 'icon/head'
+
 class DirectorItemClass(EmcItemClass):
    def item_selected(self, url, name):
       _mod._browser.page_add(url, name, _mod._styles_for_folders,
@@ -135,6 +140,9 @@ class DirectorItemClass(EmcItemClass):
 
    def label_end_get(self, url, name):
       return str(len(_mod._directors_cache[name]))
+
+   def icon_get(self, url, mod):
+      return 'icon/head'
 
 
 class MovieItemClass(EmcItemClass):
@@ -317,10 +325,12 @@ class MoviesModule(EmcModule):
       # start the browser in the wanted page
       if url is None:
          self._browser.page_add('movies://root', _('Movies'),
-                                None, self.populate_root_page)
+                                self._styles_for_folders,
+                                self.populate_root_page)
       else:
          self._browser.page_add(url, os.path.basename(url),
-                                self._styles_for_folders, self.populate_url)
+                                self._styles_for_folders,
+                                self.populate_url)
          
       self._browser.show()
       mainmenu.hide()

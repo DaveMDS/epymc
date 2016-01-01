@@ -31,7 +31,7 @@ else:
    pil_available = True
 
 from epymc.modules import EmcModule
-from epymc.browser import EmcBrowser, EmcItemClass
+from epymc.browser import EmcBrowser, EmcItemClass, FolderItemClass
 from epymc.gui import EmcSourcesManager, EmcSlideshow
 
 import epymc.mainmenu as mainmenu
@@ -127,16 +127,11 @@ class PhotoItemClass(EmcItemClass):
       return basic + pil + exif
 
 
-class FolderItemClass(EmcItemClass):
-   def item_selected(self, url, mod):
+class FolderItemClass(FolderItemClass):
+   def item_selected(self, url, user_data):
       mod_instance._browser.page_add(url, os.path.basename(url),
-                                     None, mod_instance.populate_url)
-
-   def label_get(self, url, mod):
-      return os.path.basename(url)
-
-   def icon_get(self, url, mod):
-      return 'icon/folder'
+                                     mod_instance._styles,
+                                     mod_instance.populate_url)
 
 
 class PhotosModule(EmcModule):
@@ -146,6 +141,7 @@ class PhotosModule(EmcModule):
    info = _('A module to watch your photos.')
 
    _browser = None
+   _styles = ('List', 'PosterGrid')
 
 
    def __init__(self):
@@ -191,7 +187,8 @@ class PhotosModule(EmcModule):
       # if not self._folders:
          #TODO alert the user. and instruct how to add folders
 
-      self._browser.page_add('photos://root', _('Photos'), None, self.populate_root_page)
+      self._browser.page_add('photos://root', _('Photos'), self._styles,
+                             self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
 

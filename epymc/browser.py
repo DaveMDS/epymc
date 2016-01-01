@@ -471,7 +471,7 @@ class ViewList(object):
       DBG('Init view: plain list')
 
       self._last_focused_item = None
-      self.timer = self.timer2 = None
+      self.timer1 = self.timer2 = None
       self.items_count = 0;            # This is accessed from the browser
 
       # EXTERNAL Genlists
@@ -557,7 +557,7 @@ class ViewList(object):
 
    def hide(self):
       """ Hide the view """
-      if self.timer: self.timer.delete()
+      if self.timer1: self.timer1.delete()
       if self.timer2: self.timer2.delete()
       gui.signal_emit('browser,list,hide')
       gui.signal_emit('browser,list,info,hide')
@@ -565,7 +565,7 @@ class ViewList(object):
 
    def clear(self):
       """ Clear the view """
-      if self.timer: self.timer.delete()
+      if self.timer1: self.timer1.delete()
       if self.timer2: self.timer2.delete()
       self.gl1.clear()
       self.gl2.clear()
@@ -578,7 +578,7 @@ class ViewList(object):
          item.update()
       # also request new poster & new info
       item =  self.current_list.selected_item
-      self._cb_timer(item.data_get())
+      self._cb_timer1(item.data_get())
       self._cb_timer2(item.data_get())
 
    def item_bring_in(self, pos='top', animated=True):
@@ -667,15 +667,15 @@ class ViewList(object):
 
    def _cb_item_hilight(self, gl, item):
       self._last_focused_item = item
-      if self.timer: self.timer.delete()
+      if self.timer1: self.timer1.delete()
       if self.timer2: self.timer2.delete()
-      self.timer = ecore.timer_add(0.5, self._cb_timer, item.data_get())
+      self.timer1 = ecore.timer_add(0.5, self._cb_timer1, item.data_get())
       self.timer2 = ecore.timer_add(1.0, self._cb_timer2, item.data_get())
 
    def _cb_item_unhilight(self, gl, item):
       pass
 
-   def _cb_timer(self, item_data):
+   def _cb_timer1(self, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
 
       # Fill the textblock with item info info
@@ -694,7 +694,7 @@ class ViewList(object):
       else:
          self._poster.url_set(None)
 
-      self._timer = None
+      self._timer1 = None
       return ecore.ECORE_CALLBACK_CANCEL
 
    def _cb_timer2(self, item_data):

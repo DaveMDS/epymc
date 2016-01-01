@@ -57,7 +57,7 @@ DEFAULTS = {
    'p': 'TOGGLE_PAUSE',
    'f': 'TOGGLE_FULLSCREEN',
    'F1': 'VIEW_LIST',
-   'F2': 'VIEW_GRID',
+   'F2': 'VIEW_POSTERGRID',
    'F5': 'SCALE_SMALLER',
    'F6': 'SCALE_BIGGER',
    'F7': 'SCALE_RESET',

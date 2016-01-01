@@ -50,8 +50,9 @@ ICON("arrowD")
 ICON("next")
 ICON("prev")
 
-ICON("list")
-ICON("grid")
+ICON("view_list")
+ICON("view_grid")
+ICON("view_postergrid")
 
 ICON("star")
 ICON("star_off")

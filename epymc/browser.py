@@ -64,8 +64,10 @@ def init():
     # fill buttons box in topbar
    _topbar_fman = EmcFocusManager('topbar')
    _topbar_fman.unfocus()
-   topbar_button_add('view_list', 'icon/list', input_events.event_emit, 'VIEW_LIST')
-   topbar_button_add('view_grid', 'icon/grid', input_events.event_emit, 'VIEW_GRID')
+   topbar_button_add('view_list', 'icon/view_list',
+                     input_events.event_emit, 'VIEW_LIST')
+   topbar_button_add('view_grid', 'icon/view_postergrid',
+                     input_events.event_emit, 'VIEW_POSTERGRID')
 
 def shutdown():
    global _memorydb
@@ -434,8 +436,8 @@ class EmcBrowser(object):
       elif event == 'VIEW_LIST':
          self.change_style('List')
          return input_events.EVENT_BLOCK
-      elif event == 'VIEW_GRID':
-         self.change_style('Grid')
+      elif event == 'VIEW_POSTERGRID':
+         self.change_style('PosterGrid')
          return input_events.EVENT_BLOCK
 
       return input_events.EVENT_CONTINUE
@@ -710,9 +712,9 @@ class ViewList(object):
 
 
 ################################################################################
-#### Grid View  ################################################################
+#### PosterGrid View ###########################################################
 ################################################################################
-class ViewGrid(object):
+class ViewPosterGrid(object):
    def __init__(self):
       """ TODO Function doc """
       DBG('Init view: grid')

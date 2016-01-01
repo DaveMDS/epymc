@@ -186,8 +186,6 @@ class EmcBrowser(object):
     3. add a page to the browser using the page_add() method
     4. add items to the current page using item_add(MyItemClass(), url, user_data)
    Later you can create new pages or use back(), clear(), show(), hide()
-
-   TODO doc default_style and style in general
    """
 
    def __init__(self, name, default_style='List'):
@@ -224,12 +222,23 @@ class EmcBrowser(object):
             return _memorydb.get_data(p['url'])
       return None
 
-   def page_add(self, url, title, style, populate_cb, *args, **kwargs):
+   def page_add(self, url, title, styles, populate_cb, *args, **kwargs):
       """
       When you create a page you need to give at least the url, the title
       and the populate callback. Every other arguments will be passed back
-      to the callback. style can be None to use the default page style,
+      in the callback. style can be None to use the default page style,
       usually the plain list.
+
+      Args:
+         url: A unique string id for the page
+         title: Readable text for the user
+         styles: A tuple with all the style that the page can show.
+                 Available styles: 'List', 'PosterGrid', 'CoverGrid'
+                 If set to None it default to the default style given at
+                 the Browser instance creation.
+                 The first item is the default one.
+         populate_cb: Function to call when the page need to be populated.
+                      Signature: func(browser, url, *args, **kwargs)
       """
 
       # in py2 ensure url is not unicode (shelve will not like unicode as key)
@@ -237,18 +246,20 @@ class EmcBrowser(object):
          url = url.encode('utf8')
 
       # choose the style of the new page
+      if styles is None:
+         styles = (self.default_style,)
       if _memorydb.id_exists(url):
          style = _memorydb.get_data(url)
       else:
          style = self._search_style_in_parent()
-      if not style:
-         style = self.default_style
+      if not style in styles:
+         style = styles[0]
 
       # get the correct view instance
       view = self._create_or_get_view(style)
 
       # append the new page in the pages list
-      page = {'view': view, 'url': url, 'title': title,
+      page = {'view': view, 'url': url, 'title': title, 'styles': styles,
               'cb': populate_cb, 'args': args, 'kwargs': kwargs}
       self.pages.append(page)
 
@@ -299,6 +310,14 @@ class EmcBrowser(object):
             self.current_view.refresh()
 
    def change_style(self, style):
+      # the current page is always the last one
+      page = self.pages[-1]
+
+      # check if the style is valid
+      if not style in page['styles']:
+         DBG('Style %s not available for this page' % style)
+         return
+      
       # change only if needed
       view = self._create_or_get_view(style)
       if view == self.current_view:
@@ -309,7 +328,7 @@ class EmcBrowser(object):
       self.current_view.hide()
 
       # set the new view in the current (always the last) page
-      self.pages[-1]['view'] = view
+      page['view'] = view
 
       # remember the user choice
       global _memorydb

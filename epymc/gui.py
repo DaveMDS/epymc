@@ -688,8 +688,16 @@ class EmcRemoteImage(Image):
        cache-to-file mechanism to avoid re-downloading the image again.
 
       Params:
-         url: The url to load the image from, or a local fullpath, or an
-              'icon/*' from the app theme (also image/* are supported)
+         url: The url to load the image from, can be one of:
+               * a local file fullpath
+               * a real remote url
+               * a tuple containing (url, dest) (deprecated method ??)
+               * 'icon/*' to load an icon (aspect 1:1) from the theme
+               * 'image/*' to load an image from the theme
+               * 'special/style/text' to create a "special" image, supported
+                 styles are: 'folder', 'bd'.
+                 The text will be inserted in the image.
+               * None to "unset" the image
          dest: Local path to save the image to. If the dest path already exists
                the image will not be downloaded, but directly loaded from dest.
                If dest is None the downloaded file will be saved in cache.
@@ -705,6 +713,14 @@ class EmcRemoteImage(Image):
          self.url_set(url, dest)
 
    def url_set(self, url, dest=None):
+      # None to "unset" the image
+      if url is None:
+         self.file_set(theme_file,  'emc/image/null')
+         return
+
+      # url can also include dest
+      if isinstance(url, tuple):
+         url, dest = url
 
       # a local path ?
       if os.path.exists(url):
@@ -714,6 +730,13 @@ class EmcRemoteImage(Image):
       # an icon from the theme ?
       if url.startswith(('icon/', 'image/')):
          self.file_set(theme_file, url)
+         return
+
+      # a special image ?
+      if url.startswith('special/'):
+         _, style, text = url.split('/', maxsplit=2)
+         self.file_set(theme_file,  'emc/image/' + style)
+         self.object.part_text_set('emc.text', text)
          return
 
       # a remote url ?
@@ -760,16 +783,6 @@ class EmcRemoteImage(Image):
          self._spinner.move(x, y)
          if self._spinner.clip != self.clip:
             self._spinner.clip = self.clip
-
-################################################################################
-class EmcBlankPoster(Layout):
-   def __init__(self, text=None, style='bd'):
-      group = 'emc/poster/' + style
-      Layout.__init__(self, layout, file=(theme_file, group),
-                      size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH)
-      if text:
-         self.text_set('emc.text', text)
-
 
 ################################################################################
 class EmcDialog(Layout):

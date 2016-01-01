@@ -36,7 +36,7 @@ from epymc import gui, mainmenu, input_events, ini
 from epymc.sdb import EmcDatabase
 from epymc.utils import Singleton
 from epymc.gui import EmcRemoteImage, EmcScrolledEntry, EmcButton, \
-   EmcFocusManager, EmcBlankPoster, EXPAND_BOTH, FILL_BOTH
+   EmcFocusManager, EXPAND_BOTH, FILL_BOTH
 
 def DBG(msg):
    # print('BROWSER: %s' % msg)
@@ -173,7 +173,7 @@ class FolderItemClass(EmcItemClass):
       return 'icon/folder'
 
    def poster_get(self, url, user_data):
-      return EmcBlankPoster(os.path.basename(url), style='folder')
+      return 'special/folder/' + os.path.basename(url)
 
 
 class EmcBrowser(object):
@@ -478,7 +478,8 @@ class ViewList(object):
                                   content_get_func=self.__gl_content_get)
 
       # RemoteImage (poster)
-      self.__im = None
+      self._poster = EmcRemoteImage()
+      gui.swallow_set('browser.list.poster', self._poster)
 
       # AutoScrolledEntry (info)
       self._ase = EmcScrolledEntry(autoscroll=True)
@@ -533,9 +534,7 @@ class ViewList(object):
 
    def show(self):
       """ Show the view """
-      if self.__im:
-         self.__im.delete()
-         self.__im = None
+      self._poster.url_set(None)
       gui.signal_emit('browser,list,show')
 
    def hide(self):
@@ -628,15 +627,12 @@ class ViewList(object):
 
    def __gl_content_get(self, obj, part, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
-      # DBG('_content get({}, {})'.format(part, url))
       if part == 'elm.swallow.icon':
          icon = item_class.icon_get(url, user_data)
-      elif part == 'elm.swallow.end':
+         return EmcRemoteImage(icon) if icon else None
+      if part == 'elm.swallow.end':
          icon = item_class.icon_end_get(url, user_data)
-      else:
-         icon = None
-
-      return gui.load_icon(icon)
+         return EmcRemoteImage(icon) if icon else None
 
    ### GenList Callbacks
    def _cb_item_realized(self, gl, item):
@@ -674,27 +670,11 @@ class ViewList(object):
          self._ase.autoscroll = False
          gui.signal_emit('browser,list,info,hide')
 
-      # Ask for the item poster and show (or auto-download) it
-      poster = item_class.poster_get(url, user_data)
-      if poster is None:
-         if self.__im:
-            self.__im.delete()
-            self.__im = None
-      else:
-         if self.__im is None:
-            self.__im = EmcRemoteImage()
-            gui.swallow_set('browser.list.poster', self.__im)
-         if isinstance(poster, tuple):
-            (url, dest) = poster
-            self.__im.url_set(url, dest)
-         elif poster and poster.startswith(('http://', 'https://')):
-            self.__im.url_set(poster)
-         elif poster and poster.startswith(('icon/', 'image/')):
-            self.__im.file_set(gui.theme_file, poster)
-         else:
-            self.__im.file_set(poster)
+      # Ask for the item poster
+      self._poster.url_set(item_class.poster_get(url, user_data))
 
-      return False # don't repeat the timer
+      self._timer = None
+      return ecore.ECORE_CALLBACK_CANCEL
 
    def _cb_timer2(self, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
@@ -703,7 +683,8 @@ class ViewList(object):
       fanart = item_class.fanart_get(url, user_data)
       if fanart: gui.background_set(fanart)
 
-      return False # don't repeat the timer
+      self._timer2 = None
+      return ecore.ECORE_CALLBACK_CANCEL
 
 
 ################################################################################
@@ -831,20 +812,11 @@ class ViewGrid(object):
 
    def gg_icon_get(self, obj, part, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
-
       if part == 'elm.swallow.icon':
-         poster = item_class.poster_get(url, user_data)
-         if isinstance(poster, evas.Object):
-            return poster
-         if poster:
-            return EmcRemoteImage(poster, fill_outside=True)
-         else:
-            text = item_class.label_get(url, user_data)
-            return EmcBlankPoster(text)
-
-      elif part == 'elm.swallow.end':
-         icon = item_class.icon_end_get(url, user_data)
-         return gui.load_icon(icon) if icon else None
+         return EmcRemoteImage(item_class.poster_get(url, user_data),
+                               fill_outside=True)
+      if part == 'elm.swallow.end':
+         return EmcRemoteImage(item_class.icon_end_get(url, user_data))
 
    def gg_state_get(self, obj, part, item_data):
       return False

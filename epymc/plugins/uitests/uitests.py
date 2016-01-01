@@ -114,6 +114,30 @@ class EncodingItemClass(EmcItemClass):
          EmcVKeyboard(title='Just press Accept!', text='千と千尋の神隠し',
                       accept_cb=_done_cb)
 
+class ImagesItemClass(EmcItemClass):
+   path = os.path.dirname(__file__)
+
+   def label_get(self, url, user_data):
+      return(user_data)
+
+   def poster_get(self, url, user_data):
+      if url == 'local_path':
+         return os.path.join(self.path, 'menu_bg.png')
+      elif url == 'remote_url':
+         return 'https://image.tmdb.org/t/p/original/3bKHPDte16BeNLo57W2FwO0jRJZ.jpg', '/tmp/asdasdas'
+      elif url == 'remote_url_cache':
+         return 'https://image.tmdb.org/t/p/original/cUKn61e7bUUglIGNGBEtzyuCDR4.jpg'
+      elif url == 'special_bd':
+         return 'special/bd/My super cool movie without a poster'
+      elif url == 'special_folder':
+         return 'special/folder/This is my special/folder/name <br>' \
+                '(can also include "/" and other special chars)<br>' \
+                'àèìòù<br>నాన్నకు ప్రేమతో<br>もののけ姫<br><br>...and tags:<br>' \
+                + TEST_STYLE
+      elif url == 'special_null':
+         return None
+
+      #TODO failure for local and remote
 
 class MyItemClass(EmcItemClass):
 
@@ -459,6 +483,10 @@ class MyItemClass(EmcItemClass):
          _mod._browser.page_add('uitests://encoding', 'Encoding tests', None,
                                 _mod.populate_encoding_page)
 
+      elif url == 'uitests://images':
+         _mod._browser.page_add('uitests://images', 'Image tests', None,
+                                _mod.populate_image_page)
+
 
 class UiTestsModule(EmcModule):
    name = 'uitests'
@@ -488,6 +516,7 @@ class UiTestsModule(EmcModule):
 
    def populate_root(self, browser, url):
       browser.item_add(MyItemClass(), 'uitests://encoding', 'Various string encoding tests')
+      browser.item_add(MyItemClass(), 'uitests://images', 'Browser + EmcImage')
       browser.item_add(MyItemClass(), 'uitests://movies_name', 'Movies name test')
       browser.item_add(MyItemClass(), 'uitests://sniffer', 'Event Sniffer')
       browser.item_add(MyItemClass(), 'uitests://ev_emit', 'Event Emit')
@@ -524,3 +553,12 @@ class UiTestsModule(EmcModule):
       _mod._browser.item_add(EncodingItemClass(), 'test1', 'Test 1: tmdb.org json parser')
       _mod._browser.item_add(EncodingItemClass(), 'test2', 'Test 2: tmdb.org url encode')
       _mod._browser.item_add(EncodingItemClass(), 'test3', 'Test 3: tmdb.org virtual keyboard')
+
+   def populate_image_page(self, browser, url):
+      _mod._browser.item_add(ImagesItemClass(), 'local_path', 'From a local path')
+      _mod._browser.item_add(ImagesItemClass(), 'remote_url', 'From a remote url (with local dest)')
+      _mod._browser.item_add(ImagesItemClass(), 'remote_url_cache', 'From a remote url (with auto cache)')
+      _mod._browser.item_add(ImagesItemClass(), 'special_folder', 'Special Folder')
+      _mod._browser.item_add(ImagesItemClass(), 'special_bd', 'Special Blu-ray')
+      _mod._browser.item_add(ImagesItemClass(), 'special_null', 'Special Null (transparent)')
+

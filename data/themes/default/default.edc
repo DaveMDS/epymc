@@ -129,8 +129,9 @@ styles {
       base:  "font="FONT" font_size="FONT_SIZE" color=#fff align=center wrap=mixed ellipsis=1.0";
    }
 
-   style { name: "epymc_bd_cover_style";
+   style { name: "epymc_special_image_style";
       base:  "font="FONT" font_size="FONT_SIZE" color=#222 align=center wrap=mixed ellipsis=1.0";
+      COMMON_TAGS
    }
 
    style { name: "epymc_subtitles_style";
@@ -2561,8 +2562,8 @@ collections {
       }
    }
 
-/// EmcBlankPoster, in various styles (bd, folder, etc)
-   group { name: "emc/poster/bd";
+/// EmcImage special styles
+   group { name: "emc/image/bd"; /* API */
       images {
          image: "image_bd_cover_blank.png" COMP;
       }
@@ -2570,18 +2571,21 @@ collections {
          part { name: "image"; type: IMAGE;
             description { state: "default" 0.0;
                image.normal: "image_bd_cover_blank.png";
+               aspect_preference: SOURCE;
             }
          }
-         part { name: "emc.text"; type: TEXTBLOCK;
+         part { name: "emc.text"; type: TEXTBLOCK;  /* API */
             description { state: "default" 0.0;
+               rel1.to: "image";
+               rel2.to: "image";
                rel1.relative: 0.03 0.08;
                rel2.relative: 0.97 0.98;
-               text.style: "epymc_bd_cover_style";
+               text.style: "epymc_special_image_style";
             }
          }
       }
    }
-   group { name: "emc/poster/folder";
+   group { name: "emc/image/folder";  /* API */
       images {
          image: "image_folder_vert.png" COMP;
       }
@@ -2589,13 +2593,25 @@ collections {
          part { name: "image"; type: IMAGE;
             description { state: "default" 0.0;
                image.normal: "image_folder_vert.png";
+               aspect_preference: SOURCE;
             }
          }
-         part { name: "emc.text"; type: TEXTBLOCK;
+         part { name: "emc.text"; type: TEXTBLOCK;  /* API */
             description { state: "default" 0.0;
+               rel1.to: "image";
+               rel2.to: "image";
                rel1.relative: 0.03 0.03;
                rel2.relative: 0.90 0.97;
-               text.style: "epymc_bd_cover_style";
+               text.style: "epymc_special_image_style";
+            }
+         }
+      }
+   }
+   group { name: "emc/image/null";  /* API */
+      parts {
+         part { name: "null"; type: RECT;
+            description { state: "default" 0.0;
+               visible: 0;
             }
          }
       }

@@ -719,10 +719,7 @@ class ViewPosterGrid(object):
       self._last_focused_item = None
       self._timer = None
       self.itc = GengridItemClass(item_style='default',
-                                  text_get_func=self.gg_label_get,
-                                  content_get_func=self.gg_icon_get,
-                                  state_get_func=self.gg_state_get,
-                                  del_func=self.gg_del)
+                                  content_get_func=self.gg_content_get)
       self.gg = Gengrid(gui.win, style='browser', focus_allow=False,
                         item_size=(150, 225), align=(0.5, 0.0),
                         size_hint_expand=EXPAND_BOTH, size_hint_fill=FILL_BOTH)
@@ -825,14 +822,7 @@ class ViewPosterGrid(object):
       return input_events.EVENT_CONTINUE
 
    # gengrid model
-   def gg_label_get(self, obj, part, item_data):
-      # (item_class, url, user_data) = item_data                                  # 3 #
-      # label only for the back item
-      # if isinstance(item_class, BackItemClass):
-         # return item_class.label_get(url, user_data)
-      return None
-
-   def gg_icon_get(self, obj, part, item_data):
+   def gg_content_get(self, obj, part, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
       if part == 'elm.swallow.icon':
          poster = item_class.poster_get(url, user_data)
@@ -844,13 +834,9 @@ class ViewPosterGrid(object):
             return EmcRemoteImage('special/icon/' + label, icon=icon)
 
       if part == 'elm.swallow.end':
-         return EmcRemoteImage(item_class.icon_end_get(url, user_data))
-
-   def gg_state_get(self, obj, part, item_data):
-      return False
-
-   def gg_del(self, obj, item_data):
-      pass
+         icon = item_class.icon_end_get(url, user_data)
+         if icon:
+            return EmcRemoteImage(icon)
 
    # gengrid callbacks
    def gg_higlight(self, gg, item, *args, **kwargs):

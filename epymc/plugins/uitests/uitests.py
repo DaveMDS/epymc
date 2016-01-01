@@ -427,7 +427,7 @@ class MyItemClass(EmcItemClass):
          hbox2 = Box(gui.win)
          hbox2.horizontal_set(True)
          hbox2.show()
-         for i in xrange(0,8):
+         for i in range(0,8):
             b = EmcButton(str(i))
             fman.obj_add(b)
             b.show()

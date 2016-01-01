@@ -122,6 +122,7 @@ class OnlinevideoModule(EmcModule):
    _run_dialog = None
    _update_dialog = None
    _py = sys.executable or ''
+   _styles = ('List', 'PosterGrid')
 
    _search_folders = [
       os.path.dirname(__file__),
@@ -188,7 +189,7 @@ class OnlinevideoModule(EmcModule):
       return source
 
    def cb_mainmenu(self):
-      self._browser.page_add('olvid://root', _('Channels'), None,
+      self._browser.page_add('olvid://root', _('Channels'), self._styles,
                              self.populate_root_page)
       self._browser.show()
       mainmenu.hide()
@@ -367,7 +368,7 @@ class OnlinevideoModule(EmcModule):
 
       (next_state, label, url, info, icon, poster, action) = parent_item_data
       if items and action != ACT_MORE:
-         self._browser.page_add(url, label, None,
+         self._browser.page_add(url, label, self._styles,
                                 self._populate_requested_page, items)
       elif action == ACT_MORE:
          self._populate_requested_page(self._browser, url, items, scroll=True)

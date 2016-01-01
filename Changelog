@@ -16,6 +16,7 @@ Bug fixed:
  * Fixed posters for the vimeo channel
  * Fixed tmdb language selector in config
  * Fixed (hopefully) subs decoding
+ * Fixed a bug that was causing fileman buttons to be clickable also when hidden
  * Removed usage of elm deprecated ObjectItem.data_get() function
  * Removed edc warning about "fixed: 1 1"
 

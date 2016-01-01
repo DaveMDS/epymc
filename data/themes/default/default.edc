@@ -28,10 +28,12 @@
 #define FN_COL_DISABLE 150 150 150 255
 #define FN_COL3_DISABLE 0 0 0 64
 
-#define COLOR_BLUE 63 108 168
-#define COLOR_GREEN 63 168 108
-#define COLOR_ORANGE 240 164 10
-#define COLOR_ORANGE_HEX F0A40A
+#define COLOR_BLU 51 153 255
+#define COLOR_BLU_HEX 3399FF
+// #define COLOR_GREEN 63 168 108
+// #define COLOR_BLUE 63 108 168
+// #define COLOR_ORANGE 240 164 10
+// #define COLOR_ORANGE_HEX F0A40A
 
 //// GENERIC MACROS ///////////////////////////////////////////////////////////
 #define ASPECT_FILL(_ASPECT) \
@@ -106,8 +108,8 @@ tag: "info" "+ color=#3399ff style=glow glow_color=#3399ff30"; \
 tag: "success" "+ color=#00ff00 style=glow glow_color=#00ff0030"; \
 tag: "warning" "+ color=#ff7c00 style=glow glow_color=#ff7c0030"; \
 tag: "failure" "+ color=#ff0000 style=glow glow_color=#ff000030"; \
-tag: "title" "+ font_weight=Bold color=#"COLOR_ORANGE_HEX" font_size="FONT_SIZE_BIG; \
-tag: "subtitle" "+ color=#"COLOR_ORANGE_HEX; \
+tag: "title" "+ font_weight=Bold color=#"COLOR_BLU_HEX" font_size="FONT_SIZE_BIG; \
+tag: "subtitle" "+ color=#"COLOR_BLU_HEX; \
 tag: "name" "+ color=#888888 font_weight=Bold"; \
 tag: "val" "+ color=#ffffff";
 
@@ -118,7 +120,7 @@ styles {
    }
 
    style { name: "epymc_dialog_title_style";
-      base: "font="FONT2" align=center font_size="FONT_SIZE_BIG" color=#"COLOR_ORANGE_HEX" wrap=none";
+      base: "font="FONT2" align=center font_size="FONT_SIZE_BIG" color=#"COLOR_BLU_HEX" wrap=none";
    }
 
    style { name: "epymc_browser_slide_style";

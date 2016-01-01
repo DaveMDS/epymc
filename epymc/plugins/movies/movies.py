@@ -28,7 +28,7 @@ from efl.elementary.image import Image
 from efl.elementary.entry import utf8_to_markup
 
 from epymc.modules import EmcModule
-from epymc.browser import EmcBrowser, EmcItemClass
+from epymc.browser import EmcBrowser, EmcItemClass, FolderItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog, EmcRemoteImage, EmcSourcesManager, \
    EmcVKeyboard, EmcNotify
@@ -110,13 +110,14 @@ class SpecialItemClass(EmcItemClass):
 
    def icon_get(self, url, mod):
       if url == 'movies://actors':
-         return gui.load_icon('icon/head')
+         return 'icon/head'
       elif url == 'movies://directors':
-         return gui.load_icon('icon/head')
+         return 'icon/head'
 
 class ActorItemClass(EmcItemClass):
    def item_selected(self, url, name):
-      _mod._browser.page_add(url, name, None, _mod.populate_actor_movies)
+      _mod._browser.page_add(url, name, _mod._styles_for_folders,
+                             _mod.populate_actor_movies)
 
    def label_get(self, url, name):
       return name
@@ -126,7 +127,8 @@ class ActorItemClass(EmcItemClass):
 
 class DirectorItemClass(EmcItemClass):
    def item_selected(self, url, name):
-      _mod._browser.page_add(url, name, None, _mod.populate_director_movies)
+      _mod._browser.page_add(url, name, _mod._styles_for_folders,
+                             _mod.populate_director_movies)
 
    def label_get(self, url, name):
       return name
@@ -166,6 +168,10 @@ class MovieItemClass(EmcItemClass):
          poster = get_poster_filename(e['id'])
          if os.path.exists(poster):
             return poster
+         else:
+            return 'special/bd/' + utf8_to_markup(e['title'])
+      else:
+         return 'special/bd/' + utf8_to_markup(os.path.basename(url))
 
    def fanart_get(self, url, mod):
       if mod._movie_db.id_exists(url):
@@ -196,15 +202,11 @@ class MovieItemClass(EmcItemClass):
                   _('Year'), year or _('Unknown'))
       return text
 
-class FolderItemClass(EmcItemClass):
+class MyFolderItemClass(FolderItemClass):
    def item_selected(self, url, mod):
-      mod._browser.page_add(url, os.path.basename(url), None, mod.populate_url)
+      mod._browser.page_add(url, os.path.basename(url),
+                            mod._styles_for_folders, mod.populate_url)
 
-   def label_get(self, url, mod):
-      return os.path.basename(url)
-
-   def icon_get(self, url, mod):
-      return 'icon/folder'
 
 
 class MoviesModule(EmcModule):
@@ -220,6 +222,7 @@ class MoviesModule(EmcModule):
    _scanner = None     # BackgroundScanner instance
    _actors_cache = None    # key: actor name     val: [list of films urls]
    _directors_cache = None # key: director name  val: [list of films urls]
+   _styles_for_folders = ('List', 'PosterGrid')
 
    def __init__(self):
       global _mod
@@ -313,9 +316,11 @@ class MoviesModule(EmcModule):
 
       # start the browser in the wanted page
       if url is None:
-         self._browser.page_add('movies://root', _('Movies'), None, self.populate_root_page)
+         self._browser.page_add('movies://root', _('Movies'),
+                                None, self.populate_root_page)
       else:
-         self._browser.page_add(url, os.path.basename(url), None, self.populate_url)
+         self._browser.page_add(url, os.path.basename(url),
+                                self._styles_for_folders, self.populate_url)
          
       self._browser.show()
       mainmenu.hide()
@@ -332,7 +337,7 @@ class MoviesModule(EmcModule):
 
    def populate_root_page(self, browser, page_url):
       for f in self._folders:
-         self._browser.item_add(FolderItemClass(), f, self)
+         self._browser.item_add(MyFolderItemClass(), f, self)
 
       self._browser.item_add(SpecialItemClass(), 'movies://directors', self)
       self._browser.item_add(SpecialItemClass(), 'movies://actors', self)
@@ -351,7 +356,7 @@ class MoviesModule(EmcModule):
                   files.append(fname)
 
       for fname in utils.natural_sort(dirs):
-         self._browser.item_add(FolderItemClass(), os.path.join(url, fname), self)
+         self._browser.item_add(MyFolderItemClass(), os.path.join(url, fname), self)
       for fname in utils.natural_sort(files):
          self._browser.item_add(MovieItemClass(), os.path.join(url, fname), self)
 

@@ -671,7 +671,10 @@ class ViewList(object):
          gui.signal_emit('browser,list,info,hide')
 
       # Ask for the item poster
-      self._poster.url_set(item_class.poster_get(url, user_data))
+      if not isinstance(item_class, (BackItemClass, FolderItemClass)):
+         self._poster.url_set(item_class.poster_get(url, user_data))
+      else:
+         self._poster.url_set(None)
 
       self._timer = None
       return ecore.ECORE_CALLBACK_CANCEL

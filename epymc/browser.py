@@ -471,7 +471,7 @@ class ViewList(object):
       DBG('Init view: plain list')
 
       self._last_focused_item = None
-      self.timer1 = self.timer2 = None
+      self._timer1 = self._timer2 = None
       self.items_count = 0;            # This is accessed from the browser
 
       # EXTERNAL Genlists
@@ -557,16 +557,14 @@ class ViewList(object):
 
    def hide(self):
       """ Hide the view """
-      if self.timer1: self.timer1.delete()
-      if self.timer2: self.timer2.delete()
+      self._clear_timers()
       gui.signal_emit('browser,list,hide')
       gui.signal_emit('browser,list,info,hide')
       self._ase.autoscroll = False
 
    def clear(self):
       """ Clear the view """
-      if self.timer1: self.timer1.delete()
-      if self.timer2: self.timer2.delete()
+      self._clear_timers()
       self.gl1.clear()
       self.gl2.clear()
       self.items_count = 0
@@ -576,10 +574,10 @@ class ViewList(object):
       # update visible items
       for item in self.current_list.realized_items_get():
          item.update()
-      # also request new poster & new info
+      # also request new poster, info and backdrop
       item =  self.current_list.selected_item
-      self._cb_timer1(item.data_get())
-      self._cb_timer2(item.data_get())
+      self._info_timer_cb(item.data_get())
+      self._backdrop_timer_cb(item.data_get())
 
    def item_bring_in(self, pos='top', animated=True):
       try:
@@ -667,15 +665,14 @@ class ViewList(object):
 
    def _cb_item_hilight(self, gl, item):
       self._last_focused_item = item
-      if self.timer1: self.timer1.delete()
-      if self.timer2: self.timer2.delete()
-      self.timer1 = ecore.timer_add(0.5, self._cb_timer1, item.data_get())
-      self.timer2 = ecore.timer_add(1.0, self._cb_timer2, item.data_get())
+      self._clear_timers()
+      self._timer1 = ecore.timer_add(0.5, self._info_timer_cb, item.data_get())
+      self._timer2 = ecore.timer_add(1.0, self._backdrop_timer_cb, item.data_get())
 
    def _cb_item_unhilight(self, gl, item):
       pass
 
-   def _cb_timer1(self, item_data):
+   def _info_timer_cb(self, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
 
       # Fill the textblock with item info info
@@ -697,7 +694,7 @@ class ViewList(object):
       self._timer1 = None
       return ecore.ECORE_CALLBACK_CANCEL
 
-   def _cb_timer2(self, item_data):
+   def _backdrop_timer_cb(self, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
 
       # Ask for the item fanart
@@ -706,6 +703,14 @@ class ViewList(object):
 
       self._timer2 = None
       return ecore.ECORE_CALLBACK_CANCEL
+
+   def _clear_timers(self):
+      if self._timer1:
+         self._timer1.delete()
+         self._timer1 = None
+      if self._timer2:
+         self._timer2.delete()
+         self._timer2 = None
 
 
 ################################################################################
@@ -717,8 +722,7 @@ class ViewPosterGrid(object):
       DBG('Init view: grid')
       self.items_count = 0
       self._last_focused_item = None
-      self._timer1 = None
-      self._timer2 = None
+      self._timer1 = self._timer2 = None
 
       # Gengrid
       self.itc = GengridItemClass(item_style='default',
@@ -754,18 +758,20 @@ class ViewPosterGrid(object):
       gui.signal_emit('browser,grid,show')
 
    def hide(self):
-      if self.timer1: self.timer1.delete()
-      if self.timer2: self.timer2.delete()
+      self._clear_timers()
       gui.signal_emit('browser,grid,hide')
 
    def clear(self):
-      if self.timer1: self.timer1.delete()
-      if self.timer2: self.timer2.delete()
+      self._clear_timers()
       self.items_count = 0
       self.gg.clear()
 
    def refresh(self):
       self.gg.realized_items_update()
+      # also request new info and backdrop
+      item =  self.gg.selected_item
+      self._info_timer_cb(item.data_get())
+      self._backdrop_timer_cb(item.data_get())
 
    def item_bring_in(self, pos='top', animated=True):
       try:
@@ -859,8 +865,7 @@ class ViewPosterGrid(object):
    # gengrid callbacks
    def gg_higlight(self, gg, item, *args, **kwargs):
       self._last_focused_item = item
-      if self._timer1: self._timer1.delete()
-      if self._timer2: self._timer2.delete()
+      self._clear_timers()
       self._timer1 = ecore.timer_add(0.5, self._info_timer_cb, item.data_get())
       self._timer2 = ecore.timer_add(1.0, self._backdrop_timer_cb, item.data_get())
 
@@ -893,3 +898,11 @@ class ViewPosterGrid(object):
 
       self._timer2 = None
       return ecore.ECORE_CALLBACK_CANCEL
+
+   def _clear_timers(self):
+      if self._timer1:
+         self._timer1.delete()
+         self._timer1 = None
+      if self._timer2:
+         self._timer2.delete()
+         self._timer2 = None

@@ -35,7 +35,7 @@ from efl.elementary.label import Label, ELM_WRAP_NONE, \
 from epymc import gui, mainmenu, input_events, ini
 from epymc.sdb import EmcDatabase
 from epymc.utils import Singleton
-from epymc.gui import EmcRemoteImage, EmcScrolledEntry, EmcButton, \
+from epymc.gui import EmcImage, EmcScrolledEntry, EmcButton, \
    EmcFocusManager, EXPAND_BOTH, FILL_BOTH
 
 def DBG(msg):
@@ -496,7 +496,7 @@ class ViewList(object):
                                   content_get_func=self.__gl_content_get)
 
       # RemoteImage (poster)
-      self._poster = EmcRemoteImage()
+      self._poster = EmcImage()
       gui.swallow_set('browser.list.poster', self._poster)
 
       # AutoScrolledEntry (info)
@@ -647,10 +647,10 @@ class ViewList(object):
       (item_class, url, user_data) = item_data                                  # 3 #
       if part == 'elm.swallow.icon':
          icon = item_class.icon_get(url, user_data)
-         return EmcRemoteImage(icon) if icon else None
+         return EmcImage(icon) if icon else None
       if part == 'elm.swallow.end':
          icon = item_class.icon_end_get(url, user_data)
-         return EmcRemoteImage(icon) if icon else None
+         return EmcImage(icon) if icon else None
 
    ### GenList Callbacks
    def _cb_item_realized(self, gl, item):
@@ -845,16 +845,16 @@ class ViewPosterGrid(object):
       if part == 'elm.swallow.icon':
          poster = item_class.poster_get(url, user_data)
          if poster:
-            return EmcRemoteImage(poster, fill_outside=True)
+            return EmcImage(poster, fill_outside=True)
          else:
             label = item_class.label_get(url, user_data)
             icon = item_class.icon_get(url, user_data)
-            return EmcRemoteImage('special/icon/' + label, icon=icon)
+            return EmcImage('special/icon/' + label, icon=icon)
 
       if part == 'elm.swallow.end':
          icon = item_class.icon_end_get(url, user_data)
          if icon:
-            return EmcRemoteImage(icon)
+            return EmcImage(icon)
 
    # gengrid callbacks
    def gg_higlight(self, gg, item, *args, **kwargs):

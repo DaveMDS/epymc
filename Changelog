@@ -16,17 +16,21 @@ Bug fixed:
  * Fixed posters for the vimeo channel
  * Fixed tmdb language selector in config
  * Fixed (hopefully) subs decoding
+ * Removed usage of elm deprecated ObjectItem.data_get() function
+ * Removed edc warning about "fixed: 1 1"
 
 
 New features:
 
- * Automatically download and update youtube-dl
+ * New Photo module
+ * New Watchdog module (sadly gstreamer1 continue to hang the mainloop for me)
+ * New PosterGrid view
  * New South Park Studios online video channel
+ * Automatically (and manually) download and update youtube-dl
  * New themoviedb.org online video channel (with movie trailers)
  * Better zapiks video schannel
  * Cache to file remote images for faster reloading
  * Support remote urls also in the mediaplayer cover image
- * New watchdog module (sadly gstreamer1 continue to hang the mainloop for me)
 
 
 ===============================================================================

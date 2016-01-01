@@ -176,7 +176,7 @@ def load_icon(icon):
    """
    if not icon:
       return None
-   if type(icon) in (Icon, Image, EmcRemoteImage):
+   if type(icon) in (Icon, Image, EmcImage):
       return icon
    ic = Icon(win)
    if icon[0] == '/':
@@ -199,7 +199,7 @@ def load_image(name, path = None):
    @return ElmImage
    @example: load_image('my_image.png', os.path.dirname(__file__))
 
-   DEPRECATED: use EmcRemoteImage instead !!!
+   DEPRECATED: use EmcImage instead !!!
 
    """
    DBG('Requested image: ' + str(name))
@@ -207,7 +207,7 @@ def load_image(name, path = None):
 
    # remote urls
    if name.startswith(('http://', 'https://')):
-      return EmcRemoteImage(name)
+      return EmcImage(name)
 
    im = Image(win)
 
@@ -682,7 +682,7 @@ class EmcMenu(Menu):
       return input_events.EVENT_CONTINUE
 
 ################################################################################
-class EmcRemoteImage(Image):
+class EmcImage(Image):
    """ An image object with support for remote url, with optional
        saving of the downloaded image to a local destination and a simple
        cache-to-file mechanism to avoid re-downloading the image again.
@@ -742,7 +742,7 @@ class EmcRemoteImage(Image):
          self.file_set(theme_file,  'emc/image/' + style)
          self.object.part_text_set('emc.text', text)
          if icon:
-            self._icon_obj = EmcRemoteImage(icon)
+            self._icon_obj = EmcImage(icon)
             self.object.part_swallow('emc.icon', self._icon_obj)
          return
 

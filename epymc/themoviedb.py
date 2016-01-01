@@ -31,7 +31,7 @@ except: # py2
    from urllib import urlencode
 
 import epymc.utils as utils
-from epymc.gui import EmcDialog, EmcRemoteImage
+from epymc.gui import EmcDialog, EmcImage
 
 
 def DBG(msg):
@@ -554,7 +554,7 @@ class CastPanel(EmcDialog):
       if self.info['place_of_birth']:
          text += '<name>%s:</> %s<br>' % (_('Place of birth'), self.info['place_of_birth'])
 
-      image = EmcRemoteImage(self.info['profile_path'])
+      image = EmcImage(self.info['profile_path'])
       EmcDialog.__init__(self, title=self.info['name'], style='panel',
                                content=image, text=text)
 
@@ -566,7 +566,7 @@ class CastPanel(EmcDialog):
    def photos_dialog(self):
       dia = EmcDialog(style='image_list_horiz', title=self.info['name'])
       for image in self.info['images']['profiles']:
-         img = EmcRemoteImage(image['file_path'])
+         img = EmcImage(image['file_path'])
          dia.list_item_append(None, img)
       dia.list_go()
 
@@ -574,7 +574,7 @@ class CastPanel(EmcDialog):
       dia = EmcDialog(style='list', title=self.info['name'])
       for movie in self.info['credits']['cast']:
          label = _('%(title)s as %(character)s') % (movie)
-         icon = EmcRemoteImage(movie['poster_path'])
+         icon = EmcImage(movie['poster_path'])
          icon.size_hint_min_set(100, 100) # TODO FIXME
          dia.list_item_append(label, icon)
       dia.list_go()

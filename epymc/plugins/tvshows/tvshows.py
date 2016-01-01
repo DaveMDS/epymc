@@ -29,7 +29,7 @@ from efl.elementary.entry import utf8_to_markup
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass, FolderItemClass
 from epymc.sdb import EmcDatabase
-from epymc.gui import EmcDialog, EmcSourcesManager, EmcNotify, EmcRemoteImage
+from epymc.gui import EmcDialog, EmcSourcesManager, EmcNotify, EmcImage
 from epymc.themoviedb import TMDBv3, CastPanel, get_tv_backdrop_filename, \
    get_tv_poster_filename, get_tv_icon_filename
 
@@ -487,7 +487,7 @@ class InfoPanel(EmcDialog):
       dia = EmcDialog(style='image_list_horiz', title=title,
                       done_cb=self._image_choosed_cb)
       for poster in results:
-         icon = EmcRemoteImage(poster['thumb_url'])
+         icon = EmcImage(poster['thumb_url'])
          dia.list_item_append(None, icon, dwnl_url=poster['url'],
                      dest_path=get_tv_poster_filename(poster['movie_id']),
                      icon_url=poster['icon_url'])
@@ -502,7 +502,7 @@ class InfoPanel(EmcDialog):
       dia = EmcDialog(style='image_list_vert', title=title,
                       done_cb=self._image_choosed_cb)
       for backdrop in results:
-         icon = EmcRemoteImage(backdrop['thumb_url'])
+         icon = EmcImage(backdrop['thumb_url'])
          dia.list_item_append(None, icon, dwnl_url=backdrop['url'],
                      dest_path=get_tv_backdrop_filename(backdrop['movie_id']))
       dia.list_go()
@@ -535,7 +535,7 @@ class InfoPanel(EmcDialog):
 
       for person in self._db_data['cast']:
          label = _('%(name)s as %(character)s') % (person)
-         icon = EmcRemoteImage(person['profile_path'])
+         icon = EmcImage(person['profile_path'])
          icon.size_hint_min_set(100, 100) # TODO FIXME
          dia.list_item_append(label, icon, None, person['id'])
       dia.list_go()
@@ -557,7 +557,7 @@ class InfoPanel(EmcDialog):
                          done_cb=self._result_choosed_cb)
          for item in results:
             if item['poster_url']:
-               img = EmcRemoteImage(item['poster_url'])
+               img = EmcImage(item['poster_url'])
                img.size_hint_min_set(100, 100) # TODO fixme
             else:
                img = None

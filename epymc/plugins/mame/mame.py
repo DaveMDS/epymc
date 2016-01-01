@@ -28,7 +28,7 @@ from efl import evas, ecore, elementary
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
-from epymc.gui import EmcDialog, EmcRemoteImage
+from epymc.gui import EmcDialog, EmcImage
 from epymc.utils import EmcExec
 import epymc.mainmenu as mainmenu
 import epymc.browser as browser
@@ -398,7 +398,7 @@ class MameGame(object):
          return
 
       (local, remote) = self.poster_get()
-      image = EmcRemoteImage(remote, local)
+      image = EmcImage(remote, local)
       text = '<name>%s:</> %s<br>' \
              '<name>%s:</> %s<br>' \
              '<name>%s:</> %s<br>' \

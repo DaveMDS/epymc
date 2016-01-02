@@ -69,8 +69,10 @@ def init():
    _topbar_fman.unfocus()
    topbar_button_add('view_list', 'icon/view_list',
                      input_events.event_emit, 'VIEW_LIST')
-   topbar_button_add('view_grid', 'icon/view_postergrid',
+   topbar_button_add('view_postergrid', 'icon/view_postergrid',
                      input_events.event_emit, 'VIEW_POSTERGRID')
+   topbar_button_add('view_covergrid', 'icon/view_covergrid',
+                     input_events.event_emit, 'VIEW_COVERGRID')
 
 def shutdown():
    global _memorydb
@@ -439,6 +441,9 @@ class EmcBrowser(object):
       elif event == 'VIEW_POSTERGRID':
          self.change_style('PosterGrid')
          return input_events.EVENT_BLOCK
+      elif event == 'VIEW_COVERGRID':
+         self.change_style('CoverGrid')
+         return input_events.EVENT_BLOCK
 
       return input_events.EVENT_CONTINUE
 
@@ -722,10 +727,11 @@ class ViewList(object):
 class ViewPosterGrid(object):
    def __init__(self):
       """ TODO Function doc """
-      DBG('Init view: grid')
+      DBG('Init view: ' + type(self).__name__)
       self.items_count = 0
       self._last_focused_item = None
       self._timer1 = self._timer2 = None
+      self.setup_theme_hooks()
 
       # Gengrid
       self.itc = GengridItemClass(item_style='default',
@@ -735,11 +741,21 @@ class ViewPosterGrid(object):
                         size_hint_expand=EXPAND_BOTH, size_hint_fill=FILL_BOTH)
       self.gg.callback_selected_add(self.gg_higlight)
       self.gg.callback_clicked_double_add(self.gg_selected)
-      gui.swallow_set('browser.grid.gengrid', self.gg)
+      gui.swallow_set(self._grid_swallow, self.gg)
 
       # AutoScrolledEntry (info)
       self._ase = EmcScrolledEntry(autoscroll=True)
-      gui.swallow_set('browser.grid.info', self._ase)
+      gui.swallow_set(self._info_swallow, self._ase)
+
+   def setup_theme_hooks(self):
+      """ setup stuff that is different between Poster and Cover views """
+      self._grid_swallow =     'browser.postergrid.gengrid'
+      self._info_swallow =     'browser.postergrid.info'
+      self._total_text =       'browser.postergrid.total'
+      self._signal_show =      'browser,postergrid,show'
+      self._signal_hide =      'browser,postergrid,hide'
+      self._signal_info_show = 'browser,postergrid,info,show'
+      self._signal_info_hide = 'browser,postergrid,info,hide'
 
    def page_show(self, title, anim):
       self.gg.clear()
@@ -753,17 +769,18 @@ class ViewPosterGrid(object):
          it.show()
 
       self.items_count += 1
-      gui.text_set('browser.grid.total',
+      gui.text_set(self._total_text,
          ngettext('%d item', '%d items', self.items_count) % (self.items_count))
 
    def show(self):
       size = ini.get_int('general', 'view_postergrid_size')
       self.gg.item_size = size, int(size * 1.5)
-      gui.signal_emit('browser,grid,show')
+      gui.signal_emit(self._signal_show)
 
    def hide(self):
       self._clear_timers()
-      gui.signal_emit('browser,grid,hide')
+      gui.signal_emit(self._signal_hide)
+      gui.signal_emit(self._signal_info_hide)
 
    def clear(self):
       self._clear_timers()
@@ -885,10 +902,10 @@ class ViewPosterGrid(object):
       if text:
          self._ase.text_set(text)
          self._ase.autoscroll = True
-         gui.signal_emit('browser,grid,info,show')
+         gui.signal_emit(self._signal_info_show)
       else:
          self._ase.autoscroll = False
-         gui.signal_emit('browser,grid,info,hide')
+         gui.signal_emit(self._signal_info_hide)
 
       self._timer1 = None
       return ecore.ECORE_CALLBACK_CANCEL
@@ -910,3 +927,22 @@ class ViewPosterGrid(object):
       if self._timer2:
          self._timer2.delete()
          self._timer2 = None
+
+
+################################################################################
+#### CoverGrid View ############################################################
+################################################################################
+class ViewCoverGrid(ViewPosterGrid):
+   def setup_theme_hooks(self):
+      self._grid_swallow =     'browser.covergrid.gengrid'
+      self._info_swallow =     'browser.covergrid.info'
+      self._total_text =       'browser.covergrid.total'
+      self._signal_show =      'browser,covergrid,show'
+      self._signal_hide =      'browser,covergrid,hide'
+      self._signal_info_show = 'browser,covergrid,info,show'
+      self._signal_info_hide = 'browser,covergrid,info,hide'
+
+   def show(self):
+      size = ini.get_int('general', 'view_covergrid_size')
+      self.gg.item_size = size, size
+      gui.signal_emit(self._signal_show)

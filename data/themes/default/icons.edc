@@ -52,8 +52,8 @@ ICON("prev")
 
 ICON("views")
 ICON("view_list")
-ICON("view_grid")
 ICON("view_postergrid")
+ICON("view_covergrid")
 
 ICON("star")
 ICON("star_off")

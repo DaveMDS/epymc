@@ -3,7 +3,7 @@
 
 
 Main elementary layout group: "emc/main/layout".
-All the icons adn images in icons.edc must be implemented.
+All the icons and images in icons.edc must be implemented.
 
 ### Theme info ###
    * Required data items:
@@ -60,17 +60,30 @@ All the icons adn images in icons.edc must be implemented.
       "browser,list,info,hide" "emc"
 
 
-### Browser: Grid View ###
+### Browser: PosterGrid View ###
    * Required parts:
-      "browser.grid.gengrid" -> edje swallow
-      "browser.grid.info" -> edje swallow -> EmcScrolledEntry
-      "browser.grid.total" -> edje TEXT
+      "browser.postergrid.gengrid" -> edje swallow
+      "browser.postergrid.total" -> edje TEXT
+      "browser.postergrid.info" -> edje swallow -> EmcScrolledEntry
 
    * Signals received from the application:
-      "browser,grid,show" "emc"
-      "browser,grid,hide" "emc"
-      "browser,grid,info,show" "emc"
-      "browser,grid,info,hide" "emc"
+      "browser,postergrid,show" "emc"
+      "browser,postergrid,hide" "emc"
+      "browser,postergrid,info,show" "emc"
+      "browser,postergrid,info,hide" "emc"
+
+
+### Browser: CoverGrid View ###
+   * Required parts:
+      "browser.covergrid.gengrid" -> edje swallow
+      "browser.covergrid.total" -> edje TEXT
+      "browser.covergrid.info" -> edje swallow -> EmcScrolledEntry
+
+   * Signals received from the application:
+      "browser,covergrid,show" "emc"
+      "browser,covergrid,hide" "emc"
+      "browser,covergrid,info,show" "emc"
+      "browser,covergrid,info,hide" "emc"
 
 
 ### Video Player ###

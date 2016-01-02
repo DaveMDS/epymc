@@ -1,8 +1,8 @@
 
-                     EpyMC KEY BINDINGS
+                     EpyMC KEYBOARD BINDINGS
 
-This is the list of supported key, look at modules/input_keyb/keyb.py
-to see the real mapping.
+This is the list of default keyboard bindings, you can change them from the
+configuration section inside the app or directly from the config file.
 
 
 KEYS                             ACTION
@@ -13,19 +13,28 @@ BackSpace                        BACK
 RightMouseButton                 BACK
 Esc                              EXIT
 Space, p or Pause                TOGGLE_PAUSE
-s                                STOP
-z                                FAST_BACKWARD
-x                                BACKWARD
-c                                FORWARD
-v                                FAST_FORWARD
+S                                STOP
+Z                                FAST_BACKWARD
+X                                BACKWARD
+C                                FORWARD
+V                                FAST_FORWARD
+
+Q                                SUBS_DELAY_LESS
+W                                SUBS_DELAY_MORE
+E                                SUBS_DELAY_ZERO
+
+N                                PLAYLIST_NEXT
+B                                PLAYLIST_PREV
+
 
 + or KP_+                        VOLUME_UP
 - or KP_-                        VOLUME_DOWN
 M                                VOLUME_MUTE
 
-f                                TOGGLE_FULLSCREEN
+F                                TOGGLE_FULLSCREEN
 F1                               VIEW_LIST
-F2                               VIEW_GRID
+F2                               VIEW_POSTERGRID
+F3                               VIEW_COVERGRID
 
 F5                               SMALLER SCALE
 F6                               BIGGER SCALE

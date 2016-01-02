@@ -391,7 +391,7 @@ collections {
             target: "topbar.clip";
          }
 
-/// browser view: list
+/// browser view: List
          part { name: "browser.list.clip";
             type: RECT;
             description { state: "default" 0.0;
@@ -675,8 +675,8 @@ collections {
             target: "browser.list.genlist1";
          }
 
-/// browser view: grid
-         part { name: "browser.grid.clip";
+/// browser view: Poster Grid
+         part { name: "browser.postergrid.clip";
             type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 0;
@@ -687,9 +687,9 @@ collections {
                visible: 1;
             }
          }
-         part { name: "browser.grid.grid_frame";
+         part { name: "browser.postergrid.grid_frame";
             type: IMAGE;
-            clip_to: "browser.grid.clip";
+            clip_to: "browser.postergrid.clip";
             description { state: "default" 0.0;
                rel1.offset: 0 10;
                rel1.to: "topbar.list.spacer";
@@ -700,48 +700,48 @@ collections {
                image.border: 32 32 92 78;
             }
          }
-         part { name: "browser.grid.gengrid"; /* API */
+         part { name: "browser.postergrid.gengrid"; /* API */
             type: SWALLOW;
-            clip_to: "browser.grid.clip";
+            clip_to: "browser.postergrid.clip";
             description { state: "default" 0.0;
                rel1 {
-                  to: "browser.grid.grid_frame";
+                  to: "browser.postergrid.grid_frame";
                   offset: 26 10;
                }
                rel2 {
-                  to: "browser.grid.grid_frame";
+                  to: "browser.postergrid.grid_frame";
                   offset: -20 -79;
                }
             }
          }
-         part { name: "browser.grid.total.bg";
-            clip_to: "browser.grid.clip";
+         part { name: "browser.postergrid.total.bg";
+            clip_to: "browser.postergrid.clip";
             description { state: "default" 0.0;
                image {
                   normal: "frame_box.png";
                   border: 3 3 3 3;
                }
-               rel1.to: "browser.grid.total";
+               rel1.to: "browser.postergrid.total";
                rel1.offset: -15 -3;
-               rel2.to: "browser.grid.total";
+               rel2.to: "browser.postergrid.total";
                rel2.offset: 14 2;
             }
          }
-         part { name: "browser.grid.total"; /* API */
+         part { name: "browser.postergrid.total"; /* API */
             type: TEXT;
-            clip_to: "browser.grid.clip";
+            clip_to: "browser.postergrid.clip";
             effect: SHADOW;
             scale: 1;
             description { state: "default" 0.0;
                color: FONT_COLOR;
                color3: 0 0 0 255;
                rel1 {
-                  to: "browser.grid.grid_frame";
+                  to: "browser.postergrid.grid_frame";
                   relative: 0.0 1.0;
                   offset: 0 -105;
                }
                rel2 {
-                  to: "browser.grid.grid_frame";
+                  to: "browser.postergrid.grid_frame";
                }
                text {
                   text: "X items";
@@ -752,9 +752,9 @@ collections {
                }
             }
          }
-         part { name: "browser.grid.info_bg";
+         part { name: "browser.postergrid.info_bg";
             type: IMAGE;
-            clip_to: "browser.grid.clip";
+            clip_to: "browser.postergrid.clip";
             description { state: "default" 0.0;
                fixed: 1 1;
                image {
@@ -762,7 +762,7 @@ collections {
                   border: 8 8 8 8;
                }
                rel1 {
-                  to_y: "browser.grid.gengrid";
+                  to_y: "browser.postergrid.gengrid";
                   relative: (0.65 + 0.40) 0.5;
                   offset: -7 -7;
                }
@@ -777,50 +777,198 @@ collections {
                rel2.relative: (1.0 + 0.0) 1.0;
             }
          }
-         part { name: "browser.grid.info"; /* API */
+         part { name: "browser.postergrid.info"; /* API */
             type: SWALLOW;
-            clip_to: "browser.grid.clip";
+            clip_to: "browser.postergrid.clip";
             scale: 1;
             description { state: "default" 0.0;
                fixed: 1 1;
                rel1 {
-                  to: "browser.grid.info_bg";
+                  to: "browser.postergrid.info_bg";
                   offset: 15 9;
                }
                rel2 {
-                  to: "browser.grid.info_bg";
+                  to: "browser.postergrid.info_bg";
                   offset: -12 -10;
                }
             }
          }
-         program { name: "browser_grid_show"; /* API */
-            signal: "browser,grid,show";
+         program { name: "browser_postergrid_show"; /* API */
+            signal: "browser,postergrid,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: LINEAR 1.0;
-            target: "browser.grid.clip";
+            target: "browser.postergrid.clip";
          }
-         program { name: "browser_grid_hide"; /* API */
-            signal: "browser,grid,hide";
+         program { name: "browser_postergrid_hide"; /* API */
+            signal: "browser,postergrid,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: LINEAR 0.5;
-            target: "browser.grid.clip";
+            target: "browser.postergrid.clip";
          }
-         program { name: "browser_grid_info_show"; /* API */
-            signal: "browser,grid,info,show";
+         program { name: "browser_postergrid_info_show"; /* API */
+            signal: "browser,postergrid,info,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.35;
-            target: "browser.grid.info_bg";
+            target: "browser.postergrid.info_bg";
          }
-         program { name: "browser_grid_info_hide"; /* API */
-            signal: "browser,grid,info,hide";
+         program { name: "browser_postergrid_info_hide"; /* API */
+            signal: "browser,postergrid,info,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: ACCELERATE 0.35;
-            target: "browser.grid.info_bg";
+            target: "browser.postergrid.info_bg";
          }
+
+/// browser view: Cover Grid
+         part { name: "browser.covergrid.clip";
+            type: RECT;
+            description { state: "default" 0.0;
+               color: 255 255 255 0;
+               visible: 0;
+            }
+            description { state: "visible" 0.0;
+               color: 255 255 255 255;
+               visible: 1;
+            }
+         }
+         part { name: "browser.covergrid.grid_frame";
+            type: IMAGE;
+            clip_to: "browser.covergrid.clip";
+            description { state: "default" 0.0;
+               rel1.offset: 0 10;
+               rel1.to: "topbar.list.spacer";
+               rel1.relative: 0.0 1.0;
+               rel2.relative: 0.65 1.0;
+               rel2.offset: -1 10;
+               image.normal: "frame.png";
+               image.border: 32 32 92 78;
+            }
+         }
+         part { name: "browser.covergrid.gengrid"; /* API */
+            type: SWALLOW;
+            clip_to: "browser.covergrid.clip";
+            description { state: "default" 0.0;
+               rel1 {
+                  to: "browser.covergrid.grid_frame";
+                  offset: 26 10;
+               }
+               rel2 {
+                  to: "browser.covergrid.grid_frame";
+                  offset: -20 -79;
+               }
+            }
+         }
+         part { name: "browser.covergrid.total.bg";
+            clip_to: "browser.covergrid.clip";
+            description { state: "default" 0.0;
+               image {
+                  normal: "frame_box.png";
+                  border: 3 3 3 3;
+               }
+               rel1.to: "browser.covergrid.total";
+               rel1.offset: -15 -3;
+               rel2.to: "browser.covergrid.total";
+               rel2.offset: 14 2;
+            }
+         }
+         part { name: "browser.covergrid.total"; /* API */
+            type: TEXT;
+            clip_to: "browser.covergrid.clip";
+            effect: SHADOW;
+            scale: 1;
+            description { state: "default" 0.0;
+               color: FONT_COLOR;
+               color3: 0 0 0 255;
+               rel1 {
+                  to: "browser.covergrid.grid_frame";
+                  relative: 0.0 1.0;
+                  offset: 0 -105;
+               }
+               rel2 {
+                  to: "browser.covergrid.grid_frame";
+               }
+               text {
+                  text: "X items";
+                  font: FONT;
+                  size: FONT_SIZE;
+                  align: 0.5 0.5;
+                  max: 1 1;
+               }
+            }
+         }
+         part { name: "browser.covergrid.info_bg";
+            type: IMAGE;
+            clip_to: "browser.covergrid.clip";
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               image {
+                  normal: "frame2.png";
+                  border: 8 8 8 8;
+               }
+               rel1 {
+                  to_y: "browser.covergrid.gengrid";
+                  relative: (0.65 + 0.40) 0.5;
+                  offset: -7 -7;
+               }
+               rel2 {
+                  relative: (1.0 + 0.40) 1.0;
+                  offset: -20 -9;
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               rel1.relative: (0.65 + 0.0) 0.5;
+               rel2.relative: (1.0 + 0.0) 1.0;
+            }
+         }
+         part { name: "browser.covergrid.info"; /* API */
+            type: SWALLOW;
+            clip_to: "browser.covergrid.clip";
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1 {
+                  to: "browser.covergrid.info_bg";
+                  offset: 15 9;
+               }
+               rel2 {
+                  to: "browser.covergrid.info_bg";
+                  offset: -12 -10;
+               }
+            }
+         }
+         program { name: "browser_covergrid_show"; /* API */
+            signal: "browser,covergrid,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: LINEAR 1.0;
+            target: "browser.covergrid.clip";
+         }
+         program { name: "browser_covergrid_hide"; /* API */
+            signal: "browser,covergrid,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: LINEAR 0.5;
+            target: "browser.covergrid.clip";
+         }
+         program { name: "browser_covergrid_info_show"; /* API */
+            signal: "browser,covergrid,info,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.35;
+            target: "browser.covergrid.info_bg";
+         }
+         program { name: "browser_covergrid_info_hide"; /* API */
+            signal: "browser,covergrid,info,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.35;
+            target: "browser.covergrid.info_bg";
+         }
+
 /// filemanager
          part { name: "fileman.clip";
             type: RECT;

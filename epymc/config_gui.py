@@ -463,7 +463,7 @@ def _views_populate(browser, url):
                             _('Poster grid items size'), 'icon/view_postergrid',
                             fmt='%.0f', udm='px', min=50, max=500, step=25)
    standard_item_number_add('general', 'view_covergrid_size',
-                            _('Cover grid items size'), 'icon/view_grid',
+                            _('Cover grid items size'), 'icon/view_covergrid',
                             fmt='%.0f', udm='px', min=50, max=500, step=25)
    
 ##############  THEMES  #######################################################

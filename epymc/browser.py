@@ -332,6 +332,9 @@ class EmcBrowser(object):
       if view == self.current_view:
          return
 
+      # remember the selected item
+      self.autoselect_url = self.current_view.selected_url_get()
+
       # clear & hide the current view
       self.current_view.clear()
       self.current_view.hide()
@@ -615,6 +618,12 @@ class ViewList(object):
       """ remove the focus to the view, unselect the selected item """
       self.current_list.selected_item.selected = False
 
+   def selected_url_get(self):
+      """ return the url of the currently hilighted item """
+      item = self.current_list.selected_item_get()
+      (item_class, url, user_data) = item.data_get()                            # 3 #
+      return url
+      
    def input_event_cb(self, event):
       """ Here you can manage input events for the view """
 
@@ -819,6 +828,12 @@ class ViewPosterGrid(object):
 
    def unfocus(self):
       self.gg.selected_item.selected = False
+
+   def selected_url_get(self):
+      """ return the url of the currently hilighted item """
+      item = self.gg.selected_item_get()
+      (item_class, url, user_data) = item.data_get()                            # 3 #
+      return url
 
    def input_event_cb(self, event):
       item = self.gg.selected_item_get()

@@ -360,10 +360,16 @@ def signal_cb_del(emission, source, cb):
    layout.signal_callback_del(emission, source, cb)
 
 def text_set(part, text):
-   layout.part_text_set(part, text)
+   layout.text_set(part, text)
 
-def swallow_set(part, obj):
-   layout.part_content_set(part, obj)
+def swallow_set(part, obj, delete_old=True):
+   if delete_old is True:
+      layout.content_set(part, obj)
+      return None
+   else:
+      ret = layout.content_unset(part)
+      layout.content_set(part, obj)
+      return ret
 
 def slider_val_set(part, value):
    layout.edje_get().part_drag_value_set(part, value, value)

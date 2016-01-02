@@ -50,6 +50,7 @@ ICON("arrowD")
 ICON("next")
 ICON("prev")
 
+ICON("views")
 ICON("view_list")
 ICON("view_grid")
 ICON("view_postergrid")

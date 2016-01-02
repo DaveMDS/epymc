@@ -58,8 +58,11 @@ def init():
    global _topbar_fman
 
    _memorydb = EmcDatabase('browser_view_memory')
-   if not ini.has_option('general', 'back_in_lists'):
-      ini.set('general', 'back_in_lists', 'True')
+
+   # setup default configs
+   ini.get('general', 'back_in_lists', default_value='True')
+   ini.get('general', 'view_postergrid_size', default_value=150)
+   ini.get('general', 'view_covergrid_size', default_value=150)
 
     # fill buttons box in topbar
    _topbar_fman = EmcFocusManager('topbar')

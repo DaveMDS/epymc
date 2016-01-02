@@ -257,6 +257,50 @@ class StdConfigItemAction(StdConfigItemBase):
       if callable(self._cb):
          self._cb()
 
+class StdConfigItemNumber(StdConfigItemBase):
+   def __init__(self, fmt, min, max, step, *args):
+      self._fmt = fmt
+      self._min = min
+      self._max = max
+      self._step = step
+      self._val = None
+      self._dia = None
+      StdConfigItemBase.__init__(self, *args)
+
+   def label_end_get(self, url, user_data):
+      return ini.get(self._sec, self._opt)
+
+   def item_selected(self, url, user_data):
+      self._val = ini.get_float(self._sec, self._opt)
+      self._dia = EmcDialog(style='minimal', title=self._lbl, text='')
+      self._dia.button_add(_('Ok'), self._btn_ok_cb)
+      self._dia.button_add(None, self._btn_plus_cb, icon='icon/plus')
+      self._dia.button_add(None, self._btn_minus_cb, icon='icon/minus')
+      self._dia.button_add(_('Cancel'), self._btn_canc_cb)
+      self._dia_text_update()
+
+   def _dia_text_update(self):
+      val = self._fmt % self._val
+      self._dia.text_set('<br><br><br><center><bigger>%s</bigger></center>' % val)
+
+   def _btn_plus_cb(self, btn):
+      self._val += self._step
+      self._val = min(self._val, self._max)
+      self._dia_text_update()
+
+   def _btn_minus_cb(self, btn):
+      self._val -= self._step
+      self._val = max(self._val, self._min)
+      self._dia_text_update()
+
+   def _btn_canc_cb(self, btn):
+      self._dia.delete()
+
+   def _btn_ok_cb(self, btn):
+      val = self._fmt % self._val
+      ini.set(self._sec, self._opt, val)
+      self._dia.delete()
+      StdConfigItemBase.__done__(self)
 
 ### public functions
 def init():
@@ -268,10 +312,11 @@ def init():
    _browser = EmcBrowser(_('Configuration'), 'List') # TODO use a custom style for config ?
 
    root_item_add('config://general/', 1, _('General'), 'icon/emc', _general_list)
-   root_item_add('config://themes/', 2, _('Themes'), 'icon/theme', _themes_list)
-   root_item_add('config://modules/', 3, _('Modules'), 'icon/module', _modules_list)
-   root_item_add('config://sysinfo/', 4, _('System info'), 'icon/info', _sys_info)
-   root_item_add('config://subtitles/', 30, _('Subtitles'), 'icon/subs', _subtitles_list)
+   root_item_add('config://modules/', 2, _('Modules'), 'icon/module', _modules_list)
+   root_item_add('config://themes/', 3, _('Themes'), 'icon/theme', _themes_list)
+   root_item_add('config://views/', 4, _('Views'), 'icon/views', _views_list)
+   root_item_add('config://subtitles/', 5, _('Subtitles'), 'icon/subs', _subtitles_list)
+   root_item_add('config://sysinfo/', 90, _('System info'), 'icon/info', _sys_info)
 
 def shutdown():
    _browser.delete()
@@ -334,6 +379,11 @@ def standard_item_action_add(label, icon=None, info=None, cb=None):
    _browser.item_add(StdConfigItemAction(label, icon, info, cb),
                      'config://useraction', None)
 
+def standard_item_number_add(section, option, label, icon=None, info=None, cb=None, fmt='%.0f', min=0, max=100, step=1):
+   """ TODO doc """
+   _browser.item_add(StdConfigItemNumber(fmt, min, max, step, section, option, label, icon, info, cb),
+                     'config://%s/%s' % (section, option), None)
+
 def browser_get():
    return _browser
 
@@ -362,8 +412,6 @@ def _general_populate(browser, url):
    L = [ str(x / 10.0) for x in range(5, 21) ]
    standard_item_string_from_list_add('general', 'scale', _('Interface scale'),
                                       L, 'icon/scale', cb=_change_scale)
-   standard_item_bool_add('general', 'back_in_lists',
-                          _('Show Back item in lists'), 'icon/back')
    standard_item_string_add('general', 'download_folder',
                             _('Download folder'), 'icon/download')
    standard_item_string_add('general', 'max_concurrent_download',
@@ -397,6 +445,21 @@ def _change_fps():
 def _change_scale():
    gui.scale_set(ini.get_float('general', 'scale'))
 
+##############  VIEWS  ########################################################
+
+def _views_list():
+   _browser.page_add('config://views/', _('Views'), None, _views_populate)
+   
+def _views_populate(browser, url):
+   standard_item_bool_add('general', 'back_in_lists',
+                          _('Show Back item in lists'), 'icon/back')
+   standard_item_number_add('general', 'view_postergrid_size',
+                            _('Poster grid items size'), 'icon/view_postergrid',
+                            fmt='%.0f', min=50, max=500, step=25)
+   standard_item_number_add('general', 'view_covergrid_size',
+                            _('Cover grid items size'), 'icon/view_grid',
+                            fmt='%.0f', min=50, max=500, step=25)
+   
 ##############  THEMES  #######################################################
 
 class ThemesItemClass(EmcItemClass):

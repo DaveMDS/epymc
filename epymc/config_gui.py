@@ -465,6 +465,8 @@ def _views_populate(browser, url):
    standard_item_number_add('general', 'view_covergrid_size',
                             _('Cover grid items size'), 'icon/view_covergrid',
                             fmt='%.0f', udm='px', min=50, max=500, step=25)
+   standard_item_bool_add('general', 'ignore_views_restrictions',
+                          _('Ignore views restrictions for pages'))
    
 ##############  THEMES  #######################################################
 

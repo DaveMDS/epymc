@@ -61,6 +61,7 @@ def init():
 
    # setup default configs
    ini.get('general', 'back_in_lists', default_value='True')
+   ini.get('general', 'ignore_views_restrictions', default_value='False')
    ini.get('general', 'view_postergrid_size', default_value=150)
    ini.get('general', 'view_covergrid_size', default_value=150)
 
@@ -256,8 +257,11 @@ class EmcBrowser(object):
          style = _memorydb.get_data(url)
       else:
          style = self._search_style_in_parent()
-      if not style in styles:
+      if not style:
          style = styles[0]
+      if ini.get_bool('general', 'ignore_views_restrictions') is False:
+         if not style in styles:
+            style = styles[0]
 
       # get the correct view instance
       view = self._create_or_get_view(style)
@@ -317,10 +321,11 @@ class EmcBrowser(object):
       # the current page is always the last one
       page = self.pages[-1]
 
-      # check if the style is valid
-      if not style in page['styles']:
-         DBG('Style %s not available for this page' % style)
-         return
+      # check if the style is valid (unless not explicitly ignored)
+      if ini.get_bool('general', 'ignore_views_restrictions') is False:
+         if not style in page['styles']:
+            DBG('Style %s not available for this page' % style)
+            return
       
       # change only if needed
       view = self._create_or_get_view(style)

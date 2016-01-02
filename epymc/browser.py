@@ -36,7 +36,7 @@ from epymc import gui, mainmenu, input_events, ini
 from epymc.sdb import EmcDatabase
 from epymc.utils import Singleton
 from epymc.gui import EmcImage, EmcScrolledEntry, EmcButton, \
-   EmcFocusManager, EXPAND_BOTH, FILL_BOTH
+   EmcFocusManager, EmcDialog, EXPAND_BOTH, FILL_BOTH
 
 def DBG(msg):
    # print('BROWSER: %s' % msg)
@@ -325,6 +325,11 @@ class EmcBrowser(object):
       if ini.get_bool('general', 'ignore_views_restrictions') is False:
          if not style in page['styles']:
             DBG('Style %s not available for this page' % style)
+            EmcDialog(style='info', title=_('View restriction'),
+               text=_('<br><br>The requested view is not enabled for the current ' \
+                      'page.<br><br><small><info>NOTE: You can ovveride this ' \
+                      'restriction in the <i>Configuration → Views</i> ' \
+                      'section.</info></small>'))
             return
       
       # change only if needed

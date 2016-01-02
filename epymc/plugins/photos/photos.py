@@ -141,7 +141,7 @@ class PhotosModule(EmcModule):
    info = _('A module to watch your photos.')
 
    _browser = None
-   _styles = ('List', 'PosterGrid')
+   _styles = ('CoverGrid', 'List')
 
 
    def __init__(self):

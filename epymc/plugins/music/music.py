@@ -49,7 +49,7 @@ _mod = None
 
 class RootOnAirItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod._browser.page_add('music://onair', _('OnAir'), None,
+      mod._browser.page_add('music://onair', _('OnAir'), mod._styles,
                             mod.populate_onair_page)
 
    def label_get(self, url, mod):
@@ -63,7 +63,7 @@ class RootOnAirItemClass(EmcItemClass):
 
 class RootArtistsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod._browser.page_add('music://artists', _('Artists'), None,
+      mod._browser.page_add('music://artists', _('Artists'), mod._styles,
                             mod.populate_artists_page)
 
    def label_get(self, url, mod):
@@ -74,7 +74,7 @@ class RootArtistsItemClass(EmcItemClass):
 
 class RootAlbumsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod._browser.page_add('music://albums', _('Albums'), None,
+      mod._browser.page_add('music://albums', _('Albums'), mod._styles,
                             mod.populate_albums_page)
 
    def label_get(self, url, mod):
@@ -85,7 +85,7 @@ class RootAlbumsItemClass(EmcItemClass):
 
 class RootSongsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod._browser.page_add('music://songs', _('Songs'), None,
+      mod._browser.page_add('music://songs', _('Songs'), mod._styles,
                             mod.populate_songs_page)
 
    def label_get(self, url, mod):
@@ -171,7 +171,7 @@ class SongItemClass(EmcItemClass):
 class AlbumItemClass(EmcItemClass):
    def item_selected(self, url, album):
       _mod._browser.page_add('music://album/'+album['name'], album['name'],
-                             None, _mod.populate_album_page, album)
+                             _mod._styles, _mod.populate_album_page, album)
 
    def label_get(self, url, album):
       return utf8_to_markup(_('%(name)s by %(artist)s') % (album))
@@ -199,7 +199,7 @@ class AlbumItemClass(EmcItemClass):
 class ArtistItemClass(EmcItemClass):
    def item_selected(self, url, artist):
       _mod._browser.page_add('music://artist/'+artist['name'], artist['name'],
-                             None, _mod.populate_artist_page, artist)
+                             _mod._styles, _mod.populate_artist_page, artist)
 
    def label_get(self, url, artist):
       return utf8_to_markup(artist['name'])
@@ -228,6 +228,7 @@ class MusicModule(EmcModule):
    _songs_db = None     # key=url           data=dict
    _albums_db = None    # key=album_name    data=dict
    _artists_db = None   # key=artist_name   data=dict
+   _styles = ('List', 'CoverGrid')
 
 
    def __init__(self):
@@ -301,13 +302,13 @@ class MusicModule(EmcModule):
 
       # start the browser in the requested page
       if url is None:
-         self._browser.page_add('music://root', _('Music'), None, self.populate_root_page)
+         self._browser.page_add('music://root', _('Music'), self._styles, self.populate_root_page)
       elif url == 'music://artists':
-         self._browser.page_add(url, _('Artists'), None, self.populate_artists_page)
+         self._browser.page_add(url, _('Artists'), self._styles, self.populate_artists_page)
       elif url == 'music://albums':
-         self._browser.page_add(url, _('Albums'), None, self.populate_albums_page)
+         self._browser.page_add(url, _('Albums'), self._styles, self.populate_albums_page)
       elif url == 'music://songs':
-         self._browser.page_add(url, _('Songs'), None, self.populate_songs_page)
+         self._browser.page_add(url, _('Songs'), self._styles, self.populate_songs_page)
 
       self._browser.show()
       mainmenu.hide()

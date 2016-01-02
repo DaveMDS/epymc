@@ -122,7 +122,7 @@ class OnlinevideoModule(EmcModule):
    _run_dialog = None
    _update_dialog = None
    _py = sys.executable or ''
-   _styles = ('List', 'PosterGrid')
+   _styles = ('List',)
 
    _search_folders = [
       os.path.dirname(__file__),

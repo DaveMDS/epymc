@@ -258,8 +258,9 @@ class StdConfigItemAction(StdConfigItemBase):
          self._cb()
 
 class StdConfigItemNumber(StdConfigItemBase):
-   def __init__(self, fmt, min, max, step, *args):
+   def __init__(self, fmt, udm, min, max, step, *args):
       self._fmt = fmt
+      self._udm = udm
       self._min = min
       self._max = max
       self._step = step
@@ -268,7 +269,10 @@ class StdConfigItemNumber(StdConfigItemBase):
       StdConfigItemBase.__init__(self, *args)
 
    def label_end_get(self, url, user_data):
-      return ini.get(self._sec, self._opt)
+      if self._udm:
+         return ini.get(self._sec, self._opt) + ' ' + self._udm
+      else:
+         return ini.get(self._sec, self._opt)
 
    def item_selected(self, url, user_data):
       self._val = ini.get_float(self._sec, self._opt)
@@ -280,7 +284,7 @@ class StdConfigItemNumber(StdConfigItemBase):
       self._dia_text_update()
 
    def _dia_text_update(self):
-      val = self._fmt % self._val
+      val = (self._fmt % self._val) + ' ' + self._udm
       self._dia.text_set('<br><br><br><center><bigger>%s</bigger></center>' % val)
 
    def _btn_plus_cb(self, btn):
@@ -379,9 +383,9 @@ def standard_item_action_add(label, icon=None, info=None, cb=None):
    _browser.item_add(StdConfigItemAction(label, icon, info, cb),
                      'config://useraction', None)
 
-def standard_item_number_add(section, option, label, icon=None, info=None, cb=None, fmt='%.0f', min=0, max=100, step=1):
+def standard_item_number_add(section, option, label, icon=None, info=None, cb=None, fmt='%.0f', udm='', min=0, max=100, step=1):
    """ TODO doc """
-   _browser.item_add(StdConfigItemNumber(fmt, min, max, step, section, option, label, icon, info, cb),
+   _browser.item_add(StdConfigItemNumber(fmt, udm, min, max, step, section, option, label, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
 
 def browser_get():
@@ -407,15 +411,16 @@ def _general_populate(browser, url):
 
    vals = (_('Ask'), _('Always'), _('Never'))
    standard_item_int_meaning_add('mediaplayer', 'resume_from_last_pos',
-                                _('Resume playback'), values=vals)
-   
-   L = [ str(x / 10.0) for x in range(5, 21) ]
-   standard_item_string_from_list_add('general', 'scale', _('Interface scale'),
-                                      L, 'icon/scale', cb=_change_scale)
+                                _('Resume playback'), values=vals)   
+   standard_item_number_add('general', 'scale',
+                            _('Interface scale'), 'icon/scale',
+                            fmt='%.1f', udm='x', min=0.5, max=2.0, step=0.1,
+                            cb=_change_scale)
    standard_item_string_add('general', 'download_folder',
                             _('Download folder'), 'icon/download')
-   standard_item_string_add('general', 'max_concurrent_download',
-                            _('Max concurrent download'), 'icon/download')
+   standard_item_number_add('general', 'max_concurrent_download',
+                            _('Max concurrent download'), 'icon/download',
+                            fmt='%.0f', min=1, max=10, step=1)
 
    L = evas.render_method_list()
    for remove in ('buffer', 'software_generic', 'gl_generic'):
@@ -431,9 +436,10 @@ def _general_populate(browser, url):
    standard_item_string_from_list_add('mediaplayer', 'backend',
                                       _('Multimedia engine'), L, 'icon/evas')
 
-   L = ['10', '20', '30', '60', '120']
-   standard_item_string_from_list_add('general', 'fps', _('Frames per second'),
-                                      L, 'icon/evas', cb=_change_fps)
+   standard_item_number_add('general', 'fps',
+                            _('Frames per second'), 'icon/evas',
+                            fmt='%.0f', udm='fps', min=10, max=120, step=10,
+                            cb=_change_fps)
 
 def _restart_needed():
    EmcDialog(style='info', title=_('Restart needed'),
@@ -455,10 +461,10 @@ def _views_populate(browser, url):
                           _('Show Back item in lists'), 'icon/back')
    standard_item_number_add('general', 'view_postergrid_size',
                             _('Poster grid items size'), 'icon/view_postergrid',
-                            fmt='%.0f', min=50, max=500, step=25)
+                            fmt='%.0f', udm='px', min=50, max=500, step=25)
    standard_item_number_add('general', 'view_covergrid_size',
                             _('Cover grid items size'), 'icon/view_grid',
-                            fmt='%.0f', min=50, max=500, step=25)
+                            fmt='%.0f', udm='px', min=50, max=500, step=25)
    
 ##############  THEMES  #######################################################
 

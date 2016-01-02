@@ -223,7 +223,7 @@ class PhotosModule(EmcModule):
    def populate_config(self, browser, url):
       cgui.standard_item_bool_add('photos', 'slideshow_show_controls',
                                   _('Show slideshow controls on start'))
-      L = '3 4 5 10 15 20 30 60'.split()
-      cgui.standard_item_string_from_list_add('photos', 'slideshow_delay',
-                                              _('Slideshow delay'), L)
+      cgui.standard_item_number_add('photos', 'slideshow_delay',
+                                    _('Slideshow delay'), fmt='%.0f',
+                                    udm=_('seconds'), min=2, max=30, step=1)
 

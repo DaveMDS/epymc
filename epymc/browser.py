@@ -731,7 +731,6 @@ class ViewPosterGrid(object):
       self.itc = GengridItemClass(item_style='default',
                                   content_get_func=self.gg_content_get)
       self.gg = Gengrid(gui.win, style='browser', focus_allow=False,
-                        item_size=(150, 225), # TODO make this configurable ?
                         align=(0.5, 0.0),
                         size_hint_expand=EXPAND_BOTH, size_hint_fill=FILL_BOTH)
       self.gg.callback_selected_add(self.gg_higlight)
@@ -758,6 +757,8 @@ class ViewPosterGrid(object):
          ngettext('%d item', '%d items', self.items_count) % (self.items_count))
 
    def show(self):
+      size = ini.get_int('general', 'view_postergrid_size')
+      self.gg.item_size = size, int(size * 1.5)
       gui.signal_emit('browser,grid,show')
 
    def hide(self):

@@ -626,9 +626,10 @@ class ViewList(object):
    def selected_url_get(self):
       """ return the url of the currently hilighted item """
       item = self.current_list.selected_item_get()
-      (item_class, url, user_data) = item.data_get()                            # 3 #
-      return url
-      
+      if item:
+         (item_class, url, user_data) = item.data_get()                         # 3 #
+         return url
+
    def input_event_cb(self, event):
       """ Here you can manage input events for the view """
 
@@ -837,8 +838,9 @@ class ViewPosterGrid(object):
    def selected_url_get(self):
       """ return the url of the currently hilighted item """
       item = self.gg.selected_item_get()
-      (item_class, url, user_data) = item.data_get()                            # 3 #
-      return url
+      if item:
+         (item_class, url, user_data) = item.data_get()                         # 3 #
+         return url
 
    def input_event_cb(self, event):
       item = self.gg.selected_item_get()

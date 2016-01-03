@@ -422,15 +422,18 @@ def _general_populate(browser, url):
                             _('Max concurrent download'), 'icon/download',
                             fmt='%.0f', min=1, max=10, step=1)
 
-   L = evas.render_method_list()
-   for remove in ('buffer', 'software_generic', 'gl_generic'):
-      if remove in L: L.remove(remove)
-   if 'gl_x11' in L:
-      L.remove('gl_x11')
-      L.append('opengl_x11')
-   standard_item_string_from_list_add('general', 'evas_engine',
-                                      _('Rendering engine'), L, 'icon/evas',
-                                      cb=_restart_needed)
+   # L = evas.render_method_list()
+   # for remove in ('buffer', 'software_generic', 'gl_generic'):
+   #    if remove in L: L.remove(remove)
+   # if 'gl_x11' in L:
+   #    L.remove('gl_x11')
+   #    L.append('opengl_x11')
+   # standard_item_string_from_list_add('general', 'evas_engine',
+                                      # _('Rendering engine'), L, 'icon/evas',
+                                      # cb=_restart_needed)
+   standard_item_bool_add('general', 'evas_accelerated',
+                          _('Use hardware acceleration'), 'icon/evas',
+                          cb=_restart_needed)
 
    L = ['vlc', 'gstreamer1', 'gstreamer', 'xine', 'generic']
    standard_item_string_from_list_add('mediaplayer', 'backend',

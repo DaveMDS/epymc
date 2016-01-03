@@ -40,7 +40,8 @@ from efl.elementary.genlist import Genlist, GenlistItemClass, \
    ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS
 from efl.elementary.slideshow import Slideshow, SlideshowItemClass
 from efl.elementary.theme import theme_overlay_add, theme_extension_add
-from efl.elementary.configuration import preferred_engine_set
+# from efl.elementary.configuration import preferred_engine_set
+from efl.elementary.configuration import accel_preference_set as elm_accel_set
 from efl.elementary.configuration import scale_set as elm_scale_set
 from efl.elementary.configuration import scale_get as elm_scale_get
 
@@ -65,10 +66,10 @@ FILL_HORIZ = evas.EVAS_HINT_FILL, 0.5
 
 
 def LOG(msg):
-   print('MEDIAPLAYER: %s' % msg)
+   print('GUI: %s' % msg)
 
 def DBG(msg):
-   # print('MEDIAPLAYER: %s' % msg)
+   # print('GUI: %s' % msg)
    pass
 
 def init():
@@ -78,7 +79,8 @@ def init():
 
    # get config values, setting defaults if needed
    theme_name = ini.get('general', 'theme', default_value='default')
-   evas_engine = ini.get('general', 'evas_engine', default_value='software_x11')
+   # evas_engine = ini.get('general', 'evas_engine', default_value='software_x11')
+   evas_accelerated = ini.get('general', 'evas_accelerated', default_value='True')
    fps = ini.get('general', 'fps', default_value=30)
    scale = ini.get('general', 'scale', default_value=1.0)
    fullscreen = ini.get('general', 'fullscreen', False)
@@ -106,8 +108,11 @@ def init():
    set_theme_file(theme_file)
 
    # create the elm window
-   preferred_engine_set(evas_engine)
-   LOG('Requested evas engine: ' + evas_engine)
+   if evas_accelerated == 'True':
+      elm_accel_set('accel')
+      LOG('Request an hardware accelerated evas engine')
+   # preferred_engine_set("software_x11")
+   # LOG('Requested evas engine: ' + evas_engine)
 
    win = Window('epymc', ELM_WIN_BASIC)
    win.title_set(_('Emotion Media Center'))

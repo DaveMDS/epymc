@@ -899,7 +899,7 @@ class ViewPosterGrid(object):
       if part == 'elm.swallow.icon':
          poster = item_class.poster_get(url, user_data)
          if poster:
-            return EmcImage(poster, fill_outside=True)
+            return EmcImage(poster, fill_outside=True, thumb=True)
          else:
             label = item_class.label_get(url, user_data)
             icon = item_class.icon_get(url, user_data)

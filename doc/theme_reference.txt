@@ -196,3 +196,38 @@ All the icons and images in icons.edc must be implemented.
 
    * Required parts:
       "dragable1" -> edge dragable
+
+
+### Image: Empty Poster ###
+   * Group: "emc/image/bd"
+
+   * Required parts:
+      "emc.text" -> edje TEXTBLOCK
+
+
+### Image: Folder ###
+   * Group: "emc/image/folder"
+
+   * Required parts:
+      "emc.text" -> edje TEXTBLOCK
+
+
+### Image: Generic Icon ###
+   * Group: "emc/image/icon"
+
+   * Required parts:
+      "emc.icon" -> edje SWALLOW
+      "emc.text" -> edje TEXTBLOCK
+
+
+### Image: Thumbnailing ###
+   * Group: "emc/image/thumbnailing"
+
+
+### Image: Downloading ###
+   * Group: "emc/image/downloading"
+
+
+### Image: Null placeholder ###
+   * Group: "emc/image/null"
+

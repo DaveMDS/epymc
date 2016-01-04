@@ -785,12 +785,10 @@ class EmcImage(Image):
 
    def __init__(self, url=None, dest=None, icon=None, aspect_fixed=True,
                       fill_outside=False, thumb=False):
-      self._spinner = None
       self._icon_obj = None
-      Image.__init__(self, layout, aspect_fixed=aspect_fixed, fill_outside=fill_outside,
-                     size_hint_expand=EXPAND_BOTH, size_hint_fill=FILL_BOTH)
-      self.on_move_add(self._move_resize_cb)
-      self.on_resize_add(self._move_resize_cb)
+      Image.__init__(self, layout, aspect_fixed=aspect_fixed,
+                     fill_outside=fill_outside, size_hint_expand=EXPAND_BOTH,
+                     size_hint_fill=FILL_BOTH)
       self.on_del_add(self._del_cb)
       if url is not None:
          self.url_set(url, dest, icon, thumb)
@@ -815,7 +813,7 @@ class EmcImage(Image):
             try:
                utils.download_url_async(url, dest,
                                         complete_cb=self._download_complete_cb)
-               self.start_spin()
+               self.file_set(theme_file, 'emc/image/downloading')
             except:
                pass # TODO show a dummy image
          return
@@ -828,7 +826,7 @@ class EmcImage(Image):
                self.file_set(thumb_path)
             else:
                emc_thumbnailer.generate(url, thumb_path, self._thumb_complete_cb)
-               self.start_spin()
+               self.file_set(theme_file, 'emc/image/thumbnailing')
             return
 
       # a local path ?
@@ -851,18 +849,6 @@ class EmcImage(Image):
             self.object.part_swallow('emc.icon', self._icon_obj)
          return
 
-   def start_spin(self):
-      if self._spinner is None:
-         self._spinner = Progressbar(self, style='wheel', pulse_mode=True)
-         
-      self._spinner.pulse(True)
-      self._spinner.show()
-      self._move_resize_cb(self)
-
-   def stop_spin(self):
-      self._spinner.pulse(False)
-      self._spinner.hide()
-
    def cache_path_get(self, url):
       fname =  utils.md5(url) + '.jpg' # TODO fix extension !
       return os.path.join(utils.user_cache_dir, 'remotes', fname[:2], fname)
@@ -873,7 +859,6 @@ class EmcImage(Image):
 
    def _thumb_complete_cb(self, status, file, thumb):
       if self.is_deleted(): return
-      self.stop_spin()
       if status is True:
          self.file_set(thumb)
       else:
@@ -881,23 +866,13 @@ class EmcImage(Image):
    
    def _download_complete_cb(self, dest, status):
       if self.is_deleted(): return
-      self.stop_spin()
       if status == 200:
          self.file_set(dest)
       else:
          pass # TODO show a dummy image
 
-   def _move_resize_cb(self, obj):
-      if self._spinner:
-         (x, y, w, h) = self.geometry_get()
-         self._spinner.resize(w, h)
-         self._spinner.move(x, y)
-         if self._spinner.clip != self.clip:
-            self._spinner.clip = self.clip
-
    def _del_cb(self, obj):
       if self._icon_obj: self._icon_obj.delete()
-      if self._spinner: self._spinner.delete()
       # TODO abort download / thumb ??
 
 ################################################################################

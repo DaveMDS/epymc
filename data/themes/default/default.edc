@@ -2887,6 +2887,58 @@ collections {
          }
       }
    }
+   group { name: "emc/image/thumbnailing";  /* API */
+      alias: "emc/image/downloading";  /* API */
+      images {
+         image: "knob.png" COMP;
+         image: "knob_glow.png" COMP;
+      }
+      parts {
+         part { name: "bg"; type: RECT;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               color: 0 0 0 150;
+            }
+         }
+         part { name: "knob"; mouse_events: 0;
+            scale: 1;
+            description { state: "default" 0.0;
+               image.normal: "knob.png";
+               FIXED_SIZE(40, 40)
+            }
+         }
+         part { name: "knob_spinner"; mouse_events: 0;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.to: "knob";
+               rel2.to: "knob";
+               image.normal: "knob_glow.png";
+               map.on: 1;
+               map.smooth: 1;
+               map.rotation.center: "knob";
+            }
+            description { state: "spin" 0.0;
+               inherit: "default" 0.0;
+               map.rotation.z: 360;
+            }
+         }
+         program { name: "init";
+            signal: "load"; source: "";
+            after: "spin";
+         }
+         program { name: "spin";
+            action: STATE_SET "spin" 0.0;
+            transition: LINEAR 1.0;
+            target: "knob_spinner";
+            after: "spin2";
+         }
+         program { name: "spin2";
+            action: STATE_SET "default" 0.0;
+            target: "knob_spinner";
+            after: "spin";
+         }
+      }
+   }
    group { name: "emc/image/null";  /* API */
       parts {
          part { name: "null"; type: RECT;

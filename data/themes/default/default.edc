@@ -793,6 +793,24 @@ collections {
                }
             }
          }
+         part { name: "browser.postergrid.image"; /* API */
+            type: SWALLOW;
+            clip_to: "browser.postergrid.clip";
+            description { state: "default" 0.0;
+               rel1 {
+                  to_x: "browser.postergrid.info_bg";
+                  to_y: "topbar.list.spacer";
+                  relative: 0.0 1.0;
+                  offset: 6 20;
+               }
+               rel2 {
+                  to_x: "browser.postergrid.info_bg";
+                  to_y: "browser.postergrid.info_bg";
+                  relative: 1.0 0.0;
+                  offset: -8 -4;
+               }
+            }
+         }
          program { name: "browser_postergrid_show"; /* API */
             signal: "browser,postergrid,show";
             source: "emc";
@@ -937,6 +955,24 @@ collections {
                rel2 {
                   to: "browser.covergrid.info_bg";
                   offset: -12 -10;
+               }
+            }
+         }
+         part { name: "browser.covergrid.image"; /* API */
+            type: SWALLOW;
+            clip_to: "browser.covergrid.clip";
+            description { state: "default" 0.0;
+               rel1 {
+                  to_x: "browser.covergrid.info_bg";
+                  to_y: "topbar.list.spacer";
+                  relative: 0.0 1.0;
+                  offset: 6 20;
+               }
+               rel2 {
+                  to_x: "browser.covergrid.info_bg";
+                  to_y: "browser.covergrid.info_bg";
+                  relative: 1.0 0.0;
+                  offset: -8 -4;
                }
             }
          }

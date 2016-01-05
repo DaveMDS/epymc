@@ -137,14 +137,20 @@ class EmcItemClass(Singleton):
       return None
 
    def poster_get(self, url, user_data):
-      """ Called when a view need to show the poster/cover/big_image of your
+      """ Called when a view need to show the poster of your
           item, must return the full path of a valid image file.
+          The poster MUST have a 1:2 aspect.
           You can also return a valid url (http://) to automatically
           download the image to a random temp file.
           In addition you can also set the destination path for the given url,
           to set an url AND a destination just return a tuple, as:
           (url, local_path)
           """
+      # DBG(('poster_get(%s)' % url))
+      return None
+
+   def cover_get(self, url, user_data):
+      """ Like poster_get but th image should be squared (or a bit larger) """
       # DBG(('poster_get(%s)' % url))
       return None
 
@@ -713,11 +719,13 @@ class ViewList(object):
          self._ase.autoscroll = False
          gui.signal_emit('browser,list,info,hide')
 
-      # Ask for the item poster
-      if not isinstance(item_class, (BackItemClass, FolderItemClass)):
-         self._poster.url_set(item_class.poster_get(url, user_data))
-      else:
+      # Fill the big image with the poster (or cover if poster not available)
+      if isinstance(item_class, (BackItemClass, FolderItemClass)):
          self._poster.url_set(None)
+      else:
+         image = item_class.poster_get(url, user_data) or \
+                 item_class.cover_get(url, user_data)
+         self._poster.url_set(image)
 
       self._timer1 = None
       return ecore.ECORE_CALLBACK_CANCEL
@@ -763,6 +771,10 @@ class ViewPosterGrid(object):
       self.gg.callback_clicked_double_add(self.gg_selected)
       gui.swallow_set(self._grid_swallow, self.gg)
 
+      # RemoteImage (cover)
+      self._big_image = EmcImage()
+      gui.swallow_set(self._image_swallow, self._big_image)
+
       # AutoScrolledEntry (info)
       self._ase = EmcScrolledEntry(autoscroll=True)
       gui.swallow_set(self._info_swallow, self._ase)
@@ -771,6 +783,7 @@ class ViewPosterGrid(object):
       """ setup stuff that is different between Poster and Cover views """
       self._grid_swallow =     'browser.postergrid.gengrid'
       self._info_swallow =     'browser.postergrid.info'
+      self._image_swallow =    'browser.postergrid.image'
       self._total_text =       'browser.postergrid.total'
       self._signal_show =      'browser,postergrid,show'
       self._signal_hide =      'browser,postergrid,hide'
@@ -934,8 +947,19 @@ class ViewPosterGrid(object):
          self._ase.autoscroll = False
          gui.signal_emit(self._signal_info_hide)
 
+      # Fill the big image (different between Poster and Cover views)
+      if isinstance(item_class, (BackItemClass, FolderItemClass)):
+         self._big_image.url_set(None)
+      else:
+         poster = item_class.poster_get(url, user_data)
+         cover = item_class.cover_get(url, user_data)
+         self.fill_the_big_image(poster, cover)
+
       self._timer1 = None
       return ecore.ECORE_CALLBACK_CANCEL
+
+   def fill_the_big_image(self, poster, cover):
+      self._big_image.url_set(cover or poster)
 
    def _backdrop_timer_cb(self, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
@@ -963,6 +987,7 @@ class ViewCoverGrid(ViewPosterGrid):
    def setup_theme_hooks(self):
       self._grid_swallow =     'browser.covergrid.gengrid'
       self._info_swallow =     'browser.covergrid.info'
+      self._image_swallow =    'browser.covergrid.image'
       self._total_text =       'browser.covergrid.total'
       self._signal_show =      'browser,covergrid,show'
       self._signal_hide =      'browser,covergrid,hide'
@@ -973,3 +998,22 @@ class ViewCoverGrid(ViewPosterGrid):
       size = ini.get_int('general', 'view_covergrid_size')
       self.gg.item_size = size, size
       gui.signal_emit(self._signal_show)
+
+   def fill_the_big_image(self, poster, cover):
+      self._big_image.url_set(poster or cover)
+
+   def gg_content_get(self, obj, part, item_data):
+      (item_class, url, user_data) = item_data                                  # 3 #
+      if part == 'elm.swallow.icon':
+         cover = item_class.cover_get(url, user_data)
+         if cover:
+            return EmcImage(cover, fill_outside=True, thumb=True)
+         else:
+            label = item_class.label_get(url, user_data)
+            icon = item_class.icon_get(url, user_data)
+            return EmcImage('special/icon/' + label, icon=icon)
+
+      if part == 'elm.swallow.end':
+         icon = item_class.icon_end_get(url, user_data)
+         if icon:
+            return EmcImage(icon)

@@ -36,7 +36,7 @@ import epymc.ini as ini
 import epymc.gui as gui
 import epymc.mediaplayer as mediaplayer
 import epymc.browser as browser
-from epymc.browser import EmcBrowser, EmcItemClass
+from epymc.browser import EmcBrowser, EmcItemClass, FolderItemClass, BackItemClass
 
 # from .movies import TMDB_WithGui, get_movie_name_from_url
 
@@ -142,6 +142,38 @@ class ImagesItemClass(EmcItemClass):
          return None
       #TODO failure for local and remote
 
+class ViewsItemClass(EmcItemClass):
+   path = os.path.dirname(__file__)
+
+   def label_get(self, url, user_data):
+      return user_data
+
+   def label_end_get(self, url, user_data):
+      if url in ('two_labels', 'two_labels_one_icon', 'two_labels_two_icon'):
+         return 'second'
+
+   def info_get(self, url, user_data):
+      return '<title>Testing:</title><br>' + user_data
+
+   def icon_get(self, url, user_data):
+      if url in ('one_icon', 'two_icons', 'two_labels_one_icon', 'two_labels_two_icon'):
+         return 'icon/home'
+      if url in ('poster', 'cover', 'poster_cover'):
+         return 'icon/views'
+
+   def icon_end_get(self, url, user_data):
+      if url in ('two_icons', 'two_labels_two_icon'):
+         return 'icon/evas'
+
+   def poster_get(self, url, user_data):
+      if url in ('poster', 'poster_cover'):
+         return os.path.join(self.path, 'poster.jpg')
+
+   def cover_get(self, url, user_data):
+      if url in ('cover', 'poster_cover'):
+         return os.path.join(self.path, 'cover.jpg')
+         
+
 class MyItemClass(EmcItemClass):
 
    def label_get(self, url, user_data):
@@ -161,6 +193,11 @@ class MyItemClass(EmcItemClass):
          _mod._browser.page_add('uitests://images', 'Image tests',
                                 ('List', 'PosterGrid'),
                                 _mod.populate_image_page)
+
+      elif url == 'uitests://views':
+         _mod._browser.page_add('uitests://views', 'Browser Views',
+                                ('List', 'PosterGrid', 'CoverGrid'),
+                                _mod.populate_views_page)
 
       # Events Sniffer
       elif url == 'uitests://sniffer':
@@ -521,6 +558,7 @@ class UiTestsModule(EmcModule):
 
    def populate_root(self, browser, url):
       browser.item_add(MyItemClass(), 'uitests://encoding', 'Various string encoding tests')
+      browser.item_add(MyItemClass(), 'uitests://views', 'Browser Views')
       browser.item_add(MyItemClass(), 'uitests://images', 'Browser + EmcImage')
       browser.item_add(MyItemClass(), 'uitests://movies_name', 'Movies name test')
       browser.item_add(MyItemClass(), 'uitests://sniffer', 'Event Sniffer')
@@ -568,3 +606,15 @@ class UiTestsModule(EmcModule):
       _mod._browser.item_add(ImagesItemClass(), 'special_icon', 'Special Icon (in PosterGrid view)')
       _mod._browser.item_add(ImagesItemClass(), 'special_null', 'Special Null (transparent)')
 
+   def populate_views_page(self, browser, url):
+      _mod._browser.item_add(BackItemClass(), 'back', 'special BackItemClass')
+      _mod._browser.item_add(FolderItemClass(), 'folder', 'special FolderItemClass')
+      _mod._browser.item_add(ViewsItemClass(), 'one_label', 'one label')
+      _mod._browser.item_add(ViewsItemClass(), 'one_icon', 'one icon')
+      _mod._browser.item_add(ViewsItemClass(), 'two_icons', 'two icons')
+      _mod._browser.item_add(ViewsItemClass(), 'two_labels', 'two labels')
+      _mod._browser.item_add(ViewsItemClass(), 'two_labels_one_icon', 'two labels + one icon')
+      _mod._browser.item_add(ViewsItemClass(), 'two_labels_two_icon', 'two labels + two icon')
+      _mod._browser.item_add(ViewsItemClass(), 'poster', 'with poster only')
+      _mod._browser.item_add(ViewsItemClass(), 'cover', 'with cover only')
+      _mod._browser.item_add(ViewsItemClass(), 'poster_cover', 'with poster and cover')

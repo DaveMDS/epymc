@@ -216,7 +216,7 @@ setup (
       'epymc.plugins.tvshows': ['*.png'],
       'epymc.plugins.mame': ['*.png', '*.jpg'],
       'epymc.plugins.music': ['*.png'],
-      'epymc.plugins.uitests': ['*.png'],
+      'epymc.plugins.uitests': ['*.png', '*.jpg'],
       'epymc.plugins.calibrator': ['*.jpg', '*.png'],
       'epymc.plugins.onlinevideo': [ '*.png',
          'themoviedb/*',

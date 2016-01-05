@@ -21,6 +21,7 @@ IMAGE("bd_cover_blank.png", 500, 750)
 IMAGE("folder_vert.png", 440, 654)
 IMAGE("tmdb_logo.png", 450, 300)
 IMAGE("osdo_logo.png", 450, 151)
+IMAGE("wip.jpg", 644, 476)
 
 ICON("emc")
 ICON("evas")

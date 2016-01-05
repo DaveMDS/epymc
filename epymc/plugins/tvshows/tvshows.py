@@ -114,7 +114,7 @@ class FileItemClass(EmcItemClass):
          return 'icon/check_off'
 
    def poster_get(self, url, mod):
-      return 'special/bd/' + os.path.basename(url)
+      return 'special/bd/' + utf8_to_markup(os.path.basename(url))
 
 
 class FolderItemClass(FolderItemClass):
@@ -157,7 +157,7 @@ class SerieItemClass(EmcItemClass):
          e = mod_instance._tvshows_db.get_data(serie_name)
          return get_tv_poster_filename(e['id'])
       else:
-         return 'special/bd/' + serie_name
+         return 'special/bd/' + utf8_to_markup(serie_name)
 
    def fanart_get(self, url, serie_name):
       if mod_instance._tvshows_db.id_exists(serie_name):
@@ -196,7 +196,7 @@ class SeasonItemClass(EmcItemClass):
          if os.path.exists(poster_file):
             return poster_file
          return get_tv_poster_filename(e['id'])
-      return 'special/bd/' + os.path.basename(url)
+      return 'special/bd/' + utf8_to_markup(os.path.basename(url))
 
    def fanart_get(self, url, season_num):
       serie_name = mod_instance._current_serie_name
@@ -235,7 +235,7 @@ class EpisodeItemClass(EmcItemClass):
          else:
             # serie poster
             return get_tv_poster_filename(series_id)
-      return 'special/bd/' + os.path.basename(url)
+      return 'special/bd/' + utf8_to_markup(os.path.basename(url))
          
 
    def fanart_get(self, url, episode_data):

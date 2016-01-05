@@ -101,7 +101,7 @@ class SpecialItemClass(EmcItemClass):
          mod._browser.page_add(url, _('Actors'), mod._styles_for_folders,
                                mod.populate_actors_list)
       elif url == 'movies://directors':
-         mod._browser.page_add(url, _('Actors'), mod._styles_for_folders,
+         mod._browser.page_add(url, _('Directors'), mod._styles_for_folders,
                                mod.populate_directors_list)
 
    def label_get(self, url, mod):
@@ -180,6 +180,9 @@ class MovieItemClass(EmcItemClass):
             return 'special/bd/' + utf8_to_markup(e['title'])
       else:
          return 'special/bd/' + utf8_to_markup(os.path.basename(url))
+
+   def cover_get(self, url, mod):
+      return 'image/wip.jpg'
 
    def fanart_get(self, url, mod):
       if mod._movie_db.id_exists(url):
@@ -568,7 +571,8 @@ class MoviesModule(EmcModule):
 
       # show a progress dialog
       self._poster_dialog = EmcDialog(title=_('Downloading image'),
-                                      style='progress')
+                                      style='progress',
+                                      content=gui.load_image('tmdb_logo.png'))
 
    def _cb_image_progress(self, dest, tot, done):
       if tot > 0: self._poster_dialog.progress_set(float(done) / float(tot))
@@ -612,7 +616,8 @@ class MoviesModule(EmcModule):
 
       # show a progress dialog
       self._poster_dialog = EmcDialog(title=_('Downloading image'),
-                                      style='progress')
+                                      style='progress',
+                                      content=gui.load_image('tmdb_logo.png'))
 
 
 ######## Get movie info from themoviedb.org

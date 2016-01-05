@@ -538,7 +538,8 @@ class CastPanel(EmcDialog):
       tmdb = TMDBv3(lang=lang)
       tmdb.get_cast_info(self.pid, self._fetch_done_cb)
       self._dia = EmcDialog(style='minimal', title=_('Fetching info'),
-                            text=_('please wait...'), spinner=True)
+                            content=EmcImage('image/tmdb_logo.png'),
+                            spinner=True)
 
    def _fetch_done_cb(self, tmdb, result):
       self.info = result

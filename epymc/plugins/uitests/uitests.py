@@ -503,6 +503,15 @@ class MyItemClass(EmcItemClass):
                d.list_item_append(group[5:], group)
          d.list_go()
 
+      elif url == 'uitests://imagegal':
+         d = EmcDialog(title='Images gallery (names in console)',
+                       style='image_list_vert',
+                       done_cb=lambda x, t: print(t))
+         for group in sorted(edje.file_collection_list(gui.theme_file)):
+            if group.startswith('image/'):
+               d.list_item_append(group[6:], group, t=group)
+         d.list_go()
+
       # Text style in dialog
       elif url == 'uitests://styles':
          EmcDialog(title='Text styles', text=TEST_STYLE)
@@ -567,6 +576,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://menu', 'Menu')
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + FocusManager')
       browser.item_add(MyItemClass(), 'uitests://icons', 'Icons gallery')
+      browser.item_add(MyItemClass(), 'uitests://imagegal', 'Images gallery')
       browser.item_add(MyItemClass(), 'uitests://styles', 'Text styles')
       browser.item_add(MyItemClass(), 'uitests://dm', 'Download Manager')
       browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')

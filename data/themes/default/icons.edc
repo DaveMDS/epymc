@@ -7,21 +7,20 @@
             image.normal: "icon_"NAME".png"; \
             aspect: 1 1; aspect_preference: BOTH; }}}}
 
-#define IMAGE(NAME, W, H) \
+#define IMAGE(NAME) \
    group { name: "image/"NAME; \
       images { image: "image_"NAME COMP; } \
       parts { part { name: "main_bg"; \
          description { state: "default" 0.0; \
             image.normal: "image_"NAME; \
-            aspect: (W/H) (W/H); \
-            aspect_preference: BOTH; }}}}
+            aspect_preference: SOURCE; }}}}
 
-IMAGE("dvd_cover_blank.png", 635, 890)
-IMAGE("bd_cover_blank.png", 500, 750)
-IMAGE("folder_vert.png", 440, 654)
-IMAGE("tmdb_logo.png", 450, 300)
-IMAGE("osdo_logo.png", 450, 151)
-IMAGE("wip.jpg", 644, 476)
+IMAGE("dvd_cover_blank.png")
+IMAGE("bd_cover_blank.png")
+IMAGE("folder_vert.png")
+IMAGE("tmdb_logo.png")
+IMAGE("osdo_logo.png")
+IMAGE("wip.jpg")
 
 ICON("emc")
 ICON("evas")

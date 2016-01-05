@@ -796,7 +796,7 @@ class EmcImage(Image):
    def url_set(self, url, dest=None, icon=None, thumb=False):
       # None to "unset" the image
       if url is None:
-         self.file_set(theme_file,  'emc/image/null')
+         self.file_set(theme_file, 'emc/image/null')
          return
 
       # url can also include dest
@@ -838,6 +838,26 @@ class EmcImage(Image):
       if url.startswith(('icon/', 'image/')):
          self.file_set(theme_file, url)
          return
+
+      """  TODO: will come later...
+      # a video thumbnail ?
+      if emc_thumbnailer is not None: # TODO remove this for release 
+         if url.startswith('special/videothumb/'):
+            url = url[19:]
+            if url.startswith('file://'):
+               path = url[7:]
+               
+            thumb_path = self.thumb_path_get(path)
+            if os.path.exists(thumb_path):
+               self.file_set(thumb_path)
+            else:
+               emc_thumbnailer.generate(path, thumb_path, self._thumb_complete_cb)
+               self.file_set(theme_file, 'emc/image/thumbnailing')
+            print("ASASDA")
+            print(url)
+            print(path)
+            return
+      """
 
       # a special image ?
       if url.startswith('special/'):

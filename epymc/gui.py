@@ -752,7 +752,7 @@ class EmcImage(Image):
                                         complete_cb=self._download_complete_cb)
                self.file_set(theme_file, 'emc/image/downloading')
             except:
-               pass # TODO show a dummy image
+               self.file_set(theme_file, 'emc/image/error')
          return
 
       # do we want to use/generate a thumbnail?
@@ -765,7 +765,7 @@ class EmcImage(Image):
                self._thumb_request_id = ret
                self.file_set(theme_file, 'emc/image/thumbnailing')
             else: # failed ... this cannot really happend atm
-               pass # TODO show a dummy image
+               self.file_set(theme_file, 'emc/image/error')
             return
 
       # a local path ?
@@ -789,7 +789,7 @@ class EmcImage(Image):
                self._thumb_request_id = ret
                self.file_set(theme_file, 'emc/image/thumbnailing')
             else: # failed ... this cannot really happend atm
-               pass # TODO show a dummy image
+              self.file_set(theme_file, 'emc/image/error')
          return
 
       # a special image ?
@@ -812,14 +812,14 @@ class EmcImage(Image):
       if status is True:
          self.file_set(thumb)
       else:
-         pass # TODO show a dummy image
+         self.file_set(theme_file, 'emc/image/error')
    
    def _download_complete_cb(self, dest, status):
       if self.is_deleted(): return
       if status == 200:
          self.file_set(dest)
       else:
-         pass # TODO show a dummy image
+         self.file_set(theme_file, 'emc/image/error')
 
    def _del_cb(self, obj):
       if self._icon_obj:

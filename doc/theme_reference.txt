@@ -230,6 +230,17 @@ All the icons and images in icons.edc must be implemented.
    * Group: "emc/image/downloading"
 
 
+### Image: Video Thumb Frame ###
+   * Group: "emc/image/vthumb"
+
+   * Required parts:
+      "emc.swallow" -> edje SWALLOW
+
+
+### Image: Error ###
+   * Group: "emc/image/error"
+
+
 ### Image: Null placeholder ###
    * Group: "emc/image/null"
 

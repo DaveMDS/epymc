@@ -91,9 +91,16 @@ def stdin_data_received_cb(fdh):
             et.frame = (None, None, None)
          except: # TODO This is a bug in C efl !! need to be fixed there
             pass
-      et.file = src
-      et.thumb_path = dst
-      et.generate(ethumb_generate_cb)
+
+      try:
+         et.file = src
+         et.thumb_path = dst
+      except RuntimeError:
+         ethumb_generate_cb(None, False)
+      else:
+         if et.generate(ethumb_generate_cb) is False:
+            ethumb_generate_cb(None, False)
+
    else:
       ERR('invalid cmd received "%s"' % cmd)
 

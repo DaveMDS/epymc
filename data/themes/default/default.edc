@@ -2909,7 +2909,7 @@ collections {
          }
       }
    }
-   group { name: "emc/image/vthumb";  /* API TODOC */
+   group { name: "emc/image/vthumb";  /* API */
       // TODO complete this style...as soon as emotion will be able to use frames...
       parts {
          part { name: "bg"; type: RECT;
@@ -2918,7 +2918,7 @@ collections {
                aspect_preference: BOTH;
             }
          }
-         part { name: "emc.swallow"; type: SWALLOW; /* API TODOC */
+         part { name: "emc.swallow"; type: SWALLOW; /* API */
             description { state: "default" 0.0;
                
             }
@@ -2927,6 +2927,23 @@ collections {
             description { state: "default" 0.0;
                aspect: 1 1;
                aspect_preference: BOTH;
+            }
+         }
+      }
+   }
+   group { name: "emc/image/error";  /* API */
+      images.image: "error.png" COMP;
+      parts {
+         part { name: "bg"; type: RECT;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               color: 0 0 0 150;
+            }
+         }
+         part { name: "img"; type: IMAGE;
+            description { state: "default" 0.0;
+               image.normal: "error.png";
+               aspect_preference: SOURCE;
             }
          }
       }

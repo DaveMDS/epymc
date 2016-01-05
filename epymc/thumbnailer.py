@@ -138,7 +138,7 @@ class EmcThumbnailer(Singleton):
       if msg == 'OK':
          success = True
       elif msg == 'ERR':
-         success = True
+         success = False
       else:
          ERR('unknown msg from slave "%s"' % msg)
          return

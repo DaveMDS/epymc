@@ -2912,12 +2912,28 @@ collections {
                rel2.relative: 1.0 0.7;
             }
          }
+         part { name: "text_spacer"; type: TEXTBLOCK;
+            // a trick to force the real text to have space for 2 lines
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               visible: 0;
+               rel1.relative: 0.0 1.0;
+               rel2.relative: 1.0 1.0;
+               rel1.offset: 4 -1;
+               rel2.offset: -5 -2;
+               align: 0.0 1.0;
+               text {
+                  style: "epymc_special_icon_style";
+                  text: "S<br>S";
+                  min: 0 1;
+               }
+            }
+         }
          part { name: "emc.text"; type: TEXTBLOCK;  /* API */
             description { state: "default" 0.0;
                fixed: 1 1;
-               rel1.relative: 0.0 0.7;
-               rel1.offset: 4 0;
-               rel2.offset: -5 -1;
+               rel1.to: "text_spacer";
+               rel2.to: "text_spacer";
                text.style: "epymc_special_icon_style";
             }
          }

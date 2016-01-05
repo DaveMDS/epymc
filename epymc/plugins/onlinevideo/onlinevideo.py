@@ -78,6 +78,9 @@ class ChannelItemClass(EmcItemClass):
    def poster_get(self, url, channel):
       return channel['poster']
 
+   def cover_get(self, url, channel):
+      return channel['cover']
+
    def fanart_get(self, url, channel):
       return channel['backdrop']
 
@@ -159,8 +162,8 @@ class OnlinevideoModule(EmcModule):
       self._browser.delete()
 
    def parse_source_ini_file(self, path):
-      section = 'EmcChannelV3'
-      options = ['name','label','info','icon','poster','banner',
+      section = 'EmcChannelV4'
+      options = ['name','label','info','icon','poster','cover','banner',
                  'backdrop', 'mature', 'version', 'exec', 'author']
       source = {}
       parser = ConfigParser.ConfigParser()
@@ -183,7 +186,7 @@ class OnlinevideoModule(EmcModule):
          for opt in options:
             source[opt] = parser.get(section, opt)
          dirname = os.path.dirname(path)
-         for opt in ['exec', 'icon', 'poster', 'banner', 'backdrop']:
+         for opt in ['exec', 'icon', 'poster', 'cover', 'banner', 'backdrop']:
             source[opt] = os.path.join(dirname, source[opt])
       del parser
       return source

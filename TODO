@@ -1,10 +1,38 @@
 
+TMP
+====
+
+ * report on phab the Ethumb Client instability
+
+ * fix 2 bugs in ethumb:
+   * frame cannot be unset...witout an error
+   * frame for movies do not work (+ vthumb theme)
+
+ * fix focus after view change
+
+ * gengid non scrolla quando muovo a destra (e scende di una riga)
+   ...ma forse ancora meglio:
+ * gen*: DESTRA per selezionare scrollbar e poi i bottoni in alto
+
+ * ora e data in homepage (in basso a sinistra)
+ * ora in mediaplayer
+ * icone + risoluzione (back,refresh,plus, minus, ...)
+ * icona error fa schifo
+
+ * 2 instanze ???
+ * clear remoteimg cache ?????
+ * new text styles: mi piace, etc...
+ * update italian translation
+ * migliorare grafica dei dialog
+ * Coverflow browser view
+ * styles in browser list items
+ * require efl >= 1.17 (and use setup.py efl stuff)
+
 
 BUGS
 =====
  * mame's favorites got lost from config sometimes
  * video don't keep the right aspect, usually subs get cutted out
- * change the scale when in the config->General page will randomly segv
  * text in dialogs dont scale on-the-fly (elm bug)
  * autoscrolled entry are not constant-speed changing the fps...it was used to work :/
  * no way to toggle fs with the mouse
@@ -15,12 +43,10 @@ CORE
  * joy/webserver need a key-repetition handling
  * subtitles font and size configuration
  * subtitles upload to opensubtitles.org
- * Add the ability to update youtube-dl from the gui
  * show the status of the downloads in progress (and alert on exit if in progress)
- * use xdg to find config and download folder
+ * use xdg to find config, cache download folders
  * add an option to disable exit confirmation (but show credit somewhere else)
  * apply the volume using a logaritic curve
- * Redo the evas engine selection/display using the new efl infra
 
 CORE (minor)
 ============
@@ -30,7 +56,6 @@ CORE (minor)
 NEW MODULES
 ===========
  * internet radio (check .pls files)
- * photo
  * wikipedia
  * torrent (auto)search and download ( aria2c frontend? )
  * weather

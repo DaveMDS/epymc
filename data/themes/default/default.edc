@@ -184,6 +184,7 @@ collections {
             else if (hour < 10)           { snprintf(buf, 10, "0%i:%i", hour, minute); }
             else                          { snprintf(buf, 10, "%i:%i", hour, minute); }
             set_text(PART:"topbar.clock", buf);
+            set_text(PART:"videoplayer.clock", buf);
          }
       }
       parts {
@@ -1320,6 +1321,49 @@ collections {
                rel2.relative: 0.25 0.45;
             }
          }
+         part { name: "videoplayer.clock.spacer"; type: TEXT;
+            scale: 1;
+            description { state: "default" 0.0;
+               visible: 0;
+               fixed: 1 1;
+               align: 1.0 0.5;
+               rel1 {
+                  to_x: "videoplayer.controls.bg";
+                  relative: 1.0 0.0;
+                  offset: -10 5;
+               }
+               rel2 {
+                  to: "videoplayer.controls.bg";
+                  offset: -10 -55;
+               }
+               text {
+                  font: FONT2;
+                  size: FONT_SIZE_BIG;
+                  min: 1 0;
+                  ellipsis: -1;
+                  text: "00::00";
+               }
+            }
+         }
+         part { name: "videoplayer.clock"; type: TEXT;
+            scale: 1;
+            clip_to: "videoplayer.clip";
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               color: FONT_COLOR_TOPBAR;
+               color3: FONT_COLOR3_TOPBAR;
+               rel1.to: "videoplayer.clock.spacer";
+               rel2.to: "videoplayer.clock.spacer";
+               text {
+                  font: FONT2;
+                  size: FONT_SIZE_BIG;
+                  min: 1 0;
+                  ellipsis: -1;
+                  align: 1.0 0.5;
+               }
+            }
+         }
          part { name: "videoplayer.controls.container1"; type: SPACER;
             description { state: "default" 0.0;
                rel1 {
@@ -1329,8 +1373,8 @@ collections {
                   offset: 5 5;
                }
                rel2 {
-                  to: "videoplayer.controls.bg";
-                  offset: -10 -55;
+                  to: "videoplayer.clock.spacer";
+                  relative: 0.0  1.0;
                }
             }
          }

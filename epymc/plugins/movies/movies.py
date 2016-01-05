@@ -182,7 +182,7 @@ class MovieItemClass(EmcItemClass):
          return 'special/bd/' + utf8_to_markup(os.path.basename(url))
 
    def cover_get(self, url, mod):
-      return 'image/wip.jpg'
+      return 'special/vthumb/' + url
 
    def fanart_get(self, url, mod):
       if mod._movie_db.id_exists(url):

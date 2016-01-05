@@ -39,6 +39,7 @@ def DBG(msg):
 emc_base_dir = os.path.dirname(__file__)
 user_conf_dir = os.path.expanduser('~/.config/epymc') # TODO use xdg-stuff
 user_cache_dir = os.path.expanduser('~/.cache/epymc') # TODO use xdg-stuff
+in_use_theme_file = None
 
 supported_uris = ['file','http','https']
 supported_mimes = ['application/mxf','application/ogg','application/ram', 
@@ -300,6 +301,12 @@ def get_available_themes():
    L += glob.glob(os.path.join(emc_base_dir, 'themes', '*.edj'))
 
    return L
+
+def in_use_theme_file_set(theme_file):
+   # this is a bit hackish, but I cannot find another way to use
+   # it in thumbnailer.py (without recursive imports)
+   global in_use_theme_file
+   in_use_theme_file = theme_file
 
 def url2path(url):
    # TODO ... convert the url to a local path !!

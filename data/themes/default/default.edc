@@ -2909,6 +2909,28 @@ collections {
          }
       }
    }
+   group { name: "emc/image/vthumb";  /* API TODOC */
+      // TODO complete this style...as soon as emotion will be able to use frames...
+      parts {
+         part { name: "bg"; type: RECT;
+            description { state: "default" 0.0;
+               aspect: 1 1;
+               aspect_preference: BOTH;
+            }
+         }
+         part { name: "emc.swallow"; type: SWALLOW; /* API TODOC */
+            description { state: "default" 0.0;
+               
+            }
+         }
+         part { name: "bg2"; type: RECT;
+            description { state: "default" 0.0;
+               aspect: 1 1;
+               aspect_preference: BOTH;
+            }
+         }
+      }
+   }
    group { name: "emc/image/null";  /* API */
       parts {
          part { name: "null"; type: RECT;

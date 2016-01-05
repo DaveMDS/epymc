@@ -19,9 +19,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+
+usage:
+======
+epymc_thumbnailer <theme_file>
+
+
 IN Protocol:
 ============
-GEN|src|dst\n
+GEN|src|dst|frame_style\n
 
 
 OUT Protocol:
@@ -44,6 +50,11 @@ def ERR(txt):
 
 SHUTDOWN_TIMEOUT = 60 # the slave will exit after X seconds of inactivity
 
+if len(sys.argv) > 1:
+   theme_file = sys.argv[1]
+else:
+   theme_file = None
+
 
 def ethumb_generate_cb(et, success):
    timer.reset()
@@ -58,6 +69,7 @@ def ethumb_generate_cb(et, success):
 def stdin_data_received_cb(fdh):
    timer.reset()
 
+   # TODO: this is not really correct... infact I cannot send 2 cmds in a raw..
    line = sys.stdin.readline()
    # DBG(repr(line))
 
@@ -66,12 +78,19 @@ def stdin_data_received_cb(fdh):
       return ecore.ECORE_CALLBACK_RENEW
 
    try:
-      cmd, src, dst = line[:-1].split('|', maxsplit=2)
+      cmd, src, dst, frame_style = line[:-1].split('|', maxsplit=3)
    except:
       ERR('invalid line received "%s"' % line)
       return ecore.ECORE_CALLBACK_RENEW
 
    if cmd == 'GEN':
+      if frame_style != 'None' and theme_file:
+         et.frame = (theme_file, 'emc/image/' + frame_style, 'emc.swallow')
+      else:
+         try:
+            et.frame = (None, None, None)
+         except: # TODO This is a bug in C efl !! need to be fixed there
+            pass
       et.file = src
       et.thumb_path = dst
       et.generate(ethumb_generate_cb)

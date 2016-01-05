@@ -22,7 +22,9 @@ import os
 from collections import OrderedDict
 
 from efl import ecore
+
 from epymc.utils import Singleton, md5, user_cache_dir
+import epymc.utils as utils
 
 
 def DBG(*args):
@@ -50,24 +52,29 @@ class EmcThumbnailer(Singleton):
       self._requests = OrderedDict()
       """
       {
-         1: (url, dst, func, args, kargs),
-         2: (url, dst, func, args, kargs), ...
+         1: (url, dst, func, frame, kargs),
+         2: (url, dst, func, frame, kargs), ...
       }
       """
 
    ### public api
-   def generate(self, url, func, *args, **kargs):
+   def generate(self, url, func, frame=None, **kargs):
       """ Ask the thumbnailer to generate a thumbnail
 
       Params:
          url: full path of the file to thumbnail
          func: function to call when the thumb is ready
+         frame: style for an optional frame to draw around the thumb
+                available styles: 'vthumb'
+         kargs: any other keyword args will be passed back in func call
 
       Return:
          thumb path (str) if the thumb already exists
          request id (int) if the thumb has been queued
 
       """
+      if url.startswith('file://'):
+         url = url[7:]
 
       # thumb already exists?
       thumb = self.thumb_path_get(url)
@@ -80,7 +87,7 @@ class EmcThumbnailer(Singleton):
 
       # generate a new request id + item
       self._id += 1
-      self._requests[self._id] = (url, thumb, func, args, kargs)
+      self._requests[self._id] = (url, thumb, func, frame, kargs)
 
       # TODO url is already in queue ?
 
@@ -122,9 +129,9 @@ class EmcThumbnailer(Singleton):
       except KeyError:
          return
 
-      url, thumb, func, args, kargs = item
+      url, thumb, func, frame, kargs = item
       DBG('send request', req_id, url, thumb)
-      self._slave.send('GEN|%s|%s\n' % (url, thumb))
+      self._slave.send('GEN|%s|%s|%s\n' % (url, thumb, frame))
       self._item = item
 
    def _process_slave_msg(self, msg):
@@ -137,18 +144,18 @@ class EmcThumbnailer(Singleton):
          return
 
       # process next item (if available)
-      url, thumb, func, args, kargs = self._item
+      url, thumb, func, frame, kargs = self._item
       self._item = None
       self._send_next_request()
 
       # call user callback
-      func(success, url, thumb, *args, **kargs)
+      func(success, url, thumb, **kargs)
 
    ### slave process management
    def _start_slave(self):
       DBG('starting slave')
       self._slave_starting = True
-      exe = ecore.Exe('epymc_thumbnailer',
+      exe = ecore.Exe('epymc_thumbnailer "%s"' % utils.in_use_theme_file,
                       ecore.ECORE_EXE_PIPE_READ |
                       ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED |
                       ecore.ECORE_EXE_PIPE_WRITE |

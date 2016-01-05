@@ -173,6 +173,7 @@ def set_theme_file(path):
    theme_overlay_add(path) # TODO REMOVE ME!!! it's here for buttons, and others
    theme_extension_add(path)
    theme_file = path
+   utils.in_use_theme_file_set(theme_file) # ... a bit hackish :(
 
 def load_icon(icon):
    """
@@ -709,6 +710,7 @@ class EmcImage(Image):
                * 'special/style/text' to create a "special" image, supported
                  styles are: 'folder', 'bd', 'icon'
                  The text will be inserted in the image.
+               * 'special/vthumb/video_url' to create a thumb of a video file
                * None to "unset" the image
          dest: Local path to save the image to. If the dest path already exists
                the image will not be downloaded, but directly loaded from dest.
@@ -776,25 +778,19 @@ class EmcImage(Image):
          self.file_set(theme_file, url)
          return
 
-      """  TODO: will come later...
       # a video thumbnail ?
-      if emc_thumbnailer is not None: # TODO remove this for release 
-         if url.startswith('special/videothumb/'):
-            url = url[19:]
-            if url.startswith('file://'):
-               path = url[7:]
-               
-            thumb_path = self.thumb_path_get(path)
-            if os.path.exists(thumb_path):
-               self.file_set(thumb_path)
-            else:
-               emc_thumbnailer.generate(path, thumb_path, self._thumb_complete_cb)
+      if url.startswith('special/vthumb/'):
+         if emc_thumbnailer is not None: # TODO remove this for release 
+            ret = emc_thumbnailer.generate(url[15:], self._thumb_complete_cb,
+                                           frame='vthumb')
+            if isinstance(ret, str): # thumb already exists (ret is thumb path)
+               self.file_set(ret)
+            elif isinstance(ret, int): # generation started (ret is req_id)
+               self._thumb_request_id = ret
                self.file_set(theme_file, 'emc/image/thumbnailing')
-            print("ASASDA")
-            print(url)
-            print(path)
-            return
-      """
+            else: # failed ... this cannot really happend atm
+               pass # TODO show a dummy image
+         return
 
       # a special image ?
       if url.startswith('special/'):

@@ -23,6 +23,8 @@
 #define FONT_SIZE_BIGGER 48
 #define FONT_COLOR 255 255 255 255
 #define FONT_COLOR3 0 0 0 64
+#define FONT_COLOR_TOPBAR 255 255 255 200
+#define FONT_COLOR3_TOPBAR 0 0 0 64
 #define FONT_COLOR_NOSEL 150 150 150 255
 #define FONT_COLOR3_NOSEL 0 0 0 64
 #define FN_COL_DISABLE 150 150 150 255
@@ -164,7 +166,7 @@ collections {
    #include "icons.edc"
 
 /// main UI
-   group { name: "emc/main/layout"; /* API */
+   group { name: "emc/main/layout";  /* API */
 
 /// clock embryo script
       script {
@@ -187,15 +189,13 @@ collections {
       parts {
 
 /// main background
-         part { name: "bg.bg";
-            type: IMAGE;
+         part { name: "bg.bg"; type: IMAGE;
             description { state: "default" 0.0;
                min: 960 600;
                image.normal: "background.jpg";
             }
          }
-         part { name: "bg.clip1";
-            type: RECT;
+         part { name: "bg.clip1"; type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 0;
             }
@@ -206,8 +206,7 @@ collections {
                color: 255 255 255 0;
             }
          }
-         part { name: "bg.clip2";
-            type: RECT;
+         part { name: "bg.clip2"; type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 0;
             }
@@ -218,17 +217,15 @@ collections {
                color: 255 255 255 255;
             }
          }
-         part { name: "bg.swallow.backdrop1"; /* API */
-            type: SWALLOW;
+         part { name: "bg.swallow.backdrop1"; type: SWALLOW;  /* API */
             clip_to: "bg.clip1";
             description { state: "default" 0.0; }
          }
-         part { name: "bg.swallow.backdrop2"; /* API */
-            type: SWALLOW;
+         part { name: "bg.swallow.backdrop2"; type: SWALLOW;  /* API */
             clip_to: "bg.clip2";
             description { state: "default" 0.0; }
          }
-         program { name: "backdrop_show_1"; /* API */
+         program { name: "backdrop_show_1";  /* API */
             signal: "backdrop,show,1";
             source: "emc";
             action: STATE_SET "bd1" 0.00;
@@ -236,7 +233,7 @@ collections {
             target: "bg.clip1";
             target: "bg.clip2";
          }
-         program { name: "backdrop_show_2"; /* API */
+         program { name: "backdrop_show_2";  /* API */
             signal: "backdrop,show,2";
             source: "emc";
             action: STATE_SET "bd2" 0.00;
@@ -246,8 +243,7 @@ collections {
          }
 
 /// browser top bar
-         part { name: "topbar.clip";
-            type: RECT;
+         part { name: "topbar.clip"; type: RECT;
             scale: 1;
             description { state: "default" 0.0;
                max: 9999 40;
@@ -259,8 +255,7 @@ collections {
                rel1.relative: 0.0 0.0;
             }
          }
-         part { name: "topbar.bg";
-            type: IMAGE;
+         part { name: "topbar.bg"; type: IMAGE;
             description { state: "default" 0.0;
                rel1.to: "topbar.clip";
                rel2.to: "topbar.clip";
@@ -269,8 +264,7 @@ collections {
                image.border: 31 39 2 39;
             }
          }
-         part { name: "topbar.home_icon";
-            type: IMAGE;
+         part { name: "topbar.home_icon"; type: IMAGE;
             description { state: "default" 0.0;
                image.normal: "icon_home.png";
                color: 255 255 255 170;
@@ -286,13 +280,12 @@ collections {
                }
             }
          }
-         part { name: "topbar.title"; /* API */
-            type: TEXT;
+         part { name: "topbar.title"; type: TEXT;  /* API */
             scale: 1;
             effect: FAR_SHADOW;
             description { state: "default" 0.0;
-               color: 255 255 255 200;
-               color3: FONT_COLOR3;
+               color: FONT_COLOR_TOPBAR;
+               color3: FONT_COLOR3_TOPBAR;
                rel1 {
                   to: "topbar.home_icon";
                   relative: 1.0 0.0;
@@ -310,8 +303,7 @@ collections {
                }
             }
          }
-         part { name: "topbar.box"; /* API */
-            type: BOX;
+         part { name: "topbar.box"; type: BOX;  /* API */
             mouse_events: 1;
             repeat_events: 1;
             description { state: "default" 0.0;
@@ -334,13 +326,14 @@ collections {
                }
             }
          }
-         part { name: "topbar.clock";
-            type: TEXT;
-            clip_to: "topbar.clip";
+         part { name: "topbar.clock.spacer"; type: TEXT;
+            // inherit: "topbar.clock";
+            /* This part is used as a spacer to avoid the buttons box
+             * changes it's position while the clock changes */
             scale: 1;
             description { state: "default" 0.0;
+               visible: 0;
                fixed: 1 1;
-               color: FONT_COLOR;
                align: 1.0 0.5;
                rel1 {
                   to: "topbar.clip";
@@ -356,34 +349,44 @@ collections {
                   size: FONT_SIZE_BIG;
                   min: 1 0;
                   ellipsis: -1;
+                  text: "00::00";
                }
             }
          }
-         part { name: "topbar.clock.spacer";
-            inherit: "topbar.clock";
-            /* This part is used as a spacer to avoid the buttons box
-             * changes it's position while the clock changes */
+         part { name: "topbar.clock"; type: TEXT;
+            scale: 1;
+            clip_to: "topbar.clip";
+            effect: FAR_SHADOW;
             description { state: "default" 0.0;
-               visible: 0;
-               text.text: "00:00";
+               fixed: 1 1;
+               color: FONT_COLOR_TOPBAR;
+               color3: FONT_COLOR3_TOPBAR;
+               align: 0.5 0.5;
+               rel1.to: "topbar.clock.spacer";
+               rel2.to: "topbar.clock.spacer";
+               text {
+                  font: FONT2;
+                  size: FONT_SIZE_BIG;
+                  min: 1 0;
+                  ellipsis: -1;
+               }
             }
          }
-         part { name: "topbar.list.spacer";
-            type: SPACER;
+         part { name: "topbar.list.spacer"; type: SPACER;
             scale: 1;
             description { state: "default" 0.0;
                max: 9999 40;
                align: 0.5 0.0;
             }
          }
-         program { name: "topbar_show"; /* API */
+         program { name: "topbar_show";  /* API */
             signal: "topbar,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.4;
             target: "topbar.clip";
          }
-         program { name: "topbar_hide"; /* API */
+         program { name: "topbar_hide";  /* API */
             signal: "topbar,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -392,8 +395,7 @@ collections {
          }
 
 /// browser view: List
-         part { name: "browser.list.clip";
-            type: RECT;
+         part { name: "browser.list.clip"; type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 0;
                visible: 0;
@@ -403,8 +405,7 @@ collections {
                visible: 1;
             }
          }
-         part { name: "browser.list.list_frame";
-            type: IMAGE;
+         part { name: "browser.list.list_frame"; type: IMAGE;
             clip_to: "browser.list.clip";
             description { state: "default" 0.0;
                rel1.offset: 0 10;
@@ -436,8 +437,7 @@ collections {
                visible: 1;
             }
          }
-         part { name: "browser.list.genlist1"; /* API */
-            type: EXTERNAL;
+         part { name: "browser.list.genlist1"; type: EXTERNAL;  /* API */
             source: "elm/genlist";
             clip_to: "browser.list.list_clip";
             description { state: "default" 0.0;
@@ -458,8 +458,7 @@ collections {
                rel2.relative: 2.0 1.0;
             }
          }
-         part { name: "browser.list.genlist2"; /* API */
-            type: EXTERNAL;
+         part { name: "browser.list.genlist2"; type: EXTERNAL;  /* API */
             source: "elm/genlist";
             clip_to: "browser.list.list_clip";
             description { state: "default" 0.0;
@@ -486,7 +485,7 @@ collections {
                }
             }
          }
-         part { name: "browser.list.total.bg";
+         part { name: "browser.list.total.bg"; type: IMAGE;
             clip_to: "browser.list.clip";
             description { state: "default" 0.0;
                image {
@@ -499,8 +498,7 @@ collections {
                rel2.offset: 14 2;
             }
          }
-         part { name: "browser.list.total"; /* API */
-            type: TEXT;
+         part { name: "browser.list.total"; type: TEXT;  /* API */
             clip_to: "browser.list.clip";
             effect: SHADOW;
             scale: 1;
@@ -524,8 +522,7 @@ collections {
                }
             }
          }
-         part { name: "browser.list.poster"; /* API */
-            type: SWALLOW;
+         part { name: "browser.list.poster"; type: SWALLOW;  /* API */
             clip_to: "browser.list.clip";
             description { state: "default" 0.0;
                rel1 {
@@ -542,8 +539,7 @@ collections {
                }
             }
          }
-         part { name: "browser.list.info_bg";
-            type: IMAGE;
+         part { name: "browser.list.info_bg"; type: IMAGE;
             clip_to: "browser.list.clip";
             description { state: "default" 0.0;
                image {
@@ -564,8 +560,7 @@ collections {
                rel2.relative: 1.0 (1.0 + 0.0);
             }
          }
-         part { name: "browser.list.info"; /* API */
-            type: SWALLOW;
+         part { name: "browser.list.info"; type: SWALLOW;  /* API */
             clip_to: "browser.list.clip";
             scale: 1;
             description { state: "default" 0.0;
@@ -579,7 +574,7 @@ collections {
                }
             }
          }
-         program { name: "browser_list_show"; /* API */
+         program { name: "browser_list_show";  /* API */
             signal: "browser,list,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -587,7 +582,7 @@ collections {
             target: "browser.list.clip";
             target: "browser.list.list_clip";
          }
-         program { name: "browser_list_hide"; /* API */
+         program { name: "browser_list_hide";  /* API */
             signal: "browser,list,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -595,21 +590,21 @@ collections {
             target: "browser.list.clip";
             target: "browser.list.list_clip";
          }
-         program { name: "browser_list_info_show"; /* API */
+         program { name: "browser_list_info_show";  /* API */
             signal: "browser,list,info,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.35;
             target: "browser.list.info_bg";
          }
-         program { name: "browser_list_info_hide"; /* API */
+         program { name: "browser_list_info_hide";  /* API */
             signal: "browser,list,info,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: ACCELERATE 0.35;
             target: "browser.list.info_bg";
          }
-         program { name: "browser_list_flip_left"; /* API */
+         program { name: "browser_list_flip_left";  /* API */
             signal: "browser,list,flip_left";
             source: "emc";
             script {
@@ -634,7 +629,7 @@ collections {
                }
             }
          }
-         program { name: "browser_list_flip_right"; /* API */
+         program { name: "browser_list_flip_right";  /* API */
             signal: "browser,list,flip_right";
             source: "emc";
             script {
@@ -676,8 +671,7 @@ collections {
          }
 
 /// browser view: Poster Grid
-         part { name: "browser.postergrid.clip";
-            type: RECT;
+         part { name: "browser.postergrid.clip"; type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 0;
                visible: 0;
@@ -687,8 +681,7 @@ collections {
                visible: 1;
             }
          }
-         part { name: "browser.postergrid.grid_frame";
-            type: IMAGE;
+         part { name: "browser.postergrid.grid_frame"; type: IMAGE;
             clip_to: "browser.postergrid.clip";
             description { state: "default" 0.0;
                rel1.offset: 0 10;
@@ -700,8 +693,7 @@ collections {
                image.border: 32 32 92 78;
             }
          }
-         part { name: "browser.postergrid.gengrid"; /* API */
-            type: SWALLOW;
+         part { name: "browser.postergrid.gengrid"; type: SWALLOW;  /* API */
             clip_to: "browser.postergrid.clip";
             description { state: "default" 0.0;
                rel1 {
@@ -714,7 +706,7 @@ collections {
                }
             }
          }
-         part { name: "browser.postergrid.total.bg";
+         part { name: "browser.postergrid.total.bg"; type: IMAGE;
             clip_to: "browser.postergrid.clip";
             description { state: "default" 0.0;
                image {
@@ -727,8 +719,7 @@ collections {
                rel2.offset: 14 2;
             }
          }
-         part { name: "browser.postergrid.total"; /* API */
-            type: TEXT;
+         part { name: "browser.postergrid.total"; type: TEXT;  /* API */
             clip_to: "browser.postergrid.clip";
             effect: SHADOW;
             scale: 1;
@@ -752,8 +743,7 @@ collections {
                }
             }
          }
-         part { name: "browser.postergrid.info_bg";
-            type: IMAGE;
+         part { name: "browser.postergrid.info_bg"; type: IMAGE;
             clip_to: "browser.postergrid.clip";
             description { state: "default" 0.0;
                fixed: 1 1;
@@ -777,8 +767,7 @@ collections {
                rel2.relative: (1.0 + 0.0) 1.0;
             }
          }
-         part { name: "browser.postergrid.info"; /* API */
-            type: SWALLOW;
+         part { name: "browser.postergrid.info"; type: SWALLOW;  /* API */
             clip_to: "browser.postergrid.clip";
             scale: 1;
             description { state: "default" 0.0;
@@ -793,8 +782,7 @@ collections {
                }
             }
          }
-         part { name: "browser.postergrid.image"; /* API */
-            type: SWALLOW;
+         part { name: "browser.postergrid.image"; type: SWALLOW;  /* API */
             clip_to: "browser.postergrid.clip";
             description { state: "default" 0.0;
                rel1 {
@@ -811,28 +799,28 @@ collections {
                }
             }
          }
-         program { name: "browser_postergrid_show"; /* API */
+         program { name: "browser_postergrid_show";  /* API */
             signal: "browser,postergrid,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: LINEAR 1.0;
             target: "browser.postergrid.clip";
          }
-         program { name: "browser_postergrid_hide"; /* API */
+         program { name: "browser_postergrid_hide";  /* API */
             signal: "browser,postergrid,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: LINEAR 0.5;
             target: "browser.postergrid.clip";
          }
-         program { name: "browser_postergrid_info_show"; /* API */
+         program { name: "browser_postergrid_info_show";  /* API */
             signal: "browser,postergrid,info,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.35;
             target: "browser.postergrid.info_bg";
          }
-         program { name: "browser_postergrid_info_hide"; /* API */
+         program { name: "browser_postergrid_info_hide";  /* API */
             signal: "browser,postergrid,info,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -841,8 +829,7 @@ collections {
          }
 
 /// browser view: Cover Grid
-         part { name: "browser.covergrid.clip";
-            type: RECT;
+         part { name: "browser.covergrid.clip"; type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 0;
                visible: 0;
@@ -852,8 +839,7 @@ collections {
                visible: 1;
             }
          }
-         part { name: "browser.covergrid.grid_frame";
-            type: IMAGE;
+         part { name: "browser.covergrid.grid_frame"; type: IMAGE;
             clip_to: "browser.covergrid.clip";
             description { state: "default" 0.0;
                rel1.offset: 0 10;
@@ -865,8 +851,7 @@ collections {
                image.border: 32 32 92 78;
             }
          }
-         part { name: "browser.covergrid.gengrid"; /* API */
-            type: SWALLOW;
+         part { name: "browser.covergrid.gengrid"; type: SWALLOW;  /* API */
             clip_to: "browser.covergrid.clip";
             description { state: "default" 0.0;
                rel1 {
@@ -879,7 +864,7 @@ collections {
                }
             }
          }
-         part { name: "browser.covergrid.total.bg";
+         part { name: "browser.covergrid.total.bg"; type: IMAGE;
             clip_to: "browser.covergrid.clip";
             description { state: "default" 0.0;
                image {
@@ -892,8 +877,7 @@ collections {
                rel2.offset: 14 2;
             }
          }
-         part { name: "browser.covergrid.total"; /* API */
-            type: TEXT;
+         part { name: "browser.covergrid.total"; type: TEXT;  /* API */
             clip_to: "browser.covergrid.clip";
             effect: SHADOW;
             scale: 1;
@@ -917,8 +901,7 @@ collections {
                }
             }
          }
-         part { name: "browser.covergrid.info_bg";
-            type: IMAGE;
+         part { name: "browser.covergrid.info_bg"; type: IMAGE;
             clip_to: "browser.covergrid.clip";
             description { state: "default" 0.0;
                fixed: 1 1;
@@ -942,8 +925,7 @@ collections {
                rel2.relative: (1.0 + 0.0) 1.0;
             }
          }
-         part { name: "browser.covergrid.info"; /* API */
-            type: SWALLOW;
+         part { name: "browser.covergrid.info"; type: SWALLOW;  /* API */
             clip_to: "browser.covergrid.clip";
             scale: 1;
             description { state: "default" 0.0;
@@ -958,8 +940,7 @@ collections {
                }
             }
          }
-         part { name: "browser.covergrid.image"; /* API */
-            type: SWALLOW;
+         part { name: "browser.covergrid.image"; type: SWALLOW;  /* API */
             clip_to: "browser.covergrid.clip";
             description { state: "default" 0.0;
                rel1 {
@@ -976,28 +957,28 @@ collections {
                }
             }
          }
-         program { name: "browser_covergrid_show"; /* API */
+         program { name: "browser_covergrid_show";  /* API */
             signal: "browser,covergrid,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: LINEAR 1.0;
             target: "browser.covergrid.clip";
          }
-         program { name: "browser_covergrid_hide"; /* API */
+         program { name: "browser_covergrid_hide";  /* API */
             signal: "browser,covergrid,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             transition: LINEAR 0.5;
             target: "browser.covergrid.clip";
          }
-         program { name: "browser_covergrid_info_show"; /* API */
+         program { name: "browser_covergrid_info_show";  /* API */
             signal: "browser,covergrid,info,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.35;
             target: "browser.covergrid.info_bg";
          }
-         program { name: "browser_covergrid_info_hide"; /* API */
+         program { name: "browser_covergrid_info_hide";  /* API */
             signal: "browser,covergrid,info,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -1006,8 +987,7 @@ collections {
          }
 
 /// filemanager
-         part { name: "fileman.clip";
-            type: RECT;
+         part { name: "fileman.clip"; type: RECT;
             description { state: "default" 0.0;
                color: 0 0 0 0;
             }
@@ -1015,8 +995,7 @@ collections {
                color: 255 255 255 255;
             }
          }
-         part { name: "fileman.list1.frame";
-            type: IMAGE;
+         part { name: "fileman.list1.frame"; type: IMAGE;
             clip_to: "fileman.clip";
             description { state: "default" 0.0;
                rel1.offset: 0 10;
@@ -1033,8 +1012,7 @@ collections {
                rel2.relative: 0.45 1.0;
             }
          }
-         part { name: "fileman.list1.swallow"; /* API */
-            type: SWALLOW;
+         part { name: "fileman.list1.swallow"; type: SWALLOW;  /* API */
             clip_to: "fileman.clip";
             description { state: "default" 0.0;
                rel1.to: "fileman.list1.frame";
@@ -1044,8 +1022,7 @@ collections {
                color: 200 0 0 100;
             }
          }
-         part { name: "fileman.list2.frame";
-            type: IMAGE;
+         part { name: "fileman.list2.frame"; type: IMAGE;
             clip_to: "fileman.clip";
             description { state: "default" 0.0;
                rel1.offset: 0 10;
@@ -1063,8 +1040,7 @@ collections {
                rel2.offset: -1 10;
             }
          }
-         part { name: "fileman.list2.swallow"; /* API */
-            type: SWALLOW;
+         part { name: "fileman.list2.swallow"; type: SWALLOW;  /* API */
             clip_to: "fileman.clip";
             description { state: "default" 0.0;
                rel1.to: "fileman.list2.frame";
@@ -1094,8 +1070,7 @@ collections {
                rel2.relative: 0.55 1.0;
             }
          }
-         part { name: "fileman.buttons.box"; /* API */
-            type: BOX;
+         part { name: "fileman.buttons.box"; type: BOX;  /* API */
             clip_to: "fileman.clip";
             description { state: "default" 0.0;
                rel1.to: "fileman.buttons.frame";
@@ -1110,8 +1085,7 @@ collections {
                }
             }
          }
-         part { name: "fileman.buttons.box2"; /* API */
-            type: BOX;
+         part { name: "fileman.buttons.box2"; type: BOX;  /* API */
             clip_to: "fileman.clip";
             description { state: "default" 0.0;
                rel1.to: "fileman.buttons.frame";
@@ -1129,7 +1103,7 @@ collections {
 
          // DBG_SHOW("fileman.list1.swallow", 200, 0, 0)
          // DBG_SHOW("fileman.list2.swallow", 0, 200, 0)
-         program { name: "fileman_show"; /* API */
+         program { name: "fileman_show";  /* API */
             signal: "fileman,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -1139,7 +1113,7 @@ collections {
             target: "fileman.list2.frame";
             target: "fileman.buttons.frame";
          }
-         program { name: "fileman_hide"; /* API */
+         program { name: "fileman_hide";  /* API */
             signal: "fileman,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -1151,7 +1125,7 @@ collections {
          }
 
 /// mainmenu
-         part { name: "mainmenu.title.bg";
+         part { name: "mainmenu.title.bg"; type: IMAGE;
             description { state: "default" 0.0;
                rel1 {
                   to: "mainmenu.title";
@@ -1166,8 +1140,7 @@ collections {
                }
             }
          }
-         part { name: "mainmenu.title";
-            type: TEXT;
+         part { name: "mainmenu.title"; type: TEXT;
             effect: FAR_SHADOW;
             scale: 1;
             description { state: "default" 0.0;
@@ -1191,7 +1164,7 @@ collections {
                rel2.relative: 1.0 0.0;
             }
          }
-         part { name: "mainmenu.list.bar";
+         part { name: "mainmenu.list.bar"; type: IMAGE;
             scale: 1;
             description { state: "default" 0.0;
                color: 255 255 255 180;
@@ -1213,8 +1186,7 @@ collections {
                }
             }
          }
-         part { name: "mainmenu.list.bar.shine";
-            type: IMAGE;
+         part { name: "mainmenu.list.bar.shine"; type: IMAGE;
             description { state: "default" 0.0;
                FIXED_SIZE(120, 5)
                rel1 {
@@ -1229,8 +1201,7 @@ collections {
                image.normal: "shine.png";
             }
          }
-         part { name: "mainmenu.list.swallow"; /* API */
-            type: SWALLOW;
+         part { name: "mainmenu.list.swallow"; type: SWALLOW;  /* API */
             description { state: "default" 0.0;
                rel1 {
                   relative: 0.0 -1.0;
@@ -1252,7 +1223,7 @@ collections {
                }
             }
          }
-         program { name: "mainmenu_show"; /* API */
+         program { name: "mainmenu_show";  /* API */
             signal: "mainmenu,show";
             source: "emc";
             action: STATE_SET "visible" 0.00;
@@ -1260,7 +1231,7 @@ collections {
             target: "mainmenu.list.swallow";
             target: "mainmenu.title";
          }
-         program { name: "mainmenu_hide"; /* API */
+         program { name: "mainmenu_hide";  /* API */
             signal: "mainmenu,hide";
             source: "emc";
             action: STATE_SET "default" 0.00;
@@ -1270,22 +1241,19 @@ collections {
          }
 
 /// videoplayer
-         part { name: "videoplayer.bg";
-            type: RECT;
+         part { name: "videoplayer.bg"; type: RECT;
             mouse_events: 0;
             clip_to: "videoplayer.clip";
             description { state: "default" 0.0;
                color: 0 0 0 255;
             }
          }
-         part { name: "videoplayer.video"; /* API */
-            type: SWALLOW;
+         part { name: "videoplayer.video"; type: SWALLOW;  /* API */
             clip_to: "videoplayer.clip";
             description { state: "default" 0.0;
             }
          }
-         part { name: "videoplayer.clip";
-            type: RECT;
+         part { name: "videoplayer.clip"; type: RECT;
             mouse_events: 0;
             description { state: "default" 0.0;
                color: 255 255 255 0;
@@ -1296,8 +1264,7 @@ collections {
                visible: 1;
             }
          }
-         part { name: "videoplayer.events"; /* API */
-            type: RECT;
+         part { name: "videoplayer.events"; type: RECT;  /* API */
             mouse_events: 1;
             description { state: "default" 0.0;
                color: 0 0 0 0;
@@ -1308,8 +1275,7 @@ collections {
                visible: 1;
             }
          }
-         part { name: "videoplayer.subs"; /* API */
-            type: TEXTBLOCK;
+         part { name: "videoplayer.subs"; type: TEXTBLOCK;  /* API */
             mouse_events: 0;
             clip_to: "videoplayer.clip";
             description { state: "default" 0.0;
@@ -1319,8 +1285,7 @@ collections {
                }
             }
          }
-         part { name: "videoplayer.controls.bg";
-            type: IMAGE;
+         part { name: "videoplayer.controls.bg"; type: IMAGE;
             clip_to: "videoplayer.clip";
             scale: 1;
             description { state: "default" 0.0;
@@ -1339,8 +1304,7 @@ collections {
                visible: 1;
             }
          }
-         part { name: "videoplayer.controls.poster"; /* API */
-            type: SWALLOW;
+         part { name: "videoplayer.controls.poster"; type: SWALLOW;  /* API */
             mouse_events: 0;
             clip_to: "videoplayer.clip";
             description { state: "default" 0.0;
@@ -1356,8 +1320,7 @@ collections {
                rel2.relative: 0.25 0.45;
             }
          }
-         part { name: "videoplayer.controls.container1";
-            type: SPACER;
+         part { name: "videoplayer.controls.container1"; type: SPACER;
             description { state: "default" 0.0;
                rel1 {
                   to_x: "videoplayer.controls.poster";
@@ -1371,8 +1334,7 @@ collections {
                }
             }
          }
-         part { name: "videoplayer.controls.btn_box"; /* API */
-            type: BOX;
+         part { name: "videoplayer.controls.btn_box"; type: BOX;  /* API */
             description { state: "default" 0.0;
                rel1.to: "videoplayer.controls.container1";
                rel2.to: "videoplayer.controls.container1";
@@ -1383,8 +1345,7 @@ collections {
                }
             }
          }
-         part { name: "videoplayer.controls.btn_box2"; /* API */
-            type: BOX;
+         part { name: "videoplayer.controls.btn_box2"; type: BOX;  /* API */
             description { state: "default" 0.0;
                rel1.to: "videoplayer.controls.container1";
                rel2.to: "videoplayer.controls.container1";
@@ -1395,8 +1356,7 @@ collections {
                }
             }
          }
-         part { name: "videoplayer.controls.container2";
-            type: SPACER;
+         part { name: "videoplayer.controls.container2"; type: SPACER;
             description { state: "default" 0.0;
                rel1 {
                   to_x: "videoplayer.controls.poster";
@@ -1410,8 +1370,7 @@ collections {
                }
             }
          }
-         part { name: "videoplayer.controls.position"; /* API */
-            type: TEXT;
+         part { name: "videoplayer.controls.position"; type: TEXT;  /* API */
             mouse_events: 0;
             scale: 1;
             clip_to: "videoplayer.clip";
@@ -1439,7 +1398,7 @@ collections {
                }
             }
          }
-         part { name: "videoplayer.controls.position.spacer";
+         part { name: "videoplayer.controls.position.spacer"; type: TEXT;
             inherit: "videoplayer.controls.position";
             /* This part is used as a spacer to avoid the slider
              * changes it's starting position while the numbers in
@@ -1449,8 +1408,7 @@ collections {
                text.text: "0:00:00";
             }
          }
-         part { name: "videoplayer.controls.slider"; /* API */
-            type: GROUP;
+         part { name: "videoplayer.controls.slider"; type: GROUP;  /* API */
             source: "emc/slider/default";
             mouse_events: 1;
             scale: 1;
@@ -1468,8 +1426,7 @@ collections {
                }
             }
          }
-         part { name: "videoplayer.controls.length"; /* API */
-            type: TEXT;
+         part { name: "videoplayer.controls.length"; type: TEXT;  /* API */
             mouse_events: 0;
             scale: 1;
             clip_to: "videoplayer.clip";
@@ -1497,8 +1454,7 @@ collections {
                }
             }
          }
-         part { name: "videoplayer.controls.title"; /* API */
-            type: TEXT;
+         part { name: "videoplayer.controls.title"; type: TEXT;  /* API */
             mouse_events: 0;
             scale: 1;
             clip_to: "videoplayer.clip";
@@ -1524,7 +1480,7 @@ collections {
                }
             }
          }
-         program { name: "videoplayer_show"; /* API */
+         program { name: "videoplayer_show";  /* API */
             signal: "videoplayer,show";
             source: "emc";
             action: STATE_SET "visible" 0.00;
@@ -1532,7 +1488,7 @@ collections {
             target: "videoplayer.clip";
             target: "videoplayer.events";
          }
-         program { name: "videoplayer_hide"; /* API */
+         program { name: "videoplayer_hide";  /* API */
             signal: "videoplayer,hide";
             source: "emc";
             action: STATE_SET "default" 0.00;
@@ -1540,7 +1496,7 @@ collections {
             target: "videoplayer.clip";
             target: "videoplayer.events";
          }
-         program { name: "videoplayer_controls_show"; /* API */
+         program { name: "videoplayer_controls_show";  /* API */
             signal: "videoplayer,controls,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -1548,7 +1504,7 @@ collections {
             target: "videoplayer.controls.bg";
             target: "videoplayer.controls.poster";
          }
-         program { name: "videoplayer_controls_hide"; /* API */
+         program { name: "videoplayer_controls_hide";  /* API */
             signal: "videoplayer,controls,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -1558,8 +1514,7 @@ collections {
          }
 
 /// slideshow
-         part { name: "slideshow.clip";
-            type: RECT;
+         part { name: "slideshow.clip"; type: RECT;
             description { state: "default" 0.0;
                color: 0 0 0 0;
                rel1.relative: 0.0 -1.0;
@@ -1571,16 +1526,14 @@ collections {
                rel2.relative: 1.0 1.0;
             }
          }
-         part { name: "slideshow.swallow"; /* API */
-            type: SWALLOW;
+         part { name: "slideshow.swallow"; type: SWALLOW;  /* API */
             clip_to: "slideshow.clip";
             description { state: "default" 0.0;
                rel1.to: "slideshow.clip";
                rel2.to: "slideshow.clip";
             }
          }
-         part { name: "slideshow.controls.clip";
-            type: RECT;
+         part { name: "slideshow.controls.clip"; type: RECT;
             description { state: "default" 0.0;
                rel1.to: "slideshow.controls.shadow";
                rel2.to: "slideshow.controls.shadow";
@@ -1591,8 +1544,7 @@ collections {
                color: 255 255 255 255;
             }
          }
-         part { name: "slideshow.controls.shadow";
-            type: IMAGE;
+         part { name: "slideshow.controls.shadow"; type: IMAGE;
             clip_to: "slideshow.controls.clip";
             scale: 1;
             description { state: "default" 0.0;
@@ -1604,8 +1556,7 @@ collections {
                image.border: 16 16 16 0;
             }
          }
-         part { name: "slideshow.controls.bg";
-            type: IMAGE;
+         part { name: "slideshow.controls.bg"; type: IMAGE;
             clip_to: "slideshow.controls.clip";
             scale: 1;
             description { state: "default" 0.0;
@@ -1619,8 +1570,7 @@ collections {
                image.border: 1 1 2 0;
             }
          }
-         part { name: "slideshow.controls.btn_box"; /* API */
-            type: BOX;
+         part { name: "slideshow.controls.btn_box"; type: BOX;  /* API */
             clip_to: "slideshow.controls.clip";
             scale: 1;
             description { state: "default" 0.0;
@@ -1639,8 +1589,7 @@ collections {
                align: 1.0 1.0;
             }
          }
-         part { name: "slideshow.controls.icon";
-            type: IMAGE;
+         part { name: "slideshow.controls.icon"; type: IMAGE;
             clip_to: "slideshow.controls.clip";
             scale: 1;
             description { state: "default" 0.0;
@@ -1659,8 +1608,7 @@ collections {
                align: 1.0 0.5;
             }
          }
-         part { name: "slideshow.controls.text"; /* API */
-            type: TEXT;
+         part { name: "slideshow.controls.text"; type: TEXT;  /* API */
             clip_to: "slideshow.controls.clip";
             scale: 1;
             effect: FAR_SHADOW;
@@ -1688,7 +1636,7 @@ collections {
                fixed: 1 1;
             }
          }
-         program { name: "slideshow_show"; /* API */
+         program { name: "slideshow_show";  /* API */
             signal: "slideshow,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -1697,9 +1645,9 @@ collections {
             after: "slideshow_show_done";
          }
          program { name: "slideshow_show_done";
-            action: SIGNAL_EMIT "emc,slideshow,show,done" ""; /* API */
+            action: SIGNAL_EMIT "emc,slideshow,show,done" "";  /* API */
          }
-         program { name: "slideshow_hide"; /* API */
+         program { name: "slideshow_hide";  /* API */
             signal: "slideshow,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -1708,9 +1656,9 @@ collections {
             after: "slideshow_hide_done";
          }
          program { name: "slideshow_hide_done";
-            action: SIGNAL_EMIT "emc,slideshow,hide,done" ""; /* API */
+            action: SIGNAL_EMIT "emc,slideshow,hide,done" "";  /* API */
          }
-         program { name: "slideshow_controls_show"; /* API */
+         program { name: "slideshow_controls_show";  /* API */
             signal: "slideshow,controls,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -1718,7 +1666,7 @@ collections {
             target: "slideshow.controls.btn_box";
             target: "slideshow.controls.clip";
          }
-         program { name: "slideshow_controls_hide"; /* API */
+         program { name: "slideshow_controls_hide";  /* API */
             signal: "slideshow,controls,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -1728,8 +1676,7 @@ collections {
          }
 
 /// minipos
-         part { name: "minipos.bg.shadow";
-            type: IMAGE;
+         part { name: "minipos.bg.shadow"; type: IMAGE;
             mouse_events: 0;
             scale: 1;
             description { state: "default" 0.0;
@@ -1745,8 +1692,7 @@ collections {
                color: 255 255 255 255;
             }
          }
-         part { name: "minipos.bg";
-            type: IMAGE;
+         part { name: "minipos.bg"; type: IMAGE;
             mouse_events: 0;
             scale: 1;
             description { state: "default" 0.0;
@@ -1763,7 +1709,7 @@ collections {
                align: 0.5 0.0;
             }
          }
-         part { name: "minipos.icon";
+         part { name: "minipos.icon"; type: IMAGE;
             description { state: "default" 0.0;
                aspect: 1.0 1.0;
                aspect_preference: VERTICAL;
@@ -1786,8 +1732,7 @@ collections {
                image.normal: "icon_pause.png";
             }
          }
-         part { name: "minipos.position"; /* API */
-            type: TEXT;
+         part { name: "minipos.position"; type: TEXT;  /* API */
             mouse_events: 0;
             scale: 1;
             effect: FAR_SHADOW;
@@ -1815,15 +1760,14 @@ collections {
                }
             }
          }
-         part { name: "minipos.position.spacer";
+         part { name: "minipos.position.spacer"; type: TEXT;
             inherit: "minipos.position";
             description { state: "default" 0.0;
                visible: 0;
                text.text: "0:00:00";
             }
          }
-         part { name: "minipos.slider"; /* API */
-            type: GROUP;
+         part { name: "minipos.slider"; type: GROUP;  /* API */
             source: "emc/slider/default";
             mouse_events: 0;
             scale: 1;
@@ -1841,8 +1785,7 @@ collections {
                }
             }
          }
-         part { name: "minipos.length"; /* API */
-            type: TEXT;
+         part { name: "minipos.length"; type: TEXT;  /* API */
             mouse_events: 0;
             scale: 1;
             effect: FAR_SHADOW;
@@ -1868,14 +1811,14 @@ collections {
                }
             }
          }
-         part { name: "minipos.length.spacer";
+         part { name: "minipos.length.spacer"; type: TEXT;
             inherit: "minipos.length";
             description { state: "default" 0.0;
                visible: 0;
                text.text: "0:00:00";
             }
          }
-         program { name: "minipos_show"; /* API */
+         program { name: "minipos_show";  /* API */
             signal: "minipos,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -1883,7 +1826,7 @@ collections {
             target: "minipos.bg";
             target: "minipos.bg.shadow";
          }
-         program { name: "minipos_hide"; /* API */
+         program { name: "minipos_hide";  /* API */
             signal: "minipos,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -1891,13 +1834,13 @@ collections {
             target: "minipos.bg";
             target: "minipos.bg.shadow";
          }
-         program { name: "minipos_set_play"; /* API */
+         program { name: "minipos_set_play";  /* API */
             signal: "minipos,play,set";
             source: "emc";
             action: STATE_SET "play" 0.0;
             target: "minipos.icon";
          }
-         program { name: "minipos_set_pause"; /* API */
+         program { name: "minipos_set_pause";  /* API */
             signal: "minipos,pause,set";
             source: "emc";
             action: STATE_SET "pause" 0.0;
@@ -1905,8 +1848,7 @@ collections {
          }
 
 /// volume
-         part { name: "volume.bg.shadow";
-            type: IMAGE;
+         part { name: "volume.bg.shadow"; type: IMAGE;
             mouse_events: 0;
             scale: 1;
             description { state: "default" 0.0;
@@ -1922,8 +1864,7 @@ collections {
                color: 255 255 255 255;
             }
          }
-         part { name: "volume.bg";
-            type: IMAGE;
+         part { name: "volume.bg"; type: IMAGE;
             mouse_events: 1;
             repeat_events: 0;
             scale: 1;
@@ -1941,8 +1882,7 @@ collections {
                align: 0.5 1.0;
             }
          }
-         part { name: "volume.slider"; /* API */
-            type: GROUP;
+         part { name: "volume.slider"; type: GROUP;  /* API */
             source: "emc/slider/default";
             mouse_events: 1;
             scale: 1;
@@ -1960,8 +1900,7 @@ collections {
                }
             }
          }
-         part { name: "volume.icon";
-            type: IMAGE;
+         part { name: "volume.icon"; type: IMAGE;
             description { state: "default" 0.0;
                image.normal: "volume.png";
                align: 0.0 0.5;
@@ -1983,7 +1922,7 @@ collections {
                image.normal: "volume_muted.png";
             }
          }
-         program { name: "volume_show"; /* API */
+         program { name: "volume_show";  /* API */
             signal: "volume,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -1991,7 +1930,7 @@ collections {
             target: "volume.bg";
             target: "volume.bg.shadow";
          }
-         program { name: "volume_hide"; /* API */
+         program { name: "volume_hide";  /* API */
             signal: "volume,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -1999,27 +1938,26 @@ collections {
             target: "volume.bg";
             target: "volume.bg.shadow";
          }
-         program { name: "volume_mute_on"; /* API */
+         program { name: "volume_mute_on";  /* API */
             signal: "volume,mute,on";
             source: "emc";
             action: STATE_SET "muted" 0.0;
             target: "volume.icon";
          }
-         program { name: "volume_mute_off"; /* API */
+         program { name: "volume_mute_off";  /* API */
             signal: "volume,mute,off";
             source: "emc";
             action: STATE_SET "default" 0.0;
             target: "volume.icon";
          }
-         program { name: "toggle_mute"; /* API */
+         program { name: "toggle_mute";  /* API */
             signal: "mouse,down,1";
             source: "volume.icon";
             action: SIGNAL_EMIT "emc,mute,toggle" "";
          }
 
 /// dialog & notify container boxes
-         part { name: "dialogs.box.stack"; /* API */
-            type: BOX;
+         part { name: "dialogs.box.stack"; type: BOX;  /* API */
             description { state: "default" 0.0;
                box {
                   layout: "stack";
@@ -2028,8 +1966,7 @@ collections {
                }
             }
          }
-         part { name: "notify.box.stack"; /* API */
-            type: BOX;
+         part { name: "notify.box.stack"; type: BOX;  /* API */
             scale: 1;
             description { state: "default" 0.0;
                align: 1.0 0.0;
@@ -2051,8 +1988,7 @@ collections {
 
 /// debug label for embryo scripting
          #if DEBUG_ENABLE
-         part { name: "embryo_dbg";
-            type: TEXT;
+         part { name: "embryo_dbg"; type: TEXT;
             description { state: "default" 0.0;
                color: FONT_COLOR;
                text {
@@ -2077,7 +2013,7 @@ collections {
    }
 
 /// dialogs
-   group { name: "emc/dialog/panel"; /* API */
+   group { name: "emc/dialog/panel";  /* API */
       images {
          image: "dialog_bg.png" COMP;
          image: "dialog_header.png" COMP;
@@ -2085,8 +2021,7 @@ collections {
          image: "roundclose.png" COMP;
       }
       parts {
-         part { name: "clipper";
-            type: RECT;
+         part { name: "clipper"; type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 0;
             }
@@ -2094,7 +2029,7 @@ collections {
                color: 255 255 255 255;
             }
          }
-         part { name: "base";
+         part { name: "base"; type: IMAGE;
             clip_to: "clipper";
             description { state: "default" 0.0;
                rel1.relative: 0.1 0.1;
@@ -2105,8 +2040,7 @@ collections {
                }
             }
          }
-         part { name: "emc.swallow.content"; /* API */
-            type: SWALLOW;
+         part { name: "emc.swallow.content"; type: SWALLOW;  /* API */
             clip_to: "clipper";
             description { state: "default" 0.0;
                fixed: 1 1;
@@ -2123,7 +2057,7 @@ collections {
                }
             }
          }
-         part { name: "title_bg";
+         part { name: "title_bg"; type: IMAGE;
             clip_to: "clipper";
             mouse_events: 0;
             scale: 1;
@@ -2151,8 +2085,7 @@ collections {
                visible: 1;
             }
          }
-         part { name: "title_shadow";
-            type: IMAGE;
+         part { name: "title_shadow"; type: IMAGE;
             clip_to: "clipper";
             mouse_events: 0;
             scale: 1;
@@ -2175,8 +2108,7 @@ collections {
                visible: 1;
             }
          }
-         part { name: "emc.text.title"; /* API */
-            type: TEXTBLOCK;
+         part { name: "emc.text.title"; type: TEXTBLOCK;  /* API */
             clip_to: "clipper";
             scale: 1;
             description { state: "default" 0.0;
@@ -2192,8 +2124,7 @@ collections {
                visible: 1;
             }
          }
-         part { name: "close";
-            type: IMAGE;
+         part { name: "close"; type: IMAGE;
             clip_to: "clipper";
             scale: 1;
             mouse_events: 1;
@@ -2217,8 +2148,7 @@ collections {
                color: 255 255 255 240;
             }
          }
-         part { name: "emc.box.buttons"; /* API */
-            type: BOX;
+         part { name: "emc.box.buttons"; type: BOX;  /* API */
             clip_to: "clipper";
             description { state: "default" 0.0;
                fixed: 1 1;
@@ -2259,12 +2189,12 @@ collections {
             transition: LINEAR 0.15 CURRENT;
             target: "close";
          }
-         program { name: "close_mouse_click"; /* API */
+         program { name: "close_mouse_click";  /* API */
             signal: "mouse,down,1";
             source: "close";
             action: SIGNAL_EMIT "emc,dialog,close" "";
          }
-         program { name: "show"; /* API */
+         program { name: "show";  /* API */
             signal: "emc,dialog,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -2272,10 +2202,10 @@ collections {
             target: "clipper";
             after: "show_done";
          }
-         program { name: "show_done"; /* API */
+         program { name: "show_done";  /* API */
             action: SIGNAL_EMIT "emc,dialog,show,done" "";
          }
-         program { name: "hide"; /* API */
+         program { name: "hide";  /* API */
             signal: "emc,dialog,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -2283,10 +2213,10 @@ collections {
             target: "clipper";
             after: "hide_done";
          }
-         program { name: "hide_done"; /* API */
+         program { name: "hide_done";  /* API */
             action: SIGNAL_EMIT "emc,dialog,hide,done" "";
          }
-         program { name: "show_title"; /* API */
+         program { name: "show_title";  /* API */
             signal: "emc,dialog,title,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -2294,7 +2224,7 @@ collections {
             target: "title_bg";
             target: "title_shadow";
          }
-         program { name: "hide_title"; /* API */
+         program { name: "hide_title";  /* API */
             signal: "emc,dialog,title,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -2302,13 +2232,13 @@ collections {
             target: "title_bg";
             target: "title_shadow";
          }
-         program { name: "show_buttons"; /* API */
+         program { name: "show_buttons";  /* API */
             signal: "emc,dialog,buttons,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             target: "emc.box.buttons";
          }
-         program { name: "hide_buttons"; /* API */
+         program { name: "hide_buttons";  /* API */
             signal: "emc,dialog,buttons,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -2316,7 +2246,7 @@ collections {
          }
       }
    }
-   group { name: "emc/dialog/minimal"; /* API */
+   group { name: "emc/dialog/minimal";  /* API */
       images {
          image: "dialog_bg.png" COMP;
          image: "dialog_header.png" COMP;
@@ -2326,8 +2256,7 @@ collections {
          image: "error.png" COMP;
       }
       parts {
-         part { name: "clipper";
-            type: RECT;
+         part { name: "clipper"; type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 0;
             }
@@ -2335,7 +2264,7 @@ collections {
                color: 255 255 255 255;
             }
          }
-         part { name: "base";
+         part { name: "base"; type: IMAGE;
             clip_to: "clipper";
             description { state: "default" 0.0;
                rel1 {
@@ -2353,8 +2282,7 @@ collections {
                }
             }
          }
-         part { name: "tag_image";
-            type: IMAGE;
+         part { name: "tag_image"; type: IMAGE;
             clip_to: "clipper";
             description { state: "default" 0.0;
                rel1.to: "base";
@@ -2392,8 +2320,7 @@ collections {
                image.normal: "bulb-0.png";
             }
          }
-         part { name: "emc.swallow.content"; /* API */
-            type: SWALLOW;
+         part { name: "emc.swallow.content"; type: SWALLOW;  /* API */
             clip_to: "clipper";
             scale: 1;
             description { state: "default" 0.0;
@@ -2402,8 +2329,7 @@ collections {
                max: 500 200;
             }
          }
-         part { name: "title_bg";
-            type: IMAGE;
+         part { name: "title_bg"; type: IMAGE;
             clip_to: "clipper";
             scale: 1;
             description { state: "default" 0.0;
@@ -2424,8 +2350,7 @@ collections {
                image.border: 0 0 2 2;
             }
          }
-         part { name: "title_shadow";
-            type: IMAGE;
+         part { name: "title_shadow"; type: IMAGE;
             clip_to: "clipper";
             mouse_events: 0;
             scale: 1;
@@ -2443,8 +2368,7 @@ collections {
                image.normal: "dialog_header_shadow.png";
             }
          }
-         part { name: "emc.text.title"; /* API */
-            type: TEXTBLOCK;
+         part { name: "emc.text.title"; type: TEXTBLOCK;  /* API */
             clip_to: "clipper";
             scale: 1;
             description { state: "default" 0.0;
@@ -2455,8 +2379,7 @@ collections {
                }
             }
          }
-         part { name: "close";
-            type: IMAGE;
+         part { name: "close"; type: IMAGE;
             clip_to: "clipper";
             mouse_events: 1;
             scale: 1;
@@ -2480,8 +2403,7 @@ collections {
                color: 255 255 255 240;
             }
          }
-         part { name: "emc.dialog.progress"; /* API */
-            type: EXTERNAL;
+         part { name: "emc.dialog.progress"; type: EXTERNAL;  /* API */
             clip_to: "clipper";
             source: "elm/progressbar";
             description { state: "default" 0.0;
@@ -2504,8 +2426,7 @@ collections {
                rel2.offset: 0 40;
             }
          }
-         part { name: "emc.box.buttons"; /* API */
-            type: BOX;
+         part { name: "emc.box.buttons"; type: BOX;  /* API */
             clip_to: "clipper";
             description { state: "default" 0.0;
                fixed: 1 1;
@@ -2544,12 +2465,12 @@ collections {
             transition: LINEAR 0.15 CURRENT;
             target: "close";
          }
-         program { name: "close_mouse_click"; /* API */
+         program { name: "close_mouse_click";  /* API */
             signal: "mouse,down,1";
             source: "close";
             action: SIGNAL_EMIT "emc,dialog,close" "";
          }
-         program { name: "show"; /* API */
+         program { name: "show";  /* API */
             signal: "emc,dialog,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -2557,10 +2478,10 @@ collections {
             target: "clipper";
             after: "show_done";
          }
-         program { name: "show_done"; /* API */
+         program { name: "show_done";  /* API */
             action: SIGNAL_EMIT "emc,dialog,show,done" "";
          }
-         program { name: "hide"; /* API */
+         program { name: "hide";  /* API */
             signal: "emc,dialog,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -2568,52 +2489,52 @@ collections {
             target: "clipper";
             after: "hide_done";
          }
-         program { name: "hide_done"; /* API */
+         program { name: "hide_done";  /* API */
             action: SIGNAL_EMIT "emc,dialog,hide,done" "";
          }
-         program { name: "show_buttons"; /* API */
+         program { name: "show_buttons";  /* API */
             signal: "emc,dialog,buttons,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
             target: "emc.box.buttons";
          }
-         program { name: "hide_buttons"; /* API */
+         program { name: "hide_buttons";  /* API */
             signal: "emc,dialog,buttons,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
             target: "emc.box.buttons";
          }
-         program { name: "set_info"; /* API */
+         program { name: "set_info";  /* API */
             signal: "emc,dialog,info,set";
             source: "emc";
             action: STATE_SET "info" 0.0;
             target: "tag_image";
          }
-         program { name: "set_warning"; /* API */
+         program { name: "set_warning";  /* API */
             signal: "emc,dialog,warning,set";
             source: "emc";
             action: STATE_SET "warning" 0.0;
             target: "tag_image";
          }
-         program { name: "set_error"; /* API */
+         program { name: "set_error";  /* API */
             signal: "emc,dialog,error,set";
             source: "emc";
             action: STATE_SET "error" 0.0;
             target: "tag_image";
          }
-         program { name: "set_yesno"; /* API */
+         program { name: "set_yesno";  /* API */
             signal: "emc,dialog,yesno,set";
             source: "emc";
             action: STATE_SET "yesno" 0.0;
             target: "tag_image";
          }
-         program { name: "set_cancel"; /* API */
+         program { name: "set_cancel";  /* API */
             signal: "emc,dialog,cancel,set";
             source: "emc";
             action: STATE_SET "cancel" 0.0;
             target: "tag_image";
          }
-         program { name: "set_progress_visible"; /* API */
+         program { name: "set_progress_visible";  /* API */
             signal: "emc,dialog,progress,set";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -2621,10 +2542,9 @@ collections {
          }
       }
    }
-   group { name: "emc/dialog/buffering"; /* API */
+   group { name: "emc/dialog/buffering";  /* API */
       parts {
-         part { name: "clipper";
-            type: RECT;
+         part { name: "clipper"; type: RECT;
             description { state: "default" 0.0;
                color: 255 255 255 0;
             }
@@ -2632,8 +2552,7 @@ collections {
                color: 255 255 255 255;
             }
          }
-         part { name: "base";
-            type: RECT;
+         part { name: "base"; type: RECT;
             clip_to: "clipper";
             scale: 1;
             description { state: "default" 0.0;
@@ -2643,8 +2562,7 @@ collections {
                color: 200 200 200 10;
             }
          }
-         part { name: "emc.text.title"; /* API */
-            type: TEXT;
+         part { name: "emc.text.title"; type: TEXT;  /* API */
             clip_to: "clipper";
             scale: 1;
             effect: FAR_SHADOW;
@@ -2660,8 +2578,7 @@ collections {
                }
             }
          }
-         part { name: "emc.dialog.progress"; /* API */
-            type: EXTERNAL;
+         part { name: "emc.dialog.progress"; type: EXTERNAL;  /* API */
             clip_to: "clipper";
             source: "elm/progressbar";
             description { state: "default" 0.0;
@@ -2680,7 +2597,7 @@ collections {
          }
       }
       programs {
-         program { name: "show"; /* API */
+         program { name: "show";  /* API */
             signal: "emc,dialog,show";
             source: "emc";
             action: STATE_SET "visible" 0.0;
@@ -2688,10 +2605,10 @@ collections {
             target: "clipper";
             after: "show_done";
          }
-         program { name: "show_done"; /* API */
+         program { name: "show_done";  /* API */
             action: SIGNAL_EMIT "emc,dialog,show,done" "";
          }
-         program { name: "hide"; /* API */
+         program { name: "hide";  /* API */
             signal: "emc,dialog,hide";
             source: "emc";
             action: STATE_SET "default" 0.0;
@@ -2699,17 +2616,17 @@ collections {
             target: "clipper";
             after: "hide_done";
          }
-         program { name: "hide_done"; /* API */
+         program { name: "hide_done";  /* API */
             action: SIGNAL_EMIT "emc,dialog,hide,done" "";
          }
       }
    }
 
 /// notify items
-   group { name: "emc/notify/default"; /* API */
+   group { name: "emc/notify/default";  /* API */
       min: 250 100;
       parts {
-         part { name: "bg";
+         part { name: "bg"; type: IMAGE;
             scale: 1;
             description { state: "default" 0.0;
                image.normal: "frame3.png";
@@ -2720,7 +2637,7 @@ collections {
                }
             }
          }
-         part { name: "bg.shadow";
+         part { name: "bg.shadow"; type: IMAGE;
             scale: 1;
             description { state: "default" 0.0;
                image {
@@ -2738,8 +2655,7 @@ collections {
                }
             }
          }
-         part { name: "emc.swallow.icon";  /* API */
-            type: SWALLOW;
+         part { name: "emc.swallow.icon"; type: SWALLOW;  /* API */
             scale: 1;
             description { state: "default" 0.0;
                ASPECT_FILL(1.0)
@@ -2754,8 +2670,7 @@ collections {
                }
             }
          }
-         part { name: "emc.text.caption";  /* API */
-            type: TEXTBLOCK;
+         part { name: "emc.text.caption"; type: TEXTBLOCK; /* API */
             scale: 1;
             description { state: "default" 0.0;
                rel1.offset: 0 5;
@@ -2773,7 +2688,7 @@ collections {
    }
 
 /// sliders
-   group { name: "emc/slider/default"; /* API */
+   group { name: "emc/slider/default";  /* API */
       images {
          image: "slider_run_base_horiz.png" COMP;
          image: "slider_glow_run.png" COMP;
@@ -2781,15 +2696,14 @@ collections {
          image: "knob_sz_24.png" COMP;
       }
       parts {
-         part { name: "confine";
-            type: SPACER;
+         part { name: "confine"; type: SPACER;
             mouse_events: 0;
             description { state: "default" 0.0;
                min: 40 24;
                max: -1 24;
             }
          }
-         part { name: "base";
+         part { name: "base"; type: IMAGE;
             mouse_events: 0;
             description { state: "default" 0.0;
                rel1 {
@@ -2808,7 +2722,8 @@ collections {
                fixed: 0 1;
             }
          }
-         part { name: "glow"; mouse_events: 0;
+         part { name: "glow"; type: IMAGE;
+            mouse_events: 0;
             description { state: "default" 0.0;
                image.normal: "slider_glow_run.png";
                rel1.offset: 1 1;
@@ -2820,7 +2735,8 @@ collections {
                image.border: 0 4 0 0;
             }
          }
-         part { name: "bevel"; mouse_events: 0;
+         part { name: "bevel"; type: IMAGE;
+            mouse_events: 0;
             description { state: "default" 0.0;
                rel1.to: "base";
                rel2.to: "base";
@@ -2829,7 +2745,7 @@ collections {
                fill.smooth: 0;
             }
          }
-         part { name: "dragable1"; /* API */
+         part { name: "dragable1";  /* API */
             mouse_events: 1;
             repeat_events: 1;
             scale: 1;
@@ -2850,7 +2766,7 @@ collections {
    }
 
 /// EmcImage special styles
-   group { name: "emc/image/bd"; /* API */
+   group { name: "emc/image/bd";  /* API */
       images {
          image: "image_bd_cover_blank.png" COMP;
       }
@@ -2952,14 +2868,16 @@ collections {
                color: 0 0 0 150;
             }
          }
-         part { name: "knob"; mouse_events: 0;
+         part { name: "knob"; type: IMAGE;
+            mouse_events: 0;
             scale: 1;
             description { state: "default" 0.0;
                image.normal: "knob.png";
                FIXED_SIZE(40, 40)
             }
          }
-         part { name: "knob_spinner"; mouse_events: 0;
+         part { name: "knob_spinner"; type: IMAGE;
+            mouse_events: 0;
             description { state: "default" 0.0;
                fixed: 1 1;
                rel1.to: "knob";

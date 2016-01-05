@@ -24,6 +24,7 @@ Bug fixed:
 New features:
 
  * New Photo module
+ * Thumbnailing ability, using a custom Ethumb slave process
  * New Watchdog module (sadly gstreamer1 continue to hang the mainloop for me)
  * New PosterGrid view
  * New South Park Studios online video channel

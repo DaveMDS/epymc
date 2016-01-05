@@ -46,6 +46,7 @@ from efl.elementary.configuration import scale_set as elm_scale_set
 from efl.elementary.configuration import scale_get as elm_scale_get
 
 from epymc import utils, ini, events, input_events
+from epymc.thumbnailer import emc_thumbnailer
 
 
 win = None
@@ -693,73 +694,6 @@ class EmcMenu(Menu):
       return input_events.EVENT_CONTINUE
 
 ################################################################################
-class EmcThumbnailer(object):
-   def __init__(self):
-      self._connected = False
-      self._connecting = False
-      self._client = None
-      self._queue = []
-      self._timer = ecore.Timer(1.0, self._queue_eval)
-
-   def generate(self, src, dst, cb):
-      if self._connected:
-         DBG("Request Thumb 1 (src='%s', dst='%s')" % (src, dst))
-         self._client.file = src
-         self._client.thumb_path = dst
-         self._client.generate(self._generate_cb, cb)
-      else:
-         self._queue.append((src,dst, cb))
-         self._connect()
-
-   def _queue_eval(self):
-      if len(self._queue) > 0:
-         self._connect()
-         while self._connected and len(self._queue) > 0:
-            src, dst, cb = self._queue.pop(0)
-            DBG("Request Thumb 1 (src='%s', dst='%s')" % (src, dst))
-            self._client.file = src
-            self._client.thumb_path = dst
-            self._client.generate(self._generate_cb, cb)
-      return ecore.ECORE_CALLBACK_RENEW
-
-   def _generate_cb(self, client, id, file, key, tfile, tkey, status, cb):
-      if callable(cb):
-         cb(status, file, tfile)
-
-   def _connect(self):
-      if not self._connected and not self._connecting:
-         DBG("Connecting to Ethumb...")
-         self._connecting = True
-         self._client = EthumbClient(self._connection_done_cb)
-         self._client.on_server_die_callback_set(self._connection_die_cb)
-
-   def _connection_done_cb(self, client, status):
-      self._connecting = False
-      self._connected = status
-      if status is True:
-         DBG("Ethumb connection OK")
-         self._client.format = ETHUMB_THUMB_JPEG
-         self._client.quality = 90
-         self._client.size = 384, 384
-         self._queue_eval()
-      else:
-         DBG("Ethumb Connection FAIL !!!!!")
-         self._client = None
-
-   def _connection_die_cb(self, client):
-      DBG("Ethumb server DIED !!!!!")
-      self._connected = False
-      self._connecting = False
-      self._client = None
-
-try: # EthumbClient only in recent python-efl 
-   from efl.ethumb_client import EthumbClient, ETHUMB_THUMB_JPEG
-except:
-   emc_thumbnailer = None
-else:
-   emc_thumbnailer = EmcThumbnailer()
-
-################################################################################
 class EmcImage(Image):
    """ An image object with support for remote url, with optional
        saving of the downloaded image to a local destination and a simple
@@ -786,6 +720,7 @@ class EmcImage(Image):
    def __init__(self, url=None, dest=None, icon=None, aspect_fixed=True,
                       fill_outside=False, thumb=False):
       self._icon_obj = None
+      self._thumb_request_id = None
       Image.__init__(self, layout, aspect_fixed=aspect_fixed,
                      fill_outside=fill_outside, size_hint_expand=EXPAND_BOTH,
                      size_hint_fill=FILL_BOTH)
@@ -821,12 +756,14 @@ class EmcImage(Image):
       # do we want to use/generate a thumbnail?
       if emc_thumbnailer is not None: # TODO remove this for release 
          if thumb and not url.startswith(('special/', 'icon/', 'image/')):
-            thumb_path = self.thumb_path_get(url)
-            if os.path.exists(thumb_path):
-               self.file_set(thumb_path)
-            else:
-               emc_thumbnailer.generate(url, thumb_path, self._thumb_complete_cb)
+            ret = emc_thumbnailer.generate(url, self._thumb_complete_cb)
+            if isinstance(ret, str): # thumb already exists (ret is thumb path)
+               self.file_set(ret)
+            elif isinstance(ret, int): # generation started (ret is req_id)
+               self._thumb_request_id = ret
                self.file_set(theme_file, 'emc/image/thumbnailing')
+            else: # failed ... this cannot really happend atm
+               pass # TODO show a dummy image
             return
 
       # a local path ?
@@ -873,12 +810,9 @@ class EmcImage(Image):
       fname =  utils.md5(url) + '.jpg' # TODO fix extension !
       return os.path.join(utils.user_cache_dir, 'remotes', fname[:2], fname)
 
-   def thumb_path_get(self, url):
-      fname = utils.md5(url) + '.jpg'
-      return os.path.join(utils.user_cache_dir, 'thumbs', fname[:2], fname)
-
    def _thumb_complete_cb(self, status, file, thumb):
       if self.is_deleted(): return
+      self._thumb_request_id = None
       if status is True:
          self.file_set(thumb)
       else:
@@ -892,8 +826,15 @@ class EmcImage(Image):
          pass # TODO show a dummy image
 
    def _del_cb(self, obj):
-      if self._icon_obj: self._icon_obj.delete()
-      # TODO abort download / thumb ??
+      if self._icon_obj:
+         self._icon_obj.delete()
+         self._icon_obj = None
+
+      # TODO abort download  ??
+
+      if self._thumb_request_id is not None:
+         emc_thumbnailer.cancel_request(self._thumb_request_id)
+         self._thumb_request_id = None
 
 ################################################################################
 class EmcDialog(Layout):

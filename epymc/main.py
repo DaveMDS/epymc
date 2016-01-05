@@ -69,7 +69,7 @@ def start_epymc(standalone=False):
    
    # init elementary
    elementary.init()
-   elementary.need_ethumb()
+   # elementary.need_ethumb()
 
    # create config/cache dirs if necessary
    if not os.path.exists(utils.user_cache_dir):

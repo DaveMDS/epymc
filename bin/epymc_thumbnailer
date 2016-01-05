@@ -1,0 +1,102 @@
+#!/usr/bin/env python
+# This Python file uses the following encoding: utf-8
+#
+# Copyright (C) 2010-2015 Davide Andreoli <dave@gurumeditation.it>
+#
+# This file is part of EpyMC, an EFL based Media Center written in Python.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+IN Protocol:
+============
+GEN|src|dst\n
+
+
+OUT Protocol:
+=============
+OK\n
+ERR\n
+"""
+
+import sys
+
+from efl import ecore
+from efl import ethumb
+
+
+def DBG(txt):
+   print("THUMBSLAVE: " + txt, file=sys.stderr)
+
+def ERR(txt):
+   print("THUMBSLAVE ERROR: " + txt, file=sys.stderr)
+
+SHUTDOWN_TIMEOUT = 60 # the slave will exit after X seconds of inactivity
+
+
+def ethumb_generate_cb(et, success):
+   timer.reset()
+
+   if success is True:
+      sys.stdout.write('OK\n')
+   else:
+      sys.stdout.write('ERR\n')
+   sys.stdout.flush()
+
+
+def stdin_data_received_cb(fdh):
+   timer.reset()
+
+   line = sys.stdin.readline()
+   # DBG(repr(line))
+
+   if not line or not line[-1] == '\n':
+      ERR('invalid line received "%s"' % line)
+      return ecore.ECORE_CALLBACK_RENEW
+
+   try:
+      cmd, src, dst = line[:-1].split('|', maxsplit=2)
+   except:
+      ERR('invalid line received "%s"' % line)
+      return ecore.ECORE_CALLBACK_RENEW
+
+   if cmd == 'GEN':
+      et.file = src
+      et.thumb_path = dst
+      et.generate(ethumb_generate_cb)
+   else:
+      ERR('invalid cmd received "%s"' % cmd)
+
+   return ecore.ECORE_CALLBACK_RENEW
+
+
+def shutdown_timer():
+   ecore.main_loop_quit()
+   return ecore.ECORE_CALLBACK_CANCEL
+
+
+if __name__ == '__main__':
+
+   et = ethumb.Ethumb()
+   et.thumb_format = ethumb.ETHUMB_THUMB_JPEG
+   et.thumb_quality = 80
+   et.thumb_size = 384, 384
+
+   fdh = ecore.FdHandler(sys.stdin, ecore.ECORE_FD_READ, stdin_data_received_cb)
+
+   timer = ecore.Timer(SHUTDOWN_TIMEOUT, shutdown_timer)
+   ecore.main_loop_begin()
+
+   fdh.delete()
+   timer.delete()

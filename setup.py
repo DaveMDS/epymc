@@ -186,7 +186,7 @@ setup (
    license = 'GNU GPL v3',
    platforms = 'linux',
 
-   requires = ['efl (>= 1.10.0)', 'beautifulsoup4', 'mutagen'],
+   requires = ['efl (>= 1.10.0)', 'beautifulsoup4', 'mutagen', 'dbus'],
    provides = ['epymc'],
 
    packages = [
@@ -233,6 +233,7 @@ setup (
    },
 
    scripts = ['bin/epymc', 'bin/epymc_standalone',
+              'bin/epymc_thumbnailer',
               'epymc/plugins/watchdog/epymc_watchdog'],
 
    data_files = [

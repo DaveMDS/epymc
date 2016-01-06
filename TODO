@@ -2,30 +2,24 @@
 TMP
 ====
 
+ * TASTIERA!!! non posso cambiare il foramto delle date  :(
+ * CONFIG->GENERAL renderizza male al primo colpo :(
+ 
  * report on phab the Ethumb Client instability
-
  * fix 2 bugs in ethumb:
    * frame cannot be unset...witout an error
    * frame for movies do not work (+ vthumb theme)
 
  * fix focus after view change
 
- * gengid non scrolla quando muovo a destra (e scende di una riga)
-   ...ma forse ancora meglio:
- * gen*: DESTRA per selezionare scrollbar e poi i bottoni in alto
-
- * ora e data in homepage (in basso a sinistra)
- * ora in mediaplayer
  * icone + risoluzione (back,refresh,plus, minus, ...)
  * icona error fa schifo
 
  * 2 instanze ???
- * clear remoteimg cache ?????
  * new text styles: mi piace, etc...
  * update italian translation
  * migliorare grafica dei dialog
  * Coverflow browser view
- * styles in browser list items
  * require efl >= 1.17 (and use setup.py efl stuff)
 
 

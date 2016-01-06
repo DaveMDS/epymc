@@ -533,7 +533,8 @@ class MoviesModule(EmcModule):
                          done_cb=self._cast_info_done_cb)
 
          for person in sorted(movie_info['cast'], key=itemgetter('order')):
-            label = _('%(name)s as %(character)s') % (person)
+            label = '<big>{}</big> <i>{} <big>{}</big></i>'.format(
+                     person['name'], _('as'), person['character'])
             icon = EmcImage(person['profile_path'])
             icon.size_hint_min_set(100, 100) # TODO FIXME
             dia.list_item_append(label, icon, None, person['id'])

@@ -197,7 +197,8 @@ elif STATE == ST_MOVIE_INFO:
 elif STATE == ST_CAST_LIST:
    data = v3_request(URL)
    for c in data['cast']:
-      title = _('%(name)s <i>as %(character)s</i>') % c
+      title = '{} <i>{} {}</i>'.format(
+               c['name'], _('as'), c['character'])
       poster = full_img_url(c['profile_path'], size='h632')
       item_add(ST_NONE, title, 'url', poster=poster, action=ACT_NONE)
 

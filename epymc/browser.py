@@ -445,7 +445,7 @@ class EmcBrowser(object):
          view_ret = self.current_view.input_event_cb(event)
          if view_ret == input_events.EVENT_BLOCK:
             return view_ret
-         if event == 'UP':
+         if event in ('UP', 'RIGHT'):
             self.current_view.unfocus()
             _topbar_fman.focus()
             return input_events.EVENT_BLOCK
@@ -860,18 +860,30 @@ class ViewPosterGrid(object):
       (item_class, url, user_data) = item.data_get()                            # 3 #
 
       if event == 'RIGHT':
+         x1, y1 = item.pos
          try:
-            item.next.selected = True
-            item.next.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
-         except: pass
-         return input_events.EVENT_BLOCK
+            next = item.next
+            x2, y2 = next.pos
+            if y1 == y2:
+               item.next.selected = True
+               item.next.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
+               return input_events.EVENT_BLOCK
+         except:
+            pass
+         return input_events.EVENT_CONTINUE
 
       elif event == 'LEFT':
+         x1, y1 = item.pos
          try:
-            item.prev.selected = True
-            item.prev.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
-         except: pass
-         return input_events.EVENT_BLOCK
+            prev = item.prev
+            x2, y2 = prev.pos
+            if y1 == y2:
+               item.prev.selected = True
+               item.prev.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
+               return input_events.EVENT_BLOCK
+         except:
+            pass
+         return input_events.EVENT_CONTINUE
 
       elif event == 'UP':
          try:

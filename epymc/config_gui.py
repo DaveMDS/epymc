@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import, print_function
 
+import os
 import sys
 from operator import itemgetter, attrgetter
 
@@ -448,6 +449,10 @@ def _general_populate(browser, url):
                             _('Frames per second'), 'icon/evas',
                             fmt='%.0f', udm='fps', min=10, max=120, step=10,
                             cb=_change_fps)
+   standard_item_action_add(_('Clear thumbnails cache'), icon='icon/refresh',
+                            cb=_clear_thumbnails_cache)
+   standard_item_action_add(_('Clear online images cache'), icon='icon/refresh',
+                            cb=_clear_remotes_cache)
 
 def _restart_needed():
    EmcDialog(style='info', title=_('Restart needed'),
@@ -458,6 +463,44 @@ def _change_fps():
 
 def _change_scale():
    gui.scale_set(ini.get_float('general', 'scale'))
+
+def _clear_thumbnails_cache():
+   def _idler_cb(generator):
+      try:
+         fname = next(generator)
+         os.remove(fname)
+         dia.my_counter += 1
+      except StopIteration:
+         EmcDialog(style='cancel',  title=_('Clear thumbnails cache'),
+               text='Operation completed, %d files deleted.' % dia.my_counter)
+         dia.delete()
+         return ecore.ECORE_CALLBACK_CANCEL
+      return ecore.ECORE_CALLBACK_RENEW
+
+   dia = EmcDialog(style='minimal', title=_('Clear thumbnails cache'),
+                  spinner=True, text=_('Operation in progress, please wait...'))
+   dia.my_counter = 0
+   gen = utils.grab_files(os.path.join(utils.user_cache_dir, 'thumbs'))
+   ecore.Idler(_idler_cb, gen)
+
+def _clear_remotes_cache():
+   def _idler_cb(generator):
+      try:
+         fname = next(generator)
+         os.remove(fname)
+         dia.my_counter += 1
+      except StopIteration:
+         EmcDialog(style='cancel',  title=_('Clear online images cache'),
+               text='Operation completed, %d files deleted.' % dia.my_counter)
+         dia.delete()
+         return ecore.ECORE_CALLBACK_CANCEL
+      return ecore.ECORE_CALLBACK_RENEW
+
+   dia = EmcDialog(style='minimal', title=_('Clear online images cache'),
+                  spinner=True, text=_('Operation in progress, please wait...'))
+   dia.my_counter = 0
+   gen = utils.grab_files(os.path.join(utils.user_cache_dir, 'remotes'))
+   ecore.Idler(_idler_cb, gen)
 
 ##############  VIEWS  ########################################################
 

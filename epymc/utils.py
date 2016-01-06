@@ -382,12 +382,14 @@ def grab_files(folders, show_hidden=False, recursive=True):
    generator = self.grab_files(['/path/1', '/path/2/other'])
       ...
    try:
-      filename = generator.next()
+      filename = next(generator)
       print(filename)
    except StopIteration:
       print('file list done')
 
    """
+   if not isinstance(folders, (list, tuple)):
+      folders = (folders,)
    for folder in folders:
       if folder.startswith('file://'): # mhhhh...
          folder = folder[7:]

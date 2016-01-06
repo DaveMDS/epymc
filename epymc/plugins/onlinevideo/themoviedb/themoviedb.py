@@ -114,6 +114,8 @@ elif STATE == ST_MOVIE_INFO:
    data = v3_request(URL)
    if not data['overview'] or not data['videos']['results']:
       fallback = v3_request(URL, lang='en')
+   else:
+      fallback = {'overview':'', 'videos':{'results':[]}}
 
    # movie info
    title = data['title']

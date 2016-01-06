@@ -167,27 +167,27 @@ collections {
 
 /// main UI
    group { name: "emc/main/layout";  /* API */
-
-/// clock embryo script
-      script {
-          public clock_cb(val) {
-            new year, month, day, yearday, weekday, hour, minute;
-            new Float:second;
-            new buf[32];
-
-            date(year, month, day, yearday, weekday, hour, minute, second);
-            timer(60.0 - (second), "clock_cb", 1);
-
-            buf[0] = 0;
-            if (minute < 10 && hour < 10) { snprintf(buf, 10, "0%i:0%i", hour, minute); }
-            else if (minute < 10)         { snprintf(buf, 10, "%i:0%i", hour, minute); }
-            else if (hour < 10)           { snprintf(buf, 10, "0%i:%i", hour, minute); }
-            else                          { snprintf(buf, 10, "%i:%i", hour, minute); }
-            set_text(PART:"topbar.clock", buf);
-            set_text(PART:"videoplayer.clock", buf);
-         }
-      }
       parts {
+
+/// edje messages received from the app
+         #define MESSAGE_CLOCK_TIME 12 /* API */
+         #define MESSAGE_CLOCK_DATE 13 /* API */
+         script {
+            public message(Msg_Type:type, id, ...) {
+               if ((id == MESSAGE_CLOCK_TIME) && (type == MSG_STRING)) {
+                  new buf[32];
+                  getsarg(2, buf, sizeof(buf));
+                  set_text(PART:"mainmenu.clock.time", buf);
+                  set_text(PART:"topbar.clock", buf);
+                  set_text(PART:"videoplayer.clock", buf);
+               }
+               else if ((id == MESSAGE_CLOCK_DATE) && (type == MSG_STRING)) {
+                  new buf[64];
+                  getsarg(2, buf, sizeof(buf));
+                  set_text(PART:"mainmenu.clock.date", buf);
+               }
+            }
+         }
 
 /// main background
          part { name: "bg.bg"; type: IMAGE;
@@ -1149,8 +1149,8 @@ collections {
                rel2.relative: 1.0 -0.3;
                fixed: 1 1;
                align: 0.5 0.0;
-               color: 255 255 255 200;
-               color3: FONT_COLOR3;
+               color: FONT_COLOR_TOPBAR;
+               color3: FONT_COLOR3_TOPBAR;
                text {
                   text: "Emotion Media Center";
                   font: FONT3;
@@ -1224,6 +1224,67 @@ collections {
                }
             }
          }
+         part { name: "mainmenu.clock.clip"; type: RECT;
+            description { state: "default" 0.0;
+               rel1.to: "mainmenu.clock.time";
+               rel2.to: "mainmenu.clock.date";
+               color: 255 255 255 0;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               color: 255 255 255 255;
+            }
+         }
+         part { name: "mainmenu.clock.date"; type: TEXT;
+            clip_to: "mainmenu.clock.clip";
+            effect: FAR_SHADOW;
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               color: FONT_COLOR_TOPBAR;
+               color3: FONT_COLOR3_TOPBAR;
+               rel1 {
+                  relative: 0.0 1.0;
+                  offset: 10 -11;
+               }
+               rel2 {
+                  relative: 0.0 1.0;
+                  offset: -1 -11;
+               }
+               align: 0.0 1.0;
+               text {
+                  text: "giovedì 3 gennaio";
+                  font: FONT3;
+                  size: FONT_SIZE_BIG;
+                  min: 1 1;
+                  ellipsis: -1;
+                  align: 0.0 0.5;
+               }
+            }
+         }
+         part { name: "mainmenu.clock.time"; type: TEXT;
+            clip_to: "mainmenu.clock.clip";
+            effect: FAR_SHADOW;
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               color: FONT_COLOR_TOPBAR;
+               color3: FONT_COLOR3_TOPBAR;
+               rel1.to: "mainmenu.clock.date";
+               rel2.to: "mainmenu.clock.date";
+               rel1.relative: 0.0 0.0;
+               rel2.relative: 1.0 0.0;
+               align: 0.0 1.0;
+               text {
+                  text: "12:23";
+                  font: FONT3;
+                  size: FONT_SIZE_BIGGER;
+                  min: 1 1;
+                  ellipsis: -1;
+                  align: 0.0 0.5;
+               }
+            }
+         }
          program { name: "mainmenu_show";  /* API */
             signal: "mainmenu,show";
             source: "emc";
@@ -1239,6 +1300,20 @@ collections {
             transition: ACCELERATE 0.4;
             target: "mainmenu.list.swallow";
             target: "mainmenu.title";
+         }
+         program { name: "mainmenu_show_clock";
+            signal: "mainmenu,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.00;
+            transition: SINUSOIDAL 0.4;
+            target: "mainmenu.clock.clip";
+         }
+         program { name: "mainmenu_hide_clock";
+            signal: "mainmenu,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.00;
+            transition: SINUSOIDAL 0.2;
+            target: "mainmenu.clock.clip";
          }
 
 /// videoplayer
@@ -2044,15 +2119,6 @@ collections {
             }
          }
          #endif
-      }
-      programs {
-         program { name: "init";
-            signal: "load";
-            source: "";
-            script {
-               clock_cb(0);
-            }
-         }
       }
    }
 

@@ -97,6 +97,9 @@ class StdConfigItemBase(object):
    def poster_get(self, url, user_data):
       return None
 
+   def cover_get(self, url, user_data):
+      return None
+
    def fanart_get(self, url, user_data):
       return None
 
@@ -421,6 +424,8 @@ def _general_populate(browser, url):
    standard_item_number_add('general', 'max_concurrent_download',
                             _('Max concurrent download'), 'icon/download',
                             fmt='%.0f', min=1, max=10, step=1)
+   standard_item_string_add('general', 'time_format', _('Time format'))
+   standard_item_string_add('general', 'date_format', _('Date format'))
 
    # L = evas.render_method_list()
    # for remove in ('buffer', 'software_generic', 'gl_generic'):

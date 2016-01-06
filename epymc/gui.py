@@ -21,6 +21,7 @@
 from __future__ import absolute_import, print_function
 
 import os
+from datetime import datetime
 
 from efl import evas, ecore, edje, elementary
 from efl.elementary.window import Window, ELM_WIN_BASIC
@@ -58,12 +59,19 @@ _backdrop_im2 = None
 _backdrop_curr = None
 
 _volume_hide_timer = None
+_clock_update_timer = None
+_clock_time_str = ''
+_clock_date_str = ''
+
 _theme_generation = '6'
 
 EXPAND_BOTH = evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND
 EXPAND_HORIZ = evas.EVAS_HINT_EXPAND, 0.0
 FILL_BOTH = evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL
 FILL_HORIZ = evas.EVAS_HINT_FILL, 0.5
+
+MESSAGE_CLOCK_TIME = 12
+MESSAGE_CLOCK_DATE = 13
 
 
 def LOG(msg):
@@ -77,6 +85,7 @@ def init():
    """ return: False=failed True=ok """
    global win, layout, theme_file
    global _backdrop_im1, _backdrop_im2, _backdrop_curr
+   global _clock_update_timer
 
    # get config values, setting defaults if needed
    theme_name = ini.get('general', 'theme', default_value='default')
@@ -85,6 +94,8 @@ def init():
    fps = ini.get('general', 'fps', default_value=30)
    scale = ini.get('general', 'scale', default_value=1.0)
    fullscreen = ini.get('general', 'fullscreen', False)
+   ini.get('general', 'time_format', '%H:%M')
+   ini.get('general', 'date_format', '%A %d %B')
 
    # search the theme file, or use the default one
    if os.path.isabs(theme_name) and os.path.exists(theme_name):
@@ -128,6 +139,9 @@ def init():
    win.resize_object_add(layout)
    layout.show()
 
+   # clock update timer
+   _clock_update_timer = ecore.Timer(1.0, clock_update)
+
    # right click for BACK
    layout.edje.signal_callback_add("mouse,up,3", "*",
                               (lambda o,e,s: input_events.event_emit('BACK')))
@@ -154,6 +168,7 @@ def init():
 def shutdown():
    events.listener_del('gui')
    input_events.listener_del('gui')
+   _clock_update_timer.delete()
 
 
 ### Various externally accessible functions ###
@@ -326,6 +341,22 @@ def win_raise():
    win.raise_()
    win.activate()
 
+def clock_update():
+   global _clock_time_str, _clock_date_str
+
+   dt = datetime.now()
+   time_str = dt.strftime(ini.get('general', 'time_format'))
+   date_str = dt.strftime(ini.get('general', 'date_format'))
+
+   if time_str != _clock_time_str:
+      layout.edje.message_send(MESSAGE_CLOCK_TIME, time_str)
+      _clock_time_str = time_str
+
+   if date_str != _clock_date_str:
+      layout.edje.message_send(MESSAGE_CLOCK_DATE, date_str)
+      _clock_date_str = date_str
+   
+   return ecore.ECORE_CALLBACK_RENEW
 
 ### audio info/controls notify
 _audio_notify = None

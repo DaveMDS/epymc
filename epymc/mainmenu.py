@@ -53,6 +53,7 @@ def show():
    _list.go()
    gui.signal_emit('mainmenu,show')
    input_events.listener_add('mainmenu', input_event_cb)
+   gui.clock_update()
 
 def hide():
    _list.callback_clicked_double_del(_cb_item_activated)

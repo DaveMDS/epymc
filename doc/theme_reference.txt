@@ -13,6 +13,10 @@ All the icons and images in icons.edc must be implemented.
       item: "theme.info" "A more long description of the theme";
       item: "theme.generation" "XX";
 
+### Messages ###
+   id: 12  TYPE: MSG_STRING  ->  MESSAGE_CLOCK_TIME (current formatted time)
+   id: 13  TYPE: MSG_STRING  ->  MESSAGE_CLOCK_DATE (current formatted date)
+
 
 ### Backdrop stuff ###
    * Required parts:

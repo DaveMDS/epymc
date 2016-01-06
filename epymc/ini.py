@@ -27,7 +27,7 @@ try:
 except:
    import ConfigParser
 
-_config = ConfigParser.ConfigParser()
+_config = ConfigParser.RawConfigParser()
 
 def read_from_files(files):
    readed = _config.read(files)

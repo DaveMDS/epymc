@@ -224,6 +224,7 @@ All the icons and images in icons.edc must be implemented.
    * Required parts:
       "emc.icon" -> edje SWALLOW
       "emc.text" -> edje TEXTBLOCK
+      "emc.text2" -> edje TEXTBLOCK
 
 
 ### Image: Thumbnailing ###

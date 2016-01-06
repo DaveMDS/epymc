@@ -142,6 +142,10 @@ styles {
       base:  "font="FONT" font_size="FONT_SIZE" color=#fff align=center wrap=mixed ellipsis=1.0";
    }
 
+   style { name: "epymc_special_icon_style2";
+      base:  "font="FONT" font_size="FONT_SIZE" color=#"COLOR_BLU_HEX" align=left wrap=none ellipsis=1.0";
+   }
+
    style { name: "epymc_subtitles_style";
       base: "font="FONT" align=center font_size="FONT_SIZE_BIGGER" color=#FFF wrap=word style=soft_shadow shadow_color=#00000080";
       tag: "b" "+ font_weight=Bold";
@@ -2961,6 +2965,17 @@ collections {
                rel1.to: "text_spacer";
                rel2.to: "text_spacer";
                text.style: "epymc_special_icon_style";
+            }
+         }
+         part { name: "emc.text2"; type: TEXTBLOCK;  /* API */
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.offset: 4 0;
+               rel2.offset: -5 -1;
+               text {
+                  style: "epymc_special_icon_style2";
+                  align: 0.0 0.0;
+               }
             }
          }
       }

@@ -748,10 +748,12 @@ class EmcImage(Image):
                If dest is None the downloaded file will be saved in cache.
          icon: For the special style 'icon', you can here specify the icon
                to swallow inside the special image.
+         label2: For the special style 'icon', you can here specify the
+                 secondary label text.
    """
 
-   def __init__(self, url=None, dest=None, icon=None, aspect_fixed=True,
-                      fill_outside=False, thumb=False):
+   def __init__(self, url=None, dest=None, icon=None, label2=None,
+                      aspect_fixed=True, fill_outside=False, thumb=False):
       self._icon_obj = None
       self._thumb_request_id = None
       Image.__init__(self, layout, aspect_fixed=aspect_fixed,
@@ -759,9 +761,9 @@ class EmcImage(Image):
                      size_hint_fill=FILL_BOTH)
       self.on_del_add(self._del_cb)
       if url is not None:
-         self.url_set(url, dest, icon, thumb)
+         self.url_set(url, dest, icon, label2, thumb)
 
-   def url_set(self, url, dest=None, icon=None, thumb=False):
+   def url_set(self, url, dest=None, icon=None, label2=None, thumb=False):
       # None to "unset" the image
       if url is None:
          self.file_set(theme_file, 'emc/image/null')
@@ -827,10 +829,13 @@ class EmcImage(Image):
       if url.startswith('special/'):
          _, style, text = url.split('/', maxsplit=2)
          self.file_set(theme_file,  'emc/image/' + style)
-         self.object.part_text_set('emc.text', text)
+         obj = self.object
+         obj.part_text_set('emc.text', text)
          if icon:
             self._icon_obj = EmcImage(icon)
-            self.object.part_swallow('emc.icon', self._icon_obj)
+            obj.part_swallow('emc.icon', self._icon_obj)
+         if label2:
+            obj.part_text_set('emc.text2', label2)
          return
 
    def cache_path_get(self, url):

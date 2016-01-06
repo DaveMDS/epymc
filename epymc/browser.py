@@ -917,8 +917,9 @@ class ViewPosterGrid(object):
             return EmcImage(poster, fill_outside=True, thumb=True)
          else:
             label = item_class.label_get(url, user_data)
+            label2 = item_class.label_end_get(url, user_data)
             icon = item_class.icon_get(url, user_data)
-            return EmcImage('special/icon/' + label, icon=icon)
+            return EmcImage('special/icon/' + label, icon=icon, label2=label2)
 
       if part == 'elm.swallow.end':
          icon = item_class.icon_end_get(url, user_data)
@@ -1012,8 +1013,9 @@ class ViewCoverGrid(ViewPosterGrid):
             return EmcImage(cover, fill_outside=True, thumb=True)
          else:
             label = item_class.label_get(url, user_data)
+            label2 = item_class.label_end_get(url, user_data)
             icon = item_class.icon_get(url, user_data)
-            return EmcImage('special/icon/' + label, icon=icon)
+            return EmcImage('special/icon/' + label, icon=icon, label2=label2)
 
       if part == 'elm.swallow.end':
          icon = item_class.icon_end_get(url, user_data)

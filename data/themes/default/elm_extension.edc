@@ -989,8 +989,7 @@ group { name: "elm/list/item/default";
       }
       part { name: "elm.text";
          clip_to: "disclip";
-         type:           TEXT;
-         effect:         SOFT_SHADOW;
+         type:           TEXTBLOCK;
          mouse_events:   0;
          scale: 1;
          description {
@@ -1005,20 +1004,15 @@ group { name: "elm/list/item/default";
                relative: 0.0  1.0;
                offset:   -1 -5;
             }
-            color: 0 0 0 255;
-            color3: 0 0 0 0;
             text {
-               font: FONT;
-               size: FONT_SIZE;
                min: 0 1;
                align: 0.0 0.5;
-               text_class: "list_item";
+               style: "epymc_dialog_list_style";
             }
          }
          description { state: "selected" 0.0;
             inherit: "default" 0.0;
-            color: 224 224 224 255;
-            color3: 0 0 0 64;
+            text.style: "epymc_dialog_list_style_sel";
          }
       }
       part { name: "sel_shine";

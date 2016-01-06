@@ -177,7 +177,11 @@ class ViewsItemClass(EmcItemClass):
 class MyItemClass(EmcItemClass):
 
    def label_get(self, url, user_data):
-      return user_data
+      if url == 'uitests://styles':
+         return 'Text styles <small>(<b>bold</b> <i>italic</i> <info>info</info> ' \
+                '<success>success</success> <failure>failure</failure> <warning>warning</warning>)</small>'
+      else:
+         return user_data
 
    def info_get(self, url, user_data):
       if url == 'uitests://styles':
@@ -352,7 +356,9 @@ class MyItemClass(EmcItemClass):
          d = EmcDialog(title='Dialog - List', style='list', done_cb=_dia_list_cb)
          d.list_item_append('item 1', 'icon/home')
          d.list_item_append('item 2', 'icon/star', 'icon/check_on')
-         for i in range(3, 101):
+         d.list_item_append('item 3 <b>bold</> <info>info</> <success>success</> <failure>failure</> <i>etc...</>',
+                            'icon/star', 'icon/check_on')
+         for i in range(4, 101):
             d.list_item_append('item %d'%i)
          d.list_go()
 

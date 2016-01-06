@@ -862,12 +862,14 @@ class ViewPosterGrid(object):
       if event == 'RIGHT':
          try:
             item.next.selected = True
+            item.next.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
          except: pass
          return input_events.EVENT_BLOCK
 
       elif event == 'LEFT':
          try:
             item.prev.selected = True
+            item.prev.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
          except: pass
          return input_events.EVENT_BLOCK
 

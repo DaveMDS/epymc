@@ -2341,7 +2341,7 @@ group { name: "elm/hover/base/menu/emc";
 group { name: "elm/entry/base-single/vkeyboard";
    images.image: "box_glow.png" COMP;
    parts {
-      part { name: "base"; type: IMAGE; nomouse;
+      part { name: "focus"; type: IMAGE; nomouse;
          description { state: "default" 0.0;
             visible: 0;
             rel1.offset: -7 -7;
@@ -2386,13 +2386,13 @@ group { name: "elm/entry/base-single/vkeyboard";
          signal: "elm,action,focus";
          source: "elm";
          action: STATE_SET "focused" 0.0;
-         target: "base";
+         target: "focus";
       }
       program { name: "entry_unfocus";
          signal: "elm,action,unfocus";
          source: "elm";
          action: STATE_SET "default" 0.0;
-         target: "base";
+         target: "focus";
       }
    }
 }

@@ -33,10 +33,9 @@ from efl.elementary import Window, ELM_WIN_BASIC, Layout, Icon, Image, Button, \
    Genlist, GenlistItemClass, ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS, \
    Gengrid, Slideshow, SlideshowItemClass
 from efl.elementary.theme import theme_overlay_add, theme_extension_add
-# from efl.elementary.configuration import preferred_engine_set
-from efl.elementary.configuration import accel_preference_set as elm_accel_set
 from efl.elementary.configuration import scale_set as elm_scale_set
 from efl.elementary.configuration import scale_get as elm_scale_get
+from efl.elementary.configuration import Configuration as ElmConfig
 
 from epymc import utils, ini, events, input_events
 from epymc.thumbnailer import emc_thumbnailer
@@ -92,6 +91,19 @@ def init():
 
    # connect ecore_input key event
    ecore_input.on_key_down_add(_on_key_down)
+
+   # elementary configuration
+   conf = ElmConfig()
+   conf.window_auto_focus_enable = False
+   conf.window_auto_focus_animate = False
+   conf.focus_highlight_enabled = False
+   conf.focus_highlight_animate = False
+   # conf.focus_autoscroll_mode = ELM_FOCUS_AUTOSCROLL_MODE_SHOW or ELM_FOCUS_AUTOSCROLL_MODE_BRING_IN
+   # conf.item_select_on_focus_disabled = True
+   # conf.softcursor_mode = ELM_SOFTCURSOR_MODE_ON
+   if evas_accelerated == 'True':
+      conf.accel_preference = 'accel'
+      LOG('Request an hardware accelerated evas engine')
    
    # search the theme file, or use the default one
    if os.path.isabs(theme_name) and os.path.exists(theme_name):
@@ -116,15 +128,7 @@ def init():
    set_theme_file(theme_file)
 
    # create the elm window
-   if evas_accelerated == 'True':
-      elm_accel_set('accel')
-      LOG('Request an hardware accelerated evas engine')
-   # preferred_engine_set("software_x11")
-   # LOG('Requested evas engine: ' + evas_engine)
-
    win = Window('epymc', ELM_WIN_BASIC, title=_('Emotion Media Center'))
-   win.focus_highlight_enabled = True # TODO make this configurable
-   win.focus_highlight_animate = False # TODO make this configurable
    win.callback_delete_request_add(lambda w: ask_to_exit())
    if fullscreen == 'True':
       win.fullscreen_set(1)

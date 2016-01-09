@@ -23,23 +23,15 @@ from __future__ import absolute_import, print_function
 import os
 from datetime import datetime
 
-from efl import evas, ecore, edje, elementary
-from efl.elementary.window import Window, ELM_WIN_BASIC
-from efl.elementary.layout import Layout
-from efl.elementary.icon import Icon
-from efl.elementary.image import Image
-from efl.elementary.button import Button
-from efl.elementary.menu import Menu
-from efl.elementary.progressbar import Progressbar
-from efl.elementary.box import Box
-from efl.elementary.entry import Entry
-from efl.elementary.scroller import Scroller, Scrollable
-from efl.elementary.frame import Frame
-from efl.elementary.list import List
-from efl.elementary.table import Table
-from efl.elementary.genlist import Genlist, GenlistItemClass, \
-   ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS
-from efl.elementary.slideshow import Slideshow, SlideshowItemClass
+from efl import evas
+from efl import ecore
+from efl import ecore_input
+from efl import edje
+from efl import elementary as elm
+from efl.elementary import Window, ELM_WIN_BASIC, Layout, Icon, Image, Button, \
+   Menu, Progressbar, Box, Entry, Scroller, Scrollable, Frame, List, Table, \
+   Genlist, GenlistItemClass, ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS, \
+   Gengrid, Slideshow, SlideshowItemClass
 from efl.elementary.theme import theme_overlay_add, theme_extension_add
 # from efl.elementary.configuration import preferred_engine_set
 from efl.elementary.configuration import accel_preference_set as elm_accel_set
@@ -81,6 +73,7 @@ def DBG(msg):
    # print('GUI: %s' % msg)
    pass
 
+
 def init():
    """ return: False=failed True=ok """
    global win, layout, theme_file
@@ -97,6 +90,9 @@ def init():
    ini.get('general', 'time_format', '%H:%M')
    ini.get('general', 'date_format', '%A %d %B')
 
+   # connect ecore_input key event
+   ecore_input.on_key_down_add(_on_key_down)
+   
    # search the theme file, or use the default one
    if os.path.isabs(theme_name) and os.path.exists(theme_name):
       theme_file = theme_name
@@ -126,16 +122,16 @@ def init():
    # preferred_engine_set("software_x11")
    # LOG('Requested evas engine: ' + evas_engine)
 
-   win = Window('epymc', ELM_WIN_BASIC)
-   win.title_set(_('Emotion Media Center'))
+   win = Window('epymc', ELM_WIN_BASIC, title=_('Emotion Media Center'))
+   win.focus_highlight_enabled = True # TODO make this configurable
+   win.focus_highlight_animate = False # TODO make this configurable
    win.callback_delete_request_add(lambda w: ask_to_exit())
    if fullscreen == 'True':
       win.fullscreen_set(1)
 
    # main layout (main theme)
-   layout = Layout(win)
-   layout.file_set(theme_file, 'emc/main/layout')
-   layout.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+   layout = Layout(win, file=(theme_file, 'emc/main/layout'), focus_allow=False,
+                   size_hint_expand=EXPAND_BOTH)
    win.resize_object_add(layout)
    layout.show()
 
@@ -274,7 +270,7 @@ def ask_to_exit():
    d.autoscroll_enable(3.0, 0.0)
 
 def exit_now():
-   elementary.exit()
+   elm.exit()
 
 def volume_show(hidein = 0):
    global _volume_hide_timer
@@ -429,8 +425,90 @@ def box_remove_all(part, clear=True):
 
 
 ### Internal functions ###
+
+# This is a bit hackish, will be used by the keyb module.
+# The reason is that the ecore_input event must be connected BEFORE the
+# win is created, and at that point the keyb module is not yet loaded.
+# So we need to connect here and pass the event to the key_down_func (that
+# is setted by the keyb module)
+key_down_func = None
+
+def _on_key_down(event):
+   if isinstance(win.focused_object, elm.Entry):
+      return ecore.ECORE_CALLBACK_PASS_ON
+   if key_down_func:
+      return key_down_func(event)
+   return ecore.ECORE_CALLBACK_DONE
+# hack end
+
+
+focus_directions = {
+   'UP':    elm.ELM_FOCUS_UP,
+   'DOWN':  elm.ELM_FOCUS_DOWN,
+   'LEFT':  elm.ELM_FOCUS_LEFT,
+   'RIGHT': elm.ELM_FOCUS_RIGHT,
+}
+
+def focus_move(direction, root_obj):
+   """ TODOC """
+
+   # move between lists items...
+   focused = root_obj.focused_object
+   if isinstance(focused, (Genlist, List)) and focused.focus_allow:
+      item = focused.focused_item
+      to_item = None
+      horiz = focused.horizontal if type(focused) is List else False
+      if (horiz and direction == 'RIGHT') or (not horiz and direction == 'DOWN'):
+         to_item = item.next
+      elif (horiz and direction == 'LEFT') or (not horiz and direction == 'UP'):
+         to_item = item.prev
+
+      if to_item:
+         to_item.selected = True
+         to_item.focus = True
+         # to_item.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
+         return True
+
+   # move between grid items...
+   elif isinstance(focused, Gengrid) and focused.focus_allow:
+      item = focused.focused_item
+      x1, y1 = item.pos
+      to_item = None
+      if direction in ('LEFT', 'RIGHT'):
+         to_item = item.next if direction == 'RIGHT' else item.prev
+         if to_item:
+            x2, y2 = to_item.pos
+            if y1 == y2:
+               to_item.selected = True
+               to_item.focus = True
+               return True
+      else: # UP, DOWN
+         to_item = item
+         x2, y2 = 0, 0
+         try:
+            while True:
+               to_item = to_item.next if direction == 'DOWN' else to_item.prev
+               x2, y2 = to_item.pos
+               if x2 == x1:
+                  break
+         except:
+            if direction == 'DOWN':
+               to_item = focused.last_item
+         if to_item:
+            to_item.selected = True
+            to_item.focus = True
+            # prev.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
+         return True
+
+   # or just let elm move the focus between objects
+   root_obj.focus_next(focus_directions[direction])
+   return False
+
 def _input_event_cb(event):
-   if event == 'TOGGLE_FULLSCREEN':
+   if event in focus_directions:
+      focus_move(event, win)
+
+   elif event == 'TOGGLE_FULLSCREEN':
       fullscreen_toggle()
    elif event == 'SCALE_BIGGER':
       scale_bigger()
@@ -440,6 +518,7 @@ def _input_event_cb(event):
       scale_reset()
    else:
       return input_events.EVENT_CONTINUE
+
    return input_events.EVENT_BLOCK
 
 def _event_cb(event):
@@ -639,7 +718,6 @@ class EmcButton(Button):
    def __init__(self, label=None, icon=None, **kargs):
       Button.__init__(self, layout, **kargs)
       self.style_set('emc')
-      self.focus_allow_set(False)
       if label: self.text_set(label)
       if icon: self.icon_set(icon)
       self.show()
@@ -666,8 +744,8 @@ class EmcMenu(Menu):
       item = Menu.item_add(self, parent, label, icon, self._item_selected_cb,
                            callback, *args, **kwargs)
       item.data['_user_cb_data_'] = (callback, args, kwargs)
-      if self.selected_item_get() is None:
-         item.selected_set(True)
+      if self.selected_item is None:
+         item.selected = True
       return item
 
    def close(self):
@@ -683,8 +761,8 @@ class EmcMenu(Menu):
       input_events.listener_del("EmcMenu")
 
    def _input_event_cb(self, event):
+      item = self.selected_item
       if event == 'UP':
-         item = self.selected_item_get()
          if event in self.close_on and item == self.first_item:
             self.close()
             return input_events.EVENT_BLOCK
@@ -697,7 +775,6 @@ class EmcMenu(Menu):
          return input_events.EVENT_BLOCK
 
       elif event == 'DOWN':
-         item = self.selected_item_get()
          if event in self.close_on and item == self.last_item:
             self.close()
          if not item or not item.next:
@@ -709,7 +786,6 @@ class EmcMenu(Menu):
          return input_events.EVENT_BLOCK
 
       elif event == 'OK':
-         item = self.selected_item_get()
          cb, args, kwargs = self.selected_item_get().data['_user_cb_data_']
          if callable(cb):
             cb(self, item, *args, **kwargs)
@@ -881,7 +957,6 @@ class EmcDialog(Layout):
 
    minimal_styles = ['info', 'error', 'warning', 'yesno', 'cancel', 'progress']
    dialogs_counter = 0
-   fman = None
 
    def __init__(self, title=None, text=None, content=None, spinner=False,
                 style='panel', done_cb=None, canc_cb=None, user_data=None):
@@ -893,7 +968,7 @@ class EmcDialog(Layout):
          group = 'emc/dialog/buffering'
       else:
          group = 'emc/dialog/panel'
-      Layout.__init__(self, layout, file=(theme_file, group),
+      Layout.__init__(self, layout, file=(theme_file, group), focus_allow=False,
                       size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH)
       self.signal_callback_add('emc,dialog,close', '', self._close_pressed)
       self.signal_callback_add('emc,dialog,hide,done', '',
@@ -915,7 +990,11 @@ class EmcDialog(Layout):
       self._list = None
       self._textentry = None
       self._buttons = []
-      self.fman = EmcFocusManager()
+
+      # remember last focused obj (under the dialog)
+      self._last_focused = win.focused_object
+      if self._last_focused:
+         self._last_focused.focus = False
 
       # title
       if title is None:
@@ -1019,8 +1098,9 @@ class EmcDialog(Layout):
 
    def delete(self):
       input_events.listener_del(self._name)
-      self.fman.delete()
       self.signal_emit('emc,dialog,hide', 'emc')
+      if self._last_focused:
+         self._last_focused.focus = True
 
    def _delete_real(self):
       if self._textentry:
@@ -1047,21 +1127,18 @@ class EmcDialog(Layout):
       return self._user_data
 
    def button_add(self, label, selected_cb=None, cb_data=None, icon=None):
-      if not self._buttons:
-         self.signal_emit('emc,dialog,buttons,show', 'emc')
-
       b = EmcButton(label, icon)
       b.data['cb'] = selected_cb
       b.data['cb_data'] = cb_data
       b.callback_clicked_add(self._cb_buttons)
-      self.fman.obj_add(b)
       self.box_prepend('emc.box.buttons', b)
       self._buttons.append(b)
+      if len(self._buttons) == 1:
+         self.signal_emit('emc,dialog,buttons,show', 'emc')
+         b.focus = True
       return b
 
    def buttons_clear(self):
-      self.fman.delete()
-      self.fman = EmcFocusManager()
       for b in self._buttons:
          b.delete()
       del self._buttons
@@ -1153,18 +1230,19 @@ class EmcDialog(Layout):
       # if content is List or Genlist then automanage the events
       if self._list or (self._content and type(self._content) in (List, Genlist)):
          li = self._list or self._content
-         item = li.selected_item_get()
+         item = li.selected_item
          if item:
             new_it = None
             horiz = li.horizontal if type(li) is List else False
             if (horiz and event == 'RIGHT') or (not horiz and event == 'DOWN'):
-               new_it = item.next_get()
+               new_it = item.next
             if (horiz and event == 'LEFT') or (not horiz and event == 'UP'):
-               new_it = item.prev_get()
+               new_it = item.prev
             if new_it:
                new_it.selected = True
                new_it.bring_in()
                return input_events.EVENT_BLOCK
+
 
       # try to scroll the text entry
       if self._textentry:
@@ -1173,16 +1251,13 @@ class EmcDialog(Layout):
          if event == 'DOWN':
             self._textentry.scroll_by(0, +100)
 
-      # focus between buttons
-      if self._buttons:
-         if event == 'LEFT':
-            self.fman.focus_move('l')
-         if event == 'RIGHT':
-            self.fman.focus_move('r')
-   
+      if event in focus_directions:
+         focus_move(event, self)
+         return input_events.EVENT_BLOCK
+
       if event == 'OK':
          if self._buttons:
-            self._cb_buttons(self.fman.focused_obj_get())
+            self._cb_buttons(self.focused_object)
          elif self._done_cb:
             if self._list:
                it = self._list.selected_item
@@ -1191,11 +1266,9 @@ class EmcDialog(Layout):
                self._done_cb(self)
          else:
             self.delete()
-
-      if event in ('LEFT', 'RIGHT', 'UP', 'DOWN', 'OK'):
          return input_events.EVENT_BLOCK
-      else:
-         return input_events.EVENT_CONTINUE
+
+      return input_events.EVENT_CONTINUE
 
 ################################################################################
 class EmcNotify(edje.Edje):
@@ -1421,7 +1494,7 @@ class EmcFolderSelector(EmcDialog):
       EmcDialog.__init__(self, title, style='list', done_cb=self._btn_browse_cb)
       b2 = self.button_add(_('Select'), self._btn_select_cb)
       b1 = self.button_add(_('Browse'), self._btn_browse_cb)
-      self.fman.focused_obj_set(b1)
+      b1.focus = True
 
       self.populate(os.getenv('HOME'))
 
@@ -1508,135 +1581,6 @@ class EmcSourcesManager(EmcDialog):
       self.delete()
 
 ################################################################################
-class EmcFocusManager(object):
-   """
-   This class manage a list of elementary objects, usually buttons.
-   You provide all the objects that can receive focus and the class
-   will take care of selecting the right object when you move the selection
-   Dont forget to call the delete() method when not needed anymore!!
-   If you want the class to automanage input events just pass an unique name
-   as the autoeventsname param. 
-   """
-
-   def __init__(self, autoeventsname=None):
-      self.objs = []
-      self.has_focus = True
-      self.focused_obj = None
-      self.autoeventsname = autoeventsname
-      if autoeventsname is not None:
-         input_events.listener_add(autoeventsname, self._input_event_cb)
-
-   def delete(self):
-      """ Delete the FocusManager instance and free all the used resources """
-      if self.autoeventsname is not None:
-         input_events.listener_del(self.autoeventsname)
-
-      if self.objs:
-         for o in self.objs:
-            o.on_mouse_in_del(self._mouse_in_cb)
-         del self.objs
-      del self
-
-   def obj_add(self, obj):
-      """
-      Add an object to the chain, obj must be an evas object that support
-      the focus_set() 'interface', usually an elementary obj will do the work.
-      """
-      if self.has_focus and not self.focused_obj:
-         self.focused_obj = obj
-         # obj.focus_set(True)
-         obj.disabled_set(False)
-      else:
-         # obj.focus_set(False)
-         obj.disabled_set(True)
-      obj.on_mouse_in_add(self._mouse_in_cb)
-      self.objs.append(obj)
-
-   def focus(self):
-      """ give focus to the manager """
-      self.has_focus = True
-      if not self.focused_obj:
-         self.focused_obj = self.objs[0]
-      self.focused_obj.disabled = False
-
-   def unfocus(self):
-      """ remove focus from the manager, and unselect all childs """
-      self.has_focus = False
-      if self.focused_obj:
-         self.focused_obj.disabled = True
-
-   def focused_obj_set(self, obj):
-      """ Give focus to the given obj """
-      # obj.focus_set(True)
-      if self.focused_obj:
-         self.focused_obj.disabled_set(True)
-      obj.disabled_set(False)
-      self.focused_obj = obj
-
-   def focused_obj_get(self):
-      """ Get the object that has focus """
-      return self.focused_obj
-
-   def focus_move(self, direction):
-      """
-      Try to move the selection in th given direction.
-      direction can be: 'l'eft, 'r'ight, 'u'p or 'd'own
-      """
-      x, y = self.focused_obj.center
-      nearest = None
-      distance = 99999
-      for obj in self.objs:
-         if obj != self.focused_obj:
-            ox, oy = obj.center
-            # discard objects in the wrong direction
-            if   direction == 'l' and ox >= x: continue
-            elif direction == 'r' and ox <= x: continue
-            elif direction == 'u' and oy >= y: continue
-            elif direction == 'd' and oy <= y: continue
-
-            # simple calc distance (with priority in the current direction)
-            if direction in ['l', 'r']:
-               dis = abs(x - ox) + (abs(y - oy) * 10)
-            else:
-               dis = (abs(x - ox) * 10) + abs(y - oy)
-
-            # remember the nearest object
-            if dis < distance:
-               distance = dis
-               nearest = obj
-
-      # select the new object if found
-      if nearest:
-         self.focused_obj_set(nearest)
-
-   def all_get(self):
-      """ Get the list of all the objects that was previously added """
-      return self.objs
-
-   def _mouse_in_cb(self, obj, event):
-      if not self.has_focus:
-         self.focus()
-      if self.focused_obj != obj:
-         self.focused_obj_set(obj)
-
-   def _input_event_cb(self, event):
-      if not self.has_focus:
-         return input_events.EVENT_CONTINUE
-      if event == 'LEFT':
-         self.focus_move('l')
-         return input_events.EVENT_BLOCK
-      if event == 'RIGHT':
-         self.focus_move('r')
-         return input_events.EVENT_BLOCK
-      if event == 'UP':
-         self.focus_move('u')
-         return input_events.EVENT_BLOCK
-      if event == 'DOWN':
-         self.focus_move('d')
-         return input_events.EVENT_BLOCK
-      return input_events.EVENT_CONTINUE
-
-################################################################################
 class EmcVKeyboard(EmcDialog):
    """ TODO doc this """
    def __init__(self, accept_cb=None, dismiss_cb=None,
@@ -1647,6 +1591,7 @@ class EmcVKeyboard(EmcDialog):
       self.dismiss_cb = dismiss_cb
       self.user_data = user_data
       self.current_button = None
+      self.buttons = list()
 
       # table
       tb = Table(win, homogeneous=True)
@@ -1656,15 +1601,15 @@ class EmcVKeyboard(EmcDialog):
       self.part_text_set('emc.text.title', title or _('Insert text'))
 
       # entry (TODO use scrolled_entry instead)
-      self.entry = Entry(win, style='vkeyboard', single_line=True,
-                         context_menu_disabled=True, focus_allow=False,
+      self.entry = Entry(win, style='vkeyboard',
+                         single_line=True, editable=True,
+                         context_menu_disabled=True, focus_allow=True,
                          size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
+      self.entry.callback_activated_add(self._accept_cb)
+      self.entry.callback_aborted_add(self._dismiss_cb)
       if text: self.text_set(text)
       tb.pack(self.entry, 0, 0, 10, 1)
       self.entry.show()
-
-      # focus manager
-      self.efm = EmcFocusManager()
 
       # standard keyb
       for i, c in enumerate(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']):
@@ -1692,18 +1637,18 @@ class EmcVKeyboard(EmcDialog):
 
       # catch input events
       input_events.listener_add('vkbd', self.input_event_cb)
+      self.entry.focus = True
 
    def _pack_btn(self, tb, x, y, w, h, label, icon=None, cb=None):
       b = EmcButton(label=label, icon=icon, size_hint_align=FILL_HORIZ)
       if cb: b.callback_clicked_add(cb)
       b.data['cb'] = cb
-      self.efm.obj_add(b)
       tb.pack(b, x, y, w, h)
+      self.buttons.append(b)
       return b
 
    def delete(self):
       input_events.listener_del('vkbd')
-      self.efm.delete()
       EmcDialog.delete(self)
 
    def text_set(self, text):
@@ -1737,7 +1682,7 @@ class EmcVKeyboard(EmcDialog):
       self.entry.entry_insert(' ')
 
    def _uppercase_cb(self, button):
-      for btn in self.efm.all_get():
+      for btn in self.buttons:
          c = btn.text_get()
          if c and len(c) == 1 and c.isalpha():
             if c.islower():
@@ -1758,18 +1703,15 @@ class EmcVKeyboard(EmcDialog):
 
    def input_event_cb(self, event):
       if event == 'OK':
-         btn = self.efm.focused_obj_get()
+         btn = self.focused_object
          if callable(btn.data['cb']):
             btn.data['cb'](btn)
-      elif event == 'EXIT':
+            return input_events.EVENT_BLOCK
+      if event == 'EXIT':
          self._dismiss_cb(None)
-      elif event == 'LEFT':  self.efm.focus_move('l')
-      elif event == 'RIGHT': self.efm.focus_move('r')
-      elif event == 'UP':    self.efm.focus_move('u')
-      elif event == 'DOWN':  self.efm.focus_move('d')
-      else: return input_events.EVENT_CONTINUE
+         return input_events.EVENT_BLOCK
 
-      return input_events.EVENT_BLOCK
+      return input_events.EVENT_CONTINUE
   
 ################################################################################
 class EmcScrolledEntry(Entry, Scrollable):
@@ -1782,7 +1724,7 @@ class EmcScrolledEntry(Entry, Scrollable):
       self._autoscroll_start_delay = 3.0
       self._autoscroll = autoscroll
       Entry.__init__(self, parent or layout, style='scrolledentry',
-                     editable=False, scrollable=True, **kargs)
+                     editable=False, scrollable=True, focus_allow=False, **kargs)
 
    @property
    def autoscroll(self):

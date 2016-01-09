@@ -2343,6 +2343,7 @@ group { name: "elm/entry/base-single/vkeyboard";
       part { name: "elm.text";
          type: TEXTBLOCK;
          entry_mode: EDITABLE;
+         select_mode: DEFAULT;
          cursor_mode: BEFORE;
          multiline: 0;
          // source: "elm/entry/selection/emc"; // selection under
@@ -2355,6 +2356,11 @@ group { name: "elm/entry/base-single/vkeyboard";
                align: 0.0 0.5;
             }
          }
+      }
+      program {
+         signal: "load"; source: "";
+         action: FOCUS_SET;
+         target: "elm.text";
       }
    }
 }

@@ -25,8 +25,7 @@ import os
 from efl import evas, ecore, edje, elementary, emotion
 
 from epymc import utils, ini, gui, input_events, events
-from epymc.gui import EmcFocusManager, EmcDialog, EmcButton, EmcMenu, \
-                      DownloadManager, EmcNotify
+from epymc.gui import EmcDialog, EmcButton, EmcMenu, DownloadManager, EmcNotify
 from epymc.sdb import EmcDatabase
 from epymc.subtitles import Subtitles, Opensubtitles
 
@@ -48,11 +47,11 @@ _volume = 0
 _volume_muted = False
 _emotion = None
 _buttons = list()
-_fman = None
 _buffer_dialog = None
 _video_visible = False
 _controls_visible = False
 _minipos_visible = False
+_last_focused_obj = None # used to steal/restore the focus on show/hide
 _update_timer = None # used to update the controls, minipos and buffer dialog
 _minipos_timer = None # used to hide the minipos after some secs
 _subs_timer = None # used to update the subtitles (always on)
@@ -258,7 +257,7 @@ def _play_real(start_from=None, only_audio=False):
    if not _emotion and not _init_emotion():
       return
 
-   if not _fman:
+   if not _buttons:
       _init_mediaplayer_gui()
 
    url = _onair_url
@@ -450,7 +449,11 @@ def subs_delay_apply(diff):
 
 ### gui API ###
 def video_player_show():
-   global _video_visible, _update_timer
+   global _video_visible, _update_timer, _last_focused_obj
+
+   _last_focused_obj = gui.win.focused_object
+   if _last_focused_obj:
+      _last_focused_obj.focus = False
 
    gui.signal_emit('videoplayer,show')
    _video_visible = True
@@ -460,7 +463,7 @@ def video_player_show():
    _update_timer = ecore.Timer(1.0, _update_timer_cb)
 
 def video_player_hide():
-   global _video_visible, _update_timer
+   global _video_visible, _update_timer, _last_focused_obj
 
    video_controls_hide()
    minipos_hide()
@@ -469,6 +472,8 @@ def video_player_hide():
       _update_timer.delete()
       _update_timer = None
    gui.signal_emit('videoplayer,hide')
+   if _last_focused_obj:
+      _last_focused_obj.focus = True
 
 def video_controls_show():
    global _controls_visible
@@ -478,6 +483,7 @@ def video_controls_show():
    _controls_visible = True
    gui.volume_show()
    _update_slider()
+   _play_pause_btn.focus = True
 
 def video_controls_hide():
    global _controls_visible
@@ -555,16 +561,11 @@ def _init_emotion():
    return True
 
 def _init_mediaplayer_gui():
-   global _fman
-
-   # focus manager for play/stop/etc.. buttons
-   _fman = EmcFocusManager()
 
    #  <<  fast backward
    bt = EmcButton(icon='icon/fbwd')
    bt.callback_clicked_add(_cb_btn_fbackward)
    bt.data['cb'] = _cb_btn_fbackward
-   _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
@@ -572,7 +573,6 @@ def _init_mediaplayer_gui():
    bt = EmcButton(icon='icon/bwd')
    bt.callback_clicked_add(_cb_btn_backward)
    bt.data['cb'] = _cb_btn_backward
-   _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
@@ -580,7 +580,6 @@ def _init_mediaplayer_gui():
    bt = EmcButton(icon='icon/stop')
    bt.callback_clicked_add(_cb_btn_stop)
    bt.data['cb'] = _cb_btn_stop
-   _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
@@ -588,13 +587,8 @@ def _init_mediaplayer_gui():
    bt = EmcButton(icon='icon/pause')
    bt.callback_clicked_add(_cb_btn_play)
    bt.data['cb'] = _cb_btn_play
-   _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
-   # ARGH this does'n work
-   # for some reason in fman mouse_in callback is called once (wrong) on
-   # the creation of the obj ...dunno why
-   _fman.focused_obj_set(bt)
    # store a reference to the button so we can change the icon later
    global _play_pause_btn
    _play_pause_btn = bt
@@ -603,7 +597,6 @@ def _init_mediaplayer_gui():
    bt = EmcButton(icon='icon/fwd')
    bt.callback_clicked_add(_cb_btn_forward)
    bt.data['cb'] = _cb_btn_forward
-   _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
    
@@ -611,7 +604,6 @@ def _init_mediaplayer_gui():
    bt = EmcButton(icon='icon/ffwd')
    bt.callback_clicked_add(_cb_btn_fforward)
    bt.data['cb'] = _cb_btn_fforward
-   _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
@@ -619,7 +611,6 @@ def _init_mediaplayer_gui():
    bt = EmcButton(_('Audio'))
    bt.callback_clicked_add(_build_audio_menu)
    bt.data['cb'] = _build_audio_menu
-   _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
 
@@ -627,7 +618,6 @@ def _init_mediaplayer_gui():
    bt = EmcButton(_('Video'))
    bt.callback_clicked_add(_build_video_menu)
    bt.data['cb'] = _build_video_menu
-   _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
 
@@ -635,7 +625,6 @@ def _init_mediaplayer_gui():
    bt = EmcButton(_('Subtitles'))
    bt.callback_clicked_add(_build_subtitles_menu)
    bt.data['cb'] = _build_subtitles_menu
-   _fman.obj_add(bt)
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
 
@@ -969,18 +958,12 @@ def input_event_cb(event):
          video_controls_hide()
          return input_events.EVENT_BLOCK
       elif event == 'OK':
-         button = _fman.focused_obj_get()
+         button = gui.win.focused_object
          cb = button.data['cb']
          if callable(cb):
             cb(button)
          # TODO TRY THIS INSTEAD:
          ## evas_object_smart_callback_call(obj, 'sig', NULL);
-         return input_events.EVENT_BLOCK
-      elif event == 'RIGHT':
-         _fman.focus_move('r')
-         return input_events.EVENT_BLOCK
-      elif event == 'LEFT':
-         _fman.focus_move('l')
          return input_events.EVENT_BLOCK
    else:
       if event == 'BACK':

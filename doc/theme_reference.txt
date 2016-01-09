@@ -49,10 +49,10 @@ All the icons and images in icons.edc must be implemented.
 
 ### Browser: List View ###
    * Required parts:
-      "browser.list.genlist1" -> elm_genlist style: "browser"
-      "browser.list.genlist2" -> elm_genlist style: "browser"
-      "browser.list.poster" -> edje swallow -> EmcImage
-      "browser.list.info" -> edje swallow -> EmcScrolledEntry
+      "browser.list.genlist1" -> edje SWALLOW -> Genlist style:"browser"
+      "browser.list.genlist2" -> edje SWALLOW -> Genlist style:"browser"
+      "browser.list.poster" -> edje SWALLOW -> EmcImage
+      "browser.list.info" -> edje SWALLOW -> EmcScrolledEntry
       "browser.list.total" -> edje TEXT
 
    * Signals received from the application:

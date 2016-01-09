@@ -103,15 +103,15 @@ class KeyboardModule(EmcModule):
       config_gui.root_item_add('keyb', 50, _('Keyboard'), icon='icon/keyboard',
                                callback=self.config_panel_cb)
 
-      # connect the key_down evas signal
-      gui.win.on_key_down_add(self._cb_key_down)
+      # ask the gui to forward key events to us
+      gui.key_down_func = self._key_down_cb
 
    def __shutdown__(self):
       DBG('Shutdown module')
-      gui.win.on_key_down_del(self._cb_key_down)
       config_gui.root_item_del('keyb')
+      gui.key_down_func = None
 
-   def _cb_key_down(self, win, event):
+   def _key_down_cb(self, event):
       key = event.key.lower()
       DBG('Key: %s (%s)' % (key, event.key))
 
@@ -124,7 +124,7 @@ class KeyboardModule(EmcModule):
          else:
             print('Unhandled key: ' + event.key)
 
-      return True
+      return ecore.ECORE_CALLBACK_DONE
 
    ### config panel stuff
    class KeyItemClass(EmcItemClass):

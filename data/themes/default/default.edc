@@ -456,8 +456,7 @@ collections {
                visible: 1;
             }
          }
-         part { name: "browser.list.genlist1"; type: EXTERNAL;  /* API */
-            source: "elm/genlist";
+         part { name: "browser.list.genlist1"; type: SWALLOW;  /* API */
             clip_to: "browser.list.list_clip";
             description { state: "default" 0.0;
                rel1.to: "browser.list.list_clip";
@@ -477,8 +476,7 @@ collections {
                rel2.relative: 2.0 1.0;
             }
          }
-         part { name: "browser.list.genlist2"; type: EXTERNAL;  /* API */
-            source: "elm/genlist";
+         part { name: "browser.list.genlist2"; type: SWALLOW;  /* API */
             clip_to: "browser.list.list_clip";
             description { state: "default" 0.0;
                rel1 {

@@ -140,7 +140,7 @@ class MameModule(EmcModule):
       self._categories = {}
 
       self._games = {} # key = game_id<str>  value = <MameGame> instance
-      self._browser = EmcBrowser('MAME')
+      self._browser = EmcBrowser('MAME', icon='icon/mame')
       mainmenu.item_add('mame', 50, _('M.A.M.E'), 'icon/mame', self.cb_mainmenu)
       ini.add_section('mame')
 

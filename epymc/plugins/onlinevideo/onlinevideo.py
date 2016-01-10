@@ -153,7 +153,7 @@ class OnlinevideoModule(EmcModule):
                         'icon/olvideo', self.cb_mainmenu)
 
       # create the browser instance
-      self._browser = EmcBrowser(_('Online Channels'))
+      self._browser = EmcBrowser(_('Online Channels'), icon='icon/olvideo')
 
    def __shutdown__(self):
       DBG('Shutdown module')

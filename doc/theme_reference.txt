@@ -30,8 +30,9 @@ All the icons and images in icons.edc must be implemented.
 
 ### TopBar stuff ###
    * Required parts:
-      "topbar.title" -> edje text
-      "topbar.box" -> edje box
+      "topbar.icon" -> edje SWALLOW
+      "topbar.title" -> edje TEXT
+      "topbar.box" -> edje BOX
 
    * Signals received from the application:
       "topbar,show" "emc"
@@ -66,10 +67,10 @@ All the icons and images in icons.edc must be implemented.
 
 ### Browser: PosterGrid View ###
    * Required parts:
-      "browser.postergrid.gengrid" -> edje swallow
+      "browser.postergrid.gengrid" -> edje SWALLOW
       "browser.postergrid.total" -> edje TEXT
-      "browser.postergrid.image" -> edje swallow -> EmcImage
-      "browser.postergrid.info" -> edje swallow -> EmcScrolledEntry
+      "browser.postergrid.image" -> edje SWALLOW -> EmcImage
+      "browser.postergrid.info" -> edje SWALLOW -> EmcScrolledEntry
 
    * Signals received from the application:
       "browser,postergrid,show" "emc"
@@ -80,10 +81,10 @@ All the icons and images in icons.edc must be implemented.
 
 ### Browser: CoverGrid View ###
    * Required parts:
-      "browser.covergrid.gengrid" -> edje swallow
+      "browser.covergrid.gengrid" -> edje SWALLOW
       "browser.covergrid.total" -> edje TEXT
-      "browser.covergrid.image" -> edje swallow -> EmcImage
-      "browser.covergrid.info" -> edje swallow -> EmcScrolledEntry
+      "browser.covergrid.image" -> edje SWALLOW -> EmcImage
+      "browser.covergrid.info" -> edje SWALLOW -> EmcScrolledEntry
 
    * Signals received from the application:
       "browser,covergrid,show" "emc"
@@ -94,15 +95,15 @@ All the icons and images in icons.edc must be implemented.
 
 ### Video Player ###
    * Required parts:
-      "videoplayer.video" -> edje swallow
+      "videoplayer.video" -> edje SWALLOW
       "videoplayer.events" -> edje part with mouse_events = 1
       "videoplayer.subs" -> TEXTBLOCK (style: "epymc_subtitles_style")
-      "videoplayer.controls.btn_box" -> edje box (will contain play,stop,etc buttons)
-      "videoplayer.controls.btn_box2" -> edje box (will contain Video,Audio,etc buttons)
-      "videoplayer.controls.slider" -> edje group -> "emc/slider/default"
-      "videoplayer.controls.position" -> edje text
-      "videoplayer.controls.length" -> edje text
-      "videoplayer.controls.poster" -> edje swallow
+      "videoplayer.controls.btn_box" -> edje BOX (will contain play,stop,etc buttons)
+      "videoplayer.controls.btn_box2" -> edje BOX (will contain Video,Audio,etc buttons)
+      "videoplayer.controls.slider" -> edje GROUP -> "emc/slider/default"
+      "videoplayer.controls.position" -> edje TEXT
+      "videoplayer.controls.length" -> edje TEXT
+      "videoplayer.controls.poster" -> edje SWALLOW
       "videoplayer.controls.title" -> edje TEXT
 
    * Signals received from the application:
@@ -148,9 +149,9 @@ All the icons and images in icons.edc must be implemented.
    * Group: "emc/dialog/panel"
 
    * Required parts:
-      "emc.text.title" -> edje text
-      "emc.swallow.content" -> edje swallow
-      "emc.box.buttons" -> edje box
+      "emc.text.title" -> edje TEXT
+      "emc.swallow.content" -> edje SWALLOW
+      "emc.box.buttons" -> edje BOX
 
    * Signals received from the application:
       "emc,dialog,show"
@@ -186,14 +187,14 @@ All the icons and images in icons.edc must be implemented.
 
 ### Notify box ###
    * Required parts:
-      "notify.box.stack" -> edje box (by default "vertical" as layout)
+      "notify.box.stack" -> edje BOX (by default "vertical" as layout)
 
 
 ### Notify items ###
    * Group: "emc/notify/default"
 
    * Required parts:
-      "emc.swallow.icon" -> edje swallow
+      "emc.swallow.icon" -> edje SWALLOW
       "emc.text.caption" -> edje TEXTBLOCK
 
 

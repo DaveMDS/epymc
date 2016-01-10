@@ -317,7 +317,7 @@ def init():
    mainmenu.item_add('config', 100, _('Configuration'), 'icon/config', _mainmenu_cb)
 
    # create a browser instance
-   _browser = EmcBrowser(_('Configuration'), 'List') # TODO use a custom style for config ?
+   _browser = EmcBrowser(_('Configuration'), 'List', 'icon/config')
 
    root_item_add('config://general/', 1, _('General'), 'icon/emc', _general_list)
    root_item_add('config://modules/', 2, _('Modules'), 'icon/module', _modules_list)

@@ -273,7 +273,7 @@ class MoviesModule(EmcModule):
                                icon='icon/movie', callback=config_panel_cb)
 
       # create a browser instance
-      self._browser = EmcBrowser(_('Movies'), 'List')
+      self._browser = EmcBrowser(_('Movies'), 'List', 'icon/movie')
 
       # listen to emc events
       events.listener_add('movies', self._events_cb)

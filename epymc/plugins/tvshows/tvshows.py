@@ -296,7 +296,7 @@ class TvShowsModule(EmcModule):
                                icon='icon/tv', callback=config_panel_cb)
 
       # create a browser instance
-      self._browser = EmcBrowser(_('TV Shows'), 'List')
+      self._browser = EmcBrowser(_('TV Shows'), 'List', 'icon/tv')
 
       # listen to emc events
       events.listener_add('tvshows', self._events_cb)

@@ -164,7 +164,7 @@ class PhotosModule(EmcModule):
                          callback=self.config_panel_cb)
 
       # create a browser instance
-      self._browser = EmcBrowser(_('Photos'), 'List')
+      self._browser = EmcBrowser(_('Photos'), 'List', 'icon/photo')
 
    def __shutdown__(self):
       DBG('Shutdown module')

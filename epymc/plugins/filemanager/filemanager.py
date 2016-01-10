@@ -228,6 +228,7 @@ class FileManagerModule(EmcModule):
       gui.signal_emit('fileman,show')
       gui.signal_emit('topbar,show')
       gui.text_set('topbar.title', _('File Manager'))
+      gui.swallow_set('topbar.icon', gui.EmcImage(self.icon))
       input_events.listener_add('fileman', self.input_event_cb)
       for w in self.widgets:
          w.focus_allow = True

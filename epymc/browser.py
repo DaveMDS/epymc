@@ -196,12 +196,13 @@ class EmcBrowser(object):
    Later you can create new pages or use back(), clear(), show(), hide()
    """
 
-   def __init__(self, name, default_style='List'):
+   def __init__(self, name, default_style='List', icon='icon/home'):
 
       DBG('EmcBrowser __init__')
       _instances.append(self)
       self.name = name
       self.default_style = default_style
+      self.icon = icon
 
       self.pages = []
       self.current_view = None
@@ -365,6 +366,7 @@ class EmcBrowser(object):
    def show(self):
       """ TODO Function doc """
       gui.signal_emit('topbar,show')
+      gui.swallow_set('topbar.icon', EmcImage(self.icon))
       self.current_view.show()
       input_events.listener_add('browser-' + self.name, self._input_event_cb)
 

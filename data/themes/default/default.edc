@@ -283,19 +283,26 @@ collections {
                image.border: 31 39 2 39;
             }
          }
-         part { name: "topbar.home_icon"; type: IMAGE;
+         part { name: "topbar.icon.clip"; type: RECT;
             description { state: "default" 0.0;
-               image.normal: "icon_home.png";
                color: 255 255 255 170;
+               rel1.to: "topbar.icon";
+               rel2.to: "topbar.icon";
+            }
+         }
+         part { name: "topbar.icon"; type: SWALLOW;  /* API */
+            clip_to: "topbar.icon.clip";
+            description { state: "default" 0.0;
                aspect: 1 1;
                aspect_preference: BOTH;
                align: 0.0 0.5;
                rel1 {
                   to: "topbar.clip";
-                  offset: 20 0;
+                  offset: 20 3;
                }
                rel2 {
                   to: "topbar.clip";
+                  offset: -1 -3;
                }
             }
          }
@@ -306,13 +313,15 @@ collections {
                color: FONT_COLOR_TOPBAR;
                color3: FONT_COLOR3_TOPBAR;
                rel1 {
-                  to: "topbar.home_icon";
+                  to_x: "topbar.icon";
+                  to_y: "topbar.clip";
                   relative: 1.0 0.0;
+                  offset: 3 0;
                }
                rel2 {
                   to: "topbar.box";
                   relative: 0.0 1.0;
-                  offset: -6 -1;
+                  offset: -6 -2;
                }
                text {
                   font: FONT2;

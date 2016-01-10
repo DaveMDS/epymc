@@ -258,7 +258,7 @@ class MusicModule(EmcModule):
                         self.cb_mainmenu, subitems)
 
       # create a browser instance
-      self._browser = EmcBrowser(_('Music'))
+      self._browser = EmcBrowser(_('Music'), icon='icon/music')
 
       # listen to emc events
       events.listener_add('music', self.events_cb)

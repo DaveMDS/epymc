@@ -546,7 +546,7 @@ class UiTestsModule(EmcModule):
    def __init__(self):
       img = os.path.join(self.path, 'menu_bg.png')
       mainmenu.item_add('uitests', 3, 'UI tests', img, self.cb_mainmenu)
-      self._browser = EmcBrowser('UI tests', 'List')
+      self._browser = EmcBrowser('UI tests', 'List', 'icon/star')
 
       global _mod
       _mod = self

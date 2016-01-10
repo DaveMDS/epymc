@@ -24,8 +24,6 @@ TMP
  * migliorare grafica dei dialog
  * require efl >= 1.17 (and use setup.py efl stuff)
 
- * show activity icon in topbar (in place of the home btn)
-
 
 
 BUGS

@@ -1038,6 +1038,47 @@ collections {
                rel2.relative: 0.45 1.0;
             }
          }
+         part { name: "fileman.list1.cur.bg"; type: IMAGE;
+            clip_to: "fileman.clip";
+            description { state: "default" 0.0;
+               image {
+                  normal: "frame_box.png";
+                  border: 3 3 3 3;
+               }
+               rel1 {
+                  to: "fileman.list1.frame";
+                  relative: 0.0 1.0;
+                  offset: 31 -68;
+               }
+               rel2 {
+                  to: "fileman.list1.frame";
+                  offset: -32 -37;
+               }
+            }
+         }
+         part { name: "fileman.list1.cur.text"; type: TEXT;  /* API */
+            clip_to: "fileman.clip";
+            effect: SHADOW;
+            scale: 1;
+            description { state: "default" 0.0;
+               color: FONT_COLOR_NOSEL;
+               color3: FONT_COLOR3_NOSEL;
+               rel1 {
+                  to: "fileman.list1.cur.bg";
+                  offset: 5 0;
+               }
+               rel2 {
+                  to: "fileman.list1.cur.bg";
+                  offset: -6 -1;
+               }
+               text {
+                  font: FONT;
+                  size: FONT_SIZE;
+                  align: 0.5 0.75;
+                  ellipsis: 1.0;
+               }
+            }
+         }
          part { name: "fileman.list1.swallow"; type: SWALLOW;  /* API */
             clip_to: "fileman.clip";
             description { state: "default" 0.0;
@@ -1064,6 +1105,47 @@ collections {
                rel1.relative: 0.55 1.0;
                rel2.relative: 1.0 1.0;
                rel2.offset: -1 10;
+            }
+         }
+         part { name: "fileman.list2.cur.bg"; type: IMAGE;
+            clip_to: "fileman.clip";
+            description { state: "default" 0.0;
+               image {
+                  normal: "frame_box.png";
+                  border: 3 3 3 3;
+               }
+               rel1 {
+                  to: "fileman.list2.frame";
+                  relative: 0.0 1.0;
+                  offset: 31 -68;
+               }
+               rel2 {
+                  to: "fileman.list2.frame";
+                  offset: -32 -37;
+               }
+            }
+         }
+         part { name: "fileman.list2.cur.text"; type: TEXT;  /* API */
+            clip_to: "fileman.clip";
+            effect: SHADOW;
+            scale: 1;
+            description { state: "default" 0.0;
+               color: FONT_COLOR_NOSEL;
+               color3: FONT_COLOR3_NOSEL;
+               rel1 {
+                  to: "fileman.list2.cur.bg";
+                  offset: 5 0;
+               }
+               rel2 {
+                  to: "fileman.list2.cur.bg";
+                  offset: -6 -1;
+               }
+               text {
+                  font: FONT;
+                  size: FONT_SIZE;
+                  align: 0.5 0.75;
+                  ellipsis: 1.0;
+               }
             }
          }
          part { name: "fileman.list2.swallow"; type: SWALLOW;  /* API */
@@ -1126,9 +1208,6 @@ collections {
                }
             }
          }
-
-         // DBG_SHOW("fileman.list1.swallow", 200, 0, 0)
-         // DBG_SHOW("fileman.list2.swallow", 0, 200, 0)
          program { name: "fileman_show";  /* API */
             signal: "fileman,show";
             source: "emc";

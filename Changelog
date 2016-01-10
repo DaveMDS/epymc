@@ -35,6 +35,7 @@ New features:
  * Cache to file remote images for faster reloading
  * Support remote urls also in the mediaplayer cover image
  * Virtual keybord is now also usable with the real keyboard
+ * Show current folders in the file-manager
 
 
 ===============================================================================

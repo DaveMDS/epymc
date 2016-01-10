@@ -93,6 +93,20 @@ All the icons and images in icons.edc must be implemented.
       "browser,covergrid,info,hide" "emc"
 
 
+### File manager ###
+   * Required parts:
+      "fileman.list1.cur.text" -> edje TEXT
+      "fileman.list1.swallow" -> edje SWALLOW -> ElmList style: "browser"
+      "fileman.list2.cur.text" -> edje TEXT
+      "fileman.list2.swallow" -> edje SWALLOW -> ElmList style: "browser"
+      "fileman.buttons.box" -> edje BOX
+      "fileman.buttons.box2" -> edje BOX
+
+   * Signals received from the application:
+      "fileman,show" "emc"
+      "fileman,hide" "emc"
+
+
 ### Video Player ###
    * Required parts:
       "videoplayer.video" -> edje SWALLOW

@@ -45,10 +45,11 @@ def DBG(msg):
 
 
 class FilemanList(List):
-   def __init__(self):
-      List.__init__(self, gui.layout, style='browser')
+   def __init__(self, name):
       self.current_folder = None
       self.fmonitor = None
+      self._name = name
+      List.__init__(self, gui.layout, style='browser')
       self.callback_item_focused_add(self.item_focused_cb)
       self.callback_clicked_double_add(self.item_activated_cb)
 
@@ -90,6 +91,9 @@ class FilemanList(List):
       self.first_item.selected = True
       self.first_item.focus = True
       self.current_folder = None
+
+      # update current folder text
+      gui.text_set('fileman.%s.cur.text' % self._name, _('Favorites'))
 
    def populate(self, folder):
       self.clear()
@@ -133,6 +137,9 @@ class FilemanList(List):
 
       # keep the folder monitored for changes
       self.fmonitor = ecore.FileMonitor(folder, self._fmonitor_cb)
+
+      # update current folder text
+      gui.text_set('fileman.%s.cur.text' % self._name, folder)
 
    # FileMonitor callback and utils
    def _fmonitor_cb(self, event, path):
@@ -294,7 +301,7 @@ class FileManagerModule(EmcModule):
       gui.box_append('fileman.buttons.box2', b)
       self.widgets.append(b)
 
-      li = FilemanList() 
+      li = FilemanList('list1') 
       gui.swallow_set('fileman.list1.swallow', li)
       li.populate_root(ini.get_string_list('filemanager', 'folders', ';'))
       li.callback_focused_add(self.list_focused_cb)
@@ -302,7 +309,7 @@ class FileManagerModule(EmcModule):
       self.list1 = li
       li.show() # this is wrong, but needed to make focus work on first show
 
-      li = FilemanList()
+      li = FilemanList('list2')
       gui.swallow_set('fileman.list2.swallow', li)
       li.populate_root(ini.get_string_list('filemanager', 'folders', ';'))
       li.callback_focused_add(self.list_focused_cb)

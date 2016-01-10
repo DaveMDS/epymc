@@ -92,8 +92,11 @@ class PhotoItemClass(EmcItemClass):
 
    def icon_get(self, url, mod):
       return 'icon/photo'
-   
+
    def poster_get(self, url, mod):
+      return utils.url2path(url)
+
+   def cover_get(self, url, mod):
       return utils.url2path(url)
 
    def info_get(self, url, mod):

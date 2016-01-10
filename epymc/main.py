@@ -22,7 +22,11 @@ from __future__ import absolute_import, print_function
 
 import sys, os, gettext, logging, argparse
 
-from efl import evas, ecore, edje, elementary, emotion
+from efl import evas
+from efl import ecore
+from efl import edje
+from efl import elementary
+from efl import emotion
 
 import epymc.utils as utils
 
@@ -68,7 +72,7 @@ def start_epymc(standalone=False):
    os.environ['PULSE_PROP_application.icon_name'] = 'epymc'
    
    # init elementary
-   elementary.init()
+   # elementary.init()
    # elementary.need_ethumb()
 
    # create config/cache dirs if necessary

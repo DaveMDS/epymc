@@ -27,7 +27,7 @@ from efl.elementary.box import Box
 
 from epymc.modules import EmcModule
 from epymc.gui import EmcDialog, EmcVKeyboard, EmcFolderSelector, \
-   EmcButton, EmcFocusManager, EmcNotify, EmcMenu, DownloadManager
+   EmcButton, EmcNotify, EmcMenu, DownloadManager
 
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
@@ -188,7 +188,8 @@ class MyItemClass(EmcItemClass):
          return TEST_STYLE
 
    def item_selected(self, url, user_data):
-      
+
+      # Sub-pages
       if url == 'uitests://encoding':
          _mod._browser.page_add('uitests://encoding', 'Encoding tests', None,
                                 _mod.populate_encoding_page)
@@ -261,7 +262,6 @@ class MyItemClass(EmcItemClass):
       elif url == 'uitests://dm':
          DownloadManager().queue_download('http://fredrik.hubbe.net/plugger/xvidtest.avi', 'dm_test1')
          DownloadManager().queue_download('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4', 'TheMakingOfSuzanneVega')
-         
 
       # Mediaplayer Local Video
       elif url == 'uitests://mpv':
@@ -287,7 +287,9 @@ class MyItemClass(EmcItemClass):
 
       # VKeyboard
       elif url == 'uitests://vkbd':
-         EmcVKeyboard(title='Virtual Keyboard', text='This is the keyboard test!')
+         EmcVKeyboard(title='Virtual Keyboard', text='This is the keyboard test!',
+                      accept_cb=lambda vk, t: print('ACCEPT "%s"' % t),
+                      dismiss_cb=lambda vk: print('DISMISS'))
 
       # Source Selector
       elif url == 'uitests://sselector':
@@ -422,27 +424,19 @@ class MyItemClass(EmcItemClass):
          hbox.show()
          vbox0.pack_end(hbox)
 
-         def _dialog_close_cb(dialog):
-            fman.delete()
-            dialog.delete()
-         d = EmcDialog(title='button test', content=vbox0, style='panel',
-                       done_cb=_dialog_close_cb, canc_cb=_dialog_close_cb)
-         fman = EmcFocusManager('uitest-buttons')
+         d = EmcDialog(title='button test', content=vbox0, style='panel')
 
          ### Active buttons
          vbox = Box(gui.win)
          vbox.show()
          # label
          b = EmcButton('only label')
-         fman.obj_add(b)
          vbox.pack_end(b)
          # icon
          b = EmcButton(None, 'icon/star')
-         fman.obj_add(b)
          vbox.pack_end(b)
          # label + icon
          b = EmcButton('label + icon', 'icon/star')
-         fman.obj_add(b)
          vbox.pack_end(b)
          hbox.pack_end(vbox)
 
@@ -452,17 +446,14 @@ class MyItemClass(EmcItemClass):
          # label
          b = EmcButton('only label disabled')
          b.disabled_set(True)
-         fman.obj_add(b)
          vbox.pack_end(b)
          # icon
          b = EmcButton(None, 'icon/mame')
          b.disabled_set(True)
-         fman.obj_add(b)
          vbox.pack_end(b)
          # label + icon
          b = EmcButton('label + icon disabled', 'icon/back')
          b.disabled_set(True)
-         fman.obj_add(b)
          vbox.pack_end(b)
          hbox.pack_end(vbox)
 
@@ -472,7 +463,6 @@ class MyItemClass(EmcItemClass):
          hbox2.show()
          for i in range(0,8):
             b = EmcButton(str(i))
-            fman.obj_add(b)
             b.show()
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
@@ -484,7 +474,6 @@ class MyItemClass(EmcItemClass):
          icons = ['icon/fbwd','icon/bwd','icon/stop','icon/play','icon/fwd','icon/ffwd']
          for i in icons:
             b = EmcButton(None, i)
-            fman.obj_add(b)
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
 
@@ -497,7 +486,6 @@ class MyItemClass(EmcItemClass):
                   vbox0.pack_end(hbox2)
                   hbox2.show()
                b = EmcButton(None, group)
-               fman.obj_add(b)
                hbox2.pack_end(b)
                i += 1
 
@@ -509,9 +497,10 @@ class MyItemClass(EmcItemClass):
                d.list_item_append(group[5:], group)
          d.list_go()
 
+      # Images gallery
       elif url == 'uitests://imagegal':
          d = EmcDialog(title='Images gallery (names in console)',
-                       style='image_list_vert',
+                       style='image_list_horiz',
                        done_cb=lambda x, t: print(t))
          for group in sorted(edje.file_collection_list(gui.theme_file)):
             if group.startswith('image/'):
@@ -572,6 +561,7 @@ class UiTestsModule(EmcModule):
       self._browser.show()
 
    def populate_root(self, browser, url):
+      browser.item_add(MyItemClass(), 'uitests://vkbd', 'Virtual Keyboard')
       browser.item_add(MyItemClass(), 'uitests://encoding', 'Various string encoding tests')
       browser.item_add(MyItemClass(), 'uitests://views', 'Browser Views')
       browser.item_add(MyItemClass(), 'uitests://images', 'Browser + EmcImage')
@@ -580,7 +570,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://ev_emit', 'Event Emit')
       browser.item_add(MyItemClass(), 'uitests://notify', 'Notify Stack')
       browser.item_add(MyItemClass(), 'uitests://menu', 'Menu')
-      browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + FocusManager')
+      browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + Focus')
       browser.item_add(MyItemClass(), 'uitests://icons', 'Icons gallery')
       browser.item_add(MyItemClass(), 'uitests://imagegal', 'Images gallery')
       browser.item_add(MyItemClass(), 'uitests://styles', 'Text styles')
@@ -590,7 +580,6 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://mpvom', 'Mediaplayer - Online Video (med)')
       browser.item_add(MyItemClass(), 'uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
       browser.item_add(MyItemClass(), 'uitests://tmdb', 'Themoviedb.org query with gui')
-      browser.item_add(MyItemClass(), 'uitests://vkbd', 'Virtual Keyboard')
       browser.item_add(MyItemClass(), 'uitests://sselector', 'Source Selector')
       browser.item_add(MyItemClass(), 'uitests://dlg-info', 'Dialog - Info')
       browser.item_add(MyItemClass(), 'uitests://dlg-warning', 'Dialog - Warning')

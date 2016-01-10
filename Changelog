@@ -8,6 +8,7 @@ Changes:
 
  * Dropped python 2 support, you MUST use python 3 from now on
  * Removed broken traileraddict channel (use the new tmdb instead)
+ * Use elm focus in place of the custom EmcFocusManager
 
 
 Bug fixed:
@@ -33,6 +34,7 @@ New features:
  * Better zapiks video schannel
  * Cache to file remote images for faster reloading
  * Support remote urls also in the mediaplayer cover image
+ * Virtual keybord is now also usable with the real keyboard
 
 
 ===============================================================================

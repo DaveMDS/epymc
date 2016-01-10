@@ -2,6 +2,9 @@
 TMP
 ====
 
+ * double-click in genlist that open a dialog brake the hilight !!!
+
+ 
  * TASTIERA!!! non posso cambiare il foramto delle date  :(
  * CONFIG->GENERAL renderizza male al primo colpo :(
  
@@ -19,8 +22,10 @@ TMP
  * new text styles: mi piace, etc...
  * update italian translation
  * migliorare grafica dei dialog
- * Coverflow browser view
  * require efl >= 1.17 (and use setup.py efl stuff)
+
+ * show activity icon in topbar (in place of the home btn)
+
 
 
 BUGS

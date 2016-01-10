@@ -46,32 +46,16 @@ def DBG(msg):
 
 class FilemanList(List):
    def __init__(self):
-      List.__init__(self, gui.layout, style='browser', focus_allow=False)
-      self.last_focused_item = None
+      List.__init__(self, gui.layout, style='browser')
       self.current_folder = None
       self.fmonitor = None
-      self.callback_activated_add(self.item_activated_cb)
+      self.callback_item_focused_add(self.item_focused_cb)
+      self.callback_clicked_double_add(self.item_activated_cb)
 
-   def focus(self):
-      if not self.last_focused_item:
-         self.last_focused_item = self.first_item
-      self.last_focused_item.selected = True
-
-   def unfocus(self):
-      if self.selected_item:
-         self.last_focused_item = self.selected_item
-         self.selected_item.selected = False
-
-   def focus_move(self, direction):
-      if direction == 'd':
-         if self.selected_item.next:
-            self.selected_item.next.show()
-            self.selected_item.next.selected = True
-      elif direction == 'u':
-         if self.selected_item.prev:
-            self.selected_item.prev.show()
-            self.selected_item.prev.selected = True
-      self.last_focused_item = self.selected_item
+   def item_focused_cb(self, li, item):
+      # TODO this have bug in elm when item is selected with the mouse
+      # the reported item is wrong !!
+      item.selected = True
 
    def item_activated_cb(self, li=None, item=None):
       if item is None:
@@ -82,7 +66,6 @@ class FilemanList(List):
          gui.EmcSourcesManager('filemanager')
 
    def clear(self):
-      self.last_focused_item = None
       if self.fmonitor is not None:
          self.fmonitor.delete()
          self.fmonitor = None
@@ -90,6 +73,7 @@ class FilemanList(List):
 
    def populate_root(self, favorites):
       self.clear()
+
       for path in favorites:
          if path.startswith('file://'):
             path = path[7:]
@@ -104,6 +88,7 @@ class FilemanList(List):
       it.data['path'] = 'fav'
       self.go()
       self.first_item.selected = True
+      self.first_item.focus = True
       self.current_folder = None
 
    def populate(self, folder):
@@ -143,6 +128,7 @@ class FilemanList(List):
       # start the list and select the first item
       self.go()
       self.first_item.selected = True
+      self.first_item.focus = True
       self.current_folder = folder
 
       # keep the folder monitored for changes
@@ -180,8 +166,7 @@ class FilemanList(List):
 
       # insert the new file before search or at the end
       name = os.path.basename(path)
-      it = self.item_insert_before(s, name) if s else \
-           self.item_append(name)
+      it = self.item_insert_before(s, name) if s else self.item_append(name)
       it.data['path'] = path
       self.go()
 
@@ -197,7 +182,7 @@ class FilemanList(List):
       name = os.path.basename(path)
       icon = gui.load_icon('icon/folder')
       it = self.item_insert_before(s, name, icon) if s else \
-           self.item_append(name, icon)
+                                                   self.item_append(name, icon)
       it.data['path'] = path
       it.data['isfolder'] = True
       self.go()
@@ -206,10 +191,12 @@ class FilemanList(List):
       item = self.first_item
       while item and item.data.get('path') != path:
          item = item.next
+      if item and item.selected:
+         to_sel = item.prev or item.next
+         to_sel.selected = True
       if item:
-         if item == self.last_focused_item:
-            self.last_focused_item = item.prev
          item.delete()
+
 
 class FileManagerModule(EmcModule):
    name = 'filemanager'
@@ -221,8 +208,7 @@ class FileManagerModule(EmcModule):
       self.ui_built = False
       self.list1 = None
       self.list2 = None
-      self.focused = None
-      self.focusman = gui.EmcFocusManager()
+      self.widgets = list()
       self.worker = FileManagerWorker()
       mainmenu.item_add('fileman', 60, _('File Manager'), 'icon/folder',
                         self.cb_mainmenu)
@@ -237,75 +223,92 @@ class FileManagerModule(EmcModule):
       if self.list1: self.list1.clear()
       if self.list2: self.list2.clear()
 
-   def cb_mainmenu(self, url=None):
+   def show(self):
       self.build_ui()
-      mainmenu.hide()
       gui.signal_emit('fileman,show')
       gui.signal_emit('topbar,show')
       gui.text_set('topbar.title', _('File Manager'))
       input_events.listener_add('fileman', self.input_event_cb)
+      for w in self.widgets:
+         w.focus_allow = True
+      self.list1.first_item.focus = True
+      self.list1.first_item.selected = True
+
+   def hide(self):
+      for w in self.widgets:
+         w.focus = False
+         w.focus_allow = False
+      input_events.listener_del('fileman')
+      gui.signal_emit('fileman,hide')
+      gui.signal_emit('topbar,hide')
+      mainmenu.show()
+
+   def cb_mainmenu(self, url=None):
+      mainmenu.hide()
+      self.show()
 
    def build_ui(self):
       if self.ui_built:
          return
 
       b = gui.EmcButton(_('New folder'), size_hint_align=FILL_HORIZ)
-      self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_newfolder_cb)
       b.data['cb'] = self.bt_newfolder_cb
       gui.box_append('fileman.buttons.box', b)
+      self.widgets.append(b)
 
       b = gui.EmcButton(_('Copy'), size_hint_align=FILL_HORIZ)
-      self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_copy_cb)
       b.data['cb'] = self.bt_copy_cb
       gui.box_append('fileman.buttons.box', b)
+      self.widgets.append(b)
 
       b = gui.EmcButton(_('Move'), size_hint_align=FILL_HORIZ)
-      self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_move_cb)
       b.data['cb'] = self.bt_move_cb
       gui.box_append('fileman.buttons.box', b)
+      self.widgets.append(b)
 
       b = gui.EmcButton(_('Rename'), size_hint_align=FILL_HORIZ)
-      self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_rename_cb)
       b.data['cb'] = self.bt_rename_cb
       gui.box_append('fileman.buttons.box', b)
+      self.widgets.append(b)
 
       b = gui.EmcButton(_('Delete'), size_hint_align=FILL_HORIZ)
-      self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_delete_cb)
       b.data['cb'] = self.bt_delete_cb
       gui.box_append('fileman.buttons.box', b)
+      self.widgets.append(b)
 
       b = gui.EmcButton(_('Favorites'), size_hint_align=FILL_HORIZ)
-      self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_favorites_cb)
       b.data['cb'] = self.bt_favorites_cb
       gui.box_append('fileman.buttons.box2', b)
+      self.widgets.append(b)
 
       b = gui.EmcButton(_('Close'), size_hint_align=FILL_HORIZ)
-      self.focusman.obj_add(b)
       b.callback_clicked_add(self.bt_close_cb)
       b.data['cb'] = self.bt_close_cb
       gui.box_append('fileman.buttons.box2', b)
+      self.widgets.append(b)
 
       li = FilemanList() 
       gui.swallow_set('fileman.list1.swallow', li)
       li.populate_root(ini.get_string_list('filemanager', 'folders', ';'))
-      li.callback_selected_add(self.list_item_selected_cb)
+      li.callback_focused_add(self.list_focused_cb)
+      self.widgets.append(li)
       self.list1 = li
+      li.show() # this is wrong, but needed to make focus work on first show
 
       li = FilemanList()
       gui.swallow_set('fileman.list2.swallow', li)
       li.populate_root(ini.get_string_list('filemanager', 'folders', ';'))
-      li.callback_selected_add(self.list_item_selected_cb)
+      li.callback_focused_add(self.list_focused_cb)
+      self.widgets.append(li)
       self.list2 = li
+      li.show() # this is wrong, but needed to make focus work on first show
 
-      self.list1.first_item.selected = True
-      self.focused = self.list1
-      self.focusman.unfocus()
       self.ui_built = True
 
    def bt_rename_cb(self, bt):
@@ -360,55 +363,26 @@ class FileManagerModule(EmcModule):
       li = self.list1 if self.list1.selected_item else self.list2
       li.populate_root(ini.get_string_list('filemanager', 'folders', ';'))
 
-   def bt_close_cb(self, bt=None):
-      input_events.listener_del('fileman')
-      mainmenu.show()
-      gui.signal_emit('fileman,hide')
-      gui.signal_emit('topbar,hide')
+   def bt_close_cb(self, bt):
+      self.hide()
 
-   def list_item_selected_cb(self, li, it):
-      if li == self.list1:
-         self.list2.unfocus()
-      else:
-         self.list1.unfocus()
-      self.focused = li
-      self.focusman.unfocus()
+   def list_focused_cb(self, li):
+      other = self.list2 if li == self.list1 else self.list1
+      try:
+         other.selected_item.selected = False
+      except: pass # no selected item
 
    def input_event_cb(self, event):
-      DBG(event)
-      if event == 'DOWN':
-         self.focused.focus_move('d')
-            
-      elif event == 'UP':
-         self.focused.focus_move('u')
 
-      elif event == 'RIGHT':
-         if self.focused == self.list1:
-            self.focused = self.focusman
-            self.focusman.focus()
-         elif self.focused == self.focusman:
-            self.list2.focus()
-            self.focusman.unfocus()
-            self.focused = self.list2
-
-      elif event == 'LEFT':
-         if self.focused == self.list2:
-            self.focused = self.focusman
-            self.focusman.focus()
-         elif self.focused == self.focusman:
-            self.list1.focus()
-            self.focusman.unfocus()
-            self.focused = self.list1
-
-      elif event in ('OK'):
-         if self.focused in (self.list1, self.list2):
-            self.focused.item_activated_cb()
-         else:
-            bt = self.focusman.focused_obj_get()
-            bt.data['cb'](bt)
+      if event == 'OK':
+         focused = gui.win.focused_object
+         if isinstance(focused, gui.EmcButton) and focused in self.widgets:
+            focused.data['cb'](focused)
+         elif focused in (self.list1, self.list2):
+            focused.item_activated_cb()
 
       elif event == 'BACK':
-         self.bt_close_cb()
+         self.hide()
 
       else:
          return input_events.EVENT_CONTINUE

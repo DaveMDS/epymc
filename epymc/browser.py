@@ -23,7 +23,7 @@ from __future__ import absolute_import, print_function
 import os
 import sys
 
-from efl import evas, ecore, elementary
+from efl import evas, ecore, elementary as elm
 from efl.elementary.genlist import Genlist, GenlistItem, GenlistItemClass,\
    ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS, ELM_GENLIST_ITEM_SCROLLTO_TOP, \
    ELM_GENLIST_ITEM_SCROLLTO_MIDDLE, ELM_GENLIST_ITEM_SCROLLTO_IN
@@ -35,8 +35,8 @@ from efl.elementary.label import Label, ELM_WRAP_NONE, \
 from epymc import gui, mainmenu, input_events, ini
 from epymc.sdb import EmcDatabase
 from epymc.utils import Singleton
-from epymc.gui import EmcImage, EmcScrolledEntry, EmcButton, \
-   EmcFocusManager, EmcDialog, EXPAND_BOTH, FILL_BOTH
+from epymc.gui import EmcImage, EmcScrolledEntry, EmcButton, EmcDialog, \
+   EXPAND_BOTH, FILL_BOTH
 
 def DBG(msg):
    # print('BROWSER: %s' % msg)
@@ -66,8 +66,6 @@ def init():
    ini.get('general', 'view_covergrid_size', default_value=150)
 
     # fill buttons box in topbar
-   _topbar_fman = EmcFocusManager('topbar')
-   _topbar_fman.unfocus()
    topbar_button_add('view_list', 'icon/view_list',
                      input_events.event_emit, 'VIEW_LIST')
    topbar_button_add('view_postergrid', 'icon/view_postergrid',
@@ -85,7 +83,6 @@ def topbar_button_add(name, icon, cb_func, *cb_args):
    bt.data['cb_func'] = cb_func
    bt.data['cb_args'] = cb_args
    gui.box_append('topbar.box', bt)
-   _topbar_fman.obj_add(bt)
    bt.show()
 
 def _topbar_buttons_cb(bt):
@@ -361,10 +358,6 @@ class EmcBrowser(object):
       # recreate the page
       self.refresh(hard=True)
 
-      # give focus to the new view
-      self.current_view.focus()
-      _topbar_fman.unfocus()
-
    def clear(self):
       """ TODO Function doc """
       pass #TODO implement
@@ -429,28 +422,17 @@ class EmcBrowser(object):
       cb(self, url, *args, **kwargs)
 
    def _input_event_cb(self, event):
-      # focus is on top bar:
-      if _topbar_fman.has_focus:
-         if event == 'OK':
-            btn = _topbar_fman.focused_obj_get()
-            _topbar_buttons_cb(btn)
-            return input_events.EVENT_BLOCK
-         elif event == 'DOWN':
-            _topbar_fman.unfocus()
-            self.current_view.focus()
-            return input_events.EVENT_BLOCK
+      # topbar buttons
+      if event == 'OK' and isinstance(gui.win.focused_object, EmcButton):
+         _topbar_buttons_cb(gui.win.focused_object)
+         return input_events.EVENT_BLOCK
 
-      # focus is on the view (pass the event to view):
-      else:
-         view_ret = self.current_view.input_event_cb(event)
-         if view_ret == input_events.EVENT_BLOCK:
-            return view_ret
-         if event in ('UP', 'RIGHT'):
-            self.current_view.unfocus()
-            _topbar_fman.focus()
-            return input_events.EVENT_BLOCK
+      # pass the event to the view
+      view_ret = self.current_view.input_event_cb(event)
+      if view_ret == input_events.EVENT_BLOCK:
+         return input_events.EVENT_BLOCK
 
-      # always:
+      # always
       if event == 'BACK':
          self.back()
          return input_events.EVENT_BLOCK
@@ -497,13 +479,14 @@ class ViewList(object):
       """
       DBG('Init view: plain list')
 
-      self._last_focused_item = None
       self._timer1 = self._timer2 = None
       self.items_count = 0;            # This is accessed from the browser
 
       # EXTERNAL Genlists
-      self.gl1 = gui.part_get('browser.list.genlist1')
-      self.gl2 = gui.part_get('browser.list.genlist2')
+      self.gl1 = Genlist(gui.layout)
+      gui.swallow_set('browser.list.genlist1', self.gl1)
+      self.gl2 = Genlist(gui.layout)
+      gui.swallow_set('browser.list.genlist2', self.gl2)
       self.current_list = self.gl1
 
       for gl in (self.gl1, self.gl2):
@@ -542,6 +525,8 @@ class ViewList(object):
       """
       DBG('page show ' + str(anim))
 
+      self.current_list.focus_allow = False
+
       if (anim != ANIM_NONE):
          if self.current_list == self.gl1:
             self.current_list = self.gl2
@@ -555,6 +540,7 @@ class ViewList(object):
 
       self.current_list.clear()
       self.items_count = 0
+      self.current_list.focus_allow = True
 
    def item_add(self, item_class, url, user_data, selected=False):
       """
@@ -570,7 +556,7 @@ class ViewList(object):
       item_data = (item_class, url, user_data)                                  # Master3 #
       it = self.current_list.item_append(self.itc, item_data)
       if selected or not self.current_list.selected_item_get():
-         it.selected_set(1)
+         it.selected = True
          it.show()
 
       self.items_count += 1
@@ -588,6 +574,10 @@ class ViewList(object):
       gui.signal_emit('browser,list,hide')
       gui.signal_emit('browser,list,info,hide')
       self._ase.autoscroll = False
+      self.gl1.focus = False
+      self.gl2.focus = False
+      self.gl1.focus_allow = False
+      self.gl2.focus_allow = False
 
    def clear(self):
       """ Clear the view """
@@ -620,15 +610,6 @@ class ViewList(object):
       else:
          item.show(mode)
 
-   def focus(self):
-      """ give focus to the view, selecting an item """
-      item =  self._last_focused_item or self.current_list.first_item
-      item.selected = True
-
-   def unfocus(self):
-      """ remove the focus to the view, unselect the selected item """
-      self.current_list.selected_item.selected = False
-
    def selected_url_get(self):
       """ return the url of the currently hilighted item """
       item = self.current_list.selected_item_get()
@@ -638,25 +619,9 @@ class ViewList(object):
 
    def input_event_cb(self, event):
       """ Here you can manage input events for the view """
-
-      item = self.current_list.selected_item_get()
-      (item_class, url, user_data) = item.data_get()                            # 3 #
-
-      if event == 'DOWN':
-         next = item.next_get()
-         if next:
-            next.selected = True
-            next.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
-            return input_events.EVENT_BLOCK
-
-      elif event == 'UP':
-         prev = item.prev_get()
-         if prev:
-            prev.selected = True
-            prev.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
-            return input_events.EVENT_BLOCK
-
-      elif event == 'OK':
+      if event == 'OK' and self.current_list.focus == True:
+         item = self.current_list.selected_item
+         (item_class, url, user_data) = item.data_get()                         # 3 #
          item_class.item_selected(url, user_data)
          return input_events.EVENT_BLOCK
 
@@ -688,17 +653,20 @@ class ViewList(object):
    def _cb_item_realized(self, gl, item):
       # force show/hide of icons, otherwise the genlist cache mechanism will
       # remember icons from previus usage of the item
+      # TODO: this is probably no more needed (fixed in elm)
       item.signal_emit('icon,show' if item.part_content_get('elm.swallow.icon') \
                        else 'icon,hide', 'emc')
       item.signal_emit('end,show' if item.part_content_get('elm.swallow.end') \
                        else 'end,hide', 'emc')
+      # give focus if the item is selected
+      if item.selected:
+         item.focus = True
 
    def _cb_item_selected(self, gl, item):
       (item_class, url, user_data) = item.data_get()                            # 3 #
       item_class.item_selected(url, user_data)
 
    def _cb_item_hilight(self, gl, item):
-      self._last_focused_item = item
       self._clear_timers()
       self._timer1 = ecore.timer_add(0.5, self._info_timer_cb, item.data_get())
       self._timer2 = ecore.timer_add(1.0, self._backdrop_timer_cb, item.data_get())
@@ -757,7 +725,6 @@ class ViewPosterGrid(object):
       """ TODO Function doc """
       DBG('Init view: ' + type(self).__name__)
       self.items_count = 0
-      self._last_focused_item = None
       self._timer1 = self._timer2 = None
       self.setup_theme_hooks()
 
@@ -769,6 +736,7 @@ class ViewPosterGrid(object):
                         size_hint_expand=EXPAND_BOTH, size_hint_fill=FILL_BOTH)
       self.gg.callback_selected_add(self.gg_higlight)
       self.gg.callback_clicked_double_add(self.gg_selected)
+      self.gg.callback_realized_add(self._cb_item_realized)
       gui.swallow_set(self._grid_swallow, self.gg)
 
       # RemoteImage (cover)
@@ -809,11 +777,15 @@ class ViewPosterGrid(object):
       size = ini.get_int('general', 'view_postergrid_size')
       self.gg.item_size = size, int(size * 1.5)
       gui.signal_emit(self._signal_show)
+      self.gg.focus_allow = True
+      self.gg.focus = True
 
    def hide(self):
       self._clear_timers()
       gui.signal_emit(self._signal_hide)
       gui.signal_emit(self._signal_info_hide)
+      self.gg.focus = False
+      self.gg.focus_allow = False
 
    def clear(self):
       self._clear_timers()
@@ -841,13 +813,6 @@ class ViewPosterGrid(object):
       else:
          item.show(mode)
 
-   def focus(self):
-      item =  self._last_focused_item or self.gg.first_item
-      item.selected = True
-
-   def unfocus(self):
-      self.gg.selected_item.selected = False
-
    def selected_url_get(self):
       """ return the url of the currently hilighted item """
       item = self.gg.selected_item_get()
@@ -856,65 +821,9 @@ class ViewPosterGrid(object):
          return url
 
    def input_event_cb(self, event):
-      item = self.gg.selected_item_get()
-      (item_class, url, user_data) = item.data_get()                            # 3 #
-
-      if event == 'RIGHT':
-         x1, y1 = item.pos
-         try:
-            next = item.next
-            x2, y2 = next.pos
-            if y1 == y2:
-               item.next.selected = True
-               item.next.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
-               return input_events.EVENT_BLOCK
-         except:
-            pass
-         return input_events.EVENT_CONTINUE
-
-      elif event == 'LEFT':
-         x1, y1 = item.pos
-         try:
-            prev = item.prev
-            x2, y2 = prev.pos
-            if y1 == y2:
-               item.prev.selected = True
-               item.prev.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
-               return input_events.EVENT_BLOCK
-         except:
-            pass
-         return input_events.EVENT_CONTINUE
-
-      elif event == 'UP':
-         try:
-            prev = item.prev
-            (x1, y1), (x2, y2) = item.pos, prev.pos
-            while x2 != x1:
-               prev = prev.prev
-               x2, y2 = prev.pos
-            prev.selected = True
-            prev.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
-            return input_events.EVENT_BLOCK
-         except:
-            return input_events.EVENT_CONTINUE
-
-      elif event == 'DOWN':
-         y1 = y2 = next = 0
-         try:
-            next = item.next
-            (x1, y1), (x2, y2) = item.pos, next.pos
-            while x2 != x1:
-               next = next.next
-               x2, y2 = next.pos
-         except:
-            if y2 > y1:
-               next = self.gg.last_item
-         if next:
-            next.selected = True
-            next.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
-         return input_events.EVENT_BLOCK
-
-      elif event == 'OK':
+      if event == 'OK' and self.gg.focus == True:
+         item = self.gg.selected_item
+         (item_class, url, user_data) = item.data_get()                         # 3 #
          item_class.item_selected(url, user_data)
          return input_events.EVENT_BLOCK
 
@@ -940,7 +849,6 @@ class ViewPosterGrid(object):
 
    # gengrid callbacks
    def gg_higlight(self, gg, item, *args, **kwargs):
-      self._last_focused_item = item
       self._clear_timers()
       self._timer1 = ecore.timer_add(0.5, self._info_timer_cb, item.data_get())
       self._timer2 = ecore.timer_add(1.0, self._backdrop_timer_cb, item.data_get())
@@ -948,6 +856,10 @@ class ViewPosterGrid(object):
    def gg_selected(self, gg, item, *args, **kwargs):
       (item_class, url, user_data) = item.data_get()                            # 3 #
       item_class.item_selected(url, user_data)
+
+   def _cb_item_realized(self, gg, item):
+      if item.selected:
+         item.focus = True
 
    def _info_timer_cb(self, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
@@ -1013,6 +925,8 @@ class ViewCoverGrid(ViewPosterGrid):
       size = ini.get_int('general', 'view_covergrid_size')
       self.gg.item_size = size, size
       gui.signal_emit(self._signal_show)
+      self.gg.focus_allow = True
+      self.gg.focus = True
 
    def fill_the_big_image(self, poster, cover):
       self._big_image.url_set(poster or cover)

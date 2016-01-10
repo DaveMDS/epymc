@@ -129,7 +129,8 @@ def init():
    set_theme_file(theme_file)
 
    # create the elm window
-   win = Window('epymc', ELM_WIN_BASIC, title=_('Emotion Media Center'))
+   win = Window('epymc', ELM_WIN_BASIC, title=_('Emotion Media Center'),
+                focus_allow=False)
    win.callback_delete_request_add(lambda w: ask_to_exit())
    if fullscreen == 'True':
       win.fullscreen_set(1)

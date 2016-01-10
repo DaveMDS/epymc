@@ -99,7 +99,8 @@ def init():
    conf.focus_highlight_enabled = False
    conf.focus_highlight_animate = False
    # conf.focus_autoscroll_mode = ELM_FOCUS_AUTOSCROLL_MODE_SHOW or ELM_FOCUS_AUTOSCROLL_MODE_BRING_IN
-   # conf.item_select_on_focus_disabled = True
+   conf.item_select_on_focus_disabled = False
+   conf.focus_highlight_clip_disabled = False
    # conf.softcursor_mode = ELM_SOFTCURSOR_MODE_ON
    if evas_accelerated == 'True':
       conf.accel_preference = 'accel'

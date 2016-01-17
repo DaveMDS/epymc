@@ -243,12 +243,12 @@ def play_url(url, only_audio=False, start_from=None):
       _play_real()
 
 def _resume_yes_cb(dia):
-   _play_real(start_from=dia.data_get())
    dia.delete()
+   _play_real(start_from=dia.data_get())
 
 def _resume_no_cb(dia):
-   _play_real()
    dia.delete()
+   _play_real()
 
 def _play_real(start_from=None, only_audio=False):
    global _subtitles, _subs_timer

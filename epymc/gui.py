@@ -466,13 +466,16 @@ def focus_move(direction, root_obj):
       horiz = focused.horizontal if type(focused) is List else False
       if (horiz and direction == 'RIGHT') or (not horiz and direction == 'DOWN'):
          to_item = item.next
+         while to_item and to_item.type == elm.ELM_GENLIST_ITEM_GROUP:
+            to_item = to_item.next
       elif (horiz and direction == 'LEFT') or (not horiz and direction == 'UP'):
          to_item = item.prev
-
+         while to_item and to_item.type == elm.ELM_GENLIST_ITEM_GROUP:
+            to_item = to_item.prev
       if to_item:
          to_item.selected = True
          to_item.focus = True
-         # to_item.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
+         to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
          return True
 
    # move between grid items...
@@ -484,27 +487,69 @@ def focus_move(direction, root_obj):
          to_item = item.next if direction == 'RIGHT' else item.prev
          if to_item:
             x2, y2 = to_item.pos
-            if y1 == y2:
-               to_item.selected = True
-               to_item.focus = True
-               return True
-      else: # UP, DOWN
+            if y1 != y2:
+               to_item = None
+
+      elif direction == 'DOWN':
          to_item = item
          x2, y2 = 0, 0
+         ymax = y1 + 1
          try:
             while True:
-               to_item = to_item.next if direction == 'DOWN' else to_item.prev
+               to_item = to_item.next
+               # if to_item.select_mode == elm.ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY:
+               if to_item.disabled:
+                  ymax += 1
+                  continue
                x2, y2 = to_item.pos
                if x2 == x1:
                   break
+               if y2 > ymax:
+                  while True:
+                     to_item = to_item.prev
+                     # if to_item.select_mode != elm.ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY:
+                     if not to_item.disabled:
+                        break
+                  break
          except:
-            if direction == 'DOWN':
+            if item != focused.last_item:
                to_item = focused.last_item
-         if to_item:
-            to_item.selected = True
-            to_item.focus = True
-            # prev.bring_in(ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
+            else:
+               to_item = None
+
+      else: # UP
+         to_item = item
+         x2, y2 = 0, 0
+         ymin = y1 - 1
+         try:
+            while True:
+               to_item = to_item.prev
+               # if to_item.select_mode == elm.ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY:
+               if to_item.disabled:
+                  ymin -= 1
+                  continue
+               x2, y2 = to_item.pos
+               if y2 < ymin:
+                  while True:
+                     to_item = to_item.next
+                     # if to_item.select_mode != elm.ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY:
+                     if not to_item.disabled:
+                        break
+                  break
+               if x2 == x1:
+                  break
+         except:
+            if item != focused.first_item:
+               to_item = focused.first_item
+            else:
+               to_item = None
+
+      if to_item:
+         to_item.selected = True
+         to_item.focus = True
+         to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
          return True
+
 
    # or just let elm move the focus between objects
    root_obj.focus_next(focus_directions[direction])

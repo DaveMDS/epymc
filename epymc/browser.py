@@ -294,6 +294,10 @@ class EmcBrowser(object):
       else:
          self.current_view.item_add(item_class, url, user_data)
 
+   def group_add(self, label, icon=None):
+      """ TODO DOC """
+      self.current_view.group_add(label, icon)
+      
    def back(self):
       """ TODO Function doc """
       # discard current page
@@ -482,6 +486,7 @@ class ViewList(object):
       DBG('Init view: plain list')
 
       self._timer1 = self._timer2 = None
+      self._current_group_item = None
       self.items_count = 0;            # This is accessed from the browser
 
       # EXTERNAL Genlists
@@ -506,6 +511,8 @@ class ViewList(object):
       self.itc = GenlistItemClass(item_style='default',
                                   text_get_func=self.__gl_text_get,
                                   content_get_func=self.__gl_content_get)
+      self.itc_g = GenlistItemClass(item_style='group_index',
+                                    text_get_func=self.__gl_group_text_get)
 
       # RemoteImage (poster)
       self._poster = EmcImage()
@@ -528,6 +535,7 @@ class ViewList(object):
       DBG('page show ' + str(anim))
 
       self.current_list.focus_allow = False
+      self._current_group_item = None
 
       if (anim != ANIM_NONE):
          if self.current_list == self.gl1:
@@ -556,7 +564,8 @@ class ViewList(object):
       """
       DBG('item_add(%s)' % (url))
       item_data = (item_class, url, user_data)                                  # Master3 #
-      it = self.current_list.item_append(self.itc, item_data)
+      it = self.current_list.item_append(self.itc, item_data,
+                                         parent_item=self._current_group_item)
       if selected or not self.current_list.selected_item_get():
          it.selected = True
          it.show()
@@ -564,6 +573,13 @@ class ViewList(object):
       self.items_count += 1
       gui.text_set('browser.list.total',
          ngettext('%d item', '%d items', self.items_count) % (self.items_count))
+
+   def group_add(self, label, icon=None):
+      item_data = (label, icon)                                                 # g #
+      it = self.current_list.item_append(self.itc_g, item_data,
+                                         flags=elm.ELM_GENLIST_ITEM_GROUP)
+      it.select_mode = elm.ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY
+      self._current_group_item = it
 
    def show(self):
       """ Show the view """
@@ -587,6 +603,7 @@ class ViewList(object):
       self.gl1.clear()
       self.gl2.clear()
       self.items_count = 0
+      self._current_group_item = None
 
    def refresh(self):
       """ Refresh the view """
@@ -651,6 +668,10 @@ class ViewList(object):
          icon = item_class.icon_end_get(url, user_data)
          return EmcImage(icon) if icon else None
 
+   def __gl_group_text_get(self, obj, part, item_data):
+      label, icon = item_data                                                   # g #
+      return label
+   
    ### GenList Callbacks
    def _cb_item_realized(self, gl, item):
       # force show/hide of icons, otherwise the genlist cache mechanism will
@@ -733,12 +754,15 @@ class ViewPosterGrid(object):
       # Gengrid
       self.itc = GengridItemClass(item_style='default',
                                   content_get_func=self.gg_content_get)
+      self.itc_g = GengridItemClass(item_style='group_index',
+                                    text_get_func=self.gg_group_text_get)
       self.gg = Gengrid(gui.win, style='browser', focus_allow=False,
                         align=(0.5, 0.0),
                         size_hint_expand=EXPAND_BOTH, size_hint_fill=FILL_BOTH)
       self.gg.callback_selected_add(self.gg_higlight)
       self.gg.callback_clicked_double_add(self.gg_selected)
       self.gg.callback_realized_add(self._cb_item_realized)
+      self.gg.callback_focused_add(self._cb_focused)
       gui.swallow_set(self._grid_swallow, self.gg)
 
       # RemoteImage (cover)
@@ -774,6 +798,12 @@ class ViewPosterGrid(object):
       self.items_count += 1
       gui.text_set(self._total_text,
          ngettext('%d item', '%d items', self.items_count) % (self.items_count))
+
+   def group_add(self, label, icon=None):
+      item_data = (label, icon)                                                 # g #
+      it = self.gg.item_append(self.itc_g, item_data)
+      it.select_mode = elm.ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY
+      it.disabled = True
 
    def show(self):
       size = ini.get_int('general', 'view_postergrid_size')
@@ -851,6 +881,10 @@ class ViewPosterGrid(object):
          if icon:
             return EmcImage(icon)
 
+   def gg_group_text_get(self, obj, part, item_data):
+      label, icon = item_data                                                   # g #
+      return label
+
    # gengrid callbacks
    def gg_higlight(self, gg, item, *args, **kwargs):
       self._clear_timers()
@@ -865,6 +899,12 @@ class ViewPosterGrid(object):
       if item.selected:
          item.focus = True
 
+   def _cb_focused(self, gg):
+      # try to fix focus-on-item restore
+      if gg.focused_item is None:
+         gg.selected_item.focus = True
+      
+   
    def _info_timer_cb(self, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
 

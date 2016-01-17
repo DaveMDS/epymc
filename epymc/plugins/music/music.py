@@ -174,7 +174,11 @@ class AlbumItemClass(EmcItemClass):
                              _mod._styles, _mod.populate_album_page, album)
 
    def label_get(self, url, album):
-      return utf8_to_markup(_('%(name)s by %(artist)s') % (album))
+      # return utf8_to_markup(_('%(name)s by %(artist)s') % (album))
+      return utf8_to_markup(album['name'])
+
+   def icon_get(self, url, album):
+      return _mod.search_poster_for_album(album)
 
    def cover_get(self, url, album):
       return _mod.search_poster_for_album(album)
@@ -595,7 +599,11 @@ class MusicModule(EmcModule):
    def populate_albums_page(self, browser, page_url):
       """ list of all albums """
       L = [self._albums_db.get_data(k) for k in self._albums_db.keys()]
-      for album in sorted(L, key=operator.itemgetter('name')):
+      last_artist = None
+      for album in sorted(L, key=operator.itemgetter('artist')):
+         if album['artist'] != last_artist:
+            last_artist = album['artist']
+            self._browser.group_add(last_artist)
          self._browser.item_add(AlbumItemClass(), album['name'], album)
 
    def populate_artists_page(self, browser, page_url):

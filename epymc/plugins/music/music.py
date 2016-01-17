@@ -148,7 +148,7 @@ class SongItemClass(EmcItemClass):
       except:
          return title
 
-   def poster_get(self, url, song):
+   def cover_get(self, url, song):
       return _mod.search_poster_for_song(url, song)
 
    def info_get(self, url, song):
@@ -176,7 +176,7 @@ class AlbumItemClass(EmcItemClass):
    def label_get(self, url, album):
       return utf8_to_markup(_('%(name)s by %(artist)s') % (album))
 
-   def poster_get(self, url, album):
+   def cover_get(self, url, album):
       return _mod.search_poster_for_album(album)
 
    def info_get(self, url, album):
@@ -204,7 +204,7 @@ class ArtistItemClass(EmcItemClass):
    def label_get(self, url, artist):
       return utf8_to_markup(artist['name'])
 
-   def poster_get(self, url, artist):
+   def cover_get(self, url, artist):
       return _mod.search_poster_for_artist(artist)
 
    def info_get(self, url, artist):

@@ -842,6 +842,8 @@ class ViewPosterGrid(object):
             label = item_class.label_get(url, user_data)
             label2 = item_class.label_end_get(url, user_data)
             icon = item_class.icon_get(url, user_data)
+            if icon is None:
+               icon = item_class.cover_get(url, user_data)
             return EmcImage('special/icon/' + label, icon=icon, label2=label2)
 
       if part == 'elm.swallow.end':

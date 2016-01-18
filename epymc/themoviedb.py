@@ -124,7 +124,7 @@ class TMDBv3(object):
          utils.download_abort(self.dwl_handler)
          self.dwl_handler = None
       if self.api_handler:
-         utils.download_abort(self.api_handler)
+         self.api_handler.delete()
          self.api_handler = None
 
    #### api helpers  ##########################################################
@@ -136,13 +136,12 @@ class TMDBv3(object):
    def _api_call(self, callback, cb_data, entry_point, **kargs):
       url = self._api_url(entry_point, **kargs)
       DBG('TMDB API CALL: ' + url)
-      self.api_handler = utils.download_url_async(url, urlencode=False,
-                           complete_cb=self._api_call_done_cb,
-                           user_callback=callback, user_data=cb_data)
+      self.api_handler = utils.EmcUrl(url, done_cb=self._api_call_done_cb,
+                                      user_callback=callback, user_data=cb_data)
 
-   def _api_call_done_cb(self, dest, status, user_callback, user_data):
+   def _api_call_done_cb(self, url, status, data, user_callback, user_data):
       self.api_handler = None
-      api_data = self._read_json_file_and_delete_it(dest)
+      api_data = json.loads(data)
       if user_data:
          user_callback(api_data, user_data)
       else:
@@ -151,12 +150,6 @@ class TMDBv3(object):
    def _img_url(self, final_part, size):
       if final_part:
          return self.base_url_img + '/' + size + final_part
-
-   def _read_json_file_and_delete_it(self, path):
-      with codecs.open(path, encoding='utf8') as f:
-         data = json.loads(f.read())
-      os.remove(path)
-      return data
 
    #### movie search ##########################################################
    def movie_search(self, name, year, done_cb):

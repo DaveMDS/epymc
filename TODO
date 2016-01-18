@@ -24,6 +24,8 @@ TMP
  * migliorare grafica dei dialog
  * require efl >= 1.17 (and use setup.py efl stuff)
 
+ * use EmcUrl where needed
+
 
 
 BUGS

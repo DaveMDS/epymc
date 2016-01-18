@@ -9,6 +9,8 @@ Changes:
  * Dropped python 2 support, you MUST use python 3 from now on
  * Removed broken traileraddict channel (use the new tmdb instead)
  * Use elm focus in place of the custom EmcFocusManager
+ * We now use ecore_con.Url for fetching data from the net (instead of
+   ecore.file_download + file read + file delete)
 
 
 Bug fixed:

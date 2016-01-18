@@ -28,7 +28,9 @@ except:
    from urllib import quote as urllib_quote
 
 from efl import ecore
-from efl.ecore import FileDownload, Exe, ECORE_EXE_PIPE_READ, ECORE_EXE_PIPE_READ_LINE_BUFFERED
+from efl import ecore_con
+from efl.ecore import FileDownload, Exe, \
+   ECORE_EXE_PIPE_READ, ECORE_EXE_PIPE_READ_LINE_BUFFERED
 
 
 def DBG(msg):
@@ -544,3 +546,38 @@ class EmcExec(object):
       if callable(self.done_cb):
          self.done_cb(self.outbuffer, *self.args, **self.kargs)
 
+
+class EmcUrl(ecore_con.Url):
+   """
+   A timy wrapper around ecore_con.Url to retrive an url in memory without
+   writing the data to a file, and without the need to accumulate the data
+   while they are received.
+   The download will automatically start on class instantiation.
+   The downloaded data (bytes) will be converted to str using utf8 encoding.
+
+   Args:
+      url: the url to retrive
+      done_cb: function to call when the operation is completed
+      prog_cb: function to call while the operation is in progress
+      **kargs: any other karguments will be passed back in the complete cb
+   """
+   def __init__(self, url, done_cb=None, prog_cb=None, **kargs):
+      self.done_cb = done_cb
+      self.kargs = kargs
+      self.received_data = []
+
+      ecore_con.Url.__init__(self, url)
+      self.on_complete_event_add(self._complete_cb)
+      self.on_data_event_add(self._data_cb)
+      if prog_cb is not None:
+         self.on_progress_event_add(prog_cb)
+
+      self.get()
+
+   def _complete_cb(self, event):
+      data = ''.join(self.received_data)
+      self.done_cb(event.url, event.status, data, **self.kargs)
+      self.delete()
+
+   def _data_cb(self, event):
+      self.received_data.append(event.data.decode('utf8'))

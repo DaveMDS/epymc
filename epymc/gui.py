@@ -458,17 +458,32 @@ focus_directions = {
 def focus_move(direction, root_obj):
    """ TODOC """
 
-   # move between lists items...
    focused = root_obj.focused_object
-   if isinstance(focused, (Genlist, List)) and focused.focus_allow:
+
+   # move between List items...
+   if isinstance(focused, List) and focused.focus_allow:
       item = focused.focused_item
       to_item = None
-      horiz = focused.horizontal if type(focused) is List else False
+      horiz = focused.horizontal
       if (horiz and direction == 'RIGHT') or (not horiz and direction == 'DOWN'):
+         to_item = item.next
+      elif (horiz and direction == 'LEFT') or (not horiz and direction == 'UP'):
+         to_item = item.prev
+      if to_item:
+         to_item.selected = True
+         to_item.focus = True
+         to_item.bring_in()
+         return True
+
+   # move between Genlist items...
+   elif isinstance(focused, Genlist) and focused.focus_allow:
+      item = focused.focused_item
+      to_item = None
+      if direction == 'DOWN':
          to_item = item.next
          while to_item and to_item.type == elm.ELM_GENLIST_ITEM_GROUP:
             to_item = to_item.next
-      elif (horiz and direction == 'LEFT') or (not horiz and direction == 'UP'):
+      elif direction == 'UP':
          to_item = item.prev
          while to_item and to_item.type == elm.ELM_GENLIST_ITEM_GROUP:
             to_item = to_item.prev
@@ -478,7 +493,7 @@ def focus_move(direction, root_obj):
          to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
          return True
 
-   # move between grid items...
+   # move between Gengrid items...
    elif isinstance(focused, Gengrid) and focused.focus_allow:
       item = focused.focused_item
       x1, y1 = item.pos

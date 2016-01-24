@@ -796,6 +796,8 @@ class ViewPosterGrid(object):
    def show(self):
       size = ini.get_int('general', 'view_postergrid_size')
       self.gg.item_size = size, int(size * 1.5)
+      self.gg.group_item_size = 22,22 # TODO read from theme and scale mult
+
       gui.signal_emit(self._signal_show)
       self.gg.focus_allow = True
       self.gg.focus = True
@@ -950,6 +952,8 @@ class ViewCoverGrid(ViewPosterGrid):
    def show(self):
       size = ini.get_int('general', 'view_covergrid_size')
       self.gg.item_size = size, size
+      self.gg.group_item_size = 22,22 # TODO read from theme and scale mult
+
       gui.signal_emit(self._signal_show)
       self.gg.focus_allow = True
       self.gg.focus = True

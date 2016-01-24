@@ -114,7 +114,10 @@ class PhotoItemClass(EmcItemClass):
                   _('Format'), i.format, i.mode)
 
          # exif info
-         exif_dict = extract_usefull_exif(i)
+         try:
+            exif_dict = extract_usefull_exif(i)
+         except:
+            exif_dict = {}
          exif = []
          for name, value in exif_dict.items():
             exif.append('<name>{}:</name> <value>{}</value>'.format(name, value))

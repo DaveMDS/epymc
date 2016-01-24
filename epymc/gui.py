@@ -800,6 +800,8 @@ class EmcButton(Button):
       self.content_set(load_icon(icon))
 
    def activate(self, obj=None):
+      if obj is None:
+         self.signal_emit("elm,anim,activate", "elm")
       if callable(self._cb):
          if self._cb_data is not None:
             self._cb(self, self._cb_data)

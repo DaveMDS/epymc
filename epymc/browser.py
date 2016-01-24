@@ -66,28 +66,22 @@ def init():
    ini.get('general', 'view_covergrid_size', default_value=150)
 
     # fill buttons box in topbar
-   topbar_button_add('view_list', 'icon/view_list',
-                     input_events.event_emit, 'VIEW_LIST')
-   topbar_button_add('view_postergrid', 'icon/view_postergrid',
-                     input_events.event_emit, 'VIEW_POSTERGRID')
-   topbar_button_add('view_covergrid', 'icon/view_covergrid',
-                     input_events.event_emit, 'VIEW_COVERGRID')
+   topbar_button_add(icon='icon/view_list',
+                     cb=lambda b: input_events.event_emit('VIEW_LIST'))
+   topbar_button_add(icon='icon/view_postergrid',
+                     cb=lambda b: input_events.event_emit('VIEW_POSTERGRID'))
+   topbar_button_add(icon='icon/view_covergrid',
+                     cb=lambda b: input_events.event_emit('VIEW_COVERGRID'))
 
 def shutdown():
    global _memorydb
    del _memorydb
 
-def topbar_button_add(name, icon, cb_func, *cb_args):
-   bt = EmcButton(icon=icon)
-   bt.callback_clicked_add(_topbar_buttons_cb)
-   bt.data['cb_func'] = cb_func
-   bt.data['cb_args'] = cb_args
+def topbar_button_add(label=None, icon=None, cb=None, cb_data=None):
+   bt = EmcButton(label=label, icon=icon, cb=cb, cb_data=cb_data)
    gui.box_append('topbar.box', bt)
    bt.show()
-
-def _topbar_buttons_cb(bt):
-   cb_func, cb_args = bt.data.get('cb_func'), bt.data.get('cb_args')
-   cb_func(*cb_args) if cb_args else cb_func()
+   return bt
 
 def dump_everythings():
    print('*' * 70)
@@ -428,11 +422,6 @@ class EmcBrowser(object):
       cb(self, url, *args, **kwargs)
 
    def _input_event_cb(self, event):
-      # topbar buttons
-      if event == 'OK' and isinstance(gui.win.focused_object, EmcButton):
-         _topbar_buttons_cb(gui.win.focused_object)
-         return input_events.EVENT_BLOCK
-
       # pass the event to the view
       view_ret = self.current_view.input_event_cb(event)
       if view_ret == input_events.EVENT_BLOCK:

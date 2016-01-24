@@ -563,30 +563,22 @@ def _init_emotion():
 def _init_mediaplayer_gui():
 
    #  <<  fast backward
-   bt = EmcButton(icon='icon/fbwd')
-   bt.callback_clicked_add(_cb_btn_fbackward)
-   bt.data['cb'] = _cb_btn_fbackward
+   bt = EmcButton(icon='icon/fbwd', cb=_cb_btn_fbackward)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
    #  <   backward
-   bt = EmcButton(icon='icon/bwd')
-   bt.callback_clicked_add(_cb_btn_backward)
-   bt.data['cb'] = _cb_btn_backward
+   bt = EmcButton(icon='icon/bwd', cb=_cb_btn_backward)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
    #  stop
-   bt = EmcButton(icon='icon/stop')
-   bt.callback_clicked_add(_cb_btn_stop)
-   bt.data['cb'] = _cb_btn_stop
+   bt = EmcButton(icon='icon/stop', cb=_cb_btn_stop)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
    #  play/pause
-   bt = EmcButton(icon='icon/pause')
-   bt.callback_clicked_add(_cb_btn_play)
-   bt.data['cb'] = _cb_btn_play
+   bt = EmcButton(icon='icon/pause', cb=_cb_btn_play)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
    # store a reference to the button so we can change the icon later
@@ -594,37 +586,27 @@ def _init_mediaplayer_gui():
    _play_pause_btn = bt
 
    #  >   forward
-   bt = EmcButton(icon='icon/fwd')
-   bt.callback_clicked_add(_cb_btn_forward)
-   bt.data['cb'] = _cb_btn_forward
+   bt = EmcButton(icon='icon/fwd', cb=_cb_btn_forward)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
    
    #  >>  fast forward
-   bt = EmcButton(icon='icon/ffwd')
-   bt.callback_clicked_add(_cb_btn_fforward)
-   bt.data['cb'] = _cb_btn_fforward
+   bt = EmcButton(icon='icon/ffwd', cb=_cb_btn_fforward)
    gui.box_append('videoplayer.controls.btn_box', bt)
    _buttons.append(bt)
 
    #  submenu audio
-   bt = EmcButton(_('Audio'))
-   bt.callback_clicked_add(_build_audio_menu)
-   bt.data['cb'] = _build_audio_menu
+   bt = EmcButton(_('Audio'), cb=_build_audio_menu)
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
 
    #  submenu video
-   bt = EmcButton(_('Video'))
-   bt.callback_clicked_add(_build_video_menu)
-   bt.data['cb'] = _build_video_menu
+   bt = EmcButton(_('Video'), cb=_build_video_menu)
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
 
    #  submenu subtitles
-   bt = EmcButton(_('Subtitles'))
-   bt.callback_clicked_add(_build_subtitles_menu)
-   bt.data['cb'] = _build_subtitles_menu
+   bt = EmcButton(_('Subtitles'), cb=_build_subtitles_menu)
    gui.box_append('videoplayer.controls.btn_box2', bt)
    _buttons.append(bt)
 
@@ -956,14 +938,6 @@ def input_event_cb(event):
    if _controls_visible:
       if event == 'BACK':
          video_controls_hide()
-         return input_events.EVENT_BLOCK
-      elif event == 'OK':
-         button = gui.win.focused_object
-         cb = button.data['cb']
-         if callable(cb):
-            cb(button)
-         # TODO TRY THIS INSTEAD:
-         ## evas_object_smart_callback_call(obj, 'sig', NULL);
          return input_events.EVENT_BLOCK
    else:
       if event == 'BACK':

@@ -458,7 +458,9 @@ focus_directions = {
 def focus_move(direction, root_obj=None):
    """ TODOC """
 
-   focused = root_obj.focused_object if root_obj else layout.focused_object
+   if root_obj is None:
+      root_obj = win
+   focused = root_obj.focused_object
 
    # move between List items...
    if isinstance(focused, List) and focused.focus_allow:
@@ -570,8 +572,13 @@ def focus_move(direction, root_obj=None):
    return False
 
 def _input_event_cb(event):
+   focused = win.focused_object
+
    if event in focus_directions:
-      focus_move(event, win)
+      focus_move(event)
+
+   elif event == 'OK' and isinstance(focused, EmcButton):
+      focused.activate()
 
    elif event == 'TOGGLE_FULLSCREEN':
       fullscreen_toggle()
@@ -780,15 +787,24 @@ You should have received a copy of the GNU Lesser General Public License along w
 class EmcButton(Button):
    """ A simple wrapper around the elm Button class """
 
-   def __init__(self, label=None, icon=None, **kargs):
-      Button.__init__(self, layout, **kargs)
-      self.style_set('emc')
+   def __init__(self, label=None, icon=None, cb=None, cb_data=None, **kargs):
+      self._cb = cb
+      self._cb_data = cb_data
+      Button.__init__(self, layout, style='emc', **kargs)
+      self.callback_clicked_add(self.activate)
       if label: self.text_set(label)
       if icon: self.icon_set(icon)
       self.show()
 
    def icon_set(self, icon):
       self.content_set(load_icon(icon))
+
+   def activate(self, obj=None):
+      if callable(self._cb):
+         if self._cb_data is not None:
+            self._cb(self, self._cb_data)
+         else:
+            self._cb(self)
 
 ################################################################################
 class EmcMenu(Menu):
@@ -1192,10 +1208,7 @@ class EmcDialog(Layout):
       return self._user_data
 
    def button_add(self, label, selected_cb=None, cb_data=None, icon=None):
-      b = EmcButton(label, icon)
-      b.data['cb'] = selected_cb
-      b.data['cb_data'] = cb_data
-      b.callback_clicked_add(self._cb_buttons)
+      b = EmcButton(label, icon, selected_cb, cb_data)
       self.box_prepend('emc.box.buttons', b)
       self._buttons.append(b)
       if len(self._buttons) == 1:
@@ -1267,14 +1280,6 @@ class EmcDialog(Layout):
    def progress_set(self, val):
       self.edje.part_external_object_get('emc.dialog.progress').value_set(val)
 
-   def _cb_buttons(self, button):
-      selected_cb = button.data['cb']
-      cb_data = button.data['cb_data']
-      if selected_cb and cb_data:
-         selected_cb(button, cb_data)
-      elif selected_cb:
-         selected_cb(button)
-
    def autoscroll_enable(self, speed_scale=1.0, start_delay=3.0):
       self._textentry.autoscroll_start_delay = start_delay
       self._textentry.autoscroll_speed_scale = speed_scale
@@ -1308,7 +1313,6 @@ class EmcDialog(Layout):
                new_it.bring_in()
                return input_events.EVENT_BLOCK
 
-
       # try to scroll the text entry
       if self._textentry:
          if event == 'UP':
@@ -1320,18 +1324,17 @@ class EmcDialog(Layout):
          focus_move(event, self)
          return input_events.EVENT_BLOCK
 
-      if event == 'OK':
-         if self._buttons:
-            self._cb_buttons(self.focused_object)
-         elif self._done_cb:
+      if event == 'OK' and not isinstance(self.focused_object, EmcButton):
+         if self._done_cb:
             if self._list:
                it = self._list.selected_item
                self._list_item_activated_cb(self._list, it)
             else:
                self._done_cb(self)
+            return input_events.EVENT_BLOCK
          else:
             self.delete()
-         return input_events.EVENT_BLOCK
+            return input_events.EVENT_BLOCK
 
       return input_events.EVENT_CONTINUE
 
@@ -1412,17 +1415,14 @@ class EmcSlideshow(Slideshow):
       self._ly.signal_emit('show', 'emc')
 
       # fill the controls bar with buttons
-      bt = EmcButton(icon='icon/prev')
-      bt.callback_clicked_add(lambda b: self.previous())
+      bt = EmcButton(icon='icon/prev', cb=lambda b: self.previous())
       self._ly.box_append('controls.btn_box', bt)
 
-      bt = EmcButton(icon='icon/pause')
-      bt.callback_clicked_add(lambda b: self.pause_toggle())
+      bt = EmcButton(icon='icon/pause', cb=lambda b: self.pause_toggle())
       self._ly.box_append('controls.btn_box', bt)
       self._pause_btn = bt
 
-      bt = EmcButton(icon='icon/next')
-      bt.callback_clicked_add(lambda b: self.next())
+      bt = EmcButton(icon='icon/next', cb=lambda b: self.next())
       self._ly.box_append('controls.btn_box', bt)
 
       # fill the slideshow widget
@@ -1714,9 +1714,7 @@ class EmcVKeyboard(EmcDialog):
       self.entry.focus = True
 
    def _pack_btn(self, tb, x, y, w, h, label, icon=None, cb=None):
-      b = EmcButton(label=label, icon=icon, size_hint_align=FILL_HORIZ)
-      if cb: b.callback_clicked_add(cb)
-      b.data['cb'] = cb
+      b = EmcButton(label=label, icon=icon, cb=cb, size_hint_align=FILL_HORIZ)
       tb.pack(b, x, y, w, h)
       self.buttons.append(b)
       return b
@@ -1776,11 +1774,6 @@ class EmcVKeyboard(EmcDialog):
             elif c == '_':  btn.text = ';'
 
    def input_event_cb(self, event):
-      if event == 'OK':
-         btn = self.focused_object
-         if callable(btn.data['cb']):
-            btn.data['cb'](btn)
-            return input_events.EVENT_BLOCK
       if event == 'EXIT':
          self._dismiss_cb(None)
          return input_events.EVENT_BLOCK

@@ -259,45 +259,38 @@ class FileManagerModule(EmcModule):
       if self.ui_built:
          return
 
-      b = gui.EmcButton(_('New folder'), size_hint_align=FILL_HORIZ)
-      b.callback_clicked_add(self.bt_newfolder_cb)
-      b.data['cb'] = self.bt_newfolder_cb
+      b = gui.EmcButton(_('New folder'), cb=self.bt_newfolder_cb,
+                        size_hint_fill=FILL_HORIZ)
       gui.box_append('fileman.buttons.box', b)
       self.widgets.append(b)
 
-      b = gui.EmcButton(_('Copy'), size_hint_align=FILL_HORIZ)
-      b.callback_clicked_add(self.bt_copy_cb)
-      b.data['cb'] = self.bt_copy_cb
+      b = gui.EmcButton(_('Copy'), cb=self.bt_copy_cb,
+                        size_hint_fill=FILL_HORIZ)
       gui.box_append('fileman.buttons.box', b)
       self.widgets.append(b)
 
-      b = gui.EmcButton(_('Move'), size_hint_align=FILL_HORIZ)
-      b.callback_clicked_add(self.bt_move_cb)
-      b.data['cb'] = self.bt_move_cb
+      b = gui.EmcButton(_('Move'), cb=self.bt_move_cb,
+                        size_hint_fill=FILL_HORIZ)
       gui.box_append('fileman.buttons.box', b)
       self.widgets.append(b)
 
-      b = gui.EmcButton(_('Rename'), size_hint_align=FILL_HORIZ)
-      b.callback_clicked_add(self.bt_rename_cb)
-      b.data['cb'] = self.bt_rename_cb
+      b = gui.EmcButton(_('Rename'), cb=self.bt_rename_cb,
+                        size_hint_fill=FILL_HORIZ)
       gui.box_append('fileman.buttons.box', b)
       self.widgets.append(b)
 
-      b = gui.EmcButton(_('Delete'), size_hint_align=FILL_HORIZ)
-      b.callback_clicked_add(self.bt_delete_cb)
-      b.data['cb'] = self.bt_delete_cb
+      b = gui.EmcButton(_('Delete'), cb=self.bt_delete_cb,
+                        size_hint_fill=FILL_HORIZ)
       gui.box_append('fileman.buttons.box', b)
       self.widgets.append(b)
 
-      b = gui.EmcButton(_('Favorites'), size_hint_align=FILL_HORIZ)
-      b.callback_clicked_add(self.bt_favorites_cb)
-      b.data['cb'] = self.bt_favorites_cb
+      b = gui.EmcButton(_('Favorites'), cb=self.bt_favorites_cb,
+                        size_hint_fill=FILL_HORIZ)
       gui.box_append('fileman.buttons.box2', b)
       self.widgets.append(b)
 
-      b = gui.EmcButton(_('Close'), size_hint_align=FILL_HORIZ)
-      b.callback_clicked_add(self.bt_close_cb)
-      b.data['cb'] = self.bt_close_cb
+      b = gui.EmcButton(_('Close'), cb=self.bt_close_cb,
+                        size_hint_fill=FILL_HORIZ)
       gui.box_append('fileman.buttons.box2', b)
       self.widgets.append(b)
 
@@ -384,18 +377,15 @@ class FileManagerModule(EmcModule):
 
       if event == 'OK':
          focused = gui.win.focused_object
-         if isinstance(focused, gui.EmcButton) and focused in self.widgets:
-            focused.data['cb'](focused)
-         elif focused in (self.list1, self.list2):
+         if focused in (self.list1, self.list2):
             focused.item_activated_cb()
+            return input_events.EVENT_BLOCK
 
       elif event == 'BACK':
          self.hide()
+         return input_events.EVENT_BLOCK
 
-      else:
-         return input_events.EVENT_CONTINUE
-
-      return input_events.EVENT_BLOCK
+      return input_events.EVENT_CONTINUE
 
 
 class FileManagerWorker(object):

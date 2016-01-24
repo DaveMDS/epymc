@@ -343,9 +343,9 @@ class MyItemClass(EmcItemClass):
          d = EmcDialog(title='Dialog - Progress', text=text,
                        style='progress', done_cb=_canc_cb, canc_cb=_canc_cb)
          if url.endswith('btn'):
-            d.button_add("btn1")
-            d.button_add("btn2")
-            d.button_add("btn3")
+            d.button_add("btn1", selected_cb=lambda b: print('btn1 callback'))
+            d.button_add("btn2", selected_cb=lambda b: print('btn2 callback'))
+            d.button_add("btn3", selected_cb=lambda b: print('btn3 callback'))
          self._progress = 0.0
          t = ecore.Timer(0.2, _progress_timer)
 
@@ -369,9 +369,9 @@ class MyItemClass(EmcItemClass):
          text = LOREM*4
          d = EmcDialog(title='Dialog - Panel full', text=text, style='panel',
                        spinner=True)
-         d.button_add('One')
-         d.button_add('Two')
-         d.button_add('Tree')
+         d.button_add('One', selected_cb=lambda b: print('btn1 callback'))
+         d.button_add('Two', selected_cb=lambda b: print('btn2 callback'))
+         d.button_add('Tree', selected_cb=lambda b: print('btn3 callback'))
 
       # Dialog - Panel full more
       elif url == 'uitests://dlg-panel4':
@@ -379,9 +379,9 @@ class MyItemClass(EmcItemClass):
          
          d = EmcDialog(title='Dialog - Panel full', text=text, style='panel',
                        spinner=False, content=gui.load_image('dvd_cover_blank.png'))
-         d.button_add('One')
-         d.button_add('Two')
-         d.button_add('Tree')
+         d.button_add('One', selected_cb=lambda b: print('btn1 callback'))
+         d.button_add('Two', selected_cb=lambda b: print('btn2 callback'))
+         d.button_add('Tree', selected_cb=lambda b: print('btn3 callback'))
 
       # Dialog - Panel no buttons
       elif url == 'uitests://dlg-panel2':
@@ -414,8 +414,11 @@ class MyItemClass(EmcItemClass):
          DBG('Dumping Browser')
          browser.dump_everythings()
 
-      # Buttons Theme
+      # Buttons Theme + Focus
       elif url == 'uitests://buttons':
+         def _buttons_cb(btn):
+            print(btn)
+
          vbox0 = Box(gui.win)
          vbox0.show()
 
@@ -430,13 +433,13 @@ class MyItemClass(EmcItemClass):
          vbox = Box(gui.win)
          vbox.show()
          # label
-         b = EmcButton('only label')
+         b = EmcButton('only label', cb=_buttons_cb)
          vbox.pack_end(b)
          # icon
-         b = EmcButton(None, 'icon/star')
+         b = EmcButton(icon='icon/star', cb=_buttons_cb)
          vbox.pack_end(b)
          # label + icon
-         b = EmcButton('label + icon', 'icon/star')
+         b = EmcButton('label + icon', 'icon/star', cb=_buttons_cb)
          vbox.pack_end(b)
          hbox.pack_end(vbox)
 
@@ -444,15 +447,15 @@ class MyItemClass(EmcItemClass):
          vbox = Box(gui.win)
          vbox.show()
          # label
-         b = EmcButton('only label disabled')
+         b = EmcButton('only label disabled', cb=_buttons_cb)
          b.disabled_set(True)
          vbox.pack_end(b)
          # icon
-         b = EmcButton(None, 'icon/mame')
+         b = EmcButton(icon='icon/mame', cb=_buttons_cb)
          b.disabled_set(True)
          vbox.pack_end(b)
          # label + icon
-         b = EmcButton('label + icon disabled', 'icon/back')
+         b = EmcButton('label + icon disabled', 'icon/back', cb=_buttons_cb)
          b.disabled_set(True)
          vbox.pack_end(b)
          hbox.pack_end(vbox)
@@ -462,7 +465,7 @@ class MyItemClass(EmcItemClass):
          hbox2.horizontal_set(True)
          hbox2.show()
          for i in range(0,8):
-            b = EmcButton(str(i))
+            b = EmcButton(str(i), cb=_buttons_cb)
             b.show()
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
@@ -473,7 +476,7 @@ class MyItemClass(EmcItemClass):
          hbox2.show()
          icons = ['icon/fbwd','icon/bwd','icon/stop','icon/play','icon/fwd','icon/ffwd']
          for i in icons:
-            b = EmcButton(None, i)
+            b = EmcButton(icon=i, cb=_buttons_cb)
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
 
@@ -485,7 +488,7 @@ class MyItemClass(EmcItemClass):
                   hbox2 = Box(gui.win, horizontal=True)
                   vbox0.pack_end(hbox2)
                   hbox2.show()
-               b = EmcButton(None, group)
+               b = EmcButton(icon=group, cb=_buttons_cb)
                hbox2.pack_end(b)
                i += 1
 

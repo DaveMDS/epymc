@@ -751,7 +751,6 @@ class ViewPosterGrid(object):
       self.gg.callback_selected_add(self.gg_higlight)
       self.gg.callback_clicked_double_add(self.gg_selected)
       self.gg.callback_realized_add(self._cb_item_realized)
-      self.gg.callback_focused_add(self._cb_focused)
       gui.swallow_set(self._grid_swallow, self.gg)
 
       # RemoteImage (cover)
@@ -888,12 +887,6 @@ class ViewPosterGrid(object):
       if item.selected:
          item.focus = True
 
-   def _cb_focused(self, gg):
-      # try to fix focus-on-item restore
-      if gg.focused_item is None:
-         gg.selected_item.focus = True
-      
-   
    def _info_timer_cb(self, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #
 

@@ -4,6 +4,7 @@ TMP
 
  * double-click in genlist that open a dialog brake the hilight !!!
 
+ * stop thumb generation correctly (also the one in progress)
  
  * TASTIERA!!! non posso cambiare il foramto delle date  :(
  
@@ -22,6 +23,7 @@ TMP
  * update italian translation
  * migliorare grafica dei dialog
  * require efl >= 1.17 (and use setup.py efl stuff)
+ * comment-out all DBG functions
 
  * use EmcUrl where needed
 

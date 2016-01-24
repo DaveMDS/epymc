@@ -47,6 +47,9 @@
 #define TILED_HORIZ(_WIDTH) \
    fill { size { relative: 0.0 1.0; offset: _WIDTH 0; } }
 
+#define TILED_VERT(_HEIGHT) \
+   fill { size { relative: 1.0 0.0; offset: 0 _HEIGHT; } }
+
 #define FIXED_SIZE(_WIDTH, _HEIGHT) \
    min: _WIDTH _HEIGHT; max: _WIDTH _HEIGHT; fixed: 1 1;
 
@@ -3158,25 +3161,32 @@ collections {
       }
    }
    group { name: "emc/image/vthumb";  /* API */
-      // TODO complete this style...as soon as emotion will be able to use frames...
+      images.image: "vthumb_band.png" COMP;
       parts {
-         part { name: "bg"; type: RECT;
-            description { state: "default" 0.0;
-               aspect: 1 1;
-               aspect_preference: BOTH;
-            }
-         }
          part { name: "emc.swallow"; type: SWALLOW; /* API */
             description { state: "default" 0.0;
                
             }
          }
-         part { name: "bg2"; type: RECT;
+         part { name: "left"; type: IMAGE;
             description { state: "default" 0.0;
-               aspect: 1 1;
-               aspect_preference: BOTH;
+               image.normal: "vthumb_band.png";
+               color: 255 255 255 150;
+               max: 22 9999;
+               TILED_VERT(44)
+               align: 0.0 0.0;
             }
          }
+         part { name: "right"; type: IMAGE;
+            description { state: "default" 0.0;
+               image.normal: "vthumb_band.png";
+               color: 255 255 255 150;
+               max: 22 9999;
+               TILED_VERT(44)
+               align: 1.0 0.0;
+            }
+         }
+         
       }
    }
    group { name: "emc/image/error";  /* API */

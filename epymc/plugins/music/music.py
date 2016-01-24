@@ -603,7 +603,7 @@ class MusicModule(EmcModule):
       for album in sorted(L, key=operator.itemgetter('artist')):
          if album['artist'] != last_artist:
             last_artist = album['artist']
-            self._browser.group_add(last_artist)
+            self._browser.group_add(last_artist, 'icon/head')
          self._browser.item_add(AlbumItemClass(), album['name'], album)
 
    def populate_artists_page(self, browser, page_url):

@@ -744,7 +744,8 @@ class ViewPosterGrid(object):
       self.itc = GengridItemClass(item_style='default',
                                   content_get_func=self.gg_content_get)
       self.itc_g = GengridItemClass(item_style='group_index',
-                                    text_get_func=self.gg_group_text_get)
+                                    text_get_func=self.gg_group_text_get,
+                                    content_get_func=self.gg_group_content_get)
       self.gg = Gengrid(gui.win, style='browser', focus_allow=False,
                         align=(0.5, 0.0),
                         size_hint_expand=EXPAND_BOTH, size_hint_fill=FILL_BOTH)
@@ -796,7 +797,7 @@ class ViewPosterGrid(object):
    def show(self):
       size = ini.get_int('general', 'view_postergrid_size')
       self.gg.item_size = size, int(size * 1.5)
-      self.gg.group_item_size = 22,22 # TODO read from theme and scale mult
+      self.gg.group_item_size = 32,32 # TODO read from theme and scale mult
 
       gui.signal_emit(self._signal_show)
       self.gg.focus_allow = True
@@ -875,6 +876,11 @@ class ViewPosterGrid(object):
       label, icon = item_data                                                   # g #
       return label
 
+   def gg_group_content_get(self, obj, part, item_data):
+      if part == 'elm.swallow.icon':
+         label, icon = item_data                                                # g #
+         return gui.load_icon(icon)
+
    # gengrid callbacks
    def gg_higlight(self, gg, item, *args, **kwargs):
       self._clear_timers()
@@ -952,7 +958,7 @@ class ViewCoverGrid(ViewPosterGrid):
    def show(self):
       size = ini.get_int('general', 'view_covergrid_size')
       self.gg.item_size = size, size
-      self.gg.group_item_size = 22,22 # TODO read from theme and scale mult
+      self.gg.group_item_size = 32,32 # TODO read from theme and scale mult
 
       gui.signal_emit(self._signal_show)
       self.gg.focus_allow = True

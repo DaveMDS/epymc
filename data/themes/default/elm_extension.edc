@@ -1752,6 +1752,141 @@ group { name: "elm/genlist/item_compress/default/browser";
       // }
    }
 }
+group { name: "elm/genlist/item/group_index/browser"; nomouse; program_source: "elm";
+   data.item: "texts" "elm.text";
+   data.item: "contents" "elm.swallow.icon elm.swallow.end";
+   // data.item: "treesize" TREEPAD;
+   
+   images.image: "shadow_square_tiny.png" COMP;
+   images.image: "bevel_out.png" COMP;
+   images.image: "horizontal_separated_bar_small_glow.png" COMP;
+   
+   parts {
+      image { "shadow_vbar";
+         desc { "default";
+            rel1.offset: -3 -2;
+            rel1.to: "base_vbar";
+            rel2.offset: 2 4;
+            rel2.to: "base_vbar";
+            image.normal: "shadow_square_tiny.png";
+            image.border: 6 6 6 6;
+            fill.smooth: 0;
+         }
+      }
+      image { "base_vbar";
+         desc { "default";
+            image.normal: "vgrad_med_lighter.png";
+            fill.smooth: 0;
+            min: 5 13;
+            TILED_HORIZ(120)
+         }
+      }
+      image { "bevel_vbar";
+         desc { "default";
+            rel1.to: "base_vbar";
+            rel2.to: "base_vbar";
+            image.normal: "bevel_out.png";
+            image.border: 1 1 1 1;
+            image.middle: 0;
+            fill.smooth: 0;
+            min: 5 5;
+         }
+      }
+
+      text { "elm.text";
+         effect: SHADOW BOTTOM;
+         scale;
+         desc { "default";
+            rel1.offset: 2 3;
+            rel1.relative: 1.0 0.0;
+            rel1.to_x: "elm.swallow.icon";
+            rel2.offset: -3 -3;
+            rel2.relative: 0.0 1.0;
+            rel2.to_x: "elm.swallow.end";
+            color: FONT_COLOR;
+            color_class: "list_group_item";
+            text { font: FONT; size: FONT_SIZE;
+               min: 1 1;
+               ellipsis: -1;
+               align: 0.0 0.5;
+               text_class: "list_group_item";
+            }
+            link.base: "elm,state,enabled";
+         }
+         desc { "disabled";
+            inherit: "default";
+            color: FN_COL_DISABLE;
+            color_class: "list_group_item_disabled";
+            link.base: "elm,state,disabled";
+         }
+      }
+      swallow { "elm.swallow.pad"; mouse;
+         desc { "default";
+            fixed: 1 0;
+            align: 0.0 0.5;
+            rel1.offset: 2 2;
+            rel2.relative: 0.0 1.0;
+            rel2.offset: 2 -3;
+         }
+      }
+      swallow { "elm.swallow.icon"; mouse;
+         desc { "default";
+            fixed: 1 0;
+            align: 0.0 0.5;
+            rel1.to_x: "elm.swallow.pad";
+            rel1.relative: 1.0 0.0;
+            rel1.offset: -1 2;
+            rel2.to_x: "elm.swallow.pad";
+            rel2.relative: 1.0 1.0;
+            rel2.offset: -1 -3;
+         }
+      }
+      swallow { "elm.swallow.end"; mouse;
+         desc { "default";
+            fixed: 1 0;
+            align: 1.0 0.5;
+            rel1.offset: -3 2;
+            rel1.relative: 1.0 0.0;
+            rel2.offset: -3 -3;
+         }
+      }
+      image { "bar";
+         desc { "default";
+            image.normal: "horizontal_separated_bar_small_glow.png";
+            image.border: 4 4 4 4;
+            fill.smooth: 0;
+            rel1.relative: 0.0 1.0;
+            rel1.offset: -3 -6;
+            rel2.offset: 2 3;
+            link.base: "elm,state,enabled";
+         }
+         desc { "disabled";
+            inherit: "default";
+             color: 255 255 255 64;
+             link.base: "elm,state,disabled";
+         }
+      }
+   }
+}
+group { "elm/genlist/item_compress/group_index/browser"; nomouse;
+   inherit: "elm/genlist/item/group_index/browser";
+   parts {
+      text { "elm.text";
+         desc { "default";
+            text.min: 0 1;
+         }
+         desc { "selected";
+            text.min: 0 1;
+         }
+         desc { "disabled";
+            text.min: 0 1;
+         }
+         desc { "flip_enabled";
+            text.min: 0 1;
+         }
+      }
+   }
+}
 
 //// BROWSER GENGRID ITEM (elm/gengrid/item/default/default) //////////////////
 group { name: "elm/gengrid/item/default/browser";
@@ -1956,6 +2091,9 @@ group { name: "elm/gengrid/item/default/browser";
          target:  "disclip";
       }
    }
+}
+group { name: "elm/gengrid/item/group_index/browser";
+   inherit: "elm/genlist/item/group_index/browser";
 }
 
 //// SCROLLED ENTRY (elm/entry/base-noedit/default) ////////////////////

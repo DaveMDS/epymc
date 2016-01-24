@@ -455,10 +455,10 @@ focus_directions = {
    'RIGHT': elm.ELM_FOCUS_RIGHT,
 }
 
-def focus_move(direction, root_obj):
+def focus_move(direction, root_obj=None):
    """ TODOC """
 
-   focused = root_obj.focused_object
+   focused = root_obj.focused_object if root_obj else layout.focused_object
 
    # move between List items...
    if isinstance(focused, List) and focused.focus_allow:
@@ -564,7 +564,6 @@ def focus_move(direction, root_obj):
          to_item.focus = True
          to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
          return True
-
 
    # or just let elm move the focus between objects
    root_obj.focus_next(focus_directions[direction])
@@ -1387,10 +1386,7 @@ class EmcSlideshow(Slideshow):
    """
 
    def __init__(self, url, delay=4, show_controls=False):
-      Slideshow.__init__(self, layout, loop=True, transition='fade',
-                         focus_allow=False)
-      self.callback_changed_add(self._photo_changed_cb)
-
+      # private stuff
       self._itc = SlideshowItemClass(self._item_get_func, self._item_del_func)
       self._timeout = delay
       self._first_file = None
@@ -1401,45 +1397,52 @@ class EmcSlideshow(Slideshow):
       if not os.path.isdir(self._folder):
          self._folder, self._first_file = os.path.split(self._folder)
 
-      # listen to emc input events
-      input_events.listener_add('EmcSlideShow', self._input_event_cb)
+      # swallow our layout in the main layout
+      self._ly = Layout(layout, file=(theme_file, 'emc/slideshow/default'))
+      swallow_set('slideshow.swallow', self._ly)
 
-      # swallow the slideshow in the main layout
-      swallow_set('slideshow.swallow', self)
-      signal_cb_add('emc,slideshow,show,done', '', self._show_done_signal_cb)
-      signal_cb_add('emc,slideshow,hide,done', '', self._hide_done_signal_cb)
-      signal_cb_add('mouse,down,1', 'slideshow.swallow', self._click_signal_cb)
-      signal_emit('slideshow,show')
+      # swallow the slideshow widget in our layout
+      Slideshow.__init__(self, self._ly, loop=True, transition='fade',
+                         focus_allow=False)
+      self.callback_changed_add(self._photo_changed_cb)
+      self._ly.content_set('slideshow.swallow', self)
+      self._ly.signal_callback_add('emc,show,done', '', self._show_done_signal_cb)
+      self._ly.signal_callback_add('emc,hide,done', '', self._hide_done_signal_cb)
+      self._ly.signal_callback_add('mouse,down,1', 'slideshow.swallow', self._click_signal_cb)
+      self._ly.signal_emit('show', 'emc')
 
       # fill the controls bar with buttons
       bt = EmcButton(icon='icon/prev')
       bt.callback_clicked_add(lambda b: self.previous())
-      box_append('slideshow.controls.btn_box', bt)
+      self._ly.box_append('controls.btn_box', bt)
 
       bt = EmcButton(icon='icon/pause')
       bt.callback_clicked_add(lambda b: self.pause_toggle())
-      box_append('slideshow.controls.btn_box', bt)
+      self._ly.box_append('controls.btn_box', bt)
       self._pause_btn = bt
 
       bt = EmcButton(icon='icon/next')
       bt.callback_clicked_add(lambda b: self.next())
-      box_append('slideshow.controls.btn_box', bt)
+      self._ly.box_append('controls.btn_box', bt)
 
-      # fill the widget with all the items
+      # fill the slideshow widget
       self._populate()
+
+      # listen to emc input events
+      input_events.listener_add('EmcSlideShow', self._input_event_cb)
+
+      # steal the focus
+      self._pause_btn.focus = True
 
    def delete(self):
       self.pause()
-      signal_emit('slideshow,hide')
-      signal_emit('slideshow,controls,hide')
+      input_events.listener_del('EmcSlideShow')
+      self._ly.signal_emit('hide', 'emc')
+      self._ly.signal_emit('controls,hide', 'emc')
 
    def _delete_real(self):
-      input_events.listener_del('EmcSlideShow')
-      signal_cb_del('emc,slideshow,show,done', '', self._show_done_signal_cb)
-      signal_cb_del('emc,slideshow,hide,done', '', self._hide_done_signal_cb)
-      signal_cb_del('mouse,down,1', 'slideshow.swallow', self._click_signal_cb)
-      box_remove_all('slideshow.controls.btn_box')
       Slideshow.delete(self)
+      self._ly.delete()
 
    def pause(self):
       self.timeout = 0
@@ -1453,11 +1456,11 @@ class EmcSlideshow(Slideshow):
       self.unpause() if self.timeout == 0 else self.pause()
 
    def controls_show(self):
-      signal_emit('slideshow,controls,show')
+      self._ly.signal_emit('controls,show', 'emc')
       self._controls_visible = True
 
    def controls_hide(self):
-      signal_emit('slideshow,controls,hide')
+      self._ly.signal_emit('controls,hide', 'emc')
       self._controls_visible = False
 
    def controls_toggle(self):
@@ -1475,11 +1478,11 @@ class EmcSlideshow(Slideshow):
    def _hide_done_signal_cb(self, obj, signal, src):
       self._delete_real()
 
-   ## widget smart callbacks
+   ## slideshow widget smart callbacks
    def _photo_changed_cb(self, obj, item):
       num, fname = item.data
-      text_set('slideshow.controls.text',
-               'Image {0} of {1}'.format(num, self._num_images))
+      self._ly.text_set('controls.text',
+                        _('Image {0} of {1}').format(num, self._num_images))
 
    ## internals
    def _populate(self):
@@ -1510,33 +1513,38 @@ class EmcSlideshow(Slideshow):
 
    ## emc events
    def _input_event_cb(self, event):
-      if event == 'OK':
-         self.controls_toggle()
-         return input_events.EVENT_BLOCK
 
-      if event == 'RIGHT':
-         self.next()
-         return input_events.EVENT_BLOCK
-      
-      if event == 'LEFT':
-         self.previous()
-         return input_events.EVENT_BLOCK
-      
+      if self._controls_visible:
+         if event in ('UP', 'DOWN', 'LEFT', 'RIGHT'):
+            focus_move(event, self._ly)
+            return input_events.EVENT_BLOCK
+
+         elif event in ('EXIT', 'BACK'):
+            self.controls_hide()
+            return input_events.EVENT_BLOCK
+
+      else:
+         if event == 'RIGHT':
+            self.next()
+            return input_events.EVENT_BLOCK
+         
+         elif event == 'LEFT':
+            self.previous()
+            return input_events.EVENT_BLOCK
+
+         elif event == 'OK':
+            self.controls_show()
+            return input_events.EVENT_BLOCK
+
+         elif event in ('EXIT', 'BACK'):
+            self.delete()
+            return input_events.EVENT_BLOCK
+
       if event == 'TOGGLE_PAUSE':
          self.pause_toggle()
          return input_events.EVENT_BLOCK
-      
-      if event in ('EXIT', 'BACK'):
-         if self._controls_visible:
-            self.controls_hide()
-         else:
-            self.delete()
-         return input_events.EVENT_BLOCK
 
-      if event in ('UP', 'DOWN'):
-         return input_events.EVENT_BLOCK
-      else:
-         return input_events.EVENT_CONTINUE
+      return input_events.EVENT_CONTINUE
 
 ################################################################################
 class EmcFolderSelector(EmcDialog):

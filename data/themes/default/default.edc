@@ -1736,166 +1736,9 @@ collections {
             target: "videoplayer.controls.poster";
          }
 
-/// slideshow
-         part { name: "slideshow.clip"; type: RECT;
-            description { state: "default" 0.0;
-               color: 0 0 0 0;
-               rel1.relative: 0.0 -1.0;
-               rel2.relative: 1.0 0.0;
-            }
-            description { state: "visible" 0.0;
-               color: 255 255 255 255;
-               rel1.relative: 0.0 0.0;
-               rel2.relative: 1.0 1.0;
-            }
-         }
+/// slideshow swallow
          part { name: "slideshow.swallow"; type: SWALLOW;  /* API */
-            clip_to: "slideshow.clip";
-            description { state: "default" 0.0;
-               rel1.to: "slideshow.clip";
-               rel2.to: "slideshow.clip";
-            }
-         }
-         part { name: "slideshow.controls.clip"; type: RECT;
-            description { state: "default" 0.0;
-               rel1.to: "slideshow.controls.shadow";
-               rel2.to: "slideshow.controls.shadow";
-               color: 255 255 255 0;
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               color: 255 255 255 255;
-            }
-         }
-         part { name: "slideshow.controls.shadow"; type: IMAGE;
-            clip_to: "slideshow.controls.clip";
-            scale: 1;
-            description { state: "default" 0.0;
-               rel1.to: "slideshow.controls.bg";
-               rel1.offset: -16 -16;
-               rel2.to: "slideshow.controls.bg";
-               rel2.offset: 16 6;
-               image.normal: "frame_box_for_bot_shadow.png";
-               image.border: 16 16 16 0;
-            }
-         }
-         part { name: "slideshow.controls.bg"; type: IMAGE;
-            clip_to: "slideshow.controls.clip";
-            scale: 1;
-            description { state: "default" 0.0;
-               rel1.to_x: "slideshow.controls.icon";
-               rel1.to_y: "slideshow.controls.btn_box";
-               rel2.to_x: "slideshow.controls.text";
-               rel2.to_y: "slideshow.controls.btn_box";
-               rel1.offset: -9 -5;
-               rel2.offset: 12 0;
-               image.normal: "frame_box_for_bot.png";
-               image.border: 1 1 2 0;
-            }
-         }
-         part { name: "slideshow.controls.btn_box"; type: BOX;  /* API */
-            clip_to: "slideshow.controls.clip";
-            scale: 1;
-            description { state: "default" 0.0;
-               box {
-                  layout: "horizontal";
-                  padding: 4 0;
-                  min: 1 1;
-               }
-               rel1.relative: 0.5 1.0;
-               rel2.relative: 0.5 1.0;
-               align: 1.0 0.0;
-               fixed: 1 1;
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               align: 1.0 1.0;
-            }
-         }
-         part { name: "slideshow.controls.icon"; type: IMAGE;
-            clip_to: "slideshow.controls.clip";
-            scale: 1;
-            description { state: "default" 0.0;
-               rel1 {
-                  to: "slideshow.controls.btn_box";
-                  relative: 0.0 0.0;
-                  offset: -10 0;
-               }
-               rel2 {
-                  to: "slideshow.controls.btn_box";
-                  relative: 0.0 1.0;
-                  offset: -10 0;
-               }
-               image.normal: "icon_photo.png";
-               aspect: 1 1; aspect_preference: VERTICAL;
-               align: 1.0 0.5;
-            }
-         }
-         part { name: "slideshow.controls.text"; type: TEXT;  /* API */
-            clip_to: "slideshow.controls.clip";
-            scale: 1;
-            effect: FAR_SHADOW;
-            description { state: "default" 0.0;
-               color: FONT_COLOR_NOSEL;
-               color3: FONT_COLOR3_NOSEL;
-               text {
-                  text: "Image 1 of 13";
-                  font: FONT2;
-                  size: FONT_SIZE;
-                  min: 1 0;
-                  ellipsis: -1;
-               }
-               rel1 {
-                  to: "slideshow.controls.btn_box";
-                  relative: 1.0 0.0;
-                  offset: 6 0;
-               }
-               rel2 {
-                  to: "slideshow.controls.btn_box";
-                  relative: 1.0 1.0;
-                  offset: 6 0;
-               }
-               align: 0.0 0.5;
-               fixed: 1 1;
-            }
-         }
-         program { name: "slideshow_show";  /* API */
-            signal: "slideshow,show";
-            source: "emc";
-            action: STATE_SET "visible" 0.0;
-            transition: DECELERATE 0.5;
-            target: "slideshow.clip";
-            after: "slideshow_show_done";
-         }
-         program { name: "slideshow_show_done";
-            action: SIGNAL_EMIT "emc,slideshow,show,done" "";  /* API */
-         }
-         program { name: "slideshow_hide";  /* API */
-            signal: "slideshow,hide";
-            source: "emc";
-            action: STATE_SET "default" 0.0;
-            transition: ACCELERATE 0.5;
-            target: "slideshow.clip";
-            after: "slideshow_hide_done";
-         }
-         program { name: "slideshow_hide_done";
-            action: SIGNAL_EMIT "emc,slideshow,hide,done" "";  /* API */
-         }
-         program { name: "slideshow_controls_show";  /* API */
-            signal: "slideshow,controls,show";
-            source: "emc";
-            action: STATE_SET "visible" 0.0;
-            transition: DECELERATE 0.3;
-            target: "slideshow.controls.btn_box";
-            target: "slideshow.controls.clip";
-         }
-         program { name: "slideshow_controls_hide";  /* API */
-            signal: "slideshow,controls,hide";
-            source: "emc";
-            action: STATE_SET "default" 0.0;
-            transition: ACCELERATE 0.3;
-            target: "slideshow.controls.btn_box";
-            target: "slideshow.controls.clip";
+            description { state: "default" 0.0; }
          }
 
 /// minipos
@@ -2975,6 +2818,172 @@ collections {
                max: 24 24;
                fixed: 1 1;
             }
+         }
+      }
+   }
+
+/// slideshow
+   group { name: "emc/slideshow/default";  /* API */
+      parts {
+         part { name: "clip"; type: RECT;
+            description { state: "default" 0.0;
+               color: 0 0 0 0;
+               rel1.relative: 0.0 -1.0;
+               rel2.relative: 1.0 0.0;
+            }
+            description { state: "visible" 0.0;
+               color: 255 255 255 255;
+               rel1.relative: 0.0 0.0;
+               rel2.relative: 1.0 1.0;
+            }
+         }
+         part { name: "slideshow.swallow"; type: SWALLOW;  /* API */
+            clip_to: "clip";
+            description { state: "default" 0.0;
+               rel1.to: "clip";
+               rel2.to: "clip";
+            }
+         }
+         part { name: "controls.clip"; type: RECT;
+            description { state: "default" 0.0;
+               rel1.to: "controls.shadow";
+               rel2.to: "controls.shadow";
+               color: 255 255 255 0;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               color: 255 255 255 255;
+            }
+         }
+         part { name: "controls.shadow"; type: IMAGE;
+            clip_to: "controls.clip";
+            scale: 1;
+            description { state: "default" 0.0;
+               rel1.to: "controls.bg";
+               rel1.offset: -16 -16;
+               rel2.to: "controls.bg";
+               rel2.offset: 16 6;
+               image.normal: "frame_box_for_bot_shadow.png";
+               image.border: 16 16 16 0;
+            }
+         }
+         part { name: "controls.bg"; type: IMAGE;
+            clip_to: "controls.clip";
+            scale: 1;
+            description { state: "default" 0.0;
+               rel1.to_x: "controls.icon";
+               rel1.to_y: "controls.btn_box";
+               rel2.to_x: "controls.text";
+               rel2.to_y: "controls.btn_box";
+               rel1.offset: -9 -5;
+               rel2.offset: 12 0;
+               image.normal: "frame_box_for_bot.png";
+               image.border: 1 1 2 0;
+            }
+         }
+         part { name: "controls.btn_box"; type: BOX;  /* API */
+            clip_to: "controls.clip";
+            scale: 1;
+            description { state: "default" 0.0;
+               box {
+                  layout: "horizontal";
+                  padding: 4 0;
+                  min: 1 1;
+               }
+               rel1.relative: 0.5 1.0;
+               rel2.relative: 0.5 1.0;
+               align: 1.0 0.0;
+               fixed: 1 1;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               align: 1.0 1.0;
+            }
+         }
+         part { name: "controls.icon"; type: IMAGE;
+            clip_to: "controls.clip";
+            scale: 1;
+            description { state: "default" 0.0;
+               rel1 {
+                  to: "controls.btn_box";
+                  relative: 0.0 0.0;
+                  offset: -10 0;
+               }
+               rel2 {
+                  to: "controls.btn_box";
+                  relative: 0.0 1.0;
+                  offset: -10 0;
+               }
+               image.normal: "icon_photo.png";
+               aspect: 1 1; aspect_preference: VERTICAL;
+               align: 1.0 0.5;
+            }
+         }
+         part { name: "controls.text"; type: TEXT;  /* API */
+            clip_to: "controls.clip";
+            scale: 1;
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               color: FONT_COLOR_NOSEL;
+               color3: FONT_COLOR3_NOSEL;
+               text {
+                  text: "Image 1 of 13";
+                  font: FONT2;
+                  size: FONT_SIZE;
+                  min: 1 0;
+                  ellipsis: -1;
+               }
+               rel1 {
+                  to: "controls.btn_box";
+                  relative: 1.0 0.0;
+                  offset: 6 0;
+               }
+               rel2 {
+                  to: "controls.btn_box";
+                  relative: 1.0 1.0;
+                  offset: 6 0;
+               }
+               align: 0.0 0.5;
+               fixed: 1 1;
+            }
+         }
+         program { name: "show";  /* API */
+            signal: "show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.5;
+            target: "clip";
+            after: "show_done";
+         }
+         program { name: "show_done";  /* API */
+            action: SIGNAL_EMIT "emc,show,done" "";
+         }
+         program { name: "hide";  /* API */
+            signal: "hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.5;
+            target: "clip";
+            after: "hide_done";
+         }
+         program { name: "hide_done";  /* API */
+            action: SIGNAL_EMIT "emc,hide,done" "";
+         }
+         program { name: "controls_show";  /* API */
+            signal: "controls,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.3;
+            target: "controls.btn_box";
+            target: "controls.clip";
+         }
+         program { name: "controls_hide";  /* API */
+            signal: "controls,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.3;
+            target: "controls.btn_box";
+            target: "controls.clip";
          }
       }
    }

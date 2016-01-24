@@ -1,11 +1,9 @@
 
                 EpyMC THEMES REFERENCE
 
-
-Main elementary layout group: "emc/main/layout".
 All the icons and images in icons.edc must be implemented.
 
-### Theme info ###
+### Theme info ################################################################
    * Required data items:
       item: "theme.name" "The theme name";
       item: "theme.version" "0.1";
@@ -13,9 +11,13 @@ All the icons and images in icons.edc must be implemented.
       item: "theme.info" "A more long description of the theme";
       item: "theme.generation" "XX";
 
-### Messages ###
-   id: 12  TYPE: MSG_STRING  ->  MESSAGE_CLOCK_TIME (current formatted time)
-   id: 13  TYPE: MSG_STRING  ->  MESSAGE_CLOCK_DATE (current formatted date)
+
+### Main Layout ###############################################################
+   * Group: "emc/main/layout"
+
+   * Messagges:
+      id: 12  TYPE: MSG_STRING  ->  MESSAGE_CLOCK_TIME (current formatted time)
+      id: 13  TYPE: MSG_STRING  ->  MESSAGE_CLOCK_DATE (current formatted date)
 
 
 ### Backdrop stuff ###
@@ -127,6 +129,11 @@ All the icons and images in icons.edc must be implemented.
       "videoplayer,controls,hide" "emc"
 
 
+### Slideshow ###
+   * Required parts:
+      "slideshow.swallow" -> edje SWALLOW
+
+
 ### Volume ###
    * Required parts:
       "volume.slider" -> edje GROUP -> "emc/slider/default"
@@ -159,7 +166,12 @@ All the icons and images in icons.edc must be implemented.
       "dialogs.box.stack" -> edje box (usually with "stack" as layout)
 
 
-### Dialog (panel) ###
+### Notify box ###
+   * Required parts:
+      "notify.box.stack" -> edje BOX (by default "vertical" as layout)
+
+
+### Dialog (panel) ############################################################
    * Group: "emc/dialog/panel"
 
    * Required parts:
@@ -175,13 +187,13 @@ All the icons and images in icons.edc must be implemented.
       "emc,dialog,buttons,show" "emc"
       "emc,dialog,buttons,hide" "emc"
 
-   * Signal that should/must be sent to the app
+   * Signal that should/must be sent to the app:
       "emc,dialog,close" ""
       "emc,dialog,show,done" ""
       "emc,dialog,hide,done" ""
 
 
-### Dialog (minimal) ###
+### Dialog (minimal) ##########################################################
    * Group: "emc/dialog/minimal"
 
    * Required parts:
@@ -195,16 +207,11 @@ All the icons and images in icons.edc must be implemented.
       "emc,dialog,error,set" ""
       "emc,dialog,yesno,set" ""
 
-   * Signal that should/must be sent to the app
+   * Signal that should/must be sent to the app:
       ...the same as panel dialog
 
 
-### Notify box ###
-   * Required parts:
-      "notify.box.stack" -> edje BOX (by default "vertical" as layout)
-
-
-### Notify items ###
+### Notify items ##############################################################
    * Group: "emc/notify/default"
 
    * Required parts:
@@ -212,12 +219,33 @@ All the icons and images in icons.edc must be implemented.
       "emc.text.caption" -> edje TEXTBLOCK
 
 
-### Slider ###
+### Slider ####################################################################
    * Group: "emc/slider/default"
 
    * Required parts:
       "dragable1" -> edge dragable
 
+
+### Slideshow #################################################################
+   * Group: "emc/slideshow/default"
+
+   * Required parts:
+      "slideshow.swallow" -> edje SWALLOW (elm.Slideshow will be swallowed here)
+      "controls.btn_box" -> edje BOX
+      "controls.text" -> edje TEXT
+
+   * Signals received from the application:
+      "show" "emc"
+      "hide" "emc"
+      "controls,show" "emc"
+      "controls,hide" "emc"
+
+   * Signal that must be sent to the app:
+      "emc,show,done" ""
+      "emc,hide,done" ""
+
+
+### EmcImage styles ###########################################################
 
 ### Image: Empty Poster ###
    * Group: "emc/image/bd"
@@ -225,13 +253,11 @@ All the icons and images in icons.edc must be implemented.
    * Required parts:
       "emc.text" -> edje TEXTBLOCK
 
-
 ### Image: Folder ###
    * Group: "emc/image/folder"
 
    * Required parts:
       "emc.text" -> edje TEXTBLOCK
-
 
 ### Image: Generic Icon ###
    * Group: "emc/image/icon"
@@ -241,14 +267,11 @@ All the icons and images in icons.edc must be implemented.
       "emc.text" -> edje TEXTBLOCK
       "emc.text2" -> edje TEXTBLOCK
 
-
 ### Image: Thumbnailing ###
    * Group: "emc/image/thumbnailing"
 
-
 ### Image: Downloading ###
    * Group: "emc/image/downloading"
-
 
 ### Image: Video Thumb Frame ###
    * Group: "emc/image/vthumb"
@@ -256,10 +279,8 @@ All the icons and images in icons.edc must be implemented.
    * Required parts:
       "emc.swallow" -> edje SWALLOW
 
-
 ### Image: Error ###
    * Group: "emc/image/error"
-
 
 ### Image: Null placeholder ###
    * Group: "emc/image/null"

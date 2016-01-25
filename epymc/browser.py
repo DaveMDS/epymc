@@ -581,6 +581,7 @@ class ViewList(object):
       gui.signal_emit('browser,list,hide')
       gui.signal_emit('browser,list,info,hide')
       self._ase.autoscroll = False
+      self._poster.animated_play = False
       self.gl1.focus = False
       self.gl2.focus = False
       self.gl1.focus_allow = False
@@ -805,6 +806,8 @@ class ViewPosterGrid(object):
 
    def hide(self):
       self._clear_timers()
+      self._ase.autoscroll = False
+      self._big_image.animated_play = False
       gui.signal_emit(self._signal_hide)
       gui.signal_emit(self._signal_info_hide)
       self.gg.focus = False

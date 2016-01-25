@@ -963,6 +963,9 @@ class EmcImage(Image):
       # a local path ?
       if os.path.exists(url):
          self.file_set(url)
+         if self.animated_available:
+            self.animated = True
+            self.animated_play = True
          return
       
       # an icon from the theme ?

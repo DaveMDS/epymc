@@ -454,6 +454,7 @@ def video_player_show():
    _last_focused_obj = gui.win.focused_object
    if _last_focused_obj:
       _last_focused_obj.focus = False
+   _play_pause_btn.focus = True
 
    gui.signal_emit('videoplayer,show')
    _video_visible = True
@@ -483,7 +484,9 @@ def video_controls_show():
    _controls_visible = True
    gui.volume_show()
    _update_slider()
-   _play_pause_btn.focus = True
+
+   if gui.win.focused_object is None:
+      _play_pause_btn.focus = True
 
 def video_controls_hide():
    global _controls_visible

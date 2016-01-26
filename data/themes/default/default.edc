@@ -1510,7 +1510,7 @@ collections {
                fixed: 1 1;
                align: 1.0 0.5;
                rel1 {
-                  to_x: "videoplayer.controls.bg";
+                  to: "videoplayer.controls.bg";
                   relative: 1.0 0.0;
                   offset: -10 5;
                }

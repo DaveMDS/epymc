@@ -99,7 +99,7 @@ def init():
    conf.focus_highlight_enabled = True
    conf.focus_highlight_animate = False
    conf.focus_autoscroll_mode = elm.ELM_FOCUS_AUTOSCROLL_MODE_NONE #ELM_FOCUS_AUTOSCROLL_MODE_SHOW or ELM_FOCUS_AUTOSCROLL_MODE_BRING_IN
-   conf.item_select_on_focus_disabled = True
+   conf.item_select_on_focus_disabled = False
    conf.focus_highlight_clip_disabled = False
    # conf.softcursor_mode = ELM_SOFTCURSOR_MODE_ON
    if evas_accelerated == 'True':
@@ -479,7 +479,7 @@ def focus_move(direction, root_obj=None):
 
    # move between Genlist items...
    elif isinstance(focused, Genlist) and focused.focus_allow:
-      item = focused.focused_item
+      item = focused.focused_item or focused.selected_item
       to_item = None
       if direction == 'DOWN':
          to_item = item.next
@@ -497,9 +497,10 @@ def focus_move(direction, root_obj=None):
 
    # move between Gengrid items...
    elif isinstance(focused, Gengrid) and focused.focus_allow:
-      item = focused.focused_item
+      item = focused.focused_item or focused.selected_item
       x1, y1 = item.pos
       to_item = None
+
       if direction in ('LEFT', 'RIGHT'):
          to_item = item.next if direction == 'RIGHT' else item.prev
          if to_item:
@@ -509,57 +510,41 @@ def focus_move(direction, root_obj=None):
 
       elif direction == 'DOWN':
          to_item = item
-         x2, y2 = 0, 0
-         ymax = y1 + 1
          try:
             while True:
                to_item = to_item.next
-               # if to_item.select_mode == elm.ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY:
-               if to_item.disabled:
-                  ymax += 1
-                  continue
                x2, y2 = to_item.pos
-               if x2 == x1:
-                  break
-               if y2 > ymax:
-                  while True:
-                     to_item = to_item.prev
-                     # if to_item.select_mode != elm.ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY:
-                     if not to_item.disabled:
-                        break
+               # skip items on the same row of the start one
+               if y2 == y1:
+                  continue
+               # skip group items
+               if to_item.disabled:
+                  continue
+               # search the first item on the same col (or on the left)
+               if x2 == x1 or to_item.next.pos[1] > y2:
                   break
          except:
-            if item != focused.last_item:
-               to_item = focused.last_item
-            else:
+            if to_item != focused.last_item:
                to_item = None
-
+         
       else: # UP
          to_item = item
-         x2, y2 = 0, 0
-         ymin = y1 - 1
          try:
             while True:
                to_item = to_item.prev
-               # if to_item.select_mode == elm.ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY:
-               if to_item.disabled:
-                  ymin -= 1
-                  continue
                x2, y2 = to_item.pos
-               if y2 < ymin:
-                  while True:
-                     to_item = to_item.next
-                     # if to_item.select_mode != elm.ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY:
-                     if not to_item.disabled:
-                        break
-                  break
-               if x2 == x1:
+               # skip items on the same row of the start one
+               if y2 == y1:
+                  continue
+               # skip group items
+               if to_item.disabled:
+                  continue
+               # search the first item on the same col (or on the left)
+               if x2 <= x1:
                   break
          except:
-            if item != focused.first_item:
-               to_item = focused.first_item
-            else:
-               to_item = None
+            to_item = None
+         
 
       if to_item:
          to_item.selected = True

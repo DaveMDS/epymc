@@ -554,6 +554,12 @@ def focus_move(direction, root_obj=None):
 
    # or just let elm move the focus between objects
    root_obj.focus_next(focus_directions[direction])
+
+   # workaroud for a bug in gengrid that give focus to the grid but not to an item
+   new_focused = win.focused_object
+   if isinstance(new_focused, (Gengrid, Genlist)) and new_focused.focused_item is None:
+      new_focused.selected_item.focus = True
+
    return False
 
 def _input_event_cb(event):

@@ -1320,17 +1320,21 @@ class EmcDialog(Layout):
          focus_move(event, self)
          return input_events.EVENT_BLOCK
 
-      if event == 'OK' and not isinstance(self.focused_object, EmcButton):
-         if self._done_cb:
+      if event == 'OK':
+         if isinstance(self.focused_object, EmcButton):
+            self.focused_object.activate()
+
+         elif self._done_cb:
             if self._list:
                it = self._list.selected_item
                self._list_item_activated_cb(self._list, it)
             else:
                self._done_cb(self)
-            return input_events.EVENT_BLOCK
+
          else:
             self.delete()
-            return input_events.EVENT_BLOCK
+
+         return input_events.EVENT_BLOCK
 
       return input_events.EVENT_CONTINUE
 

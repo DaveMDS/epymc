@@ -1432,7 +1432,7 @@ group { name: "elm/list/item/browser"; alias: "elm/list/item_odd/browser";
 group { name: "elm/genlist/item_compress/default/browser";
    data.item: "selectraise" "on";
    data.item: "focusraise" "on";
-   data.item: "focus_highlight" "off";
+   data.item: "focus_highlight" "on";
    data.item: "texts" "elm.text.main elm.text.end";
    data.item: "contents" "elm.swallow.icon elm.swallow.end";
    // data.item: "treesize" 16;
@@ -1534,23 +1534,6 @@ group { name: "elm/genlist/item_compress/default/browser";
             visible: 1;
          }
       }
-      // part { name: "focus"; type: IMAGE; nomouse;
-         // description { state: "default" 0.0;
-            // visible: 0;
-            // rel1.offset: -7 -7;
-            // rel2.offset: 5 5;
-            // image {
-               // normal: "box_glow.png";
-               // border: 12 12 12 12;
-               // middle: NONE;
-            // }
-            // fill.smooth: 0;
-         // }
-         // description { state: "focused" 0.0;
-            // inherit: "default" 0.0;
-            // visible: 1;
-         // }
-      // }
       part { name: "elm.swallow.icon";
          type: SWALLOW;
          scale: 1;
@@ -1687,6 +1670,36 @@ group { name: "elm/genlist/item_compress/default/browser";
             color: 255 255 255 64;
          }
       }
+      part { name: "focus_hilight"; nomouse;
+         description { state: "default" 0.0;
+            visible: 0;
+            rel1.offset: -7 -7;
+            rel2.offset: 5 5;
+            image.normal: "box_glow.png";
+            image.border: 12 12 12 12;
+            image.middle: NONE;
+            fill.smooth: 0;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+      }
+      part { name: "focus_hilight_pulse"; nomouse;
+         description { state: "default" 0.0;
+            image.normal: "box_outline.png";
+            image.border: 12 12 12 12;
+            image.middle: 0;
+            fill.smooth: 0;
+            rel1.to: "focus_hilight";
+            rel2.to: "focus_hilight";
+            color: 255 255 255 0;
+         }
+         description { state: "hi" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255;
+         }
+      }
    }
    programs {
       program { name:"go_active";
@@ -1742,14 +1755,35 @@ group { name: "elm/genlist/item_compress/default/browser";
          action: STATE_SET "default" 0.0;
          target: "elm.swallow.end";
       }
-      // program { signal: "elm,state,focused"; source: "elm";
-         // action: STATE_SET "focused" 0.0;
-         // target: "focus";
-      // }
-      // program { signal: "elm,state,unfocused"; source: "elm";
-         // action: STATE_SET "default" 0.0;
-         // target: "focus";
-      // }
+      program { signal: "elm,state,focused"; source: "elm";
+         action: STATE_SET "visible" 0.0;
+         target: "focus_hilight";
+         after: "focus_pulse";
+      }
+      program { signal: "elm,state,unfocused"; source: "elm";
+         action: STATE_SET "default" 0.0;
+         target: "focus_hilight";
+         target: "focus_hilight_pulse";
+         after: "focus_pulse_stop";
+      }
+      program { name: "focus_pulse";
+         action: STATE_SET "hi" 0.0;
+         transition: SINUSOIDAL 0.2;
+         in: 3.0 0.0;
+         target: "focus_hilight_pulse";
+         after: "focus_pulse2";
+      }
+      program { name: "focus_pulse2";
+         action: STATE_SET "default" 0.0;
+         transition: SINUSOIDAL 0.4;
+         target: "focus_hilight_pulse";
+         after: "focus_pulse";
+      }
+      program { name: "focus_pulse_stop";
+         action: ACTION_STOP;
+         target: "focus_pulse";
+         target: "focus_pulse2";
+      }
    }
 }
 group { name: "elm/genlist/item/group_index/browser"; nomouse; program_source: "elm";
@@ -1892,6 +1926,7 @@ group { "elm/genlist/item_compress/group_index/browser"; nomouse;
 group { name: "elm/gengrid/item/default/browser";
    data.item: "texts" "elm.text";
    data.item: "contents" "elm.swallow.icon elm.swallow.end";
+   data.item: "focus_highlight" "on";
    images {
       image: "bt_sm_base1.png" COMP;
       image: "bt_sm_shine.png" COMP;
@@ -2052,6 +2087,36 @@ group { name: "elm/gengrid/item/default/browser";
             color: 255 255 255 64;
          }
       }
+      part { name: "focus_hilight"; nomouse;
+         description { state: "default" 0.0;
+            visible: 0;
+            rel1.offset: -7 -7;
+            rel2.offset: 5 5;
+            image.normal: "box_glow.png";
+            image.border: 12 12 12 12;
+            image.middle: NONE;
+            fill.smooth: 0;
+         }
+         description { state: "visible" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+      }
+      part { name: "focus_hilight_pulse"; nomouse;
+         description { state: "default" 0.0;
+            image.normal: "box_outline.png";
+            image.border: 12 12 12 12;
+            image.middle: 0;
+            fill.smooth: 0;
+            rel1.to: "focus_hilight";
+            rel2.to: "focus_hilight";
+            color: 255 255 255 0;
+         }
+         description { state: "hi" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 255;
+         }
+      }
    }
    programs {
       // signal: elm,state,%s,active
@@ -2089,6 +2154,35 @@ group { name: "elm/gengrid/item/default/browser";
          source:  "elm";
          action:  STATE_SET "default" 0.0;
          target:  "disclip";
+      }
+      program { signal: "elm,state,focused"; source: "elm";
+         action: STATE_SET "visible" 0.0;
+         target: "focus_hilight";
+         after: "focus_pulse";
+      }
+      program { signal: "elm,state,unfocused"; source: "elm";
+         action: STATE_SET "default" 0.0;
+         target: "focus_hilight";
+         target: "focus_hilight_pulse";
+         after: "focus_pulse_stop";
+      }
+      program { name: "focus_pulse";
+         action: STATE_SET "hi" 0.0;
+         transition: SINUSOIDAL 0.2;
+         in: 3.0 0.0;
+         target: "focus_hilight_pulse";
+         after: "focus_pulse2";
+      }
+      program { name: "focus_pulse2";
+         action: STATE_SET "default" 0.0;
+         transition: SINUSOIDAL 0.4;
+         target: "focus_hilight_pulse";
+         after: "focus_pulse";
+      }
+      program { name: "focus_pulse_stop";
+         action: ACTION_STOP;
+         target: "focus_pulse";
+         target: "focus_pulse2";
       }
    }
 }

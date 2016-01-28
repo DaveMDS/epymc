@@ -86,6 +86,7 @@ def init():
    fps = ini.get('general', 'fps', default_value=30)
    scale = ini.get('general', 'scale', default_value=1.0)
    fullscreen = ini.get('general', 'fullscreen', False)
+   ini.get('general', 'hide_mouse', False)
    ini.get('general', 'time_format', '%H:%M')
    ini.get('general', 'date_format', '%A %d %B')
 
@@ -101,7 +102,7 @@ def init():
    conf.focus_autoscroll_mode = elm.ELM_FOCUS_AUTOSCROLL_MODE_NONE #ELM_FOCUS_AUTOSCROLL_MODE_SHOW or ELM_FOCUS_AUTOSCROLL_MODE_BRING_IN
    conf.item_select_on_focus_disabled = False
    conf.focus_highlight_clip_disabled = False
-   # conf.softcursor_mode = ELM_SOFTCURSOR_MODE_ON
+   # conf.softcursor_mode = elm.ELM_SOFTCURSOR_MODE_ON
    if evas_accelerated == 'True':
       conf.accel_preference = 'accel'
       LOG('Request an hardware accelerated evas engine')
@@ -164,6 +165,14 @@ def init():
 
    # set efl frames per second
    fps_set(fps)
+
+   # an invisible rect used to block mouse events when mouse is hidden
+   r = evas.Rectangle(win.evas, color=(0, 0, 0, 0))
+   r.on_mouse_move_add(lambda o,e: mouse_show())
+   win.resize_object_add(r)
+   win.data['mouse_blocker'] = r
+   if ini.get_bool('general', 'hide_mouse'):
+      mouse_hide()
 
    return True
 
@@ -359,6 +368,19 @@ def clock_update():
       _clock_date_str = date_str
    
    return ecore.ECORE_CALLBACK_RENEW
+
+def mouse_show():
+   if win.data['mouse_blocker'].visible:
+      DBG("Mouse pointer show")
+      win.data['mouse_blocker'].hide()
+      layout.cursor = None
+
+def mouse_hide():
+   if ini.get_bool('general', 'hide_mouse') and \
+         not win.data['mouse_blocker'].visible:
+      DBG("Mouse pointer hide")
+      win.data['mouse_blocker'].show()
+      layout.cursor = 'blank'
 
 ### audio info/controls notify
 _audio_notify = None
@@ -587,6 +609,8 @@ def _input_event_cb(event):
 def _event_cb(event):
    if event == 'VOLUME_CHANGED':
       volume_show(hidein = 3)
+   elif event == 'KEEP_ALIVE':
+      mouse_hide()
 
 
 credits = """

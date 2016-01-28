@@ -412,6 +412,7 @@ def _general_list():
 
 def _general_populate(browser, url):
    standard_item_bool_add('general', 'fullscreen', _('Start in fullscreen'))
+   standard_item_bool_add('general', 'hide_mouse', _('Hide mouse cursor when not needed'))
 
    vals = (_('Ask'), _('Always'), _('Never'))
    standard_item_int_meaning_add('mediaplayer', 'resume_from_last_pos',

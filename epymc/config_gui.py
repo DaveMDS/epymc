@@ -601,25 +601,18 @@ def _subtitles_populate(browser, url):
 ##############  SYS INFO  #####################################################
 
 def _sys_info():
-   from efl.elementary.configuration import preferred_engine_get
    from epymc.gui import _theme_generation
    from epymc import __version__ as emc_version
    try:
       from efl import __version__ as efl_version
    except:
       efl_version = _('Unknown')
-
-   if sys.version_info[0] < 3:
-      pref_engine = preferred_engine_get().encode('utf8')
-   else:
-      pref_engine = preferred_engine_get()
    
    downl_avail = ecore.file_download_protocol_available('http://')
    win_w, win_h = gui.win.size
    scr_x, scr_y, scr_w, scr_h = gui.win.screen_size
    dpi_x, dpi_y = gui.win.screen_dpi
    text = '<title>%s</><br>' \
-          '<name>%s:</name> %s<br>' \
           '<name>%s:</name> %s<br>' \
           '<name>%s:</name> %s - %s<br>' \
           '<name>%s:</> %dx%d <name>%s:</> %dx%d+%d+%d <name>%s:</> %d %d<br>' \
@@ -631,7 +624,6 @@ def _sys_info():
           '<name>%s:</name> %s<br>' \
           '<name>%s:</name> %s<br>' % (
             _('Core'),
-            _('Rendering engine'), pref_engine,
             _('Download available'), _('yes') if downl_avail else _('no'),
             _('Theme'), ini.get('general', 'theme'), gui.theme_file,
             _('Window size'), win_w, win_h,

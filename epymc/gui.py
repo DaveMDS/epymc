@@ -167,7 +167,8 @@ def init():
    fps_set(fps)
 
    # an invisible rect used to block mouse events when mouse is hidden
-   r = evas.Rectangle(win.evas, color=(0, 0, 0, 0))
+   r = evas.Rectangle(win.evas, color=(0, 0, 0, 0),
+                      size_hint_expand=EXPAND_BOTH)
    r.on_mouse_move_add(lambda o,e: mouse_show())
    win.resize_object_add(r)
    win.data['mouse_blocker'] = r

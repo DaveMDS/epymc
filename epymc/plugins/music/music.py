@@ -384,7 +384,7 @@ class MusicModule(EmcModule):
             title = meta['title'][0].encode('utf-8')
 
       if 'artist' in meta:
-         if isinstance(meta['title'][0], bytes):
+         if isinstance(meta['artist'][0], bytes):
             artist = meta['artist'][0].decode('utf-8') 
          elif utils.is_py3():
             artist = meta['artist'][0]
@@ -392,7 +392,7 @@ class MusicModule(EmcModule):
             artist = meta['artist'][0].encode('utf-8')
 
       if 'album' in meta:
-         if isinstance(meta['title'][0], bytes):
+         if isinstance(meta['album'][0], bytes):
             album = meta['album'][0].decode('utf-8') 
          elif utils.is_py3():
             album = meta['album'][0]

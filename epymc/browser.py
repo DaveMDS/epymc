@@ -501,7 +501,8 @@ class ViewList(object):
                                   text_get_func=self.__gl_text_get,
                                   content_get_func=self.__gl_content_get)
       self.itc_g = GenlistItemClass(item_style='group_index',
-                                    text_get_func=self.__gl_group_text_get)
+                                    text_get_func=self.__gl_group_text_get,
+                                    content_get_func=self.__gl_group_content_get)
 
       # RemoteImage (poster)
       self._poster = EmcImage()
@@ -661,6 +662,11 @@ class ViewList(object):
    def __gl_group_text_get(self, obj, part, item_data):
       label, icon = item_data                                                   # g #
       return label
+
+   def __gl_group_content_get(self, obj, part, item_data):
+      if part == 'elm.swallow.icon':
+         label, icon = item_data                                                # g #
+         return gui.load_icon(icon)
    
    ### GenList Callbacks
    def _cb_item_realized(self, gl, item):

@@ -72,9 +72,12 @@ class RootArtistsItemClass(EmcItemClass):
    def label_end_get(self, url, mod):
       return str(len(mod._artists_db))
 
+   def icon_get(self, url, mod):
+      return 'icon/artist'
+
 class RootAlbumsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod._browser.page_add('music://albums', _('Albums'), mod._styles,
+      mod._browser.page_add('music://albums', _('Albums'), mod._styles2,
                             mod.populate_albums_page)
 
    def label_get(self, url, mod):
@@ -82,6 +85,9 @@ class RootAlbumsItemClass(EmcItemClass):
 
    def label_end_get(self, url, mod):
       return str(len(mod._albums_db))
+
+   def icon_get(self, url, mod):
+      return 'icon/album'
 
 class RootSongsItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -93,6 +99,9 @@ class RootSongsItemClass(EmcItemClass):
 
    def label_end_get(self, url, mod):
       return str(len(mod._songs_db))
+
+   def icon_get(self, url, mod):
+      return 'icon/song'
 
 class RootRebuildItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -164,7 +173,7 @@ class SongItemClass(EmcItemClass):
          text += _('duration: %s<br>') % ('%.02d:%.02d' % (min,sec))
       return text
 
-   def icon_get(self, url, song):
+   def icon_end_get(self, url, song):
       if url == mediaplayer._onair_url:
          return 'icon/play'
 
@@ -181,7 +190,7 @@ class AlbumItemClass(EmcItemClass):
       return _mod.search_poster_for_album(album)
 
    def cover_get(self, url, album):
-      return _mod.search_poster_for_album(album)
+      return _mod.search_poster_for_album(album) or 'special/cd/'+album['name']
 
    def info_get(self, url, album):
       text = '<title>%s</title><br>' % utf8_to_markup(album['name'])
@@ -219,6 +228,8 @@ class ArtistItemClass(EmcItemClass):
       name = utf8_to_markup(artist['name'])
       return '<title>%s</><br>%s, %s' % (name, albums, songs)
 
+   def icon_get(self, url, mod):
+      return 'icon/artist'
 
 class MusicModule(EmcModule):
    name = 'music'
@@ -233,6 +244,7 @@ class MusicModule(EmcModule):
    _albums_db = None    # key=album_name    data=dict
    _artists_db = None   # key=artist_name   data=dict
    _styles = ('List', 'CoverGrid')
+   _styles2 = ('CoverGrid', 'List')
 
 
    def __init__(self):
@@ -310,7 +322,7 @@ class MusicModule(EmcModule):
       elif url == 'music://artists':
          self._browser.page_add(url, _('Artists'), self._styles, self.populate_artists_page)
       elif url == 'music://albums':
-         self._browser.page_add(url, _('Albums'), self._styles, self.populate_albums_page)
+         self._browser.page_add(url, _('Albums'), self._styles2, self.populate_albums_page)
       elif url == 'music://songs':
          self._browser.page_add(url, _('Songs'), self._styles, self.populate_songs_page)
 
@@ -597,13 +609,13 @@ class MusicModule(EmcModule):
          self._browser.item_add(SongItemClass(), song['url'], song)
 
    def populate_albums_page(self, browser, page_url):
-      """ list of all albums """
+      """ list of all albums (grouped by artist) """
       L = [self._albums_db.get_data(k) for k in self._albums_db.keys()]
       last_artist = None
       for album in sorted(L, key=operator.itemgetter('artist')):
          if album['artist'] != last_artist:
             last_artist = album['artist']
-            self._browser.group_add(last_artist, 'icon/head')
+            self._browser.group_add(last_artist, 'icon/artist')
          self._browser.item_add(AlbumItemClass(), album['name'], album)
 
    def populate_artists_page(self, browser, page_url):
@@ -613,12 +625,17 @@ class MusicModule(EmcModule):
          self._browser.item_add(ArtistItemClass(), artist['name'], artist)
 
    def populate_artist_page(self, browser, url, artist):
-      """ list of all songs for the given artist """
+      """ list of all songs for the given artist (grouped by album) """
       L = [ self._songs_db.get_data(url) for url in artist['songs'] ]
       L.sort(key=operator.itemgetter('album', 'tracknumber', 'title'))
       self._browser.item_add(QueueArtistItemClass(), url, L)
+      last_album = None
       for song in L:
+         if song['album'] != last_album:
+            last_album = song['album']
+            self._browser.group_add(last_album, 'icon/album')
          self._browser.item_add(SongItemClass(), song['url'], song)
+         
 
    def populate_album_page(self, browser, url, album):
       """ list of all songs in the given album """

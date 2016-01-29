@@ -22,7 +22,9 @@ TMP
  * new text styles: mi piace, etc...
  * update italian translation
  * migliorare grafica dei dialog
+ 
  * require efl >= 1.17 (and use setup.py efl stuff)
+ * db_py3_browser_view_memory need to be cleared for the relase (dump version)
  * comment-out all DBG functions
 
  * use EmcUrl where needed

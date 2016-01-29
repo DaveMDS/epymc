@@ -3030,6 +3030,30 @@ collections {
          }
       }
    }
+   group { name: "emc/image/cd";  /* API */
+      images {
+         image: "image_cd_cover_blank.png" COMP;
+      }
+      parts {
+         part { name: "image"; type: IMAGE;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               image.normal: "image_cd_cover_blank.png";
+               aspect_preference: SOURCE;
+            }
+         }
+         part { name: "emc.text"; type: TEXTBLOCK;  /* API */
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.to: "image";
+               rel2.to: "image";
+               rel1.relative: 0.10 0.01;
+               rel2.relative: 0.99 0.99;
+               text.style: "epymc_special_image_style";
+            }
+         }
+      }
+   }
    group { name: "emc/image/folder";  /* API */
       images {
          image: "image_folder_vert.png" COMP;

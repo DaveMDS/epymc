@@ -914,7 +914,7 @@ class EmcImage(Image):
                * 'icon/*' to load an icon (aspect 1:1) from the theme
                * 'image/*' to load an image from the theme
                * 'special/style/text' to create a "special" image, supported
-                 styles are: 'folder', 'bd', 'icon'
+                 styles are: 'folder', 'bd', 'cd', 'icon'
                  The text will be inserted in the image.
                * 'special/vthumb/video_url' to create a thumb of a video file
                * None to "unset" the image

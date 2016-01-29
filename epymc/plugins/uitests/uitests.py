@@ -133,6 +133,8 @@ class ImagesItemClass(EmcItemClass):
          return 'https://image.tmdb.org/t/p/original/cUKn61e7bUUglIGNGBEtzyuCDR4.jpg'
       elif url == 'special_bd':
          return 'special/bd/My super cool movie without a poster'
+      elif url == 'special_cd':
+         return 'special/cd/My album without a cover'
       elif url == 'special_folder':
          return 'special/folder/This is my special/folder/name <br>' \
                 '(can also include "/" and other special chars)<br>' \
@@ -611,6 +613,7 @@ class UiTestsModule(EmcModule):
       _mod._browser.item_add(ImagesItemClass(), 'remote_url_cache', 'From a remote url (with auto cache)')
       _mod._browser.item_add(ImagesItemClass(), 'special_folder', 'Special Folder')
       _mod._browser.item_add(ImagesItemClass(), 'special_bd', 'Special Blu-ray')
+      _mod._browser.item_add(ImagesItemClass(), 'special_cd', 'Special Compact-disk')
       _mod._browser.item_add(ImagesItemClass(), 'special_icon', 'Special Icon (in PosterGrid view)')
       _mod._browser.item_add(ImagesItemClass(), 'special_null', 'Special Null (transparent)')
 

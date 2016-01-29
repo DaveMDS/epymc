@@ -60,6 +60,10 @@ ICON("star")
 ICON("star_off")
 ICON("head")
 
+ICON("artist")
+ICON("album")
+ICON("song")
+
 ICON("module")
 ICON("theme")
 ICON("scale")

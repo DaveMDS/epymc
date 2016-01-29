@@ -957,6 +957,9 @@ def input_event_cb(event):
       if event == 'BACK':
          video_controls_hide()
          return input_events.EVENT_BLOCK
+      elif event in gui.focus_directions:
+         gui.focus_move(event)
+         return input_events.EVENT_BLOCK
    else:
       if event == 'BACK':
          stop()

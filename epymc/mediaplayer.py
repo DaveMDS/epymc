@@ -427,6 +427,9 @@ def volume_mute_set(mute):
    if _emotion:
       _emotion.audio_mute = _volume_muted
 
+def volume_mute_get():
+   return _volume_muted
+
 def volume_mute_toggle():
    volume_mute_set(not _volume_muted)
 
@@ -745,39 +748,51 @@ def _cb_btn_fbackward(btn):
 
 # audio menu
 def _build_audio_menu(btn):
-   trk_cnt = _emotion.audio_channel_count()
    menu = EmcMenu(relto=btn, close_on=('UP',))
+
+   # audio channels
+   trk_cnt = _emotion.audio_channel_count()
+   current = _emotion.audio_channel
    for n in range(trk_cnt):
       name = _emotion.audio_channel_name_get(n)
       if name:
          name = _('Audio track: %s') % name
       else:
          name = _('Audio track #%d') % (n + 1)
-      item = menu.item_add(None, name, None, _cb_menu_audio_track, n)
+      icon = 'item_sel' if n == current else None
+      item = menu.item_add(None, name, icon, _cb_menu_audio_track, n)
 
+   # mute / unmute
    menu.item_separator_add()
-   item = menu.item_add(None, _('Mute'), 'clock', _cb_menu_mute)
+   if volume_mute_get():
+      menu.item_add(None, _('Unmute'), 'volume',
+                    lambda m,i: volume_mute_set(False))
+   else:
+      menu.item_add(None, _('Mute'), 'mute',
+                    lambda m,i: volume_mute_set(True))
 
 def _cb_menu_audio_track(menu, item, track_num):
    print("TODO: add support in emotion/gstreamer for this")
    print("Change to audio track #" + str(track_num))
    _emotion.audio_channel_set(track_num)
 
-def _cb_menu_mute(menu, item):
-   volume_mute_toggle()
-
 # video menu
 def _build_video_menu(btn):
-   trk_cnt = _emotion.video_channel_count()
    menu = EmcMenu(relto=btn, close_on=('UP',))
+
+   # video channels
+   trk_cnt = _emotion.video_channel_count()
+   current = _emotion.video_channel
    for n in range(trk_cnt):
       name = _emotion.video_channel_name_get(n)
       if name:
          name = _('Video track: %s') % name
       else:
          name = _('Video track #%d') % (n + 1)
-      item = menu.item_add(None, name, None, _cb_menu_video_track, n)
+      icon = 'item_sel' if n == current else None
+      item = menu.item_add(None, name, icon, _cb_menu_video_track, n)
 
+   # download
    menu.item_separator_add()
    it = menu.item_add(None, _('Download video'), None, _cb_menu_download)
    if _onair_url.startswith('file://'):
@@ -806,7 +821,7 @@ def _build_subtitles_menu(btn):
    menu.item_separator_add()
 
    menu.item_add(None, _('No subtitles'),
-                 None if _subtitles.current_file else 'arrow_right',
+                 None if _subtitles.current_file else 'item_sel',
                  _cb_menu_subs_track, None)
    for sub in _subtitles.search_subs():
       if sub.startswith(utils.user_conf_dir):
@@ -814,7 +829,7 @@ def _build_subtitles_menu(btn):
       else:
          name = os.path.basename(sub)
       menu.item_add(None, name,
-                    'arrow_right' if sub == _subtitles.current_file else None,
+                    'item_sel' if sub == _subtitles.current_file else None,
                     _cb_menu_subs_track, sub)
 
    menu.item_separator_add()

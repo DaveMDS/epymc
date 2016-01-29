@@ -49,6 +49,7 @@ ICON("arrowU")
 ICON("arrowD")
 ICON("next")
 ICON("prev")
+ICON("item_sel")
 
 ICON("views")
 ICON("view_list")
@@ -71,6 +72,8 @@ ICON("fwd")
 ICON("ffwd")
 ICON("bwd")
 ICON("fbwd")
+ICON("volume")
+ICON("mute")
 
 
 // Those should go in a module specific edc...
@@ -86,3 +89,19 @@ ICON("tv")
 ICON("calib")
 ICON("olvideo")
 ICON("watchdog")
+
+
+// Elm icons (used only in EmcMenu)
+#define ELM_ICON(Name, File) \
+   group { name: "elm/icon/"##Name##"/default"; min: 16 16; max: 0 0; \
+   images.image: File COMP; parts { part { name: "base"; \
+   description { aspect: 1.0 1.0; aspect_preference: BOTH; \
+   image.normal: File; } } } }
+ELM_ICON("volume", "icon_volume.png");
+ELM_ICON("mute", "icon_mute.png");
+ELM_ICON("item_sel", "icon_item_sel.png");
+
+
+#undef ICON
+#undef IMAGE
+#undef ELM_ICON

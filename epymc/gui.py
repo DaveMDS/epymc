@@ -102,7 +102,6 @@ def init():
    conf.focus_autoscroll_mode = elm.ELM_FOCUS_AUTOSCROLL_MODE_NONE #ELM_FOCUS_AUTOSCROLL_MODE_SHOW or ELM_FOCUS_AUTOSCROLL_MODE_BRING_IN
    conf.item_select_on_focus_disabled = False
    conf.focus_highlight_clip_disabled = False
-   # conf.softcursor_mode = elm.ELM_SOFTCURSOR_MODE_ON
    if evas_accelerated == 'True':
       conf.accel_preference = 'accel'
       LOG('Request an hardware accelerated evas engine')
@@ -861,6 +860,7 @@ class EmcMenu(Menu):
 
    def _input_event_cb(self, event):
       item = self.selected_item
+
       if event == 'UP':
          if event in self.close_on and item == self.first_item:
             self.close()

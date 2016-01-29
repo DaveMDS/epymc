@@ -228,7 +228,7 @@ def play_url(url, only_audio=False, start_from=None):
 
    # resume playback from last position ?
    counts = play_counts_get(url)
-   if counts['stop_at'] > 0:
+   if counts['stop_at'] > 10.0: # don't ask if less then 10 seconds
       pos = counts['stop_at']
       if resume_opt == 1: # always resume
          _play_real(pos)

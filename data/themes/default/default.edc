@@ -200,7 +200,6 @@ collections {
                   getsarg(2, buf, sizeof(buf));
                   set_text(PART:"mainmenu.clock.time", buf);
                   set_text(PART:"topbar.clock", buf);
-                  set_text(PART:"videoplayer.clock", buf);
                }
                else if ((id == MESSAGE_CLOCK_DATE) && (type == MSG_STRING)) {
                   new buf[64];
@@ -1423,40 +1422,19 @@ collections {
             target: "mainmenu.clock.clip";
          }
 
-/// videoplayer
-         part { name: "videoplayer.bg"; type: RECT;
-            mouse_events: 0;
-            clip_to: "videoplayer.clip";
-            description { state: "default" 0.0;
-               color: 0 0 0 255;
-            }
-         }
-         part { name: "videoplayer.video"; type: SWALLOW;  /* API */
-            clip_to: "videoplayer.clip";
-            description { state: "default" 0.0;
-            }
-         }
+/// videoplayer swallow
          part { name: "videoplayer.clip"; type: RECT;
             mouse_events: 0;
             description { state: "default" 0.0;
                color: 255 255 255 0;
-               visible: 0;
             }
             description { state: "visible" 0.0;
                color: 255 255 255 255;
-               visible: 1;
             }
          }
-         part { name: "videoplayer.events"; type: RECT;  /* API */
-            mouse_events: 1;
-            description { state: "default" 0.0;
-               color: 0 0 0 0;
-               visible: 0;
-            }
-            description { state: "visible" 0.0;
-               color: 0 0 0 0;
-               visible: 1;
-            }
+         part { name: "videoplayer.swallow"; type: SWALLOW;  /* API */
+            clip_to: "videoplayer.clip";
+            description { state: "default" 0.0; }
          }
          part { name: "videoplayer.subs"; type: TEXTBLOCK;  /* API */
             mouse_events: 0;
@@ -1468,251 +1446,13 @@ collections {
                }
             }
          }
-         part { name: "videoplayer.controls.bg"; type: IMAGE;
-            clip_to: "videoplayer.clip";
-            scale: 1;
-            description { state: "default" 0.0;
-               min: 80 94;
-               max: -1 94;
-               align: 0.5 0.0;
-               fixed: 1 1;
-               rel1.relative: 0.0 -0.5;
-               image.normal: "mp_controls_bg.png";
-               image.border: 0 0 0 15;
-               visible: 0;
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               rel1.relative: 0.0 0.0;
-               visible: 1;
-            }
-         }
-         part { name: "videoplayer.controls.poster"; type: SWALLOW;  /* API */
-            mouse_events: 0;
-            clip_to: "videoplayer.clip";
-            description { state: "default" 0.0;
-               visible: 0;
-               rel1.relative: 0.0 (0.0 - 0.9);
-               rel2.relative: 0.25 (0.45 - 0.9);
-               rel1.offset: 5 5;
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               visible: 1;
-               rel1.relative: 0.0 0.0;
-               rel2.relative: 0.25 0.45;
-            }
-         }
-         part { name: "videoplayer.clock.spacer"; type: TEXT;
-            scale: 1;
-            description { state: "default" 0.0;
-               visible: 0;
-               fixed: 1 1;
-               align: 1.0 0.5;
-               rel1 {
-                  to: "videoplayer.controls.bg";
-                  relative: 1.0 0.0;
-                  offset: -10 5;
-               }
-               rel2 {
-                  to: "videoplayer.controls.bg";
-                  offset: -10 -55;
-               }
-               text {
-                  font: FONT2;
-                  size: FONT_SIZE_BIG;
-                  min: 1 0;
-                  ellipsis: -1;
-                  text: "00::00";
-               }
-            }
-         }
-         part { name: "videoplayer.clock"; type: TEXT;
-            scale: 1;
-            clip_to: "videoplayer.clip";
-            effect: FAR_SHADOW;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               color: FONT_COLOR_TOPBAR;
-               color3: FONT_COLOR3_TOPBAR;
-               rel1.to: "videoplayer.clock.spacer";
-               rel2.to: "videoplayer.clock.spacer";
-               text {
-                  font: FONT2;
-                  size: FONT_SIZE_BIG;
-                  min: 1 0;
-                  ellipsis: -1;
-                  align: 1.0 0.5;
-               }
-            }
-         }
-         part { name: "videoplayer.controls.container1"; type: SPACER;
-            description { state: "default" 0.0;
-               rel1 {
-                  to_x: "videoplayer.controls.poster";
-                  to_y: "videoplayer.controls.bg";
-                  relative: 1.0 0.0;
-                  offset: 5 5;
-               }
-               rel2 {
-                  to: "videoplayer.clock.spacer";
-                  relative: 0.0  1.0;
-               }
-            }
-         }
-         part { name: "videoplayer.controls.btn_box"; type: BOX;  /* API */
-            description { state: "default" 0.0;
-               rel1.to: "videoplayer.controls.container1";
-               rel2.to: "videoplayer.controls.container1";
-               box {
-                  layout: "horizontal";
-                  padding: 2 0;
-                  align: 0.0 0.5;
-               }
-            }
-         }
-         part { name: "videoplayer.controls.btn_box2"; type: BOX;  /* API */
-            description { state: "default" 0.0;
-               rel1.to: "videoplayer.controls.container1";
-               rel2.to: "videoplayer.controls.container1";
-               box {
-                  layout: "horizontal";
-                  padding: 2 0;
-                  align: 1.0 0.5;
-               }
-            }
-         }
-         part { name: "videoplayer.controls.container2"; type: SPACER;
-            description { state: "default" 0.0;
-               rel1 {
-                  to_x: "videoplayer.controls.poster";
-                  to_y: "videoplayer.controls.bg";
-                  relative: 1.0 0.0;
-                  offset: 7 42;
-               }
-               rel2 {
-                  to: "videoplayer.controls.bg";
-                  offset: -12 -15;
-               }
-            }
-         }
-         part { name: "videoplayer.controls.position"; type: TEXT;  /* API */
-            mouse_events: 0;
-            scale: 1;
-            clip_to: "videoplayer.clip";
-            effect: FAR_SHADOW;
-            description { state: "default" 0.0;
-               color: FONT_COLOR;
-               color3: FONT_COLOR3;
-               align: 0.0 0.5;
-               fixed: 1 1;
-               rel1 {
-                  to: "videoplayer.controls.container2";
-                  relative: 0.0 0.0;
-               }
-               rel2 {
-                  to: "videoplayer.controls.container2";
-                  relative: 0.0 1.0;
-               }
-               text {
-                  text: "0:00:00";
-                  font: FONT2;
-                  size: FONT_SIZE;
-                  align: 0.0 1.0;
-                  min: 1 0;
-                  ellipsis: -1;
-               }
-            }
-         }
-         part { name: "videoplayer.controls.position.spacer"; type: TEXT;
-            inherit: "videoplayer.controls.position";
-            /* This part is used as a spacer to avoid the slider
-             * changes it's starting position while the numbers in
-             * the position text changes */
-            description { state: "default" 0.0;
-               visible: 0;
-               text.text: "0:00:00";
-            }
-         }
-         part { name: "videoplayer.controls.slider"; type: GROUP;  /* API */
-            source: "emc/slider/default";
-            mouse_events: 1;
-            scale: 1;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               rel1 {
-                  to: "videoplayer.controls.position.spacer";
-                  relative: 1.0 0.0;
-                  offset: 5 0;
-               }
-               rel2 {
-                  to: "videoplayer.controls.length";
-                  relative: 0.0 1.0;
-                  offset: -6 -1;
-               }
-            }
-         }
-         part { name: "videoplayer.controls.length"; type: TEXT;  /* API */
-            mouse_events: 0;
-            scale: 1;
-            clip_to: "videoplayer.clip";
-            effect: FAR_SHADOW;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               color: FONT_COLOR;
-               color3: FONT_COLOR3;
-               align: 1.0 0.0;
-               rel1 {
-                  to: "videoplayer.controls.container2";
-                  relative: 1.0 0.0;
-               }
-               rel2 {
-                  to: "videoplayer.controls.container2";
-                  relative: 1.0 1.0;
-               }
-               text {
-                  text: "0:00:00";
-                  font: FONT2;
-                  size: FONT_SIZE;
-                  align: 1.0 1.0;
-                  min: 1 0;
-                  ellipsis: -1;
-               }
-            }
-         }
-         part { name: "videoplayer.controls.title"; type: TEXT;  /* API */
-            mouse_events: 0;
-            scale: 1;
-            clip_to: "videoplayer.clip";
-            effect: FAR_SHADOW;
-            description { state: "default" 0.0;
-               color: FONT_COLOR;
-               color3: FONT_COLOR3;
-               rel1 {
-                  to_x: "videoplayer.controls.poster";
-                  to_y: "videoplayer.controls.bg";
-                  relative: 1.0 1.0;
-                  offset: 5 -20;
-               }
-               rel2 {
-                  to: "videoplayer.controls.bg";
-                  relative: 1.0 1.0;
-               }
-               text {
-                  text: "Title";
-                  font: FONT2;
-                  size: FONT_SIZE_BIGGER;
-                  align: 0.0 0.0;
-               }
-            }
-         }
          program { name: "videoplayer_show";  /* API */
             signal: "videoplayer,show";
             source: "emc";
             action: STATE_SET "visible" 0.00;
             transition: LINEAR 0.4;
             target: "videoplayer.clip";
-            target: "videoplayer.events";
+            after: "videoplayer_show_done";
          }
          program { name: "videoplayer_hide";  /* API */
             signal: "videoplayer,hide";
@@ -1720,200 +1460,18 @@ collections {
             action: STATE_SET "default" 0.00;
             transition: LINEAR 0.4;
             target: "videoplayer.clip";
-            target: "videoplayer.events";
+            after: "videoplayer_hide_done";
          }
-         program { name: "videoplayer_controls_show";  /* API */
-            signal: "videoplayer,controls,show";
-            source: "emc";
-            action: STATE_SET "visible" 0.0;
-            transition: DECELERATE 0.4;
-            target: "videoplayer.controls.bg";
-            target: "videoplayer.controls.poster";
+         program { name: "videoplayer_show_done"; /* API */
+            action: SIGNAL_EMIT "videoplayer,show,done" "";
          }
-         program { name: "videoplayer_controls_hide";  /* API */
-            signal: "videoplayer,controls,hide";
-            source: "emc";
-            action: STATE_SET "default" 0.0;
-            transition: ACCELERATE 0.4;
-            target: "videoplayer.controls.bg";
-            target: "videoplayer.controls.poster";
+         program { name: "videoplayer_hide_done"; /* API */
+            action: SIGNAL_EMIT "videoplayer,hide,done" "";
          }
 
 /// slideshow swallow
          part { name: "slideshow.swallow"; type: SWALLOW;  /* API */
             description { state: "default" 0.0; }
-         }
-
-/// minipos
-         part { name: "minipos.bg.shadow"; type: IMAGE;
-            mouse_events: 0;
-            scale: 1;
-            description { state: "default" 0.0;
-               color: 0 0 0 0;
-               rel1.to: "minipos.bg";
-               rel1.offset: -20 0;
-               rel2.to: "minipos.bg";
-               rel2.offset: 20 20;
-               image.normal: "frame_box_for_top_shadow.png";
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               color: 255 255 255 255;
-            }
-         }
-         part { name: "minipos.bg"; type: IMAGE;
-            mouse_events: 0;
-            scale: 1;
-            description { state: "default" 0.0;
-               visible: 0;
-               FIXED_SIZE(500, 40)
-               align: 0.5 1.0;
-               rel2.relative: 1.0 0.0;
-               image.normal: "frame_box_for_top.png";
-               image.border: 1 1 0 1;
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               visible: 1;
-               align: 0.5 0.0;
-            }
-         }
-         part { name: "minipos.icon"; type: IMAGE;
-            description { state: "default" 0.0;
-               aspect: 1.0 1.0;
-               aspect_preference: VERTICAL;
-               align: 0.0 0.5;
-               image.normal: "icon_play.png";
-               color: 255 255 255 200;
-               rel1 {
-                  to: "minipos.bg";
-                  offset: 5 0;
-               }
-               rel2 {
-                  to: "minipos.bg";
-               }
-            }
-            description { state: "play" 0.0;
-               inherit: "default" 0.0;
-            }
-            description { state: "pause" 0.0;
-               inherit: "default" 0.0;
-               image.normal: "icon_pause.png";
-            }
-         }
-         part { name: "minipos.position"; type: TEXT;  /* API */
-            mouse_events: 0;
-            scale: 1;
-            effect: FAR_SHADOW;
-            description { state: "default" 0.0;
-               color: FONT_COLOR_NOSEL;
-               color3: FONT_COLOR3_NOSEL;
-               align: 0.0 0.5;
-               fixed: 1 1;
-               rel1 {
-                  to_x: "minipos.icon";
-                  to_y: "minipos.bg";
-                  relative: 1.0 0.0;
-                  offset: 0 0;
-               }
-               rel2 {
-                  to: "minipos.bg";
-                  relative: 0.0 1.0;
-               }
-               text {
-                  text: "0:00:00";
-                  font: FONT2;
-                  size: FONT_SIZE;
-                  min: 1 0;
-                  ellipsis: -1;
-               }
-            }
-         }
-         part { name: "minipos.position.spacer"; type: TEXT;
-            inherit: "minipos.position";
-            description { state: "default" 0.0;
-               visible: 0;
-               text.text: "0:00:00";
-            }
-         }
-         part { name: "minipos.slider"; type: GROUP;  /* API */
-            source: "emc/slider/default";
-            mouse_events: 0;
-            scale: 1;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               rel1 {
-                  to_x: "minipos.position.spacer";
-                  to_y: "minipos.bg";
-                  relative: 1.0 0.0;
-               }
-               rel2 {
-                  to_x: "minipos.length.spacer";
-                  to_y: "minipos.bg";
-                  relative: 0.0 1.0;
-               }
-            }
-         }
-         part { name: "minipos.length"; type: TEXT;  /* API */
-            mouse_events: 0;
-            scale: 1;
-            effect: FAR_SHADOW;
-            description { state: "default" 0.0;
-               color: FONT_COLOR_NOSEL;
-               color3: FONT_COLOR3_NOSEL;
-               align: 1.0 0.5;
-               fixed: 1 1;
-               rel1 {
-                  to: "minipos.bg";
-                  relative: 1.0 0.0;
-               }
-               rel2 {
-                  to: "minipos.bg";
-                  offset: -11 -1;
-               }
-               text {
-                  text: "0:00:00";
-                  font: FONT2;
-                  size: FONT_SIZE;
-                  min: 1 0;
-                  ellipsis: -1;
-               }
-            }
-         }
-         part { name: "minipos.length.spacer"; type: TEXT;
-            inherit: "minipos.length";
-            description { state: "default" 0.0;
-               visible: 0;
-               text.text: "0:00:00";
-            }
-         }
-         program { name: "minipos_show";  /* API */
-            signal: "minipos,show";
-            source: "emc";
-            action: STATE_SET "visible" 0.0;
-            transition: DECELERATE 0.3;
-            target: "minipos.bg";
-            target: "minipos.bg.shadow";
-         }
-         program { name: "minipos_hide";  /* API */
-            signal: "minipos,hide";
-            source: "emc";
-            action: STATE_SET "default" 0.0;
-            transition: ACCELERATE 0.3;
-            target: "minipos.bg";
-            target: "minipos.bg.shadow";
-         }
-         program { name: "minipos_set_play";  /* API */
-            signal: "minipos,play,set";
-            source: "emc";
-            action: STATE_SET "play" 0.0;
-            target: "minipos.icon";
-         }
-         program { name: "minipos_set_pause";  /* API */
-            signal: "minipos,pause,set";
-            source: "emc";
-            action: STATE_SET "pause" 0.0;
-            target: "minipos.icon";
          }
 
 /// volume
@@ -2839,6 +2397,441 @@ collections {
       }
    }
 
+/// videoplayer
+   group { name: "emc/videoplayer/default"; /* API */
+      parts {
+         part { name: "bg"; type: RECT;
+            mouse_events: 0;
+            description { state: "default" 0.0;
+               color: 0 0 0 255;
+            }
+         }
+         part { name: "video.swallow"; type: SWALLOW;  /* API */
+            description { state: "default" 0.0;
+            }
+         }
+         part { name: "events.rect"; type: RECT;  /* API */
+            mouse_events: 1;
+            description { state: "default" 0.0;
+               color: 0 0 0 0;
+            }
+         }
+         /// controls
+         part { name: "controls.bg"; type: IMAGE;
+            scale: 1;
+            description { state: "default" 0.0;
+               min: 80 94;
+               max: -1 94;
+               align: 0.5 0.0;
+               fixed: 1 1;
+               rel1.relative: 0.0 -0.5;
+               image.normal: "mp_controls_bg.png";
+               image.border: 0 0 0 15;
+               visible: 0;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               rel1.relative: 0.0 0.0;
+               visible: 1;
+            }
+         }
+         part { name: "controls.poster"; type: SWALLOW;  /* API */
+            mouse_events: 0;
+            description { state: "default" 0.0;
+               visible: 0;
+               rel1.relative: 0.0 (0.0 - 0.9);
+               rel2.relative: 0.25 (0.45 - 0.9);
+               rel1.offset: 5 5;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               rel1.relative: 0.0 0.0;
+               rel2.relative: 0.25 0.45;
+            }
+         }
+         part { name: "clock.spacer"; type: TEXT;
+            scale: 1;
+            description { state: "default" 0.0;
+               visible: 0;
+               fixed: 1 1;
+               align: 1.0 0.5;
+               rel1 {
+                  to: "controls.bg";
+                  relative: 1.0 0.0;
+                  offset: -10 5;
+               }
+               rel2 {
+                  to: "controls.bg";
+                  offset: -10 -55;
+               }
+               text {
+                  font: FONT2;
+                  size: FONT_SIZE_BIG;
+                  min: 1 0;
+                  ellipsis: -1;
+                  text: "00::00";
+               }
+            }
+         }
+         part { name: "clock"; type: TEXT;
+            scale: 1;
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               color: FONT_COLOR_TOPBAR;
+               color3: FONT_COLOR3_TOPBAR;
+               rel1.to: "clock.spacer";
+               rel2.to: "clock.spacer";
+               text {
+                  font: FONT2;
+                  size: FONT_SIZE_BIG;
+                  min: 1 0;
+                  ellipsis: -1;
+                  align: 1.0 0.5;
+               }
+            }
+         }
+         part { name: "controls.container1"; type: SPACER;
+            description { state: "default" 0.0;
+               rel1 {
+                  to_x: "controls.poster";
+                  to_y: "controls.bg";
+                  relative: 1.0 0.0;
+                  offset: 5 5;
+               }
+               rel2 {
+                  to: "clock.spacer";
+                  relative: 0.0  1.0;
+               }
+            }
+         }
+         part { name: "controls.btn_box"; type: BOX;  /* API */
+            description { state: "default" 0.0;
+               rel1.to: "controls.container1";
+               rel2.to: "controls.container1";
+               box {
+                  layout: "horizontal";
+                  padding: 2 0;
+                  align: 0.0 0.5;
+               }
+            }
+         }
+         part { name: "controls.btn_box2"; type: BOX;  /* API */
+            description { state: "default" 0.0;
+               rel1.to: "controls.container1";
+               rel2.to: "controls.container1";
+               box {
+                  layout: "horizontal";
+                  padding: 2 0;
+                  align: 1.0 0.5;
+               }
+            }
+         }
+         part { name: "controls.container2"; type: SPACER;
+            description { state: "default" 0.0;
+               rel1 {
+                  to_x: "controls.poster";
+                  to_y: "controls.bg";
+                  relative: 1.0 0.0;
+                  offset: 7 42;
+               }
+               rel2 {
+                  to: "controls.bg";
+                  offset: -12 -15;
+               }
+            }
+         }
+         part { name: "controls.position"; type: TEXT;  /* API */
+            mouse_events: 0;
+            scale: 1;
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               color: FONT_COLOR;
+               color3: FONT_COLOR3;
+               align: 0.0 0.5;
+               fixed: 1 1;
+               rel1 {
+                  to: "controls.container2";
+                  relative: 0.0 0.0;
+               }
+               rel2 {
+                  to: "controls.container2";
+                  relative: 0.0 1.0;
+               }
+               text {
+                  text: "0:00:00";
+                  font: FONT2;
+                  size: FONT_SIZE;
+                  align: 0.0 1.0;
+                  min: 1 0;
+                  ellipsis: -1;
+               }
+            }
+         }
+         part { name: "controls.position.spacer"; type: TEXT;
+            inherit: "controls.position";
+            /* This part is used as a spacer to avoid the slider
+             * changes it's starting position while the numbers in
+             * the position text changes */
+            description { state: "default" 0.0;
+               visible: 0;
+               text.text: "0:00:00";
+            }
+         }
+         part { name: "controls.slider"; type: GROUP;  /* API */
+            source: "emc/slider/default";
+            mouse_events: 1;
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1 {
+                  to: "controls.position.spacer";
+                  relative: 1.0 0.0;
+                  offset: 5 0;
+               }
+               rel2 {
+                  to: "controls.length";
+                  relative: 0.0 1.0;
+                  offset: -6 -1;
+               }
+            }
+         }
+         part { name: "controls.length"; type: TEXT;  /* API */
+            mouse_events: 0;
+            scale: 1;
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               color: FONT_COLOR;
+               color3: FONT_COLOR3;
+               align: 1.0 0.0;
+               rel1 {
+                  to: "controls.container2";
+                  relative: 1.0 0.0;
+               }
+               rel2 {
+                  to: "controls.container2";
+                  relative: 1.0 1.0;
+               }
+               text {
+                  text: "0:00:00";
+                  font: FONT2;
+                  size: FONT_SIZE;
+                  align: 1.0 1.0;
+                  min: 1 0;
+                  ellipsis: -1;
+               }
+            }
+         }
+         part { name: "controls.title"; type: TEXT;  /* API */
+            mouse_events: 0;
+            scale: 1;
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               color: FONT_COLOR;
+               color3: FONT_COLOR3;
+               rel1 {
+                  to_x: "controls.poster";
+                  to_y: "controls.bg";
+                  relative: 1.0 1.0;
+                  offset: 5 -20;
+               }
+               rel2 {
+                  to: "controls.bg";
+                  relative: 1.0 1.0;
+               }
+               text {
+                  text: "Title";
+                  font: FONT2;
+                  size: FONT_SIZE_BIGGER;
+                  align: 0.0 0.0;
+               }
+            }
+         }
+         program { name: "controls_show";  /* API */
+            signal: "controls,show"; source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.4;
+            target: "controls.bg";
+            target: "controls.poster";
+         }
+         program { name: "controls_hide";  /* API */
+            signal: "controls,hide"; source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.4;
+            target: "controls.bg";
+            target: "controls.poster";
+         }
+         /// minipos
+         part { name: "minipos.bg.shadow"; type: IMAGE;
+            mouse_events: 0;
+            scale: 1;
+            description { state: "default" 0.0;
+               color: 0 0 0 0;
+               rel1.to: "minipos.bg";
+               rel1.offset: -20 0;
+               rel2.to: "minipos.bg";
+               rel2.offset: 20 20;
+               image.normal: "frame_box_for_top_shadow.png";
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               color: 255 255 255 255;
+            }
+         }
+         part { name: "minipos.bg"; type: IMAGE;
+            mouse_events: 0;
+            scale: 1;
+            description { state: "default" 0.0;
+               visible: 0;
+               FIXED_SIZE(500, 40)
+               align: 0.5 1.0;
+               rel2.relative: 1.0 0.0;
+               image.normal: "frame_box_for_top.png";
+               image.border: 1 1 0 1;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               align: 0.5 0.0;
+            }
+         }
+         part { name: "minipos.icon"; type: IMAGE;
+            description { state: "default" 0.0;
+               aspect: 1.0 1.0;
+               aspect_preference: VERTICAL;
+               align: 0.0 0.5;
+               image.normal: "icon_play.png";
+               color: 255 255 255 200;
+               rel1 {
+                  to: "minipos.bg";
+                  offset: 5 0;
+               }
+               rel2 {
+                  to: "minipos.bg";
+               }
+            }
+            description { state: "play" 0.0;
+               inherit: "default" 0.0;
+            }
+            description { state: "pause" 0.0;
+               inherit: "default" 0.0;
+               image.normal: "icon_pause.png";
+            }
+         }
+         part { name: "minipos.position"; type: TEXT;  /* API */
+            mouse_events: 0;
+            scale: 1;
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               color: FONT_COLOR_NOSEL;
+               color3: FONT_COLOR3_NOSEL;
+               align: 0.0 0.5;
+               fixed: 1 1;
+               rel1 {
+                  to_x: "minipos.icon";
+                  to_y: "minipos.bg";
+                  relative: 1.0 0.0;
+                  offset: 0 0;
+               }
+               rel2 {
+                  to: "minipos.bg";
+                  relative: 0.0 1.0;
+               }
+               text {
+                  text: "0:00:00";
+                  font: FONT2;
+                  size: FONT_SIZE;
+                  min: 1 0;
+                  ellipsis: -1;
+               }
+            }
+         }
+         part { name: "minipos.position.spacer"; type: TEXT;
+            inherit: "minipos.position";
+            description { state: "default" 0.0;
+               visible: 0;
+               text.text: "0:00:00";
+            }
+         }
+         part { name: "minipos.slider"; type: GROUP;  /* API */
+            source: "emc/slider/default";
+            mouse_events: 0;
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1 {
+                  to_x: "minipos.position.spacer";
+                  to_y: "minipos.bg";
+                  relative: 1.0 0.0;
+               }
+               rel2 {
+                  to_x: "minipos.length.spacer";
+                  to_y: "minipos.bg";
+                  relative: 0.0 1.0;
+               }
+            }
+         }
+         part { name: "minipos.length"; type: TEXT;  /* API */
+            mouse_events: 0;
+            scale: 1;
+            effect: FAR_SHADOW;
+            description { state: "default" 0.0;
+               color: FONT_COLOR_NOSEL;
+               color3: FONT_COLOR3_NOSEL;
+               align: 1.0 0.5;
+               fixed: 1 1;
+               rel1 {
+                  to: "minipos.bg";
+                  relative: 1.0 0.0;
+               }
+               rel2 {
+                  to: "minipos.bg";
+                  offset: -11 -1;
+               }
+               text {
+                  text: "0:00:00";
+                  font: FONT2;
+                  size: FONT_SIZE;
+                  min: 1 0;
+                  ellipsis: -1;
+               }
+            }
+         }
+         part { name: "minipos.length.spacer"; type: TEXT;
+            inherit: "minipos.length";
+            description { state: "default" 0.0;
+               visible: 0;
+               text.text: "0:00:00";
+            }
+         }
+         program { name: "minipos_show";  /* API */
+            signal: "minipos,show"; source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.3;
+            target: "minipos.bg";
+            target: "minipos.bg.shadow";
+         }
+         program { name: "minipos_hide";  /* API */
+            signal: "minipos,hide"; source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.3;
+            target: "minipos.bg";
+            target: "minipos.bg.shadow";
+         }
+         program { name: "minipos_set_play";  /* API */
+            signal: "minipos,play,set"; source: "emc";
+            action: STATE_SET "play" 0.0;
+            target: "minipos.icon";
+         }
+         program { name: "minipos_set_pause";  /* API */
+            signal: "minipos,pause,set"; source: "emc";
+            action: STATE_SET "pause" 0.0;
+            target: "minipos.icon";
+         }
+      }
+   }
 /// slideshow
    group { name: "emc/slideshow/default";  /* API */
       parts {

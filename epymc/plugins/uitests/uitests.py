@@ -268,9 +268,9 @@ class MyItemClass(EmcItemClass):
       # Mediaplayer Local Video
       elif url == 'uitests://mpv':
          f = os.path.expanduser('~/Video/testvideo.avi')
-         mediaplayer.play_url(f, start_from=0)
+         mediaplayer.play_url(f)#, start_from=0)
          mediaplayer.title_set('Testing title')
-         mediaplayer.poster_set('dvd_cover_blank.png')
+         mediaplayer.poster_set('image/dvd_cover_blank.png')
 
       # Mediaplayer Online Video (good)
       # elif url == 'uitests://mpvo':
@@ -566,6 +566,11 @@ class UiTestsModule(EmcModule):
       self._browser.show()
 
    def populate_root(self, browser, url):
+      browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')
+      browser.item_add(MyItemClass(), 'uitests://mpvo', 'Mediaplayer - Online Video (good)')
+      browser.item_add(MyItemClass(), 'uitests://mpvom', 'Mediaplayer - Online Video (med)')
+      browser.item_add(MyItemClass(), 'uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
+      
       browser.item_add(MyItemClass(), 'uitests://vkbd', 'Virtual Keyboard')
       browser.item_add(MyItemClass(), 'uitests://encoding', 'Various string encoding tests')
       browser.item_add(MyItemClass(), 'uitests://views', 'Browser Views')
@@ -580,10 +585,6 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://imagegal', 'Images gallery')
       browser.item_add(MyItemClass(), 'uitests://styles', 'Text styles')
       browser.item_add(MyItemClass(), 'uitests://dm', 'Download Manager')
-      browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')
-      browser.item_add(MyItemClass(), 'uitests://mpvo', 'Mediaplayer - Online Video (good)')
-      browser.item_add(MyItemClass(), 'uitests://mpvom', 'Mediaplayer - Online Video (med)')
-      browser.item_add(MyItemClass(), 'uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
       browser.item_add(MyItemClass(), 'uitests://tmdb', 'Themoviedb.org query with gui')
       browser.item_add(MyItemClass(), 'uitests://sselector', 'Source Selector')
       browser.item_add(MyItemClass(), 'uitests://dlg-info', 'Dialog - Info')

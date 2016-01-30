@@ -109,27 +109,21 @@ All the icons and images in icons.edc must be implemented.
       "fileman,hide" "emc"
 
 
-### Video Player ###
+### Video Player swallow ###
    * Required parts:
-      "videoplayer.video" -> edje SWALLOW
-      "videoplayer.events" -> edje part with mouse_events = 1
-      "videoplayer.subs" -> TEXTBLOCK (style: "epymc_subtitles_style")
-      "videoplayer.controls.btn_box" -> edje BOX (will contain play,stop,etc buttons)
-      "videoplayer.controls.btn_box2" -> edje BOX (will contain Video,Audio,etc buttons)
-      "videoplayer.controls.slider" -> edje GROUP -> "emc/slider/default"
-      "videoplayer.controls.position" -> edje TEXT
-      "videoplayer.controls.length" -> edje TEXT
-      "videoplayer.controls.poster" -> edje SWALLOW
-      "videoplayer.controls.title" -> edje TEXT
+      "videoplayer.swallow" -> edje SWALLOW;
+      "videoplayer.subs" -> edje TEXTBLOCK (style: "epymc_subtitles_style")
 
    * Signals received from the application:
       "videoplayer,show" "emc"
       "videoplayer,hide" "emc"
-      "videoplayer,controls,show" "emc"
-      "videoplayer,controls,hide" "emc"
+
+   * Signal that must be sent to the app:
+      "videoplayer,show,done" ""
+      "videoplayer,hide,done" ""
 
 
-### Slideshow ###
+### Slideshow swallow ###
    * Required parts:
       "slideshow.swallow" -> edje SWALLOW
 
@@ -148,19 +142,6 @@ All the icons and images in icons.edc must be implemented.
       "emc,mute,toggle" ""
 
 
-### Minipos ###
-   * Required parts:
-      "minipos.position" -> edje TEXT
-      "minipos.slider" -> edje GROUP -> "emc/slider/default"
-      "minipos.length" -> edje TEXT
-
-   * Signals received from the application:
-      "minipos,show" "emc"
-      "minipos,hide" "emc"
-      "minipos,play,set" "emc"
-      "minipos,pause,set" "emc"
-
-
 ### Dialogs box ###
    * Required parts:
       "dialogs.box.stack" -> edje box (usually with "stack" as layout)
@@ -169,6 +150,32 @@ All the icons and images in icons.edc must be implemented.
 ### Notify box ###
    * Required parts:
       "notify.box.stack" -> edje BOX (by default "vertical" as layout)
+
+
+### Video Player ##############################################################
+   * Group: "emc/videoplayer/default"
+   
+   * Required parts:
+      "video.swallow" -> edje SWALLOW
+      "events.rect" -> edje part with mouse_events = 1
+      "controls.btn_box" -> edje BOX (will contain play,stop,etc buttons)
+      "controls.btn_box2" -> edje BOX (will contain Video,Audio,etc buttons)
+      "controls.slider" -> edje GROUP -> "emc/slider/default"
+      "controls.position" -> edje TEXT
+      "controls.length" -> edje TEXT
+      "controls.poster" -> edje SWALLOW
+      "controls.title" -> edje TEXT
+      "minipos.position" -> edje TEXT
+      "minipos.slider" -> edje GROUP -> "emc/slider/default"
+      "minipos.length" -> edje TEXT
+
+   * Signals received from the application:
+      "controls,show" "emc"
+      "controls,hide" "emc"
+      "minipos,show" "emc"
+      "minipos,hide" "emc"
+      "minipos,play,set" "emc"
+      "minipos,pause,set" "emc"
 
 
 ### Dialog (panel) ############################################################

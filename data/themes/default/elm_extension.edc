@@ -1773,7 +1773,6 @@ group { name: "elm/genlist/item_compress/default/browser";
          action:  STATE_SET "default" 0.0;
          target:  "bg";
          target:  "fg";
-         transition: LINEAR 0.1;
       }
       program { name: "start_slide";
          signal: "elm,state,selected"; source: "elm";
@@ -2201,7 +2200,6 @@ group { name: "elm/gengrid/item/default/browser";
          target:  "fg1";
          target:  "fg2";
          target:  "elm.text";
-         transition: LINEAR 0.1;
       }
       program { name:    "go_disabled";
          signal:  "elm,state,disabled";

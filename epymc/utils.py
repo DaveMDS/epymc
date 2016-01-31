@@ -332,13 +332,15 @@ def hum_size(bytes):
       size = '%.0fb' % bytes
    return size
 
-def seconds_to_duration(seconds):
-   """Convert the number of seconds in a readable duration """
+def seconds_to_duration(seconds, hours=False):
+   """Convert the number of seconds in a readable duration
+      hours: If True then hours will be visible also when < 1
+   """
    seconds = int(seconds)
    h = seconds // 3600
    m = (seconds // 60) % 60
    s = seconds % 60
-   if h > 0:
+   if h > 0 or hours:
       return '%d:%02d:%02d' % (h,m,s)
    else:
       return '%d:%02d' % (m,s)

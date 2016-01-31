@@ -35,8 +35,6 @@ TMP
 
  * mpris fail on Position > Int32    :/
 
- * use pos_percent and utils.seconds to duration in VidePlayer !!!!
-
  Music features:
    * random/loop option in player
    * playlist item remove/reorder

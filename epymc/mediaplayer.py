@@ -249,8 +249,7 @@ def play_url(url, only_audio=False, start_from=None):
          _play_real(pos)
          return
       # ask if resume or not
-      time = '%d:%.2d:%.2d' % \
-             (int(pos / 3600), int(pos / 60) % 60, int(pos % 60))
+      time = utils.seconds_to_duration(pos, True)
       EmcDialog(style='yesno', title=_('Resume playback'),
                 text=_('Continue from %s ?') % (time),
                 done_cb=_resume_yes_cb, canc_cb=_resume_no_cb, user_data=pos)
@@ -829,7 +828,6 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       gui.signal_cb_add('videoplayer,hide,done', '', self._delete_real)
 
    def _delete_real(self, obj, sig, src):
-      print("DELETE REAL")
       gui.signal_cb_del('videoplayer,hide,done', '', self._delete_real)
       EmcPlayerBase.delete(self)
       elm.Layout.delete(self)
@@ -866,17 +864,15 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
 
    ### minipos
    def minipos_show(self):
-      if self._controls_visible:
-         return
+      if not self._controls_visible:
+         self.signal_emit('minipos,show', 'emc')
+         self._minipos_visible = True
+         self._update_slider()
 
-      self.signal_emit('minipos,show', 'emc')
-      self._minipos_visible = True
-      self._update_slider()
-
-      if self._minipos_timer is None:
-         self._minipos_timer = ecore.Timer(3, self._minipos_timer_cb)
-      else:
-         self._minipos_timer.reset()
+         if self._minipos_timer is None:
+            self._minipos_timer = ecore.Timer(3, self._minipos_timer_cb)
+         else:
+            self._minipos_timer.reset()
 
    def minipos_hide(self):
       self.signal_emit('minipos,hide', 'emc')
@@ -927,33 +923,20 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
    
    ### internals
    def _update_slider(self):
-      pos = self._emotion.position
-      len = self._emotion.play_length
-
-      lh = int(len / 3600)
-      lm = int(len / 60) % 60
-      ls = int(len % 60)
-
-      ph = int(pos / 3600)
-      pm = int(pos / 60) % 60
-      ps = int(pos % 60)
-
-      pos_percent = (pos / len) if len > 0 else 0.0
+      pos = self.position_percent
+      pos_str = utils.seconds_to_duration(self._emotion.position, True)
+      len_str = utils.seconds_to_duration(self._emotion.play_length, True)
 
       if self._controls_visible:
-         self.edje.part_drag_value_set('controls.slider:dragable1',
-                                       pos_percent, pos_percent)
-         self.text_set('controls.position', '%i:%02i:%02i' % (ph,pm,ps))
-         self.text_set('controls.length', '%i:%02i:%02i' % (lh,lm,ls))
-
-         s = datetime.now().strftime('%H:%M')
-         self.text_set('clock', s)
+         self.edje.part_drag_value_set('controls.slider:dragable1', pos, pos)
+         self.text_set('controls.position', pos_str)
+         self.text_set('controls.length', len_str)
+         self.text_set('clock', datetime.now().strftime('%H:%M'))
 
       if self._minipos_visible:
-         self.edje.part_drag_value_set('minipos.slider:dragable1',
-                                       pos_percent, pos_percent)
-         self.text_set('minipos.position', '%i:%02i:%02i' % (ph,pm,ps))
-         self.text_set('minipos.length', '%i:%02i:%02i' % (lh,lm,ls))
+         self.edje.part_drag_value_set('minipos.slider:dragable1', pos, pos)
+         self.text_set('minipos.position', pos_str)
+         self.text_set('minipos.length', len_str)
 
    def _update_timer_cb(self):
       if self._buffer_dialog is not None:

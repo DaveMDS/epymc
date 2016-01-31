@@ -495,6 +495,7 @@ class ViewList(object):
          gl.callback_selected_add(self._cb_item_hilight)
          gl.callback_unselected_add(self._cb_item_unhilight)
          gl.callback_realized_add(self._cb_item_realized)
+         gl.callback_item_focused_add(lambda l,i: i.selected_set(True))
 
       # genlist item class
       self.itc = GenlistItemClass(item_style='default',
@@ -759,6 +760,7 @@ class ViewPosterGrid(object):
       self.gg.callback_selected_add(self.gg_higlight)
       self.gg.callback_clicked_double_add(self.gg_selected)
       self.gg.callback_realized_add(self._cb_item_realized)
+      self.gg.callback_item_focused_add(lambda g,i: i.selected_set(True))
       gui.swallow_set(self._grid_swallow, self.gg)
 
       # RemoteImage (cover)

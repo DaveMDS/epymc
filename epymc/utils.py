@@ -332,6 +332,17 @@ def hum_size(bytes):
       size = '%.0fb' % bytes
    return size
 
+def seconds_to_duration(seconds):
+   """Convert the number of seconds in a readable duration """
+   seconds = int(seconds)
+   h = seconds // 3600
+   m = (seconds // 60) % 60
+   s = seconds % 60
+   if h > 0:
+      return '%d:%02d:%02d' % (h,m,s)
+   else:
+      return '%d:%02d' % (m,s)
+
 def splitpath(path):
    """ Convert a string path in a list of all the components """
    return [p for p in path.split(os.path.sep) if p != '']

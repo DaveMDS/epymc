@@ -1422,6 +1422,11 @@ collections {
             target: "mainmenu.clock.clip";
          }
 
+/// slideshow swallow
+         part { name: "slideshow.swallow"; type: SWALLOW;  /* API */
+            description { state: "default" 0.0; }
+         }
+
 /// videoplayer swallow
          part { name: "videoplayer.clip"; type: RECT;
             mouse_events: 0;
@@ -1469,9 +1474,78 @@ collections {
             action: SIGNAL_EMIT "videoplayer,hide,done" "";
          }
 
-/// slideshow swallow
-         part { name: "slideshow.swallow"; type: SWALLOW;  /* API */
-            description { state: "default" 0.0; }
+/// audioplayer swallow
+         part { name: "audioplayer.swallow"; type: SWALLOW;  /* API TODOC */
+            description { state: "default" 0.0;
+               rel1 {
+                  to_y: "topbar.list.spacer";
+                  relative: (0.55 + 0.42) 1.0;
+                  offset: 0 20;
+               }
+               rel2 {
+                  relative: (1.0 + 0.42) 1.0;
+                  offset: -1 -10;
+               }
+               visible: 0;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+            }
+            description { state: "expanded" 0.0;
+               inherit: "visible" 0.0;
+               rel1.relative: (0.55 + 0.0) 1.0;
+               rel2.relative: (1.0 + 0.0) 1.0;
+            }
+         }
+         part { name: "events"; type: RECT; mouse; repeat;
+            description { state: "default" 0.0;
+               rel1.to: "audioplayer.swallow";
+               rel2.to: "audioplayer.swallow";
+               color: 0 0 0 0;
+            }
+         }
+         program { name: "audioplayer_show";  /* API */
+            signal: "audioplayer,show"; source: "emc";
+            action: STATE_SET "visible";
+            transition: LINEAR 0.4;
+            target: "audioplayer.swallow";
+            after: "audioplayer_show_done";
+         }
+         program { name: "audioplayer_hide";  /* API */
+            signal: "audioplayer,hide"; source: "emc";
+            action: STATE_SET "default";
+            transition: LINEAR 0.4;
+            target: "audioplayer.swallow";
+            after: "audioplayer_hide_done";
+         }
+         program { name: "audioplayer_show_done"; /* API */
+            action: SIGNAL_EMIT "audioplayer,show,done" "";
+         }
+         program { name: "audioplayer_hide_done"; /* API */
+            action: SIGNAL_EMIT "audioplayer,hide,done" "";
+         }
+         program { name: "audioplayer_expand";  /* API */
+            signal: "audioplayer,expand"; source: "emc";
+            action: STATE_SET "expanded";
+            transition: SINUSOIDAL 0.4 CURRENT;
+            target: "audioplayer.swallow";
+         }
+         program { name: "audioplayer_contract";  /* API */
+            signal: "audioplayer,contract"; source: "emc";
+            action: STATE_SET "visible";
+            transition: SINUSOIDAL 0.4 CURRENT;
+            target: "audioplayer.swallow";
+         }
+         program { name: "expand_mouse_in";
+            signal: "mouse,in"; source: "events";
+            filter: "audioplayer.swallow" "visible";
+            after: "audioplayer_expand";
+         }
+         program { name: "contract_mouse_out";
+            signal: "mouse,out"; source: "events";
+            filter: "audioplayer.swallow" "expanded";
+            after: "audioplayer_contract";
          }
 
 /// volume
@@ -2832,6 +2906,132 @@ collections {
          }
       }
    }
+
+/// audioplayer
+   group { name: "emc/audioplayer/default";  /* API TODOC */
+      images.image: "frame2_solid.png" COMP;
+      images.image: "dialog_header_shadow.png" COMP;
+      parts {
+         part { name: "bg"; type: IMAGE;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               image.normal: "frame2_solid.png";
+               image.border: 8 8 8 8;
+               rel1.offset: -8 -8;
+               rel2.offset: 9 9;
+            }
+         }
+         part { name: "cover.swallow"; type: SWALLOW;  /* API TODOC */
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.offset: 9 6;
+               rel2.offset: -10 -7;
+               rel2.relative: 1.0 0.3;
+               aspect: 1 1; aspect_preference: BOTH;
+               align: 0.0 0.5;
+            }
+         }
+         part { name: "playlist.swallow"; type: SWALLOW;  /* API TODOC */
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.relative: 0.0 0.3;
+               rel2.offset: -1 1;
+            }
+         }
+         part { name: "shadow"; type: IMAGE; nomouse;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               image.normal: "dialog_header_shadow.png";
+               rel1.to: "playlist.swallow";
+               rel2.to: "playlist.swallow";
+               min: 26 26;
+               max: 9999 26;
+               align: 0.0 0.0;
+            }
+         }
+         part { name: "info.spacer"; type: SPACER;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.to: "cover.swallow";
+               rel1.relative: 1.0 0.0;
+               rel1.offset: 9 0;
+               rel2.to_y: "cover.swallow";
+               rel2.relative: 1.0 1.0;
+               rel2.offset: -10 -1;
+            }
+         }
+         part { name: "artist.text"; type: TEXT; /* API TODOC */
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.to: "info.spacer";
+               rel1.relative: 0.0 0.0;
+               rel2.to: "info.spacer";
+               rel2.relative: 1.0 0.0;
+               align: 0.5 0.0;
+               text {
+                  text: "Author";
+                  font: FONT;
+                  size: FONT_SIZE;
+                  min: 0 1;
+                  ellipsis: 0.0;
+                  align: 0.0 0.5;
+               }
+            }
+         }
+         part { name: "album.text"; type: TEXT; /* API TODOC */
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.to: "artist.text";
+               rel1.relative: 0.0 1.0;
+               rel2.to: "artist.text";
+               rel2.relative: 1.0 1.0;
+               align: 0.5 0.0;
+               text {
+                  text: "Album";
+                  font: FONT;
+                  size: FONT_SIZE_BIG;
+                  min: 0 1;
+                  ellipsis: 0.0;
+                  align: 0.0 0.5;
+               }
+            }
+         }
+         part { name: "pos.slider"; type: GROUP;  /* API TODOC */
+            source: "emc/slider/default";
+            mouse_events: 1;
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.to: "info.spacer";
+               rel1.relative: 0.0 1.0;
+               rel2.to: "info.spacer";
+               align: 0.5 1.0;
+            }
+         }
+         part { name: "buttons.box"; type: BOX;  /* API TODOC */
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.to: "pos.slider";
+               rel2.to: "pos.slider";
+               rel2.relative: 1.0 0.0;
+               align: 0.5 1.0;
+               box {
+                  layout: "horizontal";
+                  padding: 2 0;
+                  align: 0.0 0.0;
+                  min: 1 1;
+               }
+            }
+         }
+         // DBG_SHOW("playlist.swallow", 0, 200, 0)
+         // DBG_SHOW("info.spacer", 0, 0, 200)
+         // DBG_SHOW("cover.swallow", 200, 0, 0)
+         // DBG_SHOW("buttons.box", 0, 200, 0)
+      }
+   }
+
 /// slideshow
    group { name: "emc/slideshow/default";  /* API */
       parts {
@@ -3032,7 +3232,8 @@ collections {
             description { state: "default" 0.0;
                fixed: 1 1;
                image.normal: "image_cd_cover_blank.png";
-               aspect_preference: SOURCE;
+               // aspect_preference: SOURCE;
+               aspect: 1 1; aspect_preference: BOTH;
             }
          }
          part { name: "emc.text"; type: TEXTBLOCK;  /* API */

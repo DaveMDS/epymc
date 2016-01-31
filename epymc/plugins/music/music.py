@@ -173,10 +173,6 @@ class SongItemClass(EmcItemClass):
          text += _('duration: %s<br>') % ('%.02d:%.02d' % (min,sec))
       return text
 
-   def icon_end_get(self, url, song):
-      if url == mediaplayer._onair_url:
-         return 'icon/play'
-
 class AlbumItemClass(EmcItemClass):
    def item_selected(self, url, album):
       _mod._browser.page_add('music://album/'+album['name'], album['name'],
@@ -231,6 +227,7 @@ class ArtistItemClass(EmcItemClass):
    def icon_get(self, url, mod):
       return 'icon/artist'
 
+
 class MusicModule(EmcModule):
    name = 'music'
    label = _('Music')
@@ -276,16 +273,10 @@ class MusicModule(EmcModule):
       # create a browser instance
       self._browser = EmcBrowser(_('Music'), icon='icon/music')
 
-      # listen to emc events
-      events.listener_add('music', self.events_cb)
-
    def __shutdown__(self):
       global _mod
       
       DBG('Shutdown module')
-
-      # stop listen to emc events
-      events.listener_del('music')
 
       # delete mainmenu item
       mainmenu.item_del('music')
@@ -539,50 +530,23 @@ class MusicModule(EmcModule):
                    icon='icon/music')
 
    def queue_album(self, songs_list):
+      mediaplayer.playlist.clear()
       for song in songs_list:
          mediaplayer.playlist.append(song['url'], metadata_cb=self.playlist_metadata_cb)
 
-      if mediaplayer._onair_url is None:
-         mediaplayer.playlist.play_next()
-
-      album = self._albums_db.get_data(songs_list[0]['album'])
-      EmcNotify('<title>%s</><br>%s' % (album['name'], _('queued')),
-                icon='icon/music')
+      # album = self._albums_db.get_data(songs_list[0]['album'])
+      # EmcNotify('<title>%s</><br>%s' % (album['name'], _('queued')),
+                # icon='icon/music')
 
    def queue_artist(self, songs_list):
+      mediaplayer.playlist.clear()
       for song in songs_list:
          mediaplayer.playlist.append(song['url'], metadata_cb=self.playlist_metadata_cb)
 
-      if mediaplayer._onair_url is None:
-         mediaplayer.playlist.play_next()
+      # artist = self._artists_db.get_data(songs_list[0]['artist'])
+      # EmcNotify('<title>%s</><br>%s' % (artist['name'], _('queued')),
+                # icon='icon/music')
 
-      artist = self._artists_db.get_data(songs_list[0]['artist'])
-      EmcNotify('<title>%s</><br>%s' % (artist['name'], _('queued')),
-                icon='icon/music')
-
-   ### emc events callback
-   def events_cb(self, event):
-
-      if event == 'PLAYBACK_STARTED':
-         DBG('PLAYBACK_STARTED')
-         # update the audio controls
-         if len(mediaplayer.playlist) > 0:
-            if self._songs_db.id_exists(mediaplayer._onair_url):
-               song = self._songs_db.get_data(mediaplayer._onair_url)
-               text = '<title>' + song['title'] + '</><br>'
-               if 'artist' in song:
-                  text += _('<em>by</em> %s<br>') % song['artist']
-               if 'album' in song:
-                  text += _('<em>from</em> %s<br>') % song['album']
-               gui.audio_controls_show(text = text)
-
-         # update the browser view
-         self._browser.refresh()
-
-      elif event == 'PLAYBACK_FINISHED':
-         DBG('PLAYBACK_FINISHED')
-         gui.audio_controls_hide()
-         self._browser.refresh()
 
 ### browser pages
    def populate_root_page(self, browser, page_url):

@@ -22,13 +22,24 @@ TMP
  * new text styles: mi piace, etc...
  * update italian translation
  * migliorare grafica dei dialog
- 
+
+ * mediaplayer-control buttons remain focusable also when mediaplayer is hidden !!!!!
+ * video download usually do not work, use youtube-dl if possible
+ * do not hide volume if videocontrols are visible
+
  * require efl >= 1.17 (and use setup.py efl stuff)
  * db_py3_browser_view_memory need to be cleared for the relase (dump version)
  * comment-out all DBG functions
 
  * use EmcUrl where needed
 
+ * mpris fail on Position > Int32    :/
+
+ * use pos_percent and utils.seconds to duration in VidePlayer !!!!
+
+ Music features:
+   * random/loop option in player
+   * playlist item remove/reorder
 
 
 BUGS

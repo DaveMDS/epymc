@@ -100,7 +100,7 @@ def init():
    conf.focus_highlight_enabled = True
    conf.focus_highlight_animate = False
    conf.focus_autoscroll_mode = elm.ELM_FOCUS_AUTOSCROLL_MODE_NONE #ELM_FOCUS_AUTOSCROLL_MODE_SHOW or ELM_FOCUS_AUTOSCROLL_MODE_BRING_IN
-   conf.item_select_on_focus_disabled = False
+   conf.item_select_on_focus_disabled = True # needed by AudioPlayer genlist
    conf.focus_highlight_clip_disabled = False
    if evas_accelerated == 'True':
       conf.accel_preference = 'accel'
@@ -382,32 +382,6 @@ def mouse_hide():
       win.data['mouse_blocker'].show()
       layout.cursor = 'blank'
 
-### audio info/controls notify
-_audio_notify = None
-
-def audio_controls_show(text=None, icon=None):
-   global _audio_notify
-   
-   if _audio_notify is None:
-      _audio_notify = EmcNotify('', hidein=0, icon='icon/music')
-
-   if text or icon:
-       audio_controls_set(text, icon)
-
-def audio_controls_hide():
-   global _audio_notify
-   
-   if _audio_notify:
-      _audio_notify.close()
-      _audio_notify = None
-
-def audio_controls_set(text=None, icon=None):
-   if _audio_notify is None:
-      return
-   if text: _audio_notify.text_set(text)
-   if icon: _audio_notify.icon_set(icon)
-
-
 ### Simple edje abstraction ###
 def part_get(name):
    return layout.edje_get().part_external_object_get(name)
@@ -512,7 +486,7 @@ def focus_move(direction, root_obj=None):
          while to_item and to_item.type == elm.ELM_GENLIST_ITEM_GROUP:
             to_item = to_item.prev
       if to_item:
-         to_item.selected = True
+         # to_item.selected = True
          to_item.focus = True
          to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
          return True
@@ -566,16 +540,16 @@ def focus_move(direction, root_obj=None):
                   break
          except:
             to_item = None
-         
 
       if to_item:
-         to_item.selected = True
+         # to_item.selected = True
          to_item.focus = True
          to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
          return True
 
    # or just let elm move the focus between objects
    root_obj.focus_next(focus_directions[direction])
+   # print("leave focus to elm...", win.focused_object)
 
    # workaroud for a bug in gengrid that give focus to the grid but not to an item
    new_focused = win.focused_object

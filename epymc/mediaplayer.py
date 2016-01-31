@@ -85,8 +85,11 @@ class PlaylistItem(object):
    def __str__(self):
       return '<PlaylistItem: %s>' % self.url
 
+   def play(self):
+      playlist.play_item(self)
 
-class Playlist(object):
+
+class Playlist(utils.Singleton):
    def __init__(self):
       self.items = []
       self.cur_idx = -1
@@ -102,6 +105,9 @@ class Playlist(object):
    def append(self, *args, **kargs):
       item = PlaylistItem(*args, **kargs)
       self.items.append(item)
+      if self.onair_item is None:
+         self.play_next()
+      events.event_emit('PLAYLIST_CHANGED')
 
    def play_next(self):
       self.play_move(+1)
@@ -124,8 +130,16 @@ class Playlist(object):
       self.onair_item = self.items[self.cur_idx]
       play_url(self.onair_item.url, only_audio=self.onair_item.only_audio)
 
+   def play_item(self, item):
+      self.cur_idx = self.items.index(item)
+      self.onair_item = item
+      play_url(self.onair_item.url, only_audio=self.onair_item.only_audio)
+
    def clear(self):
       del self.items[:]
+      self.cur_idx = -1
+      self.onair_item = None
+      events.event_emit('PLAYLIST_CHANGED')
 
 # Create the single instance of the Playlist class (everyone must use this one)
 playlist = Playlist()
@@ -257,7 +271,10 @@ def _play_real(start_from=None, only_audio=False):
    url = _onair_url
 
    if only_audio:
-      pass # TODO !!!!!!
+      if _player is None:
+         _player = EmcAudioPlayer(url)
+      else:
+         _player.url = url
    else:
       _player = EmcVideoPlayer(url)
       _player.position = start_from or 0
@@ -306,11 +323,12 @@ def stop():
          counts['stop_at'] = _player.position
       _play_db.set_data(_onair_url, counts)
 
-      # delete the player
+   # delete the player
+   if _player:
       _player.delete()
       _player = None
 
-   events.event_emit('PLAYBACK_FINISHED')
+   playlist.clear()
    _onair_url = None
    _onair_title = None
 
@@ -385,28 +403,16 @@ def volume_mute_toggle():
 
 ### input events ###
 def input_event_cb(event):
-
    if event == 'VOLUME_UP':
       volume_set(_volume + 5)
-      return input_events.EVENT_BLOCK
-
    elif event == 'VOLUME_DOWN':
       volume_set(_volume - 5)
-      return input_events.EVENT_BLOCK
-
    elif event == 'VOLUME_MUTE':
       volume_mute_toggle()
-      return input_events.EVENT_BLOCK
+   else:
+      return input_events.EVENT_CONTINUE
+   return input_events.EVENT_BLOCK
 
-   elif event == 'PLAYLIST_NEXT':
-      playlist.play_next()
-      return input_events.EVENT_BLOCK
-
-   elif event == 'PLAYLIST_PREV':
-      playlist.play_prev()
-      return input_events.EVENT_BLOCK
-
-   return input_events.EVENT_CONTINUE
 
 ###############################################################################
 class EmcPlayerBase(object):
@@ -466,14 +472,23 @@ class EmcPlayerBase(object):
 
    @property
    def position(self):
-      """ get position in seconds (float) from the start """
+      """ the playback position in seconds (float) from the start """
       return self._emotion.position
 
    @position.setter
    def position(self, pos):
-      """ pos in seconds (float) """
       self._emotion.position = pos
       events.event_emit('PLAYBACK_SEEKED')
+
+   @property
+   def position_percent(self):
+      """ the playback position in the range 0.0 -> 1.0 """
+      pos, len = self._emotion.position, self._emotion.play_length
+      return (pos / len) if len > 0 else 0.0
+
+   @position_percent.setter
+   def position_percent(self, val):
+      self.position = self._emotion.play_length * val
 
    def seek(self, offset):
       """ offset in seconds (float) """
@@ -512,8 +527,7 @@ class EmcPlayerBase(object):
       events.event_emit('PLAYBACK_STARTED')
 
    def _playback_finished_cb(self, vid):
-      stop()
-      # playlist.play_next()
+      events.event_emit('PLAYBACK_FINISHED')
 
    ### events
    def _base_input_events_cb(self, event):
@@ -558,6 +572,161 @@ class EmcPlayerBase(object):
 
 
 ###############################################################################
+class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
+   def __init__(self, url=None):
+
+      ### init the layout
+      elm.Layout.__init__(self, gui.layout, focus_allow=False,
+                          file=(gui.theme_file, 'emc/audioplayer/default'))
+      # self.callback_focused_add(self._focused_cb)
+      # self.callback_unfocused_add(self._unfocused_cb)
+      
+      # update emotion position when mouse drag the progress slider
+      self.signal_callback_add('drag', 'pos.slider:dragable1', self._pos_dragged_cb)
+
+      ### init the base player class
+      EmcPlayerBase.__init__(self)
+      self.url = url
+
+      ### control buttons
+      buttons = [
+         ('icon/prev', 'PLAYLIST_PREV'),
+         ('icon/next', 'PLAYLIST_NEXT'),
+         ('icon/pause', 'PAUSE'),
+         ('icon/play', 'PLAY'),
+         ('icon/stop', 'STOP'),
+      ]
+      def buttons_cb(b, event):
+         input_events.event_emit(event)
+      for icon, event in buttons:
+         bt = EmcButton(icon=icon,cb=buttons_cb, cb_data=event)
+         bt.callback_focused_add(self._focused_cb)
+         bt.callback_unfocused_add(self._unfocused_cb)
+         self.box_append('buttons.box', bt)
+
+      ### playlist genlist
+      self._itc = elm.GenlistItemClass(item_style='default',
+                                       text_get_func=self._gl_text_get)
+      self._gl = elm.Genlist(self, style='playlist', homogeneous=True,
+                             mode=elm.ELM_LIST_COMPRESS)
+      self._gl.callback_focused_add(self._focused_cb)
+      self._gl.callback_unfocused_add(self._unfocused_cb)
+      self._gl.callback_activated_add(self._genlist_item_activated_cb)
+      self.content_set('playlist.swallow', self._gl)
+
+      self._gl_populate()
+
+      ### swallow ourself in the main layout and show
+      gui.swallow_set('audioplayer.swallow', self)
+      gui.signal_emit('audioplayer,show')
+
+      ### listen to input and generic events
+      input_events.listener_add('EmcAudioPlayer', self._input_events_cb)
+      events.listener_add('EmcAudioPlayer', self._events_cb)
+
+      ### timer to update the slider
+      self._slider_timer = ecore.Timer(1.0, self._update_timer)
+
+   def delete(self):
+      self._slider_timer.delete()
+      input_events.listener_del('EmcAudioPlayer')
+      events.listener_del('EmcAudioPlayer')
+      EmcPlayerBase.delete(self)
+      elm.Layout.delete(self)
+
+   def _focused_cb(self, obj):
+      gui.signal_emit('audioplayer,expand')
+
+   def _unfocused_cb(self, obj):
+      if gui.win.focus == True: # do not contract when mouse goes out of win
+         gui.signal_emit('audioplayer,contract')
+
+   def _gl_populate(self):
+      self._gl.clear()
+      for item in playlist.items:
+         # print(item.metadata)
+         it = self._gl.item_append(self._itc, item)
+         if item == playlist.onair_item:
+            self._gl.focus_allow = False
+            it.selected = True
+            it.show()
+            self._gl.focus_allow = True
+
+   ## genlist item class
+   def _gl_text_get(self, obj, part, pl_item):
+      metadata = pl_item.metadata
+      if part == 'elm.text.tracknum':
+         return str(metadata.get('tracknumber'))
+      if part == 'elm.text.title':
+         return metadata.get('title')
+      if part == 'elm.text.artist':
+         return metadata.get('artist')
+      if part == 'elm.text.len':
+         seconds = metadata.get('length')
+         if seconds is not None:
+            return utils.seconds_to_duration(seconds)
+
+   def _genlist_item_activated_cb(self, gl, it):
+      playlist_item = it.data
+      playlist_item.play()
+
+   def _update_timer(self, single=False):
+      pos = self.position_percent
+      self.edje.part_drag_value_set('pos.slider:dragable1', pos, pos)
+      return ecore.ECORE_CALLBACK_CANCEL if single else ecore.ECORE_CALLBACK_RENEW
+
+   def _pos_dragged_cb(self, obj, emission, source):
+      (val,val2) = self.edje.part_drag_value_get('pos.slider:dragable1')
+      self.position_percent = val
+
+   ### input events
+   def _input_events_cb(self, event):
+      if event == 'OK' and self._gl.focus == True:
+         self._genlist_item_activated_cb(self._gl, self._gl.focused_item)
+      elif event == 'PLAYLIST_NEXT':
+         playlist.play_next()
+      elif event == 'PLAYLIST_PREV':
+         playlist.play_prev()
+      else:
+         return input_events.EVENT_CONTINUE
+      return input_events.EVENT_BLOCK
+
+   ### generic events
+   def _events_cb(self, event):
+      if event == 'PLAYBACK_STARTED':
+         # update metadata infos
+         metadata = playlist.onair_item.metadata
+         self.part_text_set('artist.text', metadata.get('artist'))
+         self.part_text_set('album.text', metadata.get('album'))
+         poster = metadata.get('poster')
+         img = EmcImage(poster or 'special/cd/' + metadata.get('album'))
+         self.content_set('cover.swallow', img)
+
+         # update selected playlist item
+         it = self._gl.nth_item_get(playlist.cur_idx)
+         if it:
+            self._gl.focus_allow = False
+            it.selected = True
+            it.show()
+            self._gl.focus_allow = True
+
+         # update the slider
+         self._update_timer(single=True)
+
+      elif event == 'PLAYBACK_FINISHED':
+         playlist.play_next()
+
+      elif event == 'PLAYLIST_CHANGED':
+         print("CHANGED")
+         self._gl_populate()
+
+      elif event == 'PLAYBACK_SEEKED':
+         # emotion need some loop to update the position, so
+         # we need a bit delay to show the updated position.
+         ecore.Timer(0.05, lambda: self._update_timer(single=True))
+
+
+###############################################################################
 class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
    def __init__(self, url=None):
 
@@ -591,7 +760,6 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
          (val,val2) = self.edje.part_drag_value_get('controls.slider:dragable1')
          self.position = self._emotion.play_length * val
       self.signal_callback_add('drag', 'controls.slider:dragable1', _drag_prog)
-
 
       ### init the base player class
       EmcPlayerBase.__init__(self)
@@ -684,7 +852,6 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       gui.volume_show()
       if self.focused_object is None:
          self._play_pause_btn.focus = True
-
 
    def controls_hide(self):
       self.signal_emit('controls,hide', 'emc')
@@ -971,16 +1138,16 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
 
    ### generic events
    def _events_cb(self, event):
-
-      if event == 'PLAYBACK_PAUSED':
+      if event == 'PLAYBACK_FINISHED':
+         stop()
+         return
+      elif event == 'PLAYBACK_PAUSED':
          self._play_pause_btn.icon_set('icon/play')
          self.signal_emit('minipos,pause,set', 'emc')
       elif event == 'PLAYBACK_UNPAUSED':
          self._play_pause_btn.icon_set('icon/pause')
          self.signal_emit('minipos,play,set', 'emc')
-
-      # update sliders on seek
-      if event == 'PLAYBACK_SEEKED':
+      elif event == 'PLAYBACK_SEEKED':
          # emotion need some loop to update the position, so
          # we need a bit delay to show the updated position.
          ecore.Timer(0.05, lambda: self._update_slider())

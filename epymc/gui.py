@@ -137,7 +137,7 @@ def init():
 
    # main layout (main theme)
    layout = Layout(win, file=(theme_file, 'emc/main/layout'), focus_allow=False,
-                   size_hint_expand=EXPAND_BOTH)
+                   size_hint_expand=EXPAND_BOTH, name='MainLayout')
    win.resize_object_add(layout)
    layout.show()
 
@@ -547,13 +547,29 @@ def focus_move(direction, root_obj=None):
          to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
          return True
 
-   # or just let elm move the focus between objects
+   # or just let elm move the focus between objects...
    root_obj.focus_next(focus_directions[direction])
-   # print("leave focus to elm...", win.focused_object)
 
-   # workaroud for a bug in gengrid that give focus to the grid but not to an item
+   # ... and now various fixes on the work done by elm
    new_focused = win.focused_object
-   if isinstance(new_focused, (Gengrid, Genlist)) and new_focused.focused_item is None:
+   DBG("Focus move  ROOT:%s  OLD:%s  NEW:%s" % (
+       root_obj.name or '<%s>' % root_obj.__class__.__name__,
+       focused.name or '<%s>' % focused.__class__.__name__,
+       new_focused.name or '<%s>' % new_focused.__class__.__name__))
+
+   if focused == new_focused:
+      if direction == 'LEFT' and focused.parent.name == 'AudioPlayer':
+         # TODO: "LEFT" should be taken from the theme, or the position
+         DBG("FOCUS FIX: always close AudioPlayer on LEFT event")
+         focused.parent.focus = False # this will make the player hide
+         new_focused = win.focused_object
+
+   if new_focused.name == 'MainLayout' or new_focused.__class__.__name__ == 'Window':
+      DBG('FOCUS FIX: remove focus from MainLayout or MainWin')
+      root_obj.focus_next(elm.ELM_FOCUS_DOWN)
+
+   if isinstance(new_focused, Gengrid) and new_focused.focused_item is None:
+      DBG('FOCUS FIX: give focus to the selected item in a focused Gengrid')
       new_focused.selected_item.focus = True
 
    return False
@@ -776,10 +792,11 @@ You should have received a copy of the GNU Lesser General Public License along w
 class EmcButton(Button):
    """ A simple wrapper around the elm Button class """
 
-   def __init__(self, label=None, icon=None, cb=None, cb_data=None, **kargs):
+   def __init__(self, label=None, icon=None, cb=None, cb_data=None,
+                      parent=None, **kargs):
       self._cb = cb
       self._cb_data = cb_data
-      Button.__init__(self, layout, style='emc', **kargs)
+      Button.__init__(self, parent or layout, style='emc', **kargs)
       self.callback_clicked_add(self.activate)
       if label: self.text_set(label)
       if icon: self.icon_set(icon)

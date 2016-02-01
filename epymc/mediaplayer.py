@@ -575,7 +575,7 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
    def __init__(self, url=None):
 
       ### init the layout
-      elm.Layout.__init__(self, gui.layout, focus_allow=False,
+      elm.Layout.__init__(self, gui.layout, focus_allow=False, name='AudioPlayer',
                           file=(gui.theme_file, 'emc/audioplayer/default'))
       # self.callback_focused_add(self._focused_cb)
       # self.callback_unfocused_add(self._unfocused_cb)
@@ -598,7 +598,7 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       def buttons_cb(b, event):
          input_events.event_emit(event)
       for icon, event in buttons:
-         bt = EmcButton(icon=icon,cb=buttons_cb, cb_data=event)
+         bt = EmcButton(parent=self, icon=icon,cb=buttons_cb, cb_data=event)
          bt.callback_focused_add(self._focused_cb)
          bt.callback_unfocused_add(self._unfocused_cb)
          self.box_append('buttons.box', bt)
@@ -606,8 +606,8 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       ### playlist genlist
       self._itc = elm.GenlistItemClass(item_style='default',
                                        text_get_func=self._gl_text_get)
-      self._gl = elm.Genlist(self, style='playlist', homogeneous=True,
-                             mode=elm.ELM_LIST_COMPRESS)
+      self._gl = elm.Genlist(self, style='playlist', name='AudioPlayerGL',
+                             homogeneous=True, mode=elm.ELM_LIST_COMPRESS)
       self._gl.callback_focused_add(self._focused_cb)
       self._gl.callback_unfocused_add(self._unfocused_cb)
       self._gl.callback_activated_add(self._genlist_item_activated_cb)
@@ -633,12 +633,18 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       EmcPlayerBase.delete(self)
       elm.Layout.delete(self)
 
-   def _focused_cb(self, obj):
+   def controls_show(self):
       gui.signal_emit('audioplayer,expand')
+
+   def controls_hide(self):
+      gui.signal_emit('audioplayer,contract')
+
+   def _focused_cb(self, obj):
+      self.controls_show()
 
    def _unfocused_cb(self, obj):
       if gui.win.focus == True: # do not contract when mouse goes out of win
-         gui.signal_emit('audioplayer,contract')
+         self.controls_hide()
 
    def _gl_populate(self):
       self._gl.clear()

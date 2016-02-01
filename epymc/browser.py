@@ -74,6 +74,9 @@ def init():
                      cb=lambda b: input_events.event_emit('VIEW_COVERGRID'))
 
 def shutdown():
+   for name, view in _views.items():
+      view.__shutdown__()
+
    global _memorydb
    del _memorydb
 
@@ -513,6 +516,9 @@ class ViewList(object):
       self._ase = EmcScrolledEntry(autoscroll=True)
       gui.swallow_set('browser.list.info', self._ase)
 
+   def __shutdown__(self):
+      self._clear_timers()
+
    def page_show(self, title, anim):
       """
       This function is called everytime a new page need to be showed.
@@ -770,6 +776,9 @@ class ViewPosterGrid(object):
       # AutoScrolledEntry (info)
       self._ase = EmcScrolledEntry(autoscroll=True)
       gui.swallow_set(self._info_swallow, self._ase)
+
+   def __shutdown__(self):
+      self._clear_timers()
 
    def setup_theme_hooks(self):
       """ setup stuff that is different between Poster and Cover views """

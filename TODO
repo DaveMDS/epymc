@@ -2,8 +2,6 @@
 TMP
 ====
 
- * double-click in genlist that open a dialog brake the hilight !!!
-
  * stop thumb generation correctly (also the one in progress)
  
  * TASTIERA!!! non posso cambiare il foramto delle date  :(
@@ -11,7 +9,6 @@ TMP
  * report on phab the Ethumb Client instability
  * fix 2 bugs in ethumb:
    * frame cannot be unset...witout an error
-   * frame for movies do not work (+ vthumb theme)
 
  * fix focus after view change
 
@@ -23,17 +20,17 @@ TMP
  * update italian translation
  * migliorare grafica dei dialog
 
- * mediaplayer-control buttons remain focusable also when mediaplayer is hidden !!!!!
  * video download usually do not work, use youtube-dl if possible
  * do not hide volume if videocontrols are visible
-
- * require efl >= 1.17 (and use setup.py efl stuff)
- * db_py3_browser_view_memory need to be cleared for the relase (dump version)
- * comment-out all DBG functions
 
  * use EmcUrl where needed
 
  * mpris fail on Position > Int32    :/
+ 
+ For release:
+   * require efl >= 1.17 (and use setup.py efl stuff)
+   * db_py3_browser_view_memory need to be cleared for the relase (dump version)
+   * comment-out all DBG functions
 
  Music features:
    * random/loop option in player

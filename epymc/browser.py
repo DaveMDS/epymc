@@ -46,7 +46,7 @@ def DBG(msg):
 _views = {}       # key=>view_name  value=>view class instance
 _memorydb = None  # EmcDatabase  key=>page_url  value=style_name
 _instances = []   # keep track of EmcBrowser instances. just for dump_all()
-_topbar_fman = None # Topbar buttons EmcFocusManager
+_topbar_btns = [] # Topbar buttons
 
 ANIM_NONE = 0
 ANIM_BACK = -1
@@ -65,7 +65,7 @@ def init():
    ini.get('general', 'view_postergrid_size', default_value=150)
    ini.get('general', 'view_covergrid_size', default_value=150)
 
-    # fill buttons box in topbar
+   # fill buttons box in topbar
    topbar_button_add(icon='icon/view_list',
                      cb=lambda b: input_events.event_emit('VIEW_LIST'))
    topbar_button_add(icon='icon/view_postergrid',
@@ -81,9 +81,10 @@ def shutdown():
    del _memorydb
 
 def topbar_button_add(label=None, icon=None, cb=None, cb_data=None):
-   bt = EmcButton(label=label, icon=icon, cb=cb, cb_data=cb_data)
+   bt = EmcButton(label=label, icon=icon, cb=cb, cb_data=cb_data,
+                  focus_allow=False, name=label or icon)
    gui.box_append('topbar.box', bt)
-   bt.show()
+   _topbar_btns.append(bt)
    return bt
 
 def dump_everythings():
@@ -370,12 +371,16 @@ class EmcBrowser(object):
       gui.swallow_set('topbar.icon', EmcImage(self.icon))
       self.current_view.show()
       input_events.listener_add('browser-' + self.name, self._input_event_cb)
+      for b in _topbar_btns:
+         b.focus_allow = True
 
    def hide(self):
       """ TODO Function doc """
       gui.signal_emit('topbar,hide')
       input_events.listener_del('browser-' + self.name)
       self.current_view.hide()
+      for b in _topbar_btns:
+         b.focus_allow = False
 
    def item_bring_in(self, pos='top', animated=True):
       """ Move the view so that the currently selected item will go on 'pos'
@@ -482,9 +487,9 @@ class ViewList(object):
       self.items_count = 0;            # This is accessed from the browser
 
       # EXTERNAL Genlists
-      self.gl1 = Genlist(gui.layout)
+      self.gl1 = Genlist(gui.layout, name='ViewGenlist1')
       gui.swallow_set('browser.list.genlist1', self.gl1)
-      self.gl2 = Genlist(gui.layout)
+      self.gl2 = Genlist(gui.layout, name='ViewGenlist2')
       gui.swallow_set('browser.list.genlist2', self.gl2)
       self.current_list = self.gl1
 

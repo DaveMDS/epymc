@@ -154,9 +154,6 @@ def start_epymc(standalone=False):
    gui.shutdown()
    sdb.shutdown()
 
-   # shutdown elementary
-   elementary.shutdown()
-   
    print('Bye Bye...')
    return 0
 

@@ -94,6 +94,7 @@ class Playlist(utils.Singleton):
       self.items = []
       self.cur_idx = -1
       self.onair_item = None
+      self._event_idler = None # Idler used to defer the PLAYLIST_CHANGED event
 
    def __str__(self):
       return '<Playlist: %d items, current: %d>' % \
@@ -107,7 +108,14 @@ class Playlist(utils.Singleton):
       self.items.append(item)
       if self.onair_item is None:
          self.play_next()
+
+      if self._event_idler is None:
+         self._event_idler = ecore.Idler(self._deferred_idler)
+
+   def _deferred_idler(self):
       events.event_emit('PLAYLIST_CHANGED')
+      self._event_idler = None
+      return ecore.ECORE_CALLBACK_CANCEL
 
    def play_next(self):
       self.play_move(+1)
@@ -139,7 +147,8 @@ class Playlist(utils.Singleton):
       del self.items[:]
       self.cur_idx = -1
       self.onair_item = None
-      events.event_emit('PLAYLIST_CHANGED')
+      if self._event_idler is None:
+         self._event_idler = ecore.Idler(self._deferred_idler)
 
 # Create the single instance of the Playlist class (everyone must use this one)
 playlist = Playlist()
@@ -649,7 +658,6 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
    def _gl_populate(self):
       self._gl.clear()
       for item in playlist.items:
-         # print(item.metadata)
          it = self._gl.item_append(self._itc, item)
          if item == playlist.onair_item:
             self._gl.focus_allow = False

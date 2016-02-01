@@ -728,10 +728,9 @@ group { name: "elm/list/base/mainmenu_sublist"; // Scroller for subitems list
 }
 group { name: "elm/list/h_item/mainmenu";       // Main horizontal list item
    alias: "elm/list/h_item_odd/mainmenu";
-
    data.item: "selectraise" "on";
    data.item: "focusraise" "on";
-   
+   data.item: "focus_highlight" "on";
    parts {
       // DBG_SHOW("base", 0, 0, 100)
       // DBG_SHOW("icon_container", 0, 100, 0)
@@ -838,6 +837,7 @@ group { name: "elm/list/h_item/mainmenu";       // Main horizontal list item
 group { name: "elm/list/item/mainmenu_sublist"; // Sub vertical list item
    alias: "elm/list/item_odd/mainmenu_sublist";
    data.item: "stacking" "above";
+   data.item: "focus_highlight" "on";
    images {
       image: "menu_bg_submenu.png" COMP;
       image: "shine.png" COMP;
@@ -911,24 +911,24 @@ group { name: "elm/list/item/mainmenu_sublist"; // Sub vertical list item
             }
          }
       }
-      part { name: "shine";
-            description { state: "default" 0.0;
-               visible: 0;
-               FIXED_SIZE(69, 5)
-               rel1 {
-                  to: "bg";
-               }
-               rel2 {
-                  to: "bg";
-                  relative: 1.0 0.0;
-               }
-               image.normal: "shine.png";
+      part { name: "shine"; nomouse;
+         description { state: "default" 0.0;
+            visible: 0;
+            FIXED_SIZE(69, 5)
+            rel1 {
+               to: "bg";
             }
-            description { state: "selected" 0.0;
-               inherit: "default" 0.0;
-               visible: 1;
+            rel2 {
+               to: "bg";
+               relative: 1.0 0.0;
             }
+            image.normal: "shine.png";
          }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+      }
    }
    programs {
       program { name: "go_active";

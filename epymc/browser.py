@@ -587,6 +587,8 @@ class ViewList(object):
       """ Show the view """
       self._poster.url_set(None)
       gui.signal_emit('browser,list,show')
+      self.current_list.focus_allow = True
+      self.current_list.focus = True
 
    def hide(self):
       """ Hide the view """

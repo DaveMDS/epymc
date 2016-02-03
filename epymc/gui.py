@@ -453,9 +453,9 @@ focus_directions = {
 
 def focus_move(direction, root_obj=None):
    """ TODOC """
-
+   
    if root_obj is None:
-      root_obj = win
+      root_obj = layout
    focused = root_obj.focused_object
 
    # move between List items...
@@ -565,8 +565,10 @@ def focus_move(direction, root_obj=None):
          new_focused = win.focused_object
 
    if new_focused.name == 'MainLayout' or new_focused.__class__.__name__ == 'Window':
-      DBG('FOCUS FIX: remove focus from MainLayout or MainWin')
-      root_obj.focus_next(elm.ELM_FOCUS_DOWN)
+      root_obj.focus_next(elm.ELM_FOCUS_PREVIOUS)
+      new_focused = win.focused_object
+      DBG('FOCUS FIX: remove focus from MainLayout or MainWin (new: %s)' % \
+          new_focused.name or '<%s>' % new_focused.__class__.__name__)
 
    if isinstance(new_focused, Gengrid) and new_focused.focused_item is None:
       DBG('FOCUS FIX: give focus to the selected item in a focused Gengrid')
@@ -1404,10 +1406,11 @@ class EmcSlideshow(Slideshow):
            parent folder will be show, starting from the given file.
    """
 
-   def __init__(self, url, delay=4, show_controls=False):
+   def __init__(self, url, delay=4, show_controls=False, on_del=None):
       # private stuff
       self._itc = SlideshowItemClass(self._item_get_func, self._item_del_func)
       self._timeout = delay
+      self._on_del = on_del
       self._first_file = None
       self._controls_visible = False
       self._show_controls_on_start = show_controls
@@ -1455,6 +1458,8 @@ class EmcSlideshow(Slideshow):
       input_events.listener_del('EmcSlideShow')
       self._ly.signal_emit('hide', 'emc')
       self._ly.signal_emit('controls,hide', 'emc')
+      if callable(self._on_del):
+         self._on_del()
 
    def _delete_real(self):
       Slideshow.delete(self)
@@ -1531,11 +1536,7 @@ class EmcSlideshow(Slideshow):
    def _input_event_cb(self, event):
 
       if self._controls_visible:
-         if event in ('UP', 'DOWN', 'LEFT', 'RIGHT'):
-            focus_move(event, self._ly)
-            return input_events.EVENT_BLOCK
-
-         elif event in ('EXIT', 'BACK'):
+         if event in ('EXIT', 'BACK'):
             self.controls_hide()
             return input_events.EVENT_BLOCK
 
@@ -1543,7 +1544,7 @@ class EmcSlideshow(Slideshow):
          if event == 'RIGHT':
             self.next()
             return input_events.EVENT_BLOCK
-         
+
          elif event == 'LEFT':
             self.previous()
             return input_events.EVENT_BLOCK

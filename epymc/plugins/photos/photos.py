@@ -85,7 +85,9 @@ class AddSourceItemClass(EmcItemClass):
 class PhotoItemClass(EmcItemClass):
    def item_selected(self, url, mod):
       EmcSlideshow(url, delay=ini.get_int('photos', 'slideshow_delay'),
-               show_controls=ini.get_bool('photos', 'slideshow_show_controls'))
+               show_controls=ini.get_bool('photos', 'slideshow_show_controls'),
+               on_del=lambda: mod._browser.show())
+      mod._browser.hide()
 
    def label_get(self, url, mod):
       return os.path.basename(url)

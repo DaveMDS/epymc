@@ -582,7 +582,7 @@ class EmcPlayerBase(object):
 ###############################################################################
 class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
    def __init__(self, url=None):
-
+      self._controls_visible = False
       ### init the layout
       elm.Layout.__init__(self, gui.layout, focus_allow=False, name='AudioPlayer',
                           file=(gui.theme_file, 'emc/audioplayer/default'))
@@ -643,10 +643,15 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       elm.Layout.delete(self)
 
    def controls_show(self):
-      gui.signal_emit('audioplayer,expand')
+      if not self._controls_visible:
+         self._controls_visible = True
+         gui.signal_emit('audioplayer,expand')
+         input_events.listener_promote('EmcAudioPlayer')
 
    def controls_hide(self):
-      gui.signal_emit('audioplayer,contract')
+      if self._controls_visible:
+         self._controls_visible = False
+         gui.signal_emit('audioplayer,contract')
 
    def _focused_cb(self, obj):
       self.controls_show()
@@ -694,15 +699,22 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
 
    ### input events
    def _input_events_cb(self, event):
-      if event == 'OK' and self._gl.focus == True:
-         self._genlist_item_activated_cb(self._gl, self._gl.focused_item)
+      if event == 'OK':
+         if self._gl.focus == True:
+            self._genlist_item_activated_cb(self._gl, self._gl.focused_item)
+            return input_events.EVENT_BLOCK
+      elif event == 'BACK':
+         if self._controls_visible:
+            self.focus = False # this will make the controls to hide
+            return input_events.EVENT_BLOCK
       elif event == 'PLAYLIST_NEXT':
          playlist.play_next()
+         return input_events.EVENT_BLOCK
       elif event == 'PLAYLIST_PREV':
          playlist.play_prev()
-      else:
-         return input_events.EVENT_CONTINUE
-      return input_events.EVENT_BLOCK
+         return input_events.EVENT_BLOCK
+
+      return input_events.EVENT_CONTINUE
 
    ### generic events
    def _events_cb(self, event):

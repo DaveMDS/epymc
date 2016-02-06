@@ -644,9 +644,14 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       self.show()
 
    def delete(self):
-      self._slider_timer.delete()
-      input_events.listener_del('EmcAudioPlayer')
-      events.listener_del('EmcAudioPlayer')
+      if self._slider_timer:
+         self._slider_timer.delete()
+         self._slider_timer = None
+      self.signal_callback_add('audioplayer,hide,done', '', self._delete_real)
+      self.pause()
+      self.hide()
+
+   def _delete_real(self, obj, sig, src):
       EmcPlayerBase.delete(self)
       elm.Layout.delete(self)
 

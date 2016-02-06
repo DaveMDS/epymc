@@ -48,6 +48,7 @@ audio_extensions = ['.mp3','.ogg','.oga','.flac','.m4a','.wav']
 _volume = 0
 _volume_muted = False
 _player = None # EmcVideoPlayer or EmcAudioPlayer instance, or None
+_saved_player = None # EmcAudioPlayer while EmcVideoPlayer is active
 _onair_url = None
 _onair_title = None
 _onair_poster = None
@@ -218,6 +219,7 @@ def shutdown():
 ### mediaplyer API ###
 def play_url(url, only_audio=False, start_from=None):
    global _onair_url, _onair_title, _onair_poster
+   global _player, _saved_player
 
    # default to 'file://' if not given
    if url.find('://', 2, 15) is -1:
@@ -238,6 +240,13 @@ def play_url(url, only_audio=False, start_from=None):
       _play_real(start_from, only_audio)
       return
 
+   # save (pause and hide) the AudioPlayer if it's active
+   if isinstance(_player, EmcAudioPlayer):
+      _player.pause()
+      _player.hide()
+      _saved_player = _player
+      _player = None
+   
    # starting position forced by param
    if start_from != None:
       _play_real(start_from, only_audio)
@@ -317,7 +326,7 @@ def play_counts_get(url):
                'stop_at': 0 }  # last play pos
 
 def stop():
-   global _player, _onair_url, _onair_title
+   global _player, _saved_player, _onair_url, _onair_title
 
    DBG('Stop()')
 
@@ -336,9 +345,15 @@ def stop():
       _player.delete()
       _player = None
 
-   playlist.clear()
-   _onair_url = None
-   _onair_title = None
+   # restore a saved AudioPlayer
+   if _saved_player is not None:
+      _player = _saved_player
+      _player.show()
+      _saved_player = None
+   else:
+      playlist.clear()
+      _onair_url = None
+      _onair_title = None
 
 def pause():
    if _player: _player.pause()
@@ -442,12 +457,13 @@ class EmcPlayerBase(object):
       self._emotion.callback_add('playback_finished', self._playback_finished_cb)
 
       ### listen to input and generic events
-      input_events.listener_add('EmcPlayerBase', self._base_input_events_cb)
-      events.listener_add('EmcPlayerBase', self._base_events_cb)
+      input_events.listener_add(self.__class__.__name__ + 'Base',
+                                self._base_input_events_cb)
+      events.listener_add(self.__class__.__name__ + 'Base', self._base_events_cb)
 
    def delete(self):
-      input_events.listener_del('EmcPlayerBase')
-      events.listener_del('EmcPlayerBase')
+      input_events.listener_del(self.__class__.__name__ + 'Base')
+      events.listener_del(self.__class__.__name__ + 'Base')
       self._emotion.delete()
 
    @property
@@ -583,6 +599,8 @@ class EmcPlayerBase(object):
 class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
    def __init__(self, url=None):
       self._controls_visible = False
+      self._slider_timer = None
+
       ### init the layout
       elm.Layout.__init__(self, gui.layout, focus_allow=False, name='AudioPlayer',
                           file=(gui.theme_file, 'emc/audioplayer/default'))
@@ -619,19 +637,11 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
                              homogeneous=True, mode=elm.ELM_LIST_COMPRESS)
       self._gl.callback_activated_add(self._genlist_item_activated_cb)
       self.content_set('playlist.swallow', self._gl)
-
       self._gl_populate()
 
       ### swallow ourself in the main layout and show
       gui.swallow_set('audioplayer.swallow', self)
-      self.signal_emit('audioplayer,show', 'emc')
-
-      ### listen to input and generic events
-      input_events.listener_add('EmcAudioPlayer', self._input_events_cb)
-      events.listener_add('EmcAudioPlayer', self._events_cb)
-
-      ### timer to update the slider
-      self._slider_timer = ecore.Timer(1.0, self._update_timer)
+      self.show()
 
    def delete(self):
       self._slider_timer.delete()
@@ -640,17 +650,32 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       EmcPlayerBase.delete(self)
       elm.Layout.delete(self)
 
+   def show(self):
+      input_events.listener_add('EmcAudioPlayer', self._input_events_cb)
+      events.listener_add('EmcAudioPlayer', self._events_cb)
+      self.signal_emit('audioplayer,show', 'emc')
+      
+   def hide(self):
+      input_events.listener_del('EmcAudioPlayer')
+      events.listener_del('EmcAudioPlayer')
+      self.signal_emit('audioplayer,hide', 'emc')
+
    def controls_show(self):
       if not self._controls_visible:
          self._controls_visible = True
          input_events.listener_promote('EmcAudioPlayer')
          self.signal_emit('audioplayer,expand', 'emc')
+         if self._slider_timer is None:
+            self._slider_timer = ecore.Timer(1.0, self._update_timer)
+         self._update_timer(single=True)
 
    def controls_hide(self):
       if self._controls_visible:
          self._controls_visible = False
-         # input_events.listener_demote('EmcAudioPlayer')
          self.signal_emit('audioplayer,contract', 'emc')
+         if self._slider_timer:
+            self._slider_timer.delete()
+            self._slider_timer = None
 
    def _gl_populate(self):
       self._gl.clear()

@@ -586,11 +586,13 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       ### init the layout
       elm.Layout.__init__(self, gui.layout, focus_allow=False, name='AudioPlayer',
                           file=(gui.theme_file, 'emc/audioplayer/default'))
-      # self.callback_focused_add(self._focused_cb)
-      # self.callback_unfocused_add(self._unfocused_cb)
       
       # update emotion position when mouse drag the progress slider
       self.signal_callback_add('drag', 'pos.slider:dragable1', self._pos_dragged_cb)
+      self.signal_callback_add('audioplayer,expand,request', '',
+                               lambda a,s,d: self.controls_show())
+      self.signal_callback_add('audioplayer,contract,request', '',
+                               lambda a,s,d: self.controls_hide())
 
       ### init the base player class
       EmcPlayerBase.__init__(self)
@@ -608,8 +610,6 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
          input_events.event_emit(event)
       for icon, event in buttons:
          bt = EmcButton(parent=self, icon=icon,cb=buttons_cb, cb_data=event)
-         bt.callback_focused_add(self._focused_cb)
-         bt.callback_unfocused_add(self._unfocused_cb)
          self.box_append('buttons.box', bt)
 
       ### playlist genlist
@@ -617,8 +617,6 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
                                        text_get_func=self._gl_text_get)
       self._gl = elm.Genlist(self, style='playlist', name='AudioPlayerGL',
                              homogeneous=True, mode=elm.ELM_LIST_COMPRESS)
-      self._gl.callback_focused_add(self._focused_cb)
-      self._gl.callback_unfocused_add(self._unfocused_cb)
       self._gl.callback_activated_add(self._genlist_item_activated_cb)
       self.content_set('playlist.swallow', self._gl)
 
@@ -626,7 +624,7 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
 
       ### swallow ourself in the main layout and show
       gui.swallow_set('audioplayer.swallow', self)
-      gui.signal_emit('audioplayer,show')
+      self.signal_emit('audioplayer,show', 'emc')
 
       ### listen to input and generic events
       input_events.listener_add('EmcAudioPlayer', self._input_events_cb)
@@ -645,20 +643,14 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
    def controls_show(self):
       if not self._controls_visible:
          self._controls_visible = True
-         gui.signal_emit('audioplayer,expand')
          input_events.listener_promote('EmcAudioPlayer')
+         self.signal_emit('audioplayer,expand', 'emc')
 
    def controls_hide(self):
       if self._controls_visible:
          self._controls_visible = False
-         gui.signal_emit('audioplayer,contract')
-
-   def _focused_cb(self, obj):
-      self.controls_show()
-
-   def _unfocused_cb(self, obj):
-      if gui.win.focus == True: # do not contract when mouse goes out of win
-         self.controls_hide()
+         # input_events.listener_demote('EmcAudioPlayer')
+         self.signal_emit('audioplayer,contract', 'emc')
 
    def _gl_populate(self):
       self._gl.clear()
@@ -705,7 +697,8 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
             return input_events.EVENT_BLOCK
       elif event == 'BACK':
          if self._controls_visible:
-            self.focus = False # this will make the controls to hide
+            self.controls_hide()
+            self.focus = False
             return input_events.EVENT_BLOCK
       elif event == 'PLAYLIST_NEXT':
          playlist.play_next()
@@ -723,6 +716,8 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
          metadata = playlist.onair_item.metadata
          self.part_text_set('artist.text', metadata.get('artist'))
          self.part_text_set('album.text', metadata.get('album'))
+         self.part_text_set('song_and_artist.text', '{0} - {1}'.format(
+                              metadata.get('artist'), metadata.get('title')))
          poster = metadata.get('poster')
          img = EmcImage(poster or 'special/cd/' + metadata.get('album'))
          self.content_set('cover.swallow', img)

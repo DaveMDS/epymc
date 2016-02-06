@@ -557,6 +557,7 @@ def focus_move(direction, root_obj=None):
        focused.name or '<%s>' % focused.__class__.__name__,
        new_focused.name or '<%s>' % new_focused.__class__.__name__))
 
+   # FOCUS FIX: always close AudioPlayer on LEFT event
    if focused == new_focused:
       if direction == 'LEFT' and focused.parent.name == 'AudioPlayer':
          # TODO: "LEFT" should be taken from the theme, or the position
@@ -564,12 +565,22 @@ def focus_move(direction, root_obj=None):
          focused.parent.focus = False # this will make the player hide
          new_focused = win.focused_object
 
+   # FOCUS FIX: expand/contract AudioPlayer on focus/unfocus
+   if focused.parent.name == 'AudioPlayer' and new_focused.parent.name != 'AudioPlayer':
+      DBG("FOCUS FIX: contract AudioPlayer when he lost focus")
+      focused.parent.controls_hide()
+   elif focused.parent.name != 'AudioPlayer' and new_focused.parent.name == 'AudioPlayer':
+      DBG("FOCUS FIX: expand AudioPlayer on focus")
+      new_focused.parent.controls_show()
+
+   # FOCUS FIX: remove focus from MainLayout or MainWin
    if new_focused.name == 'MainLayout' or new_focused.__class__.__name__ == 'Window':
       root_obj.focus_next(elm.ELM_FOCUS_PREVIOUS)
       new_focused = win.focused_object
       DBG('FOCUS FIX: remove focus from MainLayout or MainWin (new: %s)' % \
           new_focused.name or '<%s>' % new_focused.__class__.__name__)
 
+   # FOCUS FIX: focus to gengrid item
    if isinstance(new_focused, Gengrid) and new_focused.focused_item is None:
       DBG('FOCUS FIX: give focus to the selected item in a focused Gengrid')
       new_focused.selected_item.focus = True

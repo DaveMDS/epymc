@@ -1476,76 +1476,7 @@ collections {
 
 /// audioplayer swallow
          part { name: "audioplayer.swallow"; type: SWALLOW;  /* API TODOC */
-            description { state: "default" 0.0;
-               rel1 {
-                  to_y: "topbar.list.spacer";
-                  relative: (0.55 + 0.42) 1.0;
-                  offset: 0 20;
-               }
-               rel2 {
-                  relative: (1.0 + 0.42) 1.0;
-                  offset: -1 -10;
-               }
-               visible: 0;
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               visible: 1;
-            }
-            description { state: "expanded" 0.0;
-               inherit: "visible" 0.0;
-               rel1.relative: (0.55 + 0.0) 1.0;
-               rel2.relative: (1.0 + 0.0) 1.0;
-            }
-         }
-         part { name: "events"; type: RECT; mouse; repeat;
-            description { state: "default" 0.0;
-               rel1.to: "audioplayer.swallow";
-               rel2.to: "audioplayer.swallow";
-               color: 0 0 0 0;
-            }
-         }
-         program { name: "audioplayer_show";  /* API */
-            signal: "audioplayer,show"; source: "emc";
-            action: STATE_SET "visible";
-            transition: LINEAR 0.4;
-            target: "audioplayer.swallow";
-            after: "audioplayer_show_done";
-         }
-         program { name: "audioplayer_hide";  /* API */
-            signal: "audioplayer,hide"; source: "emc";
-            action: STATE_SET "default";
-            transition: LINEAR 0.4;
-            target: "audioplayer.swallow";
-            after: "audioplayer_hide_done";
-         }
-         program { name: "audioplayer_show_done"; /* API */
-            action: SIGNAL_EMIT "audioplayer,show,done" "";
-         }
-         program { name: "audioplayer_hide_done"; /* API */
-            action: SIGNAL_EMIT "audioplayer,hide,done" "";
-         }
-         program { name: "audioplayer_expand";  /* API */
-            signal: "audioplayer,expand"; source: "emc";
-            action: STATE_SET "expanded";
-            transition: SINUSOIDAL 0.4 CURRENT;
-            target: "audioplayer.swallow";
-         }
-         program { name: "audioplayer_contract";  /* API */
-            signal: "audioplayer,contract"; source: "emc";
-            action: STATE_SET "visible";
-            transition: SINUSOIDAL 0.4 CURRENT;
-            target: "audioplayer.swallow";
-         }
-         program { name: "expand_mouse_in";
-            signal: "mouse,in"; source: "events";
-            filter: "audioplayer.swallow" "visible";
-            after: "audioplayer_expand";
-         }
-         program { name: "contract_mouse_out";
-            signal: "mouse,out"; source: "events";
-            filter: "audioplayer.swallow" "expanded";
-            after: "audioplayer_contract";
+            description { state: "default" 0.0; }
          }
 
 /// volume
@@ -2911,41 +2842,80 @@ collections {
    group { name: "emc/audioplayer/default";  /* API TODOC */
       images.image: "frame2_solid.png" COMP;
       images.image: "dialog_header_shadow.png" COMP;
+      images.image: "shadow_vert.png" COMP;
+      images.image: "shadow_vert_left.png" COMP;
       parts {
          part { name: "bg"; type: IMAGE;
             description { state: "default" 0.0;
                fixed: 1 1;
                image.normal: "frame2_solid.png";
                image.border: 8 8 8 8;
+               rel1.to: "left";
                rel1.offset: -8 -8;
                rel2.offset: 9 9;
             }
          }
-         part { name: "cover.swallow"; type: SWALLOW;  /* API TODOC */
+         part { name: "main"; type: SPACER;
+            scale: 1;
             description { state: "default" 0.0;
-               fixed: 1 1;
-               rel1.offset: 9 6;
-               rel2.offset: -10 -7;
-               rel2.relative: 1.0 0.3;
-               aspect: 1 1; aspect_preference: BOTH;
+               rel1.relative: 1.20 0.0;
+               rel2.relative: 1.20 1.0;
                align: 0.0 0.5;
+               min: 400 400;
+            }
+            description { state: "contracted" 0.0;
+               inherit: "default" 0.0;
+               rel1.relative: 1.00 0.0;
+               rel2.relative: 1.00 1.0;
+               align: 0.0 0.5;
+            }
+            description { state: "expanded" 0.0;
+               inherit: "contracted" 0.0;
+               align: 1.0 0.5;
+            }
+         }
+         part { name: "cover.swallow"; type: SWALLOW;  /* API TODOC */
+            scale: 1;
+            description { state: "default" 0.0;
+               FIXED_SIZE(150, 150)
+               align: 0.0 0.0;
+               rel1.to: "left";
+               rel2.to: "main";
+               rel1.offset: 7 6;
+               rel2.offset: -10 -7;
             }
          }
          part { name: "playlist.swallow"; type: SWALLOW;  /* API TODOC */
             description { state: "default" 0.0;
                fixed: 1 1;
-               rel1.relative: 0.0 0.3;
+               rel1.to_x: "main";
+               rel1.to_y: "cover.swallow";
+               rel1.relative: 0.0 1.0;
+               rel1.offset: 0 6;
+               rel2.to: "main";
                rel2.offset: -1 1;
             }
          }
-         part { name: "shadow"; type: IMAGE; nomouse;
+         part { name: "playlist.shadow1"; type: IMAGE; nomouse;
             description { state: "default" 0.0;
                fixed: 1 1;
                image.normal: "dialog_header_shadow.png";
-               rel1.to: "playlist.swallow";
+               rel1.to_y: "playlist.swallow";
+               rel1.to_x: "left";
                rel2.to: "playlist.swallow";
                min: 26 26;
                max: 9999 26;
+               align: 0.0 0.0;
+            }
+         }
+         part { name: "playlist.shadow2"; type: IMAGE; nomouse;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               image.normal: "shadow_vert.png";
+               rel1.to: "playlist.swallow";
+               rel2.to: "playlist.swallow";
+               min: 26 26;
+               max: 26 9999;
                align: 0.0 0.0;
             }
          }
@@ -2956,6 +2926,7 @@ collections {
                rel1.relative: 1.0 0.0;
                rel1.offset: 9 0;
                rel2.to_y: "cover.swallow";
+               rel2.to_x: "main";
                rel2.relative: 1.0 1.0;
                rel2.offset: -10 -1;
             }
@@ -3025,10 +2996,110 @@ collections {
                }
             }
          }
-         // DBG_SHOW("playlist.swallow", 0, 200, 0)
-         // DBG_SHOW("info.spacer", 0, 0, 200)
-         // DBG_SHOW("cover.swallow", 200, 0, 0)
-         // DBG_SHOW("buttons.box", 0, 200, 0)
+
+         part { name: "left"; type: RECT; mouse;
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.to: "main";
+               rel2.to: "main";
+               rel2.relative: 0.0 1.0;
+               align: 1.0 0.5;
+               min: 43 43;
+               color: 0 0 0 0;
+            }
+            part { name: "shadow"; type: IMAGE; nomouse;
+               description { state: "default" 0.0;
+                  fixed: 1 1;
+                  image.normal: "shadow_vert_left.png";
+                  rel2.relative: 0.0 1.0;
+                  min: 26 26;
+                  max: 26 9999;
+                  align: 1.0 0.0;
+               }
+            }
+            part { name: "icon"; type: IMAGE; nomouse;
+               description { state: "default" 0.0;
+                  align: 0.5 1.0;
+                  aspect: 1 1;
+                  aspect_preference: HORIZONTAL;
+                  image.normal: "icon_music.png";
+                  rel2.offset: -1 -4;
+               }
+            }
+            part { name: "song_and_artist.spacer"; type: RECT; nomouse;
+               description { state: "default" 0.0;
+                  visible: 0;
+                  aspect: 1 1; aspect_preference: VERTICAL;
+                  rel1.to_y: "playlist.swallow";
+                  rel2.to: "icon";
+                  rel2.relative: 1.0 0.0;
+                  rel2.offset: -1 -7;
+               }
+               part { name: "song_and_artist.text"; type: TEXT; /* API TODOC */
+                  nomouse;
+                  scale: 1;
+                  description { state: "default" 0.0;
+                     fixed: 1 1;
+                     text {
+                        text: "Song by Artist";
+                        font: FONT;
+                        size: FONT_SIZE;
+                        align: 0.0 0.5;
+                     }
+                     map.on: 1;
+                     map.smooth: 0;
+                     map.rotation.center: "song_and_artist.spacer";
+                     map.rotation.z: -90;
+                  }
+               }
+            }
+         }
+      }
+      programs {
+         program { name: "audioplayer_show";  /* API */
+            signal: "audioplayer,show"; source: "emc";
+            action: STATE_SET "contracted";
+            // transition: LINEAR 0.4;
+            transition: SPRING 0.8 0.6 2;
+            target: "main";
+            after: "audioplayer_show_done";
+         }
+         program { name: "audioplayer_hide";  /* API */
+            signal: "audioplayer,hide"; source: "emc";
+            action: STATE_SET "default";
+            transition: LINEAR 0.4;
+            target: "main";
+            after: "audioplayer_hide_done";
+         }
+         program { name: "audioplayer_show_done"; /* API */
+            action: SIGNAL_EMIT "audioplayer,show,done" "";
+         }
+         program { name: "audioplayer_hide_done"; /* API */
+            action: SIGNAL_EMIT "audioplayer,hide,done" "";
+         }
+         program { name: "audioplayer_expand";  /* API */
+            signal: "audioplayer,expand"; source: "emc";
+            action: STATE_SET "expanded";
+            transition: SINUSOIDAL 0.4 CURRENT;
+            target: "main";
+         }
+         program { name: "audioplayer_contract";  /* API */
+            signal: "audioplayer,contract"; source: "emc";
+            action: STATE_SET "contracted";
+            transition: SINUSOIDAL 0.4 CURRENT;
+            target: "main";
+         }
+         program { name: "expand_mouse";
+            signal: "mouse,down,1"; source: "left";
+            filter: "main" "contracted";
+            action: SIGNAL_EMIT "audioplayer,expand,request" "";  /* API */
+         }
+         program { name: "contract_mouse";
+            signal: "mouse,down,1"; source: "left";
+            filter: "main" "expanded";
+            action: SIGNAL_EMIT "audioplayer,contract,request" "";  /* API */
+         }
       }
    }
 

@@ -1640,7 +1640,7 @@ collections {
       images {
          image: "dialog_bg.png" COMP;
          image: "dialog_header.png" COMP;
-         image: "dialog_header_shadow.png" COMP;
+         image: "shadow_far_top.png" COMP;
          image: "roundclose.png" COMP;
       }
       parts {
@@ -1731,7 +1731,7 @@ collections {
                rel2 {
                   to: "title_bg";
                }
-               image.normal: "dialog_header_shadow.png";
+               image.normal: "shadow_far_top.png";
             }
             description { state: "visible" 0.0;
                inherit: "default" 0.0;
@@ -1880,7 +1880,7 @@ collections {
       images {
          image: "dialog_bg.png" COMP;
          image: "dialog_header.png" COMP;
-         image: "dialog_header_shadow.png" COMP;
+         image: "shadow_far_top.png" COMP;
          image: "bulb-0.png" COMP;
          image: "warning.png" COMP;
          image: "error.png" COMP;
@@ -2002,7 +2002,7 @@ collections {
                rel2 {
                   to: "title_bg";
                }
-               image.normal: "dialog_header_shadow.png";
+               image.normal: "shadow_far_top.png";
             }
          }
          part { name: "emc.text.title"; type: TEXTBLOCK;  /* API */
@@ -2841,9 +2841,9 @@ collections {
 /// audioplayer
    group { name: "emc/audioplayer/default";  /* API TODOC */
       images.image: "frame2_solid.png" COMP;
-      images.image: "dialog_header_shadow.png" COMP;
-      images.image: "shadow_vert.png" COMP;
-      images.image: "shadow_vert_left.png" COMP;
+      images.image: "shadow_far_top.png" COMP;
+      images.image: "shadow_far_right.png" COMP;
+      images.image: "shadow_far_left.png" COMP;
       parts {
          part { name: "bg"; type: IMAGE;
             description { state: "default" 0.0;
@@ -2899,7 +2899,7 @@ collections {
          part { name: "playlist.shadow1"; type: IMAGE; nomouse;
             description { state: "default" 0.0;
                fixed: 1 1;
-               image.normal: "dialog_header_shadow.png";
+               image.normal: "shadow_far_top.png";
                rel1.to_y: "playlist.swallow";
                rel1.to_x: "left";
                rel2.to: "playlist.swallow";
@@ -2911,7 +2911,7 @@ collections {
          part { name: "playlist.shadow2"; type: IMAGE; nomouse;
             description { state: "default" 0.0;
                fixed: 1 1;
-               image.normal: "shadow_vert.png";
+               image.normal: "shadow_far_left.png";
                rel1.to: "playlist.swallow";
                rel2.to: "playlist.swallow";
                min: 26 26;
@@ -3011,7 +3011,7 @@ collections {
             part { name: "shadow"; type: IMAGE; nomouse;
                description { state: "default" 0.0;
                   fixed: 1 1;
-                  image.normal: "shadow_vert_left.png";
+                  image.normal: "shadow_far_right.png";
                   rel2.relative: 0.0 1.0;
                   min: 26 26;
                   max: 26 9999;

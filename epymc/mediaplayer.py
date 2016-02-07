@@ -178,6 +178,8 @@ def init():
       ini.set('mediaplayer', 'backend', 'gstreamer1')
    if not ini.has_option('mediaplayer', 'resume_from_last_pos'):
       ini.set('mediaplayer', 'resume_from_last_pos', '0')
+   if not ini.has_option('mediaplayer', 'playlist_loop'):
+      ini.set('mediaplayer', 'playlist_loop', 'False')
    if not ini.has_option('mediaplayer', 'video_extensions'):
       ini.set('mediaplayer', 'video_extensions', '')
    if not ini.has_option('mediaplayer', 'audio_extensions'):
@@ -619,6 +621,9 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       self.signal_callback_add('audioplayer,contract,request', '',
                                lambda a,s,d: self.controls_hide())
 
+      ### setup the playlist
+      playlist.loop = ini.get_bool('mediaplayer', 'playlist_loop')
+      
       ### init the base player class
       EmcPlayerBase.__init__(self)
       self.url = url
@@ -633,8 +638,10 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
                         cb=lambda b: input_events.event_emit('PLAYLIST_NEXT')))
       self.box_append('buttons.box', EmcButton(parent=self, icon='icon/stop',
                         cb=lambda b: input_events.event_emit('STOP')))
-      self.box_append('buttons.box', EmcButton(parent=self, icon='icon/loop',
-                        cb=self._toggle_loop_cb))
+      b = EmcButton(parent=self, icon='icon/loop', toggle=True,
+                    cb=self._toggle_loop_cb)
+      b.toggled = playlist.loop
+      self.box_append('buttons.box', b)
 
       ### playlist genlist
       self._itc = elm.GenlistItemClass(item_style='default',
@@ -727,6 +734,7 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
 
    def _toggle_loop_cb(self, b):
       playlist.loop = not playlist.loop
+      ini.set('mediaplayer', 'playlist_loop', playlist.loop)
 
    ### input events
    def _input_events_cb(self, event):

@@ -143,7 +143,7 @@ class FolderItemClass(FolderItemClass):
 
 
 class PhotosModule(EmcModule):
-   name = 'phptos'
+   name = 'photos'
    label = _('Photos')
    icon = 'icon/photo'
    info = _('A module to watch your photos.')

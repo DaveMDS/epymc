@@ -33,7 +33,7 @@ def LOG(msg):
 
 # modules enabled by default
 DEFAULT_MODS = 'calibrator input_keyb onlinevideo mame movies music ' \
-   'tvshows screensaver'
+   'tvshows screensaver photos'
 
 class EmcModule(object):
    name = ''

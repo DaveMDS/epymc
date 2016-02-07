@@ -806,9 +806,11 @@ class EmcButton(Button):
    """ A simple wrapper around the elm Button class """
 
    def __init__(self, label=None, icon=None, cb=None, cb_data=None,
-                      parent=None, **kargs):
+                      parent=None, toggle=False, **kargs):
       self._cb = cb
       self._cb_data = cb_data
+      self._is_toggle = toggle
+      self._toggled = False
       Button.__init__(self, parent or layout, style='emc', **kargs)
       self.callback_clicked_add(self.activate)
       if label: self.text_set(label)
@@ -818,9 +820,24 @@ class EmcButton(Button):
    def icon_set(self, icon):
       self.content_set(load_icon(icon))
 
+   @property
+   def toggled(self):
+      return self._toggled
+
+   @toggled.setter
+   def toggled(self, toggled):
+      self._toggled = toggled
+      if toggled:
+         self.signal_emit('emc,state,toggled', 'emc')
+      else:
+         self.signal_emit('emc,state,untoggled', 'emc')
+
    def activate(self, obj=None):
-      if obj is None:
+      if self._is_toggle:
+         self.toggled = not self._toggled
+      elif obj is None:
          self.signal_emit("elm,anim,activate", "elm")
+
       if callable(self._cb):
          if self._cb_data is not None:
             self._cb(self, self._cb_data)

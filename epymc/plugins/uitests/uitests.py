@@ -462,13 +462,30 @@ class MyItemClass(EmcItemClass):
          vbox.pack_end(b)
          hbox.pack_end(vbox)
 
-         # 7 butttons in a row (labels)
+         # toggle buttons
+         hbox2 = Box(gui.win)
+         hbox2.horizontal_set(True)
+         hbox2.show()
+         b = EmcButton('toggle label', toggle=True, cb=_buttons_cb)
+         hbox2.pack_end(b)
+         b = EmcButton('toggle label + icon', 'icon/star', toggle=True, cb=_buttons_cb)
+         hbox2.pack_end(b)
+         b = EmcButton(icon='icon/star', toggle=True, cb=_buttons_cb)
+         hbox2.pack_end(b)
+         b = EmcButton(icon='icon/star', toggle=True, cb=_buttons_cb)
+         b.toggled = True
+         hbox2.pack_end(b)
+         b = EmcButton('toggle disabled', 'icon/star', toggle=True, cb=_buttons_cb)
+         b.disabled_set(True)
+         hbox2.pack_end(b)
+         vbox0.pack_end(hbox2)
+
+         # 7 butttons in a row (numbers)
          hbox2 = Box(gui.win)
          hbox2.horizontal_set(True)
          hbox2.show()
          for i in range(0,8):
             b = EmcButton(str(i), cb=_buttons_cb)
-            b.show()
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
 
@@ -486,7 +503,7 @@ class MyItemClass(EmcItemClass):
          i = 0
          for group in edje.file_collection_list(gui.theme_file):
             if group.startswith('icon/'):
-               if i % 12 == 0:
+               if i % 16 == 0:
                   hbox2 = Box(gui.win, horizontal=True)
                   vbox0.pack_end(hbox2)
                   hbox2.show()
@@ -566,11 +583,11 @@ class UiTestsModule(EmcModule):
       self._browser.show()
 
    def populate_root(self, browser, url):
+      browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + Focus')
       browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')
       browser.item_add(MyItemClass(), 'uitests://mpvo', 'Mediaplayer - Online Video (good)')
       browser.item_add(MyItemClass(), 'uitests://mpvom', 'Mediaplayer - Online Video (med)')
       browser.item_add(MyItemClass(), 'uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
-      
       browser.item_add(MyItemClass(), 'uitests://vkbd', 'Virtual Keyboard')
       browser.item_add(MyItemClass(), 'uitests://encoding', 'Various string encoding tests')
       browser.item_add(MyItemClass(), 'uitests://views', 'Browser Views')
@@ -580,7 +597,6 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://ev_emit', 'Event Emit')
       browser.item_add(MyItemClass(), 'uitests://notify', 'Notify Stack')
       browser.item_add(MyItemClass(), 'uitests://menu', 'Menu')
-      browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + Focus')
       browser.item_add(MyItemClass(), 'uitests://icons', 'Icons gallery')
       browser.item_add(MyItemClass(), 'uitests://imagegal', 'Images gallery')
       browser.item_add(MyItemClass(), 'uitests://styles', 'Text styles')

@@ -95,6 +95,7 @@ class Playlist(utils.Singleton):
       self.items = []
       self.cur_idx = -1
       self.onair_item = None
+      self.loop = False
       self._event_idler = None # Idler used to defer the PLAYLIST_CHANGED event
 
    def __str__(self):
@@ -129,11 +130,17 @@ class Playlist(utils.Singleton):
 
       # start reached
       if self.cur_idx < 0:
-         self.cur_idx = 0
+         self.cur_idx = 0 if not self.loop else len(self.items) - 1
 
       # end reached
       if self.cur_idx >= len(self.items):
-         self.cur_idx = 0
+         if self.loop:
+            self.cur_idx = 0
+         else:
+            self.cur_idx = len(self.items) - 1
+            if _player.position_percent > 0.99:
+               _player.pause()
+            return
 
       # play the new item
       self.onair_item = self.items[self.cur_idx]
@@ -626,6 +633,8 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
                         cb=lambda b: input_events.event_emit('PLAYLIST_NEXT')))
       self.box_append('buttons.box', EmcButton(parent=self, icon='icon/stop',
                         cb=lambda b: input_events.event_emit('STOP')))
+      self.box_append('buttons.box', EmcButton(parent=self, icon='icon/loop',
+                        cb=self._toggle_loop_cb))
 
       ### playlist genlist
       self._itc = elm.GenlistItemClass(item_style='default',
@@ -715,6 +724,9 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
    def _pos_dragged_cb(self, obj, emission, source):
       (val,val2) = self.edje.part_drag_value_get('pos.slider:dragable1')
       self.position_percent = val
+
+   def _toggle_loop_cb(self, b):
+      playlist.loop = not playlist.loop
 
    ### input events
    def _input_events_cb(self, event):

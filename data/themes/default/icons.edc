@@ -79,6 +79,7 @@ ICON("fbwd")
 ICON("volume")
 ICON("mute")
 ICON("loop")
+ICON("shuffle")
 
 
 // Those should go in a module specific edc...

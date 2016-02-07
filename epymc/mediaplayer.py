@@ -21,6 +21,7 @@
 from __future__ import absolute_import, print_function
 
 import os
+import random
 from datetime import datetime
 
 from efl import evas, ecore, edje, emotion, elementary as elm
@@ -95,7 +96,8 @@ class Playlist(utils.Singleton):
       self.items = []
       self.cur_idx = -1
       self.onair_item = None
-      self.loop = False
+      self._loop = False
+      self._shuffle = False
       self._event_idler = None # Idler used to defer the PLAYLIST_CHANGED event
 
    def __str__(self):
@@ -119,22 +121,44 @@ class Playlist(utils.Singleton):
       self._event_idler = None
       return ecore.ECORE_CALLBACK_CANCEL
 
+   @property
+   def loop(self):
+      return self._loop
+
+   @loop.setter
+   def loop(self, loop):
+      self._loop = loop
+
+   @property
+   def shuffle(self):
+      return self._shuffle
+
+   @shuffle.setter
+   def shuffle(self, shuffle):
+      self._shuffle = shuffle
+
    def play_next(self):
-      self.play_move(+1)
+      if self._shuffle:
+         self.play_item(random.choice(self.items))
+      else:
+         self.play_move(+1)
 
    def play_prev(self):
-      self.play_move(-1)
+      if self._shuffle:
+         self.play_item(random.choice(self.items))
+      else:
+         self.play_move(-1)
 
    def play_move(self, offset):
       self.cur_idx += offset
 
       # start reached
       if self.cur_idx < 0:
-         self.cur_idx = 0 if not self.loop else len(self.items) - 1
+         self.cur_idx = 0 if not self._loop else len(self.items) - 1
 
       # end reached
       if self.cur_idx >= len(self.items):
-         if self.loop:
+         if self._loop:
             self.cur_idx = 0
          else:
             self.cur_idx = len(self.items) - 1
@@ -180,6 +204,8 @@ def init():
       ini.set('mediaplayer', 'resume_from_last_pos', '0')
    if not ini.has_option('mediaplayer', 'playlist_loop'):
       ini.set('mediaplayer', 'playlist_loop', 'False')
+   if not ini.has_option('mediaplayer', 'playlist_shuffle'):
+      ini.set('mediaplayer', 'playlist_shuffle', 'False')
    if not ini.has_option('mediaplayer', 'video_extensions'):
       ini.set('mediaplayer', 'video_extensions', '')
    if not ini.has_option('mediaplayer', 'audio_extensions'):
@@ -623,6 +649,7 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
 
       ### setup the playlist
       playlist.loop = ini.get_bool('mediaplayer', 'playlist_loop')
+      playlist.shuffle = ini.get_bool('mediaplayer', 'playlist_shuffle')
       
       ### init the base player class
       EmcPlayerBase.__init__(self)
@@ -641,6 +668,10 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       b = EmcButton(parent=self, icon='icon/loop', toggle=True,
                     cb=self._toggle_loop_cb)
       b.toggled = playlist.loop
+      self.box_append('buttons.box', b)
+      b = EmcButton(parent=self, icon='icon/shuffle', toggle=True,
+                    cb=self._toggle_shuffle_cb)
+      b.toggled = playlist.shuffle
       self.box_append('buttons.box', b)
 
       ### playlist genlist
@@ -735,6 +766,10 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
    def _toggle_loop_cb(self, b):
       playlist.loop = not playlist.loop
       ini.set('mediaplayer', 'playlist_loop', playlist.loop)
+
+   def _toggle_shuffle_cb(self, b):
+      playlist.shuffle = not playlist.shuffle
+      ini.set('mediaplayer', 'playlist_shuffle', playlist.shuffle)
 
    ### input events
    def _input_events_cb(self, event):

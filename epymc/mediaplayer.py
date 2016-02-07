@@ -617,18 +617,15 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       self.url = url
 
       ### control buttons
-      buttons = [
-         ('icon/prev', 'PLAYLIST_PREV'),
-         ('icon/next', 'PLAYLIST_NEXT'),
-         ('icon/pause', 'PAUSE'),
-         ('icon/play', 'PLAY'),
-         ('icon/stop', 'STOP'),
-      ]
-      def buttons_cb(b, event):
-         input_events.event_emit(event)
-      for icon, event in buttons:
-         bt = EmcButton(parent=self, icon=icon,cb=buttons_cb, cb_data=event)
-         self.box_append('buttons.box', bt)
+      self.box_append('buttons.box', EmcButton(parent=self, icon='icon/prev',
+                        cb=lambda b: input_events.event_emit('PLAYLIST_PREV')))
+      self.box_append('buttons.box', EmcButton(parent=self, icon='icon/pause',
+                        cb=lambda b: input_events.event_emit('TOGGLE_PAUSE'),
+                        name='PlayPauseBtn'))
+      self.box_append('buttons.box', EmcButton(parent=self, icon='icon/next',
+                        cb=lambda b: input_events.event_emit('PLAYLIST_NEXT')))
+      self.box_append('buttons.box', EmcButton(parent=self, icon='icon/stop',
+                        cb=lambda b: input_events.event_emit('STOP')))
 
       ### playlist genlist
       self._itc = elm.GenlistItemClass(item_style='default',
@@ -760,11 +757,18 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
             it.show()
             self._gl.focus_allow = True
 
-         # update the slider
+         # update the slider and the play/pause button
          self._update_timer(single=True)
+         self.name_find('PlayPauseBtn').icon_set('icon/pause')
 
       elif event == 'PLAYBACK_FINISHED':
          playlist.play_next()
+
+      elif event == 'PLAYBACK_PAUSED':
+         self.name_find('PlayPauseBtn').icon_set('icon/play')
+
+      elif event == 'PLAYBACK_UNPAUSED':
+         self.name_find('PlayPauseBtn').icon_set('icon/pause')
 
       elif event == 'PLAYLIST_CHANGED':
          print("CHANGED")

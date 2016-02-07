@@ -493,7 +493,7 @@ class MyItemClass(EmcItemClass):
          hbox2 = Box(gui.win)
          hbox2.horizontal_set(True)
          hbox2.show()
-         icons = ['icon/fbwd','icon/bwd','icon/stop','icon/play','icon/fwd','icon/ffwd']
+         icons = ['icon/prev', 'icon/fbwd','icon/bwd','icon/stop','icon/play','icon/fwd','icon/ffwd','icon/next']
          for i in icons:
             b = EmcButton(icon=i, cb=_buttons_cb)
             hbox2.pack_end(b)

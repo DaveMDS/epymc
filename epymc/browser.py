@@ -173,13 +173,13 @@ class FolderItemClass(EmcItemClass):
       raise NotImplementedError
 
    def label_get(self, url, user_data):
-      return os.path.basename(url)
+      return elm.utf8_to_markup(os.path.basename(url))
 
    def icon_get(self, url, user_data):
       return 'icon/folder'
 
    def poster_get(self, url, user_data):
-      return 'special/folder/' + os.path.basename(url)
+      return 'special/folder/' + elm.utf8_to_markup(os.path.basename(url))
 
 
 class EmcBrowser(object):

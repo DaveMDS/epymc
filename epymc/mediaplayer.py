@@ -251,6 +251,14 @@ def shutdown():
    input_events.listener_del("mediaplayer")
    del _play_db
 
+
+### gui API ###
+def audio_player_show():
+   if isinstance(_player, EmcAudioPlayer):
+      _player.controls_show()
+      _player.focus = True
+
+
 ### mediaplyer API ###
 def play_url(url, only_audio=False, start_from=None):
    global _onair_url, _onair_title, _onair_poster

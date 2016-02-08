@@ -27,9 +27,12 @@ Bug fixed:
 New features:
 
  * New Photo module
+ * Lots of improvements in the Music module and the AudioPlayer itself:
+   playlist is now visible and browsable, player/playlist controls are always
+   reachable in the UI, ability to set loop and shuffle.
  * Thumbnailing ability, using a custom Ethumb slave process
  * New Watchdog module (sadly gstreamer1 continue to hang the mainloop for me)
- * New PosterGrid view
+ * New PosterGrid/CoverGrid views
  * New South Park Studios online video channel
  * Automatically (and manually) download and update youtube-dl
  * New themoviedb.org online video channel (with movie trailers)

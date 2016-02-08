@@ -28,19 +28,17 @@ TMP
  * mpris fail on Position > Int32    :/
  
  For release:
-   * require efl >= 1.17 (and use setup.py efl stuff)
    * db_py3_browser_view_memory need to be cleared for the relase (dump version)
    * comment-out all DBG functions
 
  Music features:
-   * random/loop option in player
    * playlist item remove/reorder
+   * volume control is not reachable with keyboard-only
 
 
 BUGS
 =====
  * mame's favorites got lost from config sometimes
- * video don't keep the right aspect, usually subs get cutted out
  * text in dialogs dont scale on-the-fly (elm bug)
  * autoscrolled entry are not constant-speed changing the fps...it was used to work :/
  * no way to toggle fs with the mouse

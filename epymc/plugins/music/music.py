@@ -49,8 +49,7 @@ _mod = None
 
 class RootOnAirItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod._browser.page_add('music://onair', _('OnAir'), mod._styles,
-                            mod.populate_onair_page)
+      mediaplayer.audio_player_show()
 
    def label_get(self, url, mod):
       return _('OnAir')
@@ -126,22 +125,22 @@ class RootAddSourceItemClass(EmcItemClass):
    def icon_get(self, url, mod):
       return 'icon/plus'
 
-class QueueAlbumItemClass(EmcItemClass):
+class PlaySongsItemClass(EmcItemClass):
    def item_selected(self, url, songs_list):
-      _mod.queue_album(songs_list)
-
-   def label_get(self, url, songs_list):
-      return _('Play the whole album')
-
-   def icon_get(self, url, songs_list):
-      return 'icon/plus'
-
-class QueueArtistItemClass(EmcItemClass):
-   def item_selected(self, url, songs_list):
-      _mod.queue_artist(songs_list)
+      _mod.queue_song_list(songs_list, queue=False)
 
    def label_get(self, url, songs_list):
       return _('Play all the songs')
+
+   def icon_get(self, url, songs_list):
+      return 'icon/play'
+
+class QueueSongsItemClass(EmcItemClass):
+   def item_selected(self, url, songs_list):
+      _mod.queue_song_list(songs_list, queue=True)
+
+   def label_get(self, url, songs_list):
+      return _('Queue all the songs')
 
    def icon_get(self, url, songs_list):
       return 'icon/plus'
@@ -529,23 +528,11 @@ class MusicModule(EmcModule):
          EmcNotify('<title>%s</><br>%s' % (song['title'], _('queued')),
                    icon='icon/music')
 
-   def queue_album(self, songs_list):
-      mediaplayer.playlist.clear()
+   def queue_song_list(self, songs_list, queue):
+      if queue is False:
+         mediaplayer.playlist.clear()
       for song in songs_list:
          mediaplayer.playlist.append(song['url'], metadata_cb=self.playlist_metadata_cb)
-
-      # album = self._albums_db.get_data(songs_list[0]['album'])
-      # EmcNotify('<title>%s</><br>%s' % (album['name'], _('queued')),
-                # icon='icon/music')
-
-   def queue_artist(self, songs_list):
-      mediaplayer.playlist.clear()
-      for song in songs_list:
-         mediaplayer.playlist.append(song['url'], metadata_cb=self.playlist_metadata_cb)
-
-      # artist = self._artists_db.get_data(songs_list[0]['artist'])
-      # EmcNotify('<title>%s</><br>%s' % (artist['name'], _('queued')),
-                # icon='icon/music')
 
 
 ### browser pages
@@ -560,15 +547,10 @@ class MusicModule(EmcModule):
       self._browser.item_add(RootRebuildItemClass(), 'music://rebuild', self)
       self._browser.item_add(RootAddSourceItemClass(), 'music://add_source', self)
 
-   def populate_onair_page(self, browser, page_url):
-      """ list of songs in the current queue """
-      for item in mediaplayer.playlist.items:
-         song = self._songs_db.get_data(item.url)
-         self._browser.item_add(SongItemClass(), item.url, song)
-
    def populate_songs_page(self, browser, page_url):
       """ list of all the songs """
       L = [self._songs_db.get_data(k) for k in self._songs_db.keys()]
+      self._browser.item_add(PlaySongsItemClass(), page_url, L)
       for song in sorted(L, key=operator.itemgetter('title')):
          self._browser.item_add(SongItemClass(), song['url'], song)
 
@@ -592,7 +574,8 @@ class MusicModule(EmcModule):
       """ list of all songs for the given artist (grouped by album) """
       L = [ self._songs_db.get_data(url) for url in artist['songs'] ]
       L.sort(key=operator.itemgetter('album', 'tracknumber', 'title'))
-      self._browser.item_add(QueueArtistItemClass(), url, L)
+      self._browser.item_add(PlaySongsItemClass(), url, L)
+      self._browser.item_add(QueueSongsItemClass(), url, L)
       last_album = None
       for song in L:
          if song['album'] != last_album:
@@ -605,6 +588,7 @@ class MusicModule(EmcModule):
       """ list of all songs in the given album """
       L = [ self._songs_db.get_data(url) for url in album['songs'] ]
       L.sort(key=operator.itemgetter('tracknumber', 'title'))
-      self._browser.item_add(QueueAlbumItemClass(), url, L)
+      self._browser.item_add(PlaySongsItemClass(), url, L)
+      self._browser.item_add(QueueSongsItemClass(), url, L)
       for song in L:
          self._browser.item_add(SongItemClass(), song['url'], song)

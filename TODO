@@ -2,8 +2,6 @@
 TMP
 ====
 
- * TASTIERA!!! non posso cambiare il foramto delle date  :(
- 
  * report on phab the Ethumb Client instability
  * fix 2 bugs in ethumb:
    * frame cannot be unset...witout an error

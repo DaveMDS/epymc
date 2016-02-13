@@ -39,7 +39,8 @@ New features:
  * Better zapiks video schannel
  * Cache to file remote images for faster reloading
  * Support remote urls also in the mediaplayer cover image
- * Virtual keybord is now also usable with the real keyboard
+ * Virtual keyboard is now also usable with the real keyboard
+ * Virtual keyboard now support multiple layouts
  * Show current folders in the file-manager
  * Option to hide the mouse cursor when not needed (not move or video playing)
 

@@ -421,6 +421,8 @@ def _general_populate(browser, url):
                             _('Interface scale'), 'icon/scale',
                             fmt='%.1f', udm='x', min=0.5, max=2.0, step=0.1,
                             cb=_change_scale)
+   standard_item_action_add(_('Virtual keyboard layouts'), 'icon/key',
+                            cb=_vkeyb_layouts_list)
    standard_item_string_add('general', 'download_folder',
                             _('Download folder'), 'icon/download')
    standard_item_number_add('general', 'max_concurrent_download',
@@ -502,6 +504,39 @@ def _clear_remotes_cache():
    dia.my_counter = 0
    gen = utils.grab_files(os.path.join(utils.user_cache_dir, 'remotes'))
    ecore.Idler(_idler_cb, gen)
+
+def _vkeyb_layouts_list():
+   dia = EmcDialog(title=_('Virtual keyboard layouts'), style='list',
+                   done_cb=_vkeyb_layouts_select_cb)
+   dia.button_add(_('Close'),
+                  selected_cb=_vkeyb_layouts_close_cb, cb_data=dia)
+   dia.button_add(_('Select'), default=True,
+                  selected_cb=_vkeyb_layouts_select_cb, cb_data=dia)
+
+   avail = ini.get_string_list('general', 'keyb_layouts')
+   for k in sorted(gui.keyboard_layouts.keys()):
+      name = gui.keyboard_layouts[k][0]
+      end = 'icon/check_on' if k in avail else 'icon/check_off'
+      it = dia.list_item_append(name, end=end)
+      it.data['key'] = k
+
+def _vkeyb_layouts_select_cb(obj, dia=None):
+   if not dia: dia = obj
+   it = dia.list_item_selected_get()
+   key = it.data['key']
+   avail = ini.get_string_list('general', 'keyb_layouts')
+
+   if key in avail:
+      avail.remove(key)
+      dia.list_item_icon_set(it, 'icon/check_off', end=True)
+   else:
+      avail.append(key)
+      dia.list_item_icon_set(it, 'icon/check_on', end=True)
+
+   ini.set_string_list('general', 'keyb_layouts', sorted(avail))
+
+def _vkeyb_layouts_close_cb(btn, dia):
+   dia.delete()
 
 ##############  VIEWS  ########################################################
 

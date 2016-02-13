@@ -65,6 +65,14 @@ FILL_HORIZ = evas.EVAS_HINT_FILL, 0.5
 MESSAGE_CLOCK_TIME = 12
 MESSAGE_CLOCK_DATE = 13
 
+keyboard_layouts = {
+   'en_qwerty': [_('English QWERTY'), 'qwertyuiop()', 'asdfghjkl?-+',   'zxcvbnm.,@'  ],
+   'en_abc':    [_('English ABC'),    'abcdefghi ()', 'jklmnopqr -@',   'stuvwxyz  .,'],
+   'it_qwerty': [_('Italian QWERTY'), 'qwertyuiopèì', 'asdfghjklòàù',   'zxcvbnm.,@[]'],
+   'it_abc':    [_('Italian ABC'),    'aàbcdeèfghiì', 'jklmnoòpqr()',   'stuùvwxyz.,@'],
+   'symbols':   [_('Symbols'),        '.,:;?!@#$%&^', '+-*/=~°_\'"\\|', '<>()[]{}'    ],
+} # MOST IMPORTANT SYMBOLS ARE:  . , @ ( )
+
 
 def LOG(msg):
    print('GUI: %s' % msg)
@@ -90,6 +98,7 @@ def init():
    ini.get('general', 'hide_mouse', False)
    ini.get('general', 'time_format', '%H:%M')
    ini.get('general', 'date_format', '%A %d %B')
+   ini.get('general', 'keyb_layouts', 'en_abc symbols')
 
    # connect ecore_input key event
    ecore_input.on_key_down_add(_on_key_down)
@@ -1263,12 +1272,14 @@ class EmcDialog(Layout):
    def data_get(self):
       return self._user_data
 
-   def button_add(self, label, selected_cb=None, cb_data=None, icon=None):
+   def button_add(self, label, selected_cb=None, cb_data=None, icon=None, default=False):
       b = EmcButton(label, icon, selected_cb, cb_data)
       self.box_prepend('emc.box.buttons', b)
       self._buttons.append(b)
       if len(self._buttons) == 1:
          self.signal_emit('emc,dialog,buttons,show', 'emc')
+         b.focus = True
+      if default is True:
          b.focus = True
       return b
 
@@ -1317,6 +1328,9 @@ class EmcDialog(Layout):
    def list_item_selected_get(self):
       if self._list:
          return self._list.selected_item_get()
+
+   def list_item_icon_set(self, it, icon, end=False):
+      it.part_content_set('end' if end else 'icon', load_icon(icon))
 
    def _list_item_activated_cb(self, li, it):
       if self._done_cb:
@@ -1723,12 +1737,16 @@ class EmcVKeyboard(EmcDialog):
       self.accept_cb = accept_cb
       self.dismiss_cb = dismiss_cb
       self.user_data = user_data
-      self.current_button = None
       self.buttons = list()
+
+      # choose the correct layout
+      self._available_layouts = ini.get_string_list('general', 'keyb_layouts')
+      self._current_layout = self._available_layouts[0] # TODO remember the last one used
 
       # table
       tb = Table(win, homogeneous=True)
       tb.show()
+      self._table = tb
 
       # set dialog title
       self.part_text_set('emc.text.title', title or _('Insert text'))
@@ -1741,29 +1759,29 @@ class EmcVKeyboard(EmcDialog):
       self.entry.callback_activated_add(self._accept_cb)
       self.entry.callback_aborted_add(self._dismiss_cb)
       if text: self.text_set(text)
-      tb.pack(self.entry, 0, 0, 10, 1)
+      tb.pack(self.entry, 0, 0, 12, 1)
       self.entry.show()
 
-      # standard keyb
-      for i, c in enumerate(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']):
-         self._pack_btn(tb, i, 1, 1, 1, c, cb=self._default_btn_cb)
-      for i, c in enumerate(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']):
-         self._pack_btn(tb, i, 2, 1, 1, c, cb=self._default_btn_cb)
-      for i, c in enumerate(['k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't']):
-         self._pack_btn(tb, i, 3, 1, 1, c, cb=self._default_btn_cb)
-      for i, c in enumerate(['u', 'v', 'w', 'x', 'y', 'z', '.', ',', ':', ';']):
-         self._pack_btn(tb, i, 4, 1, 1, c, cb=self._default_btn_cb)
+      # numbers + backspace
+      for i, c in enumerate('1234567890'):
+         self._pack_btn(i, 1, 1, 1, c, cb=self._default_btn_cb)
+      self._pack_btn(10, 1, 2, 1, _('ERASE'), cb=self._erase_cb)
 
-      self._pack_btn(tb, 0, 5, 3, 1, _('UPPERCASE'), cb=self._uppercase_cb)
-      self._pack_btn(tb, 3, 5, 4, 1, _('SPACE'), cb=self._space_cb)
-      self._pack_btn(tb, 7, 5, 3, 1, _('ERASE'), cb=self._erase_cb)
+      # characters
+      self._apply_layout(self._current_layout)
 
-      self._pack_btn(tb, 0, 6, 4, 1, _('Dismiss'), 'icon/cancel', self._dismiss_cb)
-      self._pack_btn(tb, 4, 6, 1, 1, None, 'icon/arrowL',
+      # last 2 rows
+      self._pack_btn(0, 5, 4, 1, keyboard_layouts[self._current_layout][0],
+                                 cb=self._change_layout_cb)
+      self._pack_btn(4, 5, 4, 1, _('SPACE'), cb=self._space_cb)
+      self._pack_btn(8, 5, 4, 1, _('UPPERCASE'), cb=self._uppercase_cb)
+
+      self._pack_btn(0, 6, 5, 1, _('Dismiss'), 'icon/cancel', self._dismiss_cb)
+      self._pack_btn(5, 6, 1, 1, None, 'icon/arrowL',
                                      lambda b: self.entry.cursor_prev())
-      self._pack_btn(tb, 5, 6, 1, 1, None, 'icon/arrowR',
+      self._pack_btn(6, 6, 1, 1, None, 'icon/arrowR',
                                      lambda b: self.entry.cursor_next())
-      self._pack_btn(tb, 6, 6, 4, 1, _('Accept'),  'icon/ok', self._accept_cb)
+      self._pack_btn(7, 6, 5, 1, _('Accept'),  'icon/ok', self._accept_cb)
 
       # init the parent EmcDialog class
       EmcDialog.__init__(self, title=title, style='minimal', content=tb)
@@ -1772,9 +1790,9 @@ class EmcVKeyboard(EmcDialog):
       input_events.listener_add('vkbd', self.input_event_cb)
       self.entry.focus = True
 
-   def _pack_btn(self, tb, x, y, w, h, label, icon=None, cb=None):
+   def _pack_btn(self, x, y, w, h, label, icon=None, cb=None):
       b = EmcButton(label=label, icon=icon, cb=cb, size_hint_align=FILL_HORIZ)
-      tb.pack(b, x, y, w, h)
+      self._table.pack(b, x, y, w, h)
       self.buttons.append(b)
       return b
 
@@ -1813,6 +1831,9 @@ class EmcVKeyboard(EmcDialog):
       self.entry.entry_insert(' ')
 
    def _uppercase_cb(self, button):
+      if self._current_layout == 'symbols':
+         return
+
       for btn in self.buttons:
          c = btn.text_get()
          if c and len(c) == 1 and c.isalpha():
@@ -1823,14 +1844,41 @@ class EmcVKeyboard(EmcDialog):
                btn.text = c.lower()
                button.text = _('UPPERCASE')
          elif c and len(c) == 1:
-            if   c == '.':  btn.text = '/'
-            elif c == '/':  btn.text = '.'
-            elif c == ',':  btn.text = '@'
-            elif c == '@':  btn.text = ','
-            elif c == ':':  btn.text = '-'
-            elif c == '-':  btn.text = ':'
-            elif c == ';':  btn.text = '_'
-            elif c == '_':  btn.text = ';'
+            if   c == '(':  btn.text = '['
+            elif c == ')':  btn.text = ']'
+            elif c == '[':  btn.text = '('
+            elif c == ']':  btn.text = ')'
+            elif c == '.':  btn.text = ':'
+            elif c == ':':  btn.text = '.'
+            elif c == ',':  btn.text = ';'
+            elif c == ';':  btn.text = ','
+            elif c == '-':  btn.text = '_'
+            elif c == '_':  btn.text = '-'
+            elif c == '?':  btn.text = '!'
+            elif c == '!':  btn.text = '?'
+            elif c == '+':  btn.text = '*'
+            elif c == '*':  btn.text = '+'
+            elif c == '@':  btn.text = '/'
+            elif c == '/':  btn.text = '@'
+
+   def _apply_layout(self, layout):
+      for j in range(2, 5):
+         for i in range(12):
+            old = self._table.child_get(i, j)
+            if old: old.delete()
+
+      self._current_layout = layout
+      for j in range(3):
+         for i, c in enumerate(keyboard_layouts[self._current_layout][j+1]):
+            if c != ' ':
+               self._pack_btn(i, j+2, 1, 1, c, cb=self._default_btn_cb)
+
+   def _change_layout_cb(self, button):
+      new_idx = self._available_layouts.index(self._current_layout) + 1
+      if new_idx >= len(self._available_layouts):
+         new_idx = 0
+      self._apply_layout(self._available_layouts[new_idx])
+      button.text = keyboard_layouts[self._current_layout][0]
 
    def input_event_cb(self, event):
       if event == 'EXIT':

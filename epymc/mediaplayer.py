@@ -965,7 +965,7 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       self._controls_visible = True
       self.minipos_hide()
       self._update_slider()
-      gui.volume_show()
+      gui.volume_show(persistent=True)
       if self.focused_object is None:
          self._play_pause_btn.focus = True
 

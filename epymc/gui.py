@@ -50,6 +50,7 @@ _backdrop_im2 = None
 _backdrop_curr = None
 
 _volume_hide_timer = None
+_volume_persistent = False
 _clock_update_timer = None
 _clock_time_str = ''
 _clock_date_str = ''
@@ -287,17 +288,25 @@ def ask_to_exit():
 def exit_now():
    elm.exit()
 
-def volume_show(hidein = 0):
-   global _volume_hide_timer
+def volume_show(hidein=0, persistent=False):
+   global _volume_hide_timer, _volume_persistent
+
+   if persistent is True:
+      _volume_persistent = True
+      if _volume_hide_timer:
+         _volume_hide_timer.delete()
+         _volume_hide_timer = None
+
    signal_emit('volume,show')
-   if hidein > 0:
+   if hidein > 0 and not _volume_persistent:
       if _volume_hide_timer: _volume_hide_timer.delete()
       _volume_hide_timer = ecore.Timer(hidein, volume_hide)
 
 def volume_hide():
-   global _volume_hide_timer
+   global _volume_hide_timer, _volume_persistent
    signal_emit('volume,hide')
    _volume_hide_timer = None
+   _volume_persistent = False
 
 def volume_set(value):
    slider_val_set('volume.slider:dragable1', value)

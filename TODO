@@ -19,7 +19,6 @@ TMP
  * migliorare grafica dei dialog
 
  * video download usually do not work, use youtube-dl if possible
- * do not hide volume if videocontrols are visible
 
  * use EmcUrl where needed
 

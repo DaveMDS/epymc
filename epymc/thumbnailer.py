@@ -23,7 +23,6 @@ from collections import OrderedDict
 
 from efl import ecore
 
-from epymc.utils import Singleton, md5, user_cache_dir
 import epymc.utils as utils
 
 
@@ -34,8 +33,17 @@ def ERR(*args):
    print('THUMBNAILER:', *args)
 
 
+class ThumbItem(object):
+   def __init__(self, req_id, url, dst, frame, func, **kargs):
+      self.req_id = req_id
+      self.url = url
+      self.dst = dst
+      self.frame = frame
+      self.func = func
+      self.kargs = kargs
 
-class EmcThumbnailer(Singleton):
+
+class EmcThumbnailer(utils.Singleton):
    """ Thumbnailer that use epymc_thumbnailer bin in a separate process
 
    Do not instantiate this class directly,
@@ -48,14 +56,8 @@ class EmcThumbnailer(Singleton):
       self._slave = None # EcoreExe instance
       self._slave_starting = False
       self._id = 0       # incremental requests ids
-      self._item = None  # item currently in process (None if slave is ready)
-      self._requests = OrderedDict()
-      """
-      {
-         1: (url, dst, func, frame, kargs),
-         2: (url, dst, func, frame, kargs), ...
-      }
-      """
+      self._item = None  # ThumbItem currently in process (None if slave is ready)
+      self._requests = OrderedDict() # key: req_id  val: ThumbItem instance
 
    ### public api
    def generate(self, url, func, frame=None, **kargs):
@@ -79,6 +81,7 @@ class EmcThumbnailer(Singleton):
       # thumb already exists?
       thumb = self.thumb_path_get(url)
       if os.path.exists(thumb):
+         # TODO check file mod time ??
          return thumb
 
       # start the slave process if necessary
@@ -87,7 +90,7 @@ class EmcThumbnailer(Singleton):
 
       # generate a new request id + item
       self._id += 1
-      self._requests[self._id] = (url, thumb, func, frame, kargs)
+      self._requests[self._id] = ThumbItem(self._id, url, thumb, frame, func, **kargs)
 
       # TODO url is already in queue ?
 
@@ -98,26 +101,29 @@ class EmcThumbnailer(Singleton):
       return self._id
 
    def cancel_request(self, req_id):
-      """ Cancel a previous request
-
-      NOTE: is still possible to receive the complete cb after this call,
-      this can happend in the case that the request is currently in process.
+      """ Cancel a previous request.
 
       Params:
          req_id (int): the id as returned by generate()
 
       """
-      try:
-         self._requests.pop(req_id)
+      if self._item is not None and self._item.req_id == req_id:
+         # currently in progress, finish it but do not call the user func
+         self._item.func = None
+         self._item.kargs = None
          DBG('cancelled request', req_id)
-      except KeyError:
-         pass
+      else:
+         # or just remove from the queue (if there)
+         try:
+            self._requests.pop(req_id)
+            DBG('cancelled request', req_id)
+         except KeyError:
+            pass
 
    def thumb_path_get(self, url):
       """ Generate the path thumb for the give url (internally used) """
-      fname = md5(url) + '.jpg'
-      return os.path.join(user_cache_dir, 'thumbs', fname[:2], fname)
-
+      fname = utils.md5(url) + '.jpg'
+      return os.path.join(utils.user_cache_dir, 'thumbs', fname[:2], fname)
 
    ### slave communication management
    def _send_next_request(self):
@@ -129,9 +135,8 @@ class EmcThumbnailer(Singleton):
       except KeyError:
          return
 
-      url, thumb, func, frame, kargs = item
-      DBG('send request', req_id, url, thumb)
-      self._slave.send('GEN|%s|%s|%s\n' % (url, thumb, frame))
+      DBG('send request', item.req_id, item.url, item.dst)
+      self._slave.send('GEN|%s|%s|%s\n' % (item.url, item.dst, item.frame))
       self._item = item
 
    def _process_slave_msg(self, msg):
@@ -143,13 +148,14 @@ class EmcThumbnailer(Singleton):
          ERR('unknown msg from slave "%s"' % msg)
          return
 
-      # process next item (if available)
-      url, thumb, func, frame, kargs = self._item
-      self._item = None
-      self._send_next_request()
-
       # call user callback
-      func(success, url, thumb, **kargs)
+      item = self._item
+      self._item = None
+      if item and callable(item.func):
+         item.func(success, item.url, item.dst, **item.kargs)
+
+      # process next item (if available)
+      self._send_next_request()
 
    ### slave process management
    def _start_slave(self):
@@ -180,12 +186,7 @@ class EmcThumbnailer(Singleton):
          self._process_slave_msg(line)
 
 
-try: # Ethumb available only in recent python-efl # TODO REMOVE ME !!!!!!!!!
-   from efl.ethumb import Ethumb
-except:
-   emc_thumbnailer = None
-else:
-   emc_thumbnailer = EmcThumbnailer()
+emc_thumbnailer = EmcThumbnailer()
 
 
 """
@@ -256,7 +257,7 @@ class EmcThumbnailer(object):
       self._connecting = False
       self._client = None
 
-try: # EthumbClient only in recent python-efl 
+try: # EthumbClient only in recent python-efl
    from efl.ethumb_client import EthumbClient, ETHUMB_THUMB_JPEG
 except:
    emc_thumbnailer = None

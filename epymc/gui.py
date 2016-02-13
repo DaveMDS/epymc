@@ -969,6 +969,11 @@ class EmcImage(Image):
       if isinstance(url, tuple):
          url, dest = url
 
+      # cancel in progress thumb
+      if self._thumb_request_id is not None:
+         emc_thumbnailer.cancel_request(self._thumb_request_id)
+         self._thumb_request_id = None
+
       # a remote url ?
       if url.startswith(('http://', 'https://')):
          if dest is None:
@@ -985,17 +990,16 @@ class EmcImage(Image):
          return
 
       # do we want to use/generate a thumbnail?
-      if emc_thumbnailer is not None: # TODO remove this for release 
-         if thumb and not url.startswith(('special/', 'icon/', 'image/')):
-            ret = emc_thumbnailer.generate(url, self._thumb_complete_cb)
-            if isinstance(ret, str): # thumb already exists (ret is thumb path)
-               self.file_set(ret)
-            elif isinstance(ret, int): # generation started (ret is req_id)
-               self._thumb_request_id = ret
-               self.file_set(theme_file, 'emc/image/thumbnailing')
-            else: # failed ... this cannot really happend atm
-               self.file_set(theme_file, 'emc/image/error')
-            return
+      if thumb and not url.startswith(('special/', 'icon/', 'image/')):
+         ret = emc_thumbnailer.generate(url, self._thumb_complete_cb)
+         if isinstance(ret, str): # thumb already exists (ret is thumb path)
+            self.file_set(ret)
+         elif isinstance(ret, int): # generation started (ret is req_id)
+            self._thumb_request_id = ret
+            self.file_set(theme_file, 'emc/image/thumbnailing')
+         else: # failed ... this cannot really happend atm
+            self.file_set(theme_file, 'emc/image/error')
+         return
 
       # a local path ?
       if os.path.exists(url):
@@ -1042,8 +1046,9 @@ class EmcImage(Image):
       return os.path.join(utils.user_cache_dir, 'remotes', fname[:2], fname)
 
    def _thumb_complete_cb(self, status, file, thumb):
-      if self.is_deleted(): return
       self._thumb_request_id = None
+      if self.is_deleted():
+         return
       if status is True:
          self.file_set(thumb)
       else:

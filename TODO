@@ -6,14 +6,11 @@ TMP
  * fix 2 bugs in ethumb:
    * frame cannot be unset...witout an error
 
- * fix focus after view change
-
  * icone + risoluzione (back,refresh,plus, minus, ...)
  * icona error fa schifo
 
  * 2 instanze ???
  * new text styles: mi piace, etc...
- * update italian translation
  * migliorare grafica dei dialog
 
  * video download usually do not work, use youtube-dl if possible
@@ -25,6 +22,7 @@ TMP
  For release:
    * db_py3_browser_view_memory need to be cleared for the relase (dump version)
    * comment-out all DBG functions
+   * update italian translation
 
  Music features:
    * playlist item remove/reorder

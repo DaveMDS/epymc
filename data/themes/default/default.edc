@@ -3375,6 +3375,7 @@ collections {
             }
          }
          part { name: "emc.text"; type: TEXTBLOCK;  /* API */
+            scale: 1;
             description { state: "default" 0.0;
                fixed: 1 1;
                rel1.to: "text_spacer";

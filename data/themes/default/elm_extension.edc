@@ -1436,6 +1436,7 @@ group { name: "elm/genlist/item_compress/default/browser";
          }
       }
       part { name: "bg";
+         scale: 1;
          clip_to: "disclip";
          mouse_events: 0;
          description { state: "default" 0.0;

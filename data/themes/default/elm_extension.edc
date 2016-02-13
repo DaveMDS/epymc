@@ -8,6 +8,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
    alias: "elm/genlist/base/browser";         // browser genlist
    alias: "elm/gengrid/base/browser";         // browser gengrid
    alias: "elm/scroller/entry/scrolledentry"; // EmcScrolledEntry
+   // alias: "elm/scroller/entry_single/vkeyboard"; // EmcVKeyboard (TODO)
 
    data.item: "focus_highlight" "off";
    images {
@@ -2756,36 +2757,21 @@ group { name: "elm/hover/base/menu/emc";
 //// VKEYBOARD ENTRY (elm/entry/base-single/default) //////////////////////////
 group { name: "elm/entry/base-single/vkeyboard";
    images.image: "box_glow.png" COMP;
-   data.item: "focus_highlight" "off";
+   FOCUS_HIGHLIGHT_INTRO()
    parts {
-      // part { name: "focus"; type: IMAGE; nomouse;
-         // description { state: "default" 0.0;
-            // visible: 0;
-            // rel1.offset: -7 -7;
-            // rel2.offset: 5 5;
-            // image {
-               // normal: "box_glow.png";
-               // border: 12 12 12 12;
-               // middle: NONE;
-            // }
-            // fill.smooth: 0;
-         // }
-         // description { state: "focused" 0.0;
-            // inherit: "default" 0.0;
-            // visible: 1;
-         // }
-      // }
+      FOCUS_HIGHLIGHT_PARTS(-8 -7, 7 6)
       part { name: "elm.text";
+         scale: 1;
          type: TEXTBLOCK;
          entry_mode: EDITABLE;
          select_mode: DEFAULT;
          cursor_mode: BEFORE;
          multiline: 0;
-         // source: "elm/entry/selection/emc"; // selection under
+         source: "elm/entry/selection/vkeyboard"; // selection under
          source4: "elm/entry/cursor/vkeyboard"; // cursorover
          description { state: "default" 0.0;
-            rel1.offset: 2 0;
-            rel2.offset: -3 -1;
+            rel1.offset: 3 2;
+            rel2.offset: -4 -3;
             text {
                style: "epymc_default_style";
                min: 1 1;
@@ -2799,46 +2785,116 @@ group { name: "elm/entry/base-single/vkeyboard";
          action: FOCUS_SET;
          target: "elm.text";
       }
-      // program { name: "entry_focus";
-         // signal: "elm,action,focus";
-         // source: "elm";
-         // action: STATE_SET "focused" 0.0;
-         // target: "focus";
-      // }
-      // program { name: "entry_unfocus";
-         // signal: "elm,action,unfocus";
-         // source: "elm";
-         // action: STATE_SET "default" 0.0;
-         // target: "focus";
-      // }
+      FOCUS_HIGHLIGHT_PROGRAMS("elm,action,focus", "elm,action,unfocus")
+   }
+}
+group { name: "elm/entry/selection/vkeyboard";
+   parts {
+      part { name: "base"; type: RECT;
+         description { state: "default" 0.0;
+            color: 51 153 255 255;
+         }
+      }
    }
 }
 group { name: "elm/entry/cursor/vkeyboard";
+   min: 1 0;
+   images.image: "white_bar_vert_glow.png" COMP;
    parts {
-      part { name: "cursor"; type: RECT;
+      part { name: "cursor"; mouse_events: 0;
+         clip_to: "clipper";
          description { state: "default" 0.0;
+            rel1.offset: -4 -4;
+            rel2.offset: 3 3;
+            image.normal: "white_bar_vert_glow.png";
+            image.border: 4 4 4 4;
+            fill.smooth: 0;
             color: 255 255 255 0;
+            color_class: "entry_cursor";
+            min: 9 10;
          }
          description { state: "visible" 0.0;
+            inherit: "default" 0.0;
             color: 255 255 255 255;
+         }
+      }
+      part { name: "clipper"; type: RECT;
+         description { state: "default" 0.0;
+            rel1.to: "cursor";
+            rel2.to: "cursor";
+            fixed: 1 1;
+         }
+         description { state: "hidden" 0.0;
+            inherit: "default" 0.0;
+            visible: 0;
          }
       }
    }
    programs {
-      program { name: "pulse1";
-         signal: "load";
-         source: "";
-         action: STATE_SET "visible" 0.0;
-         transition: LINEAR 0.5;
-         target: "cursor";
-         after: "pulse2";
+      program {
+         signal: "selection,changed"; source: "elm.text";
+         action: STATE_SET "hidden" 0.0;
+         target: "clipper";
       }
-      program { name: "pulse2";
-         in: 1.0 0.0;
+      program {
+         signal: "selection,cleared"; source: "elm.text";
          action: STATE_SET "default" 0.0;
-         transition: LINEAR 0.5;
+         target: "clipper";
+      }
+      program {
+         signal: "selection,reset"; source: "elm.text";
+         action: STATE_SET "default" 0.0;
+         target: "clipper";
+      }
+      program {
+         signal: "elm,action,focus"; source: "elm";
+         action: ACTION_STOP;
+         target: "cursor_show";
+         target: "cursor_hide";
+         target: "cursor_show_timer";
+         target: "cursor_hide_timer";
+         after: "cursor_show";
+      }
+      // program {
+      //    signal: "elm,action,unfocus"; source: "elm";
+      //    action: ACTION_STOP;
+      //    target: "cursor_show";
+      //    target: "cursor_hide";
+      //    target: "cursor_show_timer";
+      //    target: "cursor_hide_timer";
+      //    after: "cursor_hide_stop";
+      // }
+      program {
+         signal: "elm,action,show,cursor"; source: "elm";
+         action: ACTION_STOP;
+         target: "cursor_show";
+         target: "cursor_hide";
+         target: "cursor_show_timer";
+         target: "cursor_hide_timer";
+         after: "cursor_show";
+      }
+      program { name: "cursor_hide_stop";
+         action: STATE_SET "default" 0.0;
          target: "cursor";
-         after: "pulse1";
+      }
+      program { name: "cursor_show";
+         action: STATE_SET "visible" 0.0;
+         target: "cursor";
+         after: "cursor_show_timer";
+      }
+      program { name: "cursor_hide";
+         action: STATE_SET "default" 0.0;
+         target: "cursor";
+         transition: SINUSOIDAL 0.2;
+         after: "cursor_hide_timer";
+      }
+      program { name: "cursor_show_timer";
+         in: 0.5 0.0;
+         after: "cursor_hide";
+      }
+      program { name: "cursor_hide_timer";
+         in: 0.2 0.0;
+         after: "cursor_show";
       }
    }
 }

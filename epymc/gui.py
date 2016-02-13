@@ -1751,8 +1751,8 @@ class EmcVKeyboard(EmcDialog):
       # set dialog title
       self.part_text_set('emc.text.title', title or _('Insert text'))
 
-      # entry (TODO use scrolled_entry instead)
-      self.entry = Entry(win, style='vkeyboard',
+      # entry
+      self.entry = Entry(win, style='vkeyboard', scrollable=True,
                          single_line=True, editable=True,
                          context_menu_disabled=True, focus_allow=True,
                          size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)

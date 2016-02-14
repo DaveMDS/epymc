@@ -249,6 +249,8 @@ def shutdown():
    global _play_db
 
    input_events.listener_del("mediaplayer")
+   if _player: _player.delete()
+   if _saved_player: _saved_player.delete()
    del _play_db
 
 
@@ -754,9 +756,10 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       self.part_text_set('album.text', metadata.get('album'))
       self.part_text_set('song_and_artist.text',
                          '<song>{0}</song> <artist>{1} {2}</artist>'.format(
-                           metadata.get('title'), _('by'), metadata.get('artist')))
+                           elm.utf8_to_markup(metadata.get('title')), _('by'),
+                           elm.utf8_to_markup(metadata.get('artist'))))
       poster = metadata.get('poster')
-      img = EmcImage(poster or 'special/cd/' + metadata.get('album'))
+      img = EmcImage(poster or 'special/cd/' + elm.utf8_to_markup(metadata.get('album')))
       self.content_set('cover.swallow', img)
 
       # update selected playlist item

@@ -537,7 +537,7 @@ class EmcExec(object):
             grab_input is False (the default)
             done_cb will also receive any other params you pass to the costructor
    """
-   def __init__(self, cmd, grab_output = False, done_cb = None, *args, **kargs):
+   def __init__(self, cmd, grab_output=False, done_cb=None, *args, **kargs):
       self.done_cb = done_cb
       self.args = args
       self.kargs = kargs

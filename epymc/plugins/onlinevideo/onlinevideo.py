@@ -208,21 +208,50 @@ class OnlinevideoModule(EmcModule):
 ###### YOUTUBE-DL DOWNLOAD AND UPDATE
    def youtubedl_check_update(self, verbose=False):
       ydl = ydl_executable()
+      self._ydl_local_version = None
+      self._ydl_remote_version = None
+      self._update_dialog = None
       if verbose:
          self._update_dialog = EmcDialog(style='info',
                                          title=_('Checking for updates'),
                                          text=_('please wait...')+'<br>')
-      else:
-         self._update_dialog = None
+      # check local version
+      EmcExec(ydl + ' --version', True, self._ydo_local_version_done)
 
-      if not os.path.exists(ydl):
-         self._ydl_download_latest()
+   def _ydo_local_version_done(self, version):
+      self._ydl_local_version = version.strip() if version else _('Unknown')
+      if self._update_dialog:
+         self._update_dialog.text_set('<name>{}:</name> {}<br>'.format(
+                                 _('Local version'), self._ydl_local_version))
+      # check remote version
+      utils.EmcUrl('http://youtube-dl.org/latest/version',
+                   done_cb=self._ydo_remote_version_done)
+
+   def _ydo_remote_version_done(self, url, status, version):
+      if status == 200:
+         self._ydl_remote_version = version.strip()
+         if self._update_dialog:
+            txt = '<name>{}:</name> {}<br>'.format(_('Upstream version'), version)
+            self._update_dialog.text_append(txt)
+
+         if self._ydl_remote_version != self._ydl_local_version:
+            self._ydl_download_latest()
+         else:
+            DBG('youtube-dl is up-to-date (%s)' % version)
+            if self._update_dialog:
+               txt = '<success>{}</success>'.format(_('Already updated'))
+               self._update_dialog.text_append(txt)
       else:
-         EmcExec(ydl + ' --version', True, self._ydo_local_version_done)
+         print("ERROR: cannot fetch ytdl upstream version")
+         if self._update_dialog:
+            txt = '<failure>{}</failure>'.format(_('Failed to fetch upstream version'))
+            self._update_dialog.text_append(txt)
 
    def _ydl_download_latest(self):
-      dia = EmcDialog(title=_('please wait'), style='progress',
-                      text=_('Updating the helper program <b>youtube-dl</b> to the latest version.<br><br>For info please visit:<br>rg3.github.io/youtube-dl/'))
+      txt = _('Updating <b>youtube-dl</b> at version <b>{0}</b><br><br>' \
+              'For info and credits please visit:<br>rg3.github.io/youtube-dl/') \
+              .format(self._ydl_remote_version)
+      dia = EmcDialog(title=_('please wait'), style='progress', text=txt)
       download_url_async('http://youtube-dl.org/latest/youtube-dl',
                          dest=ydl_executable(),
                          complete_cb=self._ydl_complete_cb,
@@ -233,36 +262,17 @@ class OnlinevideoModule(EmcModule):
       dia.progress_set((float(dlnow) / dltotal) if dltotal > 0 else 0)
 
    def _ydl_complete_cb(self, dest, status, dia):
-      os.chmod(dest, 0o0744 ) # (make it executable)
       dia.delete()
-      if self._update_dialog:
-         self._update_dialog.text_append(_('Updated to the latest version'))
-
-   def _ydo_local_version_done(self, version):
-      if version:
-         download_url_async('http://youtube-dl.org/latest/version',
-                            complete_cb=self._ydo_remote_version_done,
-                            version=version.strip())
-         if self._update_dialog:
-            txt = '<name>{}:</name> {}<br>'.format(_('Current version'), version)
-            self._update_dialog.text_set(txt)
-
-   def _ydo_remote_version_done(self, dest, status, version):
       if status == 200:
-         with open(dest) as f:
-            available = f.read().strip()
-         os.remove(dest)
-
+         os.chmod(dest, 0o0744) # (make it executable)
          if self._update_dialog:
-            txt = '<name>{}:</name> {}<br>'.format(_('Upstream version'), available)
+            txt = '<success>{}</success>'.format(_('Update completed'))
             self._update_dialog.text_append(txt)
-
-         if available != version:
-            self._ydl_download_latest()
-         else:
-            DBG('youtube-dl is up-to-date (%s)' % version)
-            if self._update_dialog:
-               self._update_dialog.text_append(_('No update available.'))
+      else:
+         print("ERROR: ytdl download failed")
+         if self._update_dialog:
+            txt = '<failure>{}</failure>'.format(_('Download failed'))
+            self._update_dialog.text_append(txt)
 
    
 ###### SOURCES STUFF

@@ -747,6 +747,30 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
             it.show()
             self._gl.focus_allow = True
 
+   def _info_update(self):
+      # update metadata infos
+      metadata = playlist.onair_item.metadata
+      self.part_text_set('artist.text', metadata.get('artist'))
+      self.part_text_set('album.text', metadata.get('album'))
+      self.part_text_set('song_and_artist.text',
+                         '<song>{0}</song> <artist>{1} {2}</artist>'.format(
+                           metadata.get('title'), _('by'), metadata.get('artist')))
+      poster = metadata.get('poster')
+      img = EmcImage(poster or 'special/cd/' + metadata.get('album'))
+      self.content_set('cover.swallow', img)
+
+      # update selected playlist item
+      it = self._gl.nth_item_get(playlist.cur_idx)
+      if it:
+         self._gl.focus_allow = False
+         it.selected = True
+         it.show()
+         self._gl.focus_allow = True
+
+      # update the slider and the play/pause button
+      self._update_timer(single=True)
+      self.name_find('PlayPauseBtn').icon_set('icon/pause')
+
    ## genlist item class
    def _gl_text_get(self, obj, part, pl_item):
       metadata = pl_item.metadata
@@ -805,27 +829,7 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
    ### generic events
    def _events_cb(self, event):
       if event == 'PLAYBACK_STARTED':
-         # update metadata infos
-         metadata = playlist.onair_item.metadata
-         self.part_text_set('artist.text', metadata.get('artist'))
-         self.part_text_set('album.text', metadata.get('album'))
-         self.part_text_set('song_and_artist.text', '{0} - {1}'.format(
-                              metadata.get('artist'), metadata.get('title')))
-         poster = metadata.get('poster')
-         img = EmcImage(poster or 'special/cd/' + metadata.get('album'))
-         self.content_set('cover.swallow', img)
-
-         # update selected playlist item
-         it = self._gl.nth_item_get(playlist.cur_idx)
-         if it:
-            self._gl.focus_allow = False
-            it.selected = True
-            it.show()
-            self._gl.focus_allow = True
-
-         # update the slider and the play/pause button
-         self._update_timer(single=True)
-         self.name_find('PlayPauseBtn').icon_set('icon/pause')
+         self._info_update()
 
       elif event == 'PLAYBACK_FINISHED':
          playlist.play_next()
@@ -837,7 +841,6 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
          self.name_find('PlayPauseBtn').icon_set('icon/pause')
 
       elif event == 'PLAYLIST_CHANGED':
-         print("CHANGED")
          self._gl_populate()
 
       elif event == 'PLAYBACK_SEEKED':

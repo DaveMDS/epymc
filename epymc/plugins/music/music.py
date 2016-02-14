@@ -152,7 +152,7 @@ class SongItemClass(EmcItemClass):
    def label_get(self, url, song):
       title = utf8_to_markup(song['title'])
       try:
-         return "%02d - %s" % (song['tracknumber'], title)
+         return "%02d. %s" % (song['tracknumber'], title)
       except:
          return title
 
@@ -160,17 +160,27 @@ class SongItemClass(EmcItemClass):
       return _mod.search_poster_for_song(url, song)
 
    def info_get(self, url, song):
-      text = '<title>{}</><br>'.format(utf8_to_markup(song['title']))
-      if 'artist' in song:
-         text += _('<em>by</em> %s<br>') % utf8_to_markup(song['artist'])
-      if 'album' in song:
-         text += _('<em>from</em> %s<br>') % utf8_to_markup(song['album'])
+      text = '<title>{}</>'.format(utf8_to_markup(song['title']))
       if 'length' in song:
-         length = int(song['length']) / 1000
-         min = length / 60
-         sec = length % 60
-         text += _('duration: %s<br>') % ('%.02d:%.02d' % (min,sec))
+         length = utils.seconds_to_duration(int(song['length']) / 1000)
+         text += ' <small>({})</small><br>'.format(length)
+      else:
+         text += '<br>'
+      if 'artist' in song:
+         text += '<artist>{0} {1}</artist><br>'.format(_('by'),
+                                                utf8_to_markup(song['artist']))
+      if 'album' in song:
+         text += '<album>{0} {1}</album><br>'.format(_('from'),
+                                              utf8_to_markup(song['album']))
+      
       return text
+
+class SongWithArtistItemClass(SongItemClass):
+   def label_get(self, url, song):
+      title = utf8_to_markup(song['title'])
+      artist = utf8_to_markup(song['artist'])
+      return '<song>{0}</song> <artist>{1} {2}</artist>'.format(
+              title, _('by'), artist)
 
 class AlbumItemClass(EmcItemClass):
    def item_selected(self, url, album):
@@ -552,7 +562,7 @@ class MusicModule(EmcModule):
       L = [self._songs_db.get_data(k) for k in self._songs_db.keys()]
       self._browser.item_add(PlaySongsItemClass(), page_url, L)
       for song in sorted(L, key=operator.itemgetter('title')):
-         self._browser.item_add(SongItemClass(), song['url'], song)
+         self._browser.item_add(SongWithArtistItemClass(), song['url'], song)
 
    def populate_albums_page(self, browser, page_url):
       """ list of all albums (grouped by artist) """

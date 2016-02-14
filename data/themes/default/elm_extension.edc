@@ -2056,6 +2056,7 @@ group { name: "elm/genlist/item_compress/default/playlist";
             fixed: 1 1;
             aspect: 1.0 0.8; aspect_preference: VERTICAL;
             align: 0.0 0.5;
+            color: COLOR_WHITE 255;
             text {
                font: FONT;
                size: FONT_SIZE_SMALL;
@@ -2069,7 +2070,7 @@ group { name: "elm/genlist/item_compress/default/playlist";
             rel1.to: "elm.text.tracknum";
             rel1.relative: 1.0 0.0;
             rel2.relative: 1.0 0.5;
-            color: FONT_COLOR;
+            color: COLOR_WHITE 255;
             text {
                font: FONT;
                size: FONT_SIZE;
@@ -2086,7 +2087,7 @@ group { name: "elm/genlist/item_compress/default/playlist";
             rel2.to: "elm.text.len";
             rel2.relative: 0.0 1.0;
             rel2.offset: -6 -1;
-            color: FONT_COLOR_NOSEL;
+            color: COLOR_GRAY 255;
             text {
                font: FONT;
                size: FONT_SIZE_SMALL;
@@ -2101,7 +2102,7 @@ group { name: "elm/genlist/item_compress/default/playlist";
             rel1.relative: 1.0 0.5;
             rel2.relative: 1.0 1.0;
             rel2.offset: -6 -1;
-            color: FONT_COLOR_NOSEL;
+            color: COLOR_GRAY 255;
             align: 1.0 0.0;
             text {
                font: FONT;

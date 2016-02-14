@@ -32,8 +32,17 @@
 
 #define COLOR_BLU 51 153 255
 #define COLOR_BLU_HEX 3399FF
-// #define COLOR_GREEN 63 168 108
-// #define COLOR_BLUE 63 108 168
+
+#define COLOR_GRAY 136 136 136
+#define COLOR_GRAY_HEX 888888
+#define COLOR_GRAY_SHADOW 0 0 0 32
+#define COLOR_GRAY_SHADOW_HEX 00000020
+
+#define COLOR_WHITE 255 255 255
+#define COLOR_WHITE_HEX FFFFFF
+#define COLOR_WHITE_SHADOW 0 0 0 32
+#define COLOR_WHITE_SHADOW_HEX 00000020
+
 // #define COLOR_ORANGE 240 164 10
 // #define COLOR_ORANGE_HEX F0A40A
 
@@ -115,13 +124,30 @@ tag: "warning" "+ color=#ff7c00 style=glow glow_color=#ff7c0030"; \
 tag: "failure" "+ color=#ff0000 style=glow glow_color=#ff000030"; \
 tag: "title" "+ font_weight=Bold color=#"COLOR_BLU_HEX" font_size="FONT_SIZE_BIG; \
 tag: "subtitle" "+ color=#"COLOR_BLU_HEX; \
-tag: "name" "+ color=#888888 font_weight=Bold"; \
+tag: "name" "+ color=#"COLOR_GRAY_HEX" font_weight=Bold"; \
 tag: "val" "+ color=#ffffff";
+
+#define AUDIOPLAYER_MUSIC_TAGS \
+tag: "song" "+ color=#"COLOR_WHITE_HEX; \
+tag: "artist" "+ color=#"COLOR_GRAY_HEX; \
+tag: "album" "+ font_style=Oblique";
+
+#define BROWSER_MUSIC_TAGS \
+tag: "song" "+ color=#"COLOR_WHITE_HEX; \
+tag: "artist" "+ font_size="FONT_SIZE_SMALL" font_style=Oblique"; \
+tag: "album" "+ font_style=Oblique";
 
 styles {
    style { name: "epymc_default_style";
       base: "font="FONT" font_size="FONT_SIZE" color=#fff wrap=word";
       COMMON_TAGS
+      AUDIOPLAYER_MUSIC_TAGS
+   }
+
+   style { name: "epymc_audioplayer_style";
+      base: "font="FONT" font_size="FONT_SIZE" color=#fff wrap=none ellipsis=1.0";
+      COMMON_TAGS
+      AUDIOPLAYER_MUSIC_TAGS
    }
 
    style { name: "epymc_dialog_title_style";
@@ -141,11 +167,13 @@ styles {
    style { name: "epymc_browser_slide_style";
       base:  "font="FONT" font_size="FONT_SIZE" color=#fff wrap=none";
       COMMON_TAGS
+      BROWSER_MUSIC_TAGS
    }
 
    style { name: "epymc_browser_grid_style";
       base:  "font="FONT" font_size="FONT_SIZE" color=#fff align=center wrap=mixed ellipsis=1.0";
       COMMON_TAGS
+      BROWSER_MUSIC_TAGS
    }
 
    style { name: "epymc_special_image_style";
@@ -156,6 +184,7 @@ styles {
    style { name: "epymc_special_icon_style";
       base:  "font="FONT" font_size="FONT_SIZE" color=#fff align=center wrap=mixed ellipsis=1.0";
       COMMON_TAGS
+      BROWSER_MUSIC_TAGS
    }
 
    style { name: "epymc_special_icon_style2";
@@ -2940,6 +2969,7 @@ collections {
                rel2.to: "info.spacer";
                rel2.relative: 1.0 0.0;
                align: 0.5 0.0;
+               color: COLOR_GRAY 255;
                text {
                   text: "Author";
                   font: FONT;
@@ -2959,6 +2989,7 @@ collections {
                rel2.to: "artist.text";
                rel2.relative: 1.0 1.0;
                align: 0.5 0.0;
+               color: COLOR_WHITE 255;
                text {
                   text: "Album";
                   font: FONT;
@@ -3036,15 +3067,14 @@ collections {
                   rel2.relative: 1.0 0.0;
                   rel2.offset: -1 -7;
                }
-               part { name: "song_and_artist.text"; type: TEXT; /* API TODOC */
+               part { name: "song_and_artist.text"; type: TEXTBLOCK; /* API TODOC */
                   nomouse;
                   scale: 1;
+                  multiline: 0;
                   description { state: "default" 0.0;
                      fixed: 1 1;
                      text {
-                        text: "Song by Artist";
-                        font: FONT;
-                        size: FONT_SIZE;
+                        style: "epymc_audioplayer_style";
                         align: 0.0 0.5;
                      }
                      map.on: 1;

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-06 17:32+0100\n"
+"POT-Creation-Date: 2016-02-14 10:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,12 +30,32 @@ msgstr ""
 msgid "EpyMC Database"
 msgstr ""
 
-#: epymc/gui.py:130
+#: epymc/gui.py:69
+msgid "English QWERTY"
+msgstr ""
+
+#: epymc/gui.py:70
+msgid "English ABC"
+msgstr ""
+
+#: epymc/gui.py:71
+msgid "Italian QWERTY"
+msgstr ""
+
+#: epymc/gui.py:72
+msgid "Italian ABC"
+msgstr ""
+
+#: epymc/gui.py:73
+msgid "Symbols"
+msgstr ""
+
+#: epymc/gui.py:142
 msgid "Emotion Media Center"
 msgstr ""
 
-#: epymc/gui.py:178 epymc/gui.py:180 epymc/gui.py:181 epymc/subtitles.py:385
-#: epymc/config_gui.py:610 epymc/utils.py:504
+#: epymc/gui.py:199 epymc/gui.py:201 epymc/gui.py:202 epymc/subtitles.py:385
+#: epymc/config_gui.py:645 epymc/utils.py:519
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:129
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:144
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:149
@@ -44,184 +64,189 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: epymc/gui.py:269
+#: epymc/gui.py:290
 msgid "credits"
 msgstr ""
 
-#: epymc/gui.py:270 epymc/config_gui.py:287
+#: epymc/gui.py:291 epymc/config_gui.py:287
 msgid "Cancel"
 msgstr ""
 
-#: epymc/gui.py:273 epymc/mainmenu.py:46
+#: epymc/gui.py:294 epymc/mainmenu.py:45
 msgid "Exit"
 msgstr ""
 
-#: epymc/gui.py:989 epymc/config_gui.py:284
+#: epymc/gui.py:1214 epymc/config_gui.py:284
 msgid "Ok"
 msgstr ""
 
-#: epymc/gui.py:993 epymc/gui.py:995
+#: epymc/gui.py:1218 epymc/gui.py:1220
 msgid "No"
 msgstr ""
 
-#: epymc/gui.py:998 epymc/gui.py:1000
+#: epymc/gui.py:1223 epymc/gui.py:1225
 msgid "Yes"
 msgstr ""
 
-#: epymc/gui.py:1417
+#: epymc/gui.py:1562
+#, python-brace-format
+msgid "Image {0} of {1}"
+msgstr ""
+
+#: epymc/gui.py:1637
 msgid "Source Selector"
 msgstr ""
 
-#: epymc/gui.py:1422
+#: epymc/gui.py:1642 epymc/config_gui.py:513
 msgid "Select"
 msgstr ""
 
-#: epymc/gui.py:1423
+#: epymc/gui.py:1643
 msgid "Browse"
 msgstr ""
 
-#: epymc/gui.py:1431 epymc/plugins/filemanager/filemanager.py:115
+#: epymc/gui.py:1651 epymc/plugins/filemanager/filemanager.py:104
 msgid "Parent folder"
 msgstr ""
 
-#: epymc/gui.py:1471
+#: epymc/gui.py:1691
 msgid "Sources Manager"
 msgstr ""
 
-#: epymc/gui.py:1473
+#: epymc/gui.py:1693
 msgid "Done"
 msgstr ""
 
-#: epymc/gui.py:1475
+#: epymc/gui.py:1695
 msgid "Add"
 msgstr ""
 
-#: epymc/gui.py:1477
+#: epymc/gui.py:1697
 msgid "Remove"
 msgstr ""
 
-#: epymc/gui.py:1491
+#: epymc/gui.py:1711
 msgid "Choose a new source"
 msgstr ""
 
-#: epymc/gui.py:1656
+#: epymc/gui.py:1752
 msgid "Insert text"
 msgstr ""
 
-#: epymc/gui.py:1679 epymc/gui.py:1748
-msgid "UPPERCASE"
-msgstr ""
-
-#: epymc/gui.py:1680
-msgid "SPACE"
-msgstr ""
-
-#: epymc/gui.py:1681
+#: epymc/gui.py:1768
 msgid "ERASE"
 msgstr ""
 
-#: epymc/gui.py:1683
+#: epymc/gui.py:1776
+msgid "SPACE"
+msgstr ""
+
+#: epymc/gui.py:1777 epymc/gui.py:1845
+msgid "UPPERCASE"
+msgstr ""
+
+#: epymc/gui.py:1779
 msgid "Dismiss"
 msgstr ""
 
-#: epymc/gui.py:1688
+#: epymc/gui.py:1784
 msgid "Accept"
 msgstr ""
 
-#: epymc/gui.py:1745
+#: epymc/gui.py:1842
 msgid "LOWERCASE"
 msgstr ""
 
-#: epymc/gui.py:1916
+#: epymc/gui.py:2032
 msgid "Download Manager"
 msgstr ""
 
-#: epymc/gui.py:1920
+#: epymc/gui.py:2036
 msgid "Start download"
 msgstr ""
 
-#: epymc/gui.py:1921 epymc/plugins/filemanager/filemanager.py:270
-#: epymc/plugins/filemanager/filemanager.py:315
+#: epymc/gui.py:2037 epymc/plugins/filemanager/filemanager.py:277
+#: epymc/plugins/filemanager/filemanager.py:319
 msgid "Rename"
 msgstr ""
 
-#: epymc/gui.py:1922
+#: epymc/gui.py:2038
 msgid "Change folder"
 msgstr ""
 
-#: epymc/gui.py:1927
+#: epymc/gui.py:2043
 msgid ""
 "File will be downloaded in the folder:<br> <b>{}</b><br><br>File will be "
 "named as:<br> <b>{}</b><br><br>You can rename the file using the <i>Rename</"
 "i> button or change the destination folder from the main configuration."
 msgstr ""
 
-#: epymc/gui.py:1935
+#: epymc/gui.py:2051
 msgid "Rename download"
 msgstr ""
 
-#: epymc/gui.py:1943
+#: epymc/gui.py:2059
 msgid "Change destination folder"
 msgstr ""
 
-#: epymc/gui.py:1958
+#: epymc/gui.py:2074
 #, python-format
 msgid "The file %s is in the download queue yet"
 msgstr ""
 
-#: epymc/gui.py:1992
+#: epymc/gui.py:2108
 msgid "Download started"
 msgstr ""
 
-#: epymc/gui.py:2008
+#: epymc/gui.py:2124
 msgid "Cannot download file"
 msgstr ""
 
-#: epymc/gui.py:2009
+#: epymc/gui.py:2125
 msgid "Failure code"
 msgstr ""
 
-#: epymc/gui.py:2010 epymc/subtitles.py:410
+#: epymc/gui.py:2126 epymc/subtitles.py:410
 msgid "Download failed"
 msgstr ""
 
-#: epymc/gui.py:2017 epymc/plugins/mame/mame.py:588
+#: epymc/gui.py:2133 epymc/plugins/mame/mame.py:588
 msgid "Download completed"
 msgstr ""
 
-#: epymc/themoviedb.py:540
+#: epymc/themoviedb.py:533
 msgid "Fetching info"
 msgstr ""
 
-#: epymc/themoviedb.py:552
+#: epymc/themoviedb.py:545
 msgid "Birthday"
 msgstr ""
 
-#: epymc/themoviedb.py:554
+#: epymc/themoviedb.py:547
 msgid "Deathday"
 msgstr ""
 
-#: epymc/themoviedb.py:556
+#: epymc/themoviedb.py:549
 msgid "Place of birth"
 msgstr ""
 
-#: epymc/themoviedb.py:563
+#: epymc/themoviedb.py:556
 #, python-format
 msgid "Movies (%s)"
 msgstr ""
 
-#: epymc/themoviedb.py:565
+#: epymc/themoviedb.py:558
 #, python-format
 msgid "Photos (%s)"
 msgstr ""
 
-#: epymc/themoviedb.py:577
+#: epymc/themoviedb.py:570
 #, python-format
 msgid "%(title)s as %(character)s"
 msgstr ""
 
-#: epymc/subtitles.py:176 epymc/mediaplayer.py:635 epymc/mediaplayer.py:725
-#: epymc/config_gui.py:326 epymc/config_gui.py:591
+#: epymc/subtitles.py:176 epymc/mediaplayer.py:912 epymc/mediaplayer.py:1025
+#: epymc/config_gui.py:326 epymc/config_gui.py:627
 msgid "Subtitles"
 msgstr ""
 
@@ -254,91 +279,95 @@ msgstr ""
 msgid "Decode failed"
 msgstr ""
 
-#: epymc/mediaplayer.py:206
+#: epymc/mediaplayer.py:273
 msgid "File not found"
 msgstr ""
 
-#: epymc/mediaplayer.py:240 epymc/config_gui.py:418
+#: epymc/mediaplayer.py:314 epymc/config_gui.py:419
 msgid "Resume playback"
 msgstr ""
 
-#: epymc/mediaplayer.py:241
+#: epymc/mediaplayer.py:315
 #, python-format
 msgid "Continue from %s ?"
 msgstr ""
 
-#: epymc/mediaplayer.py:539
+#: epymc/mediaplayer.py:495
 #, python-format
 msgid "Cannot init emotion engine:<br>%s"
 msgstr ""
 
-#: epymc/mediaplayer.py:619
+#: epymc/mediaplayer.py:906
 msgid "Audio"
 msgstr ""
 
-#: epymc/mediaplayer.py:627
+#: epymc/mediaplayer.py:909
 msgid "Video"
 msgstr ""
 
-#: epymc/mediaplayer.py:678 epymc/plugins/uitests/uitests.py:406
-msgid "Buffering"
-msgstr ""
-
-#: epymc/mediaplayer.py:726 epymc/mediaplayer.py:830 epymc/mediaplayer.py:851
-#: epymc/mediaplayer.py:859
+#: epymc/mediaplayer.py:1026 epymc/mediaplayer.py:1147
+#: epymc/mediaplayer.py:1168 epymc/mediaplayer.py:1176
 #, python-format
 msgid "Delay: %d ms"
 msgstr ""
 
-#: epymc/mediaplayer.py:779
+#: epymc/mediaplayer.py:1068 epymc/plugins/uitests/uitests.py:410
+msgid "Buffering"
+msgstr ""
+
+#: epymc/mediaplayer.py:1089
 #, python-format
 msgid "Audio track: %s"
 msgstr ""
 
-#: epymc/mediaplayer.py:781
+#: epymc/mediaplayer.py:1091
 #, python-format
 msgid "Audio track #%d"
 msgstr ""
 
-#: epymc/mediaplayer.py:785
+#: epymc/mediaplayer.py:1098
+msgid "Unmute"
+msgstr ""
+
+#: epymc/mediaplayer.py:1101
 msgid "Mute"
 msgstr ""
 
-#: epymc/mediaplayer.py:802
+#: epymc/mediaplayer.py:1117
 #, python-format
 msgid "Video track: %s"
 msgstr ""
 
-#: epymc/mediaplayer.py:804
+#: epymc/mediaplayer.py:1119
 #, python-format
 msgid "Video track #%d"
 msgstr ""
 
-#: epymc/mediaplayer.py:808
+#: epymc/mediaplayer.py:1125
 msgid "Download video"
 msgstr ""
 
-#: epymc/mediaplayer.py:826 epymc/mediaplayer.py:834
+#: epymc/mediaplayer.py:1143 epymc/mediaplayer.py:1151
 msgid "No subtitles"
 msgstr ""
 
-#: epymc/mediaplayer.py:847
+#: epymc/mediaplayer.py:1164
 msgid "Download subtitles"
 msgstr ""
 
-#: epymc/mediaplayer.py:850
+#: epymc/mediaplayer.py:1167
 msgid "Subtitles delay"
 msgstr ""
 
-#: epymc/mediaplayer.py:852
+#: epymc/mediaplayer.py:1169
 msgid "+100 ms"
 msgstr ""
 
-#: epymc/mediaplayer.py:853
+#: epymc/mediaplayer.py:1170
 msgid "Reset"
 msgstr ""
 
-#: epymc/mediaplayer.py:854
+#: epymc/mediaplayer.py:1171
 msgid "-100 ms"
 msgstr ""
 
@@ -350,7 +379,7 @@ msgstr ""
 msgid "General"
 msgstr ""
 
-#: epymc/config_gui.py:323 epymc/config_gui.py:578
+#: epymc/config_gui.py:323 epymc/config_gui.py:614
 msgid "Modules"
 msgstr ""
 
@@ -358,11 +387,11 @@ msgstr ""
 msgid "Themes"
 msgstr ""
 
-#: epymc/config_gui.py:325 epymc/config_gui.py:508
+#: epymc/config_gui.py:325 epymc/config_gui.py:544
 msgid "Views"
 msgstr ""
 
-#: epymc/config_gui.py:327 epymc/config_gui.py:648
+#: epymc/config_gui.py:327 epymc/config_gui.py:676
 msgid "System info"
 msgstr ""
 
@@ -370,183 +399,192 @@ msgstr ""
 msgid "Start in fullscreen"
 msgstr ""
 
-#: epymc/config_gui.py:416
+#: epymc/config_gui.py:415
+msgid "Hide mouse cursor when not needed"
+msgstr ""
+
+#: epymc/config_gui.py:417
 msgid "Ask"
 msgstr ""
 
-#: epymc/config_gui.py:416
+#: epymc/config_gui.py:417
 msgid "Always"
 msgstr ""
 
-#: epymc/config_gui.py:416
+#: epymc/config_gui.py:417
 msgid "Never"
 msgstr ""
 
-#: epymc/config_gui.py:420
+#: epymc/config_gui.py:421
 msgid "Interface scale"
 msgstr ""
 
-#: epymc/config_gui.py:424
+#: epymc/config_gui.py:424 epymc/config_gui.py:509
+msgid "Virtual keyboard layouts"
+msgstr ""
+
+#: epymc/config_gui.py:427
 msgid "Download folder"
 msgstr ""
 
-#: epymc/config_gui.py:426
+#: epymc/config_gui.py:429
 msgid "Max concurrent download"
 msgstr ""
 
-#: epymc/config_gui.py:428
+#: epymc/config_gui.py:431
 msgid "Time format"
 msgstr ""
 
-#: epymc/config_gui.py:429
+#: epymc/config_gui.py:432
 msgid "Date format"
 msgstr ""
 
-#: epymc/config_gui.py:441
+#: epymc/config_gui.py:444
 msgid "Use hardware acceleration"
 msgstr ""
 
-#: epymc/config_gui.py:446
+#: epymc/config_gui.py:449
 msgid "Multimedia engine"
 msgstr ""
 
-#: epymc/config_gui.py:449
+#: epymc/config_gui.py:452
 msgid "Frames per second"
 msgstr ""
 
-#: epymc/config_gui.py:452 epymc/config_gui.py:474 epymc/config_gui.py:480
+#: epymc/config_gui.py:455 epymc/config_gui.py:477 epymc/config_gui.py:483
 msgid "Clear thumbnails cache"
 msgstr ""
 
-#: epymc/config_gui.py:454 epymc/config_gui.py:493 epymc/config_gui.py:499
+#: epymc/config_gui.py:457 epymc/config_gui.py:496 epymc/config_gui.py:502
 msgid "Clear online images cache"
 msgstr ""
 
-#: epymc/config_gui.py:458
+#: epymc/config_gui.py:461
 msgid "Restart needed"
 msgstr ""
 
-#: epymc/config_gui.py:459
+#: epymc/config_gui.py:462
 msgid "You need to restart the program to apply the new configuration."
 msgstr ""
 
-#: epymc/config_gui.py:481 epymc/config_gui.py:500
+#: epymc/config_gui.py:484 epymc/config_gui.py:503
 msgid "Operation in progress, please wait..."
 msgstr ""
 
-#: epymc/config_gui.py:512
+#: epymc/config_gui.py:511 epymc/plugins/mame/mame.py:545
+#: epymc/plugins/filemanager/filemanager.py:292
+msgid "Close"
+msgstr ""
+
+#: epymc/config_gui.py:548
 msgid "Show Back item in lists"
 msgstr ""
 
-#: epymc/config_gui.py:514
+#: epymc/config_gui.py:550
 msgid "Poster grid items size"
 msgstr ""
 
-#: epymc/config_gui.py:517
+#: epymc/config_gui.py:553
 msgid "Cover grid items size"
 msgstr ""
 
-#: epymc/config_gui.py:520
+#: epymc/config_gui.py:556
 msgid "Ignore views restrictions for pages"
 msgstr ""
 
-#: epymc/config_gui.py:540 epymc/plugins/onlinevideo/onlinevideo.py:90
+#: epymc/config_gui.py:576 epymc/plugins/onlinevideo/onlinevideo.py:90
 msgid "Author"
 msgstr ""
 
-#: epymc/config_gui.py:541 epymc/plugins/onlinevideo/onlinevideo.py:89
+#: epymc/config_gui.py:577 epymc/plugins/onlinevideo/onlinevideo.py:89
 msgid "Version"
 msgstr ""
 
-#: epymc/config_gui.py:594
+#: epymc/config_gui.py:630
 msgid "Subtitles preferred languages"
 msgstr ""
 
-#: epymc/config_gui.py:595
+#: epymc/config_gui.py:631
 msgid "Subtitles encoding"
 msgstr ""
 
-#: epymc/config_gui.py:596
+#: epymc/config_gui.py:632
 msgid "Always try UTF-8 first"
 msgstr ""
 
-#: epymc/config_gui.py:597
+#: epymc/config_gui.py:633
 msgid "Opensubtitles.org Username"
 msgstr ""
 
-#: epymc/config_gui.py:598
+#: epymc/config_gui.py:634
 msgid "Opensubtitles.org Password"
 msgstr ""
 
-#: epymc/config_gui.py:633
+#: epymc/config_gui.py:662
 msgid "Core"
 msgstr ""
 
-#: epymc/config_gui.py:634
-msgid "Rendering engine"
-msgstr ""
-
-#: epymc/config_gui.py:635
+#: epymc/config_gui.py:663
 msgid "Download available"
 msgstr ""
 
-#: epymc/config_gui.py:635
+#: epymc/config_gui.py:663
 msgid "yes"
 msgstr ""
 
-#: epymc/config_gui.py:635
+#: epymc/config_gui.py:663
 msgid "no"
 msgstr ""
 
-#: epymc/config_gui.py:636
+#: epymc/config_gui.py:664
 msgid "Theme"
 msgstr ""
 
-#: epymc/config_gui.py:637
+#: epymc/config_gui.py:665
 msgid "Window size"
 msgstr ""
 
-#: epymc/config_gui.py:638
+#: epymc/config_gui.py:666
 msgid "screen"
 msgstr ""
 
-#: epymc/config_gui.py:639
+#: epymc/config_gui.py:667
 msgid "dpi"
 msgstr ""
 
-#: epymc/config_gui.py:640
+#: epymc/config_gui.py:668
 msgid "Paths"
 msgstr ""
 
-#: epymc/config_gui.py:641
+#: epymc/config_gui.py:669
 msgid "Base folder"
 msgstr ""
 
-#: epymc/config_gui.py:642
+#: epymc/config_gui.py:670
 msgid "Config folder"
 msgstr ""
 
-#: epymc/config_gui.py:643
+#: epymc/config_gui.py:671
 msgid "Versions"
 msgstr ""
 
-#: epymc/config_gui.py:644
+#: epymc/config_gui.py:672
 msgid "EpyMC"
 msgstr ""
 
-#: epymc/config_gui.py:644
+#: epymc/config_gui.py:672
 msgid "EpyMC themes API"
 msgstr ""
 
-#: epymc/config_gui.py:645
+#: epymc/config_gui.py:673
 msgid "Python"
 msgstr ""
 
-#: epymc/config_gui.py:646
+#: epymc/config_gui.py:674
 msgid "Python-EFL"
 msgstr ""
 
-#: epymc/browser.py:169
+#: epymc/browser.py:164
 msgid "Back"
 msgstr ""
 
@@ -561,7 +599,7 @@ msgid ""
 "<i>Configuration → Views</i> section.</info></small>"
 msgstr ""
 
-#: epymc/browser.py:578 epymc/browser.py:806
+#: epymc/browser.py:577 epymc/browser.py:814
 #, python-format
 msgid "%d item"
 msgid_plural "%d items"
@@ -717,7 +755,7 @@ msgstr ""
 msgid "History"
 msgstr ""
 
-#: epymc/plugins/mame/mame.py:437 epymc/plugins/filemanager/filemanager.py:276
+#: epymc/plugins/mame/mame.py:437 epymc/plugins/filemanager/filemanager.py:282
 msgid "Delete"
 msgstr ""
 
@@ -758,10 +796,6 @@ msgstr ""
 
 #: epymc/plugins/mame/mame.py:543
 msgid "Game download"
-msgstr ""
-
-#: epymc/plugins/mame/mame.py:545 epymc/plugins/filemanager/filemanager.py:288
-msgid "Close"
 msgstr ""
 
 #: epymc/plugins/mame/mame.py:550
@@ -871,73 +905,74 @@ msgstr ""
 msgid "Config done."
 msgstr ""
 
-#: epymc/plugins/filemanager/filemanager.py:103
+#: epymc/plugins/filemanager/filemanager.py:88
 msgid "Manage favorites"
 msgstr ""
 
-#: epymc/plugins/filemanager/filemanager.py:216
-#: epymc/plugins/filemanager/filemanager.py:227
-#: epymc/plugins/filemanager/filemanager.py:245
-#: epymc/plugins/filemanager/filemanager.py:449
-#: epymc/plugins/filemanager/filemanager.py:471
-msgid "File Manager"
-msgstr ""
-
-#: epymc/plugins/filemanager/filemanager.py:218
-msgid "A two panes filemanager."
-msgstr ""
-
-#: epymc/plugins/filemanager/filemanager.py:252
-#: epymc/plugins/filemanager/filemanager.py:350
-msgid "New folder"
-msgstr ""
-
-#: epymc/plugins/filemanager/filemanager.py:258
-msgid "Copy"
-msgstr ""
-
-#: epymc/plugins/filemanager/filemanager.py:264
-msgid "Move"
-msgstr ""
-
-#: epymc/plugins/filemanager/filemanager.py:282
+#: epymc/plugins/filemanager/filemanager.py:96
+#: epymc/plugins/filemanager/filemanager.py:287
 msgid "Favorites"
 msgstr ""
 
-#: epymc/plugins/filemanager/filemanager.py:446
+#: epymc/plugins/filemanager/filemanager.py:210
+#: epymc/plugins/filemanager/filemanager.py:220
+#: epymc/plugins/filemanager/filemanager.py:237
+#: epymc/plugins/filemanager/filemanager.py:421
+#: epymc/plugins/filemanager/filemanager.py:443
+msgid "File Manager"
+msgstr ""
+
+#: epymc/plugins/filemanager/filemanager.py:212
+msgid "A two panes filemanager."
+msgstr ""
+
+#: epymc/plugins/filemanager/filemanager.py:262
+#: epymc/plugins/filemanager/filemanager.py:354
+msgid "New folder"
+msgstr ""
+
+#: epymc/plugins/filemanager/filemanager.py:267
+msgid "Copy"
+msgstr ""
+
+#: epymc/plugins/filemanager/filemanager.py:272
+msgid "Move"
+msgstr ""
+
+#: epymc/plugins/filemanager/filemanager.py:418
 msgid "Are you sure you want to delete the folder?"
 msgstr ""
 
-#: epymc/plugins/filemanager/filemanager.py:448
+#: epymc/plugins/filemanager/filemanager.py:420
 msgid "Are you sure you want to delete the file?"
 msgstr ""
 
-#: epymc/plugins/filemanager/filemanager.py:472
+#: epymc/plugins/filemanager/filemanager.py:444
 msgid "Operation is starting..."
 msgstr ""
 
-#: epymc/plugins/filemanager/filemanager.py:486
+#: epymc/plugins/filemanager/filemanager.py:458
 msgid "Source is not readable"
 msgstr ""
 
-#: epymc/plugins/filemanager/filemanager.py:491
+#: epymc/plugins/filemanager/filemanager.py:463
 msgid "Destination folder is not writable"
 msgstr ""
 
-#: epymc/plugins/filemanager/filemanager.py:497
+#: epymc/plugins/filemanager/filemanager.py:469
 msgid "Invalid destination folder"
 msgstr ""
 
-#: epymc/plugins/filemanager/filemanager.py:503
+#: epymc/plugins/filemanager/filemanager.py:475
 msgid "Destination already exists"
 msgstr ""
 
-#: epymc/plugins/filemanager/filemanager.py:510
+#: epymc/plugins/filemanager/filemanager.py:482
 #, python-brace-format
 msgid "Copying file {0} of {1}:"
 msgstr ""
 
-#: epymc/plugins/filemanager/filemanager.py:512
+#: epymc/plugins/filemanager/filemanager.py:484
 #, python-brace-format
 msgid "Deleting file {0} of {1}:"
 msgstr ""
@@ -966,7 +1001,7 @@ msgid "Checking for updates"
 msgstr ""
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:214
-#: epymc/plugins/music/music.py:323 epymc/plugins/tvshows/tvshows.py:693
+#: epymc/plugins/music/music.py:329 epymc/plugins/tvshows/tvshows.py:693
 msgid "please wait..."
 msgstr ""
 
@@ -1154,9 +1189,9 @@ msgstr ""
 msgid "No trailers available"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:200
-#, python-format
-msgid "%(name)s <i>as %(character)s</i>"
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:201
+#: epymc/plugins/movies/movies.py:537 epymc/plugins/tvshows/tvshows.py:538
+msgid "as"
 msgstr ""
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:87
@@ -1336,104 +1371,97 @@ msgid ""
 "Add the ability to control the application from any MPRIS2 compatible client."
 msgstr ""
 
-#: epymc/plugins/music/music.py:52 epymc/plugins/music/music.py:56
+#: epymc/plugins/music/music.py:55
 msgid "OnAir"
 msgstr ""
 
-#: epymc/plugins/music/music.py:66 epymc/plugins/music/music.py:70
-#: epymc/plugins/music/music.py:253 epymc/plugins/music/music.py:307
+#: epymc/plugins/music/music.py:65 epymc/plugins/music/music.py:69
+#: epymc/plugins/music/music.py:265 epymc/plugins/music/music.py:313
 msgid "Artists"
 msgstr ""
 
-#: epymc/plugins/music/music.py:77 epymc/plugins/music/music.py:81
-#: epymc/plugins/music/music.py:254 epymc/plugins/music/music.py:309
+#: epymc/plugins/music/music.py:79 epymc/plugins/music/music.py:83
+#: epymc/plugins/music/music.py:266 epymc/plugins/music/music.py:315
 msgid "Albums"
 msgstr ""
 
-#: epymc/plugins/music/music.py:88 epymc/plugins/music/music.py:92
-#: epymc/plugins/music/music.py:255 epymc/plugins/music/music.py:311
+#: epymc/plugins/music/music.py:93 epymc/plugins/music/music.py:97
+#: epymc/plugins/music/music.py:267 epymc/plugins/music/music.py:317
 msgid "Songs"
 msgstr ""
 
-#: epymc/plugins/music/music.py:102 epymc/plugins/movies/movies.py:93
+#: epymc/plugins/music/music.py:110 epymc/plugins/movies/movies.py:93
 #: epymc/plugins/tvshows/tvshows.py:85
 msgid "Rescan library"
 msgstr ""
 
-#: epymc/plugins/music/music.py:115 epymc/plugins/movies/movies.py:82
+#: epymc/plugins/music/music.py:123 epymc/plugins/movies/movies.py:82
 #: epymc/plugins/tvshows/tvshows.py:73 epymc/plugins/photos/photos.py:79
 msgid "Manage sources"
 msgstr ""
 
-#: epymc/plugins/music/music.py:125
-msgid "Play the whole album"
-msgstr ""
-
-#: epymc/plugins/music/music.py:135
+#: epymc/plugins/music/music.py:133
 msgid "Play all the songs"
 msgstr ""
 
-#: epymc/plugins/music/music.py:157 epymc/plugins/music/music.py:184
-#: epymc/plugins/music/music.py:558
+#: epymc/plugins/music/music.py:143
+msgid "Queue all the songs"
+msgstr ""
+
+#: epymc/plugins/music/music.py:165 epymc/plugins/music/music.py:192
 #, python-format
 msgid "<em>by</em> %s<br>"
 msgstr ""
 
-#: epymc/plugins/music/music.py:159 epymc/plugins/music/music.py:560
+#: epymc/plugins/music/music.py:167
 #, python-format
 msgid "<em>from</em> %s<br>"
 msgstr ""
 
-#: epymc/plugins/music/music.py:164
+#: epymc/plugins/music/music.py:172
 #, python-format
 msgid "duration: %s<br>"
 msgstr ""
 
-#: epymc/plugins/music/music.py:177
-#, python-format
-msgid "%(name)s by %(artist)s"
-msgstr ""
-
-#: epymc/plugins/music/music.py:186 epymc/plugins/music/music.py:214
+#: epymc/plugins/music/music.py:194 epymc/plugins/music/music.py:222
 #, python-format
 msgid "%d song"
 msgid_plural "%d songs"
 msgstr[0] ""
 msgstr[1] ""
 
-#: epymc/plugins/music/music.py:195
+#: epymc/plugins/music/music.py:203
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: epymc/plugins/music/music.py:212
+#: epymc/plugins/music/music.py:220
 #, python-format
 msgid "%d album"
 msgid_plural "%d albums"
 msgstr[0] ""
 msgstr[1] ""
 
-#: epymc/plugins/music/music.py:221 epymc/plugins/music/music.py:257
-#: epymc/plugins/music/music.py:261 epymc/plugins/music/music.py:305
+#: epymc/plugins/music/music.py:232 epymc/plugins/music/music.py:269
+#: epymc/plugins/music/music.py:273 epymc/plugins/music/music.py:311
 msgid "Music"
 msgstr ""
 
-#: epymc/plugins/music/music.py:223
+#: epymc/plugins/music/music.py:234
 msgid "The music module build a database of all your albums, songs and artist."
 msgstr ""
 
-#: epymc/plugins/music/music.py:323 epymc/plugins/music/music.py:356
+#: epymc/plugins/music/music.py:329 epymc/plugins/music/music.py:362
 msgid "Rebuilding database"
 msgstr ""
 
-#: epymc/plugins/music/music.py:356
+#: epymc/plugins/music/music.py:362
 msgid "operation completed"
 msgstr ""
 
-#: epymc/plugins/music/music.py:522 epymc/plugins/music/music.py:533
-#: epymc/plugins/music/music.py:544
+#: epymc/plugins/music/music.py:528
 msgid "queued"
 msgstr ""
 
@@ -1445,7 +1473,7 @@ msgstr ""
 msgid "Directors"
 msgstr ""
 
-#: epymc/plugins/movies/movies.py:210 epymc/plugins/photos/photos.py:104
+#: epymc/plugins/movies/movies.py:210 epymc/plugins/photos/photos.py:109
 msgid "File size"
 msgstr ""
 
@@ -1493,10 +1521,6 @@ msgstr ""
 msgid ""
 "Media:<br>%s<br><br>No info stored for this media<br>Try the Search info "
 "button..."
-msgstr ""
-
-#: epymc/plugins/movies/movies.py:537 epymc/plugins/tvshows/tvshows.py:538
-msgid "as"
 msgstr ""
 
 #: epymc/plugins/movies/movies.py:555 epymc/plugins/tvshows/tvshows.py:486
@@ -1698,36 +1722,36 @@ msgstr ""
 msgid "Press a key on your keyboard"
 msgstr ""
 
-#: epymc/plugins/photos/photos.py:110
+#: epymc/plugins/photos/photos.py:115
 msgid "Dimensions"
 msgstr ""
 
-#: epymc/plugins/photos/photos.py:111
+#: epymc/plugins/photos/photos.py:116
 msgid "Format"
 msgstr ""
 
-#: epymc/plugins/photos/photos.py:125
+#: epymc/plugins/photos/photos.py:133
 msgid "Please install PIL to read image metadata."
 msgstr ""
 
-#: epymc/plugins/photos/photos.py:139 epymc/plugins/photos/photos.py:160
-#: epymc/plugins/photos/photos.py:163 epymc/plugins/photos/photos.py:167
-#: epymc/plugins/photos/photos.py:190 epymc/plugins/photos/photos.py:221
+#: epymc/plugins/photos/photos.py:147 epymc/plugins/photos/photos.py:168
+#: epymc/plugins/photos/photos.py:171 epymc/plugins/photos/photos.py:175
+#: epymc/plugins/photos/photos.py:198 epymc/plugins/photos/photos.py:229
 msgid "Photos"
 msgstr ""
 
-#: epymc/plugins/photos/photos.py:141
+#: epymc/plugins/photos/photos.py:149
 msgid "A module to watch your photos."
 msgstr ""
 
-#: epymc/plugins/photos/photos.py:225
+#: epymc/plugins/photos/photos.py:233
 msgid "Show slideshow controls on start"
 msgstr ""
 
-#: epymc/plugins/photos/photos.py:227
+#: epymc/plugins/photos/photos.py:235
 msgid "Slideshow delay"
 msgstr ""
 
-#: epymc/plugins/photos/photos.py:228
+#: epymc/plugins/photos/photos.py:236
 msgid "seconds"
 msgstr ""

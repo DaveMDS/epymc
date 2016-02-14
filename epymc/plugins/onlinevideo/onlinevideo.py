@@ -274,7 +274,6 @@ class OnlinevideoModule(EmcModule):
             txt = '<failure>{}</failure>'.format(_('Download failed'))
             self._update_dialog.text_append(txt)
 
-   
 ###### SOURCES STUFF
    def build_sources_list(self):
       # search all the source.ini files in all the subdirs of _search_folders
@@ -399,7 +398,6 @@ class OnlinevideoModule(EmcModule):
 
       if scroll is True:
          self._browser.item_bring_in(pos='top', animated=True)
-
 
 ###### CONFIGURATION GUI STUFF
    def config_gui_cb(self):

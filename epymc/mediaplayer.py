@@ -368,10 +368,13 @@ def play_counts_get(url):
                'finished': 0,  # num times finished
                'stop_at': 0 }  # last play pos
 
-def stop():
+def stop(emit_playback_finished=False):
    global _player, _saved_player, _onair_url, _onair_title
 
    DBG('Stop()')
+
+   if emit_playback_finished:
+      events.event_emit('PLAYBACK_FINISHED')
 
    if isinstance(_player, EmcVideoPlayer):
       # update play counts
@@ -611,7 +614,7 @@ class EmcPlayerBase(object):
          return input_events.EVENT_BLOCK
 
       elif event == 'STOP':
-         stop()
+         stop(True)
          return input_events.EVENT_BLOCK
 
       elif event == 'FORWARD':
@@ -890,7 +893,7 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       bt = EmcButton(icon='icon/bwd', cb=lambda b: self.backward())
       self.box_append('controls.btn_box', bt)
 
-      bt = EmcButton(icon='icon/stop', cb=lambda b: stop())
+      bt = EmcButton(icon='icon/stop', cb=lambda b: stop(True))
       self.box_append('controls.btn_box', bt)
 
       bt = EmcButton(icon='icon/pause', cb=lambda b: self.pause_toggle())
@@ -1220,7 +1223,7 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
             self.controls_show()
             return input_events.EVENT_BLOCK
          elif event == 'BACK':
-            stop()
+            stop(True)
             return input_events.EVENT_BLOCK
          elif event == 'RIGHT':
             self.forward()

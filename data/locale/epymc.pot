@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-14 10:31+0100\n"
+"POT-Creation-Date: 2016-02-14 12:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,6 +56,7 @@ msgstr ""
 
 #: epymc/gui.py:199 epymc/gui.py:201 epymc/gui.py:202 epymc/subtitles.py:385
 #: epymc/config_gui.py:645 epymc/utils.py:519
+#: epymc/plugins/onlinevideo/onlinevideo.py:222
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:129
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:144
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:149
@@ -207,6 +208,7 @@ msgid "Failure code"
 msgstr ""
 
 #: epymc/gui.py:2126 epymc/subtitles.py:410
+#: epymc/plugins/onlinevideo/onlinevideo.py:274
 msgid "Download failed"
 msgstr ""
 
@@ -988,7 +990,7 @@ msgid "Browse, watch and download videos from your favorite online sources."
 msgstr ""
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:148
-#: epymc/plugins/onlinevideo/onlinevideo.py:397
+#: epymc/plugins/onlinevideo/onlinevideo.py:407
 msgid "Video Channels"
 msgstr ""
 
@@ -996,74 +998,79 @@ msgstr ""
 msgid "Channels"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:213
+#: epymc/plugins/onlinevideo/onlinevideo.py:216
 msgid "Checking for updates"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:214
+#: epymc/plugins/onlinevideo/onlinevideo.py:217
 #: epymc/plugins/music/music.py:329 epymc/plugins/tvshows/tvshows.py:693
 msgid "please wait..."
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:224
-#: epymc/plugins/onlinevideo/onlinevideo.py:307
-#: epymc/plugins/onlinevideo/onlinevideo.py:316
-msgid "please wait"
-msgstr ""
-
 #: epymc/plugins/onlinevideo/onlinevideo.py:225
-msgid ""
-"Updating the helper program <b>youtube-dl</b> to the latest version."
-"<br><br>For info please visit:<br>rg3.github.io/youtube-dl/"
+msgid "Local version"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:239
-msgid "Updated to the latest version"
-msgstr ""
-
-#: epymc/plugins/onlinevideo/onlinevideo.py:247
-msgid "Current version"
-msgstr ""
-
-#: epymc/plugins/onlinevideo/onlinevideo.py:257
+#: epymc/plugins/onlinevideo/onlinevideo.py:234
 msgid "Upstream version"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:265
-msgid "No update available."
+#: epymc/plugins/onlinevideo/onlinevideo.py:242
+msgid "Already updated"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:299
+#: epymc/plugins/onlinevideo/onlinevideo.py:247
+msgid "Failed to fetch upstream version"
+msgstr ""
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:251
+#, python-brace-format
+msgid ""
+"Updating <b>youtube-dl</b> at version <b>{0}</b><br><br>For info and credits "
+"please visit:<br>rg3.github.io/youtube-dl/"
+msgstr ""
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:254
+#: epymc/plugins/onlinevideo/onlinevideo.py:317
+#: epymc/plugins/onlinevideo/onlinevideo.py:326
+msgid "please wait"
+msgstr ""
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:269
+msgid "Update completed"
+msgstr ""
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:309
 msgid "Search query"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:308
-#: epymc/plugins/onlinevideo/onlinevideo.py:317
+#: epymc/plugins/onlinevideo/onlinevideo.py:318
+#: epymc/plugins/onlinevideo/onlinevideo.py:327
 msgid "Getting info..."
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:335
+#: epymc/plugins/onlinevideo/onlinevideo.py:345
 msgid "Reported error"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:336
-#: epymc/plugins/onlinevideo/onlinevideo.py:358
+#: epymc/plugins/onlinevideo/onlinevideo.py:346
+#: epymc/plugins/onlinevideo/onlinevideo.py:368
 msgid "Error reading channel"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:359
+#: epymc/plugins/onlinevideo/onlinevideo.py:369
 msgid "No items returned"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:364
+#: epymc/plugins/onlinevideo/onlinevideo.py:374
 msgid "Suggestions"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:402
+#: epymc/plugins/onlinevideo/onlinevideo.py:412
 msgid "Automatically keep youtube-dl updated"
 msgstr ""
 
-#: epymc/plugins/onlinevideo/onlinevideo.py:403
+#: epymc/plugins/onlinevideo/onlinevideo.py:413
 msgid "Check for youtube-dl update now"
 msgstr ""
 

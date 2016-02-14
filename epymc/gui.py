@@ -2098,7 +2098,7 @@ class DownloadManager(utils.Singleton):
       DBG('************  DOWNLOAD START  ****************')
       DBG('URL: ' + url)
       DBG('PAT: ' + dest)
-      handler = utils.download_url_async(url, dest=dest+'.part',
+      handler = utils.download_url_async(url, dest=dest+'.part', urlencode=False,
                                          complete_cb=self._complete_cb,
                                          # progress_cb=self._progress_cb,
                                          myurl=url)

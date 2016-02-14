@@ -13,8 +13,6 @@ TMP
  * new text styles: mi piace, etc...
  * migliorare grafica dei dialog
 
- * video download usually do not work, use youtube-dl if possible
-
  * use EmcUrl where needed
 
  * mpris fail on Position > Int32    :/

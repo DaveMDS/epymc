@@ -1317,7 +1317,7 @@ msgstr "Пульт"
 #: epymc/plugins/input_lirc/lirc.py:126
 #, python-format
 msgid "Button: %s"
-msgstr "Кнопка"
+msgstr "Кнопка: %s"
 
 #: epymc/plugins/input_lirc/lirc.py:134 epymc/plugins/input_keyb/keyb.py:167
 #: epymc/plugins/input_keyb/keyb.py:176

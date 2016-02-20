@@ -113,6 +113,17 @@ class StandardItemClass(EmcItemClass):
          return item_data[F_INFO].replace('&', '&amp;')
 
 
+class DownloadItemClass(EmcItemClass):
+   def item_selected(self, url, item_data):
+      gui.DownloadManager().in_progress_show()
+
+   def label_get(self, url, item_data):
+      return _('Download manager')
+
+   def icon_get(self, url, item_data):
+      return 'icon/download'
+
+
 class OnlinevideoModule(EmcModule):
    name = 'onlinevideo'
    label = _('Online Channels')
@@ -204,6 +215,7 @@ class OnlinevideoModule(EmcModule):
          self.build_sources_list()
       for ch in self._sources:
          self._browser.item_add(ChannelItemClass(), ch['name'], ch)
+      self._browser.item_add(DownloadItemClass(), None)
 
 ###### YOUTUBE-DL DOWNLOAD AND UPDATE
    def youtubedl_check_update(self, verbose=False):

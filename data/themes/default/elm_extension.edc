@@ -2191,6 +2191,213 @@ group { name: "elm/genlist/item_compress/default/playlist";
    }
 }
 
+//// DOWNLOAD MANAGER GENLIST ITEM (elm/genlist/item_compress/default/default) /
+group { name: "elm/genlist/item_compress/default/dman";
+   data.item: "selectraise" "on";
+   data.item: "focusraise" "on";
+   data.item: "texts" "elm.text.fname elm.text.folder elm.text.progress elm.text.status";
+   // data.item: "contents" "elm.swallow.icon elm.swallow.end";
+   // data.item: "treesize" 16;
+   // data.item: "flips" "elm.text.flip";
+   images.image: "separator.png" COMP;
+   images.image: "vgrad_med_dark.png" COMP;
+   images.image: "shadow_rounded_horiz.png" COMP;
+   images.image: "bevel_horiz_out.png" COMP;
+   // FOCUS_HIGHLIGHT_INTRO()
+
+   parts {
+      part { name: "event";
+         type: RECT;
+         repeat_events: 1;
+         description { state: "default" 0.0;
+            color: 0 0 0 0;
+         }
+      }
+      part { name: "sep";
+         type: IMAGE;
+         description { state: "default" 0.0;
+            max: 99999 2;
+            align: 0.5 1.0;
+            image.normal: "separator.png";
+         }
+      }
+      part { name: "shadow"; nomouse;
+         description { state: "default" 0.0;
+            image.normal: "shadow_rounded_horiz.png";
+            image.border: 0 0 9 9;
+            rel1.offset: 0 -4;
+            rel2.offset: -1 5;
+            fill.smooth: 0;
+            visible: 0;
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+      }
+      part { name: "bg"; nomouse; scale;
+         clip_to: "disclip";
+         description { state: "default" 0.0;
+            min: 200 50;
+            image.normal: "vgrad_med_dark.png";
+            fill.smooth: 0;
+            TILED_HORIZ(120)
+            visible: 0;
+            rel1.offset: 0 -1;
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+      }
+      // // // // // // // // // // // // // // // // // // // // // // // // 
+      part { name: "elm.text.fname"; type: TEXT;
+         scale: 1;
+         description { state: "default" 0.0;
+            fixed: 1 1;
+            // rel1.to: "elm.text.tracknum";
+            // rel1.relative: 1.0 0.0;
+            rel1.offset: 5 0;
+            rel2.to_x: "elm.text.progress";
+            rel2.relative: 0.0 0.55;
+            rel2.offset: -6 -1;
+            color: COLOR_WHITE 255;
+            text {
+               font: FONT;
+               size: FONT_SIZE;
+               align: 0.0 0.5;
+            }
+         }
+      }
+      part { name: "elm.text.folder"; type: TEXT;
+         scale: 1;
+         description { state: "default" 0.0;
+            fixed: 1 1;
+            rel1.relative: 0.0 0.55;
+            rel1.offset: 5 0;
+            rel2.to_x: "elm.text.progress";
+            rel2.relative: 0.0 1.0;
+            rel2.offset: -6 -1;
+            color: COLOR_GRAY 255;
+            text {
+               font: FONT;
+               size: FONT_SIZE_SMALL;
+               align: 0.0 0.5;
+            }
+         }
+      }
+      part { name: "elm.text.progress"; type: TEXT;
+         scale: 1;
+         description { state: "default" 0.0;
+            fixed: 1 1;
+            rel1.relative: 1.0 0.0;
+            rel2.relative: 1.0 1.0;
+            rel2.offset: -6 -1;
+            color: COLOR_GRAY 255;
+            align: 1.0 0.0;
+            text {
+               font: FONT;
+               size: FONT_SIZE;
+               align: 0.0 1.0;
+               min: 1 0;
+               ellipsis: -1;
+            }
+         }
+      }
+      part { name: "elm.text.status"; type: TEXT;
+         scale: 1;
+         description { state: "default" 0.0;
+            fixed: 1 1;
+            rel1.to: "elm.text.progress";
+            rel2.to: "elm.text.progress";
+            color: COLOR_GRAY 255;
+            text {
+               font: FONT;
+               size: FONT_SIZE_SMALL;
+               align: 1.0 0.0;
+               min: 1 0;
+               ellipsis: -1;
+            }
+         }
+      }
+      // DBG_SHOW("elm.text.fname", 0, 80, 0)
+      // DBG_SHOW("elm.text.folder", 80, 0, 0)
+      // DBG_SHOW("elm.text.progress", 0, 0, 80)
+      // // // // // // // // // // // // // // // // // // // // // // // // 
+      part { name: "bevel"; nomouse;
+         description { state: "default" 0.0;
+            rel1.to: "bg";
+            rel2.to: "bg";
+            image.normal: "bevel_horiz_out.png";
+            image.border: 0 0 2 2;
+            image.middle: 0;
+            fill.smooth: 0;
+            visible: 0;
+         }
+         description { state: "selected" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+      }
+      part { name: "shine"; nomouse;
+         description { state: "default" 0.0;
+            rel1.to: "bg";
+            rel2.to: "bg";
+            rel2.relative: 1.0 0.0;
+            image.normal: "shine.png";
+            visible: 0;
+            FIXED_SIZE(69, 5)
+         }
+         description { state: "selected" 0.0;
+            inherit:  "default" 0.0;
+            visible: 1;
+         }
+      }
+      part { name: "disclip"; type: RECT; nomouse;
+         description { state: "default" 0.0;
+            rel1.to: "bg";
+            rel2.to: "bg";
+         }
+         description { state: "disabled" 0.0;
+            inherit: "default" 0.0;
+            color: 255 255 255 64;
+         }
+      }
+      // FOCUS_HIGHLIGHT_PARTS(-7 -7, 5 5)
+   }
+   programs {
+      program { name:"go_active";
+         signal:  "elm,state,selected"; source:  "elm";
+         action:  STATE_SET "selected" 0.0;
+         target:  "shadow";
+         target:  "bg";
+         target:  "bevel";
+         target:  "shine";
+      }
+      program { name:"go_passive";
+         signal:  "elm,state,unselected"; source:  "elm";
+         action:  STATE_SET "default" 0.0;
+         target:  "shadow";
+         target:  "bg";
+         target:  "bevel";
+         target:  "shine";
+      }
+      program { name:"go_disabled";
+         signal:  "elm,state,disabled";
+         source:  "elm";
+         action:  STATE_SET "disabled" 0.0;
+         target:  "disclip";
+      }
+      program { name:"go_enabled";
+         signal:  "elm,state,enabled";
+         source:  "elm";
+         action:  STATE_SET "default" 0.0;
+         target:  "disclip";
+      }
+      // FOCUS_HIGHLIGHT_PROGRAMS("elm,state,focused", "elm,state,unfocused")
+   }
+}
+
 //// SCROLLED ENTRY (elm/entry/base-noedit/default) ////////////////////
 group { name: "elm/entry/base-noedit/scrolledentry";
    parts {

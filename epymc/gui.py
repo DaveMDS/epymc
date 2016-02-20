@@ -1984,6 +1984,75 @@ class EmcScrolledEntry(Entry, Scrollable):
       return ecore.ECORE_CALLBACK_RENEW
 
 ################################################################################
+DMAN_QUEUED = 0
+DMAN_RUNNING = 1
+DMAN_COMPLETED = 2
+DMAN_ABORTED = 3
+DMAN_PAUSED = 4
+
+class DManItem(object):
+   def __init__(self, manager, url, dest):
+      self.url = url
+      self.dest = dest
+      self.folder, self.fname = os.path.split(dest)
+      self.status = DMAN_QUEUED
+      self.handler = None # ecore.FileDownload instance
+      self.manager = manager
+      self.total_size = 0
+      self.done_size = 0
+
+   def start(self):
+      if self.handler is not None:
+         return
+
+      DBG('************  DOWNLOAD START  ****************')
+      DBG('URL: ' + self.url)
+      DBG('PAT: ' + self.dest)
+      self.handler = utils.download_url_async(self.url, dest=self.dest+'.part',
+                                              urlencode=False,
+                                              complete_cb=self._complete_cb,
+                                              progress_cb=self._progress_cb)
+      self.status = DMAN_RUNNING
+      # notify
+      txt = '<title>{}</title><br>{}'.format(_('Download started'), self.fname)
+      EmcNotify(txt, icon='icon/download')
+
+   def abort(self):
+      if self.handler:
+         self.status = DMAN_ABORTED
+         self.handler.abort()
+         self.handler = None
+
+   def _progress_cb(self, dest, dltotal, dlnow):
+      self.total_size = dltotal
+      self.done_size = dlnow
+
+   def _complete_cb(self, dest, status):
+      if self.status == DMAN_ABORTED:
+         return
+
+      self.handler = None
+      self.status = DMAN_COMPLETED
+
+      # download failed ?
+      if status != 200:
+         txt = '<b>{}:</b><br>{}<br><br><failure>{}: {} ({})</failure>'.format(
+               _('Cannot download file'), self.fname,
+               _('Failure code'), status, utils.http_error_code_to_str(status))
+         EmcDialog(style='error', title=_('Download failed'), text=txt)
+         return
+
+      # remove the .part suffix
+      os.rename(dest, self.dest)
+
+      # notify
+      txt = '<title>{}</title><br>{}'.format(_('Download completed'),self.fname)
+      EmcNotify(txt, icon='icon/download')
+
+      # see if other (in queue) download should be started now
+      self.manager._process_queue()
+
+
 class DownloadManager(utils.Singleton):
    """ Manage a queue of urls to download.
 
@@ -1993,8 +2062,8 @@ class DownloadManager(utils.Singleton):
 
    """
    def __init__(self):
-      self.handlers = {} # in progress {key:url, data:FileDownload}
-      self.queue = []    # in queue (url, dest)
+      if not hasattr(self, 'queue'):
+         self.queue = [] # list of DManItem instances
 
    def queue_download(self, url, dest_name=None, dest_ext=None, dest_folder=None):
       """ Put a new url in the download queue.
@@ -2038,7 +2107,7 @@ class DownloadManager(utils.Singleton):
       dia.button_add(_('Change folder'), self._change_folder_cb, dia)
       self._update_dialog_text(dia)
 
-   # confirmation dialog stuff
+   ### confirmation dialog stuff
    def _update_dialog_text(self, dia):
       text = _('File will be downloaded in the folder:<br> <b>{}</b><br>' \
                '<br>File will be named as:<br> <b>{}</b><br>' \
@@ -2068,9 +2137,8 @@ class DownloadManager(utils.Singleton):
       fullpath = os.path.join(dia.data['dst_folder'], dia.data['dst_name'])
       fullpath = utils.ensure_file_not_exists(fullpath)
 
-      # check if the given url is in queue or in progress yet
-      if url in self.handlers or \
-            len([u for u,d in self.queue if u == url]) > 0:
+      # check if the given url is already in queue
+      if len([i for i in self.queue if i.url == url]) > 0:
          text = _('The file %s is in the download queue yet') % dia.data['dst_name']
          EmcDialog(style='error', text=text)
          dia.delete()
@@ -2079,63 +2147,129 @@ class DownloadManager(utils.Singleton):
       # close the dialog
       dia.delete()
 
-      # add the download to the queue
-      self.queue.append((url, fullpath))
+      # queue the download
+      self.queue.append(DManItem(self, url, fullpath))
       self._process_queue()
 
-   ###
+   ### process queue
    def _process_queue(self):
       # no items in queue, nothing to do
       if len(self.queue) < 1:
          return
 
       # respect the max_concurrent_download option
-      if len(self.handlers) >= ini.get_int('general', 'max_concurrent_download'):
+      slots = ini.get_int('general', 'max_concurrent_download')
+      for item in self.queue:
+         if item.status == DMAN_RUNNING:
+            slots -= 1
+            if slots <= 0:
+               return
+
+      # start queued items (always respecting max_concurrent_download)
+      for item in self.queue:
+         if item.status == DMAN_QUEUED:
+            item.start()
+            slots -= 1
+            if slots <= 0:
+               return
+
+   ### in progress dialog stuff
+   def in_progress_show(self):
+      """ Show a dialog with the operation in progress """
+      itc = elm.GenlistItemClass(item_style='default',
+                                 text_get_func=self._gl_text_get)
+      gl = elm.Genlist(layout, style='dman', focus_allow=False,
+                       homogeneous=True, mode=elm.ELM_LIST_COMPRESS)
+
+      self.dia = EmcDialog(title=_('Download manager'), content=gl,
+                           canc_cb=self.in_progress_hide)
+      self.dia.button_add(_('Close'), selected_cb=self.in_progress_hide)
+      self.dia.button_add(_('Start'), selected_cb=self._dia_start_cb)
+      self.dia.button_add(_('Clear completed'), selected_cb=self._dia_clear_cb)
+      self.dia.button_add(_('Cancel'), selected_cb=self._dia_cancel_cb)
+
+      if len(self.queue) > 0:
+         for item in self.queue:
+            gl.item_append(itc, item)
+         gl.first_item.selected = True
+         # start a timer to continuosly update the list
+         self.dia_timer = ecore.Timer(1.0, self._dia_update_timer_cb, gl)
+      else:
+         pass # TODO show something
+
+   def in_progress_hide(self, *args):
+      """ dismiss the progress dialog """
+      if self.dia_timer:
+         self.dia_timer.delete()
+         self.dia_timer = None
+      if self.dia:
+         self.dia.delete()
+         self.dia = None
+
+   def _gl_text_get(self, obj, part, item):
+      if part == 'elm.text.fname':
+         return item.fname
+      if part == 'elm.text.folder':
+         return item.folder
+      if part == 'elm.text.progress':
+         if item.total_size > 0:
+            percent = int((item.done_size / item.total_size) * 100)
+            return _('{0}% of {1}').format(percent, utils.hum_size(item.total_size))
+         else:
+            return _('Unknown size')
+      if part == 'elm.text.status':
+         if item.status == DMAN_QUEUED:
+            return _('queued')
+         elif item.status == DMAN_RUNNING:
+            return _('running')
+         elif item.status == DMAN_COMPLETED:
+            return _('completed')
+         elif item.status == DMAN_PAUSED:
+            return _('paused')
+
+   def _dia_update_timer_cb(self, gl):
+      gl.realized_items_update()
+      return ecore.ECORE_CALLBACK_RENEW
+
+   def _dia_start_cb(self, btn):
+      gl_item = self.dia.content_get().selected_item
+      if gl_item is not None:
+         gl_item.data.start()
+
+   def _dia_cancel_cb(self, btn):
+      gl_item = self.dia.content_get().selected_item
+      if gl_item is None:
          return
 
-      # pop an item from the queue and download it
-      url, dest = self.queue.pop(0)
-      DBG('************  DOWNLOAD START  ****************')
-      DBG('URL: ' + url)
-      DBG('PAT: ' + dest)
-      handler = utils.download_url_async(url, dest=dest+'.part', urlencode=False,
-                                         complete_cb=self._complete_cb,
-                                         # progress_cb=self._progress_cb,
-                                         myurl=url)
-      self.handlers[url] = handler
+      item = gl_item.data
+      txt = '<b>{}</b><br>'.format(item.fname)
+      txt += _('Are you sure you want to abort the download of the file?')
+      EmcDialog(style='yesno', title=_('Delete download'), text=txt,
+                done_cb=self._dia_cancel_confirmed_cb, user_data=gl_item)
 
-      # notify
-      text = '<title>%s</title><br>%s' % (_('Download started'),
-                                          os.path.basename(dest))
-      EmcNotify(text, icon='icon/download')
+   def _dia_cancel_confirmed_cb(self, dia):
+      gl_item = dia.data_get()
+      item = gl_item.data
+      dia.delete()
 
-   # def _progress_cb(self, dest, dltotal, dlnow, myurl):
-      # print "PROG (%s) %.2f %.2f" % (dest, dltotal, dlnow)
-      # pass
+      item.abort()
+      self.queue.remove(item)
+      del item
 
-   def _complete_cb(self, dest, status, myurl):
+      to_sel = gl_item.next or gl_item.prev
+      if to_sel:
+         to_sel.selected = True
+      gl_item.delete()
 
-      # remove the .part suffix
-      real_dest = dest[:-5]
-
-      # download failed ?
-      if status != 200:
-         text = '<b>%s:</b><br>%s<br><br><failure>%s: %d (%s)</failure>' % \
-               (_('Cannot download file'), os.path.basename(real_dest),
-               _('Failure code'), status, utils.http_error_code_to_str(status))
-         EmcDialog(style='error', title=_('Download failed'), text=text)
-         return
-
-      # rename the downloaded file
-      os.rename(dest, real_dest)
-
-      # notify
-      text = '<title>%s</title><br>%s' % (_('Download completed'),
-                                          os.path.basename(real_dest))
-      EmcNotify(text, icon='icon/download')
-
-      # remove the handler from the dict
-      handler = self.handlers.pop(myurl, None)
-
-      # see if other (in queue) download should be started now
       self._process_queue()
+
+   def _dia_clear_cb(self, btn):
+      gl = self.dia.content_get()
+      for gl_item in gl:
+         item = gl_item.data
+         if item.status == DMAN_COMPLETED:
+            gl_item.delete()
+            self.queue.remove(item)
+            del item
+      if gl.selected_item is None and gl.first_item:
+         gl.first_item.selected = True

@@ -40,7 +40,6 @@ CORE
  * joy/webserver need a key-repetition handling
  * subtitles font and size configuration
  * subtitles upload to opensubtitles.org
- * show the status of the downloads in progress (and alert on exit if in progress)
  * use xdg to find config, cache download folders
  * add an option to disable exit confirmation (but show credit somewhere else)
  * apply the volume using a logaritic curve

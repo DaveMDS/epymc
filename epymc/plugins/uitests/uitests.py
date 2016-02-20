@@ -265,6 +265,9 @@ class MyItemClass(EmcItemClass):
          DownloadManager().queue_download('http://fredrik.hubbe.net/plugger/xvidtest.avi', 'dm_test1')
          DownloadManager().queue_download('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4', 'TheMakingOfSuzanneVega')
 
+      elif url == 'uitests://dm2':
+         DownloadManager().in_progress_show()
+
       # Mediaplayer Local Video
       elif url == 'uitests://mpv':
          f = os.path.expanduser('~/Video/testvideo.avi')
@@ -600,7 +603,8 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://icons', 'Icons gallery')
       browser.item_add(MyItemClass(), 'uitests://imagegal', 'Images gallery')
       browser.item_add(MyItemClass(), 'uitests://styles', 'Text styles')
-      browser.item_add(MyItemClass(), 'uitests://dm', 'Download Manager')
+      browser.item_add(MyItemClass(), 'uitests://dm', 'Download Manager - start')
+      browser.item_add(MyItemClass(), 'uitests://dm2', 'Download Manager - show')
       browser.item_add(MyItemClass(), 'uitests://tmdb', 'Themoviedb.org query with gui')
       browser.item_add(MyItemClass(), 'uitests://sselector', 'Source Selector')
       browser.item_add(MyItemClass(), 'uitests://dlg-info', 'Dialog - Info')

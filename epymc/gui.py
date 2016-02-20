@@ -1247,6 +1247,8 @@ class EmcDialog(Layout):
       self.signal_emit('emc,dialog,hide', 'emc')
       if self._last_focused:
          self._last_focused.focus = True
+      for b in self._buttons:
+         b.disabled = True
 
    def _delete_real(self):
       if self._textentry:

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-06 17:32+0100\n"
-"PO-Revision-Date: 2015-02-18 07:19+0300\n"
+"PO-Revision-Date: 2016-03-17 09:51+0300\n"
 "Last-Translator: Niko2040 <niko2040@bynets.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -367,7 +367,7 @@ msgstr "Тема"
 
 #: epymc/config_gui.py:325 epymc/config_gui.py:508
 msgid "Views"
-msgstr ""
+msgstr "Режимы отображения"
 
 #: epymc/config_gui.py:327 epymc/config_gui.py:648
 msgid "System info"
@@ -403,15 +403,15 @@ msgstr "Макс. одновременных загрузок"
 
 #: epymc/config_gui.py:428
 msgid "Time format"
-msgstr ""
+msgstr "Формат времени"
 
 #: epymc/config_gui.py:429
 msgid "Date format"
-msgstr ""
+msgstr "Формат даты"
 
 #: epymc/config_gui.py:441
 msgid "Use hardware acceleration"
-msgstr ""
+msgstr "Использовать аппаратное ускорение"
 
 #: epymc/config_gui.py:446
 msgid "Multimedia engine"
@@ -423,11 +423,11 @@ msgstr "FPS"
 
 #: epymc/config_gui.py:452 epymc/config_gui.py:474 epymc/config_gui.py:480
 msgid "Clear thumbnails cache"
-msgstr ""
+msgstr "Очистить кэш миниатюр изображений"
 
 #: epymc/config_gui.py:454 epymc/config_gui.py:493 epymc/config_gui.py:499
 msgid "Clear online images cache"
-msgstr ""
+msgstr "Очистить кэш онлайн изображений"
 
 #: epymc/config_gui.py:458
 msgid "Restart needed"
@@ -440,7 +440,7 @@ msgstr ""
 
 #: epymc/config_gui.py:481 epymc/config_gui.py:500
 msgid "Operation in progress, please wait..."
-msgstr ""
+msgstr "Производится операция, пожалуйста подождите..."
 
 #: epymc/config_gui.py:512
 msgid "Show Back item in lists"
@@ -448,15 +448,15 @@ msgstr "Отображать пункт 'Назад' в списках"
 
 #: epymc/config_gui.py:514
 msgid "Poster grid items size"
-msgstr ""
+msgstr "Размер элемента сетки постеров"
 
 #: epymc/config_gui.py:517
 msgid "Cover grid items size"
-msgstr ""
+msgstr "Размер элемента сетки обложек"
 
 #: epymc/config_gui.py:520
 msgid "Ignore views restrictions for pages"
-msgstr ""
+msgstr "Игнорировать ограничения режимов отображения для страниц"
 
 #: epymc/config_gui.py:540 epymc/plugins/onlinevideo/onlinevideo.py:90
 msgid "Author"
@@ -560,7 +560,7 @@ msgstr "Назад"
 
 #: epymc/browser.py:334
 msgid "View restriction"
-msgstr ""
+msgstr "Ограничение режима отображения"
 
 #: epymc/browser.py:335
 msgid ""
@@ -568,6 +568,9 @@ msgid ""
 "<br><br><small><info>NOTE: You can ovveride this restriction in the "
 "<i>Configuration → Views</i> section.</info></small>"
 msgstr ""
+"<br><br>Запрошенный режим отображения отключён для данной страницы."
+"<br><br><small><info>ПРИМЕЧАНИЕ: Вы можете отменить это ограничение в"
+"разделе <i>Настройка → Режимы отображения</i>.</info></small>"
 
 #: epymc/browser.py:578 epymc/browser.py:806
 #, python-format
@@ -710,7 +713,7 @@ msgstr "Сохранить состояние"
 
 #: epymc/plugins/mame/mame.py:417
 msgid "Driver status"
-msgstr ""
+msgstr "Состояние драйвера"
 
 #: epymc/plugins/mame/mame.py:418
 msgid "Emulation"
@@ -795,7 +798,7 @@ msgstr "Невозможно найти игру в сети."
 
 #: epymc/plugins/watchdog/watchdog.py:36
 msgid "Watchdog"
-msgstr ""
+msgstr "Наблюдатель"
 
 #: epymc/plugins/watchdog/watchdog.py:38
 msgid ""
@@ -803,6 +806,9 @@ msgid ""
 "crash/hang. So you dont have to leave your couch in case of problems...just "
 "wait 30 seconds and the module will restart epymc for you."
 msgstr ""
+"Если этот модуль включён, то в тех редких случаях, когда EpyMC зависает или "
+"падает, он будет перезапускаться. Вам не нужно делать лишних телодвижений "
+"в случае проблем - просто подождите 30 секунд и модуль перезапустить EpyMC."
 
 #: epymc/plugins/screensaver/screensaver.py:41
 #: epymc/plugins/screensaver/screensaver.py:70
@@ -981,7 +987,7 @@ msgstr "Ищите, смотрите и загружайте видео с ва�
 #: epymc/plugins/onlinevideo/onlinevideo.py:148
 #: epymc/plugins/onlinevideo/onlinevideo.py:397
 msgid "Video Channels"
-msgstr ""
+msgstr "Видео каналы"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:195
 msgid "Channels"
@@ -989,7 +995,7 @@ msgstr "Каналы"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:213
 msgid "Checking for updates"
-msgstr ""
+msgstr "Проверка на наличие обновлений"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:214
 #: epymc/plugins/music/music.py:323 epymc/plugins/tvshows/tvshows.py:693
@@ -1011,18 +1017,20 @@ msgstr ""
 #: epymc/plugins/onlinevideo/onlinevideo.py:239
 msgid "Updated to the latest version"
 msgstr ""
+"Обновление дополнительной программы <b>youtube-dl</b> до последней версии."
+"<br><br>Для дополнительной информации посетите:<br>rg3.github.io/youtube-dl/"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:247
 msgid "Current version"
-msgstr ""
+msgstr "Текущая версия"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:257
 msgid "Upstream version"
-msgstr ""
+msgstr "Последняя версия"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:265
 msgid "No update available."
-msgstr ""
+msgstr "Нет доступных обновлений."
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:299
 msgid "Search query"
@@ -1052,21 +1060,21 @@ msgstr "Рекомендуемое"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:402
 msgid "Automatically keep youtube-dl updated"
-msgstr ""
+msgstr "Автоматически обновлять youtube-dl"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:403
 msgid "Check for youtube-dl update now"
-msgstr ""
+msgstr "Проверить youtube-dl на наличие обновлений"
 
 #: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:42
 #, python-brace-format
 msgid "Season {0}"
-msgstr ""
+msgstr "{0} Сезон"
 
 #: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:56
 #, python-brace-format
 msgid "Episode {0}"
-msgstr ""
+msgstr "Эпизод {0}"
 
 #: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:57
 #: epymc/plugins/tvshows/tvshows.py:249 epymc/plugins/tvshows/tvshows.py:462
@@ -1107,27 +1115,27 @@ msgstr[2] "лайков"
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:69
 #, python-brace-format
 msgid "Load more results (page {0} of {1})"
-msgstr ""
+msgstr "Загрузить больше результатов (страница {0} из {1})"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:77
 msgid "Search movies"
-msgstr ""
+msgstr "Поиск фильмов"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:78
 msgid "Popular movies"
-msgstr ""
+msgstr "Популярные фильмы"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:79
 msgid "Top rated movies"
-msgstr ""
+msgstr "Лучшие фильмы"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:80
 msgid "Upcoming movies"
-msgstr ""
+msgstr "Ожидаемые фильмы"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:81
 msgid "Now playing movies"
-msgstr ""
+msgstr "Фильмы в прокате"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:159
 #: epymc/plugins/movies/movies.py:203 epymc/plugins/movies/movies.py:474
@@ -1144,7 +1152,7 @@ msgstr "Актёрский состав"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:161
 msgid "Original title"
-msgstr ""
+msgstr "Оригинальное название"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:162
 #: epymc/plugins/tvshows/tvshows.py:466
@@ -1159,7 +1167,7 @@ msgstr "Рейтинг"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:163
 msgid "votes"
-msgstr ""
+msgstr "голосов"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:164
 #: epymc/plugins/movies/movies.py:476
@@ -1168,24 +1176,24 @@ msgstr "Вышел на экраны"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:180
 msgid "Language"
-msgstr ""
+msgstr "Язык"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:181
 msgid "Source"
-msgstr ""
+msgstr "Источник"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:182
 msgid "Quality"
-msgstr ""
+msgstr "Качество"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:186
 msgid "No trailers available"
-msgstr ""
+msgstr "Нет трейлеров"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:200
 #, python-format
 msgid "%(name)s <i>as %(character)s</i>"
-msgstr ""
+msgstr "%(name)s <i>в роли %(character)s</i>"
 
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:87
 msgid "comment"
@@ -1296,7 +1304,7 @@ msgstr[2] "групп"
 
 #: epymc/plugins/onlinevideo/youtube/youtube.py:91
 msgid "More items..."
-msgstr ""
+msgstr "Показать больше..."
 
 #: epymc/plugins/input_lirc/lirc.py:44
 msgid "Input - Remote Control"
@@ -1547,7 +1555,7 @@ msgstr ""
 
 #: epymc/plugins/movies/movies.py:537 epymc/plugins/tvshows/tvshows.py:538
 msgid "as"
-msgstr ""
+msgstr "в роли"
 
 #: epymc/plugins/movies/movies.py:555 epymc/plugins/tvshows/tvshows.py:486
 #, python-format
@@ -1749,7 +1757,7 @@ msgstr "Клавиатура"
 
 #: epymc/plugins/input_keyb/keyb.py:134
 msgid "Are you sure you want to remove the mapping?"
-msgstr "Вы уверены, что хотите удалить привязки клавиш"
+msgstr "Вы уверены, что хотите удалить привязки клавиш?"
 
 #: epymc/plugins/input_keyb/keyb.py:136
 msgid "Remove key"
@@ -1761,46 +1769,34 @@ msgstr "Нажмите клавишу на клавиатуре"
 
 #: epymc/plugins/photos/photos.py:110
 msgid "Dimensions"
-msgstr ""
+msgstr "Разрешение"
 
 #: epymc/plugins/photos/photos.py:111
 msgid "Format"
-msgstr ""
+msgstr "Формат"
 
 #: epymc/plugins/photos/photos.py:125
 msgid "Please install PIL to read image metadata."
-msgstr ""
+msgstr "Пожалуйста, установите PIL, чтобы прочитать метаданные."
 
 #: epymc/plugins/photos/photos.py:139 epymc/plugins/photos/photos.py:160
 #: epymc/plugins/photos/photos.py:163 epymc/plugins/photos/photos.py:167
 #: epymc/plugins/photos/photos.py:190 epymc/plugins/photos/photos.py:221
 msgid "Photos"
-msgstr ""
+msgstr "Галерея"
 
 #: epymc/plugins/photos/photos.py:141
 msgid "A module to watch your photos."
-msgstr ""
+msgstr "Модуль для просмотра фотографий и изображений."
 
 #: epymc/plugins/photos/photos.py:225
 msgid "Show slideshow controls on start"
-msgstr ""
+msgstr "Показывать кнопки управления слайд-шоу при запуске"
 
 #: epymc/plugins/photos/photos.py:227
 msgid "Slideshow delay"
-msgstr ""
+msgstr "Задержка между показом слайдов"
 
 #: epymc/plugins/photos/photos.py:228
 msgid "seconds"
-msgstr ""
-
-#~ msgid "More relevant videos"
-#~ msgstr "Больше соответствующих видео"
-
-#~ msgid "Info"
-#~ msgstr "Информация"
-
-#~ msgid "%(name)s as %(character)s"
-#~ msgstr "%(name)s в роли %(character)s"
-
-#~ msgid "Top rated"
-#~ msgstr "Самые популярные"
+msgstr "секунды"

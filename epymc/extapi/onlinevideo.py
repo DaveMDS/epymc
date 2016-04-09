@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 #
-# Copyright (C) 2010-2015 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2010-2016 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of EpyMC.
 #
@@ -203,7 +203,7 @@ def relative_date(date):
 
 def format_date(date):
    """
-   Return a localized date string (fe. 25/12/2015).
+   Return a localized date string (fe. 25/12/2016).
    Date can be a datetime obj or an integer timestamp.
    """
    if isinstance(date, int):

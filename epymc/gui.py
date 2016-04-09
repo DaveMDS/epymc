@@ -2180,6 +2180,12 @@ class DownloadManager(utils.Singleton):
    ### in progress dialog stuff
    def in_progress_show(self):
       """ Show a dialog with the operation in progress """
+
+      if len(self.queue) < 1:
+         EmcDialog(title=_('Download manager'), style='info',
+                   text='No download currently in progress')
+         return
+      
       itc = elm.GenlistItemClass(item_style='default',
                                  text_get_func=self._gl_text_get)
       gl = elm.Genlist(layout, style='dman', focus_allow=False,
@@ -2191,15 +2197,13 @@ class DownloadManager(utils.Singleton):
       self.dia.button_add(_('Start'), selected_cb=self._dia_start_cb)
       self.dia.button_add(_('Clear completed'), selected_cb=self._dia_clear_cb)
       self.dia.button_add(_('Cancel'), selected_cb=self._dia_cancel_cb)
+      
+      for item in self.queue:
+         gl.item_append(itc, item)
+      gl.first_item.selected = True
 
-      if len(self.queue) > 0:
-         for item in self.queue:
-            gl.item_append(itc, item)
-         gl.first_item.selected = True
-         # start a timer to continuosly update the list
-         self.dia_timer = ecore.Timer(1.0, self._dia_update_timer_cb, gl)
-      else:
-         pass # TODO show something
+      # start a timer to continuosly update the list
+      self.dia_timer = ecore.Timer(1.0, self._dia_update_timer_cb, gl)
 
    def in_progress_hide(self, *args):
       """ dismiss the progress dialog """

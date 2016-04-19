@@ -351,16 +351,17 @@ class TvShowsModule(EmcModule):
       # if not self._folders:
          #TODO alert the user. and instruct how to add folders
 
-      self._browser.page_add('tvshows://root', _('TV Shows'),
-                             self._styles_for_folders, self.populate_root_page)
-      self._browser.show()
-      mainmenu.hide()
-
       # open movie/idler databases (they are created if not exists)
       if self._tvshows_db is None:
          self._tvshows_db = EmcDatabase('tvshows', TVSHOWS_DB_VERSION)
       if self._idler_db is None:
          self._idler_db = EmcDatabase('tvidlercache', TVSHOWS_DB_VERSION)
+
+      # populate and show root page
+      self._browser.page_add('tvshows://root', _('TV Shows'),
+                             self._styles_for_folders, self.populate_root_page)
+      self._browser.show()
+      mainmenu.hide()
 
       # on idle scan all files (one shot every time the activity start)
       # if not self._scanner and ini.get_bool('movies', 'enable_scanner'):

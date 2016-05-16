@@ -560,6 +560,7 @@ collections {
             effect: SHADOW;
             scale: 1;
             description { state: "default" 0.0;
+               fixed: 0 1;
                color: FONT_COLOR;
                color3: 0 0 0 255;
                rel1 {
@@ -781,6 +782,7 @@ collections {
             effect: SHADOW;
             scale: 1;
             description { state: "default" 0.0;
+               fixed: 0 1;
                color: FONT_COLOR;
                color3: 0 0 0 255;
                rel1 {
@@ -939,6 +941,7 @@ collections {
             effect: SHADOW;
             scale: 1;
             description { state: "default" 0.0;
+               fixed: 0 1;
                color: FONT_COLOR;
                color3: 0 0 0 255;
                rel1 {
@@ -1072,6 +1075,7 @@ collections {
          part { name: "fileman.list1.cur.bg"; type: IMAGE;
             clip_to: "fileman.clip";
             description { state: "default" 0.0;
+               fixed: 0 1;
                image {
                   normal: "frame_box.png";
                   border: 3 3 3 3;
@@ -1141,6 +1145,7 @@ collections {
          part { name: "fileman.list2.cur.bg"; type: IMAGE;
             clip_to: "fileman.clip";
             description { state: "default" 0.0;
+               fixed: 0 1;
                image {
                   normal: "frame_box.png";
                   border: 3 3 3 3;

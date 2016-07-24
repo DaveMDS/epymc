@@ -533,6 +533,8 @@ class EmcPlayerBase(object):
       self._emotion.play = True
       self._emotion.audio_volume = volume_get() / 100.0
       self._emotion.audio_mute = volume_mute_get()
+      self._emotion.spu_mute = True
+      self._emotion.spu_channel = -1
 
    @property
    def seekable(self):
@@ -1147,19 +1149,30 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
    def _subs_menu_build(self, btn):
       menu = EmcMenu(relto=btn, close_on=('UP',))
 
+      # no subs for online videos
       if not self.url.startswith('file://'):
-         # no subs for online videos
          it = menu.item_add(None, _('No subtitles'))
          it.disabled = True
          return
 
+      # delay item
       menu.item_add(None, _('Delay: %d ms') % self._subtitles.delay,
                     None, self._subs_menu_delay_cb)
       menu.item_separator_add()
 
-      menu.item_add(None, _('No subtitles'),
-                    None if self._subtitles.current_file else 'item_sel',
-                    self._subs_menu_track_cb, None)
+      # no subs item
+      nos_it = menu.item_add(None, _('No subtitles'), None,
+                             self._subs_menu_track_cb, None)
+
+      # embedded subs
+      spu_cnt = self._emotion.spu_channel_count()
+      current = -1 if self._emotion.spu_mute else self._emotion.spu_channel
+      for n in range(spu_cnt):
+         name = self._emotion.spu_channel_name_get(n) or _('Subtitle #%d') % (n + 1)
+         icon = 'item_sel' if n == current else None
+         menu.item_add(None, name, icon, self._subs_menu_track_cb, n)
+
+      # external subs
       for sub in self._subtitles.search_subs():
          if sub.startswith(utils.user_conf_dir):
             name = os.path.basename(sub)[33:]
@@ -1169,6 +1182,11 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
                        'item_sel' if sub == self._subtitles.current_file else None,
                        self._subs_menu_track_cb, sub)
 
+      # no subs item
+      if current < 0 and self._subtitles.current_file is None:
+         nos_it.icon_name = 'item_sel'
+
+      # download item
       menu.item_separator_add()
       menu.item_add(None, _('Download subtitles'), None, self._subs_menu_download_cb)
 
@@ -1184,8 +1202,16 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       self.subs_delay_apply(offset)
       dia.text_set(_('Delay: %d ms') % self._subtitles.delay)
 
-   def _subs_menu_track_cb(self, menu, item, sub_file):
-      self._subtitles.file_set(sub_file)
+   def _subs_menu_track_cb(self, menu, item, sub):
+      if sub is None: # disable all subs
+         self._subtitles.file_set(None)
+         self._emotion.spu_mute = True
+         self._emotion.spu_channel = -1
+      elif isinstance(sub, int): # embedded sub (track count)
+         self._emotion.spu_channel = sub
+         self._emotion.spu_mute = False
+      else: # external file
+         self._subtitles.file_set(sub)
 
    def _subs_menu_download_cb(self, menu, item):
       Opensubtitles(self.url, self._subs_download_done)

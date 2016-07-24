@@ -45,6 +45,7 @@ New features:
  * Support remote urls also in the mediaplayer cover image
  * Show current folders in the file-manager
  * Option to hide the mouse cursor when not needed (not move or video playing)
+ * Support for subtitles embedded in the video files
 
 
 ===============================================================================

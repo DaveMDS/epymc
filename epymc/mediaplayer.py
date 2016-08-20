@@ -375,11 +375,8 @@ def stop(emit_playback_finished=False):
 
    DBG('Stop()')
 
-   if emit_playback_finished:
-      events.event_emit('PLAYBACK_FINISHED')
-
+   # update play counts (only for videos)
    if isinstance(_player, EmcVideoPlayer):
-      # update play counts
       counts = play_counts_get(_onair_url)
       if _player.position >= _player.play_length - 5 or _player.position == 0.0: # vlc set the pos at zero when finished :/
          counts['finished'] += 1
@@ -387,6 +384,10 @@ def stop(emit_playback_finished=False):
       else:
          counts['stop_at'] = _player.position
       _play_db.set_data(_onair_url, counts)
+
+   # notify
+   if emit_playback_finished:
+      events.event_emit('PLAYBACK_FINISHED')
 
    # delete the player
    if _player:

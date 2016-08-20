@@ -1021,14 +1021,6 @@ class EmcImage(Image):
             self.file_set(theme_file, 'emc/image/error')
          return
 
-      # a local path ?
-      if os.path.exists(url):
-         self.file_set(url)
-         if self.animated_available:
-            self.animated = True
-            self.animated_play = True
-         return
-      
       # an icon from the theme ?
       if url.startswith(('icon/', 'image/')):
          self.file_set(theme_file, url)
@@ -1059,6 +1051,14 @@ class EmcImage(Image):
             obj.part_swallow('emc.icon', self._icon_obj)
          if label2:
             obj.part_text_set('emc.text2', label2)
+         return
+
+      # a local path ?
+      if os.path.exists(url):
+         self.file_set(url)
+         if self.animated_available:
+            self.animated = True
+            self.animated_play = True
          return
 
    def cache_path_get(self, url):

@@ -477,26 +477,7 @@ class MoviesModule(EmcModule):
                   _('Country'), e['countries'],
                   _('Rating'), e['rating'],
                   _('Overview'), e['overview'])
-                  
-                  
-                  
-                  
-                
-         # info = _('<hilight>Director: </hilight> %(director)s <br>' \
-                  # 
-                  # '<hilight>Released: </hilight> %(release_date)s <br>' \
-                  # '<hilight>Country: </hilight> %(country)s <br>' \
-                  # 
-                  # '<br><hilight>Overview:</hilight> %(overview)s') % \
-                     # {
-                        # 'director': e['director'],
-                        # 'casts':  self._get_cast(e),
-                        # 'release_date': e['release_date'],
-                        # 'country': e['countries'],
-                        # 'rating': e['rating'],
-                        # 'overview': e['overview'],
-                     # }
-                      
+
          # self._dialog.text_set("test2: κόσμε END") # should see the Greek word 'kosme')
          self._dialog.text_set(info.replace('&', '&amp;'))
 

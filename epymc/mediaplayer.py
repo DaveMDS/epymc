@@ -597,12 +597,12 @@ class EmcPlayerBase(object):
    def pause_toggle(self):
       self.unpause() if self.paused else self.pause()
 
-   # emotion obj callbacks
+   ### emotion obj callbacks (implemented in subclasses)
    def _playback_started_cb(self, vid):
-      events.event_emit('PLAYBACK_STARTED')
+      pass
 
    def _playback_finished_cb(self, vid):
-      events.event_emit('PLAYBACK_FINISHED')
+      pass
 
    ### events
    def _base_input_events_cb(self, event):
@@ -812,6 +812,15 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       playlist.shuffle = not playlist.shuffle
       ini.set('mediaplayer', 'playlist_shuffle', playlist.shuffle)
 
+   ### emotion obj callbacks
+   def _playback_started_cb(self, vid):
+      events.event_emit('PLAYBACK_STARTED')
+      self._info_update()
+
+   def _playback_finished_cb(self, vid):
+      events.event_emit('PLAYBACK_FINISHED')
+      playlist.play_next()
+
    ### input events
    def _input_events_cb(self, event):
       if event == 'OK':
@@ -834,13 +843,7 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
 
    ### generic events
    def _events_cb(self, event):
-      if event == 'PLAYBACK_STARTED':
-         self._info_update()
-
-      elif event == 'PLAYBACK_FINISHED':
-         playlist.play_next()
-
-      elif event == 'PLAYBACK_PAUSED':
+      if event == 'PLAYBACK_PAUSED':
          self.name_find('PlayPauseBtn').icon_set('icon/play')
 
       elif event == 'PLAYBACK_UNPAUSED':
@@ -1220,6 +1223,13 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
    def _subs_download_done(self, dest_file):
       self._subtitles.file_set(dest_file)
 
+   ### emotion obj callbacks
+   def _playback_started_cb(self, vid):
+      events.event_emit('PLAYBACK_STARTED')
+
+   def _playback_finished_cb(self, vid):
+      stop(True)
+
    ### input events
    def _input_events_cb(self, event):
 
@@ -1275,10 +1285,7 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
 
    ### generic events
    def _events_cb(self, event):
-      if event == 'PLAYBACK_FINISHED':
-         stop()
-         return
-      elif event == 'PLAYBACK_PAUSED':
+      if event == 'PLAYBACK_PAUSED':
          self._play_pause_btn.icon_set('icon/play')
          self.signal_emit('minipos,pause,set', 'emc')
       elif event == 'PLAYBACK_UNPAUSED':

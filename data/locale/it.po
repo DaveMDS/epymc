@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-08-21 17:46+0200\n"
-"PO-Revision-Date: 2016-01-06 17:33+0100\n"
+"PO-Revision-Date: 2016-08-21 18:12+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.10\n"
+"X-Generator: Poedit 1.8.7.1\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: epymc/mainmenu.py:45 epymc/gui.py:296
@@ -28,7 +28,7 @@ msgstr "Indietro"
 
 #: epymc/browser.py:334
 msgid "View restriction"
-msgstr ""
+msgstr "Vista sconsigliata"
 
 #: epymc/browser.py:335
 msgid ""
@@ -36,6 +36,9 @@ msgid ""
 "<br><br><small><info>NOTE: You can ovveride this restriction in the "
 "<i>Configuration → Views</i> section.</info></small>"
 msgstr ""
+"<br><br>La vista richiesta è disabilitata per questa pagina."
+"<br><br><small><info>NOTA: Potete scavalcare questa restrizione nella "
+"sezione <i>Configurazione → Viste</i>.</info></small>"
 
 #: epymc/browser.py:577 epymc/browser.py:814
 #, python-format
@@ -70,7 +73,7 @@ msgstr "Temi"
 
 #: epymc/config_gui.py:325 epymc/config_gui.py:544
 msgid "Views"
-msgstr ""
+msgstr "Viste"
 
 #: epymc/config_gui.py:326 epymc/config_gui.py:627 epymc/mediaplayer.py:927
 #: epymc/mediaplayer.py:1040 epymc/subtitles.py:176
@@ -87,7 +90,7 @@ msgstr "Avvia a schermo intero"
 
 #: epymc/config_gui.py:415
 msgid "Hide mouse cursor when not needed"
-msgstr ""
+msgstr "Nascondi il puntatore del mouse"
 
 #: epymc/config_gui.py:417
 msgid "Ask"
@@ -111,7 +114,7 @@ msgstr "Fattore di scala"
 
 #: epymc/config_gui.py:424 epymc/config_gui.py:509
 msgid "Virtual keyboard layouts"
-msgstr ""
+msgstr "Layout tastiera virtuale"
 
 #: epymc/config_gui.py:427
 msgid "Download folder"
@@ -123,15 +126,15 @@ msgstr "Download simultanei"
 
 #: epymc/config_gui.py:431
 msgid "Time format"
-msgstr ""
+msgstr "Formato ora"
 
 #: epymc/config_gui.py:432
 msgid "Date format"
-msgstr ""
+msgstr "Formato data"
 
 #: epymc/config_gui.py:444
 msgid "Use hardware acceleration"
-msgstr ""
+msgstr "Usa accelerazione hardware"
 
 #: epymc/config_gui.py:449
 msgid "Multimedia engine"
@@ -143,11 +146,11 @@ msgstr "Frame al secondo"
 
 #: epymc/config_gui.py:455 epymc/config_gui.py:477 epymc/config_gui.py:483
 msgid "Clear thumbnails cache"
-msgstr ""
+msgstr "Svuota la cache delle miniature"
 
 #: epymc/config_gui.py:457 epymc/config_gui.py:496 epymc/config_gui.py:502
 msgid "Clear online images cache"
-msgstr ""
+msgstr "Svuota la cache delle immagini remote"
 
 #: epymc/config_gui.py:461
 msgid "Restart needed"
@@ -160,7 +163,7 @@ msgstr ""
 
 #: epymc/config_gui.py:484 epymc/config_gui.py:503
 msgid "Operation in progress, please wait..."
-msgstr ""
+msgstr "Operazione in corso, attendere prego..."
 
 #: epymc/config_gui.py:511 epymc/gui.py:2196
 #: epymc/plugins/filemanager/filemanager.py:292 epymc/plugins/mame/mame.py:545
@@ -177,15 +180,15 @@ msgstr "Mostra indietro nelle liste"
 
 #: epymc/config_gui.py:550
 msgid "Poster grid items size"
-msgstr ""
+msgstr "Dimensione elementi della vista Poster"
 
 #: epymc/config_gui.py:553
 msgid "Cover grid items size"
-msgstr ""
+msgstr "Dimensione elementi della vista Cover"
 
 #: epymc/config_gui.py:556
 msgid "Ignore views restrictions for pages"
-msgstr ""
+msgstr "Ignora restrizioni sulle viste delle pagine"
 
 #: epymc/config_gui.py:576 epymc/plugins/onlinevideo/onlinevideo.py:90
 msgid "Author"
@@ -353,7 +356,7 @@ msgstr "Non posso avviare il motore di emotion:<br>%s"
 #: epymc/mediaplayer.py:762 epymc/plugins/music/music.py:170
 #: epymc/plugins/music/music.py:183
 msgid "by"
-msgstr ""
+msgstr "di"
 
 #: epymc/mediaplayer.py:921
 msgid "Audio"
@@ -385,7 +388,7 @@ msgstr "Traccia audio #%d"
 
 #: epymc/mediaplayer.py:1113
 msgid "Unmute"
-msgstr ""
+msgstr "Acceso"
 
 #: epymc/mediaplayer.py:1116
 msgid "Mute"
@@ -412,7 +415,7 @@ msgstr "Nessun sottotitolo"
 #: epymc/mediaplayer.py:1175
 #, python-format
 msgid "Subtitle #%d"
-msgstr ""
+msgstr "Sottotitolo #%d"
 
 #: epymc/mediaplayer.py:1195
 msgid "Download subtitles"
@@ -470,31 +473,31 @@ msgstr "Decodifica fallita"
 
 #: epymc/gui.py:69
 msgid "English QWERTY"
-msgstr ""
+msgstr "Inglese QWERTY"
 
 #: epymc/gui.py:70
 msgid "English ABC"
-msgstr ""
+msgstr "Inglese ABC"
 
 #: epymc/gui.py:71
 msgid "Italian QWERTY"
-msgstr ""
+msgstr "Italiano QWERTY"
 
 #: epymc/gui.py:72
 msgid "Italian ABC"
-msgstr ""
+msgstr "Italiano ABC"
 
 #: epymc/gui.py:73
 msgid "Russian QWERTY"
-msgstr ""
+msgstr "Russo QWERTY"
 
 #: epymc/gui.py:74
 msgid "Russian ABC"
-msgstr ""
+msgstr "Russo ABC"
 
 #: epymc/gui.py:75
 msgid "Symbols"
-msgstr ""
+msgstr "Simboli"
 
 #: epymc/gui.py:144
 msgid "Emotion Media Center"
@@ -515,7 +518,7 @@ msgstr "Sì"
 #: epymc/gui.py:1566
 #, python-brace-format
 msgid "Image {0} of {1}"
-msgstr ""
+msgstr "Immagine {0} di {1}"
 
 #: epymc/gui.py:1641
 msgid "Source Selector"
@@ -637,24 +640,24 @@ msgstr "Il file %s è già in coda"
 #: epymc/gui.py:2185 epymc/gui.py:2194
 #: epymc/plugins/onlinevideo/onlinevideo.py:121
 msgid "Download manager"
-msgstr ""
+msgstr "Gestore download"
 
 #: epymc/gui.py:2197
 msgid "Start"
-msgstr ""
+msgstr "Avvia"
 
 #: epymc/gui.py:2198
 msgid "Clear completed"
-msgstr ""
+msgstr "Pulisci completati"
 
 #: epymc/gui.py:2225
 #, python-format, python-brace-format
 msgid "{0}% of {1}"
-msgstr ""
+msgstr "{0}% di {1}"
 
 #: epymc/gui.py:2227
 msgid "Unknown size"
-msgstr ""
+msgstr "Dimensione sconosciuta"
 
 #: epymc/gui.py:2230 epymc/plugins/music/music.py:538
 msgid "queued"
@@ -662,23 +665,23 @@ msgstr "accodato"
 
 #: epymc/gui.py:2232
 msgid "running"
-msgstr ""
+msgstr "in corso"
 
 #: epymc/gui.py:2234
 msgid "completed"
-msgstr ""
+msgstr "completato"
 
 #: epymc/gui.py:2236
 msgid "paused"
-msgstr ""
+msgstr "in pausa"
 
 #: epymc/gui.py:2254
 msgid "Are you sure you want to abort the download of the file?"
-msgstr ""
+msgstr "Siete sicuri di voler annullare lo scaricamento del file?"
 
 #: epymc/gui.py:2255
 msgid "Delete download"
-msgstr ""
+msgstr "Annulla scaricamento"
 
 #: epymc/plugins/input_joy/joy.py:45
 msgid "Input - Joystick"
@@ -771,11 +774,11 @@ msgstr "Suona tutte le canzoni"
 
 #: epymc/plugins/music/music.py:143
 msgid "Queue all the songs"
-msgstr ""
+msgstr "Accoda tutte le canzoni"
 
 #: epymc/plugins/music/music.py:173
 msgid "from"
-msgstr ""
+msgstr "di"
 
 #: epymc/plugins/music/music.py:202
 #, python-format
@@ -840,7 +843,7 @@ msgstr "Naviga, guarda e scarica filmati dai vostri siti online preferiti."
 #: epymc/plugins/onlinevideo/onlinevideo.py:159
 #: epymc/plugins/onlinevideo/onlinevideo.py:417
 msgid "Video Channels"
-msgstr ""
+msgstr "Canali Video"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:206
 msgid "Channels"
@@ -848,23 +851,23 @@ msgstr "Canali"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:228
 msgid "Checking for updates"
-msgstr ""
+msgstr "Controllo aggiornamenti"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:237
 msgid "Local version"
-msgstr ""
+msgstr "Versione locale"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:246
 msgid "Upstream version"
-msgstr ""
+msgstr "Versione disponibile"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:254
 msgid "Already updated"
-msgstr ""
+msgstr "Già aggiornato"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:259
 msgid "Failed to fetch upstream version"
-msgstr ""
+msgstr "Fallito controllo versione disponibile"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:263
 #, python-brace-format
@@ -872,6 +875,8 @@ msgid ""
 "Updating <b>youtube-dl</b> at version <b>{0}</b><br><br>For info and credits "
 "please visit:<br>rg3.github.io/youtube-dl/"
 msgstr ""
+"Aggiornamento di <b>youtube-dl</b> alla versione <b>{0}</b><br><br>Per info "
+"e crediti visitate:<br>rg3.github.io/youtube-dl/"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:266
 #: epymc/plugins/onlinevideo/onlinevideo.py:328
@@ -881,7 +886,7 @@ msgstr "Attendere"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:281
 msgid "Update completed"
-msgstr ""
+msgstr "Aggiornamento completato"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:320
 msgid "Search query"
@@ -911,11 +916,11 @@ msgstr "Consigliati"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:422
 msgid "Automatically keep youtube-dl updated"
-msgstr ""
+msgstr "Mantieni youtube-dl sempre aggiornato"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:423
 msgid "Check for youtube-dl update now"
-msgstr ""
+msgstr "Controlla aggiornamenti per youtube-dl"
 
 #: epymc/plugins/onlinevideo/zapiks/zapiks.py:87
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:83
@@ -1066,27 +1071,27 @@ msgstr "Prima messa in onda"
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:69
 #, python-brace-format
 msgid "Load more results (page {0} of {1})"
-msgstr ""
+msgstr "Carica altri risultati (pagina {0} di {1})"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:77
 msgid "Search movies"
-msgstr ""
+msgstr "Cerca film"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:78
 msgid "Popular movies"
-msgstr ""
+msgstr "Film popolari"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:79
 msgid "Top rated movies"
-msgstr ""
+msgstr "Film più votati"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:80
 msgid "Upcoming movies"
-msgstr ""
+msgstr "Film in arrivo"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:81
 msgid "Now playing movies"
-msgstr ""
+msgstr "Film in sala"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:159
 #: epymc/plugins/movies/movies.py:203 epymc/plugins/movies/movies.py:474
@@ -1103,7 +1108,7 @@ msgstr "Attori"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:161
 msgid "Original title"
-msgstr ""
+msgstr "Titolo originale"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:162
 #: epymc/plugins/tvshows/tvshows.py:467
@@ -1118,7 +1123,7 @@ msgstr "Valutazione"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:163
 msgid "votes"
-msgstr ""
+msgstr "voti"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:164
 #: epymc/plugins/movies/movies.py:476
@@ -1127,19 +1132,19 @@ msgstr "Pubblicato"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:180
 msgid "Language"
-msgstr ""
+msgstr "Lingua"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:181
 msgid "Source"
-msgstr ""
+msgstr "Sorgente"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:182
 msgid "Quality"
-msgstr ""
+msgstr "Qualità"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:186
 msgid "No trailers available"
-msgstr ""
+msgstr "Nessun trailer disponibile"
 
 #: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:201
 #: epymc/plugins/movies/movies.py:518 epymc/plugins/tvshows/tvshows.py:539
@@ -1481,7 +1486,7 @@ msgstr "Premi un tasto sulla tastiera"
 
 #: epymc/plugins/watchdog/watchdog.py:36
 msgid "Watchdog"
-msgstr ""
+msgstr "Watchdog"
 
 #: epymc/plugins/watchdog/watchdog.py:38
 msgid ""
@@ -1489,40 +1494,43 @@ msgid ""
 "crash/hang. So you dont have to leave your couch in case of problems...just "
 "wait 30 seconds and the module will restart epymc for you."
 msgstr ""
+"Questo modulo, se abilitato, farà ripartire epymc nei rari casi di crash. "
+"Così non dovrete alzarvi dal divano in caso di problemi...aspettate al "
+"massimo 30 secondi e questo modulo rilancierà epymc per voi."
 
 #: epymc/plugins/photos/photos.py:115
 msgid "Dimensions"
-msgstr ""
+msgstr "Dimensioni"
 
 #: epymc/plugins/photos/photos.py:116
 msgid "Format"
-msgstr ""
+msgstr "Formato"
 
 #: epymc/plugins/photos/photos.py:133
 msgid "Please install PIL to read image metadata."
-msgstr ""
+msgstr "Dovete installare PIL per leggere i metadati."
 
 #: epymc/plugins/photos/photos.py:147 epymc/plugins/photos/photos.py:168
 #: epymc/plugins/photos/photos.py:171 epymc/plugins/photos/photos.py:175
 #: epymc/plugins/photos/photos.py:198 epymc/plugins/photos/photos.py:229
 msgid "Photos"
-msgstr ""
+msgstr "Foto"
 
 #: epymc/plugins/photos/photos.py:149
 msgid "A module to watch your photos."
-msgstr ""
+msgstr "Un modulo per guardare le foto."
 
 #: epymc/plugins/photos/photos.py:233
 msgid "Show slideshow controls on start"
-msgstr ""
+msgstr "Mostra controlli all'avvio"
 
 #: epymc/plugins/photos/photos.py:235
 msgid "Slideshow delay"
-msgstr ""
+msgstr "Tempo tra le foto"
 
 #: epymc/plugins/photos/photos.py:236
 msgid "seconds"
-msgstr ""
+msgstr "secondi"
 
 #: epymc/plugins/calibrator/calibrator.py:50
 #: epymc/plugins/calibrator/calibrator.py:56

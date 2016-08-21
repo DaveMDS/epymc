@@ -588,9 +588,9 @@ class EmcUrl(ecore_con.Url):
       self.get()
 
    def _complete_cb(self, event):
-      data = ''.join(self.received_data)
+      data = b''.join(self.received_data).decode('utf8')
       self.done_cb(event.url, event.status, data, **self.kargs)
       self.delete()
 
    def _data_cb(self, event):
-      self.received_data.append(event.data.decode('utf8'))
+      self.received_data.append(event.data)

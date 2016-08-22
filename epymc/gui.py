@@ -72,6 +72,8 @@ keyboard_layouts = {
    'it_abc':    [_('Italian ABC'),    'aàbcdeèfghiì', 'jklmnoòpqr()',   'stuùvwxyz.,@'],
    'ru_qwerty': [_('Russian QWERTY'), 'йцукенгшщзхъ', 'фывапролджэ@',   'ячсмитьбюё,.'],
    'ru_abc':    [_('Russian ABC'),    'абвгдеёжзийк', 'лмнопрстуфх@',   'цчшщьыъэюя,.'],
+   'fi_qwerty': [_('Finnish QWERTY'), 'qwertyuiopå@', 'asdfghjklöä+',   'zxcvbnm,.-()'],
+   'fi_abc':    [_('Finnish ABC'),    'abcdefghijkl', 'mnopqrstuvw@',   'xyzåäö,.-+()'],
    'symbols':   [_('Symbols'),        '.,:;?!@#$%&^', '+-*/=~°_\'"\\|', '<>()[]{}'    ],
 } # MOST IMPORTANT SYMBOLS ARE:  . , @ ( )
 

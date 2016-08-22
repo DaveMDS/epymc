@@ -159,6 +159,8 @@ def init():
    win.resize_object_add(layout)
    layout.show()
 
+   layout.part_text_set('mainmenu.title', _('Emotion Media Center'))
+
    # clock update timer
    _clock_update_timer = ecore.Timer(1.0, clock_update)
 

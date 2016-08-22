@@ -42,6 +42,7 @@ def DBG(msg):
 
 _queue = None
 _queue_timer = None
+_instances = []
 
 class EmcDatabase(object):
    """ TODO doc this """
@@ -83,8 +84,11 @@ class EmcDatabase(object):
          self._sh[self._vkey] = version
 
       self._sync_timer = ecore.Timer(10.0, self._sync_timer_cb)
+      _instances.append(self)
 
-   def __del__(self):
+   def _close(self):
+      DBG('Closing database %s' % self._name)
+      self._sync_timer.delete()
       self._sh.close()
       self._sync_timer.delete()
 
@@ -105,7 +109,6 @@ class EmcDatabase(object):
          self._sh[key] = data
          self._sync_timer.reset()
          self._outstanding_writes = True
-         #self._sh.sync() # TODO really sync at every write ??
 
    def del_data(self, key):
       if key in self._sh:
@@ -148,6 +151,9 @@ def shutdown():
 
    _queue_timer.delete()
    del _queue
+
+   for db in _instances:
+      db._close()
 
 def _process_queue():
    global _queue

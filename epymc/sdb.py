@@ -90,7 +90,6 @@ class EmcDatabase(object):
       DBG('Closing database %s' % self._name)
       self._sync_timer.delete()
       self._sh.close()
-      self._sync_timer.delete()
 
    def __len__(self):
       return len(self._sh)

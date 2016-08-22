@@ -50,6 +50,7 @@ class EmcDatabase(object):
       self._name = name
       self._vers = version
       self._vkey = '__database__version__'
+      self._outstanding_writes = False
 
       # build the db name (different db for py2 and py3)
       dbname = os.path.join(utils.user_conf_dir,
@@ -81,6 +82,8 @@ class EmcDatabase(object):
          # store the version inside the db
          self._sh[self._vkey] = version
 
+      self._sync_timer = ecore.Timer(10.0, self._sync_timer_cb)
+
    def __del__(self):
       self._sh.close()
 
@@ -99,7 +102,9 @@ class EmcDatabase(object):
       else:
          # update the db now
          self._sh[key] = data
-         self._sh.sync() # TODO really sync at every write ??
+         self._sync_timer.reset()
+         self._outstanding_writes = True
+         #self._sh.sync() # TODO really sync at every write ??
 
    def del_data(self, key):
       if key in self._sh:
@@ -117,6 +122,14 @@ class EmcDatabase(object):
    def get_version(self):
       if self._vkey in self._sh:
          return self._sh[self._vkey]
+
+   def _sync_timer_cb(self):
+      if self._outstanding_writes:
+         DBG("Syncing database %s" % self._name)
+         self._sh.sync()
+         self._outstanding_writes = False
+
+      return True
 
 ##################
 
@@ -148,6 +161,8 @@ def _process_queue():
       count -= 1
       (db, key, data) = _queue.get_nowait()
       db._sh[key] = data
-      db._sh.sync() # TODO really sync at every write ??
+      db._sync_timer.reset()
+      db._outstanding_writes = True
+      #db._sh.sync() # TODO really sync at every write ??
 
    return True

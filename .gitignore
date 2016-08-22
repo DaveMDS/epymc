@@ -1,11 +1,9 @@
+__pycache__
+*.pyc
 build/
+epymc/locale/*
 epymc/themes/*.edj
-epymc/locale/it
-epymc/locale/ru
-epymc/locale/de
 data/locale/*.po~
-epymc/__pycache__/
-epymc/__init__.pyc
 installed_files*
 
 ## below files are created by makepkg

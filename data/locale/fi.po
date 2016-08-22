@@ -1,0 +1,1863 @@
+# Finnish translations for EpyMC.
+# Copyright (C) 2016 Davide Andreoli <dave@gurumeditation.it>
+# This file is distributed under the same license as the EpyMC package.
+# Kai Huuhko <kai.huuhko@gmail.com>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: epymc 1.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-08-21 17:46+0200\n"
+"PO-Revision-Date: 2016-08-22 06:02+0300\n"
+"Last-Translator: Kai Huuhko <kai.huuhko@gmail.com>\n"
+"Language-Team: Finnish <fi@li.org>\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: epymc/mainmenu.py:45 epymc/gui.py:296
+msgid "Exit"
+msgstr "Poistu"
+
+#: epymc/browser.py:164
+msgid "Back"
+msgstr "Takaisin"
+
+#: epymc/browser.py:334
+msgid "View restriction"
+msgstr "Näkymä rajoitettu"
+
+#: epymc/browser.py:335
+msgid ""
+"<br><br>The requested view is not enabled for the current page."
+"<br><br><small><info>NOTE: You can ovveride this restriction in the "
+"<i>Configuration → Views</i> section.</info></small>"
+msgstr ""
+"<br><br>Pyydetty näkymä ei ole käytössä nykyiselle sivulle."
+"<br><br><small><info>Huomaa: Voit ohittaa tämän rajoituksen"
+"<i>Asetukset → Näkymät</i> -osiossa.</info></small>"
+
+#: epymc/browser.py:577 epymc/browser.py:814
+#, python-format
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] "%d kohde"
+msgstr[1] "%d kohdetta"
+
+#: epymc/config_gui.py:284 epymc/gui.py:1216
+msgid "Ok"
+msgstr "Ok"
+
+#: epymc/config_gui.py:287 epymc/gui.py:293 epymc/gui.py:2199
+msgid "Cancel"
+msgstr "Peruuta"
+
+#: epymc/config_gui.py:317 epymc/config_gui.py:320 epymc/config_gui.py:400
+msgid "Configuration"
+msgstr "Asetukset"
+
+#: epymc/config_gui.py:322 epymc/config_gui.py:411
+msgid "General"
+msgstr "Yleiset"
+
+#: epymc/config_gui.py:323 epymc/config_gui.py:614
+msgid "Modules"
+msgstr "Moduulit"
+
+#: epymc/config_gui.py:324
+msgid "Themes"
+msgstr "Teemat"
+
+#: epymc/config_gui.py:325 epymc/config_gui.py:544
+msgid "Views"
+msgstr "Näkymät"
+
+#: epymc/config_gui.py:326 epymc/config_gui.py:627 epymc/mediaplayer.py:927
+#: epymc/mediaplayer.py:1040 epymc/subtitles.py:176
+msgid "Subtitles"
+msgstr "Tekstitykset"
+
+#: epymc/config_gui.py:327 epymc/config_gui.py:676
+msgid "System info"
+msgstr "Järjestelmätiedot"
+
+#: epymc/config_gui.py:414
+msgid "Start in fullscreen"
+msgstr "Käynnistä täysruututilassa"
+
+#: epymc/config_gui.py:415
+msgid "Hide mouse cursor when not needed"
+msgstr "Piilota hiirikursori käyttämättömänä"
+
+#: epymc/config_gui.py:417
+msgid "Ask"
+msgstr "Kysy"
+
+#: epymc/config_gui.py:417
+msgid "Always"
+msgstr "Aina"
+
+#: epymc/config_gui.py:417
+msgid "Never"
+msgstr "Ei koskaan"
+
+#: epymc/config_gui.py:419 epymc/mediaplayer.py:316
+msgid "Resume playback"
+msgstr "Palauta toisto"
+
+#: epymc/config_gui.py:421
+msgid "Interface scale"
+msgstr "Käyttöliittymän skaalaus"
+
+#: epymc/config_gui.py:424 epymc/config_gui.py:509
+msgid "Virtual keyboard layouts"
+msgstr "Virtuaalisen näppäimistön asettelut"
+
+#: epymc/config_gui.py:427
+msgid "Download folder"
+msgstr "Latauskansio"
+
+#: epymc/config_gui.py:429
+msgid "Max concurrent download"
+msgstr "Maks. yhtäaikaiset lataukset"
+
+#: epymc/config_gui.py:431
+msgid "Time format"
+msgstr "Aikaformaatti"
+
+#: epymc/config_gui.py:432
+msgid "Date format"
+msgstr "Päiväysformaatti"
+
+#: epymc/config_gui.py:444
+msgid "Use hardware acceleration"
+msgstr "Käytä laitteistokiihdytystä"
+
+#: epymc/config_gui.py:449
+msgid "Multimedia engine"
+msgstr "Multimedia-moottori"
+
+#: epymc/config_gui.py:452
+msgid "Frames per second"
+msgstr "Kuvapäivitysten taajuus"
+
+#: epymc/config_gui.py:455 epymc/config_gui.py:477 epymc/config_gui.py:483
+msgid "Clear thumbnails cache"
+msgstr "Tyhjennä esikatselukuvien välimuisti"
+
+#: epymc/config_gui.py:457 epymc/config_gui.py:496 epymc/config_gui.py:502
+msgid "Clear online images cache"
+msgstr "Tyhjennä verkkokuvien välimuisti"
+
+#: epymc/config_gui.py:461
+msgid "Restart needed"
+msgstr "Tarvitaan uudelleenkäynnistys"
+
+#: epymc/config_gui.py:462
+msgid "You need to restart the program to apply the new configuration."
+msgstr "Käynnistä ohjelma uudelleen jotta asetukset tulevat voimaan"
+
+#: epymc/config_gui.py:484 epymc/config_gui.py:503
+msgid "Operation in progress, please wait..."
+msgstr "Toiminto käynnissä, odota hetki..."
+
+#: epymc/config_gui.py:511 epymc/gui.py:2196
+#: epymc/plugins/filemanager/filemanager.py:292 epymc/plugins/mame/mame.py:545
+msgid "Close"
+msgstr "Sulje"
+
+#: epymc/config_gui.py:513 epymc/gui.py:1646
+msgid "Select"
+msgstr "Valitse"
+
+#: epymc/config_gui.py:548
+msgid "Show Back item in lists"
+msgstr "Näytä listoissa \"Takaisin\"-kohde"
+
+#: epymc/config_gui.py:550
+msgid "Poster grid items size"
+msgstr "Julisteruudukon kohdekoko"
+
+#: epymc/config_gui.py:553
+msgid "Cover grid items size"
+msgstr "Kansiruudukon kohdekoko"
+
+#: epymc/config_gui.py:556
+msgid "Ignore views restrictions for pages"
+msgstr "Jätä huomiotta näkymärajoitukset sivuille"
+
+#: epymc/config_gui.py:576 epymc/plugins/onlinevideo/onlinevideo.py:90
+msgid "Author"
+msgstr "Tekijä"
+
+#: epymc/config_gui.py:577 epymc/plugins/onlinevideo/onlinevideo.py:89
+msgid "Version"
+msgstr "Versio"
+
+#: epymc/config_gui.py:630
+msgid "Subtitles preferred languages"
+msgstr "Ensisijaiset tekstityskielet"
+
+#: epymc/config_gui.py:631
+msgid "Subtitles encoding"
+msgstr "Tekstitysten koodaus"
+
+#: epymc/config_gui.py:632
+msgid "Always try UTF-8 first"
+msgstr "Koita aina ensin UTF-8:aa"
+
+#: epymc/config_gui.py:633
+msgid "Opensubtitles.org Username"
+msgstr "Opensubtitles.org käyttäjänimi"
+
+#: epymc/config_gui.py:634
+msgid "Opensubtitles.org Password"
+msgstr "Opensubtitles.org salasana"
+
+#: epymc/config_gui.py:645 epymc/subtitles.py:385 epymc/utils.py:519
+#: epymc/gui.py:201 epymc/gui.py:203 epymc/gui.py:204
+#: epymc/plugins/onlinevideo/onlinevideo.py:234
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:152
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:129
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:144
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:149
+#: epymc/plugins/movies/movies.py:213
+msgid "Unknown"
+msgstr "Tuntematon"
+
+#: epymc/config_gui.py:662
+msgid "Core"
+msgstr "Ydin"
+
+#: epymc/config_gui.py:663
+msgid "Download available"
+msgstr "Lataus saatavilla"
+
+#: epymc/config_gui.py:663
+msgid "yes"
+msgstr "kyllä"
+
+#: epymc/config_gui.py:663
+msgid "no"
+msgstr "ei"
+
+#: epymc/config_gui.py:664
+msgid "Theme"
+msgstr "Teema"
+
+#: epymc/config_gui.py:665
+msgid "Window size"
+msgstr "Ikkunakoko"
+
+#: epymc/config_gui.py:666
+msgid "screen"
+msgstr "näyttö"
+
+#: epymc/config_gui.py:667
+msgid "dpi"
+msgstr "dpi"
+
+#: epymc/config_gui.py:668
+msgid "Paths"
+msgstr "Polut"
+
+#: epymc/config_gui.py:669
+msgid "Base folder"
+msgstr "Peruskansio"
+
+#: epymc/config_gui.py:670
+msgid "Config folder"
+msgstr "Asetuskansio"
+
+#: epymc/config_gui.py:671
+msgid "Versions"
+msgstr "Versiot"
+
+#: epymc/config_gui.py:672
+msgid "EpyMC"
+msgstr "EpyMC"
+
+#: epymc/config_gui.py:672
+msgid "EpyMC themes API"
+msgstr "EpyMC teema-API"
+
+#: epymc/config_gui.py:673
+msgid "Python"
+msgstr "Python"
+
+#: epymc/config_gui.py:674
+msgid "Python-EFL"
+msgstr "Python-EFL"
+
+#: epymc/sdb.py:67
+#, python-format
+msgid ""
+"<b>The database %s is outdated!</b><br><br>The old file has been renamed "
+"with a .backup extension and a new (empty) one has been created."
+"<br><br>Sorry for the incovenience."
+msgstr ""
+"<b>Tietokanta %s on vanhentunut!</b><br><br>Vanha tiedosto on nimetty uudelleen "
+".backup-päätteellä ja uusi (tyhjä) tietokanta on luotu tilalle."
+"<br><br>Pahoittelemme aiheutunutta vaivaa."
+
+#: epymc/sdb.py:68
+msgid "EpyMC Database"
+msgstr "EpyMC tietokanta"
+
+#: epymc/themoviedb.py:533
+msgid "Fetching info"
+msgstr "Haetaan tietoja"
+
+#: epymc/themoviedb.py:545
+msgid "Birthday"
+msgstr "Syntymäpäivä"
+
+#: epymc/themoviedb.py:547
+msgid "Deathday"
+msgstr "Kuolinpäivä"
+
+#: epymc/themoviedb.py:549
+msgid "Place of birth"
+msgstr "Syntymäpaikka"
+
+#: epymc/themoviedb.py:556
+#, python-format
+msgid "Movies (%s)"
+msgstr "Elokuvat (%s)"
+
+#: epymc/themoviedb.py:558
+#, python-format
+msgid "Photos (%s)"
+msgstr "Valokuvat (%s)"
+
+#: epymc/themoviedb.py:570
+#, python-format
+msgid "%(title)s as %(character)s"
+msgstr "%(title)s roolissa %(character)s"
+
+#: epymc/mediaplayer.py:275
+msgid "File not found"
+msgstr "Tiedostoa ei löytynyt"
+
+#: epymc/mediaplayer.py:317
+#, python-format
+msgid "Continue from %s ?"
+msgstr "Jatka ajasta %s ?"
+
+#: epymc/mediaplayer.py:501
+#, python-format
+msgid "Cannot init emotion engine:<br>%s"
+msgstr "Emotion-moottoria ei voitu alustaa:<br>%s"
+
+#: epymc/mediaplayer.py:762 epymc/plugins/music/music.py:170
+#: epymc/plugins/music/music.py:183
+msgid "by"
+msgstr "-"
+
+#: epymc/mediaplayer.py:921
+msgid "Audio"
+msgstr "Ääni"
+
+#: epymc/mediaplayer.py:924
+msgid "Video"
+msgstr "Kuva"
+
+#: epymc/mediaplayer.py:1041 epymc/mediaplayer.py:1163
+#: epymc/mediaplayer.py:1199 epymc/mediaplayer.py:1207
+#, python-format
+msgid "Delay: %d ms"
+msgstr "Viive: %d ms"
+
+#: epymc/mediaplayer.py:1083 epymc/plugins/uitests/uitests.py:414
+msgid "Buffering"
+msgstr "Bufferoidaan"
+
+#: epymc/mediaplayer.py:1104
+#, python-format
+msgid "Audio track: %s"
+msgstr "Ääniraita: %s"
+
+#: epymc/mediaplayer.py:1106
+#, python-format
+msgid "Audio track #%d"
+msgstr "Ääniraita nro. %d"
+
+#: epymc/mediaplayer.py:1113
+msgid "Unmute"
+msgstr "Poista mykistys"
+
+#: epymc/mediaplayer.py:1116
+msgid "Mute"
+msgstr "Mykistä"
+
+#: epymc/mediaplayer.py:1132
+#, python-format
+msgid "Video track: %s"
+msgstr "Kuvaraita: %s"
+
+#: epymc/mediaplayer.py:1134
+#, python-format
+msgid "Video track #%d"
+msgstr "Kuvaraita nro %d"
+
+#: epymc/mediaplayer.py:1140
+msgid "Download video"
+msgstr "Lataa video"
+
+#: epymc/mediaplayer.py:1158 epymc/mediaplayer.py:1168
+msgid "No subtitles"
+msgstr "Ei tekstityksiä"
+
+#: epymc/mediaplayer.py:1175
+#, python-format
+msgid "Subtitle #%d"
+msgstr "Tekstitykset nro. %d"
+
+#: epymc/mediaplayer.py:1195
+msgid "Download subtitles"
+msgstr "Lataa tekstitykset"
+
+#: epymc/mediaplayer.py:1198
+msgid "Subtitles delay"
+msgstr "Tekstitysten viive"
+
+#: epymc/mediaplayer.py:1200
+msgid "+100 ms"
+msgstr "+100 ms"
+
+#: epymc/mediaplayer.py:1201
+msgid "Reset"
+msgstr "Palauta"
+
+#: epymc/mediaplayer.py:1202
+msgid "-100 ms"
+msgstr "-100 ms"
+
+#: epymc/subtitles.py:272
+msgid "Searching subtitles"
+msgstr "Haetaan tekstityksiä"
+
+#: epymc/subtitles.py:324
+msgid "Login failed"
+msgstr "Kirjautuminen epäonnistui"
+
+#: epymc/subtitles.py:340
+msgid "Search failed"
+msgstr "Haku epäonnistui"
+
+#: epymc/subtitles.py:364
+#, python-format
+msgid "No results found for languages: %s"
+msgstr "Kielille %s ei löytynyt tuloksia"
+
+#: epymc/subtitles.py:378 epymc/plugins/mame/mame.py:427
+msgid "Download"
+msgstr "Lataa"
+
+#: epymc/subtitles.py:396
+msgid "Downloading subtitles"
+msgstr "Ladataan tekstityksiä"
+
+#: epymc/subtitles.py:410 epymc/gui.py:2046
+#: epymc/plugins/onlinevideo/onlinevideo.py:286
+msgid "Download failed"
+msgstr "Lataus epäonnistui"
+
+#: epymc/subtitles.py:429
+msgid "Decode failed"
+msgstr "Purku epäonnistui"
+
+#: epymc/gui.py:69
+msgid "English QWERTY"
+msgstr "Englanninkielinen QWERTY"
+
+#: epymc/gui.py:70
+msgid "English ABC"
+msgstr "Englanninkielinen ABC"
+
+#: epymc/gui.py:71
+msgid "Italian QWERTY"
+msgstr "Italiankielinen QWERTY"
+
+#: epymc/gui.py:72
+msgid "Italian ABC"
+msgstr "Italiankielinen ABC"
+
+#: epymc/gui.py:73
+msgid "Russian QWERTY"
+msgstr "Venäjänkielinen QWERTY"
+
+#: epymc/gui.py:74
+msgid "Russian ABC"
+msgstr "Venäjänkielinen ABC"
+
+#: epymc/gui.py:75
+msgid "Symbols"
+msgstr "Symbolit"
+
+#: epymc/gui.py:144
+msgid "Emotion Media Center"
+msgstr "Emotion-mediakeskus"
+
+#: epymc/gui.py:292
+msgid "credits"
+msgstr "lopputekstit"
+
+#: epymc/gui.py:1220 epymc/gui.py:1222
+msgid "No"
+msgstr "Ei"
+
+#: epymc/gui.py:1225 epymc/gui.py:1227
+msgid "Yes"
+msgstr "Kyllä"
+
+#: epymc/gui.py:1566
+#, python-brace-format
+msgid "Image {0} of {1}"
+msgstr "Kuva {0}/{1}"
+
+#: epymc/gui.py:1641
+msgid "Source Selector"
+msgstr "Lähteen valitsin"
+
+#: epymc/gui.py:1647
+msgid "Browse"
+msgstr "Selaa"
+
+#: epymc/gui.py:1655 epymc/plugins/filemanager/filemanager.py:104
+msgid "Parent folder"
+msgstr "Yläkansio"
+
+#: epymc/gui.py:1695
+msgid "Sources Manager"
+msgstr "Lähteiden hallinta"
+
+#: epymc/gui.py:1697
+msgid "Done"
+msgstr "Valmis"
+
+#: epymc/gui.py:1699
+msgid "Add"
+msgstr "Lisää"
+
+#: epymc/gui.py:1701
+msgid "Remove"
+msgstr "Poista"
+
+#: epymc/gui.py:1715
+msgid "Choose a new source"
+msgstr "Valitse uusi lähde"
+
+#: epymc/gui.py:1756
+msgid "Insert text"
+msgstr "Syötä tekstiä"
+
+#: epymc/gui.py:1772
+msgid "ERASE"
+msgstr "PYYHI"
+
+#: epymc/gui.py:1780
+msgid "SPACE"
+msgstr "VÄLILYÖNTI"
+
+#: epymc/gui.py:1781 epymc/gui.py:1849
+msgid "UPPERCASE"
+msgstr "ISOT KIRJAIMET"
+
+#: epymc/gui.py:1783
+msgid "Dismiss"
+msgstr "Poistu"
+
+#: epymc/gui.py:1788
+msgid "Accept"
+msgstr "Hyväksy"
+
+#: epymc/gui.py:1846
+msgid "LOWERCASE"
+msgstr "PIENET KIRJAIMET"
+
+#: epymc/gui.py:2021
+msgid "Download started"
+msgstr "Lataus käynnistyi"
+
+#: epymc/gui.py:2044
+msgid "Cannot download file"
+msgstr "Ei voida ladata tiedostoa"
+
+#: epymc/gui.py:2045
+msgid "Failure code"
+msgstr "Virhekoodi"
+
+#: epymc/gui.py:2053 epymc/plugins/mame/mame.py:588
+msgid "Download completed"
+msgstr "Lataus valmistui"
+
+#: epymc/gui.py:2105
+msgid "Download Manager"
+msgstr "Latausten hallinnointi"
+
+#: epymc/gui.py:2109
+msgid "Start download"
+msgstr "Käynnistä lataus"
+
+#: epymc/gui.py:2110 epymc/plugins/filemanager/filemanager.py:277
+#: epymc/plugins/filemanager/filemanager.py:319
+msgid "Rename"
+msgstr "Nimeä uudelleen"
+
+#: epymc/gui.py:2111
+msgid "Change folder"
+msgstr "Vaihda kansiota"
+
+#: epymc/gui.py:2116
+msgid ""
+"File will be downloaded in the folder:<br> <b>{}</b><br><br>File will be "
+"named as:<br> <b>{}</b><br><br>You can rename the file using the <i>Rename</"
+"i> button or change the destination folder from the main configuration."
+msgstr ""
+"Tiedosto ladataan kansioon:<br> <b>{}</b><br><br>Tiedostolle annetaan "
+"nimi:<br> <b>{}</b><br><br>Voit nimetä tiedoston uudelleen käyttäen "
+"<i>Nimeä uudelleen</i> nappia tai vaihtaa kohdekansion asetuksista."
+
+#: epymc/gui.py:2124
+msgid "Rename download"
+msgstr "Uudelleennimeä lataus"
+
+#: epymc/gui.py:2132
+msgid "Change destination folder"
+msgstr "Vaihda kohdekansio"
+
+#: epymc/gui.py:2146
+#, python-format
+msgid "The file %s is in the download queue yet"
+msgstr "Tiedosto %s ei vielä ole latausjonossa"
+
+#: epymc/gui.py:2185 epymc/gui.py:2194
+#: epymc/plugins/onlinevideo/onlinevideo.py:121
+msgid "Download manager"
+msgstr "Latausten hallinnointi"
+
+#: epymc/gui.py:2197
+msgid "Start"
+msgstr "Käynnistä"
+
+#: epymc/gui.py:2198
+msgid "Clear completed"
+msgstr "Tyhjennys valmistui"
+
+#: epymc/gui.py:2225
+#, python-brace-format
+msgid "{0}% of {1}"
+msgstr "{0}% koosta {1}"
+
+#: epymc/gui.py:2227
+msgid "Unknown size"
+msgstr "Koko tuntematon"
+
+#: epymc/gui.py:2230 epymc/plugins/music/music.py:538
+msgid "queued"
+msgstr "jonossa"
+
+#: epymc/gui.py:2232
+msgid "running"
+msgstr "käynnissä"
+
+#: epymc/gui.py:2234
+msgid "completed"
+msgstr "valmistunut"
+
+#: epymc/gui.py:2236
+msgid "paused"
+msgstr "keskeytetty"
+
+#: epymc/gui.py:2254
+msgid "Are you sure you want to abort the download of the file?"
+msgstr "Haluatko varmasti peruuttaa tiedoston latauksen?"
+
+#: epymc/gui.py:2255
+msgid "Delete download"
+msgstr "Poista lataus"
+
+#: epymc/plugins/input_joy/joy.py:45
+msgid "Input - Joystick"
+msgstr "Syöte - Joystick"
+
+#: epymc/plugins/input_joy/joy.py:47
+msgid ""
+"The joystick module lets you control the application using any standard "
+"digital joystick or joypad."
+msgstr ""
+"Joystick-moduulin avulla voit ohjata ohjelmaa käyttäen mitä tahansa yleistä "
+"digitaalista joystick- tai joypad-ohjainta."
+
+#: epymc/plugins/input_joy/joy.py:80 epymc/plugins/input_joy/joy.py:156
+msgid "Joystick"
+msgstr "Joystick"
+
+#: epymc/plugins/input_joy/joy.py:159
+msgid "Device"
+msgstr "Laite"
+
+#: epymc/plugins/input_joy/joy.py:161
+msgid "Configure buttons"
+msgstr "Aseta näppäimet"
+
+#: epymc/plugins/input_joy/joy.py:169
+msgid "No joystick found"
+msgstr "Joystick-ohjainta ei löytynyt"
+
+#: epymc/plugins/input_joy/joy.py:170
+msgid "Try to adjust your joystick device"
+msgstr "Yritä asettaa joystick-laitteesi uudelleen"
+
+#: epymc/plugins/input_joy/joy.py:183
+msgid "Configure joystick"
+msgstr "Joystick-asetukset"
+
+#: epymc/plugins/input_joy/joy.py:184
+msgid "Move the stick Up"
+msgstr "Liikuta joystick ylös"
+
+#: epymc/plugins/input_joy/joy.py:191
+msgid "Move the stick Right"
+msgstr "Liikuta joystick oikealle"
+
+#: epymc/plugins/input_joy/joy.py:197
+msgid "Press OK"
+msgstr "Paina OK"
+
+#: epymc/plugins/input_joy/joy.py:202
+msgid "Press BACK"
+msgstr "Paina TAKAISIN"
+
+#: epymc/plugins/input_joy/joy.py:207
+msgid "Config done."
+msgstr "Asetus valmis."
+
+#: epymc/plugins/music/music.py:55
+msgid "OnAir"
+msgstr "Toistossa"
+
+#: epymc/plugins/music/music.py:65 epymc/plugins/music/music.py:69
+#: epymc/plugins/music/music.py:275 epymc/plugins/music/music.py:323
+msgid "Artists"
+msgstr "Artistit"
+
+#: epymc/plugins/music/music.py:79 epymc/plugins/music/music.py:83
+#: epymc/plugins/music/music.py:276 epymc/plugins/music/music.py:325
+msgid "Albums"
+msgstr "Albumit"
+
+#: epymc/plugins/music/music.py:93 epymc/plugins/music/music.py:97
+#: epymc/plugins/music/music.py:277 epymc/plugins/music/music.py:327
+msgid "Songs"
+msgstr "Kappaleet"
+
+#: epymc/plugins/music/music.py:110 epymc/plugins/movies/movies.py:93
+#: epymc/plugins/tvshows/tvshows.py:85
+msgid "Rescan library"
+msgstr "Skannaa kirjasto uudelleen"
+
+#: epymc/plugins/music/music.py:123 epymc/plugins/movies/movies.py:82
+#: epymc/plugins/photos/photos.py:79 epymc/plugins/tvshows/tvshows.py:73
+msgid "Manage sources"
+msgstr "Hallinnoi lähteitä"
+
+#: epymc/plugins/music/music.py:133
+msgid "Play all the songs"
+msgstr "Toista kaikki kappaleet"
+
+#: epymc/plugins/music/music.py:143
+msgid "Queue all the songs"
+msgstr "Aseta kaikki kappaleet jonoon"
+
+#: epymc/plugins/music/music.py:173
+msgid "from"
+msgstr "albumilta"
+
+#: epymc/plugins/music/music.py:202
+#, python-format
+msgid "<em>by</em> %s<br>"
+msgstr "<em>esittäjä</em> %s<br>"
+
+#: epymc/plugins/music/music.py:204 epymc/plugins/music/music.py:232
+#, python-format
+msgid "%d song"
+msgid_plural "%d songs"
+msgstr[0] "%d kappale"
+msgstr[1] "%d kappaletta"
+
+#: epymc/plugins/music/music.py:213
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minuutti"
+msgstr[1] "%d minuuttia"
+
+#: epymc/plugins/music/music.py:230
+#, python-format
+msgid "%d album"
+msgid_plural "%d albums"
+msgstr[0] "%d albumi"
+msgstr[1] "%d albumia"
+
+#: epymc/plugins/music/music.py:242 epymc/plugins/music/music.py:279
+#: epymc/plugins/music/music.py:283 epymc/plugins/music/music.py:321
+msgid "Music"
+msgstr "Musiikki"
+
+#: epymc/plugins/music/music.py:244
+msgid "The music module build a database of all your albums, songs and artist."
+msgstr "Musiikki-moduuli rakentaa tietokannan albumeista, kappaleista ja artisteista."
+
+#: epymc/plugins/music/music.py:339 epymc/plugins/music/music.py:372
+msgid "Rebuilding database"
+msgstr "Rakennetaan tietokantaa uudelleen"
+
+#: epymc/plugins/music/music.py:339
+#: epymc/plugins/onlinevideo/onlinevideo.py:229
+#: epymc/plugins/tvshows/tvshows.py:694
+msgid "please wait..."
+msgstr "odota..."
+
+#: epymc/plugins/music/music.py:372
+msgid "operation completed"
+msgstr "toiminto valmis"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:129
+#: epymc/plugins/onlinevideo/onlinevideo.py:163
+#: epymc/plugins/onlinevideo/onlinevideo.py:167
+msgid "Online Channels"
+msgstr "Internet-kanavat"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:131
+msgid "Browse, watch and download videos from your favorite online sources."
+msgstr "Selaa, katso ja lataa videoita suosituista Internet-palveluista."
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:159
+#: epymc/plugins/onlinevideo/onlinevideo.py:417
+msgid "Video Channels"
+msgstr "Video-kanavat"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:206
+msgid "Channels"
+msgstr "Kanavat"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:228
+msgid "Checking for updates"
+msgstr "Tarkistetaan päivityksiä"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:237
+msgid "Local version"
+msgstr "Paikallinen versio"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:246
+msgid "Upstream version"
+msgstr "Ohjelmatuottajan versio"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:254
+msgid "Already updated"
+msgstr "Päivitykset ajantasalla"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:259
+msgid "Failed to fetch upstream version"
+msgstr "Ohjelmatuottajan versiota ei voitu hakea"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:263
+#, python-brace-format
+msgid ""
+"Updating <b>youtube-dl</b> at version <b>{0}</b><br><br>For info and credits "
+"please visit:<br>rg3.github.io/youtube-dl/"
+msgstr ""
+"Päivitetään <b>youtube-dl</b> versiossa <b>{0}</b><br><br>Lisätiedot löytyvät "
+"osoitteesta:<br>rg3.github.io/youtube-dl/"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:266
+#: epymc/plugins/onlinevideo/onlinevideo.py:328
+#: epymc/plugins/onlinevideo/onlinevideo.py:337
+msgid "please wait"
+msgstr "odota"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:281
+msgid "Update completed"
+msgstr "Päivitys valmis"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:320
+msgid "Search query"
+msgstr "Hakulauseke"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:329
+#: epymc/plugins/onlinevideo/onlinevideo.py:338
+msgid "Getting info..."
+msgstr "Haetaan tietoja..."
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:356
+msgid "Reported error"
+msgstr "Ilmoitti virheen"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:357
+#: epymc/plugins/onlinevideo/onlinevideo.py:379
+msgid "Error reading channel"
+msgstr "Virhe luettaessa kanavaa"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:380
+msgid "No items returned"
+msgstr "Yhtään kohdetta ei annettu"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:385
+msgid "Suggestions"
+msgstr "Ehdotukset"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:422
+msgid "Automatically keep youtube-dl updated"
+msgstr "Pidä youtube-dl automaattisesti ajantasalla"
+
+#: epymc/plugins/onlinevideo/onlinevideo.py:423
+msgid "Check for youtube-dl update now"
+msgstr "Tarkista youtube-dl päivitykset nyt"
+
+#: epymc/plugins/onlinevideo/zapiks/zapiks.py:87
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:83
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:108
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:131
+#: epymc/plugins/onlinevideo/youtube/youtube.py:82
+msgid "user"
+msgstr "käyttäjä"
+
+#: epymc/plugins/onlinevideo/zapiks/zapiks.py:87
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:84
+#: epymc/plugins/onlinevideo/youtube/youtube.py:83
+#: epymc/plugins/onlinevideo/youtube/youtube.py:157
+msgid "uploaded"
+msgstr "lähetetty"
+
+#: epymc/plugins/onlinevideo/zapiks/zapiks.py:88
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:85
+msgid "view"
+msgid_plural "views"
+msgstr[0] "näyttö"
+msgstr[1] "näyttöä"
+
+#: epymc/plugins/onlinevideo/zapiks/zapiks.py:89
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:86
+msgid "like"
+msgid_plural "likes"
+msgstr[0] "tykkäys"
+msgstr[1] "tykkäystä"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:87
+msgid "comment"
+msgid_plural "comments"
+msgstr[0] "kommentti"
+msgstr[1] "kommenttia"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:109
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:132
+msgid "created"
+msgstr "luotu"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:110
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:133
+msgid "updated"
+msgstr "päivitetty"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:111
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:134
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:291
+msgid "video"
+msgid_plural "videos"
+msgstr[0] "video"
+msgstr[1] "videot"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:112
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:135
+msgid "follower"
+msgid_plural "followers"
+msgstr[0] "seuraaja"
+msgstr[1] "seuraajaa"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:151
+msgid "joined"
+msgstr "liittynyt"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:152
+msgid "location"
+msgstr "sijainti"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:163
+#: epymc/plugins/onlinevideo/youtube/youtube.py:47
+msgid "Search videos"
+msgstr "Etsi videoita"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:164
+msgid "Search channels"
+msgstr "Etsi kanavia"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:165
+msgid "Search groups"
+msgstr "Etsi ryhmiä"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:166
+msgid "Search people"
+msgstr "Etsi henkilöitä"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:175
+msgid "More followed channels"
+msgstr "Lisää seurattuja kanavia"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:180
+msgid "More followed groups"
+msgstr "Lisää seurattuja ryhmiä"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:188
+msgid "Browse videos"
+msgstr "Selaa videoita"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:189
+#: epymc/plugins/onlinevideo/youtube/youtube.py:48
+msgid "Browse channels"
+msgstr "Selaa kanavia"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:190
+msgid "Browse groups"
+msgstr "Selaa ryhmiä"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:191
+msgid "Browse users"
+msgstr "Selaa käyttäjiä"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:208
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:226
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:244
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:261
+#, python-format
+msgid "Load more results (%d in total)"
+msgstr "Lataa lisää tuloksia (%d yhteensä)"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:292
+#: epymc/plugins/onlinevideo/youtube/youtube.py:109
+msgid "channel"
+msgid_plural "channels"
+msgstr[0] "kanava"
+msgstr[1] "kanavaa"
+
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:293
+msgid "group"
+msgid_plural "groups"
+msgstr[0] "ryhmä"
+msgstr[1] "ryhmää"
+
+#: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:42
+#, python-brace-format
+msgid "Season {0}"
+msgstr "Kausi {0}"
+
+#: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:56
+#, python-brace-format
+msgid "Episode {0}"
+msgstr "Jakso {0}"
+
+#: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:57
+#: epymc/plugins/tvshows/tvshows.py:249 epymc/plugins/tvshows/tvshows.py:463
+msgid "First aired"
+msgstr "Ensilähetys"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:69
+#, python-brace-format
+msgid "Load more results (page {0} of {1})"
+msgstr "Lataa lisää tuloksia (sivu {0}/{1})"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:77
+msgid "Search movies"
+msgstr "Etsi elokuvia"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:78
+msgid "Popular movies"
+msgstr "Suositut elokuvat"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:79
+msgid "Top rated movies"
+msgstr "Parhaiten arvostellut elokuvat"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:80
+msgid "Upcoming movies"
+msgstr "Tulevat elokuvat"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:81
+msgid "Now playing movies"
+msgstr "Tällä hetkellä esitettävät elokuvat"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:159
+#: epymc/plugins/movies/movies.py:203 epymc/plugins/movies/movies.py:474
+msgid "Director"
+msgstr "Ohjaaja"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:160
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:190
+#: epymc/plugins/movies/movies.py:204 epymc/plugins/movies/movies.py:456
+#: epymc/plugins/movies/movies.py:475 epymc/plugins/movies/movies.py:513
+#: epymc/plugins/tvshows/tvshows.py:443 epymc/plugins/tvshows/tvshows.py:534
+msgid "Cast"
+msgstr "Näyttelijät"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:161
+msgid "Original title"
+msgstr "Alkuperäinen nimi"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:162
+#: epymc/plugins/tvshows/tvshows.py:467
+msgid "Genres"
+msgstr "Lajityypit"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:163
+#: epymc/plugins/movies/movies.py:202 epymc/plugins/movies/movies.py:478
+#: epymc/plugins/tvshows/tvshows.py:469
+msgid "Rating"
+msgstr "Arvostelu"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:163
+msgid "votes"
+msgstr "ääniä"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:164
+#: epymc/plugins/movies/movies.py:476
+msgid "Released"
+msgstr "Julkaistu"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:180
+msgid "Language"
+msgstr "Kieli"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:181
+msgid "Source"
+msgstr "Lähde"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:182
+msgid "Quality"
+msgstr "Laatu"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:186
+msgid "No trailers available"
+msgstr "Trailereita ei ole saatavilla"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:201
+#: epymc/plugins/movies/movies.py:518 epymc/plugins/tvshows/tvshows.py:539
+msgid "as"
+msgstr "roolissa"
+
+#: epymc/plugins/onlinevideo/youtube/youtube.py:91
+msgid "More items..."
+msgstr "Lisää kohteita..."
+
+#: epymc/plugins/screensaver/screensaver.py:41
+#: epymc/plugins/screensaver/screensaver.py:70
+#: epymc/plugins/screensaver/screensaver.py:180
+msgid "Screen saver"
+msgstr "Näytönsäästäjä"
+
+#: epymc/plugins/screensaver/screensaver.py:43
+msgid ""
+"This module manage the X screensaver. It will prevent the screensaver to "
+"activate while watching videos and can be configured to activate the "
+"screensaver and/or shutdown your monitor after a given amount of time."
+msgstr ""
+"Tämä moduuli hallinnoi X-näytönsäästäjää, estäen sitä aktivoitumasta "
+"katsottaessa video-kuvaa ja voidaan asettaa aktivoimaan "
+"näytönsäästäjä ja/tai sammuttamaan näyttösi annetun ajan kuluttua."
+
+#: epymc/plugins/screensaver/screensaver.py:58
+#: epymc/plugins/screensaver/screensaver.py:61
+msgid "never"
+msgstr "ei koskaan"
+
+#: epymc/plugins/screensaver/screensaver.py:183
+msgid "never;1 minute;5 minutes;10 minutes;30 minutes;60 minutes"
+msgstr "ei koskaan;yksi minuutti;viisi minuuttia;10 minuuttia;30 minuuttia;60 minuuttia"
+
+#: epymc/plugins/screensaver/screensaver.py:185
+msgid "Turn on screensaver after"
+msgstr "Aseta näytönsäästäjä päälle viiveellä"
+
+#: epymc/plugins/screensaver/screensaver.py:188
+msgid "Turn off monitor after"
+msgstr "Sammuta näyttö viiveellä"
+
+#: epymc/plugins/screensaver/screensaver.py:191
+msgid "Manage screensaver only in fullscreen"
+msgstr "Hallinnoi näytönsäästäjää vain kokoruututilassa"
+
+#: epymc/plugins/filemanager/filemanager.py:88
+msgid "Manage favorites"
+msgstr "Hallinnoi suosikkeja"
+
+#: epymc/plugins/filemanager/filemanager.py:96
+#: epymc/plugins/filemanager/filemanager.py:287
+msgid "Favorites"
+msgstr "Suosikit"
+
+#: epymc/plugins/filemanager/filemanager.py:210
+#: epymc/plugins/filemanager/filemanager.py:220
+#: epymc/plugins/filemanager/filemanager.py:237
+#: epymc/plugins/filemanager/filemanager.py:421
+#: epymc/plugins/filemanager/filemanager.py:443
+msgid "File Manager"
+msgstr "Tiedostohallinnointi"
+
+#: epymc/plugins/filemanager/filemanager.py:212
+msgid "A two panes filemanager."
+msgstr "Kaksiruutuinen tiedostohallinnoija."
+
+#: epymc/plugins/filemanager/filemanager.py:262
+#: epymc/plugins/filemanager/filemanager.py:354
+msgid "New folder"
+msgstr "Uusi kansio"
+
+#: epymc/plugins/filemanager/filemanager.py:267
+msgid "Copy"
+msgstr "Kopioi"
+
+#: epymc/plugins/filemanager/filemanager.py:272
+msgid "Move"
+msgstr "Siirrä"
+
+#: epymc/plugins/filemanager/filemanager.py:282 epymc/plugins/mame/mame.py:437
+msgid "Delete"
+msgstr "Poista"
+
+#: epymc/plugins/filemanager/filemanager.py:418
+msgid "Are you sure you want to delete the folder?"
+msgstr "Haluatko varmasti poistaa kansion?"
+
+#: epymc/plugins/filemanager/filemanager.py:420
+msgid "Are you sure you want to delete the file?"
+msgstr "Haluatko varmasti poistaa tiedoston?"
+
+#: epymc/plugins/filemanager/filemanager.py:444
+msgid "Operation is starting..."
+msgstr "Toiminto käynnistyy..."
+
+#: epymc/plugins/filemanager/filemanager.py:458
+msgid "Source is not readable"
+msgstr "Lähdettä ei voida lukea"
+
+#: epymc/plugins/filemanager/filemanager.py:463
+msgid "Destination folder is not writable"
+msgstr "Kohdekansioon ei voida kirjoittaa"
+
+#: epymc/plugins/filemanager/filemanager.py:469
+msgid "Invalid destination folder"
+msgstr "Virheellinen kohdekansio"
+
+#: epymc/plugins/filemanager/filemanager.py:475
+msgid "Destination already exists"
+msgstr "Kohde on jo olemassa"
+
+#: epymc/plugins/filemanager/filemanager.py:482
+#, python-brace-format
+msgid "Copying file {0} of {1}:"
+msgstr "Kopioidaan tiedosto {0}/{1}:"
+
+#: epymc/plugins/filemanager/filemanager.py:484
+#, python-brace-format
+msgid "Deleting file {0} of {1}:"
+msgstr "Poistetaan tiedosto {0}/{1}:"
+
+#: epymc/plugins/movies/movies.py:101 epymc/plugins/movies/movies.py:109
+msgid "Actors"
+msgstr "Näyttelijät"
+
+#: epymc/plugins/movies/movies.py:104 epymc/plugins/movies/movies.py:111
+msgid "Directors"
+msgstr "Ohjaajat"
+
+#: epymc/plugins/movies/movies.py:210 epymc/plugins/photos/photos.py:109
+msgid "File size"
+msgstr "Tiedostokoko"
+
+#: epymc/plugins/movies/movies.py:212
+msgid "Title"
+msgstr "Nimi"
+
+#: epymc/plugins/movies/movies.py:213 epymc/plugins/mame/mame.py:377
+#: epymc/plugins/mame/mame.py:412
+msgid "Year"
+msgstr "Vuosi"
+
+#: epymc/plugins/movies/movies.py:225 epymc/plugins/movies/movies.py:268
+#: epymc/plugins/movies/movies.py:276 epymc/plugins/movies/movies.py:330
+msgid "Movies"
+msgstr "Elokuvat"
+
+#: epymc/plugins/movies/movies.py:227
+msgid ""
+"The movies module is used to browse your films collection, it is fully "
+"integrated with themoviedb.org online database."
+msgstr ""
+"Elokuvat-moduulin avulla voit selata elokuvakokoelmaasi, se on täysin "
+"integroitu themoviedb.org-verkkotietokannan kanssa."
+
+#: epymc/plugins/movies/movies.py:272
+msgid "Movie Collection"
+msgstr "Elokuvakokoelma"
+
+#: epymc/plugins/movies/movies.py:454 epymc/plugins/mame/mame.py:425
+msgid "Play"
+msgstr "Toista"
+
+#: epymc/plugins/movies/movies.py:457 epymc/plugins/tvshows/tvshows.py:441
+msgid "Posters"
+msgstr "Julisteet"
+
+#: epymc/plugins/movies/movies.py:458 epymc/plugins/tvshows/tvshows.py:442
+msgid "Backdrops"
+msgstr "Taustakuva"
+
+#: epymc/plugins/movies/movies.py:459
+msgid "Search Info"
+msgstr "Etsi tietoja"
+
+#: epymc/plugins/movies/movies.py:477
+msgid "Country"
+msgstr "Maa"
+
+#: epymc/plugins/movies/movies.py:479 epymc/plugins/tvshows/tvshows.py:471
+msgid "Overview"
+msgstr "Yhteenveto"
+
+#: epymc/plugins/movies/movies.py:495
+#, python-format
+msgid ""
+"Media:<br>%s<br><br>No info stored for this media<br>Try the Search info "
+"button..."
+msgstr ""
+"Media:<br>%s<br><br>Tälle medialle ei ole tallennettu tietoja<br>Koita "
+"Hae tietoja-nappia..."
+
+#: epymc/plugins/movies/movies.py:536 epymc/plugins/tvshows/tvshows.py:487
+#, python-format
+msgid "%d posters available"
+msgstr "%d julistetta saatavilla"
+
+#: epymc/plugins/movies/movies.py:555 epymc/plugins/movies/movies.py:600
+#: epymc/plugins/tvshows/tvshows.py:513
+msgid "Downloading image"
+msgstr "Ladataan kuva"
+
+#: epymc/plugins/movies/movies.py:580 epymc/plugins/tvshows/tvshows.py:502
+#, python-format
+msgid "%d backdrops available"
+msgstr "%d taustakuvaa saatavilla"
+
+#: epymc/plugins/movies/movies.py:613
+msgid "Searching for"
+msgstr "Etsitään kohdetta"
+
+#: epymc/plugins/movies/movies.py:622
+msgid "Change name"
+msgstr "Muuta nimi"
+
+#: epymc/plugins/movies/movies.py:631
+msgid "nothing found, please try with a better name"
+msgstr "mitään ei löytynyt, koita toista hakulauseketta"
+
+#: epymc/plugins/movies/movies.py:635 epymc/plugins/movies/movies.py:661
+msgid "Downloading movie info..."
+msgstr "Ladataan elokuvan tietoja..."
+
+#: epymc/plugins/movies/movies.py:637
+#, python-format
+msgid "<b>Found %d results</b><br>"
+msgstr "<b>Löytyi %d hakutulosta</b><br>"
+
+#: epymc/plugins/movies/movies.py:638 epymc/plugins/tvshows/tvshows.py:557
+#, python-format
+msgid "Found %d results, which one?"
+msgstr "Löytyi %d hakutulosta, mitä käytetään?"
+
+#: epymc/plugins/movies/movies.py:711
+msgid "Movies scanner started"
+msgstr "Elokuvaskanneri käynnistyi"
+
+#: epymc/plugins/movies/movies.py:717
+msgid "Movies scanner done"
+msgstr "Elokuvaskanneri valmis"
+
+#: epymc/plugins/movies/movies.py:762
+msgid "Found movie"
+msgstr "Elokuva löytyi"
+
+#: epymc/plugins/movies/movies.py:810
+msgid "Movies Collection"
+msgstr "Elokuvakokoelma"
+
+#: epymc/plugins/movies/movies.py:815 epymc/plugins/tvshows/tvshows.py:656
+msgid "Preferred language for contents"
+msgstr "Ensisijainen sisältökieli"
+
+#: epymc/plugins/movies/movies.py:818
+msgid "Enable background scanner"
+msgstr "Ota käyttöön taustaskanneri"
+
+#: epymc/plugins/movies/movies.py:821
+msgid "Prefer movie titles in lists"
+msgstr "Näytä mieluummin elokuvan nimet listoissa"
+
+#: epymc/plugins/input_lirc/lirc.py:44
+msgid "Input - Remote Control"
+msgstr "Syöte - kaukosäädin"
+
+#: epymc/plugins/input_lirc/lirc.py:46
+msgid ""
+"This module lets you control the application using any LIRC compatible "
+"remote controller."
+msgstr ""
+"Tämän moduulin avulla voit ohjata ohjelmaa käyttäen mitä tahansa LIRC "
+"yhteensopivaa kaukosäädintä."
+
+#: epymc/plugins/input_lirc/lirc.py:63 epymc/plugins/input_lirc/lirc.py:145
+msgid "Remote"
+msgstr "Kaukosäädin"
+
+#: epymc/plugins/input_lirc/lirc.py:126
+#, python-format
+msgid "Button: %s"
+msgstr "Näppäin: %s"
+
+#: epymc/plugins/input_lirc/lirc.py:134 epymc/plugins/input_keyb/keyb.py:167
+#: epymc/plugins/input_keyb/keyb.py:176
+msgid "Add a new key"
+msgstr "Lisää uusi näppäin"
+
+#: epymc/plugins/input_lirc/lirc.py:148
+msgid "Lirc socket"
+msgstr "Lirc pistoke"
+
+#: epymc/plugins/input_lirc/lirc.py:163
+#, python-format
+msgid "Cannot connect to lirc using socket:<br>%s"
+msgstr "Lirc-laitteeseen ei voitu yhdistää käyttäen pistoketta:<br>%s"
+
+#: epymc/plugins/input_lirc/lirc.py:169
+msgid "Configure remote"
+msgstr "Aseta kaukosäädin"
+
+#: epymc/plugins/input_lirc/lirc.py:170
+msgid "Press a key on your remote"
+msgstr "Paina kaukosäätimen näppäintä"
+
+#: epymc/plugins/input_lirc/lirc.py:192 epymc/plugins/input_keyb/keyb.py:191
+msgid "Choose an event to bind"
+msgstr "Valitse yhdistettävä toiminto"
+
+#: epymc/plugins/input_keyb/keyb.py:79
+msgid "Input - Keyboard"
+msgstr "Syöte - näppäimistö"
+
+#: epymc/plugins/input_keyb/keyb.py:81
+msgid ""
+"The keyboard module lets you control the application using your keyboard, or "
+"any other device that act as a keyboard."
+msgstr ""
+"Näppäimistö-moduulin avulla voit ohjata ohjelmaa käyttäen näppäimistöä, tai "
+"laitetta joka toimii näppäimistön tavoin."
+
+#: epymc/plugins/input_keyb/keyb.py:103 epymc/plugins/input_keyb/keyb.py:164
+msgid "Keyboard"
+msgstr "Näppäimistö"
+
+#: epymc/plugins/input_keyb/keyb.py:134
+msgid "Are you sure you want to remove the mapping?"
+msgstr "Haluatko varmasti poistaa sidoksen?"
+
+#: epymc/plugins/input_keyb/keyb.py:136
+msgid "Remove key"
+msgstr "Poista näppäin"
+
+#: epymc/plugins/input_keyb/keyb.py:177
+msgid "Press a key on your keyboard"
+msgstr "Paina näppäimistön näppäintä"
+
+#: epymc/plugins/watchdog/watchdog.py:36
+msgid "Watchdog"
+msgstr "Vahtikoira"
+
+#: epymc/plugins/watchdog/watchdog.py:38
+msgid ""
+"This module, if enabled, will respawn epymc in the rare cases of application "
+"crash/hang. So you dont have to leave your couch in case of problems...just "
+"wait 30 seconds and the module will restart epymc for you."
+msgstr ""
+"Tämä moduuli käynnistää EpyMC:n uudelleen mikäli se kaatuu tai jähmettyy. "
+"Näinollen sinun ei tarvitse nousta sohvaltasi ongelmien sattuessa... odota "
+"vain 30 sekuntia ja kaikki tapahtuu automaattisesti."
+
+#: epymc/plugins/photos/photos.py:115
+msgid "Dimensions"
+msgstr "Koko"
+
+#: epymc/plugins/photos/photos.py:116
+msgid "Format"
+msgstr "Formaatti"
+
+#: epymc/plugins/photos/photos.py:133
+msgid "Please install PIL to read image metadata."
+msgstr "Asenna PIL metatietojen lukemiseksi."
+
+#: epymc/plugins/photos/photos.py:147 epymc/plugins/photos/photos.py:168
+#: epymc/plugins/photos/photos.py:171 epymc/plugins/photos/photos.py:175
+#: epymc/plugins/photos/photos.py:198 epymc/plugins/photos/photos.py:229
+msgid "Photos"
+msgstr "Valokuvat"
+
+#: epymc/plugins/photos/photos.py:149
+msgid "A module to watch your photos."
+msgstr "Moduuli jonka avulla voit katsella valokuviasi."
+
+#: epymc/plugins/photos/photos.py:233
+msgid "Show slideshow controls on start"
+msgstr "Näytä diaesityksen ohjaimet käynnistettäessä"
+
+#: epymc/plugins/photos/photos.py:235
+msgid "Slideshow delay"
+msgstr "Diaesityksen viive"
+
+#: epymc/plugins/photos/photos.py:236
+msgid "seconds"
+msgstr "sekuntia"
+
+#: epymc/plugins/calibrator/calibrator.py:50
+#: epymc/plugins/calibrator/calibrator.py:56
+msgid "Screen calibrator"
+msgstr "Näytön kalibroija"
+
+#: epymc/plugins/calibrator/calibrator.py:52
+msgid "Use this module to calibrate your screen parameters."
+msgstr "Tämän moduulin avulla voit kalibroida näytön parametrit."
+
+#: epymc/plugins/input_webserver/webserver.py:55
+msgid ""
+"This module provide a way to control the application from your web browser."
+"<br>The server (by default) listen on port 8080, to connect just point to: "
+"<br>http://your_ip:8080<br>You can change listening port and the theme from "
+"the configurtion file."
+msgstr ""
+"Tämän moduulin avulla voit ohjata ohjelmaa verkkoselaimestasi."
+"<br>Palvelin kuuntelee oletuksena porttia 8080, yhdistääksesi kirjoita selaimeesi: "
+"<br>http://laitteen_ip:8080<br>Voit vaihtaa kuunteluportin ja käytettävän teeman "
+"asetustiedostosta."
+
+#: epymc/plugins/mame/mame.py:54
+msgid "My Games"
+msgstr "Minun pelini"
+
+#: epymc/plugins/mame/mame.py:66
+msgid "All Games"
+msgstr "Kaikki pelit"
+
+#: epymc/plugins/mame/mame.py:78
+msgid "Favorite Games"
+msgstr "Suosikkipelit"
+
+#: epymc/plugins/mame/mame.py:90
+msgid "Categories"
+msgstr "Kategoriat"
+
+#: epymc/plugins/mame/mame.py:127 epymc/plugins/mame/mame.py:144
+#: epymc/plugins/mame/mame.py:241
+msgid "M.A.M.E"
+msgstr "M.A.M.E"
+
+#: epymc/plugins/mame/mame.py:129
+msgid ""
+"This module add the ability to browse, download and play games using the M.A."
+"M.E. emulator."
+msgstr ""
+"Tämän moduulin avulla voit selata, ladata ja pelata pelejä käyttäen M.A.M.E.-"
+"emulaattoria."
+
+#: epymc/plugins/mame/mame.py:169
+msgid "Searching games, please wait..."
+msgstr "Etsitään pelejä, odota..."
+
+#: epymc/plugins/mame/mame.py:192
+msgid "M.A.M.E not found"
+msgstr "M.A.M.E.:a ei löytynyt"
+
+#: epymc/plugins/mame/mame.py:193
+msgid "Is mame installed?"
+msgstr "Onko M.A.M.E. asennettu?"
+
+#: epymc/plugins/mame/mame.py:215
+msgid "Can not get rom path from M.A.M.E."
+msgstr "M.A.M.E.:n ROM-polku ei ole saatavilla"
+
+#: epymc/plugins/mame/mame.py:216
+msgid "Is your mame well configured?"
+msgstr "Onko M.A.M.E. asetettu oikein?"
+
+#: epymc/plugins/mame/mame.py:307
+msgid "No category file found"
+msgstr "Kategoriatiedostoa ei löytynyt"
+
+#: epymc/plugins/mame/mame.py:308
+#, python-format
+msgid ""
+"The category file is not included in mame, you need to download a copy from "
+"the net. <br>The file must be placed in %s"
+msgstr ""
+"Kategoriatiedostoa ei ole sisällytetty M.A.M.E.:n, sinun tulee ladata kopio "
+"Internetistä. <br>Tiedosto tulee asettaa sijaintiin %s"
+
+#: epymc/plugins/mame/mame.py:378 epymc/plugins/mame/mame.py:413
+msgid "Manufacturer"
+msgstr "Valmistaja"
+
+#: epymc/plugins/mame/mame.py:379 epymc/plugins/mame/mame.py:414
+msgid "Players"
+msgstr "Pelaajat"
+
+#: epymc/plugins/mame/mame.py:380 epymc/plugins/mame/mame.py:415
+msgid "Buttons"
+msgstr "Näppäimet"
+
+#: epymc/plugins/mame/mame.py:416
+msgid "Save state"
+msgstr "Tallenna tila"
+
+#: epymc/plugins/mame/mame.py:417
+msgid "Driver status"
+msgstr "Ajurin tila"
+
+#: epymc/plugins/mame/mame.py:418
+msgid "Emulation"
+msgstr "Emulaatio"
+
+#: epymc/plugins/mame/mame.py:419
+msgid "Color"
+msgstr "Väri"
+
+#: epymc/plugins/mame/mame.py:420
+msgid "Sound"
+msgstr "Ääni"
+
+#: epymc/plugins/mame/mame.py:421
+msgid "Graphic"
+msgstr "Grafiikka"
+
+#: epymc/plugins/mame/mame.py:434
+msgid "History"
+msgstr "Historia"
+
+#: epymc/plugins/mame/mame.py:457
+msgid "No History file found"
+msgstr "Historiatiedostoa ei löytynyt"
+
+#: epymc/plugins/mame/mame.py:458
+#, python-format
+msgid ""
+"The History file is not included in mame, you should download a copy from "
+"arcade-history.com<br>The file must be unzipped and placed in %s"
+msgstr ""
+"Historiatiedostoa ei ole sisällytetty M.A.M.E.:n, sinun tulee ladata kopio "
+"osoitteesta arcade-history.com. <br>Tiedosto tulee purkaa sijaintiin %s"
+
+#: epymc/plugins/mame/mame.py:498
+msgid "Game not found in history file"
+msgstr "Peliä ei löytynyt historiatiedostosta"
+
+#: epymc/plugins/mame/mame.py:509
+msgid "Really delete this game?"
+msgstr "Haluatko varmasti poistaa tämän pelin?"
+
+#: epymc/plugins/mame/mame.py:521
+msgid "Game deleted"
+msgstr "Peli poistettu"
+
+#: epymc/plugins/mame/mame.py:524
+msgid "Can not delete game"
+msgstr "Peliä ei voida poistaa"
+
+#: epymc/plugins/mame/mame.py:534
+msgid "Error, can not find a writable rom directory"
+msgstr "Virhe, kirjoituskelpoista ROM-hakemistoa ei löytynyt"
+
+#: epymc/plugins/mame/mame.py:535
+msgid "You sould check your mame configuration"
+msgstr "Tarkista M.A.M.E.:n asetukset"
+
+#: epymc/plugins/mame/mame.py:543
+msgid "Game download"
+msgstr "Pelin lataus"
+
+#: epymc/plugins/mame/mame.py:550
+msgid "Trying at freeroms.com...<br>"
+msgstr "Yritetään käyttää palvelua freeroms.com..."
+
+#: epymc/plugins/mame/mame.py:580 epymc/plugins/mame/mame.py:593
+msgid "Can not find the game online."
+msgstr "Peliä ei löytynyt verkosta."
+
+#: epymc/plugins/tvshows/tvshows.py:96
+msgid "Serie info"
+msgstr "Sarjan tiedot"
+
+#: epymc/plugins/tvshows/tvshows.py:248
+msgid "Episode"
+msgstr "Jakso"
+
+#: epymc/plugins/tvshows/tvshows.py:255 epymc/plugins/tvshows/tvshows.py:292
+#: epymc/plugins/tvshows/tvshows.py:299 epymc/plugins/tvshows/tvshows.py:361
+#: epymc/plugins/tvshows/tvshows.py:652
+msgid "TV Shows"
+msgstr "TV-sarjat"
+
+#: epymc/plugins/tvshows/tvshows.py:257
+msgid ""
+"The Tv Shows module is used to browse your series collection, it is fully "
+"integrated with themoviedb.org online database."
+msgstr ""
+"TV-sarjat-moduulin avulla voit selata sarjakokoelmaasi, se on täysin "
+"integroitu themoviedb.org verkkotietokannan kanssa."
+
+#: epymc/plugins/tvshows/tvshows.py:295
+msgid "Tv Shows Collection"
+msgstr "TV-sarjojen kokoelma"
+
+#: epymc/plugins/tvshows/tvshows.py:444
+msgid "Refresh info"
+msgstr "Päivitä tiedot"
+
+#: epymc/plugins/tvshows/tvshows.py:461
+msgid "Created by"
+msgstr "Luonut"
+
+#: epymc/plugins/tvshows/tvshows.py:462
+msgid "Network"
+msgstr "Verkko"
+
+#: epymc/plugins/tvshows/tvshows.py:464
+msgid "Last aired"
+msgstr "Viimeisin lähetys"
+
+#: epymc/plugins/tvshows/tvshows.py:465
+msgid "Seasons"
+msgstr "Kaudet"
+
+#: epymc/plugins/tvshows/tvshows.py:466
+msgid "Episodes"
+msgstr "Jaksot"
+
+#: epymc/plugins/tvshows/tvshows.py:468
+msgid "Runtime"
+msgstr "Kesto"
+
+#: epymc/plugins/tvshows/tvshows.py:470
+msgid "Status"
+msgstr "Tila"
+
+#: epymc/plugins/tvshows/tvshows.py:477
+msgid ""
+"No info stored for this serie.<br>Please try the <i>refresh info</i> button."
+msgstr ""
+"Tälle sarjalle ei ole tallennettu tietoja.<br>Kokeile <i>Päivitä tiedot</i>-nappia."
+
+#: epymc/plugins/tvshows/tvshows.py:573
+#, python-format
+msgid ""
+"The search for \"%s\" did not make any results.<br>If your show is listed on "
+"themoviedb.org please rename your folder to match the title on the site."
+"<br>If otherwise it is not in the online database please contribute and add "
+"it yourself."
+msgstr ""
+"Hakulauseke \"%s\" ei vastannut mitään tuloksia.<br>Mikäli sarja on listattu "
+"themoviedb.org-palvelussa sinun tulee nimetä kansio vastaamaan palvelussa olevaa nimeä."
+"<br>Muussa tapauksessa on suotavaa osallistua yhteisöön lisäämällä palveluun "
+"uusi merkintä kyseiselle sarjalle."
+
+#: epymc/plugins/tvshows/tvshows.py:578
+msgid "Nothing found"
+msgstr "Mitään ei löytynyt"
+
+#: epymc/plugins/tvshows/tvshows.py:587
+msgid "Fetching updated info"
+msgstr "Haetaan päivitetyt tiedot"
+
+#: epymc/plugins/tvshows/tvshows.py:694
+msgid "TvShows scanner started"
+msgstr "TV-sarjojen skanneri käynnistettiin"
+
+#: epymc/plugins/tvshows/tvshows.py:725
+msgid "TvShows scanner done"
+msgstr "TV-sarjojen skanneri valmis"
+
+#: epymc/plugins/tvshows/tvshows.py:766
+#, python-format
+msgid "%d season"
+msgid_plural "%d seasons"
+msgstr[0] "%d kausi"
+msgstr[1] "%d kautta"
+
+#: epymc/plugins/tvshows/tvshows.py:768
+#, python-format
+msgid "%d episode"
+msgid_plural "%d episodes"
+msgstr[0] "%d jakso"
+msgstr[1] "%d jaksoa"
+
+#: epymc/plugins/tvshows/tvshows.py:770
+msgid "Found serie:"
+msgstr "Löydettiin sarja:"
+
+#: epymc/plugins/input_mpris2/mpris2.py:48
+msgid "Input - MPRIS2"
+msgstr "Syöte - MPRIS2"
+
+#: epymc/plugins/input_mpris2/mpris2.py:50
+msgid ""
+"Add the ability to control the application from any MPRIS2 compatible client."
+msgstr ""
+"Tämän moduulin avulla voit ohjata EpyMC:tä mistä tahansa MPRIS2-yhteensopivasta ohjelmasta."
+
+#: epymc/extapi/onlinevideo.py:189
+#, python-format
+msgid "%d year ago"
+msgid_plural "%d years ago"
+msgstr[0] "%d vuosi sitten"
+msgstr[1] "%d vuotta sitten"
+
+#: epymc/extapi/onlinevideo.py:192
+#, python-format
+msgid "%d month ago"
+msgid_plural "%d months ago"
+msgstr[0] "%d kuukausi sitten"
+msgstr[1] "%d kuukautta sitten"
+
+#: epymc/extapi/onlinevideo.py:195
+#, python-format
+msgid "%d week ago"
+msgid_plural "%d weeks ago"
+msgstr[0] "%d viikko sitten"
+msgstr[1] "%d viikkoa sitten"
+
+#: epymc/extapi/onlinevideo.py:197
+#, python-format
+msgid "%d day ago"
+msgid_plural "%d days ago"
+msgstr[0] "%d päivä sitten"
+msgstr[1] "%d päivää sitten"
+
+#: epymc/extapi/onlinevideo.py:200
+#, python-format
+msgid "%d hour ago"
+msgid_plural "%d hours ago"
+msgstr[0] "%d tunti sitten"
+msgstr[1] "%d tuntia sitten"
+
+#: epymc/extapi/onlinevideo.py:202
+#, python-format
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] "%d minuutti sitten"
+msgstr[1] "%d minuuttia sitten"

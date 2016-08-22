@@ -86,6 +86,7 @@ class EmcDatabase(object):
 
    def __del__(self):
       self._sh.close()
+      self._sync_timer.delete()
 
    def __len__(self):
       return len(self._sh)

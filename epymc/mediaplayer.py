@@ -44,7 +44,7 @@ def DBG(msg):
 video_extensions = ['.avi','.mpg','.mpeg','.mpe','.ogv','.mkv','.divx','.xvid',
                     '.mp4','.wmv','.flv','.f4v','.mov','.m4v','.m2v','.mp4v',
                     '.mpeg4','.dv','.rv','.webm','.vid','.h264','.rm']
-audio_extensions = ['.mp3','.ogg','.oga','.flac','.m4a','.wav']
+audio_extensions = ['.mp3','.ogg','.oga','.flac','.m4a','.wav','.opus']
 
 _volume = 0
 _volume_muted = False

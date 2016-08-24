@@ -568,7 +568,7 @@ class MusicModule(EmcModule):
       """ list of all albums (grouped by artist) """
       L = [self._albums_db.get_data(k) for k in self._albums_db.keys()]
       last_artist = None
-      for album in sorted(L, key=operator.itemgetter('artist')):
+      for album in sorted(L, key=lambda md: md.get('artist', '') or ''):
          if album['artist'] != last_artist:
             last_artist = album['artist']
             self._browser.group_add(last_artist, 'icon/artist')
@@ -577,7 +577,7 @@ class MusicModule(EmcModule):
    def populate_artists_page(self, browser, page_url):
       """ list of all artists """
       L = [self._artists_db.get_data(k) for k in self._artists_db.keys()]
-      for artist in sorted(L, key=operator.itemgetter('name')):
+      for artist in sorted(L, key=lambda md: md.get('name', '') or ''):
          self._browser.item_add(ArtistItemClass(), artist['name'], artist)
 
    def populate_artist_page(self, browser, url, artist):

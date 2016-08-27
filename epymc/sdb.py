@@ -52,7 +52,7 @@ class EmcDatabase(object):
       self._name = name
       self._vers = version
       self._vkey = '__database__version__'
-      self._outstanding_writes = False
+      self._sync_timer = None
 
       # build the db name (different db for py2 and py3)
       dbname = os.path.join(utils.user_conf_dir,
@@ -84,12 +84,13 @@ class EmcDatabase(object):
          # store the version inside the db
          self._sh[self._vkey] = version
 
-      self._sync_timer = ecore.Timer(10.0, self._sync_timer_cb)
       _instances.append(self)
 
    def _close(self):
       DBG('Closing database %s' % self._name)
-      self._sync_timer.delete()
+      if self._sync_timer is not None:
+         self._sync_timer.delete()
+         self._sync_timer = None
       self._sh.close()
 
    def __len__(self):
@@ -107,8 +108,11 @@ class EmcDatabase(object):
       else:
          # update the db now
          self._sh[key] = data
-         self._sync_timer.reset()
-         self._outstanding_writes = True
+         # delayed sync
+         if self._sync_timer is None:
+            self._sync_timer = ecore.Timer(5.0, self._sync_timer_cb)
+         else:
+            self._sync_timer.reset()
 
    def del_data(self, key):
       if key in self._sh:
@@ -128,12 +132,10 @@ class EmcDatabase(object):
          return self._sh[self._vkey]
 
    def _sync_timer_cb(self):
-      if self._outstanding_writes:
-         DBG("Syncing database %s" % self._name)
-         self._sh.sync()
-         self._outstanding_writes = False
-
-      return True
+      DBG("Syncing database %s" % self._name)
+      self._sh.sync()
+      self._sync_timer = None
+      return ecore.ECORE_CALLBACK_CANCEL
 
 ##################
 
@@ -168,10 +170,13 @@ def _process_queue():
       count -= 1
       (db, key, data) = _queue.get_nowait()
       db._sh[key] = data
-      db._sync_timer.reset()
-      db._outstanding_writes = True
-      #db._sh.sync() # TODO really sync at every write ??
 
-   return True
+   # delayed sync
+   if db._sync_timer is None:
+      db._sync_timer = ecore.Timer(5.0, db._sync_timer_cb)
+   else:
+      db._sync_timer.reset()
+
+   return ecore.ECORE_CALLBACK_RENEW
 
 

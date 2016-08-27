@@ -20,7 +20,12 @@
 
 from __future__ import absolute_import, print_function
 
-import sys, os, gettext, logging, argparse
+import os
+import sys
+import locale
+import gettext
+import logging
+import argparse
 
 from efl import evas
 from efl import ecore
@@ -35,6 +40,10 @@ import epymc.utils as utils
 # localle .mo files are searched directly inside the epymc package
 localedir = os.path.join(utils.emc_base_dir, 'locale')
 gettext.install('epymc', names='ngettext', localedir=localedir)
+
+# set locale to user preferred (aka the one set in env) locale
+locale.setlocale(locale.LC_ALL, '')
+
 
 import epymc.modules as modules
 import epymc.gui as gui

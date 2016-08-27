@@ -21,7 +21,6 @@
 from __future__ import absolute_import, print_function
 
 import os
-import locale
 from datetime import datetime
 
 from efl import evas
@@ -92,9 +91,6 @@ def init():
    global win, layout, theme_file
    global _backdrop_im1, _backdrop_im2, _backdrop_curr
    global _clock_update_timer
-
-   # set locale to user preferred (aka the one set in env) locale
-   locale.setlocale(locale.LC_ALL, '')
 
    # get config values, setting defaults if needed
    theme_name = ini.get('general', 'theme', default_value='default')

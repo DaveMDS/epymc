@@ -1032,16 +1032,15 @@ class EmcImage(Image):
 
       # a video thumbnail ?
       if url.startswith('special/vthumb/'):
-         if emc_thumbnailer is not None: # TODO remove this for release 
-            ret = emc_thumbnailer.generate(url[15:], self._thumb_complete_cb,
-                                           frame='vthumb')
-            if isinstance(ret, str): # thumb already exists (ret is thumb path)
-               self.file_set(ret)
-            elif isinstance(ret, int): # generation started (ret is req_id)
-               self._thumb_request_id = ret
-               self.file_set(theme_file, 'emc/image/thumbnailing')
-            else: # failed ... this cannot really happend atm
-              self.file_set(theme_file, 'emc/image/error')
+         ret = emc_thumbnailer.generate(url[15:], self._thumb_complete_cb,
+                                        frame='vthumb')
+         if isinstance(ret, str): # thumb already exists (ret is thumb path)
+            self.file_set(ret)
+         elif isinstance(ret, int): # generation started (ret is req_id)
+            self._thumb_request_id = ret
+            self.file_set(theme_file, 'emc/image/thumbnailing')
+         else: # failed ... this cannot really happend atm
+           self.file_set(theme_file, 'emc/image/error')
          return
 
       # a special image ?

@@ -44,6 +44,7 @@ _queue = None
 _queue_timer = None
 _instances = []
 
+
 class EmcDatabase(object):
    """ TODO doc this """
 
@@ -62,8 +63,7 @@ class EmcDatabase(object):
       first_run = False if glob.glob(dbname + '*') else True
 
       # open the shelve
-      #self._sh = shelve.open(dbname)
-      self._sh = EpyMCShelf(dbname)
+      self._sh = shelve.open(dbname)
 
       if (not first_run) and (version is not None) and (self.get_version() != version):
          # the db is outdated
@@ -175,7 +175,3 @@ def _process_queue():
    return True
 
 
-class EpyMCShelf(shelve.Shelf):
-    def __init__(self, filename, flag='c', protocol=None, writeback=False):
-        import dbm.gnu
-        shelve.Shelf.__init__(self, dbm.gnu.open(filename, 'cf'), protocol, writeback)

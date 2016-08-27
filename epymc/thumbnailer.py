@@ -78,10 +78,9 @@ class EmcThumbnailer(utils.Singleton):
       if url.startswith('file://'):
          url = url[7:]
 
-      # thumb already exists?
+      # thumb already exists? (and is updated)
       thumb = self.thumb_path_get(url)
-      if os.path.exists(thumb):
-         # TODO check file mod time ??
+      if os.path.exists(thumb) and os.path.getmtime(thumb) > os.path.getmtime(url):
          return thumb
 
       # start the slave process if necessary

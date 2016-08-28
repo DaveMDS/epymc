@@ -1,7 +1,9 @@
 
                 EpyMC THEMES REFERENCE
 
-All the icons and images in icons.edc must be implemented.
+* All the icons and images in icons.edc must be implemented.
+* All the elm widgets in elm_extension.edc must be implemented.
+
 
 ### Theme info ################################################################
    * Required data items:
@@ -109,9 +111,14 @@ All the icons and images in icons.edc must be implemented.
       "fileman,hide" "emc"
 
 
+### Slideshow swallow ###
+   * Required parts:
+      "slideshow.swallow" -> edje SWALLOW
+
+
 ### Video Player swallow ###
    * Required parts:
-      "videoplayer.swallow" -> edje SWALLOW;
+      "videoplayer.swallow" -> edje SWALLOW
       "videoplayer.subs" -> edje TEXTBLOCK (style: "epymc_subtitles_style")
 
    * Signals received from the application:
@@ -123,9 +130,9 @@ All the icons and images in icons.edc must be implemented.
       "videoplayer,hide,done" ""
 
 
-### Slideshow swallow ###
+### Audio Player swallow ###
    * Required parts:
-      "slideshow.swallow" -> edje SWALLOW
+      "audioplayer.swallow" -> edje SWALLOW
 
 
 ### Volume ###
@@ -176,6 +183,32 @@ All the icons and images in icons.edc must be implemented.
       "minipos,hide" "emc"
       "minipos,play,set" "emc"
       "minipos,pause,set" "emc"
+
+
+### Audio Player ##############################################################
+   * Group: "emc/audioplayer/default"
+
+   * Required parts:
+      "cover.swallow" -> edje SWALLOW -> EmcImage
+      "playlist.swallow" -> edje SWALLOW -> elm list
+      "artist.text" -> edje TEXT
+      "album.text" -> edje TEXT
+      "song_and_artist.text" -> edje TEXTBLOCK
+      "buttons.box" ->  edje BOX
+      "vol.slider" -> edje SMALLOW -> EmcSlider
+      "pos.slider" -> edje SMALLOW -> EmcSlider
+
+   * Signals received from the application:
+      "audioplayer,show" "emc"
+      "audioplayer,hide" "emc"
+      "audioplayer,expand" "emc"
+      "audioplayer,contract" "emc"
+
+   * Signal that should/must be sent to the app:
+      "audioplayer,show,done"
+      "audioplayer,hide,done"
+      "audioplayer,expand,request"
+      "audioplayer,contract,request"
 
 
 ### Dialog (panel) ############################################################

@@ -56,7 +56,7 @@ _clock_update_timer = None
 _clock_time_str = ''
 _clock_date_str = ''
 
-_theme_generation = '6'
+_theme_generation = '7'
 
 EXPAND_BOTH = evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND
 EXPAND_HORIZ = evas.EVAS_HINT_EXPAND, 0.0

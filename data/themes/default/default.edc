@@ -76,7 +76,7 @@ data {
    item: "theme.version" "0.8";
    item: "theme.author" "davemds";
    item: "theme.info" "A more long description of the theme";
-   item: "theme.generation" "6";
+   item: "theme.generation" "7";
 }
 
 images {
@@ -1509,7 +1509,7 @@ collections {
          }
 
 /// audioplayer swallow
-         part { name: "audioplayer.swallow"; type: SWALLOW;  /* API TODOC */
+         part { name: "audioplayer.swallow"; type: SWALLOW;  /* API */
             description { state: "default" 0.0; }
          }
 
@@ -2791,7 +2791,7 @@ collections {
    }
 
 /// audioplayer
-   group { name: "emc/audioplayer/default";  /* API TODOC */
+   group { name: "emc/audioplayer/default";  /* API */
       images.image: "frame2_solid.png" COMP;
       images.image: "shadow_far_top.png" COMP;
       images.image: "shadow_far_right.png" COMP;
@@ -2826,7 +2826,7 @@ collections {
                align: 1.0 0.5;
             }
          }
-         part { name: "cover.swallow"; type: SWALLOW;  /* API TODOC */
+         part { name: "cover.swallow"; type: SWALLOW;  /* API */
             scale: 1;
             description { state: "default" 0.0;
                FIXED_SIZE(150, 150)
@@ -2837,7 +2837,7 @@ collections {
                rel2.offset: -10 -7;
             }
          }
-         part { name: "playlist.swallow"; type: SWALLOW;  /* API TODOC */
+         part { name: "playlist.swallow"; type: SWALLOW;  /* API */
             description { state: "default" 0.0;
                fixed: 1 1;
                rel1.to_x: "main";
@@ -2883,7 +2883,7 @@ collections {
                rel2.offset: -10 -1;
             }
          }
-         part { name: "artist.text"; type: TEXT; /* API TODOC */
+         part { name: "artist.text"; type: TEXT; /* API */
             scale: 1;
             description { state: "default" 0.0;
                fixed: 1 1;
@@ -2903,7 +2903,7 @@ collections {
                }
             }
          }
-         part { name: "album.text"; type: TEXT; /* API TODOC */
+         part { name: "album.text"; type: TEXT; /* API */
             scale: 1;
             description { state: "default" 0.0;
                fixed: 1 1;
@@ -2923,7 +2923,7 @@ collections {
                }
             }
          }
-         part { name: "buttons.box"; type: BOX;  /* API TODOC */
+         part { name: "buttons.box"; type: BOX;  /* API */
             description { state: "default" 0.0;
                fixed: 1 1;
                rel1.to: "vol.slider";
@@ -2938,7 +2938,7 @@ collections {
                }
             }
          }
-         part { name: "vol.slider"; type: SWALLOW;  /* API TODOC */
+         part { name: "vol.slider"; type: SWALLOW;  /* API */
             scale: 1;
             description { state: "default" 0.0;
                fixed: 1 1;
@@ -2949,7 +2949,7 @@ collections {
                align: 0.5 1.0;
             }
          }
-         part { name: "pos.slider"; type: SWALLOW;  /* API TODOC */
+         part { name: "pos.slider"; type: SWALLOW;  /* API */
             scale: 1;
             description { state: "default" 0.0;
                fixed: 1 1;
@@ -2998,7 +2998,7 @@ collections {
                   rel2.relative: 1.0 0.0;
                   rel2.offset: -1 -7;
                }
-               part { name: "song_and_artist.text"; type: TEXTBLOCK; /* API TODOC */
+               part { name: "song_and_artist.text"; type: TEXTBLOCK; /* API */
                   nomouse;
                   scale: 1;
                   multiline: 0;

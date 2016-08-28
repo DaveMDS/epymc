@@ -26,16 +26,22 @@ Bug fixed:
  * Fixed compatibility with python 3.5 (os.path.exists no more accept unicode)
 
 
-New features:
+Improvements:
 
- * New Photo module
+ * Initial music library scan is now 10 times faster (measured with the library
+   and the config folder on the same slow HDD) see Issue #2 for more info.
  * Lots of improvements in the Music module and the AudioPlayer itself:
    playlist is now visible and browsable, player/playlist controls are always
    reachable in the UI, ability to set loop and shuffle.
+ * Better zapiks video schannel
+ 
+
+New features:
+
+ * New Photo module
  * New PosterGrid/CoverGrid views
  * New South Park Studios online video channel
  * New themoviedb.org online video channel (with movie trailers)
- * Better zapiks video schannel
  * Virtual keyboard is now also usable with the real keyboard
  * Virtual keyboard now support multiple layouts
  * Show the status of the downloads in progress (with ability to start/abort)
@@ -47,6 +53,11 @@ New features:
  * Show current folders in the file-manager
  * Option to hide the mouse cursor when not needed (not move or video playing)
  * Support for subtitles embedded in the video files
+
+
+New Translations:
+
+ * Finnish
 
 
 ===============================================================================

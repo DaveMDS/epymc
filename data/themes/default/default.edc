@@ -2926,8 +2926,8 @@ collections {
          part { name: "buttons.box"; type: BOX;  /* API TODOC */
             description { state: "default" 0.0;
                fixed: 1 1;
-               rel1.to: "pos.slider";
-               rel2.to: "pos.slider";
+               rel1.to: "vol.slider";
+               rel2.to: "vol.slider";
                rel2.relative: 1.0 -0.2;
                align: 0.5 1.0;
                box {
@@ -2936,6 +2936,17 @@ collections {
                   align: 0.0 0.0;
                   min: 1 1;
                }
+            }
+         }
+         part { name: "vol.slider"; type: SWALLOW;  /* API TODOC */
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.to: "pos.slider";
+               rel1.relative: 0.0 0.0;
+               rel2.to: "pos.slider";
+               rel2.relative: 1.0 0.0;
+               align: 0.5 1.0;
             }
          }
          part { name: "pos.slider"; type: SWALLOW;  /* API TODOC */

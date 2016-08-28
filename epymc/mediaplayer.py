@@ -684,6 +684,13 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       b.toggled = playlist.shuffle
       self.box_append('buttons.box', b)
 
+      ### volume slider
+      self._vol_slider = EmcSlider(self, indicator_show=False)
+      self._vol_slider.content_set('end', gui.load_icon('icon/volume'))
+      self._vol_slider.callback_changed_add(self._vol_slider_changed_cb)
+      self.content_set('vol.slider', self._vol_slider)
+      self._vol_slider.value = volume_get() / 100
+
       ### position slider
       self._pos_slider = EmcSlider(self, indicator_show_on_focus=True)
       self._pos_slider.callback_changed_add(self._pos_slider_changed_cb)
@@ -801,6 +808,9 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       return ecore.ECORE_CALLBACK_CANCEL if single else ecore.ECORE_CALLBACK_RENEW
 
    ### slider callbacks
+   def _vol_slider_changed_cb(self, sl):
+      volume_set(sl.value * 100)
+
    def _pos_slider_changed_cb(self, sl):
       self.position_percent = sl.value
 
@@ -852,6 +862,9 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
 
       elif event == 'PLAYLIST_CHANGED':
          self._gl_populate()
+
+      elif event == 'VOLUME_CHANGED':
+         self._vol_slider.value = volume_get() / 100.0
 
       elif event == 'PLAYBACK_SEEKED':
          # emotion need some loop to update the position, so

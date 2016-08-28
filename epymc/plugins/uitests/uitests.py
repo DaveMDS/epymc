@@ -24,10 +24,11 @@ import os, time
 
 from efl import ecore, edje, elementary
 from efl.elementary.box import Box
+from efl.evas import EXPAND_BOTH, FILL_BOTH, FILL_HORIZ
 
 from epymc.modules import EmcModule
 from epymc.gui import EmcDialog, EmcVKeyboard, EmcFolderSelector, \
-   EmcButton, EmcNotify, EmcMenu, DownloadManager
+   EmcButton, EmcNotify, EmcMenu, DownloadManager, EmcSlider
 
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
@@ -515,6 +516,46 @@ class MyItemClass(EmcItemClass):
                hbox2.pack_end(b)
                i += 1
 
+      # Sliders
+      elif url == 'uitests://sliders':
+         vbox = Box(gui.win)
+         d = EmcDialog(title='Slider test', content=vbox, style='panel')
+
+         # normal
+         sl = EmcSlider(vbox, value=0.5, indicator_show=False,
+                        size_hint_fill=FILL_HORIZ)
+         vbox.pack_end(sl)
+         sl.focus = True
+
+         # icons
+         sl = EmcSlider(vbox, value=0.5,  indicator_show=False,
+                        size_hint_fill=FILL_HORIZ)
+         sl.part_content_set('icon', gui.load_icon('icon/evas'))
+         sl.part_content_set('end', gui.load_icon('icon/check_on'))
+         vbox.pack_end(sl)
+
+         # with text
+         sl = EmcSlider(vbox, text='with text', value=0.5, indicator_show=False,
+                        size_hint_fill=FILL_HORIZ)
+         vbox.pack_end(sl)
+
+         # no focus
+         sl = EmcSlider(vbox, text='no focus', value=0.5, indicator_show=False,
+                        focus_allow=False, size_hint_fill=FILL_HORIZ)
+         vbox.pack_end(sl)
+
+         # unit + indicator format
+         sl = EmcSlider(vbox, text='indicator', min_max=(-1.0, 3.0),
+                        unit_format='%.2f u', indicator_format='%.1f u',
+                        indicator_show_on_focus=True,
+                        size_hint_fill=FILL_HORIZ)
+         vbox.pack_end(sl)
+
+         # disabled
+         sl = EmcSlider(vbox, text='disabled', unit_format='unit', value=0.5,
+                        disabled=True, size_hint_fill=FILL_HORIZ)
+         vbox.pack_end(sl)
+
       # Icons gallery
       elif url == 'uitests://icons':
          d = EmcDialog(title='Icons gallery', style='list')
@@ -588,6 +629,7 @@ class UiTestsModule(EmcModule):
 
    def populate_root(self, browser, url):
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + Focus')
+      browser.item_add(MyItemClass(), 'uitests://sliders', 'Sliders')
       browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')
       browser.item_add(MyItemClass(), 'uitests://mpvo', 'Mediaplayer - Online Video (good)')
       browser.item_add(MyItemClass(), 'uitests://mpvom', 'Mediaplayer - Online Video (med)')

@@ -31,7 +31,7 @@ from efl import elementary as elm
 from efl.elementary import Window, ELM_WIN_BASIC, Layout, Icon, Image, Button, \
    Menu, Progressbar, Box, Entry, Scroller, Scrollable, Frame, List, Table, \
    Genlist, GenlistItemClass, ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS, \
-   Gengrid, Slideshow, SlideshowItemClass
+   Gengrid, Slideshow, SlideshowItemClass, Slider
 from efl.elementary.theme import theme_overlay_add, theme_extension_add
 from efl.elementary.configuration import scale_set as elm_scale_set
 from efl.elementary.configuration import scale_get as elm_scale_get
@@ -571,6 +571,18 @@ def focus_move(direction, root_obj=None):
          to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
          return True
 
+   # change sliders value
+   elif isinstance(focused, EmcSlider) and focused.focus_allow:
+      sl = focused
+      if direction == 'RIGHT': # TODO support vertical
+         sl.value += sl.step
+         sl.callback_call('changed')
+         return True
+      elif direction == 'LEFT':
+         sl.value -= sl.step
+         sl.callback_call('changed')
+         return True
+
    # or just let elm move the focus between objects...
    root_obj.focus_next(focus_directions[direction])
 
@@ -867,6 +879,13 @@ class EmcButton(Button):
             self._cb(self, self._cb_data)
          else:
             self._cb(self)
+
+################################################################################
+class EmcSlider(Slider):
+   """ Simple wrapper around the elm Slider class """
+   def __init__(self, parent, **kargs):
+      Slider.__init__(self, parent, style='emc', **kargs)
+      self.show()
 
 ################################################################################
 class EmcMenu(Menu):

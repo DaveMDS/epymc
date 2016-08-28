@@ -166,7 +166,7 @@ All the icons and images in icons.edc must be implemented.
       "controls.poster" -> edje SWALLOW
       "controls.title" -> edje TEXT
       "minipos.position" -> edje TEXT
-      "minipos.slider" -> edje GROUP -> "emc/slider/default"
+      "minipos.slider" -> edje SWALLOW -> EmcSlider
       "minipos.length" -> edje TEXT
 
    * Signals received from the application:

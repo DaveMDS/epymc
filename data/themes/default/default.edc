@@ -2792,8 +2792,7 @@ collections {
                text.text: "0:00:00";
             }
          }
-         part { name: "minipos.slider"; type: GROUP;  /* API */
-            source: "emc/slider/default";
+         part { name: "minipos.slider"; type: SWALLOW;  /* API */
             mouse_events: 0;
             scale: 1;
             description { state: "default" 0.0;

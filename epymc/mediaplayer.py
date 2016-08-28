@@ -932,6 +932,10 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       self._pos_slider.callback_changed_add(
                            lambda s: setattr(self, 'position_percent', s.value))
       self.content_set('controls.slider', self._pos_slider)
+
+      ### minipos slider
+      self._minipos_slider = EmcSlider(self, focus_allow=False)
+      self.content_set('minipos.slider', self._minipos_slider)
    
       ### swallow ourself in the main layout and show
       gui.swallow_set('videoplayer.swallow', self)
@@ -1073,7 +1077,7 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
          self.text_set('clock', datetime.now().strftime('%H:%M'))
 
       if self._minipos_visible:
-         self.edje.part_drag_value_set('minipos.slider:dragable1', pos, pos)
+         self._minipos_slider.value = pos
          self.text_set('minipos.position', pos_str)
          self.text_set('minipos.length', len_str)
 

@@ -226,13 +226,6 @@ All the icons and images in icons.edc must be implemented.
       "emc.text.caption" -> edje TEXTBLOCK
 
 
-### Slider ####################################################################
-   * Group: "emc/slider/default"
-
-   * Required parts:
-      "dragable1" -> edge dragable
-
-
 ### Slideshow #################################################################
    * Group: "emc/slideshow/default"
 

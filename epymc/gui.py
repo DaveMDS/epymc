@@ -443,12 +443,6 @@ def swallow_set(part, obj, delete_old=True):
       layout.content_set(part, obj)
       return ret
 
-def slider_val_set(part, value):
-   layout.edje_get().part_drag_value_set(part, value, value)
-
-def slider_val_get(part):
-   return layout.edje_get().part_drag_value_get(part)
-
 def box_append(part, obj):
    layout.box_append(part, obj)
 

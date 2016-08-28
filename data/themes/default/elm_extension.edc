@@ -3563,8 +3563,8 @@ group { name: "elm/slider/horizontal/emc";
    images.image: "slider_run_base_light_horiz.png" COMP;
    images.image: "horiz_glow_run.png" COMP;
    images.image: "horiz_glow_run_rev.png" COMP;
-   images.image: "knob_round_small_normal.png" COMP;
-   images.image: "knob_round_small_selected.png" COMP;
+   // images.image: "knob_round_small_normal.png" COMP;
+   // images.image: "knob_round_small_selected.png" COMP;
    set { name: "knob";
       // XXX: add more sizes (at least up to 128x128)
       image { image: "knob_sz_24.png"  COMP; size: 31 31 32 32; }

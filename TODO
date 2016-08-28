@@ -20,7 +20,6 @@ TMP
  For release:
    * db_py3_browser_view_memory need to be cleared for the relase (dump version)
    * comment-out all DBG functions
-   * update italian translation
 
  Music features:
    * playlist item remove/reorder

@@ -1653,10 +1653,10 @@ group { name: "elm/genlist/item/group_index/browser"; nomouse; program_source: "
    data.item: "contents" "elm.swallow.icon elm.swallow.end";
    // data.item: "treesize" TREEPAD;
    
+   images.image: "vgrad_med_dark.png" COMP;
    images.image: "shadow_square_tiny.png" COMP;
    images.image: "bevel_out.png" COMP;
-   images.image: "horizontal_separated_bar_small_glow.png" COMP;
-   
+
    parts {
       image { "shadow_vbar";
          desc { "default";
@@ -1671,10 +1671,11 @@ group { name: "elm/genlist/item/group_index/browser"; nomouse; program_source: "
       }
       image { "base_vbar";
          desc { "default";
-            image.normal: "vgrad_med_lighter.png";
+            image.normal: "vgrad_med_dark.png";
             fill.smooth: 0;
             min: 5 13;
             TILED_HORIZ(120)
+            color: 255 255 255 200;
          }
       }
       image { "bevel_vbar";
@@ -1702,9 +1703,10 @@ group { name: "elm/genlist/item/group_index/browser"; nomouse; program_source: "
             color: FONT_COLOR;
             color_class: "list_group_item";
             text { font: FONT; size: FONT_SIZE;
-               min: 1 1;
-               ellipsis: -1;
-               align: 0.0 0.5;
+               // min: 1 1;
+               // ellipsis: -1;
+               ellipsis: 0.0;
+               align: 0.5 0.5;
                text_class: "list_group_item";
             }
             link.base: "elm,state,enabled";
@@ -1742,29 +1744,15 @@ group { name: "elm/genlist/item/group_index/browser"; nomouse; program_source: "
             fixed: 1 0;
             align: 1.0 0.5;
             rel1.offset: -3 2;
-            rel1.relative: 1.0 0.0;
+            // rel1.relative: 1.0 0.0;
             rel2.offset: -3 -3;
-         }
-      }
-      image { "bar";
-         desc { "default";
-            image.normal: "horizontal_separated_bar_small_glow.png";
-            image.border: 4 4 4 4;
-            fill.smooth: 0;
-            rel1.relative: 0.0 1.0;
-            rel1.offset: -3 -6;
-            rel2.offset: 2 3;
-            link.base: "elm,state,enabled";
-         }
-         desc { "disabled";
-            inherit: "default";
-             color: 255 255 255 64;
-             link.base: "elm,state,disabled";
+            aspect: 1 1; aspect_preference: BOTH;
+            
          }
       }
    }
 }
-group { "elm/genlist/item_compress/group_index/browser"; nomouse;
+group { name: "elm/genlist/item_compress/group_index/browser"; nomouse;
    inherit: "elm/genlist/item/group_index/browser";
    parts {
       text { "elm.text";

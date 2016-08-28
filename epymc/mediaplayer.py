@@ -28,7 +28,7 @@ from efl import evas, ecore, edje, emotion, elementary as elm
 
 from epymc import utils, ini, gui, input_events, events
 from epymc.gui import EmcDialog, EmcButton, EmcMenu, DownloadManager, \
-   EmcNotify, EmcImage
+   EmcNotify, EmcImage, EmcSlider
 from epymc.sdb import EmcDatabase
 from epymc.subtitles import Subtitles, Opensubtitles
 
@@ -655,9 +655,6 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       ### init the layout
       elm.Layout.__init__(self, gui.layout, focus_allow=False, name='AudioPlayer',
                           file=(gui.theme_file, 'emc/audioplayer/default'))
-      
-      # update emotion position when mouse drag the progress slider
-      self.signal_callback_add('drag', 'pos.slider:dragable1', self._pos_dragged_cb)
       self.signal_callback_add('audioplayer,expand,request', '',
                                lambda a,s,d: self.controls_show())
       self.signal_callback_add('audioplayer,contract,request', '',
@@ -689,6 +686,11 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
                     cb=self._toggle_shuffle_cb)
       b.toggled = playlist.shuffle
       self.box_append('buttons.box', b)
+
+      ### position slider
+      self._pos_slider = EmcSlider(self, indicator_show_on_focus=True)
+      self._pos_slider.callback_changed_add(self._pos_slider_changed_cb)
+      self.content_set('pos.slider', self._pos_slider)
 
       ### playlist genlist
       self._itc = elm.GenlistItemClass(item_style='default',
@@ -796,14 +798,16 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       playlist_item.play()
 
    def _update_timer(self, single=False):
-      pos = self.position_percent
-      self.edje.part_drag_value_set('pos.slider:dragable1', pos, pos)
+      self._pos_slider.value = self.position_percent
+      self._pos_slider.unit_format = utils.seconds_to_duration(self.play_length)
+      self._pos_slider.indicator_format = utils.seconds_to_duration(self.position)
       return ecore.ECORE_CALLBACK_CANCEL if single else ecore.ECORE_CALLBACK_RENEW
 
-   def _pos_dragged_cb(self, obj, emission, source):
-      (val,val2) = self.edje.part_drag_value_get('pos.slider:dragable1')
-      self.position_percent = val
+   ### slider callbacks
+   def _pos_slider_changed_cb(self, sl):
+      self.position_percent = sl.value
 
+   ### buttons callbacks
    def _toggle_loop_cb(self, b):
       playlist.loop = not playlist.loop
       ini.set('mediaplayer', 'playlist_loop', playlist.loop)

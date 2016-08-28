@@ -3005,24 +3005,12 @@ collections {
                }
             }
          }
-         part { name: "pos.slider"; type: GROUP;  /* API TODOC */
-            source: "emc/slider/default";
-            mouse_events: 1;
-            scale: 1;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               rel1.to: "info.spacer";
-               rel1.relative: 0.0 1.0;
-               rel2.to: "info.spacer";
-               align: 0.5 1.0;
-            }
-         }
          part { name: "buttons.box"; type: BOX;  /* API TODOC */
             description { state: "default" 0.0;
                fixed: 1 1;
                rel1.to: "pos.slider";
                rel2.to: "pos.slider";
-               rel2.relative: 1.0 0.0;
+               rel2.relative: 1.0 -0.2;
                align: 0.5 1.0;
                box {
                   layout: "horizontal";
@@ -3032,7 +3020,16 @@ collections {
                }
             }
          }
-
+         part { name: "pos.slider"; type: SWALLOW;  /* API TODOC */
+            scale: 1;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.to: "info.spacer";
+               rel1.relative: 0.0 1.0;
+               rel2.to: "info.spacer";
+               align: 0.5 1.0;
+            }
+         }
          part { name: "left"; type: RECT; mouse;
             scale: 1;
             description { state: "default" 0.0;

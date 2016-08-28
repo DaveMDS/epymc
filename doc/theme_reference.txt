@@ -160,7 +160,7 @@ All the icons and images in icons.edc must be implemented.
       "events.rect" -> edje part with mouse_events = 1
       "controls.btn_box" -> edje BOX (will contain play,stop,etc buttons)
       "controls.btn_box2" -> edje BOX (will contain Video,Audio,etc buttons)
-      "controls.slider" -> edje GROUP -> "emc/slider/default"
+      "controls.slider" -> edje SWALLOW -> EmcSlider
       "controls.position" -> edje TEXT
       "controls.length" -> edje TEXT
       "controls.poster" -> edje SWALLOW

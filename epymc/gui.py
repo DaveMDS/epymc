@@ -593,8 +593,14 @@ def focus_move(direction, root_obj=None):
        focused.name or '<%s>' % focused.__class__.__name__,
        new_focused.name or '<%s>' % new_focused.__class__.__name__))
 
-   # FOCUS FIX: always close AudioPlayer on LEFT event
+
    if focused == new_focused:
+      # FOCUS FIX: UP on VideoPlayer.PosSlider do not work
+      if direction == 'UP' and focused.name == 'VideoPlayer.PosSlider':
+         DBG("FOCUS FIX: UP on VideoPlayer.PosSlider do not work")
+         root_obj.evas.object_name_find('VideoPlayer.PlayBtn').focus = True
+
+      # FOCUS FIX: always close AudioPlayer on LEFT event
       if direction == 'LEFT' and focused.parent.name == 'AudioPlayer':
          # TODO: "LEFT" should be taken from the theme, or the position
          DBG("FOCUS FIX: always close AudioPlayer on LEFT event")

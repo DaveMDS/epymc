@@ -891,12 +891,6 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       self.signal_callback_add('mouse,down,2', 'events.rect',
                                lambda a,s,d: gui.fullscreen_toggle())
 
-      # update emotion position when mouse drag the progress slider
-      def _drag_prog(obj, emission, source):
-         (val,val2) = self.edje.part_drag_value_get('controls.slider:dragable1')
-         self.position = self._emotion.play_length * val
-      self.signal_callback_add('drag', 'controls.slider:dragable1', _drag_prog)
-
       ### init the base player class
       EmcPlayerBase.__init__(self)
       self.content_set('video.swallow', self._emotion)
@@ -915,6 +909,7 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       bt = EmcButton(icon='icon/pause', cb=lambda b: self.pause_toggle())
       self.box_append('controls.btn_box', bt)
       self._play_pause_btn = bt
+      bt.name = 'VideoPlayer.PlayBtn'
 
       bt = EmcButton(icon='icon/fwd', cb=lambda b: self.forward())
       self.box_append('controls.btn_box', bt)
@@ -930,6 +925,13 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
 
       bt = EmcButton(_('Subtitles'), cb=self._subs_menu_build)
       self.box_append('controls.btn_box2', bt)
+
+      ### position slider
+      self._pos_slider = EmcSlider(self, name='VideoPlayer.PosSlider',
+                                   indicator_show=False)
+      self._pos_slider.callback_changed_add(
+                           lambda s: setattr(self, 'position_percent', s.value))
+      self.content_set('controls.slider', self._pos_slider)
    
       ### swallow ourself in the main layout and show
       gui.swallow_set('videoplayer.swallow', self)
@@ -1065,7 +1067,7 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       len_str = utils.seconds_to_duration(self._emotion.play_length, True)
 
       if self._controls_visible:
-         self.edje.part_drag_value_set('controls.slider:dragable1', pos, pos)
+         self._pos_slider.value = pos
          self.text_set('controls.position', pos_str)
          self.text_set('controls.length', len_str)
          self.text_set('clock', datetime.now().strftime('%H:%M'))

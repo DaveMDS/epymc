@@ -2618,20 +2618,18 @@ collections {
                text.text: "0:00:00";
             }
          }
-         part { name: "controls.slider"; type: GROUP;  /* API */
-            source: "emc/slider/default";
-            mouse_events: 1;
+         part { name: "controls.slider"; type: SWALLOW;  /* API */
             scale: 1;
             description { state: "default" 0.0;
                fixed: 1 1;
                rel1 {
                   to: "controls.position.spacer";
-                  relative: 1.0 0.0;
+                  relative: 1.0 0.2;
                   offset: 5 0;
                }
                rel2 {
                   to: "controls.length";
-                  relative: 0.0 1.0;
+                  relative: 0.0 0.8;
                   offset: -6 -1;
                }
             }

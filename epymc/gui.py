@@ -489,10 +489,11 @@ focus_directions = {
 
 def focus_move(direction, root_obj=None):
    """ TODOC """
-   
+
    if root_obj is None:
       root_obj = layout
-   focused = root_obj.focused_object
+
+   focused = win.focused_object
 
    # move between List items...
    if isinstance(focused, List) and focused.focus_allow:
@@ -601,16 +602,20 @@ def focus_move(direction, root_obj=None):
    # ... and now various fixes on the work done by elm
    new_focused = win.focused_object
    DBG("Focus move  ROOT:%s  OLD:%s  NEW:%s" % (
-       root_obj.name or '<%s>' % root_obj.__class__.__name__,
-       focused.name or '<%s>' % focused.__class__.__name__,
-       new_focused.name or '<%s>' % new_focused.__class__.__name__))
+       (root_obj.name or '<%s>' % root_obj.__class__.__name__) if root_obj else None,
+       (focused.name or '<%s>' % focused.__class__.__name__) if focused else None,
+       (new_focused.name or '<%s>' % new_focused.__class__.__name__)) if new_focused else None)
 
 
    if focused == new_focused:
-      # FOCUS FIX: UP on VideoPlayer.PosSlider do not work
-      if direction == 'UP' and focused.name == 'VideoPlayer.PosSlider':
-         DBG("FOCUS FIX: UP on VideoPlayer.PosSlider do not work")
-         root_obj.evas.object_name_find('VideoPlayer.PlayBtn').focus = True
+      # FOCUS FIX: UP/DOWN on VideoPlayer.PosSlider do not work
+      if focused.name == 'VideoPlayer.PosSlider':
+         if direction == 'UP':
+            DBG("FOCUS FIX: UP on VideoPlayer.PosSlider do not work")
+            root_obj.evas.object_name_find('VideoPlayer.PlayBtn').focus = True
+         elif direction == 'DOWN':
+            DBG("FOCUS FIX: DOWN on VideoPlayer.PosSlider do not work (root is different)")
+            root_obj.evas.object_name_find('VolumeSlider').focus = True
 
       # FOCUS FIX: always close AudioPlayer on LEFT event
       if direction == 'LEFT' and focused.parent.name == 'AudioPlayer':

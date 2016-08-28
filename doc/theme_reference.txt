@@ -130,7 +130,7 @@ All the icons and images in icons.edc must be implemented.
 
 ### Volume ###
    * Required parts:
-      "volume.slider" -> edje GROUP -> "emc/slider/default"
+      "volume.slider" -> edje SWALLOW -> EmcSlider
 
    * Signals received from the application:
       "volume,show" "emc"

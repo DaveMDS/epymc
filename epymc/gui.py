@@ -49,6 +49,7 @@ _backdrop_im1 = None
 _backdrop_im2 = None
 _backdrop_curr = None
 
+_volume_slider = None
 _volume_hide_timer = None
 _volume_persistent = False
 _clock_update_timer = None
@@ -91,6 +92,7 @@ def init():
    global win, layout, theme_file
    global _backdrop_im1, _backdrop_im2, _backdrop_curr
    global _clock_update_timer
+   global _volume_slider
 
    # get config values, setting defaults if needed
    theme_name = ini.get('general', 'theme', default_value='default')
@@ -171,6 +173,12 @@ def init():
    swallow_set('bg.swallow.backdrop2', _backdrop_im2)
    _backdrop_curr = _backdrop_im2
 
+   # volume slider
+   _volume_slider = EmcSlider(layout, name='VolumeSlider',
+                              indicator_show=False, focus_allow=False)
+   swallow_set('volume.slider', _volume_slider)
+
+   # show the main window
    win.show()
    win.scale_set(float(scale))
 
@@ -313,6 +321,8 @@ def volume_show(hidein=0, persistent=False):
          _volume_hide_timer = None
 
    signal_emit('volume,show')
+   _volume_slider.focus_allow = True
+
    if hidein > 0 and not _volume_persistent:
       if _volume_hide_timer: _volume_hide_timer.delete()
       _volume_hide_timer = ecore.Timer(hidein, volume_hide)
@@ -322,9 +332,11 @@ def volume_hide():
    signal_emit('volume,hide')
    _volume_hide_timer = None
    _volume_persistent = False
+   _volume_slider.focus = False
+   _volume_slider.focus_allow = False
 
 def volume_set(value):
-   slider_val_set('volume.slider:dragable1', value)
+   _volume_slider.value = value
 
 def scale_set(scale):
    elm_scale_set(scale)

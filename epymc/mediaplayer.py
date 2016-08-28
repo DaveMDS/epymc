@@ -236,10 +236,7 @@ def init():
    input_events.listener_add("mediaplayer", input_event_cb)
 
    # update volume when mouse drag the volume slider
-   def _drag_vol(obj, emission, source):
-      (val,val2) = gui.slider_val_get('volume.slider:dragable1')
-      volume_set(val * 100.0)
-   gui.signal_cb_add('drag', 'volume.slider:dragable1', _drag_vol)
+   gui._volume_slider.callback_changed_add(lambda s: volume_set(s.value * 100))
 
    # click the volume icon to toggle mute
    gui.signal_cb_add('emc,mute,toggle', '',

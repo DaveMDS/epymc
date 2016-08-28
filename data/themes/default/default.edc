@@ -1548,20 +1548,19 @@ collections {
                align: 0.5 1.0;
             }
          }
-         part { name: "volume.slider"; type: GROUP;  /* API */
-            source: "emc/slider/default";
-            mouse_events: 1;
+         part { name: "volume.slider"; type: SWALLOW;  /* API */
             scale: 1;
             description { state: "default" 0.0;
                fixed: 1 1;
                rel1 {
                   to_y: "volume.bg";
                   to_x: "volume.icon";
-                  relative: 1.0 0.0;
+                  relative: 1.0 0.2;
                   offset: 8 0;
                }
                rel2 {
                   to: "volume.bg";
+                  relative: 1.0 0.8;
                   offset: -12 0;
                }
             }

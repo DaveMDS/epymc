@@ -45,3 +45,8 @@ update_po:
 	$(PY) setup.py update_po
 
 
+.PHONY: check_po
+check_po:
+	$(PY) setup.py check_po
+
+

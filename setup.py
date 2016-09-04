@@ -7,6 +7,7 @@
 # python setup.py build_themes
 # python setup.py build_i18n
 # python setup.py update_po
+# python setup.py check_po
 # python setup.py clean --all
 # python setup.py sdist|bdist
 # python setup.py --help
@@ -125,6 +126,40 @@ class update_po(Command):
             info('creating po file: %s' % (po_file))
             mkpath(os.path.dirname(po_file), verbose=False)
             copy_file(pot_file, po_file, verbose=False)
+
+
+class check_po(Command):
+   description = 'Give statistics about translations status'
+   user_options = []
+
+   def initialize_options(self):
+      pass
+
+   def finalize_options(self):
+      pass
+
+   def run(self):
+      try:
+         import polib
+      except ImportError:
+         error('You need python polib installed')
+         return
+
+      # print totals
+      po = polib.pofile(os.path.join('data', 'locale', 'epymc.pot'))
+      info('Total strings in epymc.pot: %d' % len(po.untranslated_entries()))
+
+      # print per-lang statistics
+      linguas_file = os.path.join('data', 'locale', 'LINGUAS')
+      for lang in sorted(open(linguas_file).read().split()):
+         po = polib.pofile(os.path.join('data', 'locale', lang + '.po'))
+         bar = '=' * (int(po.percent_translated() / 100 * 30))
+         info('%s [%-30s] %3d%% (%d translated, %d fuzzy, %d untranslated, %d obsolete)' % (
+               lang, bar, po.percent_translated(),
+               len(po.translated_entries()),
+               len(po.fuzzy_entries()),
+               len(po.untranslated_entries()),
+               len(po.obsolete_entries())))
 
 
 RECORD_FILE = "installed_files-%d.%d.txt" % sys.version_info[:2]
@@ -265,6 +300,7 @@ setup (
       'install_lib': Install,
       'uninstall': Uninstall,
       'update_po': update_po,
+      'check_po': check_po,
    },
    command_options = {
       'install': {'record': ('setup.py', RECORD_FILE)}

@@ -53,6 +53,7 @@ New features:
  * Show current folders in the file-manager
  * Option to hide the mouse cursor when not needed (not move or video playing)
  * Support for subtitles embedded in the video files
+ * New check_po setup command, give translations stats with a nice bar
 
 
 New Translations:

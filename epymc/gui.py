@@ -683,6 +683,12 @@ DAVIDE ANDREOLI
 <info>design</>
 DAVIDE ANDREOLI
 
+<info>i18n</>
+Wolfgang Morawetz - DE
+Kai Huuhko - FI
+Davide Andreoli - IT
+Niko2040 - RU
+
 <info>python efl team</>
 BORIS FAURE
 BRUNO DILLY

@@ -6,17 +6,13 @@ TMP
  * fix 2 bugs in ethumb:
    * frame cannot be unset...witout an error
 
- * icone + risoluzione (back,refresh,plus, minus, ...)
  * icona error fa schifo
 
  * 2 instanze ???
  * new text styles: mi piace, etc...
- * migliorare grafica dei dialog
 
  * use EmcUrl where needed
 
- * mpris fail on Position > Int32    :/
- 
  For release:
    * db_py3_browser_view_memory need to be cleared for the relase (dump version)
    * comment-out all DBG functions
@@ -24,6 +20,7 @@ TMP
 
 BUGS
 =====
+ * mpris fail on Position > Int32    :/
  * mame's favorites got lost from config sometimes
  * text in dialogs dont scale on-the-fly (elm bug)
  * autoscrolled entry are not constant-speed changing the fps...it was used to work :/

@@ -1672,7 +1672,6 @@ collections {
    group { name: "emc/dialog/panel";  /* API */
       images {
          image: "dialog_bg.png" COMP;
-         image: "dialog_header.png" COMP;
          image: "shadow_far_top.png" COMP;
          image: "roundclose.png" COMP;
       }
@@ -1699,7 +1698,7 @@ collections {
                rel2.relative: 0.9 0.9;
                image {
                   normal: "dialog_bg.png";
-                  border: 4 4 4 5;
+                  border: 15 15 15 15;
                }
             }
          }
@@ -1720,7 +1719,7 @@ collections {
                }
             }
          }
-         part { name: "title_bg"; type: IMAGE;
+         part { name: "title_bg"; type: SPACER;
             clip_to: "clipper";
             mouse_events: 0;
             scale: 1;
@@ -1737,38 +1736,10 @@ collections {
                   relative: 1.0 0.0;
                   offset: -4 -1;
                }
-               color: 255 255 255 200;
-               image.normal: "dialog_header.png";
-               image.border: 0 0 2 2;
-               visible: 0;
             }
             description { state: "visible" 0.0;
                inherit: "default" 0.0;
                min: 52 52;
-               visible: 1;
-            }
-         }
-         part { name: "title_shadow"; type: IMAGE;
-            clip_to: "clipper";
-            mouse_events: 0;
-            scale: 1;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               min: 26 26;
-               align: 0.5 0.0;
-               visible: 0;
-               rel1 {
-                  to: "title_bg";
-                  relative: 0.0 1.0;
-               }
-               rel2 {
-                  to: "title_bg";
-               }
-               image.normal: "shadow_far_top.png";
-            }
-            description { state: "visible" 0.0;
-               inherit: "default" 0.0;
-               visible: 1;
             }
          }
          part { name: "emc.text.title"; type: TEXTBLOCK;  /* API */
@@ -1885,7 +1856,6 @@ collections {
             action: STATE_SET "visible" 0.0;
             target: "emc.text.title";
             target: "title_bg";
-            target: "title_shadow";
          }
          program { name: "hide_title";  /* API */
             signal: "emc,dialog,title,hide";
@@ -1893,7 +1863,6 @@ collections {
             action: STATE_SET "default" 0.0;
             target: "emc.text.title";
             target: "title_bg";
-            target: "title_shadow";
          }
          program { name: "show_buttons";  /* API */
             signal: "emc,dialog,buttons,show";
@@ -1912,7 +1881,6 @@ collections {
    group { name: "emc/dialog/minimal";  /* API */
       images {
          image: "dialog_bg.png" COMP;
-         image: "dialog_header.png" COMP;
          image: "shadow_far_top.png" COMP;
          image: "bulb-0.png" COMP;
          image: "warning.png" COMP;
@@ -1944,11 +1912,11 @@ collections {
                rel2 {
                   to_x: "title_bg";
                   to_y: "emc.box.buttons";
-                  offset: 2 0;
+                  offset: 2 6;
                }
                image {
                   normal: "dialog_bg.png";
-                  border: 4 4 4 5;
+                  border: 15 15 15 15;
                }
             }
          }
@@ -1999,7 +1967,7 @@ collections {
                max: 500 200;
             }
          }
-         part { name: "title_bg"; type: IMAGE;
+         part { name: "title_bg"; type: SPACER;
             clip_to: "clipper";
             scale: 1;
             description { state: "default" 0.0;
@@ -2009,33 +1977,13 @@ collections {
                rel1 {
                   to: "emc.swallow.content";
                   offset: -10 -5;
+                  
                }
                rel2 {
                   to: "emc.swallow.content";
                   relative: 1.0 0.0;
                   offset: 5 -6;
                }
-               color: 255 255 255 200;
-               image.normal: "dialog_header.png";
-               image.border: 0 0 2 2;
-            }
-         }
-         part { name: "title_shadow"; type: IMAGE;
-            clip_to: "clipper";
-            mouse_events: 0;
-            scale: 1;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               min: 26 26;
-               align: 0.5 0.0;
-               rel1 {
-                  to: "title_bg";
-                  relative: 0.0 1.0;
-               }
-               rel2 {
-                  to: "title_bg";
-               }
-               image.normal: "shadow_far_top.png";
             }
          }
          part { name: "emc.text.title"; type: TEXTBLOCK;  /* API */

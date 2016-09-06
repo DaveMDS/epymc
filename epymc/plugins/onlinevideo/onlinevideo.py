@@ -363,7 +363,7 @@ class OnlinevideoModule(EmcModule):
                      ast.literal_eval(line)
                if icon is None:
                   if action == ACT_SEARCH: icon = 'icon/search'
-                  if action == ACT_MORE: icon = 'icon/next'
+                  if action == ACT_MORE: icon = 'icon/forward'
                if info is not None:
                   info = info.replace('\n', '<br>')
                item_data = (next_state, label, url, info, icon, poster, action)

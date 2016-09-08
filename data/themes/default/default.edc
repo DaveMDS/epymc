@@ -104,7 +104,7 @@ images {
 
 fonts {
    font: "Cuprum.otf" "Cuprum";
-   font: "Oswald-Regular.otf" "Oswald";
+   font: "Oswald-Regular.ttf" "Oswald";
    font: "Sansation-Regular.ttf" "Sansation";
 }
 

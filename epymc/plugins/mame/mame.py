@@ -41,7 +41,6 @@ def DBG(msg):
    print('MAME: %s' % msg)
    pass
 
-MAME_EXE = 'mame'
 _mod = None
 
 
@@ -144,6 +143,12 @@ class MameModule(EmcModule):
       mainmenu.item_add('mame', 50, _('M.A.M.E'), 'icon/mame', self.cb_mainmenu)
       ini.add_section('mame')
 
+      if not ini.has_option('mame', 'mame_exe'):
+         self.mame_exe = 'mame'
+         ini.set('mame', 'mame_exe', 'mame')
+      else:
+         self.mame_exe = ini.get('mame', 'mame_exe', 'mame')
+
    def __shutdown__(self):
       DBG('Shutdown MAME')
 
@@ -172,7 +177,7 @@ class MameModule(EmcModule):
       # Aquire mame dirs from the command 'mame -showconfig'
       self._rompaths = []
       self._snapshoot_dir = None
-      EmcExec(MAME_EXE + ' -showconfig', grab_output=True,
+      EmcExec(self.mame_exe + ' -showconfig', grab_output=True,
               done_cb=self.cb_showconfig_done)
 
    def count_roms(self):
@@ -220,7 +225,7 @@ class MameModule(EmcModule):
       if self._games:
          self.cb_exe_end_listfull(None, None)
       else:
-         exe = ecore.Exe(MAME_EXE + ' -listfull',
+         exe = ecore.Exe(self.mame_exe + ' -listfull',
                          ecore.ECORE_EXE_PIPE_READ |
                          ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED)
          exe.on_data_event_add(self.cb_exe_event_listfull)
@@ -340,6 +345,7 @@ class MameGame(object):
    This class describe a single mame game.
    """
    def __init__(self, gid, name):
+      self.mame_exe = ini.get("mame", "mame_exe", "mame")
       self.gid = gid
       self.name = name
       self.parsed = False
@@ -359,7 +365,7 @@ class MameGame(object):
 
    def run(self):
       DBG('RUN GAME: ' + self.gid)
-      ecore.exe_run('%s %s' % (MAME_EXE, self.gid))
+      ecore.exe_run('%s %s' % (self.mame_exe, self.gid))
 
    def poster_get(self):
       snap_file = os.path.join(_mod._snapshoot_dir, self.gid, '0000.png')
@@ -601,13 +607,21 @@ class MameGame(object):
       # do this only once
       if self.parsed: return
       # get game info from the command: mame -listxml <id>
-      cmd = '%s -listxml %s' % (MAME_EXE, self.gid)
+      cmd = '%s -listxml %s' % (self.mame_exe, self.gid)
       EmcExec(cmd, True, self._more_game_info_done, when_finished)
 
    def _more_game_info_done(self, output, when_finished):
       # parse the buffered xml data
       doc = xml.dom.minidom.parseString(output)
-      game_node = doc.getElementsByTagName('game')[0]
+      game_nodes = doc.getElementsByTagName('game')
+      if game_nodes:
+         game_node = game_nodes[0]
+      else:
+         game_nodes = doc.getElementsByTagName('machine')
+         if game_nodes:
+            game_node = game_nodes[0]
+         else:
+            return
       if game_node.getAttribute('name') != self.gid: return
 
       # fill the game infos

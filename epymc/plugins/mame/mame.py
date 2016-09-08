@@ -143,11 +143,7 @@ class MameModule(EmcModule):
       mainmenu.item_add('mame', 50, _('M.A.M.E'), 'icon/mame', self.cb_mainmenu)
       ini.add_section('mame')
 
-      if not ini.has_option('mame', 'mame_exe'):
-         self.mame_exe = 'mame'
-         ini.set('mame', 'mame_exe', 'mame')
-      else:
-         self.mame_exe = ini.get('mame', 'mame_exe', 'mame')
+      self.mame_exe = ini.get('mame', 'mame_exe', 'mame')
 
    def __shutdown__(self):
       DBG('Shutdown MAME')

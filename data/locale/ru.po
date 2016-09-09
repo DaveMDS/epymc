@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-08-21 17:46+0200\n"
-"PO-Revision-Date: 2016-09-09 02:55+0300\n"
+"PO-Revision-Date: 2016-09-09 04:12+0300\n"
 "Last-Translator: Niko2040 <niko2040@bynets.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -38,7 +38,7 @@ msgid ""
 "<i>Configuration → Views</i> section.</info></small>"
 msgstr ""
 "<br><br>Запрошенный режим отображения отключён для данной страницы."
-"<br><br><small><info>ПРИМЕЧАНИЕ: Вы можете отменить это ограничение вразделе "
+"<br><br><small><info>ПРИМЕЧАНИЕ: Вы можете отменить это ограничение в разделе "
 "<i>Настройка → Режимы отображения</i>.</info></small>"
 
 #: epymc/browser.py:577 epymc/browser.py:814
@@ -1685,7 +1685,7 @@ msgstr "Игра не найдена в файле историй"
 
 #: epymc/plugins/mame/mame.py:509
 msgid "Really delete this game?"
-msgstr "Действительно удалить эту игру"
+msgstr "Действительно удалить эту игру?"
 
 #: epymc/plugins/mame/mame.py:521
 msgid "Game deleted"

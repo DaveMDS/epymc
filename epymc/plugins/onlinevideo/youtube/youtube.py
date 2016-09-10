@@ -29,7 +29,7 @@ from epymc.extapi.onlinevideo import api_version, state_get, fetch_url, \
    ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 
 
-ytb_base = 'http://www.youtube.com'
+ytb_base = 'https://www.youtube.com'
 ytb_icon = local_resource(__file__, 'youtube.png')
 
 ST_HOME = 0
@@ -71,6 +71,8 @@ if STATE == ST_SEARCH:
       user = div.find('div', class_='yt-lockup-byline').find('a').string
       descr = div.find('div', class_='yt-lockup-description')
       meta = div.find('ul', class_='yt-lockup-meta-info')
+      if len(meta.contents) != 2:
+         continue # skip Ad items
       uploaded = meta.contents[0].string
       views = meta.contents[1].string
 
@@ -87,7 +89,7 @@ if STATE == ST_SEARCH:
 
    # more items...
    try:
-      url = ytb_base + soup.find('a', attrs={'data-link-type': 'next'})['href']
+      url = ytb_base + soup.find('div', class_='search-pager').contents[-2]['href']
       item_add(ST_SEARCH, _('More items...'), url, icon='icon/next', action=ACT_MORE)
    except:
       pass

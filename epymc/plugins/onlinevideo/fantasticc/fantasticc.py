@@ -27,6 +27,8 @@ from epymc.extapi.onlinevideo import api_version, state_get, \
    ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 
 
+url_base = 'http://fantasti.cc'
+
 ST_HOME = 0
 ST_VIDEO_LIST = 1
 ST_COLLECTION_LIST = 2
@@ -39,27 +41,26 @@ ST_PLAY = 69
 STATE, URL = state_get()
 
 
-
 # this is the first page, show fixed categories
 if STATE == ST_HOME:
    # item_add(ST_PLAY,'A Random Video', 'http://fantasti.cc/random.php?v=1')
    item_add(ST_SEARCH, 'Search videos', 'search', action=ACT_SEARCH)
 
-   item_add(ST_VIDEO_LIST, 'Upcoming video', 'http://fantasti.cc/videos/upcoming', action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Upcoming video', url_base + '/videos/upcoming', action=ACT_FOLDER)
 
-   item_add(ST_CATEGORIES_LIST, 'Categories', 'http://fantasti.cc/category', action=ACT_FOLDER)
+   item_add(ST_CATEGORIES_LIST, 'Categories', url_base + '/category', action=ACT_FOLDER)
    
-   item_add(ST_VIDEO_LIST, 'Popular today', 'http://fantasti.cc/videos/popular/today', action=ACT_FOLDER)
-   item_add(ST_VIDEO_LIST, 'Popular this week', 'http://fantasti.cc/videos/popular/7days', action=ACT_FOLDER)
-   item_add(ST_VIDEO_LIST, 'Popular this month', 'http://fantasti.cc/videos/popular/31days', action=ACT_FOLDER)
-   item_add(ST_VIDEO_LIST, 'Popular all time', 'http://fantasti.cc/videos/popular/all_time', action=ACT_FOLDER)
-   item_add(ST_VIDEO_LIST, 'Popular made popular', 'http://fantasti.cc/videos/popular/made_popular', action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Popular today', url_base + '/videos/popular/today', action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Popular this week', url_base + '/videos/popular/7days', action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Popular this month', url_base + '/videos/popular/31days', action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Popular all time', url_base + '/videos/popular/all_time', action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Popular made popular', url_base + '/videos/popular/made_popular', action=ACT_FOLDER)
 
-   item_add(ST_COLLECTION_LIST, 'Collections - Popular', 'http://fantasti.cc/videos/collections/popular/31days', action=ACT_FOLDER)
-   item_add(ST_COLLECTION_LIST, 'Collections - Top Rated', 'http://fantasti.cc/videos/collections/top_rated/31days', action=ACT_FOLDER)
-   item_add(ST_COLLECTION_LIST, 'Collections - Most Viewed', 'http://fantasti.cc/videos/collections/most_viewed/31days', action=ACT_FOLDER)
-   item_add(ST_COLLECTION_LIST, 'Collections - Most Discussed', 'http://fantasti.cc/videos/collections/most_discussed/31days', action=ACT_FOLDER)
-   item_add(ST_COLLECTION_LIST, 'Collections - Top Favorites', 'http://fantasti.cc/videos/collections/top_favorites/31days', action=ACT_FOLDER)
+   item_add(ST_COLLECTION_LIST, 'Collections - Popular', url_base + '/videos/collections/popular/31days', action=ACT_FOLDER)
+   item_add(ST_COLLECTION_LIST, 'Collections - Top Rated', url_base + '/videos/collections/top_rated/31days', action=ACT_FOLDER)
+   item_add(ST_COLLECTION_LIST, 'Collections - Most Viewed', url_base + '/videos/collections/most_viewed/31days', action=ACT_FOLDER)
+   item_add(ST_COLLECTION_LIST, 'Collections - Most Discussed', url_base + '/videos/collections/most_discussed/31days', action=ACT_FOLDER)
+   item_add(ST_COLLECTION_LIST, 'Collections - Top Favorites', url_base + '/videos/collections/top_favorites/31days', action=ACT_FOLDER)
    
 
 
@@ -93,7 +94,7 @@ elif STATE == ST_VIDEO_LIST:
    # more items...
    try:
       url = 'http://fantasti.cc/' + soup.find('a', text='next >>')['href']
-      item_add(ST_VIDEO_LIST, 'More items...', url, icon='icon/next', action=ACT_MORE)
+      item_add(ST_VIDEO_LIST, 'More items...', url, action=ACT_MORE)
    except:
       pass
 
@@ -102,21 +103,22 @@ elif STATE == ST_VIDEO_LIST:
 elif STATE == ST_COLLECTION_LIST:
    soup = fetch_url(URL, parser='bs4')
 
-   loop_div = soup.find('div', attrs = {'id' : 'loop'})
-   for box in loop_div.findAll('div', recursive=False):
-      NUM_VIDS = box.table.tr.findAll('td')[1].contents[0]
-      NUM_VIDS = re.compile('([0-9]+)').search(NUM_VIDS).group(1) 
-      TITLE = box.find('a').contents[0]
-      TITLE = '%s (%s vids)' % (TITLE, NUM_VIDS)
-      THUMB = box.find('a', recursive=False).img['src']
-      URL = box.find('a')['href']
-      # print(TITLE, URL, THUMB)
-      item_add(ST_COLLECTION_VIDEO_LIST, TITLE, 'http://fantasti.cc/' + URL, poster=THUMB)
+   for div in soup.findAll('div', class_='submitted-videos'):
+      num_vids = div.find('div', class_='counter-right').string
+      num_vids = re.compile('([0-9]+)').search(num_vids).group(1)
+      if int(num_vids) < 1:
+         continue
+      title = div.find('a', class_='clnk').string
+      title = '%s (%s vids)' % (title, num_vids)
+      thumb = div.find('div', class_='item').find('a')['style']
+      thumb = thumb.split('(', 1)[1].split(')')[0]
+      url = url_base + div.find('a', class_='clnk')['href']
+      item_add(ST_COLLECTION_VIDEO_LIST, title, url, poster=thumb)
 
    # more items...
    try:
       url = 'http://fantasti.cc/' + soup.find('a', text='next >>')['href']
-      item_add(ST_COLLECTION_LIST, 'More items...', url, icon='icon/next', action=ACT_MORE)
+      item_add(ST_COLLECTION_LIST, 'More items...', url, action=ACT_MORE)
    except:
       pass
 
@@ -125,17 +127,16 @@ elif STATE == ST_COLLECTION_LIST:
 elif STATE == ST_COLLECTION_VIDEO_LIST:
    soup = fetch_url(URL, parser='bs4')
 
-   for div in soup.findAll('div', attrs = {'class': 'HoldPhotos'}):
-      TITLE = div.p.a['title']
-      URL = div.p.a['href']
-      THUMB = div.p.a.img['src']
-      # print(TITLE, URL, THUMB)
-      item_add(ST_PLAY, TITLE, 'http://fantasti.cc' + URL, poster=THUMB)
+   for div in soup.find_all('div', class_='submitted-video-item'):
+      title = div.find('div', class_='submitted-video__name').string
+      thumb = div.img['src']
+      url = url_base + div.find('a', class_='submitted-video-open')['href']
+      item_add(ST_PLAY, title, url, poster=thumb)
 
    # more items... (TODO this do not work)
    # try:
       # url = 'http://fantasti.cc/' + soup.find('a', text='next >>')['href']
-      # item_add(ST_COLLECTION_VIDEO_LIST, 'More items...', url, icon='icon/next', action=ACT_MORE)
+      # item_add(ST_COLLECTION_VIDEO_LIST, 'More items...', url, action=ACT_MORE)
    # except:
       # pass
 
@@ -166,7 +167,7 @@ elif STATE in (ST_SEARCH, ST_SEARCH_RES):
    # more items...
    try:
       url = 'http://fantasti.cc/' + soup.find('a', text='next >>')['href']
-      item_add(ST_SEARCH_RES, 'More items...', url, icon='icon/next', action=ACT_MORE)
+      item_add(ST_SEARCH_RES, 'More items...', url, action=ACT_MORE)
    except:
       pass
 
@@ -175,9 +176,9 @@ elif STATE in (ST_SEARCH, ST_SEARCH_RES):
 elif STATE == ST_CATEGORIES_LIST:
    soup = fetch_url(URL, parser='bs4')
 
-   for a in soup.findAll('a', class_='wid-cloud'):
-      name = a.string
-      url = 'http://fantasti.cc/category/' + name.replace(' ', '+') + '/videos'
+   for div in soup.findAll('div', class_='content-block-category'):
+      name = div.find('span', class_='category-name').string
+      url = url_base + div.find('a')['href'] + 'videos/'
       item_add(ST_SEARCH_RES, name, url) 
 
 

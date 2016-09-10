@@ -24,6 +24,7 @@ Bug fixed:
  * Removed usage of elm deprecated ObjectItem.data_get() function
  * Removed edc warning about "fixed: 1 1"
  * Fixed compatibility with python 3.5 (os.path.exists no more accept unicode)
+ * Updated yt scraper to latest web changes
 
 
 Improvements:

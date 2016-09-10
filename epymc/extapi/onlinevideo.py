@@ -122,7 +122,7 @@ def fetch_url(url, headers=None, parser=None):
    if parser == 'json':
       data = json.loads(data)
    elif parser == 'bs4':
-      data = BeautifulSoup(data)
+      data = BeautifulSoup(data, 'lxml')
    elif parser == 'querystr':
       data = parse_qs(data)
 

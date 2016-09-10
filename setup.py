@@ -230,7 +230,7 @@ setup (
    license = 'GNU GPL v3',
    platforms = 'linux',
 
-   requires = ['efl (>= 1.18.0)', 'beautifulsoup4', 'mutagen', 'dbus'],
+   requires = ['efl (>= 1.18.0)', 'beautifulsoup4', 'lxml', 'mutagen', 'dbus'],
    provides = ['epymc'],
 
    packages = [

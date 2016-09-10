@@ -268,6 +268,7 @@ setup (
          'vimeo/*',
          'zapiks/*',
          'fantasticc/*',
+         'porncom/*',
          'southparkstudios/*',
       ],
       'epymc.plugins.input_webserver': [

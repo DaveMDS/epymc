@@ -43,6 +43,7 @@ New features:
  * New PosterGrid/CoverGrid views
  * New South Park Studios online video channel
  * New themoviedb.org online video channel (with movie trailers)
+ * Added a new secret online channel
  * Virtual keyboard is now also usable with the real keyboard
  * Virtual keyboard now support multiple layouts
  * Show the status of the downloads in progress (with ability to start/abort)

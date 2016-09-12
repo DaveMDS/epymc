@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-08-21 17:46+0200\n"
-"PO-Revision-Date: 2016-03-17 09:51+0300\n"
+"PO-Revision-Date: 2016-09-09 04:12+0300\n"
 "Last-Translator: Niko2040 <niko2040@bynets.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -38,7 +38,7 @@ msgid ""
 "<i>Configuration → Views</i> section.</info></small>"
 msgstr ""
 "<br><br>Запрошенный режим отображения отключён для данной страницы."
-"<br><br><small><info>ПРИМЕЧАНИЕ: Вы можете отменить это ограничение вразделе "
+"<br><br><small><info>ПРИМЕЧАНИЕ: Вы можете отменить это ограничение в разделе "
 "<i>Настройка → Режимы отображения</i>.</info></small>"
 
 #: epymc/browser.py:577 epymc/browser.py:814
@@ -92,7 +92,7 @@ msgstr "Запускать в полноэкранном режиме"
 
 #: epymc/config_gui.py:415
 msgid "Hide mouse cursor when not needed"
-msgstr ""
+msgstr "Прятать курсор, если он не нужен"
 
 #: epymc/config_gui.py:417
 msgid "Ask"
@@ -116,7 +116,7 @@ msgstr "Маштабирование интерфейса"
 
 #: epymc/config_gui.py:424 epymc/config_gui.py:509
 msgid "Virtual keyboard layouts"
-msgstr ""
+msgstr "Раскладки виртуальной клавиатуры"
 
 #: epymc/config_gui.py:427
 msgid "Download folder"
@@ -358,7 +358,7 @@ msgstr "Невозможно инициализировать движок Emoti
 #: epymc/mediaplayer.py:762 epymc/plugins/music/music.py:170
 #: epymc/plugins/music/music.py:183
 msgid "by"
-msgstr ""
+msgstr "в исполнении"
 
 #: epymc/mediaplayer.py:921
 msgid "Audio"
@@ -390,7 +390,7 @@ msgstr "Звуковая дорожка #%d"
 
 #: epymc/mediaplayer.py:1113
 msgid "Unmute"
-msgstr ""
+msgstr "Включить звук"
 
 #: epymc/mediaplayer.py:1116
 msgid "Mute"
@@ -417,7 +417,7 @@ msgstr "Нет субтитров"
 #: epymc/mediaplayer.py:1175
 #, python-format
 msgid "Subtitle #%d"
-msgstr ""
+msgstr "Субтитры #%d"
 
 #: epymc/mediaplayer.py:1195
 msgid "Download subtitles"
@@ -491,15 +491,15 @@ msgstr ""
 
 #: epymc/gui.py:73
 msgid "Russian QWERTY"
-msgstr ""
+msgstr "Русский ЙЦУКЕН"
 
 #: epymc/gui.py:74
 msgid "Russian ABC"
-msgstr ""
+msgstr "Русский АБВ"
 
 #: epymc/gui.py:75
 msgid "Symbols"
-msgstr ""
+msgstr "Символы"
 
 #: epymc/gui.py:144
 msgid "Emotion Media Center"
@@ -520,7 +520,7 @@ msgstr "Да"
 #: epymc/gui.py:1566
 #, python-brace-format
 msgid "Image {0} of {1}"
-msgstr ""
+msgstr "Изображение {0} из {1}"
 
 #: epymc/gui.py:1641
 msgid "Source Selector"
@@ -641,24 +641,24 @@ msgstr "Файл %s всё ещё в очереди загрузки"
 #: epymc/gui.py:2185 epymc/gui.py:2194
 #: epymc/plugins/onlinevideo/onlinevideo.py:121
 msgid "Download manager"
-msgstr ""
+msgstr "Управление загрузками"
 
 #: epymc/gui.py:2197
 msgid "Start"
-msgstr ""
+msgstr "Начать"
 
 #: epymc/gui.py:2198
 msgid "Clear completed"
-msgstr ""
+msgstr "Очистить завершённые"
 
 #: epymc/gui.py:2225
 #, python-format, python-brace-format
 msgid "{0}% of {1}"
-msgstr ""
+msgstr "{0}% из {1}"
 
 #: epymc/gui.py:2227
 msgid "Unknown size"
-msgstr ""
+msgstr "Неизвестный размер"
 
 #: epymc/gui.py:2230 epymc/plugins/music/music.py:538
 msgid "queued"
@@ -666,23 +666,23 @@ msgstr "в очереди"
 
 #: epymc/gui.py:2232
 msgid "running"
-msgstr ""
+msgstr "загружается"
 
 #: epymc/gui.py:2234
 msgid "completed"
-msgstr ""
+msgstr "завершён"
 
 #: epymc/gui.py:2236
 msgid "paused"
-msgstr ""
+msgstr "приостановлен"
 
 #: epymc/gui.py:2254
 msgid "Are you sure you want to abort the download of the file?"
-msgstr ""
+msgstr "Вы уверены, что хотите прервать загрузку файла?"
 
 #: epymc/gui.py:2255
 msgid "Delete download"
-msgstr ""
+msgstr "Отмена загрузки"
 
 #: epymc/plugins/input_joy/joy.py:45
 msgid "Input - Joystick"
@@ -771,15 +771,15 @@ msgstr "Управление источниками"
 
 #: epymc/plugins/music/music.py:133
 msgid "Play all the songs"
-msgstr "Воспроизвести все песни"
+msgstr "Воспроизвести все композиции"
 
 #: epymc/plugins/music/music.py:143
 msgid "Queue all the songs"
-msgstr ""
+msgstr "Добавить все композиции в очередь"
 
 #: epymc/plugins/music/music.py:173
 msgid "from"
-msgstr ""
+msgstr "из"
 
 #: epymc/plugins/music/music.py:202
 #, python-format
@@ -859,7 +859,7 @@ msgstr "Проверка на наличие обновлений"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:237
 msgid "Local version"
-msgstr ""
+msgstr "Локальная версия"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:246
 msgid "Upstream version"
@@ -867,11 +867,11 @@ msgstr "Последняя версия"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:254
 msgid "Already updated"
-msgstr ""
+msgstr "Обновление не требуется"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:259
 msgid "Failed to fetch upstream version"
-msgstr ""
+msgstr "Ошибка получения последней версии"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:263
 #, python-brace-format
@@ -879,6 +879,8 @@ msgid ""
 "Updating <b>youtube-dl</b> at version <b>{0}</b><br><br>For info and credits "
 "please visit:<br>rg3.github.io/youtube-dl/"
 msgstr ""
+"Обновление <b>youtube-dl</b> до версии <b>{0}</b><br><br>Для дополнительной "
+" информации посетите:<br>rg3.github.io/youtube-dl/"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:266
 #: epymc/plugins/onlinevideo/onlinevideo.py:328
@@ -888,7 +890,7 @@ msgstr "пожалуйста, подождите"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:281
 msgid "Update completed"
-msgstr ""
+msgstr "Обновление завершено"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:320
 msgid "Search query"
@@ -1504,7 +1506,7 @@ msgid ""
 msgstr ""
 "Если этот модуль включён, то в тех редких случаях, когда EpyMC зависает или "
 "падает, он будет перезапускаться. Вам не нужно делать лишних телодвижений в "
-"случае проблем - просто подождите 30 секунд и модуль перезапустить EpyMC."
+"случае проблем - просто подождите 30 секунд и модуль перезапустит EpyMC."
 
 #: epymc/plugins/photos/photos.py:115
 msgid "Dimensions"
@@ -1683,7 +1685,7 @@ msgstr "Игра не найдена в файле историй"
 
 #: epymc/plugins/mame/mame.py:509
 msgid "Really delete this game?"
-msgstr "Действительно удалить эту игру"
+msgstr "Действительно удалить эту игру?"
 
 #: epymc/plugins/mame/mame.py:521
 msgid "Game deleted"
@@ -1884,33 +1886,3 @@ msgid_plural "%d minutes ago"
 msgstr[0] "%d минуту назад"
 msgstr[1] "%d минуты назад"
 msgstr[2] "%d минут назад"
-
-#~ msgid "Rendering engine"
-#~ msgstr "Движок отрисовки"
-
-#~ msgid "Updated to the latest version"
-#~ msgstr ""
-#~ "Обновление дополнительной программы <b>youtube-dl</b> до последней версии."
-#~ "<br><br>Для дополнительной информации посетите:<br>rg3.github.io/youtube-"
-#~ "dl/"
-
-#~ msgid "Current version"
-#~ msgstr "Текущая версия"
-
-#~ msgid "No update available."
-#~ msgstr "Нет доступных обновлений."
-
-#~ msgid "%(name)s <i>as %(character)s</i>"
-#~ msgstr "%(name)s <i>в роли %(character)s</i>"
-
-#~ msgid "Play the whole album"
-#~ msgstr "Воспроизвести весь альбом"
-
-#~ msgid "<em>from</em> %s<br>"
-#~ msgstr "<em>из альбома</em> %s<br>"
-
-#~ msgid "duration: %s<br>"
-#~ msgstr "длительность: %s<br>"
-
-#~ msgid "%(name)s by %(artist)s"
-#~ msgstr "%(artist)s - %(name)s"

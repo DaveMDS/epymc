@@ -48,6 +48,8 @@ _memorydb = None  # EmcDatabase  key=>page_url  value=style_name
 _instances = []   # keep track of EmcBrowser instances. just for dump_all()
 _topbar_btns = [] # Topbar buttons
 
+BROWSER_MEMORY_DB_VERSION = 2
+
 ANIM_NONE = 0
 ANIM_BACK = -1
 ANIM_FORWARD = 1
@@ -57,7 +59,7 @@ def init():
    global _memorydb
    global _topbar_fman
 
-   _memorydb = EmcDatabase('browser_view_memory')
+   _memorydb = EmcDatabase('browser_view_memory', BROWSER_MEMORY_DB_VERSION)
 
    # setup default configs
    ini.get('general', 'back_in_lists', default_value='True')

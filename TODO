@@ -1,13 +1,8 @@
 
 TMP
 ====
-
  * report on phab the Ethumb Client instability
  * ethumb: frame cannot be unset...witout an error
-
- For release:
-   * db_py3_browser_view_memory need to be cleared for the relase (dump version)
-
 
 BUGS
 =====

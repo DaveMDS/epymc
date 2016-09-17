@@ -3,15 +3,7 @@ TMP
 ====
 
  * report on phab the Ethumb Client instability
- * fix 2 bugs in ethumb:
-   * frame cannot be unset...witout an error
-
- * icona error fa schifo
-
- * 2 instanze ???
- * new text styles: mi piace, etc...
-
- * use EmcUrl where needed
+ * ethumb: frame cannot be unset...witout an error
 
  For release:
    * db_py3_browser_view_memory need to be cleared for the relase (dump version)
@@ -25,6 +17,7 @@ BUGS
  * text in dialogs dont scale on-the-fly (elm bug)
  * autoscrolled entry are not constant-speed changing the fps...it was used to work :/
  * no way to toggle fs with the mouse
+ * with py3 you cannot run 2 epymc instances
 
 CORE
 =====
@@ -35,6 +28,8 @@ CORE
  * use xdg to find config, cache download folders
  * add an option to disable exit confirmation (but show credit somewhere else)
  * apply the volume using a logaritic curve
+ * better icons for dialogs background
+ * more semantic text styles (likes, views, etc...)
 
 CORE (minor)
 ============

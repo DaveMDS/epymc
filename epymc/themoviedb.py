@@ -35,8 +35,8 @@ from epymc.gui import EmcDialog, EmcImage
 
 
 def DBG(msg):
-   print('TMDB: %s' % msg)
-   # pass
+   # print('TMDB: %s' % msg)
+   pass
 
 
 TMDB_API_KEY = '19eef197b81231dff0fd1a14a8d5f863' # Key of the user DaveMDS

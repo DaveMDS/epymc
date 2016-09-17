@@ -37,7 +37,7 @@ def LOG(msg):
    print('MEDIAPLAYER: %s' % msg)
 
 def DBG(msg):
-   print('MEDIAPLAYER: %s' % msg)
+   # print('MEDIAPLAYER: %s' % msg)
    pass
 
 

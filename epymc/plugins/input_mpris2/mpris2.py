@@ -37,7 +37,7 @@ from .dbus_helper import DBusServiceObjectWithProps, dbus_property
 
 
 def DBG(msg):
-   print('MPRIS2: %s' % msg)
+   # print('MPRIS2: %s' % msg)
    pass
 
 ROOT_IFACE = "org.mpris.MediaPlayer2"

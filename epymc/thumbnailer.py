@@ -27,7 +27,8 @@ import epymc.utils as utils
 
 
 def DBG(*args):
-   print('THUMBNAILER:', *args)
+   # print('THUMBNAILER:', *args)
+   pass
 
 def ERR(*args):
    print('THUMBNAILER:', *args)

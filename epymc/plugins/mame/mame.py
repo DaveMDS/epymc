@@ -38,7 +38,7 @@ import epymc.ini as ini
 
 
 def DBG(msg):
-   print('MAME: %s' % msg)
+   # print('MAME: %s' % msg)
    pass
 
 _mod = None

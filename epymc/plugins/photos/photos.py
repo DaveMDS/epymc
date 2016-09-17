@@ -43,7 +43,7 @@ import epymc.config_gui as cgui
 
 # debuggin stuff
 def DBG(msg):
-   print('PHOTOS: %s' % msg)
+   # print('PHOTOS: %s' % msg)
    pass
 
 

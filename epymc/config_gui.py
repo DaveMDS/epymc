@@ -31,7 +31,7 @@ from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.gui import EmcDialog, EmcVKeyboard
 
 def DBG(msg):
-   print('CONFIG_GUI: %s' % msg)
+   # print('CONFIG_GUI: %s' % msg)
    pass
 
 ### private globals

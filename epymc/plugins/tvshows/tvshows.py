@@ -44,7 +44,7 @@ import epymc.config_gui as config_gui
 
 # debuggin stuff
 def DBG(msg):
-   print('TVSHOWS: %s' % msg)
+   # print('TVSHOWS: %s' % msg)
    pass
 
 TVSHOWS_DB_VERSION = 5

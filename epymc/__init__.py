@@ -18,5 +18,5 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# follow semver.org specs (ex: '1.0.0' and '1.0.0-beta1')
-__version__ = '1.2.0'
+# follow semver.org specs (ex: '1.0.0-beta1', '1.0.0', '1.1.0-dev')
+__version__ = '1.3.0-dev'

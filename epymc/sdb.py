@@ -131,6 +131,16 @@ class EmcDatabase(object):
       if self._vkey in self._sh:
          return self._sh[self._vkey]
 
+   def dump(self):
+      import pprint
+      print('=' * 60)
+      print('DB NAME: "{}" - VERSION: {}'.format(self._name, self._vers))
+      print('=' * 60)
+      for key in self._sh.keys():
+         print('\nDB KEY: "{}"'.format(key))
+         pprint.pprint(self._sh[key])
+      print('=' * 60)
+
    def _sync_timer_cb(self):
       DBG("Syncing database %s" % self._name)
       self._sh.sync()

@@ -1777,6 +1777,93 @@ class EmcSourcesManager(EmcDialog):
       self.delete()
 
 ################################################################################
+class EmcTagsManager(EmcDialog):
+   def __init__(self, tags_db, done_cb=None):
+      EmcDialog.__init__(self, _('Tags manager'), style='list',
+                         canc_cb=self._close_cb)
+      self.button_add(_('Done'), icon='icon/ok',
+                      selected_cb=self._close_cb)
+      self.button_add(_('Add'), icon='icon/plus',
+                      selected_cb=self._btn_add_cb)
+      self.button_add(_('Remove'), icon='icon/minus',
+                      selected_cb=self._btn_remove_cb)
+      self.button_add(_('Rename'), icon=None, # TODO find a decent icon
+                      selected_cb=self._btn_rename_cb)
+      self._tags_db = tags_db
+      self._done_cb = done_cb
+      self._populate()
+
+   def _populate(self):
+      self.list_clear()
+      for tag in sorted(self._tags_db.keys()):
+         self.list_item_append(tag, 'icon/tag')
+      self.list_go()
+
+   def _close_cb(self, *args):
+      if callable(self._done_cb):
+         self._done_cb()
+      self.delete()
+
+   def _btn_add_cb(self, btn):
+      EmcVKeyboard(title=_('Type a name for the new tag'),
+                   accept_cb=self._add_vkeyb_cb)
+
+   def _add_vkeyb_cb(self, vkeyb, text):
+      if not text or '/' in text:
+         EmcDialog(style='error', text=_('Invalid tag name'))
+         return False # do not close the keyb
+
+      if not text or text in self._tags_db.keys():
+         EmcDialog(style='error', text=_('Tag already exists'))
+         return False # do not close the keyb
+      self._tags_db.set_data(text, [])
+      self._populate()
+
+   def _btn_remove_cb(self, btn):
+      try:
+         tag_name = self.list_item_selected_get().text
+      except AttributeError: # no item selected
+         return
+      txt = _('Are you sure you want to delete the tag?')
+      txt += '<br><b>{}</b>'.format(tag_name)
+      EmcDialog(style='yesno', title=_('Warning'), text=txt,
+                done_cb=self._remove_confirmed_cb)
+
+   def _remove_confirmed_cb(self, dia):
+      tag_name = self.list_item_selected_get().text
+      self._tags_db.del_data(tag_name)
+      self._populate()
+      dia.delete()
+
+   def _btn_rename_cb(self, btn):
+      try:
+         tag_name = self.list_item_selected_get().text
+      except AttributeError: # no item selected
+         return
+      EmcVKeyboard(title=_('Type the new name for the tag'), text=tag_name,
+                   accept_cb=self._rename_vkeyb_cb)
+
+   def _rename_vkeyb_cb(self, vkeyb, text):
+      if not text or '/' in text:
+         EmcDialog(style='error', text=_('Invalid tag name'))
+         return False # do not close the keyb
+
+      tag_name = self.list_item_selected_get().text
+      if tag_name == text:
+         return True # close the keyb
+
+      if text in self._tags_db.keys():
+         EmcDialog(style='error', text=_('Tag already exists'))
+         return False # do not close the keyb
+
+      # create a new tag with the data of the old name and delete the old tag
+      data = self._tags_db.get_data(tag_name)
+      self._tags_db.set_data(text, data)
+      self._tags_db.del_data(tag_name)
+
+      self._populate()
+
+################################################################################
 class EmcVKeyboard(EmcDialog):
    """ TODO doc this """
    def __init__(self, accept_cb=None, dismiss_cb=None,
@@ -1861,9 +1948,11 @@ class EmcVKeyboard(EmcDialog):
    def _accept_cb(self, button):
       if self.accept_cb and callable(self.accept_cb):
          if self.user_data is not None:
-            self.accept_cb(self, self.entry.entry_get(), self.user_data)
+            ret = self.accept_cb(self, self.entry.entry_get(), self.user_data)
          else:
-            self.accept_cb(self, self.entry.entry_get())
+            ret = self.accept_cb(self, self.entry.entry_get())
+         if ret == False:
+            return
       self.delete()
 
    def _default_btn_cb(self, button):

@@ -42,6 +42,7 @@ ICON("search")
 ICON("info")
 ICON("download")
 ICON("subs")
+ICON("tag")
 
 ICON("arrowR")
 ICON("arrowL")

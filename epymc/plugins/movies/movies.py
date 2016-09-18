@@ -31,7 +31,7 @@ from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass, FolderItemClass
 from epymc.sdb import EmcDatabase
 from epymc.gui import EmcDialog, EmcImage, EmcSourcesManager, \
-   EmcVKeyboard, EmcNotify
+   EmcVKeyboard, EmcNotify, EmcTagsManager, EmcMenu
 from epymc.themoviedb import TMDBv3, CastPanel, get_poster_filename, \
    get_backdrop_filename, get_icon_filename
 
@@ -50,6 +50,7 @@ def DBG(msg):
    pass
 
 MOVIE_DB_VERSION = 1
+MOVIE_TAGS_DB_VERSION = 1
 DEFAULT_INFO_LANG = 'en'
 DEFAULT_BADWORDS = 'dvdrip AAC x264 cd1 cd2'
 DEFAULT_BADWORDS_REGEXP = '\[.*?\] {.*?} \. -'
@@ -103,18 +104,25 @@ class SpecialItemClass(EmcItemClass):
       elif url == 'movies://directors':
          mod._browser.page_add(url, _('Directors'), mod._styles_for_folders,
                                mod.populate_directors_list)
+      elif url == 'movies://tags_manager':
+         EmcTagsManager(mod._tags_db,
+                        done_cb=lambda: _mod._browser.refresh(hard=True))
 
    def label_get(self, url, mod):
       if url == 'movies://actors':
          return _('Actors')
       elif url == 'movies://directors':
          return _('Directors')
+      elif url == 'movies://tags_manager':
+         return _('Tags manager')
 
    def icon_get(self, url, mod):
       if url == 'movies://actors':
          return 'icon/head'
       elif url == 'movies://directors':
          return 'icon/head'
+      elif url == 'movies://tags_manager':
+         return 'icon/tag'
 
 class ActorItemClass(EmcItemClass):
    def item_selected(self, url, name):
@@ -143,7 +151,6 @@ class DirectorItemClass(EmcItemClass):
 
    def icon_get(self, url, mod):
       return 'icon/head'
-
 
 class MovieItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -218,6 +225,22 @@ class MyFolderItemClass(FolderItemClass):
       mod._browser.page_add(url, os.path.basename(url),
                             mod._styles_for_folders, mod.populate_url)
 
+class TagItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      tag_name = url.split('/')[-1]
+      _mod._browser.page_add(url, tag_name, _mod._styles_for_folders,
+                             _mod.populate_tag)
+
+   def label_get(self, url, mod):
+      return url.split('/')[-1]
+
+   def label_end_get(self, url, mod):
+      tag_name = url.split('/')[-1]
+      count = len(mod._tags_db.get_data(tag_name))
+      return ngettext('{} movie', '{} movies', count).format(count)
+
+   def icon_get(self, url, mod):
+      return 'icon/tag'
 
 
 class MoviesModule(EmcModule):
@@ -230,6 +253,7 @@ class MoviesModule(EmcModule):
    _browser = None     # the browser widget instance
    _movie_db = None    # key: movie_url  data: dictionary as of the tmdb api
    _idler_db = None    # key: file_url  data: timestamp of the last unsuccessfull tmdb query
+   _tags_db = None     # key: tag_name  data: list of tmdb movie IDs
    _scanner = None     # BackgroundScanner instance
    _actors_cache = None    # key: actor name     val: [list of films urls]
    _directors_cache = None # key: director name  val: [list of films urls]
@@ -325,6 +349,12 @@ class MoviesModule(EmcModule):
       # if not self._folders:
          #TODO alert the user. and instruct how to add folders
 
+      # open movie/idler/tags databases (they are created if not exists)
+      if self._movie_db is None:
+         self._movie_db = EmcDatabase('movies', MOVIE_DB_VERSION)
+         self._idler_db = EmcDatabase('movieidlercache', MOVIE_DB_VERSION)
+         self._tags_db = EmcDatabase('movietags', MOVIE_TAGS_DB_VERSION)
+
       # start the browser in the wanted page
       if url is None:
          self._browser.page_add('movies://root', _('Movies'),
@@ -338,12 +368,6 @@ class MoviesModule(EmcModule):
       self._browser.show()
       mainmenu.hide()
 
-      # open movie/idler databases (they are created if not exists)
-      if self._movie_db is None:
-         self._movie_db = EmcDatabase('movies', MOVIE_DB_VERSION)
-      if self._idler_db is None:
-         self._idler_db = EmcDatabase('movieidlercache', MOVIE_DB_VERSION)
-
       # on idle scan all files (one shot every time the activity start)
       if not self._scanner and ini.get_bool('movies', 'enable_scanner'):
          self._scanner = BackgroundScanner(self._browser, self._movie_db, self._idler_db)
@@ -354,6 +378,11 @@ class MoviesModule(EmcModule):
 
       self._browser.item_add(SpecialItemClass(), 'movies://directors', self)
       self._browser.item_add(SpecialItemClass(), 'movies://actors', self)
+
+      for tag in sorted(self._tags_db.keys()):
+         self._browser.item_add(TagItemClass(), 'movies://tag/%s' % tag, self)
+      self._browser.item_add(SpecialItemClass(), 'movies://tags_manager', self)
+
       self._browser.item_add(RescanItemClass(), 'movies://rescan_library', self)
       self._browser.item_add(AddSourceItemClass(), 'movies://add_source', self)
 
@@ -417,6 +446,13 @@ class MoviesModule(EmcModule):
       for url in self._directors_cache[name]:
          self._browser.item_add(MovieItemClass(), url, self)
 
+   def populate_tag(self, browser, url):
+      tag_name = url.split('/')[-1]
+      tag_ids = self._tags_db.get_data(tag_name)
+      for movie_url, movie in self._movie_db:
+         if movie['id'] in tag_ids:
+            self._browser.item_add(MovieItemClass(), movie_url, self)
+
    def _get_cast(self, e, max_num=999):
       cast = ''
       for person in sorted(e['cast'], key=itemgetter('order')):
@@ -456,6 +492,7 @@ class MoviesModule(EmcModule):
          self._dialog.button_add(_('Cast'), self._cb_panel_2)
          self._dialog.button_add(_('Posters'), self._cb_panel_3)
          self._dialog.button_add(_('Backdrops'), self._cb_panel_4)
+         self._dialog.button_add(_('Tags'), self._cb_panel_6)
       self._dialog.button_add(_('Search Info'), self._cb_panel_5)
 
       o_image = self._dialog.content_get()
@@ -477,8 +514,6 @@ class MoviesModule(EmcModule):
                   _('Country'), e['countries'],
                   _('Rating'), e['rating'],
                   _('Overview'), e['overview'])
-
-         # self._dialog.text_set("test2: κόσμε END") # should see the Greek word 'kosme')
          self._dialog.text_set(info.replace('&', '&amp;'))
 
          # update poster
@@ -488,6 +523,10 @@ class MoviesModule(EmcModule):
          else:
             # TODO show a dummy image
             o_image.file_set('')
+
+         # remember the movie ID
+         self._movie_id = e['id']
+
       else:
          name, year = get_movie_name_from_url(url)
          self._dialog.title_set(name)
@@ -673,6 +712,26 @@ class MoviesModule(EmcModule):
       self.tmdb_dialog.delete()
       self.tmdb_dialog = None
       del tmdb
+
+
+######## Tags
+   def _cb_panel_6(self, button):
+      m = EmcMenu(relto=button)
+      for tag in sorted(self._tags_db.keys()):
+         if self._movie_id in self._tags_db.get_data(tag):
+            icon = 'user-home' # TODO FIXME !!!!!!!!!!!!!!!!!!!!!!
+         else:
+            icon = None
+         m.item_add(label=tag, icon=icon, callback=self._tag_menu_cb)
+
+   def _tag_menu_cb(self, menu, item):
+      tag_name = item.text
+      tag_ids = self._tags_db.get_data(tag_name)
+      if self._movie_id in tag_ids:
+         tag_ids.remove(self._movie_id)
+      else:
+         tag_ids.append(self._movie_id)
+      self._tags_db.set_data(tag_name, tag_ids)
 
 
 class BackgroundScanner(ecore.Idler):

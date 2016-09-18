@@ -4,6 +4,8 @@ TMP
  * report on phab the Ethumb Client instability
  * ethumb: frame cannot be unset...witout an error
 
+ * use the new sdb.items() generator where needed, it's fastest
+
 BUGS
 =====
  * mpris fail on Position > Int32    :/

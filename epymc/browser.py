@@ -297,7 +297,7 @@ class EmcBrowser(object):
    def group_add(self, label, icon=None):
       """ TODO DOC """
       self.current_view.group_add(label, icon)
-      
+
    def back(self):
       """ TODO Function doc """
       # discard current page
@@ -319,9 +319,10 @@ class EmcBrowser(object):
    def refresh(self, hard=False):
       if self.pages and self.current_view:
          if hard:
-            # create the page
-            page = self.pages[-1]
-            self._populate_page(page, is_refresh=True)
+            # try to keep the selected item selected
+            self.autoselect_url = self.current_view.selected_url_get()
+            # re-create the page
+            self._populate_page(self.pages[-1], is_refresh=True)
          else:
             self.current_view.refresh()
 

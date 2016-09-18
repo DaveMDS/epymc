@@ -96,6 +96,20 @@ class EmcDatabase(object):
    def __len__(self):
       return len(self._sh)
 
+   def __iter__(self):
+      return self.items()
+
+   def items(self):
+      for k, v in self._sh.items():
+         if k != self._vkey:
+            yield k, v
+
+   def keys(self):
+      if self._vers:
+         return [k for k in self._sh.keys() if k != self._vkey]
+      else:
+         return self._sh.keys()
+
    def get_data(self, key):
       DBG('Get Data for db: %s, key: %s' % (self._name, key))
       return self._sh[key]
@@ -120,12 +134,6 @@ class EmcDatabase(object):
 
    def id_exists(self, key):
       return key in self._sh
-
-   def keys(self):
-      if self._vers:
-         return [k for k in self._sh.keys() if k != self._vkey]
-      else:
-         return self._sh.keys()
 
    def get_version(self):
       if self._vkey in self._sh:

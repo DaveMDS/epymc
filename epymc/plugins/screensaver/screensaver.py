@@ -78,6 +78,7 @@ class ScreenSaver(EmcModule):
    def __shutdown__(self):
       DBG('Shutdown module')
       events.listener_del('screensaveer')
+      cgui.root_item_del('ssaver')
       self.timer.delete()
       self.timer = None
 

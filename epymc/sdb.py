@@ -106,22 +106,25 @@ class EmcDatabase(object):
 
    def keys(self):
       if self._vers:
-         return [k for k in self._sh.keys() if k != self._vkey]
+         return [self.get_key(k) for k in self._sh.keys() if k != self._vkey]
       else:
          return self._sh.keys()
 
+   def get_key(self, key):
+      return key.encode("utf-8", "replace").decode("utf-8")
+
    def get_data(self, key):
       DBG('Get Data for db: %s, key: %s' % (self._name, key))
-      return self._sh[key]
+      return self._sh[self.get_key(key)]
 
    def set_data(self, key, data, thread_safe=False):
       DBG('Set data for db: %s, id: %s' % (self._name, key))
       if thread_safe:
          # just put in the queue
-         _queue.put((self, key, data))
+         _queue.put((self, self.get_key(key), data))
       else:
          # update the db now
-         self._sh[key] = data
+         self._sh[self.get_key(key)] = data
          # delayed sync
          if self._sync_timer is None:
             self._sync_timer = ecore.Timer(5.0, self._sync_timer_cb)
@@ -129,11 +132,12 @@ class EmcDatabase(object):
             self._sync_timer.reset()
 
    def del_data(self, key):
-      if key in self._sh:
-         del self._sh[key]
+      if self.get_key(key) in self._sh:
+         del self._sh[self.get_key(key)]
 
    def id_exists(self, key):
-      return key in self._sh
+      return self.get_key(key) in self._sh
+
 
    def get_version(self):
       if self._vkey in self._sh:

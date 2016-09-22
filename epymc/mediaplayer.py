@@ -527,7 +527,9 @@ class EmcPlayerBase(object):
       # files with special chars in them to play (the bug don't appear if no
       # "file://" is given. The bug can be seen also using normal vlc from
       # the command line.
-      self._emotion.file_set(url[7:] if url.startswith('file://') else url)
+      url = url[7:] if url.startswith('file://') else url
+
+      self._emotion.file_set(url.encode("utf-8", "surrogateescape"))
       self._emotion.play = True
       self._emotion.audio_volume = volume_get() / 100.0
       self._emotion.audio_mute = volume_mute_get()

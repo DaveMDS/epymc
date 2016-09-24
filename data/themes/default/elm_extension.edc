@@ -2535,6 +2535,7 @@ group { name: "elm/ctxpopup/base/emc_menu";
          }
       }
       part { name: "shine";
+         clip_to: "clip";
          description { state: "default";
             rel1.offset: 0 -2;
             rel2.relative: 1.0 0.0;
@@ -2690,8 +2691,7 @@ group { name: "elm/list/item/emc_menu";
          clip_to: "disclip";
          mouse_events:   0;
          scale: 1;
-         description {
-            state: "default";
+         description { state: "default";
             rel1 {
                to_x:     "elm.swallow.icon";
                relative: 1.0  0.0;
@@ -2700,7 +2700,7 @@ group { name: "elm/list/item/emc_menu";
             rel2 {
                to_x:     "elm.swallow.end";
                relative: 0.0  1.0;
-               offset:   -1 -5;
+               offset:   -5 -5;
             }
             text {
                min: 0 1;
@@ -2763,7 +2763,6 @@ group { name: "elm/list/item/emc_menu";
          target: "sel_bevel";
          target: "sel_shadow";
          target: "elm.text";
-         transition: LINEAR 0.1;
       }
       program { name: "go_disabled";
          signal: "elm,state,disabled";

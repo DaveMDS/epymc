@@ -388,11 +388,11 @@ msgstr "Traccia audio #%d"
 
 #: epymc/mediaplayer.py:1113
 msgid "Unmute"
-msgstr "Acceso"
+msgstr "Suona"
 
 #: epymc/mediaplayer.py:1116
 msgid "Mute"
-msgstr "Muto"
+msgstr "Silenzioso"
 
 #: epymc/mediaplayer.py:1132
 #, python-format

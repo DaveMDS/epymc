@@ -51,6 +51,7 @@ ICON("arrowD")
 ICON("next")
 ICON("prev")
 ICON("item_sel")
+ICON("item_nosel")
 
 ICON("views")
 ICON("view_list")

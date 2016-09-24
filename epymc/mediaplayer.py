@@ -1113,7 +1113,7 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
 
    ### audio menu
    def _audio_menu_build(self, btn):
-      menu = EmcMenu(relto=btn, close_on=('UP',))
+      menu = EmcMenu(relto=btn)
 
       # audio channels
       trk_cnt = self._emotion.audio_channel_count()
@@ -1124,24 +1124,23 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
             name = _('Audio track: %s') % name
          else:
             name = _('Audio track #%d') % (n + 1)
-         icon = 'item_sel' if n == current else None
-         item = menu.item_add(None, name, icon, self._audio_menu_track_cb, n)
+         icon = 'icon/item_sel' if n == current else 'icon/item_nosel'
+         menu.item_add(name, icon, None, self._audio_menu_track_cb, n)
 
       # mute / unmute
       menu.item_separator_add()
-      if volume_mute_get():
-         menu.item_add(None, _('Unmute'), 'volume',
-                       lambda m,i: volume_mute_set(False))
-      else:
-         menu.item_add(None, _('Mute'), 'mute',
-                       lambda m,i: volume_mute_set(True))
+      end_icon = 'icon/check_on' if volume_mute_get() else 'icon/check_off'
+      menu.item_add(_('Mute'), 'icon/mute', end_icon, lambda m,i: volume_mute_toggle())
+
+      # and finally show the menu
+      menu.show()
 
    def _audio_menu_track_cb(self, menu, item, track_num):
       self._emotion.audio_channel_set(track_num)
 
    ### video menu
    def _video_menu_build(self, btn):
-      menu = EmcMenu(relto=btn, close_on=('UP',))
+      menu = EmcMenu(relto=btn)
 
       # video channels
       trk_cnt = self._emotion.video_channel_count()
@@ -1152,18 +1151,20 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
             name = _('Video track: %s') % name
          else:
             name = _('Video track #%d') % (n + 1)
-         icon = 'item_sel' if n == current else None
-         item = menu.item_add(None, name, icon, self._video_menu_track_cb, n)
+         icon = 'icon/item_sel' if n == current else 'icon/item_nosel'
+         item = menu.item_add(name, icon, None, self._video_menu_track_cb, n)
 
       # download
       menu.item_separator_add()
-      it = menu.item_add(None, _('Download video'), None,
-                         self._video_menu_download_cb)
+      it = menu.item_add(_('Download video'), 'icon/download',
+                         callback=self._video_menu_download_cb)
       if self.url.startswith('file://'):
          it.disabled = True
 
+      # and finally show the menu
+      menu.show()
+
    def _video_menu_track_cb(self, menu, item, track_num):
-      print("Change to video track #" + str(track_num))
       self._emotion.video_channel_set(track_num)
 
    def _video_menu_download_cb(self, menu, item):
@@ -1171,30 +1172,30 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
 
    ### subtitles menu
    def _subs_menu_build(self, btn):
-      menu = EmcMenu(relto=btn, close_on=('UP',))
+      menu = EmcMenu(relto=btn)
 
       # no subs for online videos
       if not self.url.startswith('file://'):
-         it = menu.item_add(None, _('No subtitles'))
+         it = menu.item_add(_('No subtitles'))
          it.disabled = True
          return
 
       # delay item
-      menu.item_add(None, _('Delay: %d ms') % self._subtitles.delay,
-                    None, self._subs_menu_delay_cb)
+      menu.item_add(_('Delay: %d ms') % self._subtitles.delay,
+                    callback=self._subs_menu_delay_cb)
       menu.item_separator_add()
 
       # no subs item
-      nos_it = menu.item_add(None, _('No subtitles'), None,
-                             self._subs_menu_track_cb, None)
+      nos_it = menu.item_add(_('No subtitles'), 'icon/item_nosel',
+                             callback=self._subs_menu_track_cb)
 
       # embedded subs
       spu_cnt = self._emotion.spu_channel_count()
       current = -1 if self._emotion.spu_mute else self._emotion.spu_channel
       for n in range(spu_cnt):
          name = self._emotion.spu_channel_name_get(n) or _('Subtitle #%d') % (n + 1)
-         icon = 'item_sel' if n == current else None
-         menu.item_add(None, name, icon, self._subs_menu_track_cb, n)
+         icon = 'icon/item_sel' if n == current else 'icon/item_nosel'
+         menu.item_add(name, icon, None, self._subs_menu_track_cb, n)
 
       # external subs
       for sub in self._subtitles.search_subs():
@@ -1202,17 +1203,19 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
             name = os.path.basename(sub)[33:]
          else:
             name = os.path.basename(sub)
-         menu.item_add(None, name,
-                       'item_sel' if sub == self._subtitles.current_file else None,
-                       self._subs_menu_track_cb, sub)
+         icon = 'icon/item_sel' if sub == self._subtitles.current_file else 'icon/item_nosel'
+         menu.item_add(name, icon, None, self._subs_menu_track_cb, sub)
 
       # no subs item
       if current < 0 and self._subtitles.current_file is None:
-         nos_it.icon_name = 'item_sel'
+         menu.item_icon_set(nos_it, 'icon/item_sel')
 
       # download item
       menu.item_separator_add()
-      menu.item_add(None, _('Download subtitles'), None, self._subs_menu_download_cb)
+      menu.item_add(_('Download subtitles'), 'icon/subs', callback=self._subs_menu_download_cb)
+
+      # and finally show the menu
+      menu.show()
 
    def _subs_menu_delay_cb(self, menu, item):
       dia = EmcDialog(title=_('Subtitles delay'), style='minimal',
@@ -1226,7 +1229,7 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       self.subs_delay_apply(offset)
       dia.text_set(_('Delay: %d ms') % self._subtitles.delay)
 
-   def _subs_menu_track_cb(self, menu, item, sub):
+   def _subs_menu_track_cb(self, menu, item, sub=None):
       if sub is None: # disable all subs
          self._subtitles.file_set(None)
          self._emotion.spu_mute = True

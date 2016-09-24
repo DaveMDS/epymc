@@ -956,9 +956,13 @@ class EmcMenu(Ctxpopup):
       # show the popup
       Ctxpopup.show(self)
 
-      # auto select first
+      # auto select first (not disabled or separator) item
       if self.li.selected_item is None:
-         self.li.first_item.selected = True
+         item = self.li.first_item
+         while item and item.disabled:
+            item = item.next
+         if item:
+            item.selected = True
 
    def close(self):
       self.dismiss()
@@ -973,6 +977,12 @@ class EmcMenu(Ctxpopup):
       item.separator = True
       item.disabled = True
       return item
+
+   def item_icon_set(self, item, icon):
+      item.content_set(load_icon(icon))
+
+   def item_icon_end_set(self, item, icon):
+      item.part_content_set('end', load_icon(icon))
 
    def _dismissed_cb(self, obj):
       input_events.listener_del('EmcMenu')

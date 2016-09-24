@@ -237,24 +237,34 @@ class MyItemClass(EmcItemClass):
 
       # Menu
       elif url == 'uitests://menu':
-         def _cb_menu(menu, item, name):
-            print("Selected item: " + name)
+         def _cb_menu(menu, item):
+            print("Selected item: " + item.text)
 
          m = EmcMenu()
-         m.item_add(None, "Item 1", None, _cb_menu, "item1")
-         m.item_add(None, "Item 2", None, _cb_menu, "item2")
-         m.item_add(None, "Item 3", None, _cb_menu, "item3")
+         m.item_add("Item 1", callback=_cb_menu)
+         m.item_add("Item 2", callback=_cb_menu)
+         m.item_add("Item 3", callback=_cb_menu)
          m.item_separator_add()
-         m.item_add(None, "Item 4", "clock", _cb_menu, "item4")
-         m.item_add(None, "Item 5", "home", _cb_menu, "item5")
+         m.item_add("Item 4", "icon/evas", callback=_cb_menu)
+         m.item_add("Item 5", "icon/home", "icon/volume", callback=_cb_menu)
          m.item_separator_add()
-         it = m.item_add(None, "Disabled", None, _cb_menu, "disabled")
+         it = m.item_add("Disabled", callback=_cb_menu)
          it.disabled = True
-         it = m.item_add(None, "Disabled", 'home', _cb_menu, "disabled2")
+         it = m.item_add("Disabled", 'icon/home', callback=_cb_menu)
          it.disabled = True
-         m.item_add(None, "Item 7", None, _cb_menu, "item7")
-         it = m.item_add(None, "Item 8 (disabled)", None, _cb_menu, "item8")
+         m.item_add("Item 8", None, 'icon/volume', callback=_cb_menu)
+         it = m.item_add("Item 9 (disabled)", callback=_cb_menu)
          it.disabled = True
+         m.show()
+
+      elif url == 'uitests://menu_long':
+         def _cb_menu(menu, item):
+            print('Selected item: ' + item.text)
+
+         m = EmcMenu(dismiss_on_select=False)
+         for i in range(1, 100):
+            m.item_add('Item %d' % i, 'icon/home', 'icon/volume', callback=_cb_menu)
+         m.show()
 
       # TMDB
       # elif url == 'uitests://tmdb':
@@ -629,6 +639,8 @@ class UiTestsModule(EmcModule):
 
    def populate_root(self, browser, url):
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + Focus')
+      browser.item_add(MyItemClass(), 'uitests://menu', 'Menu small (dismiss on select)')
+      browser.item_add(MyItemClass(), 'uitests://menu_long', 'Menu long (no dismiss on select)')
       browser.item_add(MyItemClass(), 'uitests://sliders', 'Sliders')
       browser.item_add(MyItemClass(), 'uitests://mpv', 'Mediaplayer - Local Video')
       browser.item_add(MyItemClass(), 'uitests://mpvo', 'Mediaplayer - Online Video (good)')
@@ -642,7 +654,6 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://sniffer', 'Event Sniffer')
       browser.item_add(MyItemClass(), 'uitests://ev_emit', 'Event Emit')
       browser.item_add(MyItemClass(), 'uitests://notify', 'Notify Stack')
-      browser.item_add(MyItemClass(), 'uitests://menu', 'Menu')
       browser.item_add(MyItemClass(), 'uitests://icons', 'Icons gallery')
       browser.item_add(MyItemClass(), 'uitests://imagegal', 'Images gallery')
       browser.item_add(MyItemClass(), 'uitests://styles', 'Text styles')

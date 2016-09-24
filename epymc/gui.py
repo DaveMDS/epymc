@@ -28,8 +28,8 @@ from efl import ecore
 from efl import ecore_input
 from efl import edje
 from efl import elementary as elm
-from efl.elementary import Window, ELM_WIN_BASIC, Layout, Icon, Image, Button, \
-   Menu, Progressbar, Box, Entry, Scroller, Scrollable, Frame, List, Table, \
+from efl.elementary import Window, ELM_WIN_BASIC, Layout, Icon, Image, Button,  \
+   Progressbar, Box, Entry, Scroller, Scrollable, Frame, List, Table, Ctxpopup, \
    Genlist, GenlistItemClass, ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS, \
    Gengrid, Slideshow, SlideshowItemClass, Slider
 from efl.elementary.theme import theme_overlay_add, theme_extension_add
@@ -496,8 +496,12 @@ def focus_move(direction, root_obj=None):
       horiz = focused.horizontal
       if (horiz and direction == 'RIGHT') or (not horiz and direction == 'DOWN'):
          to_item = item.next
+         while to_item and to_item.disabled:
+            to_item = to_item.next
       elif (horiz and direction == 'LEFT') or (not horiz and direction == 'UP'):
          to_item = item.prev
+         while to_item and to_item.disabled:
+            to_item = to_item.prev
       if to_item:
          to_item.selected = True
          to_item.focus = True
@@ -861,6 +865,11 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 
 ################################################################################
+class _ScrollableList(List, Scrollable):
+   def __init__(self, parent, **kargs):
+      List.__init__(self, parent, **kargs)
+
+################################################################################
 class EmcButton(Button):
    """ A simple wrapper around the elm Button class """
 
@@ -911,80 +920,94 @@ class EmcSlider(Slider):
       self.show()
 
 ################################################################################
-class EmcMenu(Menu):
-   """ TODO doc this """
+class EmcMenu(Ctxpopup):
+   """ Dont forget to call show() AFTER all items added """
+   def __init__(self, relto=None, dismiss_on_select=True):
+      self.dismiss_on_select = dismiss_on_select
 
-   def __init__(self, relto=None, close_on=()):
-      self.close_on = close_on
-      Menu.__init__(self, layout, style='emc', focus_allow=False)
+      # base popup class
+      Ctxpopup.__init__(self, layout, style='emc_menu', direction_priority = (
+         elm.ELM_CTXPOPUP_DIRECTION_DOWN, elm.ELM_CTXPOPUP_DIRECTION_UP,
+         elm.ELM_CTXPOPUP_DIRECTION_RIGHT, elm.ELM_CTXPOPUP_DIRECTION_LEFT)
+      )
+      self.callback_dismissed_add(self._dismissed_cb)
+
+      # Scrollable list as content
+      self.li = _ScrollableList(self, style='emc_menu', mode=elm.ELM_LIST_EXPAND)
+      self.li.content_min_limit(True, False)
+      self.li.callback_activated_add(self._item_activated_cb)
+      self.li.on_mouse_move_add(self._mouse_move_cb)
+      self.li.on_mouse_down_add(self._mouse_click_cb)
+      self.content = self.li
+
+      # adjust popup position
       if relto:
-         # TODO better pos calc
-         x, y, w, h = relto.geometry
-         self.move(x, y + h)
-      input_events.listener_add("EmcMenu", self._input_event_cb)
-      self.callback_clicked_add(self._dismiss_cb)
-      self.show()
+         x, y = relto.center
+         self.move(x, y)
 
-   def item_add(self, parent=None, label=None, icon=None, callback=None, *args, **kwargs):
-      item = Menu.item_add(self, parent, label, icon, self._item_selected_cb,
-                           callback, *args, **kwargs)
-      item.data['_user_cb_data_'] = (callback, args, kwargs)
-      if self.selected_item is None:
-         item.selected = True
-      return item
+      input_events.listener_add('EmcMenu', self._input_event_cb)
+
+   def show(self):
+      # adjust list size
+      win_w, win_h = win.size
+      self.li.size_hint_max = (-1, win_h / 1.5)
+      self.li.go()
+
+      # show the popup
+      Ctxpopup.show(self)
+
+      # auto select first
+      if self.li.selected_item is None:
+         self.li.first_item.selected = True
 
    def close(self):
-      input_events.listener_del("EmcMenu")
-      Menu.close(self)
+      self.dismiss()
 
-   def _item_selected_cb(self, menu, item, cb, *args, **kwargs):
-      input_events.listener_del("EmcMenu")
+   def item_add(self, label=None, icon=None, end=None, callback=None, *args, **kargs):
+      item = self.li.item_append(label, load_icon(icon), load_icon(end))
+      item.data['_user_cb_data_'] = (callback, args, kargs)
+      return item
+
+   def item_separator_add(self):
+      item = self.li.item_append()
+      item.separator = True
+      item.disabled = True
+      return item
+
+   def _dismissed_cb(self, obj):
+      input_events.listener_del('EmcMenu')
+      self.delete()
+      del self
+
+   def _item_activated_cb(self, obj, item):
+      cb, args, kwargs = item.data['_user_cb_data_']
       if callable(cb):
-         cb(menu, item, *args, **kwargs)
+         cb(self, item, *args, **kwargs)
+      if self.dismiss_on_select:
+         self.dismiss()
 
-   def _dismiss_cb(self, menu):
-      input_events.listener_del("EmcMenu")
+   def _mouse_move_cb(self, obj, event):
+      item, pos = self.li.at_xy_item_get(*event.position.canvas)
+      if item and not item.disabled:
+         item.selected = True
+
+   def _mouse_click_cb(self, obj, event):
+      self._item_activated_cb(self.li, self.li.selected_item)
 
    def _input_event_cb(self, event):
-      item = self.selected_item
-
-      if event == 'UP':
-         if event in self.close_on and item == self.first_item:
-            self.close()
-            return input_events.EVENT_BLOCK
-         if not item or not item.prev:
-            return input_events.EVENT_BLOCK
-         while item.prev and (item.prev.is_separator or item.prev.disabled):
-            item = item.prev
-         if item and item.prev:
-            item.prev.selected = True
+      if event == 'OK':
+         self._item_activated_cb(self.li, self.li.selected_item)
          return input_events.EVENT_BLOCK
-
-      elif event == 'DOWN':
-         if event in self.close_on and item == self.last_item:
-            self.close()
-         if not item or not item.next:
-            return input_events.EVENT_BLOCK
-         while item.next and (item.next.is_separator or item.next.disabled):
-            item = item.next
-         if item and item.next:
-            item.next.selected = True
+      elif event in ('BACK', 'EXIT'):
+         self.dismiss()
          return input_events.EVENT_BLOCK
-
-      elif event == 'OK':
-         cb, args, kwargs = self.selected_item_get().data['_user_cb_data_']
-         if callable(cb):
-            cb(self, item, *args, **kwargs)
-         self.close()
+      elif event in ('UP', 'DOWN', 'LEFT', 'RIGHT'):
+         if focus_move(event, self) == False:
+            d = self.direction
+            if (d == elm.ELM_CTXPOPUP_DIRECTION_DOWN and event == 'UP') or \
+               (d == elm.ELM_CTXPOPUP_DIRECTION_UP and event == 'DOWN'):
+               self.dismiss()
          return input_events.EVENT_BLOCK
-
-      elif event == 'BACK' or event == 'EXIT':
-         self.close()
-         return input_events.EVENT_BLOCK
-
-      elif event in ('LEFT', 'RIGHT'):
-         return input_events.EVENT_BLOCK
-
       return input_events.EVENT_CONTINUE
 
 ################################################################################

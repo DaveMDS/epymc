@@ -716,21 +716,24 @@ class MoviesModule(EmcModule):
 
 ######## Tags
    def _cb_panel_6(self, button):
-      m = EmcMenu(relto=button)
+      m = EmcMenu(relto=button, dismiss_on_select=False)
       for tag in sorted(self._tags_db.keys()):
          if self._movie_id in self._tags_db.get_data(tag):
-            icon = 'user-home' # TODO FIXME !!!!!!!!!!!!!!!!!!!!!!
+            end = 'icon/check_on'
          else:
-            icon = None
-         m.item_add(label=tag, icon=icon, callback=self._tag_menu_cb)
+            end = 'icon/check_off'
+         m.item_add(tag, 'icon/tag', end, callback=self._tag_menu_cb)
+      m.show()
 
    def _tag_menu_cb(self, menu, item):
       tag_name = item.text
       tag_ids = self._tags_db.get_data(tag_name)
       if self._movie_id in tag_ids:
          tag_ids.remove(self._movie_id)
+         menu.item_icon_end_set(item, 'icon/check_off')
       else:
          tag_ids.append(self._movie_id)
+         menu.item_icon_end_set(item, 'icon/check_on')
       self._tags_db.set_data(tag_name, tag_ids)
 
 

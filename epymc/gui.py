@@ -1813,7 +1813,7 @@ class EmcSourcesManager(EmcDialog):
 class EmcTagsManager(EmcDialog):
    def __init__(self, tags_db, done_cb=None):
       EmcDialog.__init__(self, _('Tags manager'), style='list',
-                         canc_cb=self._close_cb)
+                         done_cb=self._btn_rename_cb, canc_cb=self._close_cb)
       self.button_add(_('Done'), icon='icon/ok',
                       selected_cb=self._close_cb)
       self.button_add(_('Add'), icon='icon/plus',
@@ -1823,7 +1823,7 @@ class EmcTagsManager(EmcDialog):
       self.button_add(_('Rename'), icon=None, # TODO find a decent icon
                       selected_cb=self._btn_rename_cb)
       self._tags_db = tags_db
-      self._done_cb = done_cb
+      self._tags_done_cb = done_cb
       self._populate()
 
    def _populate(self):
@@ -1833,8 +1833,8 @@ class EmcTagsManager(EmcDialog):
       self.list_go()
 
    def _close_cb(self, *args):
-      if callable(self._done_cb):
-         self._done_cb()
+      if callable(self._tags_done_cb):
+         self._tags_done_cb()
       self.delete()
 
    def _btn_add_cb(self, btn):
@@ -1868,7 +1868,7 @@ class EmcTagsManager(EmcDialog):
       self._populate()
       dia.delete()
 
-   def _btn_rename_cb(self, btn):
+   def _btn_rename_cb(self, obj):
       try:
          tag_name = self.list_item_selected_get().text
       except AttributeError: # no item selected

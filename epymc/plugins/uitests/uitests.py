@@ -377,7 +377,9 @@ class MyItemClass(EmcItemClass):
          d.list_item_append('item 2', 'icon/star', 'icon/check_on')
          d.list_item_append('item 3 <b>bold</> <info>info</> <success>success</> <failure>failure</> <i>etc...</>',
                             'icon/star', 'icon/check_on')
-         for i in range(4, 101):
+         d.list_item_append('item 4', 'icon/tag', 'text/End Text')
+         d.list_item_append('item 5', 'icon/tag', 'text/<b>End</> <info>Text</>')
+         for i in range(6, 101):
             d.list_item_append('item %d'%i)
          d.list_go()
 

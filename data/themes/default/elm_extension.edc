@@ -954,7 +954,7 @@ group { name: "elm/list/item/image_list";
 }
 
 //// DIALOG LISTS (icons + text) (elm/list/item/default) //////////////////////
-group { name: "elm/list/item/default";
+group { name: "elm/list/item/dialog";
    data.item: "selectraise" "on";
    images {
       image: "vgrad_med_dark.png" COMP;
@@ -1165,8 +1165,8 @@ group { name: "elm/list/item/default";
       }
    }
 }
-group { name: "elm/list/item_odd/default";
-   inherit: "elm/list/item/default";
+group { name: "elm/list/item_odd/dialog";
+   inherit: "elm/list/item/dialog";
    parts {
       part { name: "base";
          type: RECT;

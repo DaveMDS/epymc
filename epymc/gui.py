@@ -28,10 +28,6 @@ from efl import ecore
 from efl import ecore_input
 from efl import edje
 from efl import elementary as elm
-from efl.elementary import Window, ELM_WIN_BASIC, Layout, Icon, Image, Button,  \
-   Progressbar, Box, Entry, Scroller, Scrollable, Frame, List, Table, Ctxpopup, \
-   Genlist, GenlistItemClass, ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS, \
-   Gengrid, Slideshow, SlideshowItemClass, Slider
 from efl.elementary.theme import theme_overlay_add, theme_extension_add
 from efl.elementary.configuration import scale_set as elm_scale_set
 from efl.elementary.configuration import scale_get as elm_scale_get
@@ -145,14 +141,14 @@ def init():
    set_theme_file(theme_file)
 
    # create the elm window
-   win = Window('epymc', ELM_WIN_BASIC, title=_('Emotion Media Center'),
+   win = elm.Window('epymc', elm.ELM_WIN_BASIC, title=_('Emotion Media Center'),
                 focus_allow=False)
    win.callback_delete_request_add(lambda w: ask_to_exit())
    if fullscreen == 'True':
       win.fullscreen_set(1)
 
    # main layout (main theme)
-   layout = Layout(win, file=(theme_file, 'emc/main/layout'), focus_allow=False,
+   layout = elm.Layout(win, file=(theme_file, 'emc/main/layout'), focus_allow=False,
                    size_hint_expand=EXPAND_BOTH, name='MainLayout')
    win.resize_object_add(layout)
    layout.show()
@@ -167,8 +163,8 @@ def init():
                               (lambda o,e,s: input_events.event_emit('BACK')))
 
    # two Image objects for the backdrop
-   _backdrop_im1 = Image(win, fill_outside=True)
-   _backdrop_im2 = Image(win, fill_outside=True)
+   _backdrop_im1 = elm.Image(win, fill_outside=True)
+   _backdrop_im2 = elm.Image(win, fill_outside=True)
    swallow_set('bg.swallow.backdrop1', _backdrop_im1)
    swallow_set('bg.swallow.backdrop2', _backdrop_im2)
    _backdrop_curr = _backdrop_im2
@@ -235,7 +231,7 @@ def load_icon(icon):
       return None
    if isinstance(icon, evas.Object):
       return icon
-   ic = Icon(win)
+   ic = elm.Icon(win)
    if icon[0] == '/':
       try:
          ic.file_set(icon)
@@ -266,7 +262,7 @@ def load_image(name, path = None):
    if name.startswith(('http://', 'https://')):
       return EmcImage(name)
 
-   im = Image(win)
+   im = elm.Image(win)
 
    # if it's a full path just load it
    if os.path.exists(name):
@@ -490,7 +486,7 @@ def focus_move(direction, root_obj=None):
    focused = win.focused_object
 
    # move between List items...
-   if isinstance(focused, List) and focused.focus_allow:
+   if isinstance(focused, elm.List) and focused.focus_allow:
       item = focused.focused_item
       to_item = None
       horiz = focused.horizontal
@@ -509,7 +505,7 @@ def focus_move(direction, root_obj=None):
          return True
 
    # move between Genlist items...
-   elif isinstance(focused, Genlist) and focused.focus_allow:
+   elif isinstance(focused, elm.Genlist) and focused.focus_allow:
       item = focused.focused_item or focused.selected_item
       to_item = None
       if direction == 'DOWN':
@@ -527,7 +523,7 @@ def focus_move(direction, root_obj=None):
          return True
 
    # move between Gengrid items...
-   elif isinstance(focused, Gengrid) and focused.focus_allow:
+   elif isinstance(focused, elm.Gengrid) and focused.focus_allow:
       item = focused.focused_item or focused.selected_item
       x1, y1 = item.pos
       to_item = None
@@ -638,7 +634,7 @@ def focus_move(direction, root_obj=None):
           new_focused.name or '<%s>' % new_focused.__class__.__name__)
 
    # FOCUS FIX: focus to gengrid item
-   if isinstance(new_focused, Gengrid) and new_focused.focused_item is None:
+   if isinstance(new_focused, elm.Gengrid) and new_focused.focused_item is None:
       DBG('FOCUS FIX: give focus to the selected item in a focused Gengrid')
       new_focused.selected_item.focus = True
 
@@ -865,12 +861,12 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 
 ################################################################################
-class _ScrollableList(List, Scrollable):
+class _ScrollableList(elm.List, elm.Scrollable):
    def __init__(self, parent, **kargs):
-      List.__init__(self, parent, **kargs)
+      elm.List.__init__(self, parent, **kargs)
 
 ################################################################################
-class EmcButton(Button):
+class EmcButton(elm.Button):
    """ A simple wrapper around the elm Button class """
 
    def __init__(self, label=None, icon=None, cb=None, cb_data=None,
@@ -879,7 +875,7 @@ class EmcButton(Button):
       self._cb_data = cb_data
       self._is_toggle = toggle
       self._toggled = False
-      Button.__init__(self, parent or layout, style='emc', **kargs)
+      elm.Button.__init__(self, parent or layout, style='emc', **kargs)
       self.callback_clicked_add(self.activate)
       if label: self.text_set(label)
       if icon: self.icon_set(icon)
@@ -913,20 +909,20 @@ class EmcButton(Button):
             self._cb(self)
 
 ################################################################################
-class EmcSlider(Slider):
+class EmcSlider(elm.Slider):
    """ Simple wrapper around the elm Slider class """
    def __init__(self, parent, **kargs):
-      Slider.__init__(self, parent, style='emc', **kargs)
+      elm.Slider.__init__(self, parent, style='emc', **kargs)
       self.show()
 
 ################################################################################
-class EmcMenu(Ctxpopup):
+class EmcMenu(elm.Ctxpopup):
    """ Dont forget to call show() AFTER all items added """
    def __init__(self, relto=None, dismiss_on_select=True):
       self.dismiss_on_select = dismiss_on_select
 
       # base popup class
-      Ctxpopup.__init__(self, layout, style='emc_menu', direction_priority = (
+      elm.Ctxpopup.__init__(self, layout, style='emc_menu', direction_priority = (
          elm.ELM_CTXPOPUP_DIRECTION_DOWN, elm.ELM_CTXPOPUP_DIRECTION_UP,
          elm.ELM_CTXPOPUP_DIRECTION_RIGHT, elm.ELM_CTXPOPUP_DIRECTION_LEFT)
       )
@@ -954,7 +950,7 @@ class EmcMenu(Ctxpopup):
       self.li.go()
 
       # show the popup
-      Ctxpopup.show(self)
+      elm.Ctxpopup.show(self)
 
       # auto select first (not disabled or separator) item
       if self.li.selected_item is None:
@@ -1021,7 +1017,7 @@ class EmcMenu(Ctxpopup):
       return input_events.EVENT_CONTINUE
 
 ################################################################################
-class EmcImage(Image):
+class EmcImage(elm.Image):
    """ An image object with support for remote url, with optional
        saving of the downloaded image to a local destination and a simple
        cache-to-file mechanism to avoid re-downloading the image again.
@@ -1051,7 +1047,7 @@ class EmcImage(Image):
                       aspect_fixed=True, fill_outside=False, thumb=False):
       self._icon_obj = None
       self._thumb_request_id = None
-      Image.__init__(self, layout, aspect_fixed=aspect_fixed,
+      elm.Image.__init__(self, layout, aspect_fixed=aspect_fixed,
                      fill_outside=fill_outside, size_hint_expand=EXPAND_BOTH,
                      size_hint_fill=FILL_BOTH)
       self.on_del_add(self._del_cb)
@@ -1171,7 +1167,7 @@ class EmcImage(Image):
          self._thumb_request_id = None
 
 ################################################################################
-class EmcDialog(Layout):
+class EmcDialog(elm.Layout):
    """ TODO doc this
    style can be 'panel' or 'minimal'
 
@@ -1194,7 +1190,7 @@ class EmcDialog(Layout):
          group = 'emc/dialog/buffering'
       else:
          group = 'emc/dialog/panel'
-      Layout.__init__(self, layout, file=(theme_file, group), focus_allow=False,
+      elm.Layout.__init__(self, layout, file=(theme_file, group), focus_allow=False,
                       size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH)
       self.signal_callback_add('emc,dialog,close', '', self._close_pressed)
       self.signal_callback_add('emc,dialog,hide,done', '',
@@ -1231,14 +1227,14 @@ class EmcDialog(Layout):
 
       # vbox
       if style != 'buffering':
-         self._vbox = Box(self, horizontal=False, size_hint_align=FILL_HORIZ,
+         self._vbox = elm.Box(self, horizontal=False, size_hint_align=FILL_HORIZ,
                           size_hint_weight=EXPAND_HORIZ)
          self._vbox.show()
          self.content_set('emc.swallow.content', self._vbox)
 
       # if both text and content given then put them side by side
       if text and content:
-         hbox = Box(self, horizontal=True, size_hint_align=FILL_BOTH,
+         hbox = elm.Box(self, horizontal=True, size_hint_align=FILL_BOTH,
                     size_hint_weight=EXPAND_BOTH)
          hbox.show()
          self._vbox.pack_end(hbox)
@@ -1257,7 +1253,7 @@ class EmcDialog(Layout):
 
       # user content
       if content is not None:
-         frame = Frame(self, style='pad_small', size_hint_align=FILL_BOTH,
+         frame = elm.Frame(self, style='pad_small', size_hint_align=FILL_BOTH,
                        size_hint_weight=EXPAND_BOTH, content=content)
          frame.show()
          if text is not None:
@@ -1267,8 +1263,8 @@ class EmcDialog(Layout):
 
       # automatic list
       if style in ['list', 'image_list_horiz', 'image_list_vert']:
-         self._list = List(self, focus_allow=False, size_hint_align=FILL_BOTH,
-                           size_hint_weight=EXPAND_BOTH,
+         self._list = elm.List(self, focus_allow=False,
+                           size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH,
                            horizontal=True if style == 'image_list_horiz' else False,
                            style='dialog' if style == 'list' else 'image_list')
          self._list.callback_activated_add(self._list_item_activated_cb)
@@ -1277,7 +1273,7 @@ class EmcDialog(Layout):
 
       # spinner
       if spinner:
-         self._spinner = Progressbar(self, style='wheel', pulse_mode=True)
+         self._spinner = elm.Progressbar(self, style='wheel', pulse_mode=True)
          self._spinner.pulse(True)
          self._spinner.show()
          self._vbox.pack_end(self._spinner)
@@ -1339,7 +1335,7 @@ class EmcDialog(Layout):
       if content:
          content.delete()
       box_remove('dialogs.box.stack', self)
-      Layout.delete(self)
+      elm.Layout.delete(self)
       del self
 
    def _close_pressed(self, a, s, d):
@@ -1450,12 +1446,12 @@ class EmcDialog(Layout):
          return input_events.EVENT_BLOCK
 
       # if content is List or Genlist then automanage the events
-      if self._list or (self._content and type(self._content) in (List, Genlist)):
+      if self._list or (self._content and type(self._content) in (elm.List, elm.Genlist)):
          li = self._list or self._content
          item = li.selected_item
          if item:
             new_it = None
-            horiz = li.horizontal if type(li) is List else False
+            horiz = li.horizontal if type(li) is elm.List else False
             if (horiz and event == 'RIGHT') or (not horiz and event == 'DOWN'):
                new_it = item.next
             if (horiz and event == 'LEFT') or (not horiz and event == 'UP'):
@@ -1536,7 +1532,7 @@ class EmcNotify(edje.Edje):
       self.part_text_set('emc.text.caption', text)
 
 ################################################################################
-class EmcSlideshow(Slideshow):
+class EmcSlideshow(elm.Slideshow):
    """ Fullscreen slideshow widget, with controls.
 
    Params:
@@ -1546,7 +1542,7 @@ class EmcSlideshow(Slideshow):
 
    def __init__(self, url, delay=4, show_controls=False, on_del=None):
       # private stuff
-      self._itc = SlideshowItemClass(self._item_get_func, self._item_del_func)
+      self._itc = elm.SlideshowItemClass(self._item_get_func, self._item_del_func)
       self._timeout = delay
       self._on_del = on_del
       self._first_file = None
@@ -1558,12 +1554,12 @@ class EmcSlideshow(Slideshow):
          self._folder, self._first_file = os.path.split(self._folder)
 
       # swallow our layout in the main layout
-      self._ly = Layout(layout, file=(theme_file, 'emc/slideshow/default'))
+      self._ly = elm.Layout(layout, file=(theme_file, 'emc/slideshow/default'))
       swallow_set('slideshow.swallow', self._ly)
 
       # swallow the slideshow widget in our layout
-      Slideshow.__init__(self, self._ly, loop=True, transition='fade',
-                         focus_allow=False)
+      elm.Slideshow.__init__(self, self._ly, loop=True, transition='fade',
+                             focus_allow=False)
       self.callback_changed_add(self._photo_changed_cb)
       self._ly.content_set('slideshow.swallow', self)
       self._ly.signal_callback_add('emc,show,done', '', self._show_done_signal_cb)
@@ -1600,7 +1596,7 @@ class EmcSlideshow(Slideshow):
          self._on_del()
 
    def _delete_real(self):
-      Slideshow.delete(self)
+      elm.Slideshow.delete(self)
       self._ly.delete()
 
    def pause(self):
@@ -1664,7 +1660,7 @@ class EmcSlideshow(Slideshow):
    def _item_get_func(self, obj, item_data):
       num, fname = item_data
       fullpath = os.path.join(self._folder, fname)
-      img = Image(self, file=fullpath)
+      img = elm.Image(self, file=fullpath)
       return img
 
    def _item_del_func(self, obj, item_data):
@@ -1915,7 +1911,7 @@ class EmcVKeyboard(EmcDialog):
       self._current_layout = self._available_layouts[0] # TODO remember the last one used
 
       # table
-      tb = Table(win, homogeneous=True)
+      tb = elm.Table(win, homogeneous=True)
       tb.show()
       self._table = tb
 
@@ -1923,7 +1919,7 @@ class EmcVKeyboard(EmcDialog):
       self.part_text_set('emc.text.title', title or _('Insert text'))
 
       # entry
-      self.entry = Entry(win, style='vkeyboard', scrollable=True,
+      self.entry = elm.Entry(win, style='vkeyboard', scrollable=True,
                          single_line=True, editable=True,
                          context_menu_disabled=True, focus_allow=True,
                          size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
@@ -2061,7 +2057,7 @@ class EmcVKeyboard(EmcDialog):
       return input_events.EVENT_CONTINUE
   
 ################################################################################
-class EmcScrolledEntry(Entry, Scrollable):
+class EmcScrolledEntry(elm.Entry, elm.Scrollable):
    """ A non editable, multiline text entry, with autoscroll ability. """
    def __init__(self, parent=None, autoscroll=False, **kargs):
       self._animator = None
@@ -2070,7 +2066,7 @@ class EmcScrolledEntry(Entry, Scrollable):
       self._autoscroll_speed_scale = 1.0
       self._autoscroll_start_delay = 3.0
       self._autoscroll = autoscroll
-      Entry.__init__(self, parent or layout, style='scrolledentry',
+      elm.Entry.__init__(self, parent or layout, style='scrolledentry',
                      editable=False, scrollable=True, focus_allow=False, **kargs)
 
    @property
@@ -2103,7 +2099,7 @@ class EmcScrolledEntry(Entry, Scrollable):
       self._autoscroll_start_delay = value
 
    def text_set(self, text):
-      Entry.text_set(self, text)
+      elm.Entry.text_set(self, text)
       if self._autoscroll:
          self._autoscroll_stop()
          self._autoscroll_start()
@@ -2117,7 +2113,7 @@ class EmcScrolledEntry(Entry, Scrollable):
 
    def delete(self):
       self._autoscroll_stop()
-      Entry.delete(self)
+      elm.Entry.delete(self)
 
    def _autoscroll_start(self):
       if self._animator is None:

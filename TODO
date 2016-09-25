@@ -5,6 +5,7 @@ TMP
  * ethumb: frame cannot be unset...witout an error
 
  * use the new sdb.items() generator where needed, it's fastest
+ * config -> general -> date format  Wrong entry size !!
 
 BUGS
 =====

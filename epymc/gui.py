@@ -231,19 +231,19 @@ def load_icon(icon):
          can be a theme icon (ex: icon/folder).
    see icons.edc for all the existing icon
    """
-   if not icon:
+   if icon is None:
       return None
-   if type(icon) in (Icon, Image, EmcImage):
+   if isinstance(icon, evas.Object):
       return icon
    ic = Icon(win)
    if icon[0] == '/':
       try:
          ic.file_set(icon)
-      except: pass
+      except RuntimeError: pass
    else:
       try:
          ic.file_set(theme_file, icon)
-      except: pass
+      except RuntimeError: pass
 
    ic.size_hint_aspect_set(evas.EVAS_ASPECT_CONTROL_VERTICAL, 1, 1)
    return ic
@@ -1393,9 +1393,9 @@ class EmcDialog(Layout):
 
    def list_item_append(self, label, icon=None, end=None, *args, **kwargs):
       if self._list:
-         if icon: icon = load_icon(icon)
-         if end: end = load_icon(end)
-         it = self._list.item_append(label, icon, end, None)
+         if isinstance(end, str) and end.startswith('text/'):
+            end = elm.Label(self, style='dia_list', text=end[5:])
+         it = self._list.item_append(label, load_icon(icon), load_icon(end), None)
          it.data['_user_item_data_'] = (args, kwargs)
          if not self._list.selected_item_get():
             it.selected = True
@@ -1829,7 +1829,9 @@ class EmcTagsManager(EmcDialog):
    def _populate(self):
       self.list_clear()
       for tag in sorted(self._tags_db.keys()):
-         self.list_item_append(tag, 'icon/tag')
+         count = len(self._tags_db.get_data(tag))
+         txt = ngettext('{} item', '{} items', count).format(count)
+         self.list_item_append(tag, 'icon/tag', 'text/' + txt)
       self.list_go()
 
    def _close_cb(self, *args):

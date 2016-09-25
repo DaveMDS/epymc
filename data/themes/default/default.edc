@@ -164,6 +164,11 @@ styles {
       COMMON_TAGS
    }
 
+   style { name: "epymc_dialog_list_style_end";
+      base: "font="FONT" align=right font_size="FONT_SIZE_SMALL" color=#969696 wrap=none";
+      COMMON_TAGS
+   }
+
    style { name: "epymc_browser_slide_style";
       base:  "font="FONT" font_size="FONT_SIZE" color=#fff wrap=none";
       COMMON_TAGS

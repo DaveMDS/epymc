@@ -1177,6 +1177,19 @@ group { name: "elm/list/item_odd/default";
       }
    }
 }
+group { name: "elm/label/base/dia_list"; // end label inside dialog lists
+   parts {
+      part { name: "elm.text"; type: TEXTBLOCK;
+         scale: 1;
+         description { state: "default" 0.0;
+            text {
+               style: "epymc_dialog_list_style_end";
+               min: 0 1;
+            }
+         }
+      }
+   }
+}
 
 //// FILEMANAGER LISTS (icon + text) (elm/list/item/default) //////////////////
 group { name: "elm/list/item/browser"; alias: "elm/list/item_odd/browser";

@@ -122,15 +122,12 @@ class EmcDatabase(object):
       else:
          # update the db now
          self._sh[key] = data
-         # delayed sync
-         if self._sync_timer is None:
-            self._sync_timer = ecore.Timer(5.0, self._sync_timer_cb)
-         else:
-            self._sync_timer.reset()
+         self._delayed_sync()
 
    def del_data(self, key):
       if key in self._sh:
          del self._sh[key]
+         self._delayed_sync()
 
    def id_exists(self, key):
       return key in self._sh
@@ -148,6 +145,12 @@ class EmcDatabase(object):
          print('\nDB KEY: "{}"'.format(key))
          pprint.pprint(self._sh[key])
       print('=' * 60)
+
+   def _delayed_sync(self):
+      if self._sync_timer is None:
+         self._sync_timer = ecore.Timer(5.0, self._sync_timer_cb)
+      else:
+         self._sync_timer.reset()
 
    def _sync_timer_cb(self):
       DBG("Syncing database %s" % self._name)
@@ -188,12 +191,7 @@ def _process_queue():
       count -= 1
       (db, key, data) = _queue.get_nowait()
       db._sh[key] = data
-
-   # delayed sync
-   if db._sync_timer is None:
-      db._sync_timer = ecore.Timer(5.0, db._sync_timer_cb)
-   else:
-      db._sync_timer.reset()
+   db._delayed_sync()
 
    return ecore.ECORE_CALLBACK_RENEW
 

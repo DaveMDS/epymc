@@ -269,6 +269,8 @@ class MoviesModule(EmcModule):
       ini.add_section('movies')
       if not ini.has_option('movies', 'enable_scanner'):
          ini.set('movies', 'enable_scanner', 'False')
+      if not ini.has_option('movies', 'scanner_clean_dead_files'):
+         ini.set('movies', 'scanner_clean_dead_files', '0')
       if not ini.has_option('movies', 'badwords'):
          ini.set('movies', 'badwords', DEFAULT_BADWORDS)
       if not ini.has_option('movies', 'badwords_regexp'):
@@ -742,26 +744,31 @@ class BackgroundScanner(ecore.Idler):
       self._browser = browser
       self._movie_db = movie_db
       self._idler_db = idler_db
-      self._current_url = None  # also used as a semaphore
+      self._current_url = None  # also used as a semaphore in step1
       self._generator = None
       self._tmdb = None # TMDBv3 instance
       self._retry_after = ini.get_int('movies', 'tmdb_retry_days')
       self._retry_after *= 24 * 60 * 60
+      self._added_count = 0
+      self._current_step = self._step1
+      self._dead_files = []
 
       ecore.Idler.__init__(self, self._idle_cb)
 
    def abort(self):
-      # stop the idler
       self.delete()
-      # abort any tmdb operations
       if self._tmdb:
          self._tmdb.abort()
          del self._tmdb
          self._tmdb = None
-         
+      del self
+
    def _idle_cb(self):
       # DBG('Mainloop idle')
-      
+      return self._current_step()
+
+   def _step1(self):
+      """ STEP 1: normal filesystem scan """
       if self._current_url is not None:
          # DBG('im busy')
          return ecore.ECORE_CALLBACK_RENEW
@@ -770,16 +777,17 @@ class BackgroundScanner(ecore.Idler):
       if self._generator is None:
          folders = ini.get_string_list('movies', 'folders', ';')
          self._generator = utils.grab_files(folders)
-         EmcNotify(_('Movies scanner started'))
+         txt = '<br><title>{}</>'.format(_('Movies scanner started'))
+         EmcNotify(txt, 'icon/movie')
 
-      # get the next file from the generator
+      # get the next file from the files generator
       try:
          filename = next(self._generator)
       except StopIteration:
-         EmcNotify(_('Movies scanner done'))
-         DBG("Movies scanner done")
+         DBG("Starting step 2")
          self._generator = None
-         return ecore.ECORE_CALLBACK_CANCEL
+         self._current_step = self._step2
+         return ecore.ECORE_CALLBACK_RENEW
 
       url = 'file://' + filename
 
@@ -797,14 +805,14 @@ class BackgroundScanner(ecore.Idler):
       if emotion.extension_may_play_get(filename):
          self._tmdb = TMDBv3(lang=ini.get('movies', 'info_lang'))
          name, year = get_movie_name_from_url(url)
-         self._tmdb.movie_search(name, year, self._search_done_cb)
+         self._tmdb.movie_search(name, year, self._step1_search_cb)
          self._current_url = url
 
       return ecore.ECORE_CALLBACK_RENEW
 
-   def _search_done_cb(self, tmdb_obj, results):
+   def _step1_search_cb(self, tmdb_obj, results):
       if len(results) > 0:
-         self._tmdb.get_movie_info(results[0]['tmdb_id'], self._tmdb_complete)
+         self._tmdb.get_movie_info(results[0]['tmdb_id'], self._step1_tmdb_cb)
       else:
          # store the current time in the cache db
          self._idler_db.set_data(self._current_url, time.time())
@@ -813,15 +821,16 @@ class BackgroundScanner(ecore.Idler):
          self._tmdb = None
          self._current_url = None
 
-   def _tmdb_complete(self, tmdb, movie_info):
+   def _step1_tmdb_cb(self, tmdb, movie_info):
       if movie_info is None:
          # store the current time in the cache db
          self._idler_db.set_data(self._idler_url, time.time())
       else:
          # store the result in movie db
+         self._added_count += 1
+         self._movie_db.set_data(self._current_url, movie_info)
+         found = _('Found movie')
          try:
-            self._movie_db.set_data(self._current_url, movie_info)
-            found = _('Found movie')
             text = '<title>%s</><br>%s (%s)' % \
                    (found, movie_info['title'], movie_info['release_date'][:4])
             EmcNotify(text, icon=get_poster_filename(movie_info['id']))
@@ -838,6 +847,56 @@ class BackgroundScanner(ecore.Idler):
       del self._tmdb
       self._tmdb = None
 
+   def _step2(self):
+      """ STEP 2: scan all the db items to find dead files """
+      # the first time build the generator object
+      if self._generator is None:
+         self._generator = self._movie_db.items()
+
+      # get the next db item from the generator
+      try:
+         url, movie_data = next(self._generator)
+      except StopIteration:
+         DBG("Movies scanner done (step 2)")
+         self._generator = None
+
+         count = len(self._dead_files)
+         txt = '<title>{}</><br>{}: {}<br>{}: {}'.format(
+               _('Movies scanner done'),
+               _('New movies'), self._added_count,
+               _('Dead files'), count)
+         EmcNotify(txt, 'icon/movie')
+
+         if count == 0:
+            return ecore.ECORE_CALLBACK_CANCEL
+
+         clean = ini.get_int('movies', 'scanner_clean_dead_files')
+         if clean == 2: # never
+            return ecore.ECORE_CALLBACK_CANCEL
+
+         elif clean == 1: # always
+            self._step2_clean_cb()
+
+         elif clean == 0: # ask
+            txt = _('Found {} movies in the database that point to not ' \
+                    'existent files.<br>' \
+                    'Should I remove those movies?'.format(count))
+            EmcDialog(style='yesno', title=_('Clean dead files'), text=txt,
+                      done_cb=self._step2_clean_cb)
+
+         return ecore.ECORE_CALLBACK_CANCEL
+
+      # check if the file still exists
+      if not os.path.exists(utils.url2path(url)):
+         self._dead_files.append(url)
+
+      return ecore.ECORE_CALLBACK_RENEW
+
+   def _step2_clean_cb(self, dia=None):
+      for url in self._dead_files:
+         self._movie_db.del_data(url)
+      if dia is not None:
+         dia.delete()
 
 ###### UTILS
 def get_movie_name_from_url(url):
@@ -876,9 +935,14 @@ def populate_config(browser, url):
    config_gui.standard_item_lang_add('movies', 'info_lang',
                                      _('Preferred language for contents'))
 
+   config_gui.standard_item_bool_add('movies', 'db_names_in_list',
+                                     _('Prefer movie titles in lists'))
+
    config_gui.standard_item_bool_add('movies', 'enable_scanner',
                                      _('Enable background scanner'))
 
-   config_gui.standard_item_bool_add('movies', 'db_names_in_list',
-                                     _('Prefer movie titles in lists'))
+   vals = (_('Ask'), _('Always'), _('Never'))
+   config_gui.standard_item_int_meaning_add('movies', 'scanner_clean_dead_files',
+                                    _('Background scan also clean dead files'),
+                                    values=vals)
 

@@ -103,6 +103,9 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
             rel2.to: "sb_vbar_base";
             color: 0 0 0 0;
          }
+         description { state: "clicked" 0.0;
+            inherit: "default" 0.0;
+         }
          description { state: "hidden" 0.0;
             inherit: "default" 0.0;
             min: 0 0;
@@ -239,6 +242,9 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
             rel2.relative: 0.5  0.5;
             rel2.to: "sb_hbar_base";
             color: 0 0 0 0;
+         }
+         description { state: "clicked" 0.0;
+            inherit: "default" 0.0;
          }
          description { state: "hidden" 0.0;
             inherit: "default" 0.0;

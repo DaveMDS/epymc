@@ -6,6 +6,7 @@ TMP
 
  * use the new sdb.items() generator where needed, it's fastest
  * config -> general -> date format  Wrong entry size !!
+ * clean dead files in music db like in movies
 
 BUGS
 =====

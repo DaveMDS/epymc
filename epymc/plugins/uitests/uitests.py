@@ -302,6 +302,9 @@ class MyItemClass(EmcItemClass):
       elif url == 'uitests://mpvob':
          mediaplayer.play_url('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4')
 
+      elif url == 'uitests://dvd':
+         mediaplayer.play_url('dvd:///dev/sr0')
+         
       # VKeyboard
       elif url == 'uitests://vkbd':
          EmcVKeyboard(title='Virtual Keyboard', text='This is the keyboard test!',
@@ -589,7 +592,7 @@ class MyItemClass(EmcItemClass):
       # Text style in dialog
       elif url == 'uitests://styles':
          EmcDialog(title='Text styles', text=TEST_STYLE)
-   
+
       # Movie name test
       # elif url == 'uitests://movies_name':
          # urls = [ 'alien.avi',
@@ -648,6 +651,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://mpvo', 'Mediaplayer - Online Video (good)')
       browser.item_add(MyItemClass(), 'uitests://mpvom', 'Mediaplayer - Online Video (med)')
       browser.item_add(MyItemClass(), 'uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
+      browser.item_add(MyItemClass(), 'uitests://dvd', 'Mediaplayer - DVD Playback (/dev/sr0)')
       browser.item_add(MyItemClass(), 'uitests://vkbd', 'Virtual Keyboard')
       browser.item_add(MyItemClass(), 'uitests://encoding', 'Various string encoding tests')
       browser.item_add(MyItemClass(), 'uitests://views', 'Browser Views')

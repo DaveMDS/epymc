@@ -531,8 +531,9 @@ class EmcPlayerBase(object):
       self._emotion.play = True
       self._emotion.audio_volume = volume_get() / 100.0
       self._emotion.audio_mute = volume_mute_get()
-      self._emotion.spu_mute = True
-      self._emotion.spu_channel = -1
+      if not url.startswith('dvd://'): # spu used in dvdnav
+         self._emotion.spu_mute = True
+         self._emotion.spu_channel = -1
 
    @property
    def seekable(self):
@@ -873,6 +874,15 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
 
 
 ###############################################################################
+emotion_events_map = {
+   'UP': emotion.EMOTION_EVENT_UP,
+   'DOWN': emotion.EMOTION_EVENT_DOWN,
+   'LEFT': emotion.EMOTION_EVENT_LEFT,
+   'RIGHT': emotion.EMOTION_EVENT_RIGHT,
+   'OK': emotion.EMOTION_EVENT_SELECT,
+   'TOGGLE_DVD_MENU': emotion.EMOTION_EVENT_MENU1,
+}
+
 class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
    def __init__(self, url=None):
 
@@ -1256,7 +1266,22 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
    ### input events
    def _input_events_cb(self, event):
 
-      if event == 'SUBS_DELAY_MORE':
+      # DVD menu navigation (send events to emotion)
+      # TODO: the play_length check is just a temorary hack (dvd menu are quite
+      #       always short videos). We should be able to query number of buttons
+      #       in spu, and check num_buttons > 0. But emotion do not (yet)
+      #       provide this info, thus the len hack.
+      if self._url.startswith('dvd://') and self.play_length < 60:
+         if event in emotion_events_map:
+            DBG('Sending event: "%s" to emotion for DVD navigation' % event)
+            self._emotion.event_simple_send(emotion_events_map[event])
+            return input_events.EVENT_BLOCK
+
+      if event == 'TOGGLE_DVD_MENU':
+         self._emotion.event_simple_send(emotion_events_map[event])
+         return input_events.EVENT_BLOCK
+
+      elif event == 'SUBS_DELAY_MORE':
          if self._subtitles:
             self.subs_delay_more()
             self._subtitles_delay_notify()

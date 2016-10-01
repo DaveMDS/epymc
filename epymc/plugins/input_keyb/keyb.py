@@ -72,6 +72,7 @@ DEFAULTS = {
    'q': 'SUBS_DELAY_LESS',
    'w': 'SUBS_DELAY_MORE',
    'e': 'SUBS_DELAY_ZERO',
+   'd': 'TOGGLE_DVD_MENU',
 }
 
 class KeyboardModule(EmcModule):

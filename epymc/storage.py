@@ -111,8 +111,8 @@ def list_devices(filter_type=None):
          if device.type not in filter_type:
             continue
       l.append(device)
-
-   return l.sort(key=attrgetter('type', 'label'))
+   l.sort(key=attrgetter('type', 'label'))
+   return l
 
 def device_added(device):
    """ Called by a manager when a new device is discovered """

@@ -260,6 +260,7 @@ setup (
       'epymc.plugins.filemanager',
       'epymc.plugins.photos',
       'epymc.plugins.watchdog',
+      'epymc.plugins.opticals',
    ],
 
    package_data = {

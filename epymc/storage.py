@@ -58,6 +58,7 @@ class EmcDevice(object):
    mount_point = None  # ex: "/media/disk" or None if not mounted
    label = None        # ex: "DVDVOLUME"
    icon = None         # ex: "icon/dvd"
+   audio_tracks = 0    # number of tracks for EmcDevType.AUDIOCD
 
    def __init__(self, **kargs):
       self.__dict__.update(kargs)
@@ -69,6 +70,8 @@ class EmcDevice(object):
              '  mount_point: {0.mount_point}\n' \
              '  label: {0.label}\n' \
              '  icon: {0.icon}\n' \
+             '  icon: {0.icon}\n' \
+             '  audio_tracks: {0.audio_tracks}\n' \
              '>'.format(self)
 
    @property
@@ -120,8 +123,6 @@ def device_added(device):
    events.event_emit('STORAGE_CHANGED')
    # TODO more accurate notification system
 
-   # TODO mount?
-
 def device_removed(uniq_id):
    """ Called by a manager when a device is removed """
    if uniq_id in _devices:
@@ -129,7 +130,6 @@ def device_removed(uniq_id):
       events.event_emit('STORAGE_CHANGED')
       # TODO more accurate notification system
 
-   
 
 
 ######## MOUNT HELPERS ########################################################
@@ -311,10 +311,16 @@ class EmcDeviceManagerUdev():
          # is already mounted?
          mount_point = check_mount(udevice.device_node)
 
+         # number of audio tracks for AudioCD
+         if emc_type == EmcDevType.AUDIOCD:
+            audio_tracks = int(udevice.get('ID_CDROM_MEDIA_TRACK_COUNT_AUDIO', 0))
+         else:
+            audio_tracks = 0
+
          # create the EmcDevice instance
          d = EmcDevice(uniq_id=udevice.device_path, type=emc_type,
                        device=udevice.device_node, mount_point=mount_point,
-                       label=label, icon=icon)
+                       label=label, icon=icon, audio_tracks=audio_tracks)
          self.queue.put((action, d))
 
       elif action == 'remove':

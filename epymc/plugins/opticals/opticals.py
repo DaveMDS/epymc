@@ -67,7 +67,16 @@ class OpticalsModule(EmcModule):
 
    def play_audiocd(self, device):
       self.insert_disk_dialog_destroy()
-      mediaplayer.play_url('cdda://', only_audio=True)
+
+      playlist = mediaplayer.playlist
+      playlist.clear()
+      for i in range(1, device.audio_tracks + 1):
+         url = 'cdda://{}'.format(i)
+         meta = {
+            'url': url, 'tracknumber': i,
+            'title': _('Audio track {}').format(i),
+         }
+         playlist.append(url=url, metadata=meta)
 
    def mainmenu_cb(self):
       if not self.check_and_play_disk():

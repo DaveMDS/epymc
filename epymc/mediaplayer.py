@@ -767,14 +767,16 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
    def _info_update(self):
       # update metadata infos
       metadata = playlist.onair_item.metadata
-      self.part_text_set('artist.text', metadata.get('artist'))
-      self.part_text_set('album.text', metadata.get('album'))
+      title = elm.utf8_to_markup(metadata.get('title') or _('Unknown title'))
+      artist = elm.utf8_to_markup(metadata.get('artist') or _('Unknown artist'))
+      album = elm.utf8_to_markup(metadata.get('album') or _('Unknown album'))
+      self.part_text_set('artist.text', artist)
+      self.part_text_set('album.text', album)
       self.part_text_set('song_and_artist.text',
                          '<song>{0}</song> <artist>{1} {2}</artist>'.format(
-                           elm.utf8_to_markup(metadata.get('title')), _('by'),
-                           elm.utf8_to_markup(metadata.get('artist'))))
+                           title, _('by'), artist))
       poster = metadata.get('poster')
-      img = EmcImage(poster or 'special/cd/' + elm.utf8_to_markup(metadata.get('album')))
+      img = EmcImage(poster or 'special/cd/' + album)
       self.content_set('cover.swallow', img)
 
       # update selected playlist item
@@ -795,9 +797,9 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       if part == 'elm.text.tracknum':
          return str(metadata.get('tracknumber'))
       if part == 'elm.text.title':
-         return metadata.get('title')
+         return metadata.get('title') or _('Unknown title')
       if part == 'elm.text.artist':
-         return metadata.get('artist')
+         return metadata.get('artist') or _('Unknown artist')
       if part == 'elm.text.len':
          seconds = metadata.get('length')
          if seconds is not None:

@@ -294,6 +294,11 @@ def play_url(url, only_audio=False, start_from=None):
       _play_real(start_from, only_audio)
       return
 
+   # dont resume on dvd playback, it doesn't work :(
+   if url.startswith('dvd://'):
+      _play_real(0)
+      return
+
    # resume_opt: 0=ask, 1=always, 2=never
    resume_opt = ini.get_int('mediaplayer', 'resume_from_last_pos')
 

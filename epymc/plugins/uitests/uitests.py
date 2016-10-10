@@ -24,6 +24,7 @@ import os, time
 
 from efl import ecore, edje, elementary
 from efl.elementary.box import Box
+from efl.elementary.entry import utf8_to_markup
 from efl.evas import EXPAND_BOTH, FILL_BOTH, FILL_HORIZ
 
 from epymc.modules import EmcModule
@@ -36,6 +37,7 @@ import epymc.events as events
 import epymc.ini as ini
 import epymc.gui as gui
 import epymc.mediaplayer as mediaplayer
+import epymc.storage as storage
 import epymc.browser as browser
 from epymc.browser import EmcBrowser, EmcItemClass, FolderItemClass, BackItemClass
 
@@ -593,6 +595,32 @@ class MyItemClass(EmcItemClass):
       elif url == 'uitests://styles':
          EmcDialog(title='Text styles', text=TEST_STYLE)
 
+      # Storage devices
+      elif url == 'uitests://storage':
+
+         def storage_events_cb(event):
+            if event != 'STORAGE_CHANGED':
+               return
+            dia.list_clear()
+            for device in storage.list_devices():
+               txt = '{0.label} [ {0.device} ➙ {0.mount_point} ]'.format(device)
+               dia.list_item_append(txt, device.icon, device=device)
+            dia.list_go()
+
+         def dia_canc_cb(dia):
+            events.listener_del('uit_storage')
+            dia.delete()
+
+         def dia_sel_cb(dia, device):
+            print(device)
+            txt = '<small>{}</>'.format(utf8_to_markup(str(device)))
+            EmcDialog(style='info', title='Device info', text=txt)
+
+         dia = EmcDialog(title='Storage devices', style='list',
+                         done_cb=dia_sel_cb, canc_cb=dia_canc_cb)
+         storage_events_cb('STORAGE_CHANGED')
+         events.listener_add('uit_storage', storage_events_cb)
+         
       # Movie name test
       # elif url == 'uitests://movies_name':
          # urls = [ 'alien.avi',
@@ -644,6 +672,7 @@ class UiTestsModule(EmcModule):
 
    def populate_root(self, browser, url):
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + Focus')
+      browser.item_add(MyItemClass(), 'uitests://storage', 'Storage devices')
       browser.item_add(MyItemClass(), 'uitests://menu', 'Menu small (dismiss on select)')
       browser.item_add(MyItemClass(), 'uitests://menu_long', 'Menu long (no dismiss on select)')
       browser.item_add(MyItemClass(), 'uitests://sliders', 'Sliders')

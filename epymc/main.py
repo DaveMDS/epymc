@@ -53,6 +53,7 @@ import epymc.mediaplayer as mediaplayer
 import epymc.ini as ini
 import epymc.sdb as sdb
 import epymc.browser as browser
+import epymc.storage as storage
 
 
 def start_epymc(standalone=False):
@@ -111,6 +112,7 @@ def start_epymc(standalone=False):
    mainmenu.init()
    config_gui.init()
    mediaplayer.init()
+   storage.init()
 
    # load & init modules
    modules.load_all()
@@ -156,6 +158,7 @@ def start_epymc(standalone=False):
    # shutdown
    modules.save_enabled()
    modules.shutdown_all()
+   storage.shutdown()
    config_gui.shutdown()
    ini.write_to_file(os.path.join(utils.user_conf_dir, 'epymc.conf'))
    mediaplayer.shutdown()

@@ -83,6 +83,10 @@ ICON("mute")
 ICON("loop")
 ICON("shuffle")
 
+ICON("optical")
+ICON("thumbdrive")
+ICON("harddisk")
+
 
 // Those should go in a module specific edc...
 ICON("movie")

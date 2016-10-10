@@ -1300,12 +1300,11 @@ class EmcDialog(elm.Layout):
          else:
             self.button_add(_('Yes'), lambda btn: self.delete())
 
-      # Do we want the cancel button? we have the red-round-close...
-      # if style in ('cancel'):
-         # if canc_cb:
-            # self.button_add('Cancel', lambda btn: self._canc_cb(self))
-         # else:
-            # self.button_add('Cancel', lambda btn: self.delete())
+      if style == 'cancel':
+         if canc_cb:
+            self.button_add(_('Cancel'), lambda btn: self._canc_cb(self))
+         else:
+            self.button_add(_('Cancel'), lambda btn: self.delete())
 
       # listen for input events (not for the buffering dialog)
       if style != 'buffering':

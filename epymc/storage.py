@@ -206,7 +206,8 @@ class EmcDeviceManagerUdev():
          action, device = self.queue.get_nowait()
 
          if action == 'add': # device is EmcDevice instance
-            if device.is_mounted:
+            if device.is_mounted or device.type in (EmcDevType.AUDIOCD,
+                                                    EmcDevType.DVD):
                device_added(device)
             else: # TODO make this configurable
                try_mount(device, self.device_mounted_cb)

@@ -24,6 +24,7 @@ from epymc.modules import EmcModule
 import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
 import epymc.events as events
+import epymc.utils as utils
 import epymc.storage as storage
 from epymc.storage import EmcDevType
 from epymc.gui import EmcDialog
@@ -46,7 +47,12 @@ class OpticalsModule(EmcModule):
    def __init__(self):
       DBG('Init module')
       self.insert_disk_dialog = None
-      mainmenu.item_add(self.name, 4, self.label, self.icon, self.mainmenu_cb)
+      subitems = [
+         (_('Play'), None, 'opticals://play'),
+         (_('Eject'), None, 'opticals://eject'),
+      ]
+      mainmenu.item_add(self.name, 4, self.label, self.icon,
+                        self.mainmenu_cb, subitems)
 
    def __shutdown__(self):
       DBG('Shutdown module')
@@ -102,9 +108,12 @@ class OpticalsModule(EmcModule):
             }
             playlist.append(url=url, metadata=meta)
 
-   def mainmenu_cb(self):
-      if not self.check_and_play_disk():
-         self.insert_disk_dialog_create()
+   def mainmenu_cb(self, url=None):
+      if url is None or url == 'opticals://play':
+         if not self.check_and_play_disk():
+            self.insert_disk_dialog_create()
+      elif url == 'opticals://eject':
+         utils.EmcExec('eject')
 
    def insert_disk_dialog_create(self):
       self.insert_disk_dialog = \

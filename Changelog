@@ -8,7 +8,8 @@ New features:
 
  * Storage device support, using udev and udisks2
  * Full DVD playback support, including DVD menu navigation
- * Audio CD playback support
+ * Audio CD playback support, including MusicBrainz album info
+ * MusicBrainz integration
  * Movie tagging ability. You can now organize your library using custom tags
 
 

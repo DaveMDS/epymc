@@ -237,6 +237,7 @@ setup (
       'mutagen',
       'dbus',
       'pyudev',
+      'libdiscid',
    ],
 
    provides = ['epymc'],

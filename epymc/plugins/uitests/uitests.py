@@ -20,7 +20,9 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-import os, time
+import os
+import time
+import pprint
 
 from efl import ecore, edje, elementary
 from efl.elementary.box import Box
@@ -40,6 +42,7 @@ import epymc.mediaplayer as mediaplayer
 import epymc.storage as storage
 import epymc.browser as browser
 from epymc.browser import EmcBrowser, EmcItemClass, FolderItemClass, BackItemClass
+from epymc.musicbrainz import MusicBrainz
 
 # from .movies import TMDB_WithGui, get_movie_name_from_url
 
@@ -304,8 +307,9 @@ class MyItemClass(EmcItemClass):
       elif url == 'uitests://mpvob':
          mediaplayer.play_url('http://www.archive.org/download/TheMakingOfSuzanneVegasSecondLifeGuitar/3-TheMakingOfSuzanneVega_sSecondLifeGuitar.mp4')
 
+      # Mediaplayer DVD
       elif url == 'uitests://dvd':
-         mediaplayer.play_url('dvd:///dev/sr0')
+         mediaplayer.play_url('dvd:///dev/cdrom')
          
       # VKeyboard
       elif url == 'uitests://vkbd':
@@ -620,7 +624,17 @@ class MyItemClass(EmcItemClass):
                          done_cb=dia_sel_cb, canc_cb=dia_canc_cb)
          storage_events_cb('STORAGE_CHANGED')
          events.listener_add('uit_storage', storage_events_cb)
+
+      # Music Brainz AudioCD 
+      elif url == 'uitests://mbrainz':
+         def info_cb(album):
+            txt = utf8_to_markup(pprint.pformat(album))
+            EmcDialog(title='Result', text='<small>{}</>'.format(txt))
+
+         # musicbrainz.calculate_discid('/dev/sr0')
+         MusicBrainz().get_cdrom_info('/dev/cdrom', info_cb, ignore_cache=True)
          
+
       # Movie name test
       # elif url == 'uitests://movies_name':
          # urls = [ 'alien.avi',
@@ -673,6 +687,7 @@ class UiTestsModule(EmcModule):
    def populate_root(self, browser, url):
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + Focus')
       browser.item_add(MyItemClass(), 'uitests://storage', 'Storage devices')
+      browser.item_add(MyItemClass(), 'uitests://mbrainz', 'Music Brainz AudioCD (/dev/cdrom)')
       browser.item_add(MyItemClass(), 'uitests://menu', 'Menu small (dismiss on select)')
       browser.item_add(MyItemClass(), 'uitests://menu_long', 'Menu long (no dismiss on select)')
       browser.item_add(MyItemClass(), 'uitests://sliders', 'Sliders')
@@ -680,7 +695,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://mpvo', 'Mediaplayer - Online Video (good)')
       browser.item_add(MyItemClass(), 'uitests://mpvom', 'Mediaplayer - Online Video (med)')
       browser.item_add(MyItemClass(), 'uitests://mpvob', 'Mediaplayer - Online Video (bad video)')
-      browser.item_add(MyItemClass(), 'uitests://dvd', 'Mediaplayer - DVD Playback (/dev/sr0)')
+      browser.item_add(MyItemClass(), 'uitests://dvd', 'Mediaplayer - DVD Playback (/dev/cdrom)')
       browser.item_add(MyItemClass(), 'uitests://vkbd', 'Virtual Keyboard')
       browser.item_add(MyItemClass(), 'uitests://encoding', 'Various string encoding tests')
       browser.item_add(MyItemClass(), 'uitests://views', 'Browser Views')

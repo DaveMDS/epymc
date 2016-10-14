@@ -19,6 +19,7 @@ IMAGE("dvd_cover_blank.png")
 IMAGE("bd_cover_blank.png")
 IMAGE("folder_vert.png")
 IMAGE("tmdb_logo.png")
+IMAGE("musicbrainz_logo.png")
 IMAGE("osdo_logo.png")
 IMAGE("wip.jpg")
 

@@ -20,7 +20,6 @@ BUGS
 
 CORE
 =====
- * DVD playback !!
  * joy/webserver need a key-repetition handling
  * subtitles font and size configuration
  * subtitles upload to opensubtitles.org
@@ -29,6 +28,7 @@ CORE
  * apply the volume using a logaritic curve
  * better icons for dialogs background
  * more semantic text styles (likes, views, etc...)
+ * cache musicbrainz discid results
 
 CORE (minor)
 ============

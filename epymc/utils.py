@@ -572,9 +572,11 @@ class EmcUrl(ecore_con.Url):
       url: the url to retrive
       done_cb: function to call when the operation is completed
       prog_cb: function to call while the operation is in progress
+      headers: additional headers for the request, it must be a dict like:
+               {'User-Agent': 'my user agent', ...}
       **kargs: any other karguments will be passed back in the complete cb
    """
-   def __init__(self, url, done_cb=None, prog_cb=None, **kargs):
+   def __init__(self, url, done_cb=None, prog_cb=None, headers=None, **kargs):
       self.done_cb = done_cb
       self.kargs = kargs
       self.received_data = []
@@ -584,7 +586,9 @@ class EmcUrl(ecore_con.Url):
       self.on_data_event_add(self._data_cb)
       if prog_cb is not None:
          self.on_progress_event_add(prog_cb)
-
+      if headers is not None:
+         for key in headers:
+            self.additional_header_add(key, headers[key])
       self.get()
 
    def _complete_cb(self, event):

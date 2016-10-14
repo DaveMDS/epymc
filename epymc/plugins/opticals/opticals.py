@@ -27,6 +27,7 @@ import epymc.events as events
 import epymc.storage as storage
 from epymc.storage import EmcDevType
 from epymc.gui import EmcDialog
+from epymc.musicbrainz import MusicBrainz
 
 
 def DBG(msg):
@@ -36,7 +37,7 @@ def DBG(msg):
 
 class OpticalsModule(EmcModule):
    name = 'opticals'
-   label = _('Optical Disks')
+   label = _('Optical Discs')
    icon = 'icon/optical'
    info = _('This module add support for playing DVD and Audio CD')
 
@@ -67,16 +68,39 @@ class OpticalsModule(EmcModule):
 
    def play_audiocd(self, device):
       self.insert_disk_dialog_destroy()
+      ret = MusicBrainz().get_cdrom_info(device.device, self._audiocd_info_cb,
+                                         device=device)
+      if isinstance(ret, dict):
+         self._audiocd_info_cb(ret, device)
+      elif ret == False:
+         self._audiocd_info_cb(None, device)
 
+   def _audiocd_info_cb(self, album, device):
       playlist = mediaplayer.playlist
       playlist.clear()
-      for i in range(1, device.audio_tracks + 1):
-         url = 'cdda://{}'.format(i)
-         meta = {
-            'url': url, 'tracknumber': i,
-            'title': _('Audio track {}').format(i),
-         }
-         playlist.append(url=url, metadata=meta)
+      if album is None:
+         # MusicBrainz failed, just show plain tracks
+         for i in range(1, device.audio_tracks + 1):
+            url = 'cdda://{}'.format(i)
+            meta = {
+               'url': url, 'tracknumber': i,
+               'title': _('Audio track {}').format(i),
+            }
+            playlist.append(url=url, metadata=meta)
+      else:
+         # Use MusicBrainz infos
+         for trk in album['tracks']:
+            url = 'cdda://{}'.format(trk['num'])
+            meta = {
+               'url': url,
+               'title': trk['title'],
+               'length': trk['length'],
+               'tracknumber': trk['num'],
+               'artist': ', '.join(album['artists']),
+               'album': album['title'],
+               'poster': album['cover_url'],
+            }
+            playlist.append(url=url, metadata=meta)
 
    def mainmenu_cb(self):
       if not self.check_and_play_disk():
@@ -84,8 +108,8 @@ class OpticalsModule(EmcModule):
 
    def insert_disk_dialog_create(self):
       self.insert_disk_dialog = \
-         EmcDialog(style='cancel', title=_('No disk found'),
-                   text=_('Please insert a disk (DVD or Audio CD)'),
+         EmcDialog(style='cancel', title=_('No disc found'),
+                   text=_('Please insert a disc (DVD or Audio CD)'),
                    canc_cb=self.insert_disk_dialog_destroy)
       events.listener_add('opticals', self.events_cb)
       

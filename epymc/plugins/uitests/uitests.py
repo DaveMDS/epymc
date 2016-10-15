@@ -319,7 +319,7 @@ class MyItemClass(EmcItemClass):
 
       # Source Selector
       elif url == 'uitests://sselector':
-         EmcFolderSelector(title='Source Selector Test',
+         EmcFolderSelector(title='Folder Selector Test',
                            done_cb=lambda p: DBG('Selected: ' + p))
 
       # Dialog - Info
@@ -687,6 +687,7 @@ class UiTestsModule(EmcModule):
    def populate_root(self, browser, url):
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + Focus')
       browser.item_add(MyItemClass(), 'uitests://storage', 'Storage devices')
+      browser.item_add(MyItemClass(), 'uitests://sselector', 'Folder Selector')
       browser.item_add(MyItemClass(), 'uitests://mbrainz', 'Music Brainz AudioCD (/dev/cdrom)')
       browser.item_add(MyItemClass(), 'uitests://menu', 'Menu small (dismiss on select)')
       browser.item_add(MyItemClass(), 'uitests://menu_long', 'Menu long (no dismiss on select)')
@@ -710,7 +711,6 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://dm', 'Download Manager - start')
       browser.item_add(MyItemClass(), 'uitests://dm2', 'Download Manager - show')
       browser.item_add(MyItemClass(), 'uitests://tmdb', 'Themoviedb.org query with gui')
-      browser.item_add(MyItemClass(), 'uitests://sselector', 'Source Selector')
       browser.item_add(MyItemClass(), 'uitests://dlg-info', 'Dialog - Info')
       browser.item_add(MyItemClass(), 'uitests://dlg-warning', 'Dialog - Warning')
       browser.item_add(MyItemClass(), 'uitests://dlg-warning2', 'Dialog - Warning (no title)')

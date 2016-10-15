@@ -33,7 +33,7 @@ from efl.elementary.configuration import scale_set as elm_scale_set
 from efl.elementary.configuration import scale_get as elm_scale_get
 from efl.elementary.configuration import Configuration as ElmConfig
 
-from epymc import utils, ini, events, input_events
+from epymc import utils, ini, events, input_events, storage
 from epymc.thumbnailer import emc_thumbnailer
 
 
@@ -1707,48 +1707,78 @@ class EmcFolderSelector(EmcDialog):
       title:
          The (optional) dialog title.
       done_cb:
-         The function to call when the selection is over.
-         Signature: cb(path, [cb_data])
-      cb_data:
-         Optional user-data to pass back in the done_cb function.
+         The (mandatory) function to call when the selection is done.
+         Signature: func(path, **kargs)
+      **kargs:
+         Any other keyword arguments will be passed back in the done_cd func
    """
-
-   def __init__(self, title=_('Source Selector'), done_cb=None, cb_data=None):
-      self._selected_cb = done_cb
-      self._selected_cb_data = cb_data
+   def __init__(self, title=_('Source Selector'), done_cb=None, **kargs):
+      self._user_cb = done_cb
+      self._user_kargs = kargs
 
       EmcDialog.__init__(self, title, style='list', done_cb=self._btn_browse_cb)
-      b2 = self.button_add(_('Select'), self._btn_select_cb)
-      b1 = self.button_add(_('Browse'), self._btn_browse_cb)
-      b1.focus = True
+      self.button_add(_('Select'), self._btn_select_cb)
+      self.button_add(_('Browse'), self._btn_browse_cb, default=True)
 
-      self.populate(os.getenv('HOME'))
+      self.populate_devices()
 
-   def populate(self, folder):
-      parent_folder = os.path.normpath(os.path.join(folder, '..'))
-      if folder != parent_folder:
-         it = self.list_item_append(_('Parent folder'), 'icon/arrowU')
-         it.data['fullpath'] = parent_folder
-      for fname in utils.natural_sort(os.listdir(folder)):
+   def populate_devices(self):
+      self.list_clear()
+
+      # home & root
+      it = self.list_item_append(_('Home'), 'icon/home')
+      it.data['root'] = it.data['path'] = os.getenv('HOME')
+      it = self.list_item_append(_('Root filesystem'), 'icon/folder')
+      it.data['root'] = it.data['path'] = '/'
+
+      # other storage devices
+      for dev in storage.list_devices():
+         if dev.is_mounted and dev.mount_point != '/':
+            it = self.list_item_append(dev.label, dev.icon)
+            it.data['root'] = it.data['path'] = dev.mount_point
+
+      self.list_go()
+
+   def populate_folder(self, root, folder):
+      if folder == '': # back in '/'
+         self.populate_devices()
+         return
+
+      try:
+         folders = os.listdir(folder)
+      except PermissionError:
+         EmcDialog(style='error', text=_('Permission denied'))
+         return
+
+      self.list_clear()
+
+      # back item
+      parent = os.path.normpath(os.path.join(folder, '..'))
+      it = self.list_item_append(_('Back'), 'icon/back')
+      it.data['root'] = root
+      it.data['path'] = parent if parent != folder else '' # back in '/'
+
+      # folders
+      for fname in utils.natural_sort(folders):
          fullpath = os.path.join(folder, fname)
          if fname[0] != '.' and os.path.isdir(fullpath):
             it = self.list_item_append(fname, 'icon/folder')
-            it.data['fullpath'] = fullpath
-      self.list_go()
+            it.data['root'] = root
+            it.data['path'] = fullpath
 
+      self.list_go()
+      
    def _btn_browse_cb(self, btn):
-      path = self.list_item_selected_get().data['fullpath']
-      self.list_clear()
-      self.populate(path)
+      it = self.list_item_selected_get()
+      if len(it.data['path']) < len(it.data['root']):
+         self.populate_devices()
+      else:
+         self.populate_folder(it.data['root'], it.data['path'])
 
    def _btn_select_cb(self, btn):
-      path = self.list_item_selected_get().data['fullpath']
-      if path and callable(self._selected_cb):
-         if self._selected_cb_data:
-            self._selected_cb('file://' + path, self._selected_cb_data)
-         else:
-            self._selected_cb('file://' + path)
-
+      path = self.list_item_selected_get().data['path']
+      if path and callable(self._user_cb):
+         self._user_cb('file://' + path, **self._user_kargs)
       self.delete()
 
 ################################################################################
@@ -2296,7 +2326,7 @@ class DownloadManager(utils.Singleton):
 
    def _change_folder_cb(self, bt, dia):
       EmcFolderSelector(title=_('Change destination folder'),
-                        done_cb=self._change_folder_done_cb, cb_data=dia)
+                        done_cb=self._change_folder_done_cb, dia=dia)
 
    def _change_folder_done_cb(self, folder, dia):
       dia.data['dst_folder'] = folder.replace('file://', '')

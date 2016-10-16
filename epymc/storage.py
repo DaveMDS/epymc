@@ -58,6 +58,7 @@ class EmcDevice(object):
    mount_point = None  # ex: "/media/disk" or None if not mounted
    label = None        # ex: "DVDVOLUME"
    icon = None         # ex: "icon/dvd"
+   size = 0            # partition size in bytes
    audio_tracks = 0    # number of tracks for EmcDevType.AUDIOCD
 
    def __init__(self, **kargs):
@@ -71,6 +72,7 @@ class EmcDevice(object):
              '  label: {0.label}\n' \
              '  icon: {0.icon}\n' \
              '  icon: {0.icon}\n' \
+             '  size: {0.size}\n' \
              '  audio_tracks: {0.audio_tracks}\n' \
              '>'.format(self)
 
@@ -130,6 +132,26 @@ def device_removed(uniq_id):
       events.event_emit('STORAGE_CHANGED')
       # TODO more accurate notification system
 
+def partition_hum_size(bytes):
+   """ Get the human readable size like reported by UDisk2 """
+   bytes = float(bytes)
+   if bytes > 1000000000000:
+      size = bytes / 1000000000000
+      unit = 'TB'
+   elif bytes > 1000000000:
+      size = bytes / 1000000000
+      unit = 'GB'
+   elif bytes > 1000000:
+      size = bytes / 1000000
+      unit = 'MB'
+   else:
+      size = bytes / 1000
+      unit = 'KB'
+
+   if size < 10:
+      return '%.1f %s' % (size, unit)
+   else:
+      return '%.0f %s' % (size, unit)
 
 
 ######## MOUNT HELPERS ########################################################
@@ -275,6 +297,9 @@ class EmcDeviceManagerUdev():
       if action == 'add':
          # self.dump_udevice(udevice) # for debug
 
+         # partition size (in bytes)
+         size = int(udevice.get('ID_PART_ENTRY_SIZE', '0')) * 512
+         
          # choose label
          if emc_type == EmcDevType.AUDIOCD:
             label = _('Audio CD')
@@ -292,6 +317,8 @@ class EmcDeviceManagerUdev():
 
             if fs_label:
                label = fs_label
+            elif size > 0:
+               label = _('{} Volume').format(partition_hum_size(size))
             elif vendor and model:
                label = '{} {}'.format(vendor, model)
             elif model or vendor:
@@ -319,10 +346,11 @@ class EmcDeviceManagerUdev():
             audio_tracks = 0
 
          # create the EmcDevice instance
-         d = EmcDevice(uniq_id=udevice.device_path, type=emc_type,
+         d = EmcDevice(uniq_id=udevice.device_path, type=emc_type, size=size,
                        device=udevice.device_node, mount_point=mount_point,
                        label=label, icon=icon, audio_tracks=audio_tracks)
          self.queue.put((action, d))
+         # self.dump_udevice(udevice)
 
       elif action == 'remove':
          self.queue.put((action, udevice.device_path))

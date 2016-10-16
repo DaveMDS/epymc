@@ -637,6 +637,7 @@ def _subtitles_populate(browser, url):
 ##############  SYS INFO  #####################################################
 
 def _sys_info():
+   import pyudev
    from epymc.gui import _theme_generation
    from epymc import __version__ as emc_version
    try:
@@ -658,7 +659,8 @@ def _sys_info():
           '<br><title>%s</><br>' \
           '<name>%s:</name> %s <name> %s:</name> %s<br>' \
           '<name>%s:</name> %s<br>' \
-          '<name>%s:</name> %s<br>' % (
+          '<name>%s:</name> %s<br>' \
+          '<name>%s:</name> %s <name> %s:</name> %s<br>' % (
             _('Core'),
             _('Download available'), _('yes') if downl_avail else _('no'),
             _('Theme'), ini.get('general', 'theme'), gui.theme_file,
@@ -672,6 +674,7 @@ def _sys_info():
             _('EpyMC'), emc_version, _('EpyMC themes API'), _theme_generation,
             _('Python'), sys.version,
             _('Python-EFL'), efl_version,
+            _('Udev'), pyudev.udev_version(), _('pyudev'), pyudev.__version__,
           )
    EmcDialog(style='panel', title=_('System info'), text=text)
 

@@ -34,6 +34,7 @@ from epymc.modules import EmcModule
 from epymc.gui import EXPAND_BOTH, EXPAND_HORIZ, FILL_BOTH, FILL_HORIZ
 import epymc.mainmenu as mainmenu
 import epymc.input_events as input_events
+import epymc.storage as storage
 import epymc.utils as utils
 import epymc.gui as gui
 import epymc.ini as ini
@@ -75,6 +76,13 @@ class FilemanList(List):
    def populate_root(self, favorites):
       self.clear()
 
+      # storage devices
+      for dev in storage.list_devices():
+         if dev.is_mounted:
+            it = self.item_append(dev.label, gui.load_icon(dev.icon))
+            it.data['path'] = dev.mount_point
+
+      # favorites
       for path in favorites:
          if path.startswith('file://'):
             path = path[7:]

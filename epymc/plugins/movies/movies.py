@@ -104,6 +104,12 @@ class SpecialItemClass(EmcItemClass):
       elif url == 'movies://directors':
          mod._browser.page_add(url, _('Directors'), mod._styles_for_folders,
                                mod.populate_directors_list)
+      elif url.startswith('movies://actors/'):
+         name = url.replace('movies://actors/', '')
+         CastPanel(name=name, lang=ini.get('movies', 'info_lang'))
+      elif url.startswith('movies://directors/'):
+         name = url.replace('movies://directors/', '')
+         CastPanel(name=name, lang=ini.get('movies', 'info_lang'))
       elif url == 'movies://tags_manager':
          EmcTagsManager(mod._tags_db,
                         done_cb=lambda: _mod._browser.refresh(hard=True))
@@ -113,6 +119,10 @@ class SpecialItemClass(EmcItemClass):
          return _('Actors')
       elif url == 'movies://directors':
          return _('Directors')
+      elif url.startswith('movies://actors/'):
+         return _('Actor info')
+      elif url.startswith('movies://directors/'):
+         return _('Director info')
       elif url == 'movies://tags_manager':
          return _('Tags manager')
 
@@ -121,6 +131,8 @@ class SpecialItemClass(EmcItemClass):
          return 'icon/head'
       elif url == 'movies://directors':
          return 'icon/head'
+      elif url.startswith(('movies://directors/', 'movies://actors/')):
+         return 'icon/info'
       elif url == 'movies://tags_manager':
          return 'icon/tag'
 
@@ -422,6 +434,9 @@ class MoviesModule(EmcModule):
          self._browser.item_add(ActorItemClass(), 'movies://actors/'+name, name)
 
    def populate_actor_movies(self, browser, url):
+      # actor info item
+      self._browser.item_add(SpecialItemClass(), url, self)
+      # all movies for this actor
       name = url.replace('movies://actors/', '')
       for url in self._actors_cache[name]:
          self._browser.item_add(MovieItemClass(), url, self)
@@ -444,9 +459,12 @@ class MoviesModule(EmcModule):
                                 'movies://directors/'+name, name)
 
    def populate_director_movies(self, browser, url):
+      # director info item
+      self._browser.item_add(SpecialItemClass(), url, self)
+      # all movies for this director
       name = url.replace('movies://directors/', '')
-      for url in self._directors_cache[name]:
-         self._browser.item_add(MovieItemClass(), url, self)
+      for movie_url in self._directors_cache[name]:
+         self._browser.item_add(MovieItemClass(), movie_url, self)
 
    def populate_tag(self, browser, url):
       tag_name = url.split('/')[-1]

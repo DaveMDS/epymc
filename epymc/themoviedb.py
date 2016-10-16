@@ -506,6 +506,14 @@ class TMDBv3(object):
       done_cb(self, results)
 
    #### get cast info #########################################################
+   def person_search(self, name, done_cb):
+      self._api_call(self._person_search_done, done_cb,
+                     '/search/person', query=name)
+
+   def _person_search_done(self, api_data, done_cb):
+      # TODO adjust image urls
+      done_cb(self, api_data)
+      
    def get_cast_info(self, cast_id, done_cb):
       self._api_call(self._cast_info_done, done_cb,
                      '/person/%s' % cast_id, append_to_response='credits,images')
@@ -524,15 +532,23 @@ class TMDBv3(object):
 
 
 class CastPanel(EmcDialog):
-   def __init__(self, pid, lang=DEFAULT_INFO_LANG):
+   def __init__(self, pid=None, name=None, lang=DEFAULT_INFO_LANG):
       self.pid = pid
       self.info = None
 
       tmdb = TMDBv3(lang=lang)
-      tmdb.get_cast_info(self.pid, self._fetch_done_cb)
+      if name:
+         tmdb.person_search(name, self._search_done_cb)
+      elif pid:
+         tmdb.get_cast_info(self.pid, self._fetch_done_cb)
       self._dia = EmcDialog(style='minimal', title=_('Fetching info'),
                             content=EmcImage('image/tmdb_logo.png'),
                             spinner=True)
+
+   def _search_done_cb(self, tmdb, result):
+      # TODO manage errors
+      self.pid = result['results'][0]['id']
+      tmdb.get_cast_info(self.pid, self._fetch_done_cb)
 
    def _fetch_done_cb(self, tmdb, result):
       self.info = result

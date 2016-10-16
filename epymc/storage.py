@@ -43,12 +43,14 @@ _udev_module = None # EmcDeviceManagerUdev instance
 ######## PUBLIC API ###########################################################
 
 class EmcDevType:
-   HARDDISK   = 1
-   DVD        = 2
-   AUDIOCD    = 3
-   DATADISK   = 4
-   THUMBDRIVE = 5
-   NETSHARE   = 6
+   SYSTEM     = 1 # like home and root
+   FAVORITE   = 2 # user favorite folders  (TOBEDONE)
+   HARDDISK   = 3 # internal hard drives
+   DVD        = 4 # dvd video discs
+   AUDIOCD    = 5 # audio cd discs
+   DATADISK   = 6 # cdrom disc
+   THUMBDRIVE = 7 # usb thumbdrives
+   NETSHARE   = 8 # networks shares (samba, ntfs) (TOBEDONE)
 
 
 class EmcDevice(object):
@@ -60,6 +62,7 @@ class EmcDevice(object):
    icon = None         # ex: "icon/dvd"
    size = 0            # partition size in bytes
    audio_tracks = 0    # number of tracks for EmcDevType.AUDIOCD
+   sort_key = 100      # additional value for further ordering
 
    def __init__(self, **kargs):
       self.__dict__.update(kargs)
@@ -70,7 +73,6 @@ class EmcDevice(object):
              '  device: {0.device}\n' \
              '  mount_point: {0.mount_point}\n' \
              '  label: {0.label}\n' \
-             '  icon: {0.icon}\n' \
              '  icon: {0.icon}\n' \
              '  size: {0.size}\n' \
              '  audio_tracks: {0.audio_tracks}\n' \
@@ -94,6 +96,9 @@ class EmcDevice(object):
 def init():
    global _udev_module
    DBG('init')
+   device_added(EmcDevice(uniq_id='user_home', type=EmcDevType.SYSTEM,
+                          sort_key=10, mount_point=os.getenv('HOME'),
+                          label=_('User home'), icon='icon/home'))
    _udev_module = EmcDeviceManagerUdev()
 
 def shutdown():
@@ -116,7 +121,7 @@ def list_devices(filter_type=None):
          if device.type not in filter_type:
             continue
       l.append(device)
-   l.sort(key=attrgetter('type', 'label'))
+   l.sort(key=attrgetter('type', 'sort_key', 'label'))
    return l
 
 def device_added(device):
@@ -299,12 +304,21 @@ class EmcDeviceManagerUdev():
 
          # partition size (in bytes)
          size = int(udevice.get('ID_PART_ENTRY_SIZE', '0')) * 512
+
+         # is already mounted?
+         mount_point = check_mount(udevice.device_node)
+
+         # the root filesystem is special
+         if mount_point == '/':
+            emc_type = EmcDevType.SYSTEM
          
          # choose label
          if emc_type == EmcDevType.AUDIOCD:
             label = _('Audio CD')
          elif emc_type == EmcDevType.DVD:
             label = _('DVD Disk')
+         elif mount_point == '/':
+            label = _('Root filesystem')
          else:
             fs_label = udevice.get('ID_FS_LABEL_ENC') or udevice.get('ID_FS_LABEL')
             vendor = udevice.get('ID_VENDOR_ENC') or udevice.get('ID_VENDOR')
@@ -332,7 +346,9 @@ class EmcDeviceManagerUdev():
                label = _('Volume')
 
          # choose icon
-         if emc_type in (EmcDevType.AUDIOCD, EmcDevType.DVD, EmcDevType.DATADISK):
+         if mount_point == '/':
+            icon = 'icon/folder' # TODO better icon
+         elif emc_type in (EmcDevType.AUDIOCD, EmcDevType.DVD, EmcDevType.DATADISK):
             icon = 'icon/optical'
          elif emc_type == EmcDevType.HARDDISK:
             icon = 'icon/harddisk'
@@ -340,9 +356,6 @@ class EmcDeviceManagerUdev():
             icon = 'icon/thumbdrive'
          elif emc_type == EmcDevType.NETSHARE:
             icon = 'icon/netshare'
-
-         # is already mounted?
-         mount_point = check_mount(udevice.device_node)
 
          # number of audio tracks for AudioCD
          if emc_type == EmcDevType.AUDIOCD:

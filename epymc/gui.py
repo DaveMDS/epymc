@@ -1725,15 +1725,9 @@ class EmcFolderSelector(EmcDialog):
    def populate_devices(self):
       self.list_clear()
 
-      # home & root
-      it = self.list_item_append(_('Home'), 'icon/home')
-      it.data['root'] = it.data['path'] = os.getenv('HOME')
-      it = self.list_item_append(_('Root filesystem'), 'icon/folder')
-      it.data['root'] = it.data['path'] = '/'
-
       # other storage devices
       for dev in storage.list_devices():
-         if dev.is_mounted and dev.mount_point != '/':
+         if dev.is_mounted:
             it = self.list_item_append(dev.label, dev.icon)
             it.data['root'] = it.data['path'] = dev.mount_point
 

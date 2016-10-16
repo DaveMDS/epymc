@@ -21,6 +21,7 @@
 import os
 from operator import attrgetter
 
+import epymc.ini as ini
 import epymc.utils as utils
 import epymc.events as events
 
@@ -96,6 +97,13 @@ class EmcDevice(object):
 def init():
    global _udev_module
    DBG('init')
+
+   ini.add_section('storage')
+   if not ini.has_option('storage', 'show_home'):
+      ini.set('storage', 'show_home', True)
+   if not ini.has_option('storage', 'show_root'):
+      ini.set('storage', 'show_root', False)
+
    device_added(EmcDevice(uniq_id='user_home', type=EmcDevType.SYSTEM,
                           sort_key=10, mount_point=os.getenv('HOME'),
                           label=_('User home'), icon='icon/home'))
@@ -119,6 +127,11 @@ def list_devices(filter_type=None):
             continue
       elif isinstance(filter_type, tuple):
          if device.type not in filter_type:
+            continue
+      if device.type == EmcDevType.SYSTEM:
+         if device.mount_point == '/' and not ini.get_bool('storage', 'show_root'):
+            continue
+         if device.mount_point == os.getenv('HOME') and not ini.get_bool('storage', 'show_home'):
             continue
       l.append(device)
    l.sort(key=attrgetter('type', 'sort_key', 'label'))

@@ -323,7 +323,8 @@ def init():
    root_item_add('config://modules/', 2, _('Modules'), 'icon/module', _modules_list)
    root_item_add('config://themes/', 3, _('Themes'), 'icon/theme', _themes_list)
    root_item_add('config://views/', 4, _('Views'), 'icon/views', _views_list)
-   root_item_add('config://subtitles/', 5, _('Subtitles'), 'icon/subs', _subtitles_list)
+   root_item_add('config://storage/', 5, _('Storage devices'), 'icon/harddisk', _storage_list)
+   root_item_add('config://subtitles/', 6, _('Subtitles'), 'icon/subs', _subtitles_list)
    root_item_add('config://sysinfo/', 90, _('System info'), 'icon/info', _sys_info)
 
 def shutdown():
@@ -633,6 +634,16 @@ def _subtitles_populate(browser, url):
    standard_item_string_add('subtitles', 'opensubtitles_user', _('Opensubtitles.org Username'))
    standard_item_string_add('subtitles', 'opensubtitles_pass', _('Opensubtitles.org Password'), pwd=True)
 
+##############  STORAGE  ######################################################
+
+def _storage_list():
+   _browser.page_add('config://storage/', _('Storage devices'), None, _storage_populate)
+
+def _storage_populate(browser, url):
+   standard_item_bool_add('storage', 'show_home',
+                          _('Show home folder'), 'icon/folder')
+   standard_item_bool_add('storage', 'show_root',
+                          _('Show root folder'), 'icon/folder')
 
 ##############  SYS INFO  #####################################################
 

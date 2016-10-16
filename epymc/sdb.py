@@ -94,7 +94,13 @@ class EmcDatabase(object):
       self._sh.close()
 
    def __len__(self):
-      return len(self._sh)
+      if self._vers:
+         return len(self._sh) - 1
+      else:
+         return len(self._sh)
+
+   def __contains__(self, key):
+      return key in self._sh
 
    def __iter__(self):
       return self.items()

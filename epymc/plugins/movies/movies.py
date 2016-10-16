@@ -51,6 +51,7 @@ def DBG(msg):
 
 MOVIE_DB_VERSION = 1
 MOVIE_TAGS_DB_VERSION = 1
+MOVIE_FAV_PEOPLE_DB_VERSION = 1
 DEFAULT_INFO_LANG = 'en'
 DEFAULT_BADWORDS = 'dvdrip AAC x264 cd1 cd2'
 DEFAULT_BADWORDS_REGEXP = '\[.*?\] {.*?} \. -'
@@ -126,6 +127,15 @@ class SpecialItemClass(EmcItemClass):
       elif url == 'movies://tags_manager':
          return _('Tags manager')
 
+   def label_end_get(self, url, mod):
+      if url == 'movies://actors':
+         count = len(_mod._fav_actors_db)
+      elif url == 'movies://directors':
+         count = len(_mod._fav_directors_db)
+      else:
+         return None
+      return ngettext('{} favorite', '{} favorites', count).format(count)
+
    def icon_get(self, url, mod):
       if url == 'movies://actors':
          return 'icon/head'
@@ -147,8 +157,11 @@ class ActorItemClass(EmcItemClass):
    def label_end_get(self, url, name):
       return str(len(_mod._actors_cache[name]))
 
-   def icon_get(self, url, mod):
-      return 'icon/head'
+   def icon_get(self, url, name):
+      if name in _mod._fav_actors_db:
+         return 'icon/star'
+      else:
+         return 'icon/head'
 
 class DirectorItemClass(EmcItemClass):
    def item_selected(self, url, name):
@@ -161,8 +174,11 @@ class DirectorItemClass(EmcItemClass):
    def label_end_get(self, url, name):
       return str(len(_mod._directors_cache[name]))
 
-   def icon_get(self, url, mod):
-      return 'icon/head'
+   def icon_get(self, url, name):
+      if name in _mod._fav_directors_db:
+         return 'icon/star'
+      else:
+         return 'icon/head'
 
 class MovieItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -254,6 +270,46 @@ class TagItemClass(EmcItemClass):
    def icon_get(self, url, mod):
       return 'icon/tag'
 
+class SetFavoriteDirectorItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      if url in mod._fav_directors_db:
+         mod._fav_directors_db.del_data(url)
+      else:
+         mod._fav_directors_db.set_data(url, None)
+      mod._browser.refresh()
+
+   def label_get(self, url, mod):
+      if url in mod._fav_directors_db:
+         return _('Remove from favorites')
+      else:
+         return _('Add to favorites')
+
+   def icon_get(self, url, mod):
+      if url in mod._fav_directors_db:
+         return 'icon/star'
+      else:
+         return 'icon/star_off'
+
+class SetFavoriteActorItemClass(EmcItemClass):
+   def item_selected(self, url, mod):
+      if url in mod._fav_actors_db:
+         mod._fav_actors_db.del_data(url)
+      else:
+         mod._fav_actors_db.set_data(url, None)
+      mod._browser.refresh()
+
+   def label_get(self, url, mod):
+      if url in mod._fav_actors_db:
+         return _('Remove from favorites')
+      else:
+         return _('Add to favorites')
+
+   def icon_get(self, url, mod):
+      if url in mod._fav_actors_db:
+         return 'icon/star'
+      else:
+         return 'icon/star_off'
+
 
 class MoviesModule(EmcModule):
    name = 'movies'
@@ -262,13 +318,15 @@ class MoviesModule(EmcModule):
    info = _('The movies module is used to browse your films collection, '
             'it is fully integrated with themoviedb.org online database.')
 
-   _browser = None     # the browser widget instance
-   _movie_db = None    # key: movie_url  data: dictionary as of the tmdb api
-   _idler_db = None    # key: file_url  data: timestamp of the last unsuccessfull tmdb query
-   _tags_db = None     # key: tag_name  data: list of tmdb movie IDs
-   _scanner = None     # BackgroundScanner instance
-   _actors_cache = None    # key: actor name     val: [list of films urls]
-   _directors_cache = None # key: director name  val: [list of films urls]
+   _browser = None          # the browser widget instance
+   _movie_db = None         # key: movie_url  data: dictionary as of the tmdb api
+   _idler_db = None         # key: file_url  data: timestamp of the last unsuccessfull tmdb query
+   _tags_db = None          # key: tag_name  data: list of tmdb movie IDs
+   _fav_actors_db = None    # key: actor_name  data: None
+   _fav_directors_db = None # key: director_name  data: None
+   _scanner = None          # BackgroundScanner instance
+   _actors_cache = None     # key: actor name     val: [list of films urls]
+   _directors_cache = None  # key: director name  val: [list of films urls]
    _styles_for_folders = ('List', 'PosterGrid')
 
    def __init__(self):
@@ -368,6 +426,8 @@ class MoviesModule(EmcModule):
          self._movie_db = EmcDatabase('movies', MOVIE_DB_VERSION)
          self._idler_db = EmcDatabase('movieidlercache', MOVIE_DB_VERSION)
          self._tags_db = EmcDatabase('movietags', MOVIE_TAGS_DB_VERSION)
+         self._fav_actors_db = EmcDatabase('moviefavactors', MOVIE_FAV_PEOPLE_DB_VERSION)
+         self._fav_directors_db = EmcDatabase('moviefavdirectors', MOVIE_FAV_PEOPLE_DB_VERSION)
 
       # start the browser in the wanted page
       if url is None:
@@ -417,52 +477,62 @@ class MoviesModule(EmcModule):
          self._browser.item_add(MovieItemClass(), os.path.join(url, fname), self)
 
    def populate_actors_list(self, browser, url):
-      actors = {} # key:actor_name  val:[list of movie urls]
+      # first show the favorites
+      for name in sorted(self._fav_actors_db.keys()):
+         self._browser.item_add(ActorItemClass(), 'movies://actors/'+name, name)
 
-      for url in self._movie_db.keys():
-         movie = self._movie_db.get_data(url)
+      # then all the actors NOT in favorites
+      actors = {} # key:actor_name  val:[list of movie urls]
+      for url, movie in self._movie_db:
          for actor in movie['cast']:
             name = actor['name']
             if name in actors:
                actors[name].append(url)
             else:
                actors[name] = [url]
-
       self._actors_cache = actors
 
       for name in sorted(self._actors_cache.keys()):
-         self._browser.item_add(ActorItemClass(), 'movies://actors/'+name, name)
+         if name not in self._fav_actors_db:
+            self._browser.item_add(ActorItemClass(), 'movies://actors/'+name, name)
 
    def populate_actor_movies(self, browser, url):
+      name = url.replace('movies://actors/', '')
       # actor info item
       self._browser.item_add(SpecialItemClass(), url, self)
+      # favorite/unfavorite item
+      self._browser.item_add(SetFavoriteActorItemClass(), name, self)
       # all movies for this actor
-      name = url.replace('movies://actors/', '')
       for url in self._actors_cache[name]:
          self._browser.item_add(MovieItemClass(), url, self)
 
    def populate_directors_list(self, browser, url):
+      # first show the favorites
+      for name in sorted(self._fav_directors_db.keys()):
+         self._browser.item_add(DirectorItemClass(),
+                                'movies://directors/'+name, name)
+      # then all the directors NOT in favorites
       directors = {} # key:director_name  val:[list of movie urls]
-
-      for url in self._movie_db.keys():
-         movie = self._movie_db.get_data(url)
+      for url, movie in self._movie_db:
          name = movie['director']
          if name in directors:
             directors[name].append(url)
          else:
             directors[name] = [url]
-
       self._directors_cache = directors
 
       for name in sorted(self._directors_cache.keys()):
-         self._browser.item_add(DirectorItemClass(),
-                                'movies://directors/'+name, name)
+         if name not in self._fav_directors_db:
+            self._browser.item_add(DirectorItemClass(),
+                                   'movies://directors/'+name, name)
 
    def populate_director_movies(self, browser, url):
+      name = url.replace('movies://directors/', '')
       # director info item
       self._browser.item_add(SpecialItemClass(), url, self)
+      # favorite/unfavorite item
+      self._browser.item_add(SetFavoriteDirectorItemClass(), name, self)
       # all movies for this director
-      name = url.replace('movies://directors/', '')
       for movie_url in self._directors_cache[name]:
          self._browser.item_add(MovieItemClass(), movie_url, self)
 

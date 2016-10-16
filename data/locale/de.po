@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-03 16:29+0200\n"
+"POT-Creation-Date: 2016-10-16 10:00+0200\n"
 "PO-Revision-Date: 2016-09-03 18:52+0200\n"
 "Last-Translator: Wolfgang Morawetz <wolfgang.morawetz@gmail.com>\n"
 "Language-Team: Deutsch <>\n"
@@ -21,428 +21,43 @@ msgstr ""
 "X-Generator: Gtranslator 2.91.7\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-#: epymc/mainmenu.py:45 epymc/gui.py:308
+#: epymc/mainmenu.py:45 epymc/gui.py:304
 msgid "Exit"
 msgstr "Beenden"
 
-#: epymc/subtitles.py:176 epymc/mediaplayer.py:936 epymc/mediaplayer.py:1060
-#: epymc/config_gui.py:326 epymc/config_gui.py:627
-msgid "Subtitles"
-msgstr "Untertiteln"
+#: epymc/browser.py:166 epymc/gui.py:1757
+msgid "Back"
+msgstr "Zurück"
 
-#: epymc/subtitles.py:272
-msgid "Searching subtitles"
-msgstr "Suche untertiteln"
+#: epymc/browser.py:337
+msgid "View restriction"
+msgstr "Zeige Einschrenkungen"
 
-#: epymc/subtitles.py:324
-msgid "Login failed"
-msgstr "Anmeldung fehlgeschlagen"
+#: epymc/browser.py:338
+msgid ""
+"<br><br>The requested view is not enabled for the current page."
+"<br><br><small><info>NOTE: You can ovveride this restriction in the "
+"<i>Configuration → Views</i> section.</info></small>"
+msgstr ""
+"<br><br>Die Anzeige nachfrage ist für diese Steie nicht "
+"aktiviert<br><br><small><info>INFO: Sie können diese Einschrämkung in der "
+"<i> Konfiguration → Anzeigen</i> sektion ändern.</info></small>"
 
-#: epymc/subtitles.py:340
-msgid "Search failed"
-msgstr "Suche fehlgeschlagen"
-
-#: epymc/subtitles.py:364
+#: epymc/browser.py:580 epymc/browser.py:817
 #, python-format
-msgid "No results found for languages: %s"
-msgstr "Keine Ergebnise für diese Sprachen: %s"
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] "%d Eintrag"
+msgstr[1] "%d Einträge"
 
-#: epymc/subtitles.py:378 epymc/plugins/mame/mame.py:427
-msgid "Download"
-msgstr "Download"
-
-#: epymc/subtitles.py:385 epymc/utils.py:519 epymc/gui.py:213 epymc/gui.py:215
-#: epymc/gui.py:216 epymc/config_gui.py:645 epymc/plugins/movies/movies.py:213
-#: epymc/plugins/onlinevideo/onlinevideo.py:234
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:129
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:144
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:149
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:152
-msgid "Unknown"
-msgstr "Unbekannt"
-
-#: epymc/subtitles.py:396
-msgid "Downloading subtitles"
-msgstr "Download der Untertiteln."
-
-#: epymc/subtitles.py:410 epymc/gui.py:2085
-#: epymc/plugins/onlinevideo/onlinevideo.py:286
-msgid "Download failed"
-msgstr "Download fehlgeschlagen"
-
-#: epymc/subtitles.py:429
-msgid "Decode failed"
-msgstr "Dekodieren fehlgeschlagen"
-
-#: epymc/themoviedb.py:533
-msgid "Fetching info"
-msgstr "Hole informationen"
-
-#: epymc/themoviedb.py:545
-msgid "Birthday"
-msgstr "Geburtstag"
-
-#: epymc/themoviedb.py:547
-msgid "Deathday"
-msgstr "Todestag"
-
-#: epymc/themoviedb.py:549
-msgid "Place of birth"
-msgstr "Geburtsort"
-
-#: epymc/themoviedb.py:556
-#, python-format
-msgid "Movies (%s)"
-msgstr "Filme (%s)"
-
-#: epymc/themoviedb.py:558
-#, python-format
-msgid "Photos (%s)"
-msgstr "Fotos (%s)"
-
-#: epymc/themoviedb.py:570
-#, python-format
-msgid "%(title)s as %(character)s"
-msgstr "%(title)s nach %(character)s"
-
-#: epymc/mediaplayer.py:272
-msgid "File not found"
-msgstr "Datei nicht gefunden"
-
-#: epymc/mediaplayer.py:313 epymc/config_gui.py:419
-msgid "Resume playback"
-msgstr "Wiedergabe fortführen"
-
-#: epymc/mediaplayer.py:314
-#, python-format
-msgid "Continue from %s ?"
-msgstr "Fortführen ab %s ?"
-
-#: epymc/mediaplayer.py:498
-#, python-format
-msgid "Cannot init emotion engine:<br>%s"
-msgstr "Initialisierung der \"emotion engine\" ist fehlgeschlagen:<br>%s"
-
-#: epymc/mediaplayer.py:768 epymc/plugins/music/music.py:170
-#: epymc/plugins/music/music.py:183
-msgid "by"
-msgstr "von"
-
-#: epymc/mediaplayer.py:930
-msgid "Audio"
-msgstr "Ton"
-
-#: epymc/mediaplayer.py:933
-msgid "Video"
-msgstr "Video"
-
-#: epymc/mediaplayer.py:1061 epymc/mediaplayer.py:1183
-#: epymc/mediaplayer.py:1219 epymc/mediaplayer.py:1227
-#, python-format
-msgid "Delay: %d ms"
-msgstr "Verzögerung: %d ms"
-
-#: epymc/mediaplayer.py:1103 epymc/plugins/uitests/uitests.py:415
-msgid "Buffering"
-msgstr "Pufferung"
-
-#: epymc/mediaplayer.py:1124
-#, python-format
-msgid "Audio track: %s"
-msgstr "Tonspur: %s"
-
-#: epymc/mediaplayer.py:1126
-#, python-format
-msgid "Audio track #%d"
-msgstr "Tonspur #%d"
-
-#: epymc/mediaplayer.py:1133
-msgid "Unmute"
-msgstr "Lautschalten"
-
-#: epymc/mediaplayer.py:1136
-msgid "Mute"
-msgstr "Stummschalten"
-
-#: epymc/mediaplayer.py:1152
-#, python-format
-msgid "Video track: %s"
-msgstr "Videospur: %s"
-
-#: epymc/mediaplayer.py:1154
-#, python-format
-msgid "Video track #%d"
-msgstr "Videospur #%d"
-
-#: epymc/mediaplayer.py:1160
-msgid "Download video"
-msgstr "Download Video"
-
-#: epymc/mediaplayer.py:1178 epymc/mediaplayer.py:1188
-msgid "No subtitles"
-msgstr "Keine Untertiteln"
-
-#: epymc/mediaplayer.py:1195
-#, python-format
-msgid "Subtitle #%d"
-msgstr "Untertitel #%d"
-
-#: epymc/mediaplayer.py:1215
-msgid "Download subtitles"
-msgstr "Download Untertiteln"
-
-#: epymc/mediaplayer.py:1218
-msgid "Subtitles delay"
-msgstr "Untertitel verzögerung"
-
-#: epymc/mediaplayer.py:1220
-msgid "+100 ms"
-msgstr "+100 ms"
-
-#: epymc/mediaplayer.py:1221
-msgid "Reset"
-msgstr "Zurücksetzen"
-
-#: epymc/mediaplayer.py:1222
-msgid "-100 ms"
-msgstr "-100 ms"
-
-#: epymc/gui.py:70
-msgid "English QWERTY"
-msgstr "Englisch QUERTY"
-
-#: epymc/gui.py:71
-msgid "English ABC"
-msgstr "Englisch ABC"
-
-#: epymc/gui.py:72
-msgid "Italian QWERTY"
-msgstr "Italienisch QUERTY"
-
-#: epymc/gui.py:73
-msgid "Italian ABC"
-msgstr "Italienisch ABC"
-
-#: epymc/gui.py:74
-msgid "Russian QWERTY"
-msgstr "Russisch QUERTY"
-
-#: epymc/gui.py:75
-msgid "Russian ABC"
-msgstr "Russisch ABC"
-
-#: epymc/gui.py:76
-msgid "Finnish QWERTY"
-msgstr "Finisch QUERTY"
-
-#: epymc/gui.py:77
-msgid "Finnish ABC"
-msgstr "Finisch ABC"
-
-#: epymc/gui.py:78
-msgid "Symbols"
-msgstr "Symbole"
-
-#: epymc/gui.py:148 epymc/gui.py:160
-msgid "Emotion Media Center"
-msgstr "Emotion Media Center"
-
-#: epymc/gui.py:304
-msgid "credits"
-msgstr "Anerkennung"
-
-#: epymc/gui.py:305 epymc/gui.py:2238 epymc/config_gui.py:287
-msgid "Cancel"
-msgstr "Abbrechen"
-
-#: epymc/gui.py:1255 epymc/config_gui.py:284
+#: epymc/config_gui.py:284 epymc/gui.py:1292
 msgid "Ok"
 msgstr "Ok"
 
-#: epymc/gui.py:1259 epymc/gui.py:1261
-msgid "No"
-msgstr "Nein"
-
-#: epymc/gui.py:1264 epymc/gui.py:1266
-msgid "Yes"
-msgstr "Ja"
-
-#: epymc/gui.py:1605
-#, python-brace-format
-msgid "Image {0} of {1}"
-msgstr "Bild {0} of {1}"
-
-#: epymc/gui.py:1680
-msgid "Source Selector"
-msgstr "Quelle wählen"
-
-#: epymc/gui.py:1685 epymc/config_gui.py:513
-msgid "Select"
-msgstr "Auswählen"
-
-#: epymc/gui.py:1686
-msgid "Browse"
-msgstr "Betrachten"
-
-#: epymc/gui.py:1694 epymc/plugins/filemanager/filemanager.py:104
-msgid "Parent folder"
-msgstr "Vorheriger Ordner"
-
-#: epymc/gui.py:1734
-msgid "Sources Manager"
-msgstr "Quellen verwalten"
-
-#: epymc/gui.py:1736
-msgid "Done"
-msgstr "Erledigt"
-
-#: epymc/gui.py:1738
-msgid "Add"
-msgstr "Hinzufügen"
-
-#: epymc/gui.py:1740
-msgid "Remove"
-msgstr "Entfernen"
-
-#: epymc/gui.py:1754
-msgid "Choose a new source"
-msgstr "Eine neue Quelle auswählen"
-
-#: epymc/gui.py:1795
-msgid "Insert text"
-msgstr "Text einfügen"
-
-#: epymc/gui.py:1811
-msgid "ERASE"
-msgstr "LÖSCHEN"
-
-#: epymc/gui.py:1819
-msgid "SPACE"
-msgstr "ABSTAND"
-
-#: epymc/gui.py:1820 epymc/gui.py:1888
-msgid "UPPERCASE"
-msgstr "GROßSCHREIBUNG"
-
-#: epymc/gui.py:1822
-msgid "Dismiss"
-msgstr "Verwerfen"
-
-#: epymc/gui.py:1827
-msgid "Accept"
-msgstr "Anehmen"
-
-#: epymc/gui.py:1885
-msgid "LOWERCASE"
-msgstr "KLEINSCHREIBUNG"
-
-#: epymc/gui.py:2060
-msgid "Download started"
-msgstr "Download starten"
-
-#: epymc/gui.py:2083
-msgid "Cannot download file"
-msgstr "Download der Datei nicht möglich"
-
-#: epymc/gui.py:2084
-msgid "Failure code"
-msgstr "Fehler Code"
-
-#: epymc/gui.py:2092 epymc/plugins/mame/mame.py:588
-msgid "Download completed"
-msgstr "Download fertiggestellt"
-
-#: epymc/gui.py:2144
-msgid "Download Manager"
-msgstr "Download Verwaltung"
-
-#: epymc/gui.py:2148
-msgid "Start download"
-msgstr "Starte download"
-
-#: epymc/gui.py:2149 epymc/plugins/filemanager/filemanager.py:277
-#: epymc/plugins/filemanager/filemanager.py:319
-msgid "Rename"
-msgstr "Umbenennen"
-
-#: epymc/gui.py:2150
-msgid "Change folder"
-msgstr "Ordner wechseln"
-
-#: epymc/gui.py:2155
-msgid ""
-"File will be downloaded in the folder:<br> <b>{}</b><br><br>File will be "
-"named as:<br> <b>{}</b><br><br>You can rename the file using the <i>Rename</"
-"i> button or change the destination folder from the main configuration."
-msgstr ""
-"Der Download der Datei kommt in den Ordner :<br> <b>{}</b><br><br>Die Datei "
-"wird benannt ‭:<br> <b>{}</b><br><br>Der Name der Datei kann entweder mit der "
-"<i>Umbenennen</i> Schaltfläche geändert werden oder durch das Ändern des "
-"Ziel Ordners in der Hauptkonfiguration."
-
-#: epymc/gui.py:2163
-msgid "Rename download"
-msgstr "Download umbenennen"
-
-#: epymc/gui.py:2171
-msgid "Change destination folder"
-msgstr "Ziel Ordner ändern"
-
-#: epymc/gui.py:2185
-#, python-format
-msgid "The file %s is in the download queue yet"
-msgstr "Die Datei %s ist jetzt in der Download liste"
-
-#: epymc/gui.py:2224 epymc/gui.py:2233
-#: epymc/plugins/onlinevideo/onlinevideo.py:121
-msgid "Download manager"
-msgstr "Download Manager"
-
-#: epymc/gui.py:2235 epymc/config_gui.py:511 epymc/plugins/mame/mame.py:545
-#: epymc/plugins/filemanager/filemanager.py:292
-msgid "Close"
-msgstr "Schließen"
-
-#: epymc/gui.py:2236
-msgid "Start"
-msgstr "Start"
-
-#: epymc/gui.py:2237
-msgid "Clear completed"
-msgstr "Löschung durchgeführt"
-
-#: epymc/gui.py:2264
-#, python-format, python-brace-format
-msgid "{0}% of {1}"
-msgstr "{0}% of {1}"
-
-#: epymc/gui.py:2266
-msgid "Unknown size"
-msgstr "unbekannte Größe"
-
-#: epymc/gui.py:2269 epymc/plugins/music/music.py:538
-msgid "queued"
-msgstr "in der Warteschlange"
-
-#: epymc/gui.py:2271
-msgid "running"
-msgstr "in Ausführung"
-
-#: epymc/gui.py:2273
-msgid "completed"
-msgstr "beendet"
-
-#: epymc/gui.py:2275
-msgid "paused"
-msgstr "Pause"
-
-#: epymc/gui.py:2293
-msgid "Are you sure you want to abort the download of the file?"
-msgstr "Wollen sie wirklich den Download der Datei beenden?"
-
-#: epymc/gui.py:2294
-msgid "Delete download"
-msgstr "Download gelöscht"
+#: epymc/config_gui.py:287 epymc/gui.py:301 epymc/gui.py:1307 epymc/gui.py:1309
+#: epymc/gui.py:2395
+msgid "Cancel"
+msgstr "Abbrechen"
 
 #: epymc/config_gui.py:317 epymc/config_gui.py:320 epymc/config_gui.py:400
 msgid "Configuration"
@@ -464,6 +79,11 @@ msgstr "Themen"
 msgid "Views"
 msgstr "Anzeigen"
 
+#: epymc/config_gui.py:326 epymc/config_gui.py:627 epymc/mediaplayer.py:953
+#: epymc/mediaplayer.py:1077 epymc/subtitles.py:176
+msgid "Subtitles"
+msgstr "Untertiteln"
+
 #: epymc/config_gui.py:327 epymc/config_gui.py:676
 msgid "System info"
 msgstr "System info"
@@ -476,17 +96,21 @@ msgstr "In Großansicht starten"
 msgid "Hide mouse cursor when not needed"
 msgstr "Blende den Mauszeiger aus wen er nicht benötigt wird"
 
-#: epymc/config_gui.py:417
+#: epymc/config_gui.py:417 epymc/plugins/movies/movies.py:944
 msgid "Ask"
 msgstr "Frage"
 
-#: epymc/config_gui.py:417
+#: epymc/config_gui.py:417 epymc/plugins/movies/movies.py:944
 msgid "Always"
 msgstr "Immer"
 
-#: epymc/config_gui.py:417
+#: epymc/config_gui.py:417 epymc/plugins/movies/movies.py:944
 msgid "Never"
 msgstr "Niemals"
+
+#: epymc/config_gui.py:419 epymc/mediaplayer.py:318
+msgid "Resume playback"
+msgstr "Wiedergabe fortführen"
 
 #: epymc/config_gui.py:421
 msgid "Interface scale"
@@ -545,6 +169,15 @@ msgstr ""
 msgid "Operation in progress, please wait..."
 msgstr "Vorgang in Bearbeitung, bitte warten..."
 
+#: epymc/config_gui.py:511 epymc/gui.py:2392
+#: epymc/plugins/filemanager/filemanager.py:300 epymc/plugins/mame/mame.py:547
+msgid "Close"
+msgstr "Schließen"
+
+#: epymc/config_gui.py:513 epymc/gui.py:1720
+msgid "Select"
+msgstr "Auswählen"
+
 #: epymc/config_gui.py:548
 msgid "Show Back item in lists"
 msgstr "Zeige vorherige listen Einträge "
@@ -588,6 +221,17 @@ msgstr "Opensubtitles.org Benutzername"
 #: epymc/config_gui.py:634
 msgid "Opensubtitles.org Password"
 msgstr "Opensubtitles.org Passwort"
+
+#: epymc/config_gui.py:645 epymc/subtitles.py:385 epymc/utils.py:519
+#: epymc/gui.py:209 epymc/gui.py:211 epymc/gui.py:212
+#: epymc/plugins/onlinevideo/onlinevideo.py:234
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:152
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:129
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:144
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:149
+#: epymc/plugins/movies/movies.py:220
+msgid "Unknown"
+msgstr "Unbekannt"
 
 #: epymc/config_gui.py:662
 msgid "Core"
@@ -668,233 +312,540 @@ msgstr ""
 msgid "EpyMC Database"
 msgstr "EpyMC Datenbank"
 
-#: epymc/browser.py:164
-msgid "Back"
-msgstr "Zurück"
+#: epymc/themoviedb.py:533 epymc/musicbrainz.py:169
+msgid "Fetching info"
+msgstr "Hole informationen"
 
-#: epymc/browser.py:334
-msgid "View restriction"
-msgstr "Zeige Einschrenkungen"
+#: epymc/themoviedb.py:545
+msgid "Birthday"
+msgstr "Geburtstag"
 
-#: epymc/browser.py:335
-msgid ""
-"<br><br>The requested view is not enabled for the current page."
-"<br><br><small><info>NOTE: You can ovveride this restriction in the "
-"<i>Configuration → Views</i> section.</info></small>"
+#: epymc/themoviedb.py:547
+msgid "Deathday"
+msgstr "Todestag"
+
+#: epymc/themoviedb.py:549
+msgid "Place of birth"
+msgstr "Geburtsort"
+
+#: epymc/themoviedb.py:556
+#, python-format
+msgid "Movies (%s)"
+msgstr "Filme (%s)"
+
+#: epymc/themoviedb.py:558
+#, python-format
+msgid "Photos (%s)"
+msgstr "Fotos (%s)"
+
+#: epymc/themoviedb.py:570
+#, python-format
+msgid "%(title)s as %(character)s"
+msgstr "%(title)s nach %(character)s"
+
+#: epymc/mediaplayer.py:272
+msgid "File not found"
+msgstr "Datei nicht gefunden"
+
+#: epymc/mediaplayer.py:319
+#, python-format
+msgid "Continue from %s ?"
+msgstr "Fortführen ab %s ?"
+
+#: epymc/mediaplayer.py:503
+#, python-format
+msgid "Cannot init emotion engine:<br>%s"
+msgstr "Initialisierung der \"emotion engine\" ist fehlgeschlagen:<br>%s"
+
+#: epymc/mediaplayer.py:770 epymc/mediaplayer.py:800
+msgid "Unknown title"
 msgstr ""
-"<br><br>Die Anzeige nachfrage ist für diese Steie nicht "
-"aktiviert<br><br><small><info>INFO: Sie können diese Einschrämkung in der "
-"<i> Konfiguration → Anzeigen</i> sektion ändern.</info></small>"
 
-#: epymc/browser.py:577 epymc/browser.py:814
-#, python-format
-msgid "%d item"
-msgid_plural "%d items"
-msgstr[0] "%d Eintrag"
-msgstr[1] "%d Einträge"
-
-#: epymc/plugins/input_mpris2/mpris2.py:48
-msgid "Input - MPRIS2"
-msgstr "MPRIS2 Eingabe"
-
-#: epymc/plugins/input_mpris2/mpris2.py:50
-msgid ""
-"Add the ability to control the application from any MPRIS2 compatible client."
+#: epymc/mediaplayer.py:771 epymc/mediaplayer.py:802
+msgid "Unknown artist"
 msgstr ""
-"Aktiviere die Anwendungssteuerung über eine MPRIS2 Kompatible Anwendung."
 
-#: epymc/plugins/tvshows/tvshows.py:73 epymc/plugins/music/music.py:123
-#: epymc/plugins/movies/movies.py:82 epymc/plugins/photos/photos.py:79
-msgid "Manage sources"
-msgstr "Quellen Organisieren"
-
-#: epymc/plugins/tvshows/tvshows.py:85 epymc/plugins/music/music.py:110
-#: epymc/plugins/movies/movies.py:93
-msgid "Rescan library"
-msgstr "Bibliothek neu einlesen"
-
-#: epymc/plugins/tvshows/tvshows.py:96
-msgid "Serie info"
-msgstr "Serien Information"
-
-#: epymc/plugins/tvshows/tvshows.py:248
-msgid "Episode"
-msgstr "Episode"
-
-#: epymc/plugins/tvshows/tvshows.py:249 epymc/plugins/tvshows/tvshows.py:463
-#: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:57
-msgid "First aired"
-msgstr "Erstaustrahlung"
-
-#: epymc/plugins/tvshows/tvshows.py:255 epymc/plugins/tvshows/tvshows.py:292
-#: epymc/plugins/tvshows/tvshows.py:299 epymc/plugins/tvshows/tvshows.py:361
-#: epymc/plugins/tvshows/tvshows.py:652
-msgid "TV Shows"
-msgstr "TV Sendungen"
-
-#: epymc/plugins/tvshows/tvshows.py:257
-msgid ""
-"The Tv Shows module is used to browse your series collection, it is fully "
-"integrated with themoviedb.org online database."
+#: epymc/mediaplayer.py:772
+msgid "Unknown album"
 msgstr ""
-"Mit dem Modul für TV Sendungen ist es möglich seine TV Sammlung zu "
-"durchsuchen. Es arbeitet mit der Online Datenbank von \"themoviedb.org\" "
-"zusammen. "
 
-#: epymc/plugins/tvshows/tvshows.py:295
-msgid "Tv Shows Collection"
-msgstr "Sammlung von TV Sendungen"
+#: epymc/mediaplayer.py:777 epymc/plugins/music/music.py:170
+#: epymc/plugins/music/music.py:183
+msgid "by"
+msgstr "von"
 
-#: epymc/plugins/tvshows/tvshows.py:441 epymc/plugins/movies/movies.py:457
-msgid "Posters"
-msgstr "Poster"
+#: epymc/mediaplayer.py:947
+msgid "Audio"
+msgstr "Ton"
 
-#: epymc/plugins/tvshows/tvshows.py:442 epymc/plugins/movies/movies.py:458
-msgid "Backdrops"
-msgstr "Hintergrundbild"
+#: epymc/mediaplayer.py:950
+msgid "Video"
+msgstr "Video"
 
-#: epymc/plugins/tvshows/tvshows.py:443 epymc/plugins/tvshows/tvshows.py:534
-#: epymc/plugins/movies/movies.py:204 epymc/plugins/movies/movies.py:456
-#: epymc/plugins/movies/movies.py:475 epymc/plugins/movies/movies.py:513
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:160
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:190
-msgid "Cast"
-msgstr "Besetzung"
+#: epymc/mediaplayer.py:1078 epymc/mediaplayer.py:1201
+#: epymc/mediaplayer.py:1239 epymc/mediaplayer.py:1247
+#, python-format
+msgid "Delay: %d ms"
+msgstr "Verzögerung: %d ms"
 
-#: epymc/plugins/tvshows/tvshows.py:444
-msgid "Refresh info"
-msgstr "Information Aktualisieren"
+#: epymc/mediaplayer.py:1120 epymc/plugins/uitests/uitests.py:437
+msgid "Buffering"
+msgstr "Pufferung"
 
-#: epymc/plugins/tvshows/tvshows.py:461
-msgid "Created by"
-msgstr "Produzent"
+#: epymc/mediaplayer.py:1141
+#, python-format
+msgid "Audio track: %s"
+msgstr "Tonspur: %s"
 
-#: epymc/plugins/tvshows/tvshows.py:462
-msgid "Network"
-msgstr "Netzwerk"
+#: epymc/mediaplayer.py:1143
+#, python-format
+msgid "Audio track #%d"
+msgstr "Tonspur #%d"
 
-#: epymc/plugins/tvshows/tvshows.py:464
-msgid "Last aired"
-msgstr "Zuletzt Gesendet"
+#: epymc/mediaplayer.py:1150
+msgid "Mute"
+msgstr "Stummschalten"
 
-#: epymc/plugins/tvshows/tvshows.py:465
-msgid "Seasons"
-msgstr "Staffel"
+#: epymc/mediaplayer.py:1168
+#, python-format
+msgid "Video track: %s"
+msgstr "Videospur: %s"
 
-#: epymc/plugins/tvshows/tvshows.py:466
-msgid "Episodes"
-msgstr "Episoden"
+#: epymc/mediaplayer.py:1170
+#, python-format
+msgid "Video track #%d"
+msgstr "Videospur #%d"
 
-#: epymc/plugins/tvshows/tvshows.py:467
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:162
-msgid "Genres"
-msgstr "Genre"
+#: epymc/mediaplayer.py:1176
+msgid "Download video"
+msgstr "Download Video"
 
-#: epymc/plugins/tvshows/tvshows.py:468
-msgid "Runtime"
-msgstr "Laufzeit"
+#: epymc/mediaplayer.py:1196 epymc/mediaplayer.py:1206
+msgid "No subtitles"
+msgstr "Keine Untertiteln"
 
-#: epymc/plugins/tvshows/tvshows.py:469 epymc/plugins/movies/movies.py:202
-#: epymc/plugins/movies/movies.py:478
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:163
-msgid "Rating"
-msgstr "Bewertung"
+#: epymc/mediaplayer.py:1213
+#, python-format
+msgid "Subtitle #%d"
+msgstr "Untertitel #%d"
 
-#: epymc/plugins/tvshows/tvshows.py:470
-msgid "Status"
-msgstr "Status"
+#: epymc/mediaplayer.py:1232
+msgid "Download subtitles"
+msgstr "Download Untertiteln"
 
-#: epymc/plugins/tvshows/tvshows.py:471 epymc/plugins/movies/movies.py:479
-msgid "Overview"
-msgstr "Übersicht"
+#: epymc/mediaplayer.py:1238
+msgid "Subtitles delay"
+msgstr "Untertitel verzögerung"
 
-#: epymc/plugins/tvshows/tvshows.py:477
-msgid ""
-"No info stored for this serie.<br>Please try the <i>refresh info</i> button."
+#: epymc/mediaplayer.py:1240
+msgid "+100 ms"
+msgstr "+100 ms"
+
+#: epymc/mediaplayer.py:1241
+msgid "Reset"
+msgstr "Zurücksetzen"
+
+#: epymc/mediaplayer.py:1242
+msgid "-100 ms"
+msgstr "-100 ms"
+
+#: epymc/subtitles.py:272
+msgid "Searching subtitles"
+msgstr "Suche untertiteln"
+
+#: epymc/subtitles.py:324
+msgid "Login failed"
+msgstr "Anmeldung fehlgeschlagen"
+
+#: epymc/subtitles.py:340
+msgid "Search failed"
+msgstr "Suche fehlgeschlagen"
+
+#: epymc/subtitles.py:364
+#, python-format
+msgid "No results found for languages: %s"
+msgstr "Keine Ergebnise für diese Sprachen: %s"
+
+#: epymc/subtitles.py:378 epymc/plugins/mame/mame.py:429
+msgid "Download"
+msgstr "Download"
+
+#: epymc/subtitles.py:396
+msgid "Downloading subtitles"
+msgstr "Download der Untertiteln."
+
+#: epymc/subtitles.py:410 epymc/gui.py:2242
+#: epymc/plugins/onlinevideo/onlinevideo.py:286
+msgid "Download failed"
+msgstr "Download fehlgeschlagen"
+
+#: epymc/subtitles.py:429
+msgid "Decode failed"
+msgstr "Dekodieren fehlgeschlagen"
+
+#: epymc/gui.py:66
+msgid "English QWERTY"
+msgstr "Englisch QUERTY"
+
+#: epymc/gui.py:67
+msgid "English ABC"
+msgstr "Englisch ABC"
+
+#: epymc/gui.py:68
+msgid "Italian QWERTY"
+msgstr "Italienisch QUERTY"
+
+#: epymc/gui.py:69
+msgid "Italian ABC"
+msgstr "Italienisch ABC"
+
+#: epymc/gui.py:70
+msgid "Russian QWERTY"
+msgstr "Russisch QUERTY"
+
+#: epymc/gui.py:71
+msgid "Russian ABC"
+msgstr "Russisch ABC"
+
+#: epymc/gui.py:72
+msgid "Finnish QWERTY"
+msgstr "Finisch QUERTY"
+
+#: epymc/gui.py:73
+msgid "Finnish ABC"
+msgstr "Finisch ABC"
+
+#: epymc/gui.py:74
+msgid "Symbols"
+msgstr "Symbole"
+
+#: epymc/gui.py:144 epymc/gui.py:156
+msgid "Emotion Media Center"
+msgstr "Emotion Media Center"
+
+#: epymc/gui.py:300
+msgid "credits"
+msgstr "Anerkennung"
+
+#: epymc/gui.py:1296 epymc/gui.py:1298
+msgid "No"
+msgstr "Nein"
+
+#: epymc/gui.py:1301 epymc/gui.py:1303
+msgid "Yes"
+msgstr "Ja"
+
+#: epymc/gui.py:1641
+#, python-brace-format
+msgid "Image {0} of {1}"
+msgstr "Bild {0} of {1}"
+
+#: epymc/gui.py:1715
+msgid "Source Selector"
+msgstr "Quelle wählen"
+
+#: epymc/gui.py:1721
+msgid "Browse"
+msgstr "Betrachten"
+
+#: epymc/gui.py:1729
+msgid "Home"
 msgstr ""
-"Keine Information für diese Sendung.<br>Bitte versuchen sie "
-"die<i>Information Aktualisieren</i>Schaltfläche."
 
-#: epymc/plugins/tvshows/tvshows.py:487 epymc/plugins/movies/movies.py:536
-#, python-format
-msgid "%d posters available"
-msgstr "%d Poster verfügbar"
-
-#: epymc/plugins/tvshows/tvshows.py:502 epymc/plugins/movies/movies.py:580
-#, python-format
-msgid "%d backdrops available"
-msgstr "%d Hintergrundbild(er) verfügbar"
-
-#: epymc/plugins/tvshows/tvshows.py:513 epymc/plugins/movies/movies.py:555
-#: epymc/plugins/movies/movies.py:600
-msgid "Downloading image"
-msgstr "Download Bild"
-
-#: epymc/plugins/tvshows/tvshows.py:539 epymc/plugins/movies/movies.py:518
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:201
-msgid "as"
-msgstr "wie"
-
-#: epymc/plugins/tvshows/tvshows.py:557 epymc/plugins/movies/movies.py:638
-#, python-format
-msgid "Found %d results, which one?"
-msgstr "%d Ergebnisse gefunden, welches? "
-
-#: epymc/plugins/tvshows/tvshows.py:573
-#, python-format
-msgid ""
-"The search for \"%s\" did not make any results.<br>If your show is listed on "
-"themoviedb.org please rename your folder to match the title on the site."
-"<br>If otherwise it is not in the online database please contribute and add "
-"it yourself."
+#: epymc/gui.py:1731
+msgid "Root filesystem"
 msgstr ""
-"Die Suche nach \"%s\" ist Ergebnislos.<br>Falls die Sendung auf \"themoviedb."
-"org\" aufgelistet ist benennen sie den Ordner bitte genauso wie auf "
-"\"themoviedb.org\".<br>Ist die Sendung nicht aufgelistet dann ergänzen sie "
-"bitte die Informationen auf \"themoviedb.org\"."
 
-#: epymc/plugins/tvshows/tvshows.py:578
-msgid "Nothing found"
-msgstr "Nichts gefunden"
+#: epymc/gui.py:1750
+msgid "Permission denied"
+msgstr ""
 
-#: epymc/plugins/tvshows/tvshows.py:587
-msgid "Fetching updated info"
-msgstr "Hole aktualisierte Informationen"
+#: epymc/gui.py:1800
+msgid "Sources Manager"
+msgstr "Quellen verwalten"
 
-#: epymc/plugins/tvshows/tvshows.py:656 epymc/plugins/movies/movies.py:815
-msgid "Preferred language for contents"
-msgstr "Bevorzugte Sprache für den Inhalt"
+#: epymc/gui.py:1802 epymc/gui.py:1844
+msgid "Done"
+msgstr "Erledigt"
 
-#: epymc/plugins/tvshows/tvshows.py:694
-msgid "TvShows scanner started"
-msgstr "Scanner für TV Sendung gestartet"
+#: epymc/gui.py:1804 epymc/gui.py:1846
+msgid "Add"
+msgstr "Hinzufügen"
 
-#: epymc/plugins/tvshows/tvshows.py:694 epymc/plugins/music/music.py:339
-#: epymc/plugins/onlinevideo/onlinevideo.py:229
-msgid "please wait..."
-msgstr "Bitte warten..."
+#: epymc/gui.py:1806 epymc/gui.py:1848
+msgid "Remove"
+msgstr "Entfernen"
 
-#: epymc/plugins/tvshows/tvshows.py:725
-msgid "TvShows scanner done"
-msgstr "Scanner für TV Sendung abgeschlossen"
+#: epymc/gui.py:1820
+msgid "Choose a new source"
+msgstr "Eine neue Quelle auswählen"
 
-#: epymc/plugins/tvshows/tvshows.py:766
+#: epymc/gui.py:1842 epymc/plugins/movies/movies.py:117
+msgid "Tags manager"
+msgstr ""
+
+#: epymc/gui.py:1850 epymc/gui.py:2306
+#: epymc/plugins/filemanager/filemanager.py:285
+#: epymc/plugins/filemanager/filemanager.py:327
+msgid "Rename"
+msgstr "Umbenennen"
+
+#: epymc/gui.py:1860
+msgid "{} item"
+msgid_plural "{} items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: epymc/gui.py:1870
+msgid "Type a name for the new tag"
+msgstr ""
+
+#: epymc/gui.py:1875 epymc/gui.py:1910
+msgid "Invalid tag name"
+msgstr ""
+
+#: epymc/gui.py:1879 epymc/gui.py:1918
+msgid "Tag already exists"
+msgstr ""
+
+#: epymc/gui.py:1889
+msgid "Are you sure you want to delete the tag?"
+msgstr ""
+
+#: epymc/gui.py:1891
+msgid "Warning"
+msgstr ""
+
+#: epymc/gui.py:1905
+msgid "Type the new name for the tag"
+msgstr ""
+
+#: epymc/gui.py:1950
+msgid "Insert text"
+msgstr "Text einfügen"
+
+#: epymc/gui.py:1966
+msgid "ERASE"
+msgstr "LÖSCHEN"
+
+#: epymc/gui.py:1974
+msgid "SPACE"
+msgstr "ABSTAND"
+
+#: epymc/gui.py:1975 epymc/gui.py:2045
+msgid "UPPERCASE"
+msgstr "GROßSCHREIBUNG"
+
+#: epymc/gui.py:1977
+msgid "Dismiss"
+msgstr "Verwerfen"
+
+#: epymc/gui.py:1982
+msgid "Accept"
+msgstr "Anehmen"
+
+#: epymc/gui.py:2042
+msgid "LOWERCASE"
+msgstr "KLEINSCHREIBUNG"
+
+#: epymc/gui.py:2217
+msgid "Download started"
+msgstr "Download starten"
+
+#: epymc/gui.py:2240
+msgid "Cannot download file"
+msgstr "Download der Datei nicht möglich"
+
+#: epymc/gui.py:2241
+msgid "Failure code"
+msgstr "Fehler Code"
+
+#: epymc/gui.py:2249 epymc/plugins/mame/mame.py:590
+msgid "Download completed"
+msgstr "Download fertiggestellt"
+
+#: epymc/gui.py:2301
+msgid "Download Manager"
+msgstr "Download Verwaltung"
+
+#: epymc/gui.py:2305
+msgid "Start download"
+msgstr "Starte download"
+
+#: epymc/gui.py:2307
+msgid "Change folder"
+msgstr "Ordner wechseln"
+
+#: epymc/gui.py:2312
+msgid ""
+"File will be downloaded in the folder:<br> <b>{}</b><br><br>File will be "
+"named as:<br> <b>{}</b><br><br>You can rename the file using the <i>Rename</"
+"i> button or change the destination folder from the main configuration."
+msgstr ""
+"Der Download der Datei kommt in den Ordner :<br> <b>{}</b><br><br>Die Datei "
+"wird benannt ‭:<br> <b>{}</b><br><br>Der Name der Datei kann entweder mit der "
+"<i>Umbenennen</i> Schaltfläche geändert werden oder durch das Ändern des "
+"Ziel Ordners in der Hauptkonfiguration."
+
+#: epymc/gui.py:2320
+msgid "Rename download"
+msgstr "Download umbenennen"
+
+#: epymc/gui.py:2328
+msgid "Change destination folder"
+msgstr "Ziel Ordner ändern"
+
+#: epymc/gui.py:2342
 #, python-format
-msgid "%d season"
-msgid_plural "%d seasons"
-msgstr[0] "%d Staffel"
-msgstr[1] "%d Staffeln"
+msgid "The file %s is in the download queue yet"
+msgstr "Die Datei %s ist jetzt in der Download liste"
 
-#: epymc/plugins/tvshows/tvshows.py:768
-#, python-format
-msgid "%d episode"
-msgid_plural "%d episodes"
-msgstr[0] "%d Episode"
-msgstr[1] "%d Episoden"
+#: epymc/gui.py:2381 epymc/gui.py:2390
+#: epymc/plugins/onlinevideo/onlinevideo.py:121
+msgid "Download manager"
+msgstr "Download Manager"
 
-#: epymc/plugins/tvshows/tvshows.py:770
-msgid "Found serie:"
-msgstr "Serie gefunden:"
+#: epymc/gui.py:2393
+msgid "Start"
+msgstr "Start"
+
+#: epymc/gui.py:2394
+msgid "Clear completed"
+msgstr "Löschung durchgeführt"
+
+#: epymc/gui.py:2421
+#, python-format, python-brace-format
+msgid "{0}% of {1}"
+msgstr "{0}% of {1}"
+
+#: epymc/gui.py:2423
+msgid "Unknown size"
+msgstr "unbekannte Größe"
+
+#: epymc/gui.py:2426 epymc/plugins/music/music.py:538
+msgid "queued"
+msgstr "in der Warteschlange"
+
+#: epymc/gui.py:2428
+msgid "running"
+msgstr "in Ausführung"
+
+#: epymc/gui.py:2430
+msgid "completed"
+msgstr "beendet"
+
+#: epymc/gui.py:2432
+msgid "paused"
+msgstr "Pause"
+
+#: epymc/gui.py:2450
+msgid "Are you sure you want to abort the download of the file?"
+msgstr "Wollen sie wirklich den Download der Datei beenden?"
+
+#: epymc/gui.py:2451
+msgid "Delete download"
+msgstr "Download gelöscht"
+
+#: epymc/storage.py:305
+msgid "Audio CD"
+msgstr ""
+
+#: epymc/storage.py:307
+msgid "DVD Disk"
+msgstr ""
+
+#: epymc/storage.py:321
+msgid "{} Volume"
+msgstr ""
+
+#: epymc/storage.py:327
+msgid "Volume"
+msgstr ""
+
+#: epymc/plugins/opticals/opticals.py:41
+msgid "Optical Discs"
+msgstr ""
+
+#: epymc/plugins/opticals/opticals.py:43
+msgid "This module add support for playing DVD and Audio CD"
+msgstr ""
+
+#: epymc/plugins/opticals/opticals.py:51 epymc/plugins/movies/movies.py:492
+#: epymc/plugins/mame/mame.py:427
+msgid "Play"
+msgstr "Abspielen"
+
+#: epymc/plugins/opticals/opticals.py:52
+msgid "Eject"
+msgstr ""
+
+#: epymc/plugins/opticals/opticals.py:93
+msgid "Audio track {}"
+msgstr ""
+
+#: epymc/plugins/opticals/opticals.py:120
+msgid "No disc found"
+msgstr ""
+
+#: epymc/plugins/opticals/opticals.py:121
+msgid "Please insert a disc (DVD or Audio CD)"
+msgstr ""
+
+#: epymc/plugins/input_joy/joy.py:45
+msgid "Input - Joystick"
+msgstr "Eingabe - Joystick"
+
+#: epymc/plugins/input_joy/joy.py:47
+msgid ""
+"The joystick module lets you control the application using any standard "
+"digital joystick or joypad."
+msgstr ""
+"Das \"Joystick Modul\" ermöglicht die Anwendung mit einem Standard Joystick/"
+"Controller zu bedienen.‭"
+
+#: epymc/plugins/input_joy/joy.py:80 epymc/plugins/input_joy/joy.py:156
+msgid "Joystick"
+msgstr "Joystick"
+
+#: epymc/plugins/input_joy/joy.py:159
+msgid "Device"
+msgstr "Gerät"
+
+#: epymc/plugins/input_joy/joy.py:161
+msgid "Configure buttons"
+msgstr "Schaltflächen Konfigurieren"
+
+#: epymc/plugins/input_joy/joy.py:169
+msgid "No joystick found"
+msgstr "Keinen Joystick gefunden"
+
+#: epymc/plugins/input_joy/joy.py:170
+msgid "Try to adjust your joystick device"
+msgstr "Versuch den Joystick zu justieren"
+
+#: epymc/plugins/input_joy/joy.py:183
+msgid "Configure joystick"
+msgstr "Joystick Konfigurieren"
+
+#: epymc/plugins/input_joy/joy.py:184
+msgid "Move the stick Up"
+msgstr "Bewege den Joystick nach oben"
+
+#: epymc/plugins/input_joy/joy.py:191
+msgid "Move the stick Right"
+msgstr "Bewege den Joystick nach rechts"
+
+#: epymc/plugins/input_joy/joy.py:197
+msgid "Press OK"
+msgstr "Drücke OK"
+
+#: epymc/plugins/input_joy/joy.py:202
+msgid "Press BACK"
+msgstr "Drücke zurück"
+
+#: epymc/plugins/input_joy/joy.py:207
+msgid "Config done."
+msgstr "Konfiguration abgeschlossen"
 
 #: epymc/plugins/music/music.py:55
 msgid "OnAir"
@@ -914,6 +865,16 @@ msgstr "Alben"
 #: epymc/plugins/music/music.py:277 epymc/plugins/music/music.py:327
 msgid "Songs"
 msgstr "Lieder"
+
+#: epymc/plugins/music/music.py:110 epymc/plugins/movies/movies.py:94
+#: epymc/plugins/tvshows/tvshows.py:85
+msgid "Rescan library"
+msgstr "Bibliothek neu einlesen"
+
+#: epymc/plugins/music/music.py:123 epymc/plugins/movies/movies.py:83
+#: epymc/plugins/photos/photos.py:79 epymc/plugins/tvshows/tvshows.py:73
+msgid "Manage sources"
+msgstr "Quellen Organisieren"
 
 #: epymc/plugins/music/music.py:133
 msgid "Play all the songs"
@@ -968,448 +929,15 @@ msgstr ""
 msgid "Rebuilding database"
 msgstr "Datenbank neu Erstellen"
 
+#: epymc/plugins/music/music.py:339
+#: epymc/plugins/onlinevideo/onlinevideo.py:229
+#: epymc/plugins/tvshows/tvshows.py:694
+msgid "please wait..."
+msgstr "Bitte warten..."
+
 #: epymc/plugins/music/music.py:372
 msgid "operation completed"
 msgstr "Aufgabe Abgeschlossen."
-
-#: epymc/plugins/movies/movies.py:101 epymc/plugins/movies/movies.py:109
-msgid "Actors"
-msgstr "Schauspieler"
-
-#: epymc/plugins/movies/movies.py:104 epymc/plugins/movies/movies.py:111
-msgid "Directors"
-msgstr "Regisseure"
-
-#: epymc/plugins/movies/movies.py:203 epymc/plugins/movies/movies.py:474
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:159
-msgid "Director"
-msgstr "Regiesseur"
-
-#: epymc/plugins/movies/movies.py:210 epymc/plugins/photos/photos.py:109
-msgid "File size"
-msgstr "Datei größe"
-
-#: epymc/plugins/movies/movies.py:212
-msgid "Title"
-msgstr "Titel"
-
-#: epymc/plugins/movies/movies.py:213 epymc/plugins/mame/mame.py:377
-#: epymc/plugins/mame/mame.py:412
-msgid "Year"
-msgstr "Jahr"
-
-#: epymc/plugins/movies/movies.py:225 epymc/plugins/movies/movies.py:268
-#: epymc/plugins/movies/movies.py:276 epymc/plugins/movies/movies.py:330
-msgid "Movies"
-msgstr "Filme"
-
-#: epymc/plugins/movies/movies.py:227
-msgid ""
-"The movies module is used to browse your films collection, it is fully "
-"integrated with themoviedb.org online database."
-msgstr ""
-"Mit dem Modul Movie ist es möglich seine Film Sammlung zu durchsuchen. Es "
-"arbeitet mit der Online Datenbank von \"themoviedb.org\" zusammen."
-
-#: epymc/plugins/movies/movies.py:272
-msgid "Movie Collection"
-msgstr "Film Sammlung"
-
-#: epymc/plugins/movies/movies.py:454 epymc/plugins/mame/mame.py:425
-msgid "Play"
-msgstr "Abspielen"
-
-#: epymc/plugins/movies/movies.py:459
-msgid "Search Info"
-msgstr "Information Suchen"
-
-#: epymc/plugins/movies/movies.py:476
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:164
-msgid "Released"
-msgstr "Veröffentlicht"
-
-#: epymc/plugins/movies/movies.py:477
-msgid "Country"
-msgstr "Land"
-
-#: epymc/plugins/movies/movies.py:495
-#, python-format
-msgid ""
-"Media:<br>%s<br><br>No info stored for this media<br>Try the Search info "
-"button..."
-msgstr ""
-"Medium:<br>%s<br><br>Keine Information für dieses Medium "
-"gespeichert<br>Versuchen sie die \"Information Suchen\" Schaltfläche."
-
-#: epymc/plugins/movies/movies.py:613
-msgid "Searching for"
-msgstr "Suchen nach"
-
-#: epymc/plugins/movies/movies.py:622
-msgid "Change name"
-msgstr "Namen Ändern"
-
-#: epymc/plugins/movies/movies.py:631
-msgid "nothing found, please try with a better name"
-msgstr "Suche ergab kein Ergebnis, bitte versuchen sie einen Anderen Namen"
-
-#: epymc/plugins/movies/movies.py:635 epymc/plugins/movies/movies.py:661
-msgid "Downloading movie info..."
-msgstr "Informationen zu dem Film werden heruntergeladen..."
-
-#: epymc/plugins/movies/movies.py:637
-#, python-format
-msgid "<b>Found %d results</b><br>"
-msgstr "<b>%d Ergebnisse gefunden</b><br>"
-
-#: epymc/plugins/movies/movies.py:711
-msgid "Movies scanner started"
-msgstr "Scanner für Filme gestartet"
-
-#: epymc/plugins/movies/movies.py:717
-msgid "Movies scanner done"
-msgstr "Scanner für Filme abgeschlossen"
-
-#: epymc/plugins/movies/movies.py:762
-msgid "Found movie"
-msgstr "Film gefunden"
-
-#: epymc/plugins/movies/movies.py:810
-msgid "Movies Collection"
-msgstr "Film Sammlung"
-
-#: epymc/plugins/movies/movies.py:818
-msgid "Enable background scanner"
-msgstr "Aktiviere (im Hintergrund) das Sammeln von Informationen."
-
-#: epymc/plugins/movies/movies.py:821
-msgid "Prefer movie titles in lists"
-msgstr "Bevorzugte Filmtiteln aus Liste"
-
-#: epymc/plugins/mame/mame.py:54
-msgid "My Games"
-msgstr "Meine Spiele"
-
-#: epymc/plugins/mame/mame.py:66
-msgid "All Games"
-msgstr "Alle Spiele"
-
-#: epymc/plugins/mame/mame.py:78
-msgid "Favorite Games"
-msgstr "Bevorzugte Spiele"
-
-#: epymc/plugins/mame/mame.py:90
-msgid "Categories"
-msgstr "Kategorien"
-
-#: epymc/plugins/mame/mame.py:127 epymc/plugins/mame/mame.py:144
-#: epymc/plugins/mame/mame.py:241
-msgid "M.A.M.E"
-msgstr "M.A.M.E."
-
-#: epymc/plugins/mame/mame.py:129
-msgid ""
-"This module add the ability to browse, download and play games using the M.A."
-"M.E. emulator."
-msgstr ""
-"Dieses Modul ermöglicht es mit dem M.A.M.E. Simulator das Durchsuchen, "
-"Downloaden und Spielen von Spielen"
-
-#: epymc/plugins/mame/mame.py:169
-msgid "Searching games, please wait..."
-msgstr "Suche Spiele, bitte warten..."
-
-#: epymc/plugins/mame/mame.py:192
-msgid "M.A.M.E not found"
-msgstr "M.A.M.E. nicht gefunden"
-
-#: epymc/plugins/mame/mame.py:193
-msgid "Is mame installed?"
-msgstr "Ist M.A.M.E. installiert?"
-
-#: epymc/plugins/mame/mame.py:215
-msgid "Can not get rom path from M.A.M.E."
-msgstr "Kein \"rom\" Pfad für M.A.M.E."
-
-#: epymc/plugins/mame/mame.py:216
-msgid "Is your mame well configured?"
-msgstr "Ist M.A.M.E.richtig Konfiguriert?"
-
-#: epymc/plugins/mame/mame.py:307
-msgid "No category file found"
-msgstr "Keine Kategorie Datei gefunden"
-
-#: epymc/plugins/mame/mame.py:308
-#, python-format
-msgid ""
-"The category file is not included in mame, you need to download a copy from "
-"the net. <br>The file must be placed in %s"
-msgstr ""
-"Die Kategorie Datei ist nicht teil von M.A.M.E. Eine Kopie der Datei wird "
-"aus dem Internet benötigt und muss in<br>%s gespeichert werden."
-
-#: epymc/plugins/mame/mame.py:378 epymc/plugins/mame/mame.py:413
-msgid "Manufacturer"
-msgstr "Hersteller"
-
-#: epymc/plugins/mame/mame.py:379 epymc/plugins/mame/mame.py:414
-msgid "Players"
-msgstr "Spieler"
-
-#: epymc/plugins/mame/mame.py:380 epymc/plugins/mame/mame.py:415
-msgid "Buttons"
-msgstr "Schaltflächen"
-
-#: epymc/plugins/mame/mame.py:416
-msgid "Save state"
-msgstr "Sicherungs Status"
-
-#: epymc/plugins/mame/mame.py:417
-msgid "Driver status"
-msgstr "Treiber Status"
-
-#: epymc/plugins/mame/mame.py:418
-msgid "Emulation"
-msgstr "Emulation"
-
-#: epymc/plugins/mame/mame.py:419
-msgid "Color"
-msgstr "Farbe"
-
-#: epymc/plugins/mame/mame.py:420
-msgid "Sound"
-msgstr "Audio"
-
-#: epymc/plugins/mame/mame.py:421
-msgid "Graphic"
-msgstr "Grafik"
-
-#: epymc/plugins/mame/mame.py:434
-msgid "History"
-msgstr "Historie"
-
-#: epymc/plugins/mame/mame.py:437 epymc/plugins/filemanager/filemanager.py:282
-msgid "Delete"
-msgstr "Löschen"
-
-#: epymc/plugins/mame/mame.py:457
-msgid "No History file found"
-msgstr "Keine Datei in der Historie gefunden"
-
-#: epymc/plugins/mame/mame.py:458
-#, python-format
-msgid ""
-"The History file is not included in mame, you should download a copy from "
-"arcade-history.com<br>The file must be unzipped and placed in %s"
-msgstr ""
-"Die Historie Datei ist kein Teil von M.A.M.E. Diese Datei kann von \"arcarde-"
-"history.com heruntergeladen werden.<br>Die Datei muss entpackt und in %s "
-"abgespeichert werden."
-
-#: epymc/plugins/mame/mame.py:498
-msgid "Game not found in history file"
-msgstr "Das Spiel konnte nicht in der Historie Datei gefunden werden."
-
-#: epymc/plugins/mame/mame.py:509
-msgid "Really delete this game?"
-msgstr "Dieses Spiel wirklich löschen?"
-
-#: epymc/plugins/mame/mame.py:521
-msgid "Game deleted"
-msgstr "Spiel gelöscht"
-
-#: epymc/plugins/mame/mame.py:524
-msgid "Can not delete game"
-msgstr "Kann das Spiel nicht löschen"
-
-#: epymc/plugins/mame/mame.py:534
-msgid "Error, can not find a writable rom directory"
-msgstr "Fehler, kein beschreibares rom im Ordner gerfunden."
-
-#: epymc/plugins/mame/mame.py:535
-msgid "You sould check your mame configuration"
-msgstr "Bitte überprüfen sie die Konfiguration von M.A.M.E."
-
-#: epymc/plugins/mame/mame.py:543
-msgid "Game download"
-msgstr "Download Spiel"
-
-#: epymc/plugins/mame/mame.py:550
-msgid "Trying at freeroms.com...<br>"
-msgstr "Versuche freeroms.com"
-
-#: epymc/plugins/mame/mame.py:580 epymc/plugins/mame/mame.py:593
-msgid "Can not find the game online."
-msgstr "Kann das Siel im WWW nicht finden"
-
-#: epymc/plugins/calibrator/calibrator.py:50
-#: epymc/plugins/calibrator/calibrator.py:56
-msgid "Screen calibrator"
-msgstr "Bildschirmkalibrierung"
-
-#: epymc/plugins/calibrator/calibrator.py:52
-msgid "Use this module to calibrate your screen parameters."
-msgstr "Modul um den Bildschirm zu Kalibrieren."
-
-#: epymc/plugins/input_keyb/keyb.py:79
-msgid "Input - Keyboard"
-msgstr "Tastatur Eingabe"
-
-#: epymc/plugins/input_keyb/keyb.py:81
-msgid ""
-"The keyboard module lets you control the application using your keyboard, or "
-"any other device that act as a keyboard."
-msgstr ""
-"Das Tastatur Modul erlaubt die Steuerung der Anwendung mittels Tastatur oder "
-"jedem Anderem Tastatur ähnlichem Gerät "
-
-#: epymc/plugins/input_keyb/keyb.py:103 epymc/plugins/input_keyb/keyb.py:164
-msgid "Keyboard"
-msgstr "Tastatur"
-
-#: epymc/plugins/input_keyb/keyb.py:134
-msgid "Are you sure you want to remove the mapping?"
-msgstr "Die Zuweisung wirklich aufheben?"
-
-#: epymc/plugins/input_keyb/keyb.py:136
-msgid "Remove key"
-msgstr "Taste entfernen"
-
-#: epymc/plugins/input_keyb/keyb.py:167 epymc/plugins/input_keyb/keyb.py:176
-#: epymc/plugins/input_lirc/lirc.py:134
-msgid "Add a new key"
-msgstr "Neue Taste zuweisen"
-
-#: epymc/plugins/input_keyb/keyb.py:177
-msgid "Press a key on your keyboard"
-msgstr "Drück eine Taste der Tastatur."
-
-#: epymc/plugins/input_keyb/keyb.py:191 epymc/plugins/input_lirc/lirc.py:192
-msgid "Choose an event to bind"
-msgstr "Wähle das zuzuweisende Ereignis."
-
-#: epymc/plugins/input_lirc/lirc.py:44
-msgid "Input - Remote Control"
-msgstr "Eingabe Fernbedienung"
-
-#: epymc/plugins/input_lirc/lirc.py:46
-msgid ""
-"This module lets you control the application using any LIRC compatible "
-"remote controller."
-msgstr ""
-"Dieses Modul ermöglicht die Steuerung der Anwendung mit jedem LIRC "
-"kompatiblen Gerät."
-
-#: epymc/plugins/input_lirc/lirc.py:63 epymc/plugins/input_lirc/lirc.py:145
-msgid "Remote"
-msgstr "Fernbedienung"
-
-#: epymc/plugins/input_lirc/lirc.py:126
-#, python-format
-msgid "Button: %s"
-msgstr "Schaltfläche: %s"
-
-#: epymc/plugins/input_lirc/lirc.py:148
-msgid "Lirc socket"
-msgstr "LIRC Anschluss"
-
-#: epymc/plugins/input_lirc/lirc.py:163
-#, python-format
-msgid "Cannot connect to lirc using socket:<br>%s"
-msgstr "Kann LIRC nicht über den Anschluss:<br>%s verbinden"
-
-#: epymc/plugins/input_lirc/lirc.py:169
-msgid "Configure remote"
-msgstr "Fernbedienung einrichten"
-
-#: epymc/plugins/input_lirc/lirc.py:170
-msgid "Press a key on your remote"
-msgstr "Eine Taste auf der Fernbedienung Drücken."
-
-#: epymc/plugins/input_webserver/webserver.py:55
-msgid ""
-"This module provide a way to control the application from your web browser."
-"<br>The server (by default) listen on port 8080, to connect just point to: "
-"<br>http://your_ip:8080<br>You can change listening port and the theme from "
-"the configurtion file."
-msgstr ""
-"Dieses Modul ermöglicht die Anwendung mit einem Web Browser zu steuern."
-"<br>Der Server lauscht (per Grundeinstellung) auf dem Port 8080. Um sich mit "
-"dem Server zu verbinden wählen sie die Adresse:<br>http://"
-"Ihre_IP:8080<br>Die Port-Nummer und das Thema ist in der Konfigurations "
-"Datei veränderbar."
-
-#: epymc/plugins/filemanager/filemanager.py:88
-msgid "Manage favorites"
-msgstr "Favoriten verwalten."
-
-#: epymc/plugins/filemanager/filemanager.py:96
-#: epymc/plugins/filemanager/filemanager.py:287
-msgid "Favorites"
-msgstr "Favoriten"
-
-#: epymc/plugins/filemanager/filemanager.py:210
-#: epymc/plugins/filemanager/filemanager.py:220
-#: epymc/plugins/filemanager/filemanager.py:237
-#: epymc/plugins/filemanager/filemanager.py:421
-#: epymc/plugins/filemanager/filemanager.py:443
-msgid "File Manager"
-msgstr "Dateiverwaltung"
-
-#: epymc/plugins/filemanager/filemanager.py:212
-msgid "A two panes filemanager."
-msgstr "Dateiverwaltung mit zwei gleichzeitigen Ansichten von Ordnern"
-
-#: epymc/plugins/filemanager/filemanager.py:262
-#: epymc/plugins/filemanager/filemanager.py:354
-msgid "New folder"
-msgstr "Neuer Ordner"
-
-#: epymc/plugins/filemanager/filemanager.py:267
-msgid "Copy"
-msgstr "Kopieren"
-
-#: epymc/plugins/filemanager/filemanager.py:272
-msgid "Move"
-msgstr "Verschieben"
-
-#: epymc/plugins/filemanager/filemanager.py:418
-msgid "Are you sure you want to delete the folder?"
-msgstr "Diesen Ordner wirklich löschen?"
-
-#: epymc/plugins/filemanager/filemanager.py:420
-msgid "Are you sure you want to delete the file?"
-msgstr "Diese Datei wirklich löschen."
-
-#: epymc/plugins/filemanager/filemanager.py:444
-msgid "Operation is starting..."
-msgstr "Operation gestartet "
-
-#: epymc/plugins/filemanager/filemanager.py:458
-msgid "Source is not readable"
-msgstr "Quelle ist nicht lesbar."
-
-#: epymc/plugins/filemanager/filemanager.py:463
-msgid "Destination folder is not writable"
-msgstr "Ziel Ordner ist nicht Lesbar"
-
-#: epymc/plugins/filemanager/filemanager.py:469
-msgid "Invalid destination folder"
-msgstr "Ungültiger Zielordner"
-
-#: epymc/plugins/filemanager/filemanager.py:475
-msgid "Destination already exists"
-msgstr "Ziel existiert bereits"
-
-#: epymc/plugins/filemanager/filemanager.py:482
-#, python-brace-format
-msgid "Copying file {0} of {1}:"
-msgstr "Kopiere Datei {0} von {1}:"
-
-#: epymc/plugins/filemanager/filemanager.py:484
-#, python-brace-format
-msgid "Deleting file {0} of {1}:"
-msgstr "Lösche Datei {0} von {1}:"
 
 #: epymc/plugins/onlinevideo/onlinevideo.py:129
 #: epymc/plugins/onlinevideo/onlinevideo.py:163
@@ -1504,103 +1032,25 @@ msgstr "youtube-dl automatisch akktualisieren"
 msgid "Check for youtube-dl update now"
 msgstr "Überrüfe jetzt youtube-dl auf aktualisierungen "
 
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:69
-#, python-brace-format
-msgid "Load more results (page {0} of {1})"
-msgstr "Lade mehr ergebnisse (Seite {0} von {1})"
-
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:77
-msgid "Search movies"
-msgstr "Suche FIlme"
-
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:78
-msgid "Popular movies"
-msgstr "Populäre Filme"
-
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:79
-msgid "Top rated movies"
-msgstr "Hoch Bewertete Filme"
-
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:80
-msgid "Upcoming movies"
-msgstr "Bald erscheinende Filme"
-
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:81
-msgid "Now playing movies"
-msgstr "Es läuft gerade der Film"
-
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:161
-msgid "Original title"
-msgstr "Original Titel"
-
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:163
-msgid "votes"
-msgstr "Stimmen"
-
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:180
-msgid "Language"
-msgstr "Sprache"
-
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:181
-msgid "Source"
-msgstr "Quelle"
-
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:182
-msgid "Quality"
-msgstr "Qualität"
-
-#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:186
-msgid "No trailers available"
-msgstr "Keine Trailer vorhanden"
-
-#: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:42
-#, python-brace-format
-msgid "Season {0}"
-msgstr "Staffel {0}"
-
-#: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:56
-#, python-brace-format
-msgid "Episode {0}"
-msgstr "Episode {0}"
-
-#: epymc/plugins/onlinevideo/youtube/youtube.py:47
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:163
-msgid "Search videos"
-msgstr "Suche Videos"
-
-#: epymc/plugins/onlinevideo/youtube/youtube.py:48
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:189
-msgid "Browse channels"
-msgstr "Kanäle dursuchen"
-
-#: epymc/plugins/onlinevideo/youtube/youtube.py:82
 #: epymc/plugins/onlinevideo/zapiks/zapiks.py:87
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:83
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:108
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:131
+#: epymc/plugins/onlinevideo/youtube/youtube.py:84
 msgid "user"
 msgstr "Benutzer"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:83
-#: epymc/plugins/onlinevideo/youtube/youtube.py:157
 #: epymc/plugins/onlinevideo/zapiks/zapiks.py:87
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:84
+#: epymc/plugins/onlinevideo/porncom/porncom.py:53
+#: epymc/plugins/onlinevideo/youtube/youtube.py:85
+#: epymc/plugins/onlinevideo/youtube/youtube.py:159
 msgid "uploaded"
 msgstr "Hochladen"
 
-#: epymc/plugins/onlinevideo/youtube/youtube.py:91
-msgid "More items..."
-msgstr "Mehr Objekte..."
-
-#: epymc/plugins/onlinevideo/youtube/youtube.py:109
-#: epymc/plugins/onlinevideo/vimeo/vimeo.py:292
-msgid "channel"
-msgid_plural "channels"
-msgstr[0] "Knanal"
-msgstr[1] "Kanäle"
-
 #: epymc/plugins/onlinevideo/zapiks/zapiks.py:88
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:85
+#: epymc/plugins/onlinevideo/porncom/porncom.py:54
 msgid "view"
 msgid_plural "views"
 msgstr[0] "Ansicht"
@@ -1608,6 +1058,7 @@ msgstr[1] "Ansichten"
 
 #: epymc/plugins/onlinevideo/zapiks/zapiks.py:89
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:86
+#: epymc/plugins/onlinevideo/porncom/porncom.py:56
 msgid "like"
 msgid_plural "likes"
 msgstr[0] "Gefällt"
@@ -1652,6 +1103,11 @@ msgstr "Beigetreten"
 msgid "location"
 msgstr "Ort"
 
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:163
+#: epymc/plugins/onlinevideo/youtube/youtube.py:47
+msgid "Search videos"
+msgstr "Suche Videos"
+
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:164
 msgid "Search channels"
 msgstr "Kanal Durchsuchen"
@@ -1676,6 +1132,11 @@ msgstr "Mehr Gruppen Beobachten"
 msgid "Browse videos"
 msgstr "Videos Durchsehen"
 
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:189
+#: epymc/plugins/onlinevideo/youtube/youtube.py:48
+msgid "Browse channels"
+msgstr "Kanäle dursuchen"
+
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:190
 msgid "Browse groups"
 msgstr "Gruppen Durchsehen"
@@ -1692,11 +1153,485 @@ msgstr "Benutzer Durchsehen"
 msgid "Load more results (%d in total)"
 msgstr "Lade mehr Ergebnisse (%d von der Gesamtmenge)"
 
+#: epymc/plugins/onlinevideo/vimeo/vimeo.py:292
+#: epymc/plugins/onlinevideo/youtube/youtube.py:111
+msgid "channel"
+msgid_plural "channels"
+msgstr[0] "Knanal"
+msgstr[1] "Kanäle"
+
 #: epymc/plugins/onlinevideo/vimeo/vimeo.py:293
 msgid "group"
 msgid_plural "groups"
 msgstr[0] "Gruppe"
 msgstr[1] "Gruppen"
+
+#: epymc/plugins/onlinevideo/porncom/porncom.py:55
+msgid "rated"
+msgstr ""
+
+#: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:42
+#, python-brace-format
+msgid "Season {0}"
+msgstr "Staffel {0}"
+
+#: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:56
+#, python-brace-format
+msgid "Episode {0}"
+msgstr "Episode {0}"
+
+#: epymc/plugins/onlinevideo/southparkstudios/southparkstudios.py:57
+#: epymc/plugins/tvshows/tvshows.py:249 epymc/plugins/tvshows/tvshows.py:463
+msgid "First aired"
+msgstr "Erstaustrahlung"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:69
+#, python-brace-format
+msgid "Load more results (page {0} of {1})"
+msgstr "Lade mehr ergebnisse (Seite {0} von {1})"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:77
+msgid "Search movies"
+msgstr "Suche FIlme"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:78
+msgid "Popular movies"
+msgstr "Populäre Filme"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:79
+msgid "Top rated movies"
+msgstr "Hoch Bewertete Filme"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:80
+msgid "Upcoming movies"
+msgstr "Bald erscheinende Filme"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:81
+msgid "Now playing movies"
+msgstr "Es läuft gerade der Film"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:159
+#: epymc/plugins/movies/movies.py:210 epymc/plugins/movies/movies.py:513
+msgid "Director"
+msgstr "Regiesseur"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:160
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:190
+#: epymc/plugins/movies/movies.py:211 epymc/plugins/movies/movies.py:494
+#: epymc/plugins/movies/movies.py:514 epymc/plugins/movies/movies.py:554
+#: epymc/plugins/tvshows/tvshows.py:443 epymc/plugins/tvshows/tvshows.py:534
+msgid "Cast"
+msgstr "Besetzung"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:161
+msgid "Original title"
+msgstr "Original Titel"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:162
+#: epymc/plugins/tvshows/tvshows.py:467
+msgid "Genres"
+msgstr "Genre"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:163
+#: epymc/plugins/movies/movies.py:209 epymc/plugins/movies/movies.py:517
+#: epymc/plugins/tvshows/tvshows.py:469
+msgid "Rating"
+msgstr "Bewertung"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:163
+msgid "votes"
+msgstr "Stimmen"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:164
+#: epymc/plugins/movies/movies.py:515
+msgid "Released"
+msgstr "Veröffentlicht"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:180
+msgid "Language"
+msgstr "Sprache"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:181
+msgid "Source"
+msgstr "Quelle"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:182
+msgid "Quality"
+msgstr "Qualität"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:186
+msgid "No trailers available"
+msgstr "Keine Trailer vorhanden"
+
+#: epymc/plugins/onlinevideo/themoviedb/themoviedb.py:201
+#: epymc/plugins/movies/movies.py:559 epymc/plugins/tvshows/tvshows.py:539
+msgid "as"
+msgstr "wie"
+
+#: epymc/plugins/onlinevideo/youtube/youtube.py:93
+msgid "More items..."
+msgstr "Mehr Objekte..."
+
+#: epymc/plugins/screensaver/screensaver.py:41
+#: epymc/plugins/screensaver/screensaver.py:70
+#: epymc/plugins/screensaver/screensaver.py:181
+msgid "Screen saver"
+msgstr "Bildschirmschoner"
+
+#: epymc/plugins/screensaver/screensaver.py:43
+msgid ""
+"This module manage the X screensaver. It will prevent the screensaver to "
+"activate while watching videos and can be configured to activate the "
+"screensaver and/or shutdown your monitor after a given amount of time."
+msgstr ""
+"Dieses Modul Verwaltet den \"X-Screensaver\". Es verhindert das der "
+"Bildschirmschoner sich während des Betrachten von Filmen Aktiviert und "
+"ermöglicht die Konfiguration zur Aktivierung und/oder Abschaltung des "
+"Bildschirmes nach einer angegebenen Zeit."
+
+#: epymc/plugins/screensaver/screensaver.py:58
+#: epymc/plugins/screensaver/screensaver.py:61
+msgid "never"
+msgstr "Niemals"
+
+#: epymc/plugins/screensaver/screensaver.py:184
+msgid "never;1 minute;5 minutes;10 minutes;30 minutes;60 minutes"
+msgstr "Niemals;1 Minute;5 Minuten;10 Minuten;30 Minuten;60 Minuten"
+
+#: epymc/plugins/screensaver/screensaver.py:186
+msgid "Turn on screensaver after"
+msgstr "Aktiviere den Bildschirmschoner nach"
+
+#: epymc/plugins/screensaver/screensaver.py:189
+msgid "Turn off monitor after"
+msgstr "Deaktiviere den Bildschirmschoner nach"
+
+#: epymc/plugins/screensaver/screensaver.py:192
+msgid "Manage screensaver only in fullscreen"
+msgstr "Verwalte den Bildschirmschoner nur in der Vollbild Ansicht"
+
+#: epymc/plugins/filemanager/filemanager.py:96
+msgid "Manage favorites"
+msgstr "Favoriten verwalten."
+
+#: epymc/plugins/filemanager/filemanager.py:104
+#: epymc/plugins/filemanager/filemanager.py:295
+msgid "Favorites"
+msgstr "Favoriten"
+
+#: epymc/plugins/filemanager/filemanager.py:112
+msgid "Parent folder"
+msgstr "Vorheriger Ordner"
+
+#: epymc/plugins/filemanager/filemanager.py:218
+#: epymc/plugins/filemanager/filemanager.py:228
+#: epymc/plugins/filemanager/filemanager.py:245
+#: epymc/plugins/filemanager/filemanager.py:429
+#: epymc/plugins/filemanager/filemanager.py:451
+msgid "File Manager"
+msgstr "Dateiverwaltung"
+
+#: epymc/plugins/filemanager/filemanager.py:220
+msgid "A two panes filemanager."
+msgstr "Dateiverwaltung mit zwei gleichzeitigen Ansichten von Ordnern"
+
+#: epymc/plugins/filemanager/filemanager.py:270
+#: epymc/plugins/filemanager/filemanager.py:362
+msgid "New folder"
+msgstr "Neuer Ordner"
+
+#: epymc/plugins/filemanager/filemanager.py:275
+msgid "Copy"
+msgstr "Kopieren"
+
+#: epymc/plugins/filemanager/filemanager.py:280
+msgid "Move"
+msgstr "Verschieben"
+
+#: epymc/plugins/filemanager/filemanager.py:290 epymc/plugins/mame/mame.py:439
+msgid "Delete"
+msgstr "Löschen"
+
+#: epymc/plugins/filemanager/filemanager.py:426
+msgid "Are you sure you want to delete the folder?"
+msgstr "Diesen Ordner wirklich löschen?"
+
+#: epymc/plugins/filemanager/filemanager.py:428
+msgid "Are you sure you want to delete the file?"
+msgstr "Diese Datei wirklich löschen."
+
+#: epymc/plugins/filemanager/filemanager.py:452
+msgid "Operation is starting..."
+msgstr "Operation gestartet "
+
+#: epymc/plugins/filemanager/filemanager.py:466
+msgid "Source is not readable"
+msgstr "Quelle ist nicht lesbar."
+
+#: epymc/plugins/filemanager/filemanager.py:471
+msgid "Destination folder is not writable"
+msgstr "Ziel Ordner ist nicht Lesbar"
+
+#: epymc/plugins/filemanager/filemanager.py:477
+msgid "Invalid destination folder"
+msgstr "Ungültiger Zielordner"
+
+#: epymc/plugins/filemanager/filemanager.py:483
+msgid "Destination already exists"
+msgstr "Ziel existiert bereits"
+
+#: epymc/plugins/filemanager/filemanager.py:490
+#, python-brace-format
+msgid "Copying file {0} of {1}:"
+msgstr "Kopiere Datei {0} von {1}:"
+
+#: epymc/plugins/filemanager/filemanager.py:492
+#, python-brace-format
+msgid "Deleting file {0} of {1}:"
+msgstr "Lösche Datei {0} von {1}:"
+
+#: epymc/plugins/movies/movies.py:102 epymc/plugins/movies/movies.py:113
+msgid "Actors"
+msgstr "Schauspieler"
+
+#: epymc/plugins/movies/movies.py:105 epymc/plugins/movies/movies.py:115
+msgid "Directors"
+msgstr "Regisseure"
+
+#: epymc/plugins/movies/movies.py:217 epymc/plugins/photos/photos.py:109
+msgid "File size"
+msgstr "Datei größe"
+
+#: epymc/plugins/movies/movies.py:219
+msgid "Title"
+msgstr "Titel"
+
+#: epymc/plugins/movies/movies.py:220 epymc/plugins/mame/mame.py:379
+#: epymc/plugins/mame/mame.py:414
+msgid "Year"
+msgstr "Jahr"
+
+#: epymc/plugins/movies/movies.py:240
+msgid "{} movie"
+msgid_plural "{} movies"
+msgstr[0] ""
+msgstr[1] ""
+
+#: epymc/plugins/movies/movies.py:248 epymc/plugins/movies/movies.py:294
+#: epymc/plugins/movies/movies.py:302 epymc/plugins/movies/movies.py:362
+msgid "Movies"
+msgstr "Filme"
+
+#: epymc/plugins/movies/movies.py:250
+msgid ""
+"The movies module is used to browse your films collection, it is fully "
+"integrated with themoviedb.org online database."
+msgstr ""
+"Mit dem Modul Movie ist es möglich seine Film Sammlung zu durchsuchen. Es "
+"arbeitet mit der Online Datenbank von \"themoviedb.org\" zusammen."
+
+#: epymc/plugins/movies/movies.py:298
+msgid "Movie Collection"
+msgstr "Film Sammlung"
+
+#: epymc/plugins/movies/movies.py:495 epymc/plugins/tvshows/tvshows.py:441
+msgid "Posters"
+msgstr "Poster"
+
+#: epymc/plugins/movies/movies.py:496 epymc/plugins/tvshows/tvshows.py:442
+msgid "Backdrops"
+msgstr "Hintergrundbild"
+
+#: epymc/plugins/movies/movies.py:497
+msgid "Tags"
+msgstr ""
+
+#: epymc/plugins/movies/movies.py:498
+msgid "Search Info"
+msgstr "Information Suchen"
+
+#: epymc/plugins/movies/movies.py:516
+msgid "Country"
+msgstr "Land"
+
+#: epymc/plugins/movies/movies.py:518 epymc/plugins/tvshows/tvshows.py:471
+msgid "Overview"
+msgstr "Übersicht"
+
+#: epymc/plugins/movies/movies.py:536
+#, python-format
+msgid ""
+"Media:<br>%s<br><br>No info stored for this media<br>Try the Search info "
+"button..."
+msgstr ""
+"Medium:<br>%s<br><br>Keine Information für dieses Medium "
+"gespeichert<br>Versuchen sie die \"Information Suchen\" Schaltfläche."
+
+#: epymc/plugins/movies/movies.py:577 epymc/plugins/tvshows/tvshows.py:487
+#, python-format
+msgid "%d posters available"
+msgstr "%d Poster verfügbar"
+
+#: epymc/plugins/movies/movies.py:596 epymc/plugins/movies/movies.py:641
+#: epymc/plugins/tvshows/tvshows.py:513
+msgid "Downloading image"
+msgstr "Download Bild"
+
+#: epymc/plugins/movies/movies.py:621 epymc/plugins/tvshows/tvshows.py:502
+#, python-format
+msgid "%d backdrops available"
+msgstr "%d Hintergrundbild(er) verfügbar"
+
+#: epymc/plugins/movies/movies.py:654
+msgid "Searching for"
+msgstr "Suchen nach"
+
+#: epymc/plugins/movies/movies.py:663
+msgid "Change name"
+msgstr "Namen Ändern"
+
+#: epymc/plugins/movies/movies.py:672
+msgid "nothing found, please try with a better name"
+msgstr "Suche ergab kein Ergebnis, bitte versuchen sie einen Anderen Namen"
+
+#: epymc/plugins/movies/movies.py:676 epymc/plugins/movies/movies.py:702
+msgid "Downloading movie info..."
+msgstr "Informationen zu dem Film werden heruntergeladen..."
+
+#: epymc/plugins/movies/movies.py:678
+#, python-format
+msgid "<b>Found %d results</b><br>"
+msgstr "<b>%d Ergebnisse gefunden</b><br>"
+
+#: epymc/plugins/movies/movies.py:679 epymc/plugins/tvshows/tvshows.py:557
+#, python-format
+msgid "Found %d results, which one?"
+msgstr "%d Ergebnisse gefunden, welches? "
+
+#: epymc/plugins/movies/movies.py:780
+msgid "Movies scanner started"
+msgstr "Scanner für Filme gestartet"
+
+#: epymc/plugins/movies/movies.py:832
+msgid "Found movie"
+msgstr "Film gefunden"
+
+#: epymc/plugins/movies/movies.py:865
+msgid "Movies scanner done"
+msgstr "Scanner für Filme abgeschlossen"
+
+#: epymc/plugins/movies/movies.py:866
+msgid "New movies"
+msgstr ""
+
+#: epymc/plugins/movies/movies.py:867
+msgid "Dead files"
+msgstr ""
+
+#: epymc/plugins/movies/movies.py:881
+msgid ""
+"Found {} movies in the database that point to not existent files.<br>Should "
+"I remove those movies?"
+msgstr ""
+
+#: epymc/plugins/movies/movies.py:884
+msgid "Clean dead files"
+msgstr ""
+
+#: epymc/plugins/movies/movies.py:931
+msgid "Movies Collection"
+msgstr "Film Sammlung"
+
+#: epymc/plugins/movies/movies.py:936 epymc/plugins/tvshows/tvshows.py:656
+msgid "Preferred language for contents"
+msgstr "Bevorzugte Sprache für den Inhalt"
+
+#: epymc/plugins/movies/movies.py:939
+msgid "Prefer movie titles in lists"
+msgstr "Bevorzugte Filmtiteln aus Liste"
+
+#: epymc/plugins/movies/movies.py:942
+msgid "Enable background scanner"
+msgstr "Aktiviere (im Hintergrund) das Sammeln von Informationen."
+
+#: epymc/plugins/movies/movies.py:946
+msgid "Background scan also clean dead files"
+msgstr ""
+
+#: epymc/plugins/input_lirc/lirc.py:44
+msgid "Input - Remote Control"
+msgstr "Eingabe Fernbedienung"
+
+#: epymc/plugins/input_lirc/lirc.py:46
+msgid ""
+"This module lets you control the application using any LIRC compatible "
+"remote controller."
+msgstr ""
+"Dieses Modul ermöglicht die Steuerung der Anwendung mit jedem LIRC "
+"kompatiblen Gerät."
+
+#: epymc/plugins/input_lirc/lirc.py:63 epymc/plugins/input_lirc/lirc.py:145
+msgid "Remote"
+msgstr "Fernbedienung"
+
+#: epymc/plugins/input_lirc/lirc.py:126
+#, python-format
+msgid "Button: %s"
+msgstr "Schaltfläche: %s"
+
+#: epymc/plugins/input_lirc/lirc.py:134 epymc/plugins/input_keyb/keyb.py:168
+#: epymc/plugins/input_keyb/keyb.py:177
+msgid "Add a new key"
+msgstr "Neue Taste zuweisen"
+
+#: epymc/plugins/input_lirc/lirc.py:148
+msgid "Lirc socket"
+msgstr "LIRC Anschluss"
+
+#: epymc/plugins/input_lirc/lirc.py:163
+#, python-format
+msgid "Cannot connect to lirc using socket:<br>%s"
+msgstr "Kann LIRC nicht über den Anschluss:<br>%s verbinden"
+
+#: epymc/plugins/input_lirc/lirc.py:169
+msgid "Configure remote"
+msgstr "Fernbedienung einrichten"
+
+#: epymc/plugins/input_lirc/lirc.py:170
+msgid "Press a key on your remote"
+msgstr "Eine Taste auf der Fernbedienung Drücken."
+
+#: epymc/plugins/input_lirc/lirc.py:192 epymc/plugins/input_keyb/keyb.py:192
+msgid "Choose an event to bind"
+msgstr "Wähle das zuzuweisende Ereignis."
+
+#: epymc/plugins/input_keyb/keyb.py:80
+msgid "Input - Keyboard"
+msgstr "Tastatur Eingabe"
+
+#: epymc/plugins/input_keyb/keyb.py:82
+msgid ""
+"The keyboard module lets you control the application using your keyboard, or "
+"any other device that act as a keyboard."
+msgstr ""
+"Das Tastatur Modul erlaubt die Steuerung der Anwendung mittels Tastatur oder "
+"jedem Anderem Tastatur ähnlichem Gerät "
+
+#: epymc/plugins/input_keyb/keyb.py:104 epymc/plugins/input_keyb/keyb.py:165
+msgid "Keyboard"
+msgstr "Tastatur"
+
+#: epymc/plugins/input_keyb/keyb.py:135
+msgid "Are you sure you want to remove the mapping?"
+msgstr "Die Zuweisung wirklich aufheben?"
+
+#: epymc/plugins/input_keyb/keyb.py:137
+msgid "Remove key"
+msgstr "Taste entfernen"
+
+#: epymc/plugins/input_keyb/keyb.py:178
+msgid "Press a key on your keyboard"
+msgstr "Drück eine Taste der Tastatur."
 
 #: epymc/plugins/watchdog/watchdog.py:36
 msgid "Watchdog"
@@ -1750,99 +1685,302 @@ msgstr "Verzögerung bei Bildwechsel"
 msgid "seconds"
 msgstr "sekunden"
 
-#: epymc/plugins/input_joy/joy.py:45
-msgid "Input - Joystick"
-msgstr "Eingabe - Joystick"
+#: epymc/plugins/calibrator/calibrator.py:50
+#: epymc/plugins/calibrator/calibrator.py:56
+msgid "Screen calibrator"
+msgstr "Bildschirmkalibrierung"
 
-#: epymc/plugins/input_joy/joy.py:47
+#: epymc/plugins/calibrator/calibrator.py:52
+msgid "Use this module to calibrate your screen parameters."
+msgstr "Modul um den Bildschirm zu Kalibrieren."
+
+#: epymc/plugins/input_webserver/webserver.py:55
 msgid ""
-"The joystick module lets you control the application using any standard "
-"digital joystick or joypad."
+"This module provide a way to control the application from your web browser."
+"<br>The server (by default) listen on port 8080, to connect just point to: "
+"<br>http://your_ip:8080<br>You can change listening port and the theme from "
+"the configurtion file."
 msgstr ""
-"Das \"Joystick Modul\" ermöglicht die Anwendung mit einem Standard Joystick/"
-"Controller zu bedienen.‭"
+"Dieses Modul ermöglicht die Anwendung mit einem Web Browser zu steuern."
+"<br>Der Server lauscht (per Grundeinstellung) auf dem Port 8080. Um sich mit "
+"dem Server zu verbinden wählen sie die Adresse:<br>http://"
+"Ihre_IP:8080<br>Die Port-Nummer und das Thema ist in der Konfigurations "
+"Datei veränderbar."
 
-#: epymc/plugins/input_joy/joy.py:80 epymc/plugins/input_joy/joy.py:156
-msgid "Joystick"
-msgstr "Joystick"
+#: epymc/plugins/mame/mame.py:53
+msgid "My Games"
+msgstr "Meine Spiele"
 
-#: epymc/plugins/input_joy/joy.py:159
-msgid "Device"
-msgstr "Gerät"
+#: epymc/plugins/mame/mame.py:65
+msgid "All Games"
+msgstr "Alle Spiele"
 
-#: epymc/plugins/input_joy/joy.py:161
-msgid "Configure buttons"
-msgstr "Schaltflächen Konfigurieren"
+#: epymc/plugins/mame/mame.py:77
+msgid "Favorite Games"
+msgstr "Bevorzugte Spiele"
 
-#: epymc/plugins/input_joy/joy.py:169
-msgid "No joystick found"
-msgstr "Keinen Joystick gefunden"
+#: epymc/plugins/mame/mame.py:89
+msgid "Categories"
+msgstr "Kategorien"
 
-#: epymc/plugins/input_joy/joy.py:170
-msgid "Try to adjust your joystick device"
-msgstr "Versuch den Joystick zu justieren"
+#: epymc/plugins/mame/mame.py:126 epymc/plugins/mame/mame.py:143
+#: epymc/plugins/mame/mame.py:242
+msgid "M.A.M.E"
+msgstr "M.A.M.E."
 
-#: epymc/plugins/input_joy/joy.py:183
-msgid "Configure joystick"
-msgstr "Joystick Konfigurieren"
-
-#: epymc/plugins/input_joy/joy.py:184
-msgid "Move the stick Up"
-msgstr "Bewege den Joystick nach oben"
-
-#: epymc/plugins/input_joy/joy.py:191
-msgid "Move the stick Right"
-msgstr "Bewege den Joystick nach rechts"
-
-#: epymc/plugins/input_joy/joy.py:197
-msgid "Press OK"
-msgstr "Drücke OK"
-
-#: epymc/plugins/input_joy/joy.py:202
-msgid "Press BACK"
-msgstr "Drücke zurück"
-
-#: epymc/plugins/input_joy/joy.py:207
-msgid "Config done."
-msgstr "Konfiguration abgeschlossen"
-
-#: epymc/plugins/screensaver/screensaver.py:41
-#: epymc/plugins/screensaver/screensaver.py:70
-#: epymc/plugins/screensaver/screensaver.py:180
-msgid "Screen saver"
-msgstr "Bildschirmschoner"
-
-#: epymc/plugins/screensaver/screensaver.py:43
+#: epymc/plugins/mame/mame.py:128
 msgid ""
-"This module manage the X screensaver. It will prevent the screensaver to "
-"activate while watching videos and can be configured to activate the "
-"screensaver and/or shutdown your monitor after a given amount of time."
+"This module add the ability to browse, download and play games using the M.A."
+"M.E. emulator."
 msgstr ""
-"Dieses Modul Verwaltet den \"X-Screensaver\". Es verhindert das der "
-"Bildschirmschoner sich während des Betrachten von Filmen Aktiviert und "
-"ermöglicht die Konfiguration zur Aktivierung und/oder Abschaltung des "
-"Bildschirmes nach einer angegebenen Zeit."
+"Dieses Modul ermöglicht es mit dem M.A.M.E. Simulator das Durchsuchen, "
+"Downloaden und Spielen von Spielen"
 
-#: epymc/plugins/screensaver/screensaver.py:58
-#: epymc/plugins/screensaver/screensaver.py:61
-msgid "never"
-msgstr "Niemals"
+#: epymc/plugins/mame/mame.py:170
+msgid "Searching games, please wait..."
+msgstr "Suche Spiele, bitte warten..."
 
-#: epymc/plugins/screensaver/screensaver.py:183
-msgid "never;1 minute;5 minutes;10 minutes;30 minutes;60 minutes"
-msgstr "Niemals;1 Minute;5 Minuten;10 Minuten;30 Minuten;60 Minuten"
+#: epymc/plugins/mame/mame.py:193
+msgid "M.A.M.E not found"
+msgstr "M.A.M.E. nicht gefunden"
 
-#: epymc/plugins/screensaver/screensaver.py:185
-msgid "Turn on screensaver after"
-msgstr "Aktiviere den Bildschirmschoner nach"
+#: epymc/plugins/mame/mame.py:194
+msgid "Is mame installed?"
+msgstr "Ist M.A.M.E. installiert?"
 
-#: epymc/plugins/screensaver/screensaver.py:188
-msgid "Turn off monitor after"
-msgstr "Deaktiviere den Bildschirmschoner nach"
+#: epymc/plugins/mame/mame.py:216
+msgid "Can not get rom path from M.A.M.E."
+msgstr "Kein \"rom\" Pfad für M.A.M.E."
 
-#: epymc/plugins/screensaver/screensaver.py:191
-msgid "Manage screensaver only in fullscreen"
-msgstr "Verwalte den Bildschirmschoner nur in der Vollbild Ansicht"
+#: epymc/plugins/mame/mame.py:217
+msgid "Is your mame well configured?"
+msgstr "Ist M.A.M.E.richtig Konfiguriert?"
+
+#: epymc/plugins/mame/mame.py:308
+msgid "No category file found"
+msgstr "Keine Kategorie Datei gefunden"
+
+#: epymc/plugins/mame/mame.py:309
+#, python-format
+msgid ""
+"The category file is not included in mame, you need to download a copy from "
+"the net. <br>The file must be placed in %s"
+msgstr ""
+"Die Kategorie Datei ist nicht teil von M.A.M.E. Eine Kopie der Datei wird "
+"aus dem Internet benötigt und muss in<br>%s gespeichert werden."
+
+#: epymc/plugins/mame/mame.py:380 epymc/plugins/mame/mame.py:415
+msgid "Manufacturer"
+msgstr "Hersteller"
+
+#: epymc/plugins/mame/mame.py:381 epymc/plugins/mame/mame.py:416
+msgid "Players"
+msgstr "Spieler"
+
+#: epymc/plugins/mame/mame.py:382 epymc/plugins/mame/mame.py:417
+msgid "Buttons"
+msgstr "Schaltflächen"
+
+#: epymc/plugins/mame/mame.py:418
+msgid "Save state"
+msgstr "Sicherungs Status"
+
+#: epymc/plugins/mame/mame.py:419
+msgid "Driver status"
+msgstr "Treiber Status"
+
+#: epymc/plugins/mame/mame.py:420
+msgid "Emulation"
+msgstr "Emulation"
+
+#: epymc/plugins/mame/mame.py:421
+msgid "Color"
+msgstr "Farbe"
+
+#: epymc/plugins/mame/mame.py:422
+msgid "Sound"
+msgstr "Audio"
+
+#: epymc/plugins/mame/mame.py:423
+msgid "Graphic"
+msgstr "Grafik"
+
+#: epymc/plugins/mame/mame.py:436
+msgid "History"
+msgstr "Historie"
+
+#: epymc/plugins/mame/mame.py:459
+msgid "No History file found"
+msgstr "Keine Datei in der Historie gefunden"
+
+#: epymc/plugins/mame/mame.py:460
+#, python-format
+msgid ""
+"The History file is not included in mame, you should download a copy from "
+"arcade-history.com<br>The file must be unzipped and placed in %s"
+msgstr ""
+"Die Historie Datei ist kein Teil von M.A.M.E. Diese Datei kann von \"arcarde-"
+"history.com heruntergeladen werden.<br>Die Datei muss entpackt und in %s "
+"abgespeichert werden."
+
+#: epymc/plugins/mame/mame.py:500
+msgid "Game not found in history file"
+msgstr "Das Spiel konnte nicht in der Historie Datei gefunden werden."
+
+#: epymc/plugins/mame/mame.py:511
+msgid "Really delete this game?"
+msgstr "Dieses Spiel wirklich löschen?"
+
+#: epymc/plugins/mame/mame.py:523
+msgid "Game deleted"
+msgstr "Spiel gelöscht"
+
+#: epymc/plugins/mame/mame.py:526
+msgid "Can not delete game"
+msgstr "Kann das Spiel nicht löschen"
+
+#: epymc/plugins/mame/mame.py:536
+msgid "Error, can not find a writable rom directory"
+msgstr "Fehler, kein beschreibares rom im Ordner gerfunden."
+
+#: epymc/plugins/mame/mame.py:537
+msgid "You sould check your mame configuration"
+msgstr "Bitte überprüfen sie die Konfiguration von M.A.M.E."
+
+#: epymc/plugins/mame/mame.py:545
+msgid "Game download"
+msgstr "Download Spiel"
+
+#: epymc/plugins/mame/mame.py:552
+msgid "Trying at freeroms.com...<br>"
+msgstr "Versuche freeroms.com"
+
+#: epymc/plugins/mame/mame.py:582 epymc/plugins/mame/mame.py:595
+msgid "Can not find the game online."
+msgstr "Kann das Siel im WWW nicht finden"
+
+#: epymc/plugins/tvshows/tvshows.py:96
+msgid "Serie info"
+msgstr "Serien Information"
+
+#: epymc/plugins/tvshows/tvshows.py:248
+msgid "Episode"
+msgstr "Episode"
+
+#: epymc/plugins/tvshows/tvshows.py:255 epymc/plugins/tvshows/tvshows.py:292
+#: epymc/plugins/tvshows/tvshows.py:299 epymc/plugins/tvshows/tvshows.py:361
+#: epymc/plugins/tvshows/tvshows.py:652
+msgid "TV Shows"
+msgstr "TV Sendungen"
+
+#: epymc/plugins/tvshows/tvshows.py:257
+msgid ""
+"The Tv Shows module is used to browse your series collection, it is fully "
+"integrated with themoviedb.org online database."
+msgstr ""
+"Mit dem Modul für TV Sendungen ist es möglich seine TV Sammlung zu "
+"durchsuchen. Es arbeitet mit der Online Datenbank von \"themoviedb.org\" "
+"zusammen. "
+
+#: epymc/plugins/tvshows/tvshows.py:295
+msgid "Tv Shows Collection"
+msgstr "Sammlung von TV Sendungen"
+
+#: epymc/plugins/tvshows/tvshows.py:444
+msgid "Refresh info"
+msgstr "Information Aktualisieren"
+
+#: epymc/plugins/tvshows/tvshows.py:461
+msgid "Created by"
+msgstr "Produzent"
+
+#: epymc/plugins/tvshows/tvshows.py:462
+msgid "Network"
+msgstr "Netzwerk"
+
+#: epymc/plugins/tvshows/tvshows.py:464
+msgid "Last aired"
+msgstr "Zuletzt Gesendet"
+
+#: epymc/plugins/tvshows/tvshows.py:465
+msgid "Seasons"
+msgstr "Staffel"
+
+#: epymc/plugins/tvshows/tvshows.py:466
+msgid "Episodes"
+msgstr "Episoden"
+
+#: epymc/plugins/tvshows/tvshows.py:468
+msgid "Runtime"
+msgstr "Laufzeit"
+
+#: epymc/plugins/tvshows/tvshows.py:470
+msgid "Status"
+msgstr "Status"
+
+#: epymc/plugins/tvshows/tvshows.py:477
+msgid ""
+"No info stored for this serie.<br>Please try the <i>refresh info</i> button."
+msgstr ""
+"Keine Information für diese Sendung.<br>Bitte versuchen sie "
+"die<i>Information Aktualisieren</i>Schaltfläche."
+
+#: epymc/plugins/tvshows/tvshows.py:573
+#, python-format
+msgid ""
+"The search for \"%s\" did not make any results.<br>If your show is listed on "
+"themoviedb.org please rename your folder to match the title on the site."
+"<br>If otherwise it is not in the online database please contribute and add "
+"it yourself."
+msgstr ""
+"Die Suche nach \"%s\" ist Ergebnislos.<br>Falls die Sendung auf \"themoviedb."
+"org\" aufgelistet ist benennen sie den Ordner bitte genauso wie auf "
+"\"themoviedb.org\".<br>Ist die Sendung nicht aufgelistet dann ergänzen sie "
+"bitte die Informationen auf \"themoviedb.org\"."
+
+#: epymc/plugins/tvshows/tvshows.py:578
+msgid "Nothing found"
+msgstr "Nichts gefunden"
+
+#: epymc/plugins/tvshows/tvshows.py:587
+msgid "Fetching updated info"
+msgstr "Hole aktualisierte Informationen"
+
+#: epymc/plugins/tvshows/tvshows.py:694
+msgid "TvShows scanner started"
+msgstr "Scanner für TV Sendung gestartet"
+
+#: epymc/plugins/tvshows/tvshows.py:725
+msgid "TvShows scanner done"
+msgstr "Scanner für TV Sendung abgeschlossen"
+
+#: epymc/plugins/tvshows/tvshows.py:766
+#, python-format
+msgid "%d season"
+msgid_plural "%d seasons"
+msgstr[0] "%d Staffel"
+msgstr[1] "%d Staffeln"
+
+#: epymc/plugins/tvshows/tvshows.py:768
+#, python-format
+msgid "%d episode"
+msgid_plural "%d episodes"
+msgstr[0] "%d Episode"
+msgstr[1] "%d Episoden"
+
+#: epymc/plugins/tvshows/tvshows.py:770
+msgid "Found serie:"
+msgstr "Serie gefunden:"
+
+#: epymc/plugins/input_mpris2/mpris2.py:48
+msgid "Input - MPRIS2"
+msgstr "MPRIS2 Eingabe"
+
+#: epymc/plugins/input_mpris2/mpris2.py:50
+msgid ""
+"Add the ability to control the application from any MPRIS2 compatible client."
+msgstr ""
+"Aktiviere die Anwendungssteuerung über eine MPRIS2 Kompatible Anwendung."
 
 #: epymc/extapi/onlinevideo.py:189
 #, python-format
@@ -1885,6 +2023,9 @@ msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "vor %d Minute"
 msgstr[1] "vor %d Minuten"
+
+#~ msgid "Unmute"
+#~ msgstr "Lautschalten"
 
 #~ msgid "Rendering engine"
 #~ msgstr "Darstellungs Engine"

@@ -122,9 +122,13 @@ def start_epymc(standalone=False):
    mainmenu.show()
 
    # if mediafile given on command line play it (must be a video file)
-   if args.mediafile and os.path.exists(args.mediafile):
-      mediaplayer.play_url(os.path.abspath(args.mediafile))
-      mediaplayer.title_set(os.path.basename(args.mediafile))
+   if args.mediafile:
+      if args.mediafile.startswith(('http://', 'https')):
+         mediaplayer.play_url(args.mediafile)
+         mediaplayer.title_set('')
+      elif os.path.exists(args.mediafile):
+         mediaplayer.play_url(os.path.abspath(args.mediafile))
+         mediaplayer.title_set(os.path.basename(args.mediafile))
    # or autostart the give activity (ex: --activity movies)
    elif args.activity:
       mainmenu.item_activate(args.activity)

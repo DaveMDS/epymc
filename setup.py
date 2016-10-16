@@ -2,17 +2,17 @@
 #
 # usage:
 #
-# python setup.py install [--prefix=]
-# python setup.py uninstall [--prefix=]
-# python setup.py build_themes
-# python setup.py build_i18n
-# python setup.py update_po
-# python setup.py check_po
-# python setup.py clean --all
-# python setup.py sdist|bdist
-# python setup.py --help
-# python setup.py --help-commands
-# python setup.py --help uninstall
+# python3 setup.py install [--prefix=]
+# python3 setup.py uninstall [--prefix=]
+# python3 setup.py build_themes
+# python3 setup.py build_i18n
+# python3 setup.py update_po
+# python3 setup.py check_po
+# python3 setup.py clean --all
+# python3 setup.py sdist|bdist
+# python3 setup.py --help
+# python3 setup.py --help-commands
+# python3 setup.py --help uninstall
 #
 # distutils reference:
 #  http://docs.python.org/distutils/

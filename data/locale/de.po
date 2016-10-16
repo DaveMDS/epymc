@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: epymc 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-16 10:00+0200\n"
+"POT-Creation-Date: 2016-10-16 10:19+0200\n"
 "PO-Revision-Date: 2016-09-03 18:52+0200\n"
 "Last-Translator: Wolfgang Morawetz <wolfgang.morawetz@gmail.com>\n"
 "Language-Team: Deutsch <>\n"
@@ -754,11 +754,19 @@ msgstr ""
 msgid "DVD Disk"
 msgstr ""
 
-#: epymc/storage.py:321
+#: epymc/storage.py:322
+msgid "{} Hard disk"
+msgstr ""
+
+#: epymc/storage.py:324
+msgid "{} Thumb drive"
+msgstr ""
+
+#: epymc/storage.py:326
 msgid "{} Volume"
 msgstr ""
 
-#: epymc/storage.py:327
+#: epymc/storage.py:332
 msgid "Volume"
 msgstr ""
 

@@ -318,7 +318,12 @@ class EmcDeviceManagerUdev():
             if fs_label:
                label = fs_label
             elif size > 0:
-               label = _('{} Volume').format(partition_hum_size(size))
+               if emc_type == EmcDevType.HARDDISK:
+                  label = _('{} Hard disk').format(partition_hum_size(size))
+               elif emc_type == EmcDevType.THUMBDRIVE:
+                  label = _('{} Thumb drive').format(partition_hum_size(size))
+               else:
+                  label = _('{} Volume').format(partition_hum_size(size))
             elif vendor and model:
                label = '{} {}'.format(vendor, model)
             elif model or vendor:

@@ -44,7 +44,7 @@ gettext.install('epymc', names='ngettext', localedir=localedir)
 # set locale to user preferred (aka the one set in env) locale
 locale.setlocale(locale.LC_ALL, '')
 
-
+from epymc import __version__ as emc_v
 import epymc.modules as modules
 import epymc.gui as gui
 import epymc.mainmenu as mainmenu
@@ -56,17 +56,21 @@ import epymc.browser as browser
 import epymc.storage as storage
 
 
+
 def start_epymc(standalone=False):
 
    # parse command line arguments
-   parser = argparse.ArgumentParser(description='Emotion Media Center')
+   parser = argparse.ArgumentParser(description='Emotion Media Center v%s' % emc_v)
    parser.add_argument('-a', '--activity',
                        help='start directy in the given activity')
    parser.add_argument('-f', '--fullscreen', action='store_true',
                        help='start in fullscreen')
+   parser.add_argument('-y', '--youtube-dl', action='store_true',
+                       help='use youtube-dl to scrape and play mediaurl')
    parser.add_argument('--standalone', action='store_true',
                        help='start in X without a WM (fullscreen)')
-   parser.add_argument('mediafile', nargs='?')
+   parser.add_argument('mediaurl', nargs='?',
+                       help='local file or remote url to play')
    args = parser.parse_args()
 
    # setup efl logging (you also need to set EINA_LOG_LEVEL=X)
@@ -121,14 +125,40 @@ def start_epymc(standalone=False):
    # show the mainmenu
    mainmenu.show()
 
-   # if mediafile given on command line play it (must be a video file)
-   if args.mediafile:
-      if args.mediafile.startswith(('http://', 'https')):
-         mediaplayer.play_url(args.mediafile)
+   # use youtube-dl to scrape and play the url given on command line
+   if args.youtube_dl and args.mediaurl:
+      from epymc.youtubedl import YoutubeDL
+
+      ytdl = YoutubeDL()
+
+      def ytdl_url_cb(real_url):
+         if not real_url:
+            gui.EmcDialog(style='error',
+                          text=_('youtube-dl is unable to scrape the given url'))
+         else:
+            print('Real video url:',real_url)
+            mediaplayer.play_url(real_url)
+            mediaplayer.title_set('')
+
+      def ytdl_update_cb(success, dialog):
+         if dialog: dialog.delete()
+         print('Scraping url:', args.mediaurl)
+         ytdl.get_real_video_url(args.mediaurl, ytdl_url_cb)
+
+      print('Checking for ytdl updates')
+      if ini.get_bool('videochannels', 'autoupdate_ytdl') == True:
+         ytdl.check_update(verbose=True, done_cb=ytdl_update_cb)
+      else:
+         ytdl_update_cb(True, None)
+      
+   # if mediaurl given on command line play it (must be a video file)
+   elif args.mediaurl:
+      if args.mediaurl.startswith(('http://', 'https://')):
+         mediaplayer.play_url(args.mediaurl)
          mediaplayer.title_set('')
-      elif os.path.exists(args.mediafile):
-         mediaplayer.play_url(os.path.abspath(args.mediafile))
-         mediaplayer.title_set(os.path.basename(args.mediafile))
+      elif os.path.exists(args.mediaurl):
+         mediaplayer.play_url(os.path.abspath(args.mediaurl))
+         mediaplayer.title_set(os.path.basename(args.mediaurl))
    # or autostart the give activity (ex: --activity movies)
    elif args.activity:
       mainmenu.item_activate(args.activity)

@@ -14,6 +14,7 @@ New features:
  * Movies: you can now choose favorite actors/directors for faster browsing
  * Movies: while browsing by actor/director you can now see the person info panel
  * Auto play media url (http/https) passed on command line
+ * Auto-scrape youtube-dl links passed on command line (epymc -y any_supported_url)
 
 
 Improvements:

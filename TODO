@@ -19,6 +19,7 @@ BUGS
  * no way to toggle fs with the mouse
  * with py3 you cannot run 2 epymc instances
  * dialogs on boot lost focus (thus unusable with keys)
+ * play/pause do not work while buffering
 
 CORE
 =====

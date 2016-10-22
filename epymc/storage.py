@@ -27,7 +27,7 @@ import epymc.events as events
 
 
 def DBG(*args):
-   print('STORAGE:', *args)
+   # print('STORAGE:', *args)
    pass
 
 def LOG(*args):

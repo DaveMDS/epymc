@@ -20,6 +20,7 @@ Improvements:
 
  * Better and more flexible EmcMenu implementation
  * Movie scanner now also clean not existent files (configurable)
+ * Better youtube-dl integration
 
 
 New Translations:

@@ -31,6 +31,7 @@ from __future__ import absolute_import, print_function
 import os
 import sys
 import ast
+import locale
 from lxml import etree
 from operator import attrgetter
 
@@ -78,6 +79,8 @@ class KodiAddon(object):
             self._main_exe = extension.get('library')
             self._provides = extension.findtext('provides')
 
+      self._metadata = None # will be fetched lazily
+
    def __str__(self):
       return '<KodiAddon {0.id} v={0.version} main={0._main_exe}>'.format(self)
 
@@ -103,6 +106,46 @@ class KodiAddon(object):
    def version(self):
       """ ex: "0.4.3" """
       return self._version
+
+   @property
+   def metadata(self):
+      """ a dict containing extended addon info (parsed lazily) """
+      if self._metadata is None:
+         self._metadata = {}
+         self._metadata['screenshots'] = []
+         syslang, encoding = locale.getdefaultlocale()
+         meta = self._xml_tree.find(".//extension[@point='xbmc.addon.metadata']")
+         for elem in meta.iterchildren():
+            # translatable elements
+            if elem.tag in ('summary', 'description', 'disclaimer'):
+               print("TAG", elem.get('lang'), elem.tag)
+               lang = elem.get('lang', 'en_GB')
+               if lang == syslang or lang == syslang[:2] or lang[:2] == 'en':
+                  self._metadata[elem.tag] = elem.text
+            # non traslatable elementes
+            elif elem.tag in ('language', 'platform', 'license', 'forum',
+                              'website', 'email', 'source', 'news', 'broken'):
+               self._metadata[elem.tag] = elem.text
+            # <assets>
+            elif elem.tag == 'assets':
+               for ass_elem in elem.iterchildren():
+                  if ass_elem.tag in ('icon', 'fanart'):
+                     full_path = os.path.join(self._path, ass_elem.text)
+                     self._metadata[ass_elem.tag] = full_path
+                  elif ass_elem.tag == 'screenshot':
+                     full_path = os.path.join(self._path, ass_elem.text)
+                     self._metadata['screenshots'].append(full_path)
+            else:
+               DBG('METATADA: Unsupported element:', elem.tag)
+         # old style assets
+         if not self._metadata.get('icon'):
+            icon = os.path.join(self._path, 'icon.png')
+            self._metadata['icon'] = icon if os.path.exists(icon) else None
+         if not self._metadata.get('fanart'):
+            fart = os.path.join(self._path, 'fanart.jpg')
+            self._metadata['fanart'] = fart if os.path.exists(fart) else None
+         
+      return self._metadata
 
    @property
    def path(self):
@@ -236,11 +279,29 @@ class KodiAddon(object):
 
 class AddonItemClass(EmcItemClass):
    def item_selected(self, url, addon):
-      print('item_selected', url)
       addon.request_page(None)
 
    def label_get(self, url, addon):
       return addon.name.replace('&', '&amp;')
+
+   def info_get(self, url, addon):
+      txt = []
+      title = addon.metadata.get('summary')
+      desc = addon.metadata.get('description')
+      disclaimer = addon.metadata.get('disclaimer')
+      if title: txt.append('<title>{}</title>'.format(title))
+      if desc: txt.append(desc)
+      if disclaimer: txt.append('<br><small>{}</small>'.format(disclaimer))
+      return '<br>'.join(txt)
+
+   def icon_get(self, url, addon):
+      return addon.metadata.get('icon')
+
+   def poster_get(self, url, addon):
+      return addon.metadata.get('icon')
+
+   def fanart_get(self, url, addon):
+      return addon.metadata.get('fanart')
 
 
 class StandardItemClass(EmcItemClass):

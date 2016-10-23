@@ -262,6 +262,7 @@ setup (
       'epymc.plugins.photos',
       'epymc.plugins.watchdog',
       'epymc.plugins.opticals',
+      'epymc.plugins.kodi_addons',
    ],
 
    package_data = {

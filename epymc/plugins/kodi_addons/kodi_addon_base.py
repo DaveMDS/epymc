@@ -72,11 +72,23 @@ def addon_factory(xml_info, repository=None):
       return KodiRepository(root)
 
 
+def load_available_addons():
+   L = []
+   folder = os.path.join(utils.user_conf_dir, 'kodi', 'addons')
+   for fname in os.listdir(folder):
+      xml_path = os.path.join(folder, fname, 'addon.xml')
+      a = addon_factory(xml_path)
+      print(a)
+      # TODO check err
+      L.append(a)
+   return L
+
+
 class KodiAddonBase(object):
    """ Base class for any kodi addon: pluginsource, repository or python module """
 
    def __init__(self, xml_root, repository=None):
-      print("\n##### ADDON FROM: %s  #####" % xml_root)
+      print("\n##### ADDON FROM: {}  ##### ({})".format(xml_root, repository))
       self._repo = repository
       self._root = xml_root
 

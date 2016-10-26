@@ -53,18 +53,6 @@ def DBG(*args):
 
 
 
-def load_available_addons():
-   L = []
-   folder = os.path.join(utils.user_conf_dir, 'kodi', 'addons')
-   for fname in os.listdir(folder):
-      path = os.path.join(folder, fname, 'addon.xml')
-      a = addon_factory(path)
-      print(a)
-      # TODO check err
-      L.append(a)
-   return L
-
-
 class StandardItemClass(EmcItemClass):
    def item_selected(self, url, item_data):
       addon, listitem = item_data

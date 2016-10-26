@@ -48,16 +48,6 @@ def DBG(*args):
    pass
 
 
-def load_available_repos():
-   L = []
-   # r = KodiRepository('http://mirrors.kodi.tv/addons/krypton')
-   # r = KodiRepository('/home/dave/.config/epymc/kodi/repos/repository.kodi_official/addon.xml')
-   r = addon_factory('/home/dave/.config/epymc/kodi/repos/repository.kodi_official/addon.xml')
-   L.append(r)
-   return L
-
-
-
 
 class KodiRepository(KodiAddonBase):
 
@@ -100,6 +90,7 @@ class KodiRepository(KodiAddonBase):
       return addon.version if addon else None
 
    def get_addons(self, done_cb, **kargs):
+      """ TODO doc """
       if self._addons:
          done_cb(self, self._addons, **kargs) # hmm, I don't like this instant resolution...
 
@@ -124,27 +115,11 @@ class KodiRepository(KodiAddonBase):
    def _parse_xml(self, local):
       root = etree.parse(local).getroot()
       for addon_el in root.iterchildren():
-         addon = addon_factory(addon_el)
-         self._addons[addon.id] = addon
+         addon = addon_factory(addon_el, self)
+         if addon:
+            self._addons[addon.id] = addon
 
       self._done_cb(self, self._addons, **self._done_cb_kargs)
-      
-
-class KodiRepository_OLD(object):
-
-   supported_extensions = ('xbmc.python.pluginsource')
-
-   def __init__(self, base_url):
-      self._addons = []
-      self._base_url = base_url
-      self._xml_url = base_url + '/addons.xml'
-      self._xml_cache = os.path.join(utils.user_cache_dir, 'kodirepos', 'asasd', 'addons.xml') # TODO fix asasd !! :)
-      # http://mirrors.kodi.tv/addons/krypton/addons.xml
-
-   def __str__(self):
-      return '<KodiRepo from {}>'.format(self._base_url)
-
-
 
 
 

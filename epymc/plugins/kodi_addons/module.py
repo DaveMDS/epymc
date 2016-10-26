@@ -49,8 +49,9 @@ from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.gui import EmcDialog, EmcImage
 
-from .kodi_repository import KodiRepository, load_available_repos
-from .kodi_pluginsource import KodiPluginSource, load_available_addons
+from .kodi_addon_base import load_available_addons
+from .kodi_repository import KodiRepository
+from .kodi_pluginsource import KodiPluginSource
 
 
 
@@ -224,6 +225,7 @@ class AddonItemClass(EmcItemClass):
       return '<br>'.join(txt)
 
    def icon_get(self, url, addon):
+      print("ICON", addon.icon, addon)
       return addon.icon
 
    def poster_get(self, url, addon):
@@ -242,8 +244,6 @@ class KodiAddonsModule(EmcModule):
    _browser = None
    _styles = ('List',)
    _addons = []
-   _repos = []
-
 
    def __init__(self):
       global _mod
@@ -256,11 +256,7 @@ class KodiAddonsModule(EmcModule):
       # ini.add_section('videochannels')
       # ini.get('videochannels', 'autoupdate_ytdl', 'True')
 
-      self._repos = load_available_repos()
       self._addons = load_available_addons()
-      # r = KodiRepository('http://mirrors.kodi.tv/addons/krypton')
-      # print(r)
-      # self._repos.append(r)
 
       # add an item in the mainmenu
       mainmenu.item_add(self.name, 15, self.label, self.icon, self.mainmenu_cb)
@@ -294,24 +290,25 @@ class KodiAddonsModule(EmcModule):
    def populate_root_page(self, browser, url):
    
       for addon in sorted(self._addons, key=attrgetter('name')):
-         browser.item_add(AddonItemClass(), None, addon)
+         if type(addon) == KodiPluginSource:
+            browser.item_add(AddonItemClass(), None, addon)
 
       browser.item_add(GetMoreItemClass(), 'kodi_addons://manage', self)
 
 
    def populate_repositories_page(self, browser, url):
-      for repo in self._repos:
-         browser.item_add(RepoItemClass(), url+'/repo_name', repo) # TODO fix repo_name
+      for addon in self._addons:
+         if type(addon) == KodiRepository:
+            browser.item_add(RepoItemClass(), url+'/repo_name', addon) # TODO fix repo_name
 
    def populate_repository_page(self, browser, url, repo):
       repo.get_addons(self._repo_get_addons_done)
 
    def _repo_get_addons_done(self, repo, addons):
-      print("HEYAAA", repo)
-      for addon in sorted(addons.values()): # TODO fix order
-         self._browser.item_add(AddonItemClass(), 'url', addon) # TODO fix url
-      # for addon in sorted(addons, key=attrgetter('name')):
-         # self._browser.item_add(AddonItemClass(), 'url', addon)
+      for addon in sorted(addons.values()):
+         if type(addon) == KodiPluginSource:
+            self._browser.item_add(AddonItemClass(), 'url', addon) # TODO fix url
+
 
 
    ###### Config Panel stuff ##################################################
@@ -352,10 +349,11 @@ class KodiAddonsModule(EmcModule):
 
    def populate_config_repos(self, browser, url):
       print("REPOS")
-      for repo in self._repos:
-         config_gui.standard_item_action_add(repo.name, repo.icon, info=None,
-                                             cb=lambda r: RepoInfoPanel(r),
-                                             r=repo)
+      for addon in self._addons:
+         if type(addon) == KodiRepository:
+            config_gui.standard_item_action_add(addon.name, addon.icon, info=None,
+                                                cb=lambda a: RepoInfoPanel(a),
+                                                a=addon)
       config_gui.standard_item_action_add(_('Add a new repo'), icon='icon/plus',
                                           info=None, cb=self.new_repo_wizard)
 
@@ -365,9 +363,10 @@ class KodiAddonsModule(EmcModule):
    def populate_config_addons(self, browser, url):
       print("ADDONS")
       for addon in self._addons:
-         config_gui.standard_item_action_add(addon.name, addon.icon, info=None,
-                                             cb=lambda a: AddonInfoPanel(a),
-                                             a=addon)
+         if type(addon) == KodiPluginSource:
+            config_gui.standard_item_action_add(addon.name, addon.icon, info=None,
+                                                cb=lambda a: AddonInfoPanel(a),
+                                                a=addon)
       config_gui.standard_item_action_add(_('Add a new addon'), icon='icon/plus',
                                           info=None,
                                           cb=self.new_addon_wizard)

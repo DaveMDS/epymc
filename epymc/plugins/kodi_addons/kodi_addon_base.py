@@ -32,21 +32,10 @@ import os
 import sys
 import locale
 from lxml import etree
-from operator import attrgetter
 
-from efl import ecore
 from efl.elementary import utf8_to_markup
 
-import epymc.mainmenu as mainmenu
-import epymc.mediaplayer as mediaplayer
 import epymc.utils as utils
-import epymc.gui as gui
-# import epymc.ini as ini
-# import epymc.config_gui as cgui
-
-# from epymc.modules import EmcModule
-# from epymc.browser import EmcBrowser, EmcItemClass
-# from epymc.gui import EmcDialog, EmcImage
 
 
 
@@ -69,13 +58,13 @@ def addon_factory(xml_info, repository=None):
    # create the correct subclass (based on the xlm extension point)   
    ext = root.find(".//extension[@point='xbmc.python.pluginsource']")
    if ext is not None:
-      from .kodi_pluginsource import KodiAddon
-      return KodiAddon(root, repository)
+      from .kodi_pluginsource import KodiPluginSource
+      return KodiPluginSource(root, repository)
 
    ext = root.find(".//extension[@point='xbmc.python.module']")
    if ext is not None:
-      from .kodi_module import KodiModule
-      return KodiModule(root, repository)
+      from .kodi_pythonmodule import KodiPythonModule
+      return KodiPythonModule(root, repository)
 
    ext = root.find(".//extension[@point='xbmc.addon.repository']")
    if ext is not None:

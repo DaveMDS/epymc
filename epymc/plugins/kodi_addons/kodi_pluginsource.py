@@ -44,9 +44,7 @@ import epymc.utils as utils
 import epymc.gui as gui
 from epymc.browser import EmcBrowser, EmcItemClass
 
-
-from .kodi_addon import KodiAddonBase, addon_factory
-# from .kodi_module import KodiModule
+from .kodi_addon_base import KodiAddonBase, addon_factory
 
 
 def DBG(*args):
@@ -98,7 +96,7 @@ class StandardItemClass(EmcItemClass):
          return None
 
 
-class KodiAddon(KodiAddonBase):
+class KodiPluginSource(KodiAddonBase):
 
    # _main_exe = None # ?????????????????????????
    extension_point = ".//extension[@point='xbmc.python.pluginsource']"

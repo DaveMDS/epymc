@@ -39,9 +39,7 @@ from efl.elementary import utf8_to_markup
 import epymc.utils as utils
 import epymc.gui as gui
 
-from .kodi_addon import KodiAddonBase, addon_factory
-from .kodi_pluginsource import KodiAddon
-from .kodi_module import KodiModule
+from .kodi_addon_base import KodiAddonBase, addon_factory
 
 
 

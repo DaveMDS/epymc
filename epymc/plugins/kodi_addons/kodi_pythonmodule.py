@@ -21,10 +21,10 @@
 from __future__ import absolute_import, print_function
 
 
-from .kodi_addon import KodiAddonBase
+from .kodi_addon_base import KodiAddonBase
 
 
-class KodiModule(KodiAddonBase):
+class KodiPythonModule(KodiAddonBase):
 
    extension_point = ".//extension[@point='xbmc.python.module']"
 

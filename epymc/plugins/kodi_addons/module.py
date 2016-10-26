@@ -50,7 +50,7 @@ from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.gui import EmcDialog, EmcImage
 
 from .kodi_repository import KodiRepository, load_available_repos
-from .kodi_pluginsource import KodiAddon, load_available_addons
+from .kodi_pluginsource import KodiPluginSource, load_available_addons
 
 
 
@@ -297,14 +297,6 @@ class KodiAddonsModule(EmcModule):
          browser.item_add(AddonItemClass(), None, addon)
 
       browser.item_add(GetMoreItemClass(), 'kodi_addons://manage', self)
-   
-      # self.current_addon = KodiAddon()
-      
-      # if not self._sources:
-         # self.build_sources_list()
-      # for ch in self._sources:
-         # self._browser.item_add(ChannelItemClass(), ch['name'], ch)
-      # self._browser.item_add(DownloadItemClass(), None)
 
 
    def populate_repositories_page(self, browser, url):

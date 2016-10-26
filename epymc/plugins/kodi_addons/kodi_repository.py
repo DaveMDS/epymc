@@ -25,7 +25,7 @@ from lxml import etree
 
 import epymc.utils as utils
 
-from .kodi_addon_base import KodiAddonBase, addon_factory
+from .kodi_addon_base import KodiAddonBase, addon_factory, base_repos_path
 
 
 def DBG(*args):
@@ -44,9 +44,9 @@ class KodiRepository(KodiAddonBase):
       ext = self._root.find(self.extension_point)
       for elem in ext.iterchildren():
          if elem.tag == 'info':
-            self._addons_info_url = elem.text
+            self._addons_xml_url = elem.text
          elif elem.tag == 'checksum':
-            self._addons_list_md5_url = elem.text
+            self._addons_xml_md5_url = elem.text
          elif elem.tag == 'datadir':
             self._base_url = elem.text
 
@@ -57,15 +57,17 @@ class KodiRepository(KodiAddonBase):
 
    @property
    def addons_xml(self):
-      """ ex: http://mirrors.kodi.tv/addons/krypton/addons.xml (info) """
-      local = os.path.join(self._folder, 'addons.xml')
-      remote = self._addons_info_url
+      """ Local path and remote url for the addons.xml file (tuple) """
+      local = os.path.join(base_repos_path, self.id , 'addons.xml')
+      remote = self._addons_xml_url
       return (local, remote)
 
    @property
-   def addons_list_md5_url(self): # TODO FIXME like addons_xml
-      """ ex: http://mirrors.kodi.tv/addons/krypton/addons.xml.md5 (checksum) """
-      return self._addons_list_md5_url
+   def addons_xml_md5(self):
+      """ Local path and remote url for the addons.xml.md5 file (tuple) """
+      local = os.path.join(base_repos_path, self.id , 'addons.xml.md5')
+      remote = self._addons_xml_md5_url
+      return (local, remote)
 
    def addon_available(self, id, min_version=None):
       """ return the addon available version or None if addon not available """

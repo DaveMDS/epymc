@@ -246,7 +246,7 @@ class KodiAddonsModule(EmcModule):
       # ini.add_section('videochannels')
       # ini.get('videochannels', 'autoupdate_ytdl', 'True')
 
-      # create needed folders in .config/epymc/kodi
+      # create needed folders in ~/.config/epymc/kodi
       if not os.path.exists(base_pkgs_path):
          os.makedirs(base_pkgs_path)
       if not os.path.exists(base_temp_path):

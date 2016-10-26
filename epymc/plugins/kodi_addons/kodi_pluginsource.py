@@ -117,6 +117,18 @@ class KodiPluginSource(KodiAddonBase):
       except KeyError:
          return listitem.get('thumbnailImage')
 
+   def play_listitem(self, listitem, media_url=None):
+         url = media_url or listitem.get('path')
+         try:
+            title = listitem['infoLabels']['Title']
+         except KeyError:
+            title = ''
+         poster = self.best_poster_for_listitem(listitem)
+
+         mediaplayer.play_url(url)
+         mediaplayer.title_set(title)
+         mediaplayer.poster_set(poster)
+
    ### Addon runner
    def request_page(self, url=None, browser=None):
 
@@ -133,8 +145,10 @@ class KodiPluginSource(KodiAddonBase):
       arg3 = url[idx:] if idx != -1 else ''
       arg2 = '123456'
 
-      # PYTHONPATH augmented with our xbmclib + all plugin requirements
-      PYTHONPATH = [xbmclib_path]
+      # augmented with: our xbmclib, addon lib folders, all plugin requirements
+      PYTHONPATH = [xbmclib_path,
+                    os.path.join(self.installed_path, 'lib'),
+                    os.path.join(self.installed_path, 'resources', 'lib')]
       for require_id, min_version in self.requires:
          mod = get_installed_addon(require_id)
          if mod is None:
@@ -202,16 +216,7 @@ class KodiPluginSource(KodiAddonBase):
       self._page_items.append(listitem)
 
    def _Player_play(self, item=None, listitem=None, windowed=False, startpos=-1):
-      if item:
-         try:
-            title = listitem['infoLabels']['Title']
-         except KeyError:
-            title = ''
-         
-         poster = self.best_poster_for_listitem(listitem)
-         mediaplayer.play_url(item)
-         mediaplayer.title_set(title)
-         mediaplayer.poster_set(poster)
+      self.play_listitem(listitem, item)
 
    def _endOfDirectory(self, succeeded=True, updateListing=False, cacheToDisc=True):
       if succeeded == True:
@@ -220,3 +225,9 @@ class KodiPluginSource(KodiAddonBase):
          self._page_items = None
       else:
          pass # TODO ALERT
+
+   def _setResolvedUrl(self, succeeded, listitem):
+      if succeeded:
+         self.play_listitem(listitem)
+      else:
+         EmcDialog(style='error', text='Addon error') # TODO better dialog

@@ -48,21 +48,21 @@ SORT_METHOD_VIDEO_YEAR = 18
 def addSortMethod(handle, sortMethod, label2Mask=None):
    pass
 
-"""
-def addDirectoryItem(handle, url, listitem, isFolder=False, totalItems=1):
-   print('addDirectoryItem ', url, listitem)
-   # print((next_state, label, url, info, icon, poster, action))
-   return True
-"""
+
 def addDirectoryItem(handle, url, listitem, isFolder=False, totalItems=1):
    kargs = {
       'handle': handle,
       'url': url,
-      'listitem': listitem.__dict__,
+      'listitem': listitem,
       'isFolder': isFolder,
       'totalItems': totalItems,
    }
    print('addDirectoryItem {}'.format(kargs))
+   return True
+
+def addDirectoryItems(handle, items, totalItems=1):
+   for url, listitem, isFolder in items:
+      addDirectoryItem(handle, url, listitem, isFolder, totalItems)
    return True
 
 def setContent(handle, content):
@@ -76,4 +76,13 @@ def endOfDirectory(handle, succeeded=True, updateListing=False, cacheToDisc=True
       'cacheToDisc': cacheToDisc,
    }
    print('endOfDirectory {}'.format(kargs))
+
+
+def setResolvedUrl(handle, succeeded, listitem):
+   kargs = {
+      'succeeded': succeeded,
+      'listitem': listitem,
+   }
+   print('setResolvedUrl {}'.format(kargs))
+   
    

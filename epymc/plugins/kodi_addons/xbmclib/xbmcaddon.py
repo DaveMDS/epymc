@@ -17,6 +17,10 @@ class Addon(object):
       self._po = None # already parsed POFile instance
       self._et = None # already parsed xml lang file (ElementTree)
 
+
+   def getAddonInfo(self, id):
+      return 'TODO'
+      
    def getSetting(self, id):
       return '0' # TODO
 

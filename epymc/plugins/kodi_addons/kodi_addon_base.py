@@ -121,7 +121,7 @@ class KodiAddonBase(object):
 
       self._id = xml_root.get('id')
       self._name = xml_root.get('name')
-      self._version = xml_root.get('version')
+      self._version = xml_root.get('version', '0.0.1')
       self._author = xml_root.get('provider-name')
       self._metadata = None # will be lazily parsed
       self._requires = None # will be lazily parsed

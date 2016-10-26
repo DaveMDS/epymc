@@ -44,3 +44,7 @@ class ListItem(object):
 
    def setArt(self, values):
       self.art.update(values)
+
+   def setThumbnailImage(self, thumb):
+      """ deprecated """
+      self.art['thumb'] = thumb

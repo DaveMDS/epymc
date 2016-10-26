@@ -35,6 +35,12 @@ def DBG(*args):
    pass
 
 
+base_kodi_path = os.path.join(utils.user_conf_dir, 'kodi')
+base_addon_path = os.path.join(base_kodi_path, 'addons')
+base_pkg_path = os.path.join(base_kodi_path, 'packages')
+base_temp_path = os.path.join(base_kodi_path, 'temp')
+
+
 def addon_factory(xml_info, repository=None):
    """ TODO doc """
 
@@ -65,9 +71,8 @@ def addon_factory(xml_info, repository=None):
 
 def load_available_addons():
    L = []
-   folder = os.path.join(utils.user_conf_dir, 'kodi', 'addons')
-   for fname in os.listdir(folder):
-      xml_path = os.path.join(folder, fname, 'addon.xml')
+   for fname in os.listdir(base_addon_path):
+      xml_path = os.path.join(base_addon_path, fname, 'addon.xml')
       a = addon_factory(xml_path)
       # TODO check err
       L.append(a)
@@ -90,7 +95,7 @@ class KodiAddonBase(object):
       self._requires = None # will be lazily parsed
 
       if repository is None:
-         self._folder = os.path.join(utils.user_conf_dir, 'kodi', 'addons', self._id)
+         self._folder = os.path.join(base_addon_path, self._id)
       else:
          self._folder = None
 

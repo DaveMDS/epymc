@@ -40,7 +40,7 @@ from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.gui import EmcDialog, EmcImage
 
-from .kodi_addon_base import load_available_addons
+from .kodi_addon_base import load_available_addons, base_pkg_path, base_addon_path
 from .kodi_repository import KodiRepository
 from .kodi_pluginsource import KodiPluginSource
 
@@ -108,7 +108,7 @@ class AddonInfoPanel(EmcDialog):
          return
 
       fname = os.path.basename(pkg)
-      dest = os.path.join(utils.user_conf_dir, 'kodi', 'packages', fname)
+      dest = os.path.join(base_pkg_path, fname)
       utils.download_url_async(pkg, dest, complete_cb=self.download_complete_cb)
       
    def download_complete_cb(self, dest, status):
@@ -126,9 +126,8 @@ class AddonInfoPanel(EmcDialog):
          return
       print("INSTALL", pkg)
 
-      dest_path = os.path.join(utils.user_conf_dir, 'kodi', 'addons')
       with zipfile.ZipFile(pkg, 'r') as z: # TODO make this async?
-         z.extractall(dest_path)
+         z.extractall(base_addon_path)
 
       self.install_next_package()
 

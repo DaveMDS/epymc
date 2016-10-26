@@ -251,15 +251,16 @@ class StdConfigItemIntMeaning(StdConfigItemBase):
 class StdConfigItemAction(StdConfigItemBase): 
    """ This class is used by the function standard_item_action_add(...) """
 
-   def __init__(self, label, icon=None, info=None, selected_cb=None):
+   def __init__(self, label, icon=None, info=None, selected_cb=None, kargs={}):
       self._lbl = label
       self._ico = icon
       self._inf = info
       self._cb = selected_cb
+      self._cb_kargs = kargs
 
    def item_selected(self, url, user_data):
       if callable(self._cb):
-         self._cb()
+         self._cb(**self._cb_kargs)
 
 class StdConfigItemNumber(StdConfigItemBase):
    def __init__(self, fmt, udm, min, max, step, *args):
@@ -383,9 +384,9 @@ def standard_item_int_meaning_add(section, option, label, values, icon=None, inf
    _browser.item_add(StdConfigItemIntMeaning(values, section, option, label, icon, info, cb),
                      'config://%s/%s' % (section, option), None)
 
-def standard_item_action_add(label, icon=None, info=None, cb=None):
+def standard_item_action_add(label, icon=None, info=None, cb=None, **kargs):
    """ TODO doc """
-   _browser.item_add(StdConfigItemAction(label, icon, info, cb),
+   _browser.item_add(StdConfigItemAction(label, icon, info, cb, kargs),
                      'config://useraction', None)
 
 def standard_item_number_add(section, option, label, icon=None, info=None, cb=None, fmt='%.0f', udm='', min=0, max=100, step=1):

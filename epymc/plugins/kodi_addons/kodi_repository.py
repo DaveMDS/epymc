@@ -39,7 +39,7 @@ from efl.elementary import utf8_to_markup
 import epymc.utils as utils
 import epymc.gui as gui
 
-from .kodi_addon import KodiAddonBase
+from .kodi_addon import KodiAddonBase, addon_factory
 from .kodi_pluginsource import KodiAddon
 from .kodi_module import KodiModule
 
@@ -53,10 +53,10 @@ def DBG(*args):
 def load_available_repos():
    L = []
    # r = KodiRepository('http://mirrors.kodi.tv/addons/krypton')
-   r = KodiRepository('/home/dave/.config/epymc/kodi/repos/repository.kodi_official/addon.xml')
+   # r = KodiRepository('/home/dave/.config/epymc/kodi/repos/repository.kodi_official/addon.xml')
+   r = addon_factory('/home/dave/.config/epymc/kodi/repos/repository.kodi_official/addon.xml')
    L.append(r)
    return L
-
 
 
 
@@ -126,15 +126,8 @@ class KodiRepository(KodiAddonBase):
    def _parse_xml(self, local):
       root = etree.parse(local).getroot()
       for addon_el in root.iterchildren():
-         ext = addon_el.find(".//extension[@point='xbmc.python.pluginsource']")
-         if ext is not None:
-            addon = KodiAddon(addon_el, repository=self)
-            self._addons[addon.id] = addon
-         else:
-            ext = addon_el.find(".//extension[@point='xbmc.python.module']")
-            if ext is not None:
-               addon = KodiModule(addon_el, repository=self)
-               self._addons[addon.id] = addon
+         addon = addon_factory(addon_el)
+         self._addons[addon.id] = addon
 
       self._done_cb(self, self._addons, **self._done_cb_kargs)
       

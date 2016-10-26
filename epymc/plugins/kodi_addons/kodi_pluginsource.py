@@ -45,8 +45,8 @@ import epymc.gui as gui
 from epymc.browser import EmcBrowser, EmcItemClass
 
 
-from .kodi_addon import KodiAddonBase
-from .kodi_module import KodiModule
+from .kodi_addon import KodiAddonBase, addon_factory
+# from .kodi_module import KodiModule
 
 
 def DBG(*args):
@@ -60,10 +60,7 @@ def load_available_addons():
    folder = os.path.join(utils.user_conf_dir, 'kodi', 'addons')
    for fname in os.listdir(folder):
       path = os.path.join(folder, fname, 'addon.xml')
-      try:
-         a = KodiAddon(path)
-      except: # TODO somethign better....
-         a = KodiModule(path) 
+      a = addon_factory(path)
       print(a)
       # TODO check err
       L.append(a)

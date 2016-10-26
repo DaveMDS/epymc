@@ -195,10 +195,10 @@ class RepoItemClass(EmcItemClass):
       return repo.icon
 
    def poster_get(self, url, repo):
-      return addon.icon
+      return repo.icon
 
    def fanart_get(self, url, repo):
-      return addon.fanart
+      return repo.fanart
 
 class AddonItemClass(EmcItemClass):
    def item_selected(self, url, addon):

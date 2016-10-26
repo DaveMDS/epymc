@@ -55,29 +55,53 @@ def DBG(*args):
    pass
 
 
+def addon_factory(xml_info, repository=None):
+   """ TODO doc """
+
+   if isinstance(xml_info, etree._Element):
+      root = xml_info
+   elif os.path.exists(xml_info):
+      document = etree.parse(xml_info)
+      root = document.getroot()
+   else:
+      raise TypeError('xml_info must be str (xml file) or ET Element, given: %s' % xml_info)
+
+   # create the correct subclass (based on the xlm extension point)   
+   ext = root.find(".//extension[@point='xbmc.python.pluginsource']")
+   if ext is not None:
+      from .kodi_pluginsource import KodiAddon
+      return KodiAddon(root, repository)
+
+   ext = root.find(".//extension[@point='xbmc.python.module']")
+   if ext is not None:
+      from .kodi_module import KodiModule
+      return KodiModule(root, repository)
+
+   ext = root.find(".//extension[@point='xbmc.addon.repository']")
+   if ext is not None:
+      from .kodi_repository import KodiRepository
+      return KodiRepository(root)
+
+
 class KodiAddonBase(object):
    """ Base class for any kodi addon: pluginsource, repository or python module """
 
-   def __init__(self, xml_info, repository=None):
-      print("\n##### ADDON FROM: %s  #####" % xml_info)
+   def __init__(self, xml_root, repository=None):
+      print("\n##### ADDON FROM: %s  #####" % xml_root)
       self._repo = repository
+      self._root = xml_root
 
-      if isinstance(xml_info, etree._Element):
-         self._root = xml_info
-         self._folder = None
-      elif os.path.exists(xml_info):
-         document = etree.parse(xml_info)
-         self._root = document.getroot()
-         self._folder = os.path.dirname(xml_info)
-      else:
-         raise TypeError('xml_info must be a str (xml file path) or an ET Element')
-
-      self._id = self._root.get('id')
-      self._name = self._root.get('name')
-      self._version = self._root.get('version')
-      self._author = self._root.get('provider-name')
+      self._id = xml_root.get('id')
+      self._name = xml_root.get('name')
+      self._version = xml_root.get('version')
+      self._author = xml_root.get('provider-name')
       self._metadata = None # will be lazily parsed
       self._requires = None # will be lazily parsed
+
+      if repository is None:
+         self._folder = os.path.join(utils.user_conf_dir, 'kodi', 'addons', self._id)
+      else:
+         self._folder = None
 
    def __str__(self):
       return '<{0.__class__.__name__} id={0.id} version={0.version}>'.format(self)

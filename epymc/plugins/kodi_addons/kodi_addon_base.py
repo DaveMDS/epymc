@@ -40,6 +40,8 @@ base_pkgs_path = os.path.join(base_kodi_path, 'packages')
 base_temp_path = os.path.join(base_kodi_path, 'temp')
 base_repos_path = os.path.join(base_kodi_path, 'repos')
 
+installed_addons = {} # key: addon_in  val: KodiAddon instance
+
 
 def addon_factory(xml_info, repository=None):
    """ TODO doc """
@@ -77,25 +79,35 @@ def addon_factory(xml_info, repository=None):
    return None
 
 
-def load_available_addons():
-   L = []
+def load_installed_addons():
 
    # system addons
    sys_addons_path = os.path.join(os.path.dirname(__file__), 'addons')
    for fname in os.listdir(sys_addons_path):
       xml_path = os.path.join(sys_addons_path, fname, 'addon.xml')
-      a = addon_factory(xml_path)
+      addon = addon_factory(xml_path)
       # TODO check err
-      L.append(a)
+      installed_addons[addon.id] = addon
 
    # user addons
    for fname in os.listdir(base_addons_path):
       xml_path = os.path.join(base_addons_path, fname, 'addon.xml')
-      a = addon_factory(xml_path)
+      addon = addon_factory(xml_path)
       # TODO check err
-      L.append(a)
+      installed_addons[addon.id] = addon
 
-   return L
+
+def get_installed_addon(id):
+   return installed_addons.get(id)
+
+
+def get_installed_addons(cls=None):
+   if cls is None:
+      return sorted(installed_addons.values())
+   else:
+      return sorted([ a for a in installed_addons.values() if type(a) == cls ])
+
+
 
 
 class KodiAddonBase(object):

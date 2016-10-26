@@ -20,6 +20,8 @@
 
 from __future__ import absolute_import, print_function
 
+import os
+
 from .kodi_addon_base import KodiAddonBase
 
 
@@ -31,13 +33,13 @@ class KodiPythonModule(KodiAddonBase):
       KodiAddonBase.__init__(self, *args)
 
       ext = self._root.find(self.extension_point)
-      self._main = ext.get('library')
+      self._main_import = ext.get('library')
       for elem in ext.iterchildren():
          if elem.tag == 'provides':
             self._provides = elem.text
 
    @property
-   def main(self):
-      """ main library """
-      return os.path.join(self.installed_path, self._main)
+   def main_import(self):
+      """ main library to import """
+      return os.path.join(self.installed_path, self._main_import)
 

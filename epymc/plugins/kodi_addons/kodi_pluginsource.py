@@ -37,7 +37,7 @@ import epymc.mediaplayer as mediaplayer
 from epymc.browser import EmcItemClass
 from epymc.gui import EmcDialog
 
-from .kodi_addon_base import KodiAddonBase
+from .kodi_addon_base import KodiAddonBase, get_installed_addon
 
 
 def DBG(*args):
@@ -126,16 +126,26 @@ class KodiPluginSource(KodiAddonBase):
 
       DBG('running: "{}" with url: "{}"'.format(self.name, url))
 
+      # 3 "well-know" arguments for the plugin
       idx = url.find('?')
-      if idx != -1:
-         arg1 = url[:idx]
-         arg3 = url[idx:]
-      else:
-         arg1 = url
-         arg3 = ''
+      arg1 = url[:idx] if idx != -1 else url
+      arg3 = url[idx:] if idx != -1 else ''
+      arg2 = '123456'
+
+      # PYTHONPATH augmented with our xbmclib + all plugin requirements
+      PYTHONPATH = [xbmclib_path]
+      for require_id, min_version in self.requires:
+         mod = get_installed_addon(require_id)
+         if not mod:
+            EmcDialog(style='error', text='Missing dep') # TODO better dialog
+            return
+
+         # todo check min version
+
+         PYTHONPATH.append(mod.main_import)
 
       cmd = 'env PYTHONPATH="{}" python2 "{}" "{}" "{}" "{}"'.format(
-             xbmclib_path, self.main_exe, arg1, '123456', arg3)
+             ':'.join(PYTHONPATH), self.main_exe, arg1, arg2, arg3)
       print('CMD:', cmd)
       self._stderr_lines = []
       self._page_items = []

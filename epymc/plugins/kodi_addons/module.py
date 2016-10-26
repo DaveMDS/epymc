@@ -40,7 +40,7 @@ from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.gui import EmcDialog, EmcImage
 
-from .kodi_addon_base import load_available_addons, \
+from .kodi_addon_base import load_installed_addons, get_installed_addons, \
    base_pkgs_path, base_addons_path, base_temp_path, base_repos_path
 from .kodi_repository import KodiRepository
 from .kodi_pluginsource import KodiPluginSource
@@ -233,7 +233,6 @@ class KodiAddonsModule(EmcModule):
 
    _browser = None
    _styles = ('List',)
-   _addons = []
 
    def __init__(self):
       global _mod
@@ -257,7 +256,7 @@ class KodiAddonsModule(EmcModule):
          os.makedirs(base_repos_path)
 
       # load all available addons
-      self._addons = load_available_addons()
+      load_installed_addons()
 
       # add an item in the mainmenu
       mainmenu.item_add(self.name, 15, self.label, self.icon, self.mainmenu_cb)
@@ -283,14 +282,12 @@ class KodiAddonsModule(EmcModule):
       mainmenu.hide()
 
    def populate_root_page(self, browser, url):
-      L = [ addon for addon in self._addons if type(addon) == KodiPluginSource ]
-      for addon in sorted(L):
+      for addon in get_installed_addons(KodiPluginSource):
          browser.item_add(AddonItemClass(), None, addon)
       browser.item_add(GetMoreItemClass(), 'kodi_addons://manage', self)
 
    def populate_repositories_page(self, browser, url):
-      L = [ addon for addon in self._addons if type(addon) == KodiRepository ]
-      for repo in sorted(L):
+      for repo in get_installed_addons(KodiRepository):
          browser.item_add(RepoItemClass(), url+'/repo_name', repo) # TODO fix repo_name
 
    def populate_repository_page(self, browser, url, repo):
@@ -339,11 +336,10 @@ class KodiAddonsModule(EmcModule):
                                           info=None, cb=add_addons_page)
 
    def populate_config_repos(self, browser, url):
-      L = [ addon for addon in self._addons if type(addon) == KodiRepository ]
-      for addon in sorted(L):
-         config_gui.standard_item_action_add(addon.name, addon.icon, info=None,
-                                             cb=lambda a: RepoInfoPanel(a),
-                                             a=addon)
+      for repo in get_installed_addons(KodiRepository):
+         config_gui.standard_item_action_add(repo.name, repo.icon, info=None,
+                                             cb=lambda r: RepoInfoPanel(r),
+                                             r=repo)
       config_gui.standard_item_action_add(_('Add a new repo'), icon='icon/plus',
                                           info=None, cb=self.new_repo_wizard)
 
@@ -351,8 +347,7 @@ class KodiAddonsModule(EmcModule):
       EmcDialog(style='minimal', text='repo wizard')
 
    def populate_config_addons(self, browser, url):
-      L = [ addon for addon in self._addons if type(addon) == KodiPluginSource ]
-      for addon in sorted(L):
+      for addon in get_installed_addons(KodiPluginSource):
          config_gui.standard_item_action_add(addon.name, addon.icon, info=None,
                                              cb=lambda a: AddonInfoPanel(a),
                                              a=addon)

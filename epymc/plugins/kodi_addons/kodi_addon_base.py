@@ -22,6 +22,7 @@ from __future__ import absolute_import, print_function
 
 import os
 import locale
+from distutils.version import StrictVersion
 from lxml import etree
 
 from efl.elementary import utf8_to_markup
@@ -162,6 +163,10 @@ class KodiAddonBase(object):
    def version(self):
       """ ex: '0.4.3' """
       return self._version
+
+   def check_version(self, min_version):
+      """ True if addon version >= min_version """
+      return StrictVersion(self.version) >= StrictVersion(min_version)
 
    @property
    def author(self):

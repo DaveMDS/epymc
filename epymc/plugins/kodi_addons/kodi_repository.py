@@ -69,10 +69,11 @@ class KodiRepository(KodiAddonBase):
       remote = self._addons_xml_md5_url
       return (local, remote)
 
-   def addon_available(self, id, min_version=None):
+   def addon_available(self, addon_id, min_version=None):
       """ return the addon available version or None if addon not available """
-      addon = self._addons.get(id)
-      # TODO check min_version
+      addon = self._addons.get(addon_id)
+      if addon and min_version and addon.check_version(min_version) == False:
+         return None
       return addon.version if addon else None
 
    def get_addons(self, done_cb, **kargs):

@@ -136,21 +136,24 @@ class KodiPluginSource(KodiAddonBase):
       PYTHONPATH = [xbmclib_path]
       for require_id, min_version in self.requires:
          mod = get_installed_addon(require_id)
-         if not mod:
+         if mod is None:
             EmcDialog(style='error', text='Missing dep') # TODO better dialog
             return
 
-         # todo check min version
+         if mod.check_version(min_version) is False:
+            EmcDialog(style='error', text='Dep too old') # TODO better dialog
+            return
 
          PYTHONPATH.append(mod.main_import)
 
+      # build (and run) the plugin command line
       cmd = 'env PYTHONPATH="{}" python2 "{}" "{}" "{}" "{}"'.format(
              ':'.join(PYTHONPATH), self.main_exe, arg1, arg2, arg3)
       print('CMD:', cmd)
       self._stderr_lines = []
       self._page_items = []
       self._page_url = url
-      
+
       exe = ecore.Exe(cmd, ecore.ECORE_EXE_PIPE_READ |
                            ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED |
                            ecore.ECORE_EXE_PIPE_ERROR |

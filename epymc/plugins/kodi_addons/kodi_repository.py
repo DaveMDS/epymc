@@ -37,8 +37,8 @@ class KodiRepository(KodiAddonBase):
 
    extension_point = ".//extension[@point='xbmc.addon.repository']"
 
-   def __init__(self, xml_info):
-      KodiAddonBase.__init__(self, xml_info)
+   def __init__(self, *args):
+      KodiAddonBase.__init__(self, *args)
       self._addons = {} # key: addon_id  val: KodiAddon instance
 
       ext = self._root.find(self.extension_point)

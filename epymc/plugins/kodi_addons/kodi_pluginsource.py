@@ -82,8 +82,8 @@ class KodiPluginSource(KodiAddonBase):
 
    extension_point = ".//extension[@point='xbmc.python.pluginsource']"
 
-   def __init__(self, xml_info, repository=None):
-      KodiAddonBase.__init__(self, xml_info, repository)
+   def __init__(self, *args):
+      KodiAddonBase.__init__(self, *args)
 
       ext = self._root.find(self.extension_point)
       self._main_exe = ext.get('library')

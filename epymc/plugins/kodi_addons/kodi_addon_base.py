@@ -43,30 +43,35 @@ base_temp_path = os.path.join(base_kodi_path, 'temp')
 
 def addon_factory(xml_info, repository=None):
    """ TODO doc """
+   from .kodi_pluginsource import KodiPluginSource
+   from .kodi_pythonmodule import KodiPythonModule
+   from .kodi_repository import KodiRepository
 
    if isinstance(xml_info, etree._Element):
       root = xml_info
    elif os.path.exists(xml_info):
-      document = etree.parse(xml_info)
-      root = document.getroot()
+      root = etree.parse(xml_info).getroot()
    else:
-      raise TypeError('xml_info must be str (xml file) or ET Element, given: %s' % xml_info)
+      raise TypeError('xml_info must be str (xml file) or ET Element')
 
-   # create the correct subclass (based on the xlm extension point)   
-   ext = root.find(".//extension[@point='xbmc.python.pluginsource']")
-   if ext is not None:
-      from .kodi_pluginsource import KodiPluginSource
-      return KodiPluginSource(root, repository)
+   # create the correct subclass (based on the xlm extension point)
+   for elem in root.iterfind('extension'):
+      ext_point = elem.get('point')
 
-   ext = root.find(".//extension[@point='xbmc.python.module']")
-   if ext is not None:
-      from .kodi_pythonmodule import KodiPythonModule
-      return KodiPythonModule(root, repository)
+      if ext_point == 'xbmc.python.pluginsource':
+         return KodiPluginSource(root, repository)
 
-   ext = root.find(".//extension[@point='xbmc.addon.repository']")
-   if ext is not None:
-      from .kodi_repository import KodiRepository
-      return KodiRepository(root)
+      elif ext_point == 'xbmc.python.module':
+         return KodiPythonModule(root, repository)
+
+      elif ext_point == 'xbmc.addon.repository':
+         return KodiRepository(root, repository)
+
+      elif ext_point != 'xbmc.addon.metadata':
+         DBG('Unsupported extension: "{}" for addon: "{}"'.format(
+             ext_point, root.get('id')))
+
+   return None
 
 
 def load_available_addons():
@@ -83,9 +88,8 @@ class KodiAddonBase(object):
    """ Base class for any kodi addon: pluginsource, repository or python module """
 
    def __init__(self, xml_root, repository=None):
-      print("\n##### ADDON FROM: {}  ##### ({})".format(xml_root, repository))
-      self._repo = repository
       self._root = xml_root
+      self._repo = repository
 
       self._id = xml_root.get('id')
       self._name = xml_root.get('name')

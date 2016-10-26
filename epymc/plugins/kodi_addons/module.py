@@ -40,7 +40,8 @@ from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.gui import EmcDialog, EmcImage
 
-from .kodi_addon_base import load_installed_addons, get_installed_addons, \
+from .kodi_addon_base import load_installed_addons, \
+   get_installed_addon, get_installed_addons, \
    base_pkgs_path, base_addons_path, base_temp_path, base_repos_path
 from .kodi_repository import KodiRepository
 from .kodi_pluginsource import KodiPluginSource
@@ -71,7 +72,8 @@ class AddonInfoPanel(EmcDialog):
       addon = self.addon
       repo = self.addon.repository
 
-      if is_addon_installed(addon.id, addon.version):
+      installed = get_installed_addon(addon.id)
+      if installed and installed.check_version(addon.version):
          EmcDialog(style='info', text='already installed') # TODO better dialog
          return
 
@@ -82,7 +84,8 @@ class AddonInfoPanel(EmcDialog):
 
       # dependencies packages
       for id, min_version in addon.requires:
-         if is_addon_installed(id, min_version):
+         installed = get_installed_addon(id)
+         if installed and installed.check_version(min_version):
             continue
 
          repo_version = repo.addon_available(id, min_version)
@@ -93,6 +96,8 @@ class AddonInfoPanel(EmcDialog):
 
          EmcDialog(style='error', text='missing pkg in repo') # TODO better dialog
          return
+
+      # TODO also install dependencies of dependencies...
 
       print("REQUIRES:", addon.requires)
       print(needed_pkgs)
@@ -134,16 +139,6 @@ class AddonInfoPanel(EmcDialog):
 
    def install_completed(self):
       print("ALL DONE \o/")
-
-
-
-
-def is_addon_installed(id, min_version):
-   for addon in _mod._addons:
-      # TODO ver < ver
-      if addon.id == id and addon.version == min_version:
-         return True
-   return False
 
 
 

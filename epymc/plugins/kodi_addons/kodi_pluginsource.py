@@ -29,26 +29,18 @@
 from __future__ import absolute_import, print_function
 
 import os
-import sys
 import ast
-import locale
-from lxml import etree
-from operator import attrgetter
 
 from efl import ecore
-from efl.elementary import utf8_to_markup
 
-import epymc.mainmenu as mainmenu
 import epymc.mediaplayer as mediaplayer
-import epymc.utils as utils
-import epymc.gui as gui
-from epymc.browser import EmcBrowser, EmcItemClass
+from epymc.browser import EmcItemClass
 
-from .kodi_addon_base import KodiAddonBase, addon_factory
+from .kodi_addon_base import KodiAddonBase
 
 
 def DBG(*args):
-   print('KODI ADDON:', *args)
+   print('KODI SOURCE:', *args)
    pass
 
 
@@ -56,7 +48,6 @@ def DBG(*args):
 class StandardItemClass(EmcItemClass):
    def item_selected(self, url, item_data):
       addon, listitem = item_data
-      # _mod.run_addon(url=listitem['url'])
       addon.request_page(url)
 
    def label_get(self, url, item_data):
@@ -86,10 +77,8 @@ class StandardItemClass(EmcItemClass):
 
 class KodiPluginSource(KodiAddonBase):
 
-   # _main_exe = None # ?????????????????????????
    extension_point = ".//extension[@point='xbmc.python.pluginsource']"
 
-   # def __init__(self, path=None, xml_element=None, repo=None):
    def __init__(self, xml_info, repository=None):
       KodiAddonBase.__init__(self, xml_info, repository)
 
@@ -162,7 +151,6 @@ class KodiPluginSource(KodiAddonBase):
       exe.on_del_event_add(self._addon_complete_cb)
 
    def _addon_stdout_cb(self, exe, event):
-      # self._stdout_lines += event.lines
       for line in event.lines:
          # print('LINE: "{}"'.format(line))
          try:
@@ -183,12 +171,11 @@ class KodiPluginSource(KodiAddonBase):
          EmcDialog(style='error', text=txt)
          DBG('\n'.join(self._stderr_lines)) # TODO remove me?
       else:
-         print("OK, DONE")
+         DBG("OK, DONE")
          self._page_items = None
          self._page_url = None
 
    def _populate_requested_page(self, browser, page_url, items):
-      print("pop", page_url)
       for listitem in items:
          self._browser.item_add(StandardItemClass(), listitem['url'], (self, listitem))
 
@@ -198,7 +185,6 @@ class KodiPluginSource(KodiAddonBase):
       listitem['url'] = url
       listitem['isFolder'] = isFolder
       self._page_items.append(listitem)
-      print(listitem)
 
    def _Player_play(self, item=None, listitem=None, windowed=False, startpos=-1):
       if item:
@@ -211,7 +197,6 @@ class KodiPluginSource(KodiAddonBase):
          mediaplayer.play_url(item)
          mediaplayer.title_set(title)
          mediaplayer.poster_set(poster)
-         print("URL", item)
 
    def _endOfDirectory(self, succeeded=True, updateListing=False, cacheToDisc=True):
       if succeeded == True:

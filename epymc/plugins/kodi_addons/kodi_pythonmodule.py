@@ -20,7 +20,6 @@
 
 from __future__ import absolute_import, print_function
 
-
 from .kodi_addon_base import KodiAddonBase
 
 

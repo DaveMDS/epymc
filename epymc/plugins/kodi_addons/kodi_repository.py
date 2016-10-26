@@ -18,35 +18,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Kodi references:
-#  http://kodi.wiki/view/Python_development
-#  http://mirrors.kodi.tv/docs/python-docs/16.x-jarvis/xbmc.html
-
-
-# Require:
-#  python2-polib
-
 from __future__ import absolute_import, print_function
 
 import os
-import sys
-import locale
 from lxml import etree
 
-from efl import ecore
-from efl.elementary import utf8_to_markup
-
 import epymc.utils as utils
-import epymc.gui as gui
 
 from .kodi_addon_base import KodiAddonBase, addon_factory
-
 
 
 def DBG(*args):
    print('KODI REPO:', *args)
    pass
-
 
 
 class KodiRepository(KodiAddonBase):

@@ -18,18 +18,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Kodi references:
-#  http://kodi.wiki/view/Python_development
-#  http://mirrors.kodi.tv/docs/python-docs/16.x-jarvis/xbmc.html
-
-
-# Require:
-#  python2-polib
-
 from __future__ import absolute_import, print_function
 
 import os
-import sys
 import locale
 from lxml import etree
 
@@ -78,7 +69,6 @@ def load_available_addons():
    for fname in os.listdir(folder):
       xml_path = os.path.join(folder, fname, 'addon.xml')
       a = addon_factory(xml_path)
-      print(a)
       # TODO check err
       L.append(a)
    return L
@@ -149,6 +139,7 @@ class KodiAddonBase(object):
 
    @property
    def icon(self):
+      """ full path (or url) of the png icon """
       if self.is_installed:
          icon = os.path.join(self._folder, self.metadata.get('icon'))
          if os.path.exists(icon):
@@ -158,6 +149,7 @@ class KodiAddonBase(object):
 
    @property
    def fanart(self):
+      """ full path (or url) of the jpg fanart (if available) """
       if self.is_installed:
          fart = os.path.join(self._folder, self.metadata.get('fanart'))
          if os.path.exists(fart):

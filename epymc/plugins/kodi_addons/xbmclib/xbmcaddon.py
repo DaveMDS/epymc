@@ -21,7 +21,7 @@ class Addon(object):
       return '0' # TODO
 
    def getLocalizedString(self, id):
-      # search and parse po file (or string.xml)
+      # search and parse strings.po (or string.xml)
       if self._po is None and self._et is None:
          # TODO also support: "en_US" (only "en" atm)
          lang, encoding = locale.getdefaultlocale()
@@ -41,7 +41,9 @@ class Addon(object):
             for lang in (lang_name, 'English'):
                xml_file = os.path.join(addons_dir, self.id, 'resources',
                                       'language', lang, 'strings.xml')
-
+               if not os.path.exists(xml_file):
+                  continue
+               # try different encoding (if encoding not provided in xml)
                for enc in (None, 'utf-8', 'iso-8859-1'):
                   parser = ET.XMLParser(encoding=enc)
                   try:

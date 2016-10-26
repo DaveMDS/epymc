@@ -38,6 +38,7 @@ from epymc.browser import EmcItemClass
 from epymc.gui import EmcDialog
 
 from .kodi_addon_base import KodiAddonBase, get_installed_addon
+from .kodi_pythonmodule import KodiPythonModule
 
 
 def DBG(*args):
@@ -144,7 +145,8 @@ class KodiPluginSource(KodiAddonBase):
             EmcDialog(style='error', text='Dep too old') # TODO better dialog
             return
 
-         PYTHONPATH.append(mod.main_import)
+         if type(mod) == KodiPythonModule:
+            PYTHONPATH.append(mod.main_import)
 
       # build (and run) the plugin command line
       cmd = 'env PYTHONPATH="{}" python2 "{}" "{}" "{}" "{}"'.format(

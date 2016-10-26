@@ -32,18 +32,16 @@ import os
 import sys
 import locale
 from lxml import etree
-# from operator import attrgetter
 
 from efl import ecore
 from efl.elementary import utf8_to_markup
 
 import epymc.utils as utils
 import epymc.gui as gui
-# import epymc.ini as ini
-# import epymc.config_gui as cgui
 
 from .kodi_addon import KodiAddonBase
 from .kodi_pluginsource import KodiAddon
+from .kodi_module import KodiModule
 
 
 
@@ -69,7 +67,7 @@ class KodiRepository(KodiAddonBase):
 
    def __init__(self, xml_info):
       KodiAddonBase.__init__(self, xml_info)
-      self._addons = []
+      self._addons = {} # key: addon_id  val: KodiAddon instance
 
       ext = self._root.find(self.extension_point)
       for elem in ext.iterchildren():
@@ -86,11 +84,6 @@ class KodiRepository(KodiAddonBase):
       return self._base_url
 
    @property
-   def addons_list_url(self):
-      """ ex: http://mirrors.kodi.tv/addons/krypton/addons.xml (info) """
-      return self._addons_info_url
-
-   @property
    def addons_xml(self):
       """ ex: http://mirrors.kodi.tv/addons/krypton/addons.xml (info) """
       local = os.path.join(self._folder, 'addons.xml')
@@ -98,9 +91,15 @@ class KodiRepository(KodiAddonBase):
       return (local, remote)
 
    @property
-   def addons_list_md5_url(self):
+   def addons_list_md5_url(self): # TODO FIXME like addons_xml
       """ ex: http://mirrors.kodi.tv/addons/krypton/addons.xml.md5 (checksum) """
       return self._addons_list_md5_url
+
+   def addon_available(self, id, min_version=None):
+      """ return the addon available version or None if addon not available """
+      addon = self._addons.get(id)
+      # TODO check min_version
+      return addon.version if addon else None
 
    def get_addons(self, done_cb, **kargs):
       if self._addons:
@@ -125,17 +124,17 @@ class KodiRepository(KodiAddonBase):
       self._parse_xml(dest)
 
    def _parse_xml(self, local):
-      print("PARSE")
       root = etree.parse(local).getroot()
-      print(root)
       for addon_el in root.iterchildren():
          ext = addon_el.find(".//extension[@point='xbmc.python.pluginsource']")
          if ext is not None:
-            self._addons.append(KodiAddon(addon_el, repository=self))
-         # id = addon_el.get('id')
-         # if id.startswith(('plugin.video.', 'plugin.audio.', 'plugin.image.')):
-            # self._addons.append(KodiAddon(xml_element=addon_el, repo=self))
-            # self._addons.append(KodiAddon(addon_el))
+            addon = KodiAddon(addon_el, repository=self)
+            self._addons[addon.id] = addon
+         else:
+            ext = addon_el.find(".//extension[@point='xbmc.python.module']")
+            if ext is not None:
+               addon = KodiModule(addon_el, repository=self)
+               self._addons[addon.id] = addon
 
       self._done_cb(self, self._addons, **self._done_cb_kargs)
       

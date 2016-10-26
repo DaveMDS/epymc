@@ -46,6 +46,7 @@ from epymc.browser import EmcBrowser, EmcItemClass
 
 
 from .kodi_addon import KodiAddonBase
+from .kodi_module import KodiModule
 
 
 def DBG(*args):
@@ -59,7 +60,10 @@ def load_available_addons():
    folder = os.path.join(utils.user_conf_dir, 'kodi', 'addons')
    for fname in os.listdir(folder):
       path = os.path.join(folder, fname, 'addon.xml')
-      a = KodiAddon(path)
+      try:
+         a = KodiAddon(path)
+      except: # TODO somethign better....
+         a = KodiModule(path) 
       print(a)
       # TODO check err
       L.append(a)
@@ -104,8 +108,7 @@ class KodiAddon(KodiAddonBase):
 
    # def __init__(self, path=None, xml_element=None, repo=None):
    def __init__(self, xml_info, repository=None):
-      KodiAddonBase.__init__(self, xml_info)
-      self._repo = repository
+      KodiAddonBase.__init__(self, xml_info, repository)
 
       ext = self._root.find(self.extension_point)
       self._main_exe = ext.get('library')

@@ -31,6 +31,7 @@ from __future__ import absolute_import, print_function
 import os
 import sys
 import locale
+import zipfile
 from lxml import etree
 from operator import attrgetter
 
@@ -62,16 +63,96 @@ def DBG(*args):
 _mod = None
 
 
-class AddonInstallDialog(EmcDialog):
+class AddonInfoPanel(EmcDialog):
    def __init__(self, addon):
-      self._addon = addon
+      self.addon = addon
       EmcDialog.__init__(self, style='panel',
                          title=addon.name + ' v' + addon.version,
                          content=EmcImage(addon.icon),
                          text=addon.info_text_long)
-      self.button_add('Options')
-      self.button_add('Install/Update')
-      self.button_add('Uninstall')
+      self.button_add('Options').disabled = True
+      self.button_add('Install/Update',  selected_cb=self.install_btn_cb)
+      self.button_add('Uninstall').disabled = True
+
+   def install_btn_cb(self, btn):
+      addon = self.addon
+      repo = self.addon.repository
+
+      if is_addon_installed(addon.id, addon.version):
+         EmcDialog(style='info', text='already installed') # TODO better dialog
+         return
+
+      # addon package
+      print("INSTALL:", addon.id, repo)
+      zip_url = '{0}/{1}/{1}-{2}.zip'.format(repo.base_url, addon.id, addon.version)
+      needed_pkgs = [zip_url]
+
+      # dependencies packages
+      for id, min_version in addon.requires:
+         if is_addon_installed(id, min_version):
+            continue
+
+         repo_version = repo.addon_available(id, min_version)
+         if repo_version is not None:
+            zip_url = '{0}/{1}/{1}-{2}.zip'.format(repo.base_url, id, repo_version)
+            needed_pkgs.append(zip_url)
+            continue
+
+         EmcDialog(style='error', text='missing pkg in repo') # TODO better dialog
+         return
+
+      print("REQUIRES:", addon.requires)
+      print(needed_pkgs)
+      self._to_download_pkgs = needed_pkgs
+      self._to_install_pkgs = []
+      self.download_next_package()
+      EmcDialog(style='minimal', text='installing...', spinner=True) # TODO better dialog
+
+   def download_next_package(self):
+      try:
+         pkg = self._to_download_pkgs.pop()
+      except IndexError: # all downloads done
+         self.install_next_package()
+         return
+
+      fname = os.path.basename(pkg)
+      dest = os.path.join(utils.user_conf_dir, 'kodi', 'packages', fname)
+      utils.download_url_async(pkg, dest, complete_cb=self.download_complete_cb)
+      
+   def download_complete_cb(self, dest, status):
+      if status == 200:
+         self._to_install_pkgs.append(dest)
+         self.download_next_package()
+      else:
+         EmcDialog(style='error', text='download failed')  # TODO better dialog
+
+   def install_next_package(self):
+      try:
+         pkg = self._to_install_pkgs.pop(0)
+      except IndexError: # all installations done
+         self.install_completed()
+         return
+      print("INSTALL", pkg)
+
+      dest_path = os.path.join(utils.user_conf_dir, 'kodi', 'addons')
+      with zipfile.ZipFile(pkg, 'r') as z: # TODO make this async?
+         z.extractall(dest_path)
+
+      self.install_next_package()
+
+   def install_completed(self):
+      print("ALL DONE \o/")
+
+
+
+
+def is_addon_installed(id, min_version):
+   for addon in _mod._addons:
+      # TODO ver < ver
+      if addon.id == id and addon.version == min_version:
+         return True
+   return False
+
 
 
 class RepoInfoPanel(EmcDialog):
@@ -81,13 +162,13 @@ class RepoInfoPanel(EmcDialog):
                          title=_('Addons Repository'),
                          content=EmcImage(repo.icon),
                          text=repo.info_text_long)
-      self.button_add('Enable/Disable')
-      self.button_add('Uninstall')
+      self.button_add('Enable/Disable').disabled = True
+      self.button_add('Uninstall').disabled = True
 
 
 class GetMoreItemClass(EmcItemClass):
    def item_selected(self, url, mod):
-      mod._browser.page_add('kodi_addons://repos', 'label TODO', None,
+      mod._browser.page_add('kodi_addons://repos', _('Get more'), None,
                              mod.populate_repositories_page)
 
    def label_get(self, url, mod):
@@ -124,7 +205,7 @@ class AddonItemClass(EmcItemClass):
       if addon.is_installed:
          addon.request_page(None, _mod._browser)
       else:
-         AddonInstallDialog(addon)
+         AddonInfoPanel(addon)
 
    def label_get(self, url, addon):
       return addon.name.replace('&', '&amp;')
@@ -150,8 +231,6 @@ class AddonItemClass(EmcItemClass):
 
    def fanart_get(self, url, addon):
       return addon.fanart
-
-
 
 
 class KodiAddonsModule(EmcModule):
@@ -233,14 +312,14 @@ class KodiAddonsModule(EmcModule):
          browser.item_add(RepoItemClass(), url+'/repo_name', repo) # TODO fix repo_name
 
    def populate_repository_page(self, browser, url, repo):
-      print("POP33")
-      print(repo)
       repo.get_addons(self._repo_get_addons_done)
 
    def _repo_get_addons_done(self, repo, addons):
       print("HEYAAA", repo)
-      for addon in sorted(addons, key=attrgetter('name')):
-         self._browser.item_add(AddonItemClass(), 'url', addon)
+      for addon in sorted(addons.values()): # TODO fix order
+         self._browser.item_add(AddonItemClass(), 'url', addon) # TODO fix url
+      # for addon in sorted(addons, key=attrgetter('name')):
+         # self._browser.item_add(AddonItemClass(), 'url', addon)
 
 
    ###### Config Panel stuff ##################################################
@@ -295,7 +374,7 @@ class KodiAddonsModule(EmcModule):
       print("ADDONS")
       for addon in self._addons:
          config_gui.standard_item_action_add(addon.name, addon.icon, info=None,
-                                             cb=lambda a: AddonInstallDialog(a),
+                                             cb=lambda a: AddonInfoPanel(a),
                                              a=addon)
       config_gui.standard_item_action_add(_('Add a new addon'), icon='icon/plus',
                                           info=None,

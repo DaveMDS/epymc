@@ -56,10 +56,11 @@ def DBG(*args):
 
 
 class KodiAddonBase(object):
-   """ Base class for any kodi addon: pluginsource or repository """
+   """ Base class for any kodi addon: pluginsource, repository or python module """
 
-   def __init__(self, xml_info):
+   def __init__(self, xml_info, repository=None):
       print("\n##### ADDON FROM: %s  #####" % xml_info)
+      self._repo = repository
 
       if isinstance(xml_info, etree._Element):
          self._root = xml_info
@@ -76,9 +77,16 @@ class KodiAddonBase(object):
       self._version = self._root.get('version')
       self._author = self._root.get('provider-name')
       self._metadata = None # will be lazily parsed
+      self._requires = None # will be lazily parsed
 
    def __str__(self):
-      return '<KodiAddon id={0.id} version={0.version}>'.format(self)
+      return '<{0.__class__.__name__} id={0.id} version={0.version}>'.format(self)
+
+   def __lt__(self, other):
+      return self.name.lower() < other.name.lower()
+
+   def __gt__(self, other):
+      return self.name.lower() > other.name.lower()
 
    @property
    def is_installed(self):
@@ -88,6 +96,11 @@ class KodiAddonBase(object):
    def installed_path(self):
       """ full path of the installed addon """
       return self._folder
+
+   @property
+   def repository(self):
+      """ KodiRepository instance (if provided) """
+      return self._repo
 
    @property
    def id(self):
@@ -128,6 +141,18 @@ class KodiAddonBase(object):
          fart = self.metadata.get('fanart')
          if fart:
             return os.path.join(self._repo.base_url, self._id, fart)
+
+   @property
+   def requires(self):
+      """ [ (id, vers), ... ] """
+      if self._requires is None:
+         self._requires = []
+         for require in self._root.find('requires'):
+            id = require.get('addon')
+            ver = require.get('version')
+            if id and ver and id != 'xbmc.python':
+               self._requires.append((id, ver))
+      return self._requires
 
    @property
    def metadata(self):

@@ -40,7 +40,8 @@ from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.gui import EmcDialog, EmcImage
 
-from .kodi_addon_base import load_available_addons, base_pkg_path, base_addon_path
+from .kodi_addon_base import load_available_addons, \
+   base_pkgs_path, base_addons_path, base_temp_path, base_repos_path
 from .kodi_repository import KodiRepository
 from .kodi_pluginsource import KodiPluginSource
 
@@ -108,7 +109,7 @@ class AddonInfoPanel(EmcDialog):
          return
 
       fname = os.path.basename(pkg)
-      dest = os.path.join(base_pkg_path, fname)
+      dest = os.path.join(base_pkgs_path, fname)
       utils.download_url_async(pkg, dest, complete_cb=self.download_complete_cb)
       
    def download_complete_cb(self, dest, status):
@@ -127,7 +128,7 @@ class AddonInfoPanel(EmcDialog):
       print("INSTALL", pkg)
 
       with zipfile.ZipFile(pkg, 'r') as z: # TODO make this async?
-         z.extractall(base_addon_path)
+         z.extractall(base_addons_path)
 
       self.install_next_package()
 
@@ -245,8 +246,17 @@ class KodiAddonsModule(EmcModule):
       # ini.add_section('videochannels')
       # ini.get('videochannels', 'autoupdate_ytdl', 'True')
 
-      # TODO create folders in .config/epymc/kodi
+      # create needed folders in .config/epymc/kodi
+      if not os.path.exists(base_pkgs_path):
+         os.makedirs(base_pkgs_path)
+      if not os.path.exists(base_temp_path):
+         os.makedirs(base_temp_path)
+      if not os.path.exists(base_addons_path):
+         os.makedirs(base_addons_path)
+      if not os.path.exists(base_repos_path):
+         os.makedirs(base_repos_path)
 
+      # load all available addons
       self._addons = load_available_addons()
 
       # add an item in the mainmenu

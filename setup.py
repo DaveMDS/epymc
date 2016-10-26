@@ -286,7 +286,10 @@ setup (
       'epymc.plugins.input_webserver': [
          'default/*',
          'mobile/*',
-      ]
+      ],
+      'epymc.plugins.kodi_addons': [
+         'addons/repository.kodi_official/*',
+      ],
    },
 
    scripts = ['bin/epymc', 'bin/epymc_standalone',

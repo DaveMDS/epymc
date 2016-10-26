@@ -29,16 +29,16 @@ from efl.elementary import utf8_to_markup
 import epymc.utils as utils
 
 
-
 def DBG(*args):
    print('KODI ADDON:', *args)
    pass
 
 
 base_kodi_path = os.path.join(utils.user_conf_dir, 'kodi')
-base_addon_path = os.path.join(base_kodi_path, 'addons')
-base_pkg_path = os.path.join(base_kodi_path, 'packages')
+base_addons_path = os.path.join(base_kodi_path, 'addons')
+base_pkgs_path = os.path.join(base_kodi_path, 'packages')
 base_temp_path = os.path.join(base_kodi_path, 'temp')
+base_repos_path = os.path.join(base_kodi_path, 'repos')
 
 
 def addon_factory(xml_info, repository=None):
@@ -47,10 +47,13 @@ def addon_factory(xml_info, repository=None):
    from .kodi_pythonmodule import KodiPythonModule
    from .kodi_repository import KodiRepository
 
+   # xml_info can be the xml file path or an already opened ET Element
    if isinstance(xml_info, etree._Element):
       root = xml_info
+      folder = None
    elif os.path.exists(xml_info):
       root = etree.parse(xml_info).getroot()
+      folder = os.path.dirname(xml_info)
    else:
       raise TypeError('xml_info must be str (xml file) or ET Element')
 
@@ -59,13 +62,13 @@ def addon_factory(xml_info, repository=None):
       ext_point = elem.get('point')
 
       if ext_point == 'xbmc.python.pluginsource':
-         return KodiPluginSource(root, repository)
+         return KodiPluginSource(root, folder, repository)
 
       elif ext_point == 'xbmc.python.module':
-         return KodiPythonModule(root, repository)
+         return KodiPythonModule(root, folder, repository)
 
       elif ext_point == 'xbmc.addon.repository':
-         return KodiRepository(root, repository)
+         return KodiRepository(root, folder, repository)
 
       elif ext_point != 'xbmc.addon.metadata':
          DBG('Unsupported extension: "{}" for addon: "{}"'.format(
@@ -76,20 +79,32 @@ def addon_factory(xml_info, repository=None):
 
 def load_available_addons():
    L = []
-   for fname in os.listdir(base_addon_path):
-      xml_path = os.path.join(base_addon_path, fname, 'addon.xml')
+
+   # system addons
+   sys_addons_path = os.path.join(os.path.dirname(__file__), 'addons')
+   for fname in os.listdir(sys_addons_path):
+      xml_path = os.path.join(sys_addons_path, fname, 'addon.xml')
       a = addon_factory(xml_path)
       # TODO check err
       L.append(a)
+
+   # user addons
+   for fname in os.listdir(base_addons_path):
+      xml_path = os.path.join(base_addons_path, fname, 'addon.xml')
+      a = addon_factory(xml_path)
+      # TODO check err
+      L.append(a)
+
    return L
 
 
 class KodiAddonBase(object):
    """ Base class for any kodi addon: pluginsource, repository or python module """
 
-   def __init__(self, xml_root, repository=None):
+   def __init__(self, xml_root, folder=None, repository=None):
       self._root = xml_root
       self._repo = repository
+      self._folder = folder
 
       self._id = xml_root.get('id')
       self._name = xml_root.get('name')
@@ -97,11 +112,6 @@ class KodiAddonBase(object):
       self._author = xml_root.get('provider-name')
       self._metadata = None # will be lazily parsed
       self._requires = None # will be lazily parsed
-
-      if repository is None:
-         self._folder = os.path.join(base_addon_path, self._id)
-      else:
-         self._folder = None
 
    def __str__(self):
       return '<{0.__class__.__name__} id={0.id} version={0.version}>'.format(self)

@@ -263,6 +263,7 @@ setup (
       'epymc.plugins.watchdog',
       'epymc.plugins.opticals',
       'epymc.plugins.kodi_addons',
+      'epymc.plugins.kodi_addons.xbmclib',
    ],
 
    package_data = {

@@ -35,6 +35,7 @@ from efl import ecore
 
 import epymc.mediaplayer as mediaplayer
 from epymc.browser import EmcItemClass
+from epymc.gui import EmcDialog
 
 from .kodi_addon_base import KodiAddonBase
 
@@ -43,6 +44,8 @@ def DBG(*args):
    print('KODI SOURCE:', *args)
    pass
 
+
+xbmclib_path = os.path.join(os.path.dirname(__file__), 'xbmclib')
 
 
 class StandardItemClass(EmcItemClass):
@@ -122,9 +125,6 @@ class KodiPluginSource(KodiAddonBase):
          self._browser = browser
 
       DBG('running: "{}" with url: "{}"'.format(self.name, url))
-      
-      libpath = '/home/dave/github/davemds/epymc/epymc/plugins/kodi_addons/xbmclib/'
-      # TODO FIX env !!!
 
       idx = url.find('?')
       if idx != -1:
@@ -134,8 +134,8 @@ class KodiPluginSource(KodiAddonBase):
          arg1 = url
          arg3 = ''
 
-      cmd = 'env PYTHONPATH={} python2 "{}" "{}" "{}" "{}"'.format(
-             libpath, self.main_exe, arg1, '123456', arg3)
+      cmd = 'env PYTHONPATH="{}" python2 "{}" "{}" "{}" "{}"'.format(
+             xbmclib_path, self.main_exe, arg1, '123456', arg3)
       print('CMD:', cmd)
       self._stderr_lines = []
       self._page_items = []

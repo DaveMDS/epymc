@@ -70,11 +70,11 @@ class KodiRepository(KodiAddonBase):
       return (local, remote)
 
    def addon_available(self, addon_id, min_version=None):
-      """ return the addon available version or None if addon not available """
+      """ return the KodiAddon instance if available, also check min_version if given """
       addon = self._addons.get(addon_id)
       if addon and min_version and addon.check_version(min_version) == False:
          return None
-      return addon.version if addon else None
+      return addon
 
    def get_addons(self, done_cb, **kargs):
       """ TODO doc """

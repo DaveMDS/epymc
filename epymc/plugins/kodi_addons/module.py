@@ -38,9 +38,9 @@ import epymc.utils as utils
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
-from epymc.gui import EmcDialog, EmcImage
+from epymc.gui import EmcDialog, EmcImage, EmcNotify
 
-from .kodi_addon_base import load_installed_addons, \
+from .kodi_addon_base import load_installed_addons, load_single_addon, \
    get_installed_addon, get_installed_addons, \
    base_pkgs_path, base_addons_path, base_temp_path, base_repos_path
 from .kodi_repository import KodiRepository
@@ -60,8 +60,7 @@ _mod = None
 class AddonInfoPanel(EmcDialog):
    def __init__(self, addon):
       self.addon = addon
-      EmcDialog.__init__(self, style='panel',
-                         title=addon.name + ' v' + addon.version,
+      EmcDialog.__init__(self, style='panel', title=addon.name,
                          content=EmcImage(addon.icon),
                          text=addon.info_text_long)
       self.button_add('Options').disabled = True
@@ -69,77 +68,85 @@ class AddonInfoPanel(EmcDialog):
       self.button_add('Uninstall').disabled = True
 
    def install_btn_cb(self, btn):
-      addon = self.addon
       repo = self.addon.repository
+      addon = self.addon
 
+      # addon already installed ?
       installed = get_installed_addon(addon.id)
       if installed and installed.check_version(addon.version):
          EmcDialog(style='info', text='already installed') # TODO better dialog
          return
 
-      # addon package
-      print("INSTALL:", addon.id, repo)
-      zip_url = '{0}/{1}/{1}-{2}.zip'.format(repo.base_url, addon.id, addon.version)
-      needed_pkgs = [zip_url]
+      # main addon
+      needed_addons = [addon]
+      total_size = int(addon.metadata.get('size', 0))
 
-      # dependencies packages
+      # addon dependencies
       for id, min_version in addon.requires:
+         # dep already installed?
          installed = get_installed_addon(id)
          if installed and installed.check_version(min_version):
             continue
 
-         repo_version = repo.addon_available(id, min_version)
-         if repo_version is not None:
-            zip_url = '{0}/{1}/{1}-{2}.zip'.format(repo.base_url, id, repo_version)
-            needed_pkgs.append(zip_url)
-            continue
+         # is dep present in repo?
+         addon = repo.addon_available(id, min_version)
+         if addon is None:
+            EmcDialog(style='error', text='missing pkg in repo') # TODO better dialog
+            return
 
-         EmcDialog(style='error', text='missing pkg in repo') # TODO better dialog
-         return
+         needed_addons.append(addon)
+         total_size += int(addon.metadata.get('size', 0))
 
-      # TODO also install dependencies of dependencies...
-
-      print("REQUIRES:", addon.requires)
-      print(needed_pkgs)
-      self._to_download_pkgs = needed_pkgs
-      self._to_install_pkgs = []
-      self.download_next_package()
-      EmcDialog(style='minimal', text='installing...', spinner=True) # TODO better dialog
-
-   def download_next_package(self):
-      try:
-         pkg = self._to_download_pkgs.pop()
-      except IndexError: # all downloads done
-         self.install_next_package()
-         return
-
-      fname = os.path.basename(pkg)
-      dest = os.path.join(base_pkgs_path, fname)
-      utils.download_url_async(pkg, dest, complete_cb=self.download_complete_cb)
+      # TODO also install dependencies of dependencies? 
       
-   def download_complete_cb(self, dest, status):
+      self._to_download_addons = needed_addons
+      self._total_download_size = total_size or 1
+      self._total_downloaded = 1
+      self._install_dialog = EmcDialog(style='progress', text='installing...') # TODO better dialog
+      self.download_next_addon()
+
+   def download_next_addon(self):
+      try:
+         addon = self._to_download_addons.pop()
+      except IndexError: # all addons done
+         self.install_completed()
+         return
+
+      zip_name = '{0}-{1}.zip'.format(addon.id, addon.version)
+      zip_url = '{0}/{1}/{2}'.format(self.addon.repository.base_url,
+                                     addon.id, zip_name)
+      zip_dest = os.path.join(base_pkgs_path, zip_name)
+      utils.download_url_async(zip_url, zip_dest, addon=addon,
+                               progress_cb=self.download_progress_cb,
+                               complete_cb=self.download_complete_cb)
+
+   def download_progress_cb(self, dest, tot, done, addon):
+      done += self._total_downloaded
+      self._install_dialog.progress_set(done / self._total_download_size)
+
+   def download_complete_cb(self, dest, status, addon):
       if status == 200:
-         self._to_install_pkgs.append(dest)
-         self.download_next_package()
+         self._total_downloaded += int(addon.metadata.get('size', 0))
+         self.install_addon(addon, dest)
+         self.download_next_addon()
       else:
          EmcDialog(style='error', text='download failed')  # TODO better dialog
 
-   def install_next_package(self):
-      try:
-         pkg = self._to_install_pkgs.pop(0)
-      except IndexError: # all installations done
-         self.install_completed()
-         return
-      print("INSTALL", pkg)
-
-      with zipfile.ZipFile(pkg, 'r') as z: # TODO make this async?
+   def install_addon(self, addon, zip_path):
+      # unzip TODO check errors
+      with zipfile.ZipFile(zip_path, 'r') as z:
          z.extractall(base_addons_path)
 
-      self.install_next_package()
+      # load
+      load_single_addon(addon.id)
+
+      # notify
+      txt = '<title>{0}</title><br>{1.name}<br>{1.version}'.format(
+            _('Addon installed'), addon)
+      EmcNotify(txt, icon=addon.icon)
 
    def install_completed(self):
-      print("ALL DONE \o/")
-
+      self._install_dialog.delete()
 
 
 class RepoInfoPanel(EmcDialog):
@@ -198,7 +205,12 @@ class AddonItemClass(EmcItemClass):
       return addon.name.replace('&', '&amp;')
 
    def label_end_get(self, url, addon):
-      return ' '.join(addon.provides)
+      if addon.is_installed:
+         return ' '.join(addon.provides)
+      else:
+         size = int(addon.metadata.get('size', 0))
+         if size > 0:
+            return utils.hum_size(size)
 
    def info_get(self, url, addon):
       txt = []

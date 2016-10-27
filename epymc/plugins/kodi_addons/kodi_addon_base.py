@@ -40,6 +40,7 @@ base_addons_path = os.path.join(base_kodi_path, 'addons')
 base_pkgs_path = os.path.join(base_kodi_path, 'packages')
 base_temp_path = os.path.join(base_kodi_path, 'temp')
 base_repos_path = os.path.join(base_kodi_path, 'repos')
+sys_addons_path = os.path.join(os.path.dirname(__file__), 'addons')
 
 installed_addons = {} # key: addon_in  val: KodiAddon instance
 
@@ -81,28 +82,43 @@ def addon_factory(xml_info, repository=None):
 
 
 def load_installed_addons():
+   """ Load all installed addons, in system and user dirs """
 
-   # system addons
-   sys_addons_path = os.path.join(os.path.dirname(__file__), 'addons')
    for fname in os.listdir(sys_addons_path):
-      xml_path = os.path.join(sys_addons_path, fname, 'addon.xml')
-      addon = addon_factory(xml_path)
-      # TODO check err
-      installed_addons[addon.id] = addon
+      load_single_addon(fname, True)
 
-   # user addons
    for fname in os.listdir(base_addons_path):
-      xml_path = os.path.join(base_addons_path, fname, 'addon.xml')
-      addon = addon_factory(xml_path)
-      # TODO check err
-      installed_addons[addon.id] = addon
+      load_single_addon(fname)
 
 
-def get_installed_addon(id):
-   return installed_addons.get(id)
+def load_single_addon(addon_id, system=False):
+   """ Load a single (installed) addon
+   Args:
+      addon_id (str): the addon id
+      system (bool): whenever to load from system dir or user dir
+   """
+   if system:
+      xml_path = os.path.join(sys_addons_path, addon_id, 'addon.xml')
+   else:
+      xml_path = os.path.join(base_addons_path, addon_id, 'addon.xml')
+
+   addon = addon_factory(xml_path)
+   # TODO check err
+   installed_addons[addon.id] = addon
+
+
+def get_installed_addon(addon_id):
+   """ Get a single addon instance, addon must be installed """
+   return installed_addons.get(addon_id)
 
 
 def get_installed_addons(cls=None):
+   """ Get a sorted list of installed addons, optionally filtered
+   Args:
+      cls: the class to filter by (ex: KodiPluginSource or KodiRepository)
+   Return:
+      A sorted list of addons instances
+   """
    if cls is None:
       return sorted(installed_addons.values())
    else:

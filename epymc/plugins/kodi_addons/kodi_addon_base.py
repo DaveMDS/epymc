@@ -23,6 +23,7 @@ from __future__ import absolute_import, print_function
 import os
 import locale
 import zipfile
+import shutil
 from lxml import etree
 from distutils.version import StrictVersion
 
@@ -145,6 +146,23 @@ def install_from_local_zip(zip_file):
 
    return load_single_addon(addon_id)
 
+
+def uninstall_addon(addon):
+   """ Uninstall (and unload) the given addon
+   Args:
+      addon: The addon instance to uninstall
+   Return:
+      True if success, False otherwise
+   """
+   try:
+      shutil.rmtree(addon.installed_path)
+   except:
+      return False
+
+   del installed_addons[addon.id]
+   return True
+   
+   
 
 class KodiAddonBase(object):
    """ Base class for any kodi addon: pluginsource, repository or python module """

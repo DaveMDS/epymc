@@ -38,11 +38,13 @@ import epymc.utils as utils
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
-from epymc.gui import EmcDialog, EmcImage, EmcNotify, EmcVKeyboard, EmcFileSelector
+from epymc.gui import EmcDialog, EmcConfirmDialog, EmcImage, EmcNotify, \
+   EmcVKeyboard, EmcFileSelector
 
 from .kodi_addon_base import load_installed_addons, load_single_addon, \
    get_installed_addon, get_installed_addons, install_from_local_zip, \
-   base_pkgs_path, base_addons_path, base_temp_path, base_repos_path
+   uninstall_addon, base_pkgs_path, base_addons_path, base_temp_path, \
+   base_repos_path
 from .kodi_repository import KodiRepository
 from .kodi_pluginsource import KodiPluginSource
 
@@ -62,14 +64,15 @@ def notify_addon_installed(addon):
    EmcNotify(txt, icon=addon.icon)
 
 class AddonInfoPanel(EmcDialog):
-   def __init__(self, addon):
+   def __init__(self, addon, browser=None):
       self.addon = addon
+      self.browser = browser
       EmcDialog.__init__(self, style='panel', title=addon.name,
                          content=EmcImage(addon.icon),
                          text=addon.info_text_long)
-      self.button_add('Options').disabled = True
-      self.button_add('Install/Update',  selected_cb=self.install_btn_cb)
-      self.button_add('Uninstall').disabled = True
+      self.button_add(_('Options')).disabled = True
+      self.button_add('Install/Update',  selected_cb=self.install_btn_cb) # TODO label
+      self.button_add(_('Uninstall'), selected_cb=self.uninstall_btn_cb)
 
    def install_btn_cb(self, btn):
       repo = self.addon.repository
@@ -145,10 +148,26 @@ class AddonInfoPanel(EmcDialog):
    def install_completed(self):
       self._install_dialog.delete()
 
+   def uninstall_btn_cb(self, btn):
+      txt = '{0}<br><br><hilight>{1.name} v.{1.version}</hilight>'.format(
+            _('Are you sure you want to delete this addon?'), self.addon)
+      EmcConfirmDialog(txt, self.uninstall_confirmed_cb)
+
+   def uninstall_confirmed_cb(self, confirmed):
+      if not confirmed:
+         return
+      if not uninstall_addon(self.addon):
+         EmcErrorDialog(_('Cannot remove the addon'))
+      else:
+         self.delete()
+         if self.browser is not None:
+            self.browser.refresh(True)
+
 
 class RepoInfoPanel(EmcDialog):
-   def __init__(self, repo):
+   def __init__(self, repo, browser):
       self._repo = repo
+      self.browser = browser
       EmcDialog.__init__(self, style='panel',
                          title=_('Addons Repository'),
                          content=EmcImage(repo.icon),
@@ -340,7 +359,7 @@ class KodiAddonsModule(EmcModule):
    def populate_config_repos(self, browser, url):
       for repo in get_installed_addons(KodiRepository):
          config_gui.standard_item_action_add(repo.name, repo.icon,  r=repo,
-                                             cb=lambda r: RepoInfoPanel(r))
+                                       cb=lambda r: RepoInfoPanel(r, browser))
       config_gui.standard_item_action_add(
                   _('Add a new repository from zip file'), icon='icon/plus',
                   cb=lambda: AddonFromZipDialog(lambda: browser.refresh(True)))
@@ -348,7 +367,7 @@ class KodiAddonsModule(EmcModule):
    def populate_config_chans(self, browser, url):
       for addon in get_installed_addons(KodiPluginSource):
          config_gui.standard_item_action_add(addon.name, addon.icon, a=addon,
-                                             cb=lambda a: AddonInfoPanel(a))
+                                       cb=lambda a: AddonInfoPanel(a, browser))
       config_gui.standard_item_action_add(
                   _('Add a new channel from zip file'), icon='icon/plus',
                   cb=lambda: AddonFromZipDialog(lambda: browser.refresh(True)))

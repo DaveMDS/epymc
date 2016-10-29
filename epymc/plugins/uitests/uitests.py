@@ -30,7 +30,7 @@ from efl.elementary.entry import utf8_to_markup
 from efl.evas import EXPAND_BOTH, FILL_BOTH, FILL_HORIZ
 
 from epymc.modules import EmcModule
-from epymc.gui import EmcDialog, EmcVKeyboard, EmcFolderSelector, \
+from epymc.gui import EmcDialog, EmcVKeyboard, EmcFileSelector, \
    EmcButton, EmcNotify, EmcMenu, DownloadManager, EmcSlider
 
 import epymc.mainmenu as mainmenu
@@ -317,10 +317,20 @@ class MyItemClass(EmcItemClass):
                       accept_cb=lambda vk, t: print('ACCEPT "%s"' % t),
                       dismiss_cb=lambda vk: print('DISMISS'))
 
-      # Source Selector
-      elif url == 'uitests://sselector':
-         EmcFolderSelector(title='Folder Selector Test',
-                           done_cb=lambda p: DBG('Selected: ' + p))
+      # File Selector (only folders)
+      elif url == 'uitests://folder_sel':
+         EmcFileSelector(title='Folder Selector Test',
+                         done_cb=lambda p: DBG('Selected: ' + p))
+
+      # File Selector (*)
+      elif url == 'uitests://file_sel':
+         EmcFileSelector(title='File Selector Test (*)', file_filter='*',
+                         done_cb=lambda p: DBG('Selected: ' + p))
+
+      # File Selector (*.jpg|*.png)
+      elif url == 'uitests://file_sel_filter':
+         EmcFileSelector(title='File Selector Test (*.jpg|*.png)', file_filter='*.jpg|*.png',
+                         done_cb=lambda p: DBG('Selected: ' + p))
 
       # Dialog - Info
       elif url == 'uitests://dlg-info':
@@ -687,7 +697,9 @@ class UiTestsModule(EmcModule):
    def populate_root(self, browser, url):
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + Focus')
       browser.item_add(MyItemClass(), 'uitests://storage', 'Storage devices')
-      browser.item_add(MyItemClass(), 'uitests://sselector', 'Folder Selector')
+      browser.item_add(MyItemClass(), 'uitests://folder_sel', 'File Selector (folders only)')
+      browser.item_add(MyItemClass(), 'uitests://file_sel', 'File Selector (*)')
+      browser.item_add(MyItemClass(), 'uitests://file_sel_filter', 'File Selector (*.jpg|*.png)')
       browser.item_add(MyItemClass(), 'uitests://mbrainz', 'Music Brainz AudioCD (/dev/cdrom)')
       browser.item_add(MyItemClass(), 'uitests://menu', 'Menu small (dismiss on select)')
       browser.item_add(MyItemClass(), 'uitests://menu_long', 'Menu long (no dismiss on select)')

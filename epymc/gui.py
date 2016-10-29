@@ -21,6 +21,7 @@
 from __future__ import absolute_import, print_function
 
 import os
+import fnmatch
 from datetime import datetime
 
 from efl import evas
@@ -1705,22 +1706,28 @@ class EmcSlideshow(elm.Slideshow):
       return input_events.EVENT_CONTINUE
 
 ################################################################################
-class EmcFolderSelector(EmcDialog):
+class EmcFileSelector(EmcDialog):
    """
    Open a dialog that allow the user to choose a path on the filesystem.
 
    Args:
-      title:
+      title (str):
          The (optional) dialog title.
+      file_filter (str or None):
+         A multiple (|separated) glob expression for file filtering
+         None to NOT show any file (the default)
+         "*" to show ALL file, "*.jpg|*.png" to include both patterns
+         Pattern are NOT case sensitive
       done_cb:
          The (mandatory) function to call when the selection is done.
          Signature: func(path, **kargs)
       **kargs:
          Any other keyword arguments will be passed back in the done_cd func
    """
-   def __init__(self, title=_('Source Selector'), done_cb=None, **kargs):
+   def __init__(self, title=_('File selector'), file_filter=None, done_cb=None, **kargs):
       self._user_cb = done_cb
       self._user_kargs = kargs
+      self._filters = file_filter.lower().split('|') if file_filter else None
 
       EmcDialog.__init__(self, title, style='list', done_cb=self._btn_browse_cb)
       self.button_add(_('Select'), self._btn_select_cb)
@@ -1736,6 +1743,7 @@ class EmcFolderSelector(EmcDialog):
          if dev.is_mounted:
             it = self.list_item_append(dev.label, dev.icon)
             it.data['root'] = it.data['path'] = dev.mount_point
+            it.data['is_folder'] = True
 
       self.list_go()
 
@@ -1745,7 +1753,7 @@ class EmcFolderSelector(EmcDialog):
          return
 
       try:
-         folders = os.listdir(folder)
+         files_and_folders = utils.natural_sort(os.listdir(folder))
       except PermissionError:
          EmcDialog(style='error', text=_('Permission denied'))
          return
@@ -1755,25 +1763,51 @@ class EmcFolderSelector(EmcDialog):
       # back item
       parent = os.path.normpath(os.path.join(folder, '..'))
       it = self.list_item_append(_('Back'), 'icon/back')
+      it.data['is_folder'] = True
       it.data['root'] = root
       it.data['path'] = parent if parent != folder else '' # back in '/'
 
-      # folders
-      for fname in utils.natural_sort(folders):
+      # split files and folders (and filter files)
+      files = []
+      folders = []
+      for fname in files_and_folders:
+         if fname[0] == '.': continue
          fullpath = os.path.join(folder, fname)
-         if fname[0] != '.' and os.path.isdir(fullpath):
-            it = self.list_item_append(fname, 'icon/folder')
-            it.data['root'] = root
-            it.data['path'] = fullpath
+         if os.path.isdir(fullpath):
+            folders.append(fullpath)
+         elif self._filters is not None:
+            if self._filters[0] == '*':
+               files.append(fullpath)
+            else:
+               lowered = fname.lower()
+               for pattern in self._filters:
+                  if fnmatch.fnmatch(lowered, pattern):
+                     files.append(fullpath)
+                     break
+
+      for fullpath in folders:
+         it = self.list_item_append(os.path.basename(fullpath), 'icon/folder')
+         it.data['is_folder'] = True
+         it.data['root'] = root
+         it.data['path'] = fullpath
+
+      for fullpath in files:
+         it = self.list_item_append(os.path.basename(fullpath))
+         it.data['is_folder'] = False
+         it.data['root'] = root
+         it.data['path'] = fullpath
 
       self.list_go()
       
    def _btn_browse_cb(self, btn):
       it = self.list_item_selected_get()
-      if len(it.data['path']) < len(it.data['root']):
-         self.populate_devices()
+      if it.data['is_folder']:
+         if len(it.data['path']) < len(it.data['root']):
+            self.populate_devices()
+         else:
+            self.populate_folder(it.data['root'], it.data['path'])
       else:
-         self.populate_folder(it.data['root'], it.data['path'])
+         self._btn_select_cb(btn)
 
    def _btn_select_cb(self, btn):
       path = self.list_item_selected_get().data['path']
@@ -1817,7 +1851,7 @@ class EmcSourcesManager(EmcDialog):
       self.list_go()
 
    def _cb_btn_add(self, btn):
-      EmcFolderSelector(title=_('Choose a new source'), done_cb=self._cb_selected)
+      EmcFileSelector(title=_('Choose a new source'), done_cb=self._cb_selected)
 
    def _cb_btn_remove(self, btn):
       it = self.list_item_selected_get()
@@ -2325,8 +2359,8 @@ class DownloadManager(utils.Singleton):
       self._update_dialog_text(dia)
 
    def _change_folder_cb(self, bt, dia):
-      EmcFolderSelector(title=_('Change destination folder'),
-                        done_cb=self._change_folder_done_cb, dia=dia)
+      EmcFileSelector(title=_('Change destination folder'),
+                      done_cb=self._change_folder_done_cb, dia=dia)
 
    def _change_folder_done_cb(self, folder, dia):
       dia.data['dst_folder'] = folder.replace('file://', '')

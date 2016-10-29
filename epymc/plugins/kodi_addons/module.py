@@ -38,7 +38,7 @@ import epymc.utils as utils
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
-from epymc.gui import EmcDialog, EmcImage, EmcNotify, EmcVKeyboard
+from epymc.gui import EmcDialog, EmcImage, EmcNotify, EmcVKeyboard, EmcFileSelector
 
 from .kodi_addon_base import load_installed_addons, load_single_addon, \
    get_installed_addon, get_installed_addons, install_from_local_zip, \
@@ -355,24 +355,37 @@ class KodiAddonsModule(EmcModule):
 
 
 class AddonFromZipDialog(EmcDialog):
+
+   zipfile_regexp = '[a-z0-9.]+-[0-9]+\.[0-9]+\.[0-9]+\.zip'
+
    def __init__(self, success_cb, **kargs):
       self._success_cb = success_cb
       self._cb_kargs = kargs
       EmcDialog.__init__(self, style='minimal', title='Install addon',
                          text='install') # TODO better text
-      self.button_add(_('From url'), selected_cb=self.from_url_btn_cb)
-      self.button_add(_('From local zip'), selected_cb=self.from_zip_btn_cb).disabled = True
+      self.button_add(_('From remote url'), selected_cb=self.from_url_btn_cb)
+      self.button_add(_('From local file'), selected_cb=self.from_local_btn_cb)
 
-   def from_zip_btn_cb(self, btn):
-      pass # TODO fileselector
+   def from_local_btn_cb(self, btn):
+      EmcFileSelector(title=_('Choose a zip addon file'), file_filter='*.zip',
+                      done_cb=self.zip_sel_cb)
 
    def from_url_btn_cb(self, btn):
       EmcVKeyboard(title=_('Insert the addon url'), accept_cb=self.url_typed_cb)
 
+   def zip_sel_cb(self, path):
+      self.delete()
+      if re.fullmatch(self.zipfile_regexp, os.path.basename(path)):
+         self.install_zip(utils.url2path(path))
+      else:
+         EmcDialog(style='error', text='invalid zip file') # TODO better dialog
+
    def url_typed_cb(self, vkeyb, url):
       zip_name = os.path.basename(url)
-      if re.fullmatch('[a-z0-9.]+-[0-9]+\.[0-9]+\.[0-9]+\.zip', zip_name) is None:
+      if re.fullmatch(self.zipfile_regexp, zip_name) is None:
+         self.delete()
          EmcDialog(style='error', text='invalid url') # TODO better dialog
+         return
 
       self.buttons_clear()
       self.progress_show()
@@ -391,15 +404,15 @@ class AddonFromZipDialog(EmcDialog):
       self.delete()
       if status != 200:
          EmcDialog(style='error', text='Download failed') # TODO better dialog
-         return
+      else:
+         self.install_zip(dest)
 
-      addon = install_from_local_zip(dest)
+   def install_zip(self, zip_file):
+      addon = install_from_local_zip(zip_file)
       if addon is None:
          EmcDialog(style='error', text='Install failed') # TODO better dialog
-      
-      notify_addon_installed(addon)
-
-      self._success_cb(**self._cb_kargs)
-
+      else:
+         notify_addon_installed(addon)
+         self._success_cb(**self._cb_kargs)
 
 

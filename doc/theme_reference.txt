@@ -218,14 +218,22 @@
       "emc.text.title" -> edje TEXT
       "emc.swallow.content" -> edje SWALLOW
       "emc.box.buttons" -> edje BOX
+      "emc.dialog.progress" -> external elm/progressbar
 
    * Signals received from the application:
-      "emc,dialog,show"
-      "emc,dialog,hide"
+      "emc,dialog,show" "emc" (theme must then emit "emc,dialog,show,done")
+      "emc,dialog,hide" "emc" (theme must then emit "emc,dialog,hide,done")
+      "emc,dialog,info,set" "emc" (set 'info' style)
+      "emc,dialog,warning,set" "emc" (set 'warning' style)
+      "emc,dialog,error,set" "emc" (set 'error' style)
+      "emc,dialog,yesno,set" "emc" (set 'yesno' style)
+      "emc,dialog,cancel,set" "emc" (set 'cancel' style)
       "emc,dialog,title,show" "emc"
       "emc,dialog,title,hide" "emc"
       "emc,dialog,buttons,show" "emc"
       "emc,dialog,buttons,hide" "emc"
+      "emc,dialog,progress,show" "emc"
+      "emc,dialog,progress,hide" "emc"
 
    * Signal that should/must be sent to the app:
       "emc,dialog,close" ""

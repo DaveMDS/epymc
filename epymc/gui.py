@@ -1363,10 +1363,10 @@ class EmcDialog(elm.Layout):
       return b
 
    def buttons_clear(self):
+      self.signal_emit('emc,dialog,buttons,hide', 'emc')
       for b in self._buttons:
          b.delete()
-      del self._buttons
-      self._buttons = []
+      del self._buttons[:]
 
    def title_set(self, text):
       if text is not None:
@@ -1428,6 +1428,12 @@ class EmcDialog(elm.Layout):
 
    def progress_set(self, val):
       self.edje.part_external_object_get('emc.dialog.progress').value_set(val)
+
+   def progress_show(self):
+      self.signal_emit('emc,dialog,progress,show', 'emc')
+
+   def progress_hide(self):
+      self.signal_emit('emc,dialog,progress,hide', 'emc')
 
    def autoscroll_enable(self, speed_scale=1.0, start_delay=3.0):
       self._textentry.autoscroll_start_delay = start_delay

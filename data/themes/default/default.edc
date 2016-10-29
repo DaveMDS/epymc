@@ -2157,10 +2157,22 @@ collections {
             action: STATE_SET "cancel" 0.0;
             target: "tag_image";
          }
-         program { name: "set_progress_visible";  /* API */
+         program { name: "set_progress";  /* API */
             signal: "emc,dialog,progress,set";
             source: "emc";
             action: STATE_SET "visible" 0.0;
+            target: "emc.dialog.progress";
+         }
+         program { name: "show_progress";  /* API */
+            signal: "emc,dialog,progress,show";
+            source: "emc";
+            action: STATE_SET "visible" 0.0;
+            target: "emc.dialog.progress";
+         }
+         program { name: "hide_progress";  /* API */
+            signal: "emc,dialog,progress,hide";
+            source: "emc";
+            action: STATE_SET "default" 0.0;
             target: "emc.dialog.progress";
          }
       }

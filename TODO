@@ -9,6 +9,8 @@ TMP
  * clean dead files in music db like in movies
  * uitests -> sorage device -> up, up, up ... below browser move focus
  * cast panel: movie list is not complete, see directors panel
+ * For 1.3 release:
+   * raise theme generation
 
 BUGS
 =====

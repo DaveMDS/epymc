@@ -29,7 +29,7 @@
 from __future__ import absolute_import, print_function
 
 import os
-import zipfile
+import re
 
 import epymc.config_gui as config_gui
 import epymc.mainmenu as mainmenu
@@ -38,10 +38,10 @@ import epymc.utils as utils
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
-from epymc.gui import EmcDialog, EmcImage, EmcNotify
+from epymc.gui import EmcDialog, EmcImage, EmcNotify, EmcVKeyboard
 
 from .kodi_addon_base import load_installed_addons, load_single_addon, \
-   get_installed_addon, get_installed_addons, \
+   get_installed_addon, get_installed_addons, install_from_local_zip, \
    base_pkgs_path, base_addons_path, base_temp_path, base_repos_path
 from .kodi_repository import KodiRepository
 from .kodi_pluginsource import KodiPluginSource
@@ -56,6 +56,10 @@ def DBG(*args):
 
 _mod = None
 
+def notify_addon_installed(addon):
+   txt = '<title>{0}</title><br>{1.name}<br>{1.version}'.format(
+         _('Addon installed'), addon)
+   EmcNotify(txt, icon=addon.icon)
 
 class AddonInfoPanel(EmcDialog):
    def __init__(self, addon):
@@ -125,25 +129,18 @@ class AddonInfoPanel(EmcDialog):
       self._install_dialog.progress_set(done / self._total_download_size)
 
    def download_complete_cb(self, dest, status, addon):
-      if status == 200:
-         self._total_downloaded += int(addon.metadata.get('size', 0))
-         self.install_addon(addon, dest)
-         self.download_next_addon()
-      else:
+      if status != 200:
          EmcDialog(style='error', text='download failed')  # TODO better dialog
+         return
 
-   def install_addon(self, addon, zip_path):
-      # unzip TODO check errors
-      with zipfile.ZipFile(zip_path, 'r') as z:
-         z.extractall(base_addons_path)
+      self._total_downloaded += int(addon.metadata.get('size', 0))
 
-      # load
-      load_single_addon(addon.id)
-
-      # notify
-      txt = '<title>{0}</title><br>{1.name}<br>{1.version}'.format(
-            _('Addon installed'), addon)
-      EmcNotify(txt, icon=addon.icon)
+      addon = install_from_local_zip(dest)
+      if addon is None:
+         EmcDialog(style='error', text='Install failed') # TODO better dialog
+      else:
+         notify_addon_installed(addon)
+         self.download_next_addon()
 
    def install_completed(self):
       self._install_dialog.delete()
@@ -333,34 +330,76 @@ class KodiAddonsModule(EmcModule):
       def add_repos_page():
          browser.page_add('config://kodi_addon/repos', _('Repositories'),
                           None, self.populate_config_repos)
-      def add_addons_page():
-         browser.page_add('config://kodi_addon/addons', _('Addons'),
-                          None, self.populate_config_addons)
+      def add_chans_page():
+         browser.page_add('config://kodi_addon/chans', _('Channels'),
+                          None, self.populate_config_chans)
 
-      config_gui.standard_item_action_add(_('Repositories'), icon=None,
-                                          info=None, cb=add_repos_page)
-      config_gui.standard_item_action_add(_('Addons'), icon=None,
-                                          info=None, cb=add_addons_page)
+      config_gui.standard_item_action_add(_('Repositories'), cb=add_repos_page)
+      config_gui.standard_item_action_add(_('Channels'), cb=add_chans_page)
 
    def populate_config_repos(self, browser, url):
       for repo in get_installed_addons(KodiRepository):
-         config_gui.standard_item_action_add(repo.name, repo.icon, info=None,
-                                             cb=lambda r: RepoInfoPanel(r),
-                                             r=repo)
-      config_gui.standard_item_action_add(_('Add a new repo'), icon='icon/plus',
-                                          info=None, cb=self.new_repo_wizard)
+         config_gui.standard_item_action_add(repo.name, repo.icon,  r=repo,
+                                             cb=lambda r: RepoInfoPanel(r))
+      config_gui.standard_item_action_add(
+                  _('Add a new repository from zip file'), icon='icon/plus',
+                  cb=lambda: AddonFromZipDialog(lambda: browser.refresh(True)))
 
-   def new_repo_wizard(self):
-      EmcDialog(style='minimal', text='repo wizard')
-
-   def populate_config_addons(self, browser, url):
+   def populate_config_chans(self, browser, url):
       for addon in get_installed_addons(KodiPluginSource):
-         config_gui.standard_item_action_add(addon.name, addon.icon, info=None,
-                                             cb=lambda a: AddonInfoPanel(a),
-                                             a=addon)
-      config_gui.standard_item_action_add(_('Add a new addon'), icon='icon/plus',
-                                          info=None,
-                                          cb=self.new_addon_wizard)
+         config_gui.standard_item_action_add(addon.name, addon.icon, a=addon,
+                                             cb=lambda a: AddonInfoPanel(a))
+      config_gui.standard_item_action_add(
+                  _('Add a new channel from zip file'), icon='icon/plus',
+                  cb=lambda: AddonFromZipDialog(lambda: browser.refresh(True)))
 
-   def new_addon_wizard(self):
-      EmcDialog(style='minimal', text='addon wizard')
+
+class AddonFromZipDialog(EmcDialog):
+   def __init__(self, success_cb, **kargs):
+      self._success_cb = success_cb
+      self._cb_kargs = kargs
+      EmcDialog.__init__(self, style='minimal', title='Install addon',
+                         text='install') # TODO better text
+      self.button_add(_('From url'), selected_cb=self.from_url_btn_cb)
+      self.button_add(_('From local zip'), selected_cb=self.from_zip_btn_cb).disabled = True
+
+   def from_zip_btn_cb(self, btn):
+      pass # TODO fileselector
+
+   def from_url_btn_cb(self, btn):
+      EmcVKeyboard(title=_('Insert the addon url'), accept_cb=self.url_typed_cb)
+
+   def url_typed_cb(self, vkeyb, url):
+      zip_name = os.path.basename(url)
+      if re.fullmatch('[a-z0-9.]+-[0-9]+\.[0-9]+\.[0-9]+\.zip', zip_name) is None:
+         EmcDialog(style='error', text='invalid url') # TODO better dialog
+
+      self.buttons_clear()
+      self.progress_show()
+      self.text_set('installing, please wait...') # TODO better text
+
+      dest = os.path.join(base_pkgs_path, zip_name)
+      utils.download_url_async(url, dest,
+                               progress_cb=self.download_progress_cb,
+                               complete_cb=self.download_done_cb)
+      
+   def download_progress_cb(self, dest, total, done):
+      if total and done:
+         self.progress_set(done / total)
+
+   def download_done_cb(self, dest, status):
+      self.delete()
+      if status != 200:
+         EmcDialog(style='error', text='Download failed') # TODO better dialog
+         return
+
+      addon = install_from_local_zip(dest)
+      if addon is None:
+         EmcDialog(style='error', text='Install failed') # TODO better dialog
+      
+      notify_addon_installed(addon)
+
+      self._success_cb(**self._cb_kargs)
+
+
+

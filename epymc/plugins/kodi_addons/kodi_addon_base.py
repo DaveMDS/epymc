@@ -22,8 +22,9 @@ from __future__ import absolute_import, print_function
 
 import os
 import locale
-from distutils.version import StrictVersion
+import zipfile
 from lxml import etree
+from distutils.version import StrictVersion
 
 from efl.elementary import utf8_to_markup
 
@@ -96,6 +97,8 @@ def load_single_addon(addon_id, system=False):
    Args:
       addon_id (str): the addon id
       system (bool): whenever to load from system dir or user dir
+   Return:
+      The KodiAddon instance (any of the base subclass)
    """
    if system:
       xml_path = os.path.join(sys_addons_path, addon_id, 'addon.xml')
@@ -105,6 +108,8 @@ def load_single_addon(addon_id, system=False):
    addon = addon_factory(xml_path)
    # TODO check err
    installed_addons[addon.id] = addon
+
+   return addon
 
 
 def get_installed_addon(addon_id):
@@ -125,6 +130,20 @@ def get_installed_addons(cls=None):
       return sorted([ a for a in installed_addons.values() if type(a) == cls ])
 
 
+def install_from_local_zip(zip_file):
+   """ Install (and load) any type of addons from a local zip file
+   Args:
+      zip_file (str): Full path of the zip to install
+   Return:
+      The new installed addon instance or None on errors
+   """
+   addon_id = os.path.basename(zip_file).split('-')[0]
+   
+   # TODO check errors
+   with zipfile.ZipFile(zip_file, 'r') as z:
+      z.extractall(base_addons_path)
+
+   return load_single_addon(addon_id)
 
 
 class KodiAddonBase(object):

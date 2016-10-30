@@ -35,7 +35,7 @@ from efl import ecore
 
 import epymc.mediaplayer as mediaplayer
 from epymc.browser import EmcItemClass
-from epymc.gui import EmcDialog
+from epymc.gui import EmcDialog, EmcWaitDialog
 
 from .kodi_addon_base import KodiAddonBase, get_installed_addon
 from .kodi_pythonmodule import KodiPythonModule
@@ -217,6 +217,8 @@ class KodiPluginSource(KodiAddonBase):
 
    def __init__(self, *args):
       KodiAddonBase.__init__(self, *args)
+      self._run_dialog = None
+      self._run_dialog_timer = None
 
       ext = self._root.find(self.extension_point)
       self._main_exe = ext.get('library')
@@ -240,7 +242,21 @@ class KodiPluginSource(KodiAddonBase):
       return self._provides.split()
 
 
-   ### Addon runner
+   ### Addon runner  
+   def show_run_dialog(self):
+      if self._run_dialog_timer is not None:
+         self._run_dialog_timer.delete()
+         self._run_dialog_timer = None
+      self._run_dialog = EmcWaitDialog(_('Getting info...'), self._cmd_canc_cb)
+
+   def hide_run_dialog(self):
+      if self._run_dialog_timer is not None:
+         self._run_dialog_timer.delete()
+         self._run_dialog_timer = None
+      if self._run_dialog is not None:
+         self._run_dialog.delete()
+         self._run_dialog = None
+
    def request_page(self, url=None, browser=None):
 
       if url is None:
@@ -276,19 +292,24 @@ class KodiPluginSource(KodiAddonBase):
       # build (and run) the plugin command line
       cmd = 'env PYTHONPATH="{}" python2 "{}" "{}" "{}" "{}"'.format(
              ':'.join(PYTHONPATH), self.main_exe, arg1, arg2, arg3)
-      DBG('CMD:', cmd)
       self._stderr_lines = []
       self._page_items = []
       self._page_url = url
 
-      exe = ecore.Exe(cmd, ecore.ECORE_EXE_PIPE_READ |
-                           ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED |
-                           ecore.ECORE_EXE_PIPE_ERROR |
-                           ecore.ECORE_EXE_PIPE_ERROR_LINE_BUFFERED |
-                           ecore.ECORE_EXE_TERM_WITH_PARENT)
-      exe.on_data_event_add(self._addon_stdout_cb)
-      exe.on_error_event_add(self._addon_stderr_cb)
-      exe.on_del_event_add(self._addon_complete_cb)
+      self._exe = ecore.Exe(cmd, ecore.ECORE_EXE_PIPE_READ |
+                                 ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED |
+                                 ecore.ECORE_EXE_PIPE_ERROR |
+                                 ecore.ECORE_EXE_PIPE_ERROR_LINE_BUFFERED |
+                                 ecore.ECORE_EXE_TERM_WITH_PARENT)
+      self._exe.on_data_event_add(self._addon_stdout_cb)
+      self._exe.on_error_event_add(self._addon_stderr_cb)
+      self._exe.on_del_event_add(self._addon_complete_cb)
+
+      DBG('RUNNING CMD:', cmd)
+      self._run_dialog_timer = ecore.Timer(0.5, lambda: self.show_run_dialog())
+
+   def _cmd_canc_cb(self):
+      self._exe.delete()
 
    def _addon_stdout_cb(self, exe, event):
       for line in event.lines:
@@ -306,6 +327,7 @@ class KodiPluginSource(KodiAddonBase):
       self._stderr_lines += event.lines
 
    def _addon_complete_cb(self, exe, event):
+      self.hide_run_dialog()
       if event.exit_code != 0:
          txt = '<small>{}</small>'.format('<br>'.join(self._stderr_lines))
          EmcDialog(style='error', text=txt)
@@ -316,6 +338,7 @@ class KodiPluginSource(KodiAddonBase):
          self._page_url = None
 
    def _populate_requested_page(self, browser, page_url, items):
+      self.hide_run_dialog()
       for listitem in items:
          self._browser.item_add(StandardItemClass(), listitem['url'], (self, listitem))
 
@@ -327,9 +350,11 @@ class KodiPluginSource(KodiAddonBase):
       self._page_items.append(listitem)
 
    def _Player_play(self, item=None, listitem=None, windowed=False, startpos=-1):
+      self.hide_run_dialog()
       listitem_play(listitem, item)
 
    def _endOfDirectory(self, succeeded=True, updateListing=False, cacheToDisc=True):
+      self.hide_run_dialog()
       if succeeded == True:
          self._browser.page_add(self._page_url, 'page label', None, # TODO item styles
                                  self._populate_requested_page, items=self._page_items)
@@ -338,6 +363,7 @@ class KodiPluginSource(KodiAddonBase):
          pass # TODO ALERT
 
    def _setResolvedUrl(self, succeeded, listitem):
+      self.hide_run_dialog()
       if succeeded:
          listitem_play(listitem)
       else:

@@ -1526,6 +1526,19 @@ class EmcConfirmDialog(EmcDialog):
       dialog.delete()
       self.confirm_cb(False, **self.confirm_cb_kargs)
 
+class EmcWaitDialog(EmcDialog):
+   def __init__(self, text, canc_cb, title=_('Please wait'), **kargs):
+      self._user_cb = canc_cb
+      self._user_cb_kargs = kargs
+      EmcDialog.__init__(self, style='minimal', text=text, title=title,
+                         spinner=True, canc_cb=self.cancel_cb, **kargs)
+      self.button_add(_('Cancel'), self.cancel_cb)
+
+   def cancel_cb(self, *args):
+      self.delete()
+      if callable(self._user_cb):
+         self._user_cb(**self._user_cb_kargs)
+   
 ################################################################################
 class EmcNotify(edje.Edje):
    """ TODO doc this"""

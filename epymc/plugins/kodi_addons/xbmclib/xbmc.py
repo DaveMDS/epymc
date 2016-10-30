@@ -14,7 +14,7 @@ def translatePath(path):
       return path.replace('special://temp', _temp, 1)
    else:
       print("UNSUPPORTED PATH", path)
-      
+
    return None # or path ?
 
 

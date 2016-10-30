@@ -18,7 +18,7 @@ class Addon(object):
 
 
    def getAddonInfo(self, id):
-      return 'TODO'
+      return 'TODO getAddonInfo'
       
    def getSetting(self, id):
       return '0' # TODO

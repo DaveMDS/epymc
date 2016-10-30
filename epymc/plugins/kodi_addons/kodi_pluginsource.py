@@ -389,15 +389,18 @@ class KodiPluginSource(KodiAddonBase):
 
    def _getInfoLabel(self, infotag):
       """ http://kodi.wiki/view/InfoLabels """
-      print("GET", infotag)
-      
-      if infotag.startswith('ListItem.'):
+      ctx, key = infotag.split('.', 1)
+      val = None
+
+      if ctx == 'ListItem':
          listitem = self._selected_listitem
-         key = infotag.split('.', 1)[1].lower()
-         val = listitem['infoLabels'].get(key)
-         if val:
-            self._exe.send(val + '\n')
-            return
-      print('ERROR: cannot resolve {}'.format(infotag))
-      self._exe.send("ERROR\n")
+         val = listitem['infoLabels'].get(key.lower())
+
+      # TODO implement more context
+
+      if val is None:
+         DBG('ERROR: cannot resolve InfoLabel: {}'.format(infotag))
+
+      # always send something back, or the addon will hang
+      self._exe.send('{}\n'.format(val or 'Unknown'))
       

@@ -44,11 +44,11 @@ class KodiRepository(KodiAddonBase):
       ext = self._root.find(self.extension_point)
       for elem in ext.iterchildren():
          if elem.tag == 'info':
-            self._addons_xml_url = elem.text
+            self._addons_xml_url = elem.text.strip()
          elif elem.tag == 'checksum':
-            self._addons_xml_md5_url = elem.text
+            self._addons_xml_md5_url = elem.text.strip()
          elif elem.tag == 'datadir':
-            self._base_url = elem.text
+            self._base_url = elem.text.strip()
 
    @property
    def base_url(self):

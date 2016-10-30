@@ -30,8 +30,9 @@ from efl.elementary.entry import utf8_to_markup
 from efl.evas import EXPAND_BOTH, FILL_BOTH, FILL_HORIZ
 
 from epymc.modules import EmcModule
-from epymc.gui import EmcDialog, EmcVKeyboard, EmcFileSelector, \
-   EmcButton, EmcNotify, EmcMenu, DownloadManager, EmcSlider
+from epymc.gui import EmcSlider, EmcVKeyboard, EmcFileSelector, EmcButton, \
+   EmcDialog, EmcInfoDialog, EmcWarningDialog, EmcErrorDialog, EmcConfirmDialog, \
+   EmcNotify, EmcMenu, DownloadManager
 
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
@@ -334,23 +335,28 @@ class MyItemClass(EmcItemClass):
 
       # Dialog - Info
       elif url == 'uitests://dlg-info':
-         EmcDialog(title='Dialog - Info', text=LOREM, style='info')
+         EmcInfoDialog(LOREM)
 
       # Dialog - Warning
       elif url == 'uitests://dlg-warning':
-         text = 'This is an <br><br><b>Warning</><br>dialog<br>'
-         EmcDialog(title='Dialog - Warning', text=text, style='warning')
+         EmcWarningDialog('This is an <br><br><b>Warning</><br>dialog<br>')
 
-      # Dialog - Warning (no title)
+      # Dialog - Warning (custom title)
       elif url == 'uitests://dlg-warning2':
-         text = 'This is an <br><br><b>Warning</><br>dialog<br>'
-         EmcDialog(text=text, style='warning')
+         EmcWarningDialog('This is an <br><br><b>Warning</><br>dialog<br>',
+                          title='Custom warning title')
 
       # Dialog - Error
       elif url == 'uitests://dlg-error':
-         text = 'This is an <br><br><b>Error</><br>dialog<br>'
-         EmcDialog(title='Dialog - Error', text=text, style='error')
+         EmcErrorDialog('This is an <br><br><b>Error</><br>dialog<br>')
 
+      # Dialog - Confirm
+      elif url == 'uitests://dlg-confirm':
+         def _confirm_cb(confirmed, asd_1, asd_2):
+            print('Confirmed:', confirmed, 'kargs:', asd_1, asd_2)
+         EmcConfirmDialog('This is a <br><br><b>confirmation</><br><br>dialog<br>',
+                          _confirm_cb, asd_1='asd1', asd_2='asd2')
+      
       # Dialog - YesNo
       elif url == 'uitests://dlg-yesno':
          text = 'This is an <br><br><b>Yes/No</><br>dialog<br>'
@@ -643,29 +649,7 @@ class MyItemClass(EmcItemClass):
 
          # musicbrainz.calculate_discid('/dev/sr0')
          MusicBrainz().get_cdrom_info('/dev/cdrom', info_cb, ignore_cache=True)
-         
 
-      # Movie name test
-      # elif url == 'uitests://movies_name':
-         # urls = [ 'alien.avi',
-                  # 'alien (1978).avi',
-                  # '(2003)alien 3.avi',
-                  # '[DivX - ITA] alien 3.avi',
-                  # '[DivX - ITA] ali]en 3.avi',
-                  # '[DivX - ITA] al[i]en 3.avi',
-                  # '[DivX - ITA]alien3.avi',
-                  # '[DivX - ITA]   alien3   .avi',
-                  # '[DivX - ITA]alien.3.la.clonazione.avi',
-                  # '[DivX - ITA]alien 3 - la clonazione.avi',
-                  # '{DivX - ITA} alien 3.avi',
-                  # 'alien {DivX - ITA}.avi',
-                  # '[DivX - ITA] Die Hard I - Trappola di Cristallo.avi',
-                # ]
-         # t = ''
-         # for u in urls:
-            # t += '<hilight>URL:</> ' + u + '<br>'
-            # t += '<hilight>name/year:</> ' + str(get_movie_name_from_url(u)) + '<br><br>'
-         # EmcDialog(title = 'Movie name test', text = t)
 
 
 class UiTestsModule(EmcModule):
@@ -725,8 +709,9 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://tmdb', 'Themoviedb.org query with gui')
       browser.item_add(MyItemClass(), 'uitests://dlg-info', 'Dialog - Info')
       browser.item_add(MyItemClass(), 'uitests://dlg-warning', 'Dialog - Warning')
-      browser.item_add(MyItemClass(), 'uitests://dlg-warning2', 'Dialog - Warning (no title)')
+      browser.item_add(MyItemClass(), 'uitests://dlg-warning2', 'Dialog - Warning (custom title)')
       browser.item_add(MyItemClass(), 'uitests://dlg-error', 'Dialog - Error')
+      browser.item_add(MyItemClass(), 'uitests://dlg-confirm', 'Dialog - Confirm')
       browser.item_add(MyItemClass(), 'uitests://dlg-yesno', 'Dialog - YesNo')
       browser.item_add(MyItemClass(), 'uitests://dlg-cancel', 'Dialog - Cancel')
       browser.item_add(MyItemClass(), 'uitests://dlg-progress', 'Dialog - Progress')

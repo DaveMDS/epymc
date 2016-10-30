@@ -54,128 +54,15 @@ def DBG(*args):
    print('KODI MODULE:', *args)
    pass
 
-
-
 _mod = None
+
 
 def notify_addon_installed(addon):
    txt = '<title>{0}</title><br>{1.name}<br>{1.version}'.format(
          _('Addon installed'), addon)
    EmcNotify(txt, icon=addon.icon)
 
-class AddonInfoPanel(EmcDialog):
-   def __init__(self, addon, browser=None):
-      self.addon = addon
-      self.browser = browser
-      EmcDialog.__init__(self, style='panel', title=addon.name,
-                         content=EmcImage(addon.icon),
-                         text=addon.info_text_long)
-      if addon.is_installed:
-         self.button_add(_('Options')).disabled = True
-         self.button_add(_('Enable') if addon.disabled else _('Disable'),
-                         selected_cb=self.enable_disable_btn_cb,
-                         cb_data=not addon.disabled)
-         self.button_add(_('Update'),  selected_cb=self.install_btn_cb)
-         self.button_add(_('Uninstall'), selected_cb=self.uninstall_btn_cb)
-      else:
-         self.button_add(_('Install'),  selected_cb=self.install_btn_cb)
-
-   def enable_disable_btn_cb(self, btn, disable):
-      self.addon.disabled = disable
-      self.delete()
-      if self.browser is not None:
-         self.browser.refresh()
-
-   def install_btn_cb(self, btn):
-      repo = self.addon.repository
-      addon = self.addon
-
-      # addon already installed ?
-      installed = get_installed_addon(addon.id)
-      if installed and installed.check_version(addon.version):
-         EmcDialog(style='info', text='already installed') # TODO better dialog
-         return
-
-      # main addon
-      needed_addons = [addon]
-      total_size = int(addon.metadata.get('size', 0))
-
-      # addon dependencies
-      for id, min_version in addon.requires:
-         # dep already installed?
-         installed = get_installed_addon(id)
-         if installed and installed.check_version(min_version):
-            continue
-
-         # is dep present in repo?
-         addon = repo.addon_available(id, min_version)
-         if addon is None:
-            EmcDialog(style='error', text='missing pkg in repo') # TODO better dialog
-            return
-
-         needed_addons.append(addon)
-         total_size += int(addon.metadata.get('size', 0))
-
-      # TODO also install dependencies of dependencies? 
-      
-      self._to_download_addons = needed_addons
-      self._total_download_size = total_size or 1
-      self._total_downloaded = 1
-      self._install_dialog = EmcDialog(style='progress', text='installing...') # TODO better dialog
-      self.download_next_addon()
-
-   def download_next_addon(self):
-      try:
-         addon = self._to_download_addons.pop()
-      except IndexError: # all addons done
-         self.install_completed()
-         return
-
-      zip_name = '{0}-{1}.zip'.format(addon.id, addon.version)
-      zip_url = '{0}/{1}/{2}'.format(self.addon.repository.base_url,
-                                     addon.id, zip_name)
-      zip_dest = os.path.join(base_pkgs_path, zip_name)
-      utils.download_url_async(zip_url, zip_dest, addon=addon,
-                               progress_cb=self.download_progress_cb,
-                               complete_cb=self.download_complete_cb)
-
-   def download_progress_cb(self, dest, tot, done, addon):
-      done += self._total_downloaded
-      self._install_dialog.progress_set(done / self._total_download_size)
-
-   def download_complete_cb(self, dest, status, addon):
-      if status != 200:
-         EmcDialog(style='error', text='download failed')  # TODO better dialog
-         return
-
-      self._total_downloaded += int(addon.metadata.get('size', 0))
-
-      addon = install_from_local_zip(dest)
-      if addon is None:
-         EmcDialog(style='error', text='Install failed') # TODO better dialog
-      else:
-         notify_addon_installed(addon)
-         self.download_next_addon()
-
-   def install_completed(self):
-      self._install_dialog.delete()
-
-   def uninstall_btn_cb(self, btn):
-      txt = '{0}<br><br><hilight>{1.name} v.{1.version}</hilight>'.format(
-            _('Are you sure you want to delete this addon?'), self.addon)
-      EmcConfirmDialog(txt, self.uninstall_confirmed_cb)
-
-   def uninstall_confirmed_cb(self, confirmed):
-      if not confirmed:
-         return
-      if not uninstall_addon(self.addon):
-         EmcErrorDialog(_('Cannot remove this addon'))
-      else:
-         self.delete()
-         if self.browser is not None:
-            self.browser.refresh(True)
-
-
+### Browser ItemClass #########################################################
 class GetMoreItemClass(EmcItemClass):
    def item_selected(self, url, mod):
       mod._browser.page_add('kodi_addons://repos', _('Get more'), None,
@@ -248,6 +135,7 @@ class AddonItemClass(EmcItemClass):
       return addon.fanart
 
 
+### The epymc module ##########################################################
 class KodiAddonsModule(EmcModule):
    name = 'kodi_addons'
    label = _('Kodi Addons')
@@ -375,6 +263,121 @@ class KodiAddonsModule(EmcModule):
                   cb=lambda: AddonFromZipDialog(lambda: browser.refresh(True)))
 
 
+### Addon info panel ##########################################################
+class AddonInfoPanel(EmcDialog):
+   def __init__(self, addon, browser=None):
+      self.addon = addon
+      self.browser = browser
+      EmcDialog.__init__(self, style='panel', title=addon.name,
+                         content=EmcImage(addon.icon),
+                         text=addon.info_text_long)
+      if addon.is_installed:
+         self.button_add(_('Options')).disabled = True
+         self.button_add(_('Enable') if addon.disabled else _('Disable'),
+                         selected_cb=self.enable_disable_btn_cb,
+                         cb_data=not addon.disabled)
+         self.button_add(_('Update'),  selected_cb=self.install_btn_cb)
+         self.button_add(_('Uninstall'), selected_cb=self.uninstall_btn_cb)
+      else:
+         self.button_add(_('Install'),  selected_cb=self.install_btn_cb)
+
+   def enable_disable_btn_cb(self, btn, disable):
+      self.addon.disabled = disable
+      self.delete()
+      if self.browser is not None:
+         self.browser.refresh()
+
+   def install_btn_cb(self, btn):
+      repo = self.addon.repository
+      addon = self.addon
+
+      # addon already installed ?
+      installed = get_installed_addon(addon.id)
+      if installed and installed.check_version(addon.version):
+         EmcDialog(style='info', text='already installed') # TODO better dialog
+         return
+
+      # main addon
+      needed_addons = [addon]
+      total_size = int(addon.metadata.get('size', 0))
+
+      # addon dependencies
+      for id, min_version in addon.requires:
+         # dep already installed?
+         installed = get_installed_addon(id)
+         if installed and installed.check_version(min_version):
+            continue
+
+         # is dep present in repo?
+         addon = repo.addon_available(id, min_version)
+         if addon is None:
+            EmcDialog(style='error', text='missing pkg in repo') # TODO better dialog
+            return
+
+         needed_addons.append(addon)
+         total_size += int(addon.metadata.get('size', 0))
+
+      # TODO also install dependencies of dependencies? 
+      
+      self._to_download_addons = needed_addons
+      self._total_download_size = total_size or 1
+      self._total_downloaded = 1
+      self._install_dialog = EmcDialog(style='progress', text='installing...') # TODO better dialog
+      self.download_next_addon()
+
+   def download_next_addon(self):
+      try:
+         addon = self._to_download_addons.pop()
+      except IndexError: # all addons done
+         self.install_completed()
+         return
+
+      zip_name = '{0}-{1}.zip'.format(addon.id, addon.version)
+      zip_url = '{0}/{1}/{2}'.format(self.addon.repository.base_url,
+                                     addon.id, zip_name)
+      zip_dest = os.path.join(base_pkgs_path, zip_name)
+      utils.download_url_async(zip_url, zip_dest, addon=addon,
+                               progress_cb=self.download_progress_cb,
+                               complete_cb=self.download_complete_cb)
+
+   def download_progress_cb(self, dest, tot, done, addon):
+      done += self._total_downloaded
+      self._install_dialog.progress_set(done / self._total_download_size)
+
+   def download_complete_cb(self, dest, status, addon):
+      if status != 200:
+         EmcDialog(style='error', text='download failed')  # TODO better dialog
+         return
+
+      self._total_downloaded += int(addon.metadata.get('size', 0))
+
+      addon = install_from_local_zip(dest)
+      if addon is None:
+         EmcDialog(style='error', text='Install failed') # TODO better dialog
+      else:
+         notify_addon_installed(addon)
+         self.download_next_addon()
+
+   def install_completed(self):
+      self._install_dialog.delete()
+
+   def uninstall_btn_cb(self, btn):
+      txt = '{0}<br><br><hilight>{1.name} v.{1.version}</hilight>'.format(
+            _('Are you sure you want to delete this addon?'), self.addon)
+      EmcConfirmDialog(txt, self.uninstall_confirmed_cb)
+
+   def uninstall_confirmed_cb(self, confirmed):
+      if not confirmed:
+         return
+      if not uninstall_addon(self.addon):
+         EmcErrorDialog(_('Cannot remove this addon'))
+      else:
+         self.delete()
+         if self.browser is not None:
+            self.browser.refresh(True)
+
+
+### Addon install panel #######################################################
 class AddonFromZipDialog(EmcDialog):
 
    zipfile_regexp = '[a-z0-9.]+-[0-9]+\.[0-9]+\.[0-9]+\.zip'

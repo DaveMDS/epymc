@@ -29,29 +29,21 @@ LOGNONE = 7
 
 def log(msg, level=LOGNOTICE):
    print(msg)
-   
+
 def executebuiltin(function):
    print('NOT IMPLEMENTED: executebuiltin ("{}")'.format(function))
 
+
 class Player(object):
-   def __init__(self):
+
+   @emc_method_call
+   def play(self, item=None, listitem=None, windowed=False, startpos=-1):
       pass
 
-   def play(self, item=None, listitem=None, windowed=False, startpos=-1):
-      kargs = {
-         'item': item,
-         'listitem': listitem,
-         'windowed': windowed,
-         'startpos': startpos,
-      }
-      print('Player_play {}'.format(kargs))
 
-
+@emc_function_call
 def getInfoLabel(infotag):
-   kargs = {
-      'infotag': infotag,
-   }
-   print('getInfoLabel {}'.format(kargs))
-   sys.stdout.flush()
-   res = sys.stdin.readline()
-   return res.rstrip('\n')
+   return emc_wait_replay()
+
+
+

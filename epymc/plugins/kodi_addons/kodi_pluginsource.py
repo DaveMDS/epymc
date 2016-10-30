@@ -322,16 +322,24 @@ class KodiPluginSource(KodiAddonBase):
       self._exe.delete()
 
    def _addon_stdout_cb(self, exe, event):
+      """ Lines from addon stdout use this protocol:
+
+      func_name {args: (...), kargs: {...}}\n
+
+      Func is resolved to a method of this class and called with args and kargs
+      Function from xbmclib is prefixed with a _ (ex: _addDirectoryItem)
+      while methods become: _Class_method (ex: _Player_play)
+      """
       for line in event.lines:
          # print('LINE: "{}"'.format(line))
          try:
-            action, params = line.split(' ', 1)
-            method = getattr(self, '_' + action)
+            func_name, args_and_kargs = line.split(' ', 1)
+            method = getattr(self, func_name)
          except (AttributeError, ValueError):
             DBG("-->", line)
          else:
-            method(**ast.literal_eval(params))
-         # TODO error check
+            args_and_kargs = ast.literal_eval(args_and_kargs)
+            method(*args_and_kargs['args'], **args_and_kargs['kargs'])
 
    def _addon_stderr_cb(self, exe, event):
       self._stderr_lines += event.lines
@@ -363,7 +371,7 @@ class KodiPluginSource(KodiAddonBase):
       self.hide_run_dialog()
       listitem_play(listitem, item)
 
-   def _endOfDirectory(self, succeeded=True, updateListing=False, cacheToDisc=True):
+   def _endOfDirectory(self, handle, succeeded=True, updateListing=False, cacheToDisc=True):
       self.hide_run_dialog()
       if succeeded == True:
          self._browser.page_add(self._page_url, 'page label', None, # TODO item styles

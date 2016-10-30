@@ -49,15 +49,8 @@ def addSortMethod(handle, sortMethod, label2Mask=None):
    print('NOT IMPLEMENTED: addSortMethod')
 
 
+@emc_function_call
 def addDirectoryItem(handle, url, listitem, isFolder=False, totalItems=1):
-   kargs = {
-      'handle': handle,
-      'url': url,
-      'listitem': listitem,
-      'isFolder': isFolder,
-      'totalItems': totalItems,
-   }
-   print('addDirectoryItem {}'.format(kargs))
    return True
 
 def addDirectoryItems(handle, items, totalItems=1):
@@ -69,20 +62,12 @@ def setContent(handle, content):
    print('NOT IMPLEMENTED: setContent ("{}")'.format(content))
    # content: files, songs, artists, albums, movies, tvshows, episodes, musicvideos
 
+@emc_function_call
 def endOfDirectory(handle, succeeded=True, updateListing=False, cacheToDisc=True):
-   kargs = {
-      'succeeded': succeeded,
-      'updateListing': updateListing,
-      'cacheToDisc': cacheToDisc,
-   }
-   print('endOfDirectory {}'.format(kargs))
+   pass
 
-
+@emc_function_call
 def setResolvedUrl(handle, succeeded, listitem):
-   kargs = {
-      'succeeded': succeeded,
-      'listitem': listitem,
-   }
-   print('setResolvedUrl {}'.format(kargs))
+   pass
    
    

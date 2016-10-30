@@ -34,7 +34,7 @@ import re
 import epymc.config_gui as config_gui
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
-# import epymc.ini as ini
+import epymc.ini as ini
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
@@ -51,7 +51,7 @@ from .kodi_pluginsource import KodiPluginSource
 
 
 def DBG(*args):
-   print('KODI ADDONS:', *args)
+   print('KODI MODULE:', *args)
    pass
 
 
@@ -72,11 +72,19 @@ class AddonInfoPanel(EmcDialog):
                          text=addon.info_text_long)
       if addon.is_installed:
          self.button_add(_('Options')).disabled = True
-         self.button_add('Enable/Disable').disabled = True # TODO label
+         self.button_add(_('Enable') if addon.disabled else _('Disable'),
+                         selected_cb=self.enable_disable_btn_cb,
+                         cb_data=not addon.disabled)
          self.button_add(_('Update'),  selected_cb=self.install_btn_cb)
          self.button_add(_('Uninstall'), selected_cb=self.uninstall_btn_cb)
       else:
          self.button_add(_('Install'),  selected_cb=self.install_btn_cb)
+
+   def enable_disable_btn_cb(self, btn, disable):
+      self.addon.disabled = disable
+      self.delete()
+      if self.browser is not None:
+         self.browser.refresh()
 
    def install_btn_cb(self, btn):
       repo = self.addon.repository
@@ -257,8 +265,8 @@ class KodiAddonsModule(EmcModule):
       _mod = self
 
       # create ini options if not exists (with defaults)
-      # ini.add_section('videochannels')
-      # ini.get('videochannels', 'autoupdate_ytdl', 'True')
+      ini.add_section('kodiaddons')
+      ini.get('kodiaddons', 'disabled_addons', '')
 
       # create needed folders in ~/.config/epymc/kodi
       if not os.path.exists(base_pkgs_path):
@@ -298,12 +306,14 @@ class KodiAddonsModule(EmcModule):
 
    def populate_root_page(self, browser, url):
       for addon in get_installed_addons(KodiPluginSource):
-         browser.item_add(AddonItemClass(), None, addon)
+         if not addon.disabled:
+            browser.item_add(AddonItemClass(), None, addon)
       browser.item_add(GetMoreItemClass(), 'kodi_addons://manage', self)
 
    def populate_repositories_page(self, browser, url):
       for repo in get_installed_addons(KodiRepository):
-         browser.item_add(RepoItemClass(), url+'/repo_name', repo) # TODO fix repo_name
+         if not repo.disabled:
+            browser.item_add(RepoItemClass(), url+'/repo_name', repo) # TODO fix repo_name
 
    def populate_repository_page(self, browser, url, repo):
       repo.get_addons(self._repo_get_addons_done)

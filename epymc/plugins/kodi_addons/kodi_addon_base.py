@@ -30,6 +30,7 @@ from distutils.version import StrictVersion
 from efl.elementary import utf8_to_markup
 
 import epymc.utils as utils
+import epymc.ini as ini
 
 
 def DBG(*args):
@@ -189,9 +190,26 @@ class KodiAddonBase(object):
       return self.name.lower() > other.name.lower()
 
    @property
-   def is_installed(self):
+   def is_installed(self): # TODO rename to "installed"
       return self._folder is not None
 
+   @property
+   def disabled(self):
+      """ Whenever the addon has been disabled (bool) """
+      return self._id in ini.get_string_list('kodiaddons', 'disabled_addons')
+
+   @disabled.setter
+   def disabled(self, disable):
+      """ Disable (True) or enable (False) the addon """
+      L = ini.get_string_list('kodiaddons', 'disabled_addons')
+      if disable == True and self._id not in L:
+         L.append(self._id)
+      elif disable == False and self._id in L:
+         L.remove(self._id)
+      else:
+         return
+      ini.set_string_list('kodiaddons', 'disabled_addons', L)
+      
    @property
    def installed_path(self):
       """ full path of the installed addon """

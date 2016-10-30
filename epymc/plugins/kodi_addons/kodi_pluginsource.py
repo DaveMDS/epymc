@@ -26,6 +26,9 @@
 # Require:
 #  python2-polib
 
+# Todo:
+#  - Playlist (southpark)
+
 from __future__ import absolute_import, print_function
 
 import os
@@ -141,6 +144,10 @@ xbmclib_path = os.path.join(os.path.dirname(__file__), 'xbmclib')
       StartOffset: '256.4'
       fanart_image: ''       # only see in SouthPark addon :/
    }
+
+   streamInfo: {
+      ...
+   }
 }
 """
 
@@ -183,6 +190,7 @@ def listitem_play(listitem, media_url=None):
 class StandardItemClass(EmcItemClass):
    def item_selected(self, url, item_data):
       addon, listitem = item_data
+      addon._selected_listitem = listitem
       if listitem.get('isFolder') or url.startswith('plugin://'):
          addon.request_page(url)
       else:
@@ -202,11 +210,11 @@ class StandardItemClass(EmcItemClass):
 
    def fanart_get(self, url, item_data):
       addon, listitem = item_data
-      return listitem_best_fanart(listitem)
+      return listitem_best_fanart(listitem) or addon.fanart
 
    def info_get(self, url, item_data):
       addon, listitem = item_data
-      import pprint
+      import pprint  # usefull for debug
       pprint.pprint(listitem)
       return listitem_best_info(listitem)
 
@@ -219,6 +227,7 @@ class KodiPluginSource(KodiAddonBase):
       KodiAddonBase.__init__(self, *args)
       self._run_dialog = None
       self._run_dialog_timer = None
+      self._selected_listitem = None
 
       ext = self._root.find(self.extension_point)
       self._main_exe = ext.get('library')
@@ -300,6 +309,7 @@ class KodiPluginSource(KodiAddonBase):
                                  ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED |
                                  ecore.ECORE_EXE_PIPE_ERROR |
                                  ecore.ECORE_EXE_PIPE_ERROR_LINE_BUFFERED |
+                                 ecore.ECORE_EXE_PIPE_WRITE |
                                  ecore.ECORE_EXE_TERM_WITH_PARENT)
       self._exe.on_data_event_add(self._addon_stdout_cb)
       self._exe.on_error_event_add(self._addon_stderr_cb)
@@ -368,3 +378,18 @@ class KodiPluginSource(KodiAddonBase):
          listitem_play(listitem)
       else:
          EmcDialog(style='error', text='Addon error') # TODO better dialog
+
+   def _getInfoLabel(self, infotag):
+      """ http://kodi.wiki/view/InfoLabels """
+      print("GET", infotag)
+      
+      if infotag.startswith('ListItem.'):
+         listitem = self._selected_listitem
+         key = infotag.split('.', 1)[1].lower()
+         val = listitem['infoLabels'].get(key)
+         if val:
+            self._exe.send(val + '\n')
+            return
+      print('ERROR: cannot resolve {}'.format(infotag))
+      self._exe.send("ERROR\n")
+      

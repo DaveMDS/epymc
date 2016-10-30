@@ -23,6 +23,7 @@ class ListItem(object):
       self.infoLabels = LowerCaseDict()
       self.properties = LowerCaseDict()
       self.art = LowerCaseDict()
+      self.streamInfo = LowerCaseDict()
       if iconImage: # deprecated (use art instead)
          self.art['icon'] = iconImage
       if thumbnailImage: # deprecated (use art instead)
@@ -49,18 +50,28 @@ class ListItem(object):
    def getPath(self):
       return self.path
 
+   def setArt(self, values):
+      self.art.update(values)
+
    def setInfo(self, type=None, infoLabels={}):
       self.infoLabels.update(infoLabels)
-      
+
+   def addStreamInfo(self, type=None, values={}):
+      self.streamInfo.update(values)
+
    def setProperty(self, key, value):
       self.properties[key] = value
 
    def getProperty(self, key):
       return self.properties.get(key)
 
-   def setArt(self, values):
-      self.art.update(values)
+   def addContextMenuItems(self, items, replaceItems=False):
+      print('NOT IMPLEMENTED: addContextMenuItems (items: {})'.format(len(items)))
 
    def setThumbnailImage(self, thumb):
       """ deprecated  (use art instead) """
       self.art['thumb'] = thumb
+
+   def setIconImage(self, icon):
+      """ deprecated  (use art instead) """
+      self.art['icon'] = icon

@@ -1,6 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 import os
+import sys
 
 _home = os.path.expanduser('~/.config/epymc/kodi')
 _temp = os.path.join(_home, 'temp')
@@ -44,3 +45,13 @@ class Player(object):
          'startpos': startpos,
       }
       print('Player_play {}'.format(kargs))
+
+
+def getInfoLabel(infotag):
+   kargs = {
+      'infotag': infotag,
+   }
+   print('getInfoLabel {}'.format(kargs))
+   sys.stdout.flush()
+   res = sys.stdin.readline()
+   return res.rstrip('\n')

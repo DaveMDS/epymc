@@ -62,6 +62,7 @@ def notify_addon_installed(addon):
          _('Addon installed'), addon)
    EmcNotify(txt, icon=addon.icon)
 
+
 ### Browser ItemClass #########################################################
 class GetMoreItemClass(EmcItemClass):
    def item_selected(self, url, mod):

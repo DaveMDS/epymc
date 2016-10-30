@@ -34,7 +34,7 @@ class KodiPythonModule(KodiAddonBase):
 
       ext = self._root.find(self.extension_point)
       self._main_import = ext.get('library')
-      for elem in ext.iterchildren():
+      for elem in ext:
          if elem.tag == 'provides':
             self._provides = elem.text
 

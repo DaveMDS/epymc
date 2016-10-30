@@ -21,7 +21,7 @@
 from __future__ import absolute_import, print_function
 
 import os
-from lxml import etree
+from xml.etree import ElementTree
 
 import epymc.utils as utils
 
@@ -42,7 +42,7 @@ class KodiRepository(KodiAddonBase):
       self._addons = {} # key: addon_id  val: KodiAddon instance
 
       ext = self._root.find(self.extension_point)
-      for elem in ext.iterchildren():
+      for elem in ext:
          if elem.tag == 'info':
             self._addons_xml_url = elem.text.strip()
          elif elem.tag == 'checksum':
@@ -100,8 +100,8 @@ class KodiRepository(KodiAddonBase):
       self._parse_xml(dest)
 
    def _parse_xml(self, local):
-      root = etree.parse(local).getroot()
-      for addon_el in root.iterchildren():
+      root = ElementTree.parse(local).getroot()
+      for addon_el in root:
          addon = addon_factory(addon_el, self)
          if addon:
             self._addons[addon.id] = addon

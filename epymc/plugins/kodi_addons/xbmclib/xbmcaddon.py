@@ -3,8 +3,7 @@
 import os
 import locale
 import polib
-import lxml
-from lxml import etree as ET
+from xml.etree import ElementTree 
 
 user_dir = os.path.expanduser('~/.config/epymc/kodi')
 addons_dir = os.path.expanduser('~/.config/epymc/kodi/addons')
@@ -49,10 +48,10 @@ class Addon(object):
                   continue
                # try different encoding (if encoding not provided in xml)
                for enc in (None, 'utf-8', 'iso-8859-1'):
-                  parser = ET.XMLParser(encoding=enc)
+                  parser = ElementTree.XMLParser(encoding=enc)
                   try:
-                     self._et = ET.parse(xml_file, parser=parser)
-                  except ET.XMLSyntaxError:
+                     self._et = ElementTree.parse(xml_file, parser=parser)
+                  except ElementTree.ParseError:
                      pass
                   else:
                      break

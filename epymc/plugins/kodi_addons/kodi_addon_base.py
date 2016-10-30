@@ -24,7 +24,7 @@ import os
 import locale
 import zipfile
 import shutil
-from lxml import etree
+from xml.etree import ElementTree
 from distutils.version import StrictVersion
 
 from efl.elementary import utf8_to_markup
@@ -55,11 +55,11 @@ def addon_factory(xml_info, repository=None):
    from .kodi_repository import KodiRepository
 
    # xml_info can be the xml file path or an already opened ET Element
-   if isinstance(xml_info, etree._Element):
+   if isinstance(xml_info, ElementTree.Element):
       root = xml_info
       folder = None
    elif os.path.exists(xml_info):
-      root = etree.parse(xml_info).getroot()
+      root = ElementTree.parse(xml_info).getroot()
       folder = os.path.dirname(xml_info)
    else:
       raise TypeError('xml_info must be str (xml file) or ET Element')
@@ -286,7 +286,7 @@ class KodiAddonBase(object):
          syslang, encoding = locale.getdefaultlocale()
 
          meta = self._root.find(".//extension[@point='xbmc.addon.metadata']")
-         for elem in meta.iterchildren():
+         for elem in meta:
             if elem.tag == 'assets':
                for ass_elem in elem.iterchildren():
                   if ass_elem.tag == 'screenshot':

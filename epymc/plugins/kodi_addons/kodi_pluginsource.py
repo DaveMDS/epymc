@@ -52,7 +52,7 @@ xbmclib_path = os.path.join(os.path.dirname(__file__), 'xbmclib')
 class StandardItemClass(EmcItemClass):
    def item_selected(self, url, item_data):
       addon, listitem = item_data
-      if listitem.get('isFolder', False):
+      if listitem.get('isFolder') or url.startswith('plugin://'):
          addon.request_page(url)
       else:
          addon.play_listitem(listitem)

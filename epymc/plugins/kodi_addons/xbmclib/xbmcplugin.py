@@ -46,7 +46,7 @@ SORT_METHOD_VIDEO_USER_RATING = 20
 SORT_METHOD_VIDEO_YEAR = 18
 
 def addSortMethod(handle, sortMethod, label2Mask=None):
-   pass
+   print('NOT IMPLEMENTED: addSortMethod')
 
 
 def addDirectoryItem(handle, url, listitem, isFolder=False, totalItems=1):
@@ -66,8 +66,8 @@ def addDirectoryItems(handle, items, totalItems=1):
    return True
 
 def setContent(handle, content):
+   print('NOT IMPLEMENTED: setContent')
    # content: files, songs, artists, albums, movies, tvshows, episodes, musicvideos
-   pass
 
 def endOfDirectory(handle, succeeded=True, updateListing=False, cacheToDisc=True):
    kargs = {

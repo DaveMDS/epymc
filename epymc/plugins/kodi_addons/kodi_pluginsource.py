@@ -52,7 +52,10 @@ xbmclib_path = os.path.join(os.path.dirname(__file__), 'xbmclib')
 class StandardItemClass(EmcItemClass):
    def item_selected(self, url, item_data):
       addon, listitem = item_data
-      addon.request_page(url)
+      if listitem.get('isFolder', False):
+         addon.request_page(url)
+      else:
+         addon.play_listitem(listitem)
 
    def label_get(self, url, item_data):
       addon, listitem = item_data
@@ -62,6 +65,8 @@ class StandardItemClass(EmcItemClass):
       addon, listitem = item_data
       if listitem.get('isFolder') == True:
          return 'icon/folder'
+      else:
+         return 'icon/play'
       # TODO listitem iconImage or thumbnailImage
 
    def poster_get(self, url, item_data):
@@ -117,12 +122,18 @@ class KodiPluginSource(KodiAddonBase):
       except KeyError:
          return listitem.get('thumbnailImage')
 
-   def play_listitem(self, listitem, media_url=None):
-         url = media_url or listitem.get('path')
+   def best_label_for_listitem(self, listitem):
+      title = listitem.get('label')
+      if not title:
          try:
             title = listitem['infoLabels']['Title']
          except KeyError:
             title = ''
+      return title
+
+   def play_listitem(self, listitem, media_url=None):
+         url = media_url or listitem.get('url') or listitem.get('path')
+         title = self.best_label_for_listitem(listitem)
          poster = self.best_poster_for_listitem(listitem)
 
          mediaplayer.play_url(url)

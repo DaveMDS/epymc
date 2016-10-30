@@ -29,7 +29,8 @@ LOGNONE = 7
 def log(msg, level=LOGNOTICE):
    print(msg)
    
-
+def executebuiltin(function):
+   print('NOT IMPLEMENTED: executebuiltin ("{}")'.format(function))
 
 class Player(object):
    def __init__(self):

@@ -66,7 +66,7 @@ def addDirectoryItems(handle, items, totalItems=1):
    return True
 
 def setContent(handle, content):
-   print('NOT IMPLEMENTED: setContent')
+   print('NOT IMPLEMENTED: setContent ("{}")'.format(content))
    # content: files, songs, artists, albums, movies, tvshows, episodes, musicvideos
 
 def endOfDirectory(handle, succeeded=True, updateListing=False, cacheToDisc=True):

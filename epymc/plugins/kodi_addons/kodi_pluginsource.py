@@ -49,39 +49,166 @@ def DBG(*args):
 xbmclib_path = os.path.join(os.path.dirname(__file__), 'xbmclib')
 
 
+### listitem utils ############################################################
+""" listitem reference:
+{
+   url: ''             # those 2 are added by emc in _addDirectoryItem
+   isFolder: bool      #
+
+   path: ''
+   label: ''
+   label2: ''
+
+   art: {
+      icon: ''
+      thumb: ''
+      poster: ''
+      banner: ''
+      fanart: ''
+      clearart: ''
+      clearlogo: ''
+      landscape: ''
+      ... and any other key name
+   }
+
+   infoLabels: {
+      # All types:
+      count: integer (12) - can be used to store an id for later, or for sorting purposes
+      size: long (1024) - size in bytes
+      date: string (d.m.Y / 01.01.2009) - file date
+
+      # Video values:
+      genre: string (Comedy)
+      year: integer (2009)
+      episode: integer (4)
+      season: integer (1)
+      top250: integer (192)
+      tracknumber: integer (3)
+      rating: float (6.4) - range is 0..10
+      userrating: integer (9) - range is 1..10
+      watched: depreciated - use playcount instead
+      playcount: integer (2) - number of times this item has been played
+      overlay: integer (2) - range is 0..8. See GUIListItem.h for values
+      cast: list (["Michal C. Hall","Jennifer Carpenter"]) - if provided a list of tuples cast will be interpreted as castandrole
+      castandrole: list of tuples ([("Michael C. Hall","Dexter"),("Jennifer Carpenter","Debra")])
+      director: string (Dagur Kari)
+      mpaa: string (PG-13)
+      plot: string (Long Description)
+      plotoutline: string (Short Description)
+      title: string (Big Fan)
+      originaltitle: string (Big Fan)
+      sorttitle: string (Big Fan)
+      duration: integer (245) - duration in seconds
+      studio: string (Warner Bros.)
+      tagline: string (An awesome movie) - short description of movie
+      writer: string (Robert D. Siegel)
+      tvshowtitle: string (Heroes)
+      premiered: string (2005-03-04)
+      status: string (Continuing) - status of a TVshow
+      code: string (tt0110293) - IMDb code
+      aired: string (2008-12-07)
+      credits: string (Andy Kaufman) - writing credits
+      lastplayed: string (Y-m-d h:m:s = 2009-04-05 23:16:04)
+      album: string (The Joshua Tree)
+      artist: list (['U2'])
+      votes: string (12345 votes)
+      trailer: string (/home/user/trailer.avi)
+      dateadded: string (Y-m-d h:m:s = 2009-04-05 23:16:04)
+      mediatype: string - "video", "movie", "tvshow", "season", "episode" or "musicvideo"
+
+      # Music values:
+      tracknumber: integer (8)
+      discnumber: integer (2)
+      duration: integer (245) - duration in seconds
+      year: integer (1998)
+      genre: string (Rock)
+      album: string (Pulse)
+      artist: string (Muse)
+      title: string (American Pie)
+      rating: string (3) - single character between 0 and 5
+      lyrics: string (On a dark desert highway...)
+      playcount: integer (2) - number of times this item has been played
+      lastplayed: string (Y-m-d h:m:s = 2009-04-05 23:16:04)
+
+      # Picture values:
+      title: string (In the last summer-1)
+      picturepath: string (/home/username/pictures/img001.jpg)
+      exif: string (See CPictureInfoTag::TranslateString in PictureInfoTag.cpp for valid strings) 
+   }
+
+   properties: { # Always lowercase, here use camel only for readability
+      AspectRatio: '1.85 : 1'
+      StartOffset: '256.4'
+      fanart_image: ''       # only see in SouthPark addon :/
+   }
+}
+"""
+
+def listitem_best_label(listitem):
+   if listitem:
+      return listitem.get('label') or listitem['infoLabels'].get('title')
+
+def listitem_best_icon(listitem):
+   if listitem:
+      if listitem['isFolder']:
+         return 'icon/folder'
+      else:
+         return 'icon/play'
+      # TODO search in art
+
+def listitem_best_poster(listitem):
+   if listitem:
+      return listitem['art'].get('thumb')
+
+def listitem_best_fanart(listitem):
+   if listitem:
+      return listitem['art'].get('fanart')
+
+def listitem_best_info(listitem):
+   if listitem:
+      return listitem['infoLabels'].get('plot', '').replace('&', '&amp;')
+      # TODO show all available infoLabels
+
+def listitem_play(listitem, media_url=None):
+   if listitem:
+      url = media_url or listitem.get('url') or listitem.get('path')
+      title = listitem_best_label(listitem)
+      poster = listitem_best_poster(listitem)
+
+      mediaplayer.play_url(url)
+      mediaplayer.title_set(title)
+      mediaplayer.poster_set(poster)
+
+
 class StandardItemClass(EmcItemClass):
    def item_selected(self, url, item_data):
       addon, listitem = item_data
       if listitem.get('isFolder') or url.startswith('plugin://'):
          addon.request_page(url)
       else:
-         addon.play_listitem(listitem)
+         listitem_play(listitem)
 
    def label_get(self, url, item_data):
       addon, listitem = item_data
-      return listitem['label'].replace('&', '&amp;')
+      return listitem_best_label(listitem).replace('&', '&amp;')
 
    def icon_get(self, url, item_data):
       addon, listitem = item_data
-      if listitem.get('isFolder') == True:
-         return 'icon/folder'
-      else:
-         return 'icon/play'
-      # TODO listitem iconImage or thumbnailImage
+      return listitem_best_icon(listitem)
 
    def poster_get(self, url, item_data):
       addon, listitem = item_data
-      return addon.best_poster_for_listitem(listitem)
+      return listitem_best_poster(listitem)
 
-   # def fanart_get(self, url, channel):
-      # return _mod._current_src['backdrop']
+   def fanart_get(self, url, item_data):
+      addon, listitem = item_data
+      return listitem_best_fanart(listitem)
 
    def info_get(self, url, item_data):
       addon, listitem = item_data
-      try:
-         return listitem['infoLabels']['plot'].replace('&', '&amp;')
-      except KeyError:
-         return None
+      import pprint
+      pprint.pprint(listitem)
+      return listitem_best_info(listitem)
 
 
 class KodiPluginSource(KodiAddonBase):
@@ -112,33 +239,6 @@ class KodiPluginSource(KodiAddonBase):
       """ ['video', 'audio', 'image', 'executable'] """
       return self._provides.split()
 
-
-   ### Utils
-   def best_poster_for_listitem(self, listitem):
-      if not listitem:
-         return None
-      try:
-         return listitem['art']['thumb']
-      except KeyError:
-         return listitem.get('thumbnailImage')
-
-   def best_label_for_listitem(self, listitem):
-      title = listitem.get('label')
-      if not title:
-         try:
-            title = listitem['infoLabels']['Title']
-         except KeyError:
-            title = ''
-      return title
-
-   def play_listitem(self, listitem, media_url=None):
-         url = media_url or listitem.get('url') or listitem.get('path')
-         title = self.best_label_for_listitem(listitem)
-         poster = self.best_poster_for_listitem(listitem)
-
-         mediaplayer.play_url(url)
-         mediaplayer.title_set(title)
-         mediaplayer.poster_set(poster)
 
    ### Addon runner
    def request_page(self, url=None, browser=None):
@@ -176,7 +276,7 @@ class KodiPluginSource(KodiAddonBase):
       # build (and run) the plugin command line
       cmd = 'env PYTHONPATH="{}" python2 "{}" "{}" "{}" "{}"'.format(
              ':'.join(PYTHONPATH), self.main_exe, arg1, arg2, arg3)
-      print('CMD:', cmd)
+      DBG('CMD:', cmd)
       self._stderr_lines = []
       self._page_items = []
       self._page_url = url
@@ -197,7 +297,7 @@ class KodiPluginSource(KodiAddonBase):
             action, params = line.split(' ', 1)
             method = getattr(self, '_' + action)
          except (AttributeError, ValueError):
-            print("---", line)
+            DBG("-->", line)
          else:
             method(**ast.literal_eval(params))
          # TODO error check
@@ -227,7 +327,7 @@ class KodiPluginSource(KodiAddonBase):
       self._page_items.append(listitem)
 
    def _Player_play(self, item=None, listitem=None, windowed=False, startpos=-1):
-      self.play_listitem(listitem, item)
+      listitem_play(listitem, item)
 
    def _endOfDirectory(self, succeeded=True, updateListing=False, cacheToDisc=True):
       if succeeded == True:
@@ -239,6 +339,6 @@ class KodiPluginSource(KodiAddonBase):
 
    def _setResolvedUrl(self, succeeded, listitem):
       if succeeded:
-         self.play_listitem(listitem)
+         listitem_play(listitem)
       else:
          EmcDialog(style='error', text='Addon error') # TODO better dialog

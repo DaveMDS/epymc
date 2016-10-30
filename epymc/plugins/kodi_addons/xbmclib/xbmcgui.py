@@ -1,16 +1,32 @@
 # This Python file uses the following encoding: utf-8
 
+
+class LowerCaseDict(dict):
+   """  A dict with always lowered keys """
+   def __setitem__(self, key, val):
+      dict.__setitem__(self, key.lower(), val)
+
+   def __getitem__(self, key):
+      dict.__getitem__(self, key.lower())
+
+   def update(self, other):
+      for key in other:
+         self[key] = other[key]
+
+
 class ListItem(object):
 
    def __init__(self, label='', label2=None, iconImage=None, thumbnailImage=None, path=None):
+      self.path = path
       self.label = label
       self.label2 = label2
-      self.iconImage = iconImage
-      self.thumbnailImage = thumbnailImage
-      self.path = path
-      self.infoLabels = {}
-      self.properties = {}
-      self.art = {}
+      self.infoLabels = LowerCaseDict()
+      self.properties = LowerCaseDict()
+      self.art = LowerCaseDict()
+      if iconImage: # deprecated (use art instead)
+         self.art['icon'] = iconImage
+      if thumbnailImage: # deprecated (use art instead)
+         self.art['thumb'] = thumbnailImage
 
    def __repr__(self):
       return str(self.__dict__)
@@ -34,7 +50,7 @@ class ListItem(object):
       return self.path
 
    def setInfo(self, type=None, infoLabels={}):
-      self.infoLabels = infoLabels
+      self.infoLabels.update(infoLabels)
       
    def setProperty(self, key, value):
       self.properties[key] = value
@@ -46,5 +62,5 @@ class ListItem(object):
       self.art.update(values)
 
    def setThumbnailImage(self, thumb):
-      """ deprecated """
+      """ deprecated  (use art instead) """
       self.art['thumb'] = thumb

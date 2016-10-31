@@ -8,14 +8,16 @@ _temp = os.path.join(_home, 'temp')
 
 def translatePath(path):
    """ http://kodi.wiki/view/Special_protocol """
+   if os.path.exists(path):
+      return path
+
    if path.startswith('special://home'):
       return path.replace('special://home', _home, 1)
    elif path.startswith('special://temp'):
       return path.replace('special://temp', _temp, 1)
-   else:
-      print("UNSUPPORTED PATH", path)
 
-   return None # or path ?
+   print("UNSUPPORTED PATH", path)
+   return None
 
 
 LOGDEBUG = 0

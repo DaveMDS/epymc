@@ -13,8 +13,8 @@ class Addon(object):
 
    def __init__(self, id=None):
       self.id = id or addon_id # addon_id comes from sitecustomize.py
-      self._po = None # already parsed POFile instance
-      self._et = None # already parsed xml lang file (ElementTree)
+      self._strings_po = None # already parsed POFile instance
+      self._strings_et = None # already parsed xml lang file (ElementTree)
 
 
    def getAddonInfo(self, id):
@@ -25,7 +25,7 @@ class Addon(object):
 
    def getLocalizedString(self, id):
       # search and parse strings.po (or string.xml)
-      if self._po is None and self._et is None:
+      if self._strings_po is None and self._strings_et is None:
          # TODO also support: "en_US" (only "en" atm)
          lang, encoding = locale.getdefaultlocale()
          lang_name = iso639_table.get(lang[:2], 'English') if lang else 'English'
@@ -34,13 +34,13 @@ class Addon(object):
             po_file = os.path.join(addons_dir, self.id, 'resources',
                                   'language', lang, 'strings.po')
             try:
-               self._po = polib.pofile(po_file)
+               self._strings_po = polib.pofile(po_file)
             except IOError:
                continue
             else:
                break
          # or xml file
-         if self._po is None:
+         if self._strings_po is None:
             for lang in (lang_name, 'English'):
                xml_file = os.path.join(addons_dir, self.id, 'resources',
                                       'language', lang, 'strings.xml')
@@ -50,26 +50,26 @@ class Addon(object):
                for enc in (None, 'utf-8', 'iso-8859-1'):
                   parser = ElementTree.XMLParser(encoding=enc)
                   try:
-                     self._et = ElementTree.parse(xml_file, parser=parser)
+                     self._strings_et = ElementTree.parse(xml_file, parser=parser)
                   except ElementTree.ParseError:
                      pass
                   else:
                      break
 
-               if self._et is not None:
+               if self._strings_et is not None:
                   break
 
       # already parsed po file
-      if self._po is not None:
+      if self._strings_po is not None:
          ctx = '#{}'.format(id)
-         for entry in self._po:
+         for entry in self._strings_po:
             if entry.msgctxt == ctx:
                return entry.msgstr
          return 'Localize ERROR1 {}'.format(id)
 
       # already parsed xml lang file
-      elif self._et is not None:
-         el = self._et.find(".//string[@id='{}']".format(id))
+      elif self._strings_et is not None:
+         el = self._strings_et.find(".//string[@id='{}']".format(id))
          if el is not None:
             return el.text
          return 'Localize ERROR2 {}'.format(id)

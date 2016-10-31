@@ -426,7 +426,7 @@ class KodiPluginSource(KodiAddonBase):
    def _Addon_setSetting(self, addon_id, id, value):
       addon = get_installed_addon(addon_id)
       DBG("SET SETTING:", id, " val:", value)
-      addon.settings.set(id, value)
+      addon.settings[id] = value
       addon.settings_save() # TODO really save at every set ?
 
    ###  xbmclib.gui proxied functions  #########################################

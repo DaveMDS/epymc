@@ -3,20 +3,42 @@
 import os
 import sys
 
-_home = os.path.expanduser('~/.config/epymc/kodi')
-_temp = os.path.join(_home, 'temp')
+
 
 def translatePath(path):
    """ http://kodi.wiki/view/Special_protocol """
-   if os.path.exists(path):
+
+   if path.startswith('special://'):
+      path = path.replace('special://', '', 1)
+      base = os.path.expanduser('~/.config/epymc/kodi')
+
+      if '/' in path:
+         tag, path = path.split('/', 1)
+      else:
+         tag, path = path, ''
+
+      if tag == 'home':
+         return os.path.join(base, path)
+
+      elif tag == 'temp':
+         return os.path.join(base, 'temp', path)
+
+      elif tag in ('masterprofile', 'profile', 'userdata'):
+         return os.path.join(base, 'userdata', path)
+
+      elif tag == 'database':
+         return os.path.join(base, 'userdata', 'Database', path)
+
+      elif tag == 'thumbnails':
+         return os.path.join(base, 'userdata', 'Thumbnails', path)
+
+      # TODO: subtitles, recordings, screenshots, musicplaylists,
+      #       videoplaylists, cdrips, skin, logpath
+
+   elif os.path.exists(path):
       return path
 
-   if path.startswith('special://home'):
-      return path.replace('special://home', _home, 1)
-   elif path.startswith('special://temp'):
-      return path.replace('special://temp', _temp, 1)
-
-   print("UNSUPPORTED PATH", path)
+   print("UNSUPPORTED SPECIAL PATH:", path)
    return None
 
 
@@ -51,4 +73,5 @@ def getInfoLabel(infotag):
    return emc_wait_replay()
 
 
-
+def getSkinDir():
+   return 'MediaCenter'

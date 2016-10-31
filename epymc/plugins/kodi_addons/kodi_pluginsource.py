@@ -198,11 +198,7 @@ def listitem_play(listitem, media_url=None):
 class StandardItemClass(EmcItemClass):
    def item_selected(self, url, item_data):
       addon, listitem = item_data
-      addon._selected_listitem = listitem
-      if listitem.get('isFolder') or url.startswith('plugin://'):
-         addon.request_page(url)
-      else:
-         listitem_play(listitem)
+      addon._item_selected_cb(url, listitem)
 
    def label_get(self, url, item_data):
       addon, listitem = item_data
@@ -273,6 +269,21 @@ class KodiPluginSource(KodiAddonBase):
       if self._run_dialog is not None:
          self._run_dialog.delete()
          self._run_dialog = None
+
+   def _item_selected_cb(self, url, listitem):
+      self._selected_listitem = listitem
+
+      # addons can request pages from another addons!
+      addon = self
+      if url.startswith('plugin://'):
+         addon_id = url[9:url.index('/', 10)]
+         if addon_id != self.id:
+            addon = get_installed_addon(addon_id)
+
+      if listitem.get('isFolder') or url.startswith('plugin://'):
+         addon.request_page(url)
+      else:
+         listitem_play(listitem)
 
    def request_page(self, url=None, browser=None):
 

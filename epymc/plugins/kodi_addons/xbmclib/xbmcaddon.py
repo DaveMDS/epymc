@@ -20,10 +20,14 @@ class Addon(object):
    @emc_method_call
    def getAddonInfo(self, id):
       return emc_wait_replay()
-      
+
+   @emc_method_call
    def getSetting(self, id):
-      print("NOT IMPLEMENTED: getSetting ({})".format(id))
-      return '0' # TODO
+      return emc_wait_replay()
+
+   @emc_method_call
+   def setSetting(self, id, value):
+      pass
 
    def getLocalizedString(self, id):
       # search and parse strings.po (or string.xml)

@@ -43,8 +43,8 @@ from epymc.gui import EmcDialog, EmcConfirmDialog, EmcErrorDialog, \
 
 from .kodi_addon_base import load_installed_addons, load_single_addon, \
    get_installed_addon, get_installed_addons, install_from_local_zip, \
-   uninstall_addon, base_pkgs_path, base_addons_path, base_temp_path, \
-   base_repos_path
+   uninstall_addon, base_pkgs_path, base_addons_path, base_addons_data_path,\
+   base_temp_path, base_repos_path
 from .kodi_repository import KodiRepository
 from .kodi_pluginsource import KodiPluginSource
 
@@ -164,6 +164,8 @@ class KodiAddonsModule(EmcModule):
          os.makedirs(base_temp_path)
       if not os.path.exists(base_addons_path):
          os.makedirs(base_addons_path)
+      if not os.path.exists(base_addons_data_path):
+         os.makedirs(base_addons_data_path)
       if not os.path.exists(base_repos_path):
          os.makedirs(base_repos_path)
 

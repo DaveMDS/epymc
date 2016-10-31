@@ -416,6 +416,19 @@ class KodiPluginSource(KodiAddonBase):
       else:
          return val
 
+   @return_to_addon
+   def _Addon_getSetting(self, addon_id, id):
+      addon = get_installed_addon(addon_id)
+      val = addon.settings.get(id)
+      DBG("GET SETTING:", id, " val:", val)
+      return val # TODO not sure if need to return None or '' for unknown id 
+
+   def _Addon_setSetting(self, addon_id, id, value):
+      addon = get_installed_addon(addon_id)
+      DBG("SET SETTING:", id, " val:", value)
+      addon.settings.set(id, value)
+      addon.settings_save() # TODO really save at every set ?
+
    ###  xbmclib.gui proxied functions  #########################################
    
    ###  xbmclib.xbmcplugin proxied functions  ##################################

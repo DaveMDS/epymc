@@ -40,6 +40,7 @@ def DBG(*args):
 
 base_kodi_path = os.path.join(utils.user_conf_dir, 'kodi')
 base_addons_path = os.path.join(base_kodi_path, 'addons')
+base_addons_data_path = os.path.join(base_kodi_path, 'addon_data')
 base_pkgs_path = os.path.join(base_kodi_path, 'packages')
 base_temp_path = os.path.join(base_kodi_path, 'temp')
 base_repos_path = os.path.join(base_kodi_path, 'repos')
@@ -179,6 +180,7 @@ class KodiAddonBase(object):
       self._author = xml_root.get('provider-name')
       self._metadata = None # will be lazily parsed
       self._requires = None # will be lazily parsed
+      self._settings = None # will be lazily loaded
 
    def __str__(self):
       return '<{0.__class__.__name__} id={0.id} version={0.version}>'.format(self)
@@ -355,4 +357,73 @@ class KodiAddonBase(object):
 
       return '<br>'.join(txt)
 
+   ### Settings stuff
+   @property
+   def settings(self):
+      """ A dict with all the actual user settings values """
+      if self._settings is None:
+         self.settings_load()
+      return self._settings
 
+   @property
+   def master_settings_file(self):
+      """ The main settings xml file path, or None if addon do not have options """
+      path = os.path.join(self.path, 'resources', 'settings.xml')
+      return path if os.path.exists(path) else None
+
+   @property
+   def user_settings_file(self):
+      """ The user settings xml file path """
+      return os.path.join(base_addons_data_path, self.id, 'settings.xml')
+
+   def settings_create_defaults(self):
+      """ Create default user settings, in _settings dict and user xml file """
+      master_xml_file = self.master_settings_file
+
+      self._settings = {}
+
+      # read keys and defaults from master xml file (if exists)
+      if master_xml_file is not None:
+         DBG('Creating default settings from:', master_xml_file)
+         root = ElementTree.parse(master_xml_file).getroot()
+         for elem in root.iter('setting'):
+            if elem.get('id'):
+               self._settings[elem.get('id')] = elem.get('default', '')
+      else:
+         DBG('Creating empty settings for:', self.id)
+      # and save to user settings xml file
+      self.settings_save()
+
+   def settings_load(self):
+      """ Load settings from the user xml file, create defaults if not exists"""
+      xml_file = self.user_settings_file
+
+      if not os.path.exists(xml_file):
+         self.settings_create_defaults()
+      else:
+         DBG('Loading settings from:', xml_file)
+         self._settings = {}
+         root = ElementTree.parse(xml_file).getroot()
+         for elem in root.iter('setting'):
+            self._settings[elem.get('id')] = elem.get('value', '')
+
+   def settings_save(self):
+      """ Save current settings to the user xml file """
+      user_xml_file = self.user_settings_file
+      DBG('Saving settings to:', user_xml_file)
+
+      # build the xml tree
+      root = ElementTree.Element('settings')
+      for key, val in sorted(self._settings.items()):
+         ElementTree.SubElement(root, 'setting', {'id': key, 'value': val})
+
+      # prettify the tree
+      from xml.dom import minidom
+      rough_str = ElementTree.tostring(root) # , 'utf-8')
+      reparsed = minidom.parseString(rough_str)
+      pretty_str = reparsed.toprettyxml(indent='    ')
+
+      # save to user file
+      os.makedirs(os.path.dirname(user_xml_file), exist_ok=True)
+      with open(user_xml_file, 'w') as f:
+         f.write(pretty_str)

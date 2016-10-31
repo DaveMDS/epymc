@@ -40,7 +40,7 @@ def DBG(*args):
 
 base_kodi_path = os.path.join(utils.user_conf_dir, 'kodi')
 base_addons_path = os.path.join(base_kodi_path, 'addons')
-base_addons_data_path = os.path.join(base_kodi_path, 'addon_data')
+base_addons_data_path = os.path.join(base_kodi_path, 'userdata', 'addon_data')
 base_pkgs_path = os.path.join(base_kodi_path, 'packages')
 base_temp_path = os.path.join(base_kodi_path, 'temp')
 base_repos_path = os.path.join(base_kodi_path, 'repos')

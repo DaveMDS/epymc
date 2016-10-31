@@ -12,17 +12,17 @@ def emc_function_call(func):
       params = {'args': args, 'kargs': kargs}
       sys.stdout.write('_{} {}\n'.format(func.__name__, params))
       sys.stdout.flush()
-      func(*args, **kargs)
+      return func(*args, **kargs)
    return func_wrapper
 
 def emc_method_call(meth):
    """ Decorator to be used on methods """
    def func_wrapper(self, *args, **kargs):
-      params = {'args': args, 'kargs': kargs}
+      params = {'args': (self._class_id,) + args, 'kargs': kargs}
       sys.stdout.write('_{}_{} {}\n'.format(self.__class__.__name__,
                                             meth.__name__, params))
       sys.stdout.flush()
-      meth(*args, **kargs)
+      return meth(self, *args, **kargs)
    return func_wrapper
 
 def emc_wait_replay():

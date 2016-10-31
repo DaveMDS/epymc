@@ -156,7 +156,7 @@ def uninstall_addon(addon):
       True if success, False otherwise
    """
    try:
-      shutil.rmtree(addon.installed_path)
+      shutil.rmtree(addon.path)
    except:
       return False
 
@@ -211,7 +211,7 @@ class KodiAddonBase(object):
       ini.set_string_list('kodiaddons', 'disabled_addons', L)
       
    @property
-   def installed_path(self):
+   def path(self):
       """ full path of the installed addon """
       return self._folder
 
@@ -308,6 +308,21 @@ class KodiAddonBase(object):
 
       return self._metadata
 
+   @property
+   def changelog(self):
+      return self.metadata.get('news')
+
+   @property
+   def description(self):
+      return self.metadata.get('description')
+
+   @property
+   def disclaimer(self):
+      return self.metadata.get('disclaimer')
+
+   @property
+   def summary(self):
+      return self.metadata.get('summary')
 
    @property
    def info_text_short(self):

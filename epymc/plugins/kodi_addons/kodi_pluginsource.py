@@ -52,6 +52,14 @@ def DBG(*args):
 xbmclib_path = os.path.join(os.path.dirname(__file__), 'xbmclib')
 
 
+def return_to_addon(meth):
+   """ Decorator for proxied functions that return a value back to the addon """
+   def func_wrapper(self, *args, **kargs):
+      ret = meth(self, *args, **kargs)
+      self._exe.send('{}\n'.format(ret))
+   return func_wrapper
+
+
 ### listitem utils ############################################################
 """ listitem reference:
 {
@@ -238,7 +246,7 @@ class KodiPluginSource(KodiAddonBase):
    @property
    def main_exe(self):
       """ main executable script (full_path) """
-      return os.path.join(self.installed_path, self._main_exe)
+      return os.path.join(self.path, self._main_exe)
 
    @property
    def root_url(self):
@@ -251,7 +259,7 @@ class KodiPluginSource(KodiAddonBase):
       return self._provides.split()
 
 
-   ### Addon runner  
+   ###  Addon runner  ##########################################################
    def show_run_dialog(self):
       if self._run_dialog_timer is not None:
          self._run_dialog_timer.delete()
@@ -283,8 +291,8 @@ class KodiPluginSource(KodiAddonBase):
 
       # augmented with: our xbmclib, addon lib folders, all plugin requirements
       PYTHONPATH = [xbmclib_path,
-                    os.path.join(self.installed_path, 'lib'),
-                    os.path.join(self.installed_path, 'resources', 'lib')]
+                    os.path.join(self.path, 'lib'),
+                    os.path.join(self.path, 'resources', 'lib')]
       for require_id, min_version in self.requires:
          mod = get_installed_addon(require_id)
          if mod is None:
@@ -360,16 +368,50 @@ class KodiPluginSource(KodiAddonBase):
       for listitem in items:
          self._browser.item_add(StandardItemClass(), listitem['url'], (self, listitem))
 
+   ###  xbmclib.xbmc proxied functions  ########################################
+   @return_to_addon
+   def _getInfoLabel(self, infotag):
+      """ http://kodi.wiki/view/InfoLabels """
+      ctx, key = infotag.split('.', 1)
+      val = None
 
-   ### Addons proxied functions
+      if ctx == 'ListItem':
+         listitem = self._selected_listitem
+         val = listitem['infoLabels'].get(key.lower())
+
+      # TODO implement more context
+
+      if val is None:
+         DBG('ERROR: cannot resolve InfoLabel: {}'.format(infotag))
+
+      return val or 'Unknown'
+
+   def _Player_play(self, player_id, item=None, listitem=None, windowed=False, startpos=-1):
+      self.hide_run_dialog()
+      listitem_play(listitem, item)
+
+   ###  xbmclib.addon proxied functions  #######################################
+   @return_to_addon
+   def _Addon_getAddonInfo(self, addon_id, id):
+      addon = get_installed_addon(addon_id)
+      if addon is None:
+         return None
+
+      # TODO not supported ids: type, profile, stars
+      try:
+         val = getattr(addon, id)
+      except AttributeError:
+         DBG('Unknown AddonInfo id:', id)
+      else:
+         return val
+
+   ###  xbmclib.gui proxied functions  #########################################
+   
+   ###  xbmclib.xbmcplugin proxied functions  ##################################
    def _addDirectoryItem(self, handle, url, listitem, isFolder=False, totalItems=1):
       listitem['url'] = url
       listitem['isFolder'] = isFolder
       self._page_items.append(listitem)
-
-   def _Player_play(self, item=None, listitem=None, windowed=False, startpos=-1):
-      self.hide_run_dialog()
-      listitem_play(listitem, item)
 
    def _endOfDirectory(self, handle, succeeded=True, updateListing=False, cacheToDisc=True):
       self.hide_run_dialog()
@@ -387,20 +429,5 @@ class KodiPluginSource(KodiAddonBase):
       else:
          EmcDialog(style='error', text='Addon error') # TODO better dialog
 
-   def _getInfoLabel(self, infotag):
-      """ http://kodi.wiki/view/InfoLabels """
-      ctx, key = infotag.split('.', 1)
-      val = None
 
-      if ctx == 'ListItem':
-         listitem = self._selected_listitem
-         val = listitem['infoLabels'].get(key.lower())
 
-      # TODO implement more context
-
-      if val is None:
-         DBG('ERROR: cannot resolve InfoLabel: {}'.format(infotag))
-
-      # always send something back, or the addon will hang
-      self._exe.send('{}\n'.format(val or 'Unknown'))
-      

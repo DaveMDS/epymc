@@ -41,5 +41,5 @@ class KodiPythonModule(KodiAddonBase):
    @property
    def main_import(self):
       """ main library to import """
-      return os.path.join(self.installed_path, self._main_import)
+      return os.path.join(self.path, self._main_import)
 

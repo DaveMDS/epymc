@@ -36,6 +36,9 @@ def executebuiltin(function):
 
 class Player(object):
 
+   def __init__(self):
+      self._class_id = None # this will be passed back in methods to emc
+
    @emc_method_call
    def play(self, item=None, listitem=None, windowed=False, startpos=-1):
       pass

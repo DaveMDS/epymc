@@ -13,14 +13,16 @@ class Addon(object):
 
    def __init__(self, id=None):
       self.id = id or addon_id # addon_id comes from sitecustomize.py
-      self._strings_po = None # already parsed POFile instance
-      self._strings_et = None # already parsed xml lang file (ElementTree)
+      self._class_id = self.id # this will be passed back in methods to emc
+      self._strings_po = None  # already parsed POFile instance
+      self._strings_et = None  # already parsed xml lang file (ElementTree)
 
-
+   @emc_method_call
    def getAddonInfo(self, id):
-      return 'TODO getAddonInfo'
+      return emc_wait_replay()
       
    def getSetting(self, id):
+      print("NOT IMPLEMENTED: getSetting ({})".format(id))
       return '0' # TODO
 
    def getLocalizedString(self, id):

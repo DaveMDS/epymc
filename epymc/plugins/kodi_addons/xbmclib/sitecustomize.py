@@ -55,9 +55,11 @@ sys.path_hooks[:0] = [argv_setter_hook]
 
 
 ### inject some more stuff in the addon main namespace #########################
-import xbmc, xbmcaddon, xbmcgui, xbmcplugin
+import xbmc, xbmcaddon, xbmcgui, xbmcplugin, xbmcvfs
 __builtin__.xbmc = xbmc
 __builtin__.xbmcaddon = xbmcaddon
 __builtin__.xbmcgui = xbmcgui
 __builtin__.xbmcplugin = xbmcplugin
+__builtin__.xbmcvfs = xbmcvfs
+__builtin__.sys = sys
 

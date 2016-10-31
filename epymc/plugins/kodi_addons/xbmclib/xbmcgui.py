@@ -16,7 +16,8 @@ class LowerCaseDict(dict):
 
 class ListItem(object):
 
-   def __init__(self, label='', label2=None, iconImage=None, thumbnailImage=None, path=None):
+   def __init__(self, label='', label2=None, iconImage=None,
+                thumbnailImage=None, path=None):
       self.path = path
       self.label = label
       self.label2 = label2
@@ -24,9 +25,9 @@ class ListItem(object):
       self.properties = LowerCaseDict()
       self.art = LowerCaseDict()
       self.streamInfo = LowerCaseDict()
-      if iconImage: # deprecated (use art instead)
+      if iconImage:  # deprecated (use art instead)
          self.art['icon'] = iconImage
-      if thumbnailImage: # deprecated (use art instead)
+      if thumbnailImage:  # deprecated (use art instead)
          self.art['thumb'] = thumbnailImage
 
    def __repr__(self):
@@ -66,7 +67,7 @@ class ListItem(object):
       return self.properties.get(key)
 
    def addContextMenuItems(self, items, replaceItems=False):
-      print('NOT IMPLEMENTED: addContextMenuItems (items: {})'.format(len(items)))
+      print('NOT IMPLEMENTED: addContextMenuItems(items:{})'.format(len(items)))
 
    def setThumbnailImage(self, thumb):
       """ deprecated  (use art instead) """

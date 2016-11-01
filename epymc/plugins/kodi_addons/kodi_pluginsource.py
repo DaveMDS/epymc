@@ -420,14 +420,17 @@ class KodiPluginSource(KodiAddonBase):
    def _Addon_getSetting(self, addon_id, id):
       addon = get_installed_addon(addon_id)
       val = addon.settings.get(id)
-      DBG("GET SETTING:", id, " val:", val)
+      # DBG("GET SETTING:", id, " val:", val)
       return val # TODO not sure if need to return None or '' for unknown id 
 
    def _Addon_setSetting(self, addon_id, id, value):
       addon = get_installed_addon(addon_id)
-      DBG("SET SETTING:", id, " val:", value)
+      # DBG("SET SETTING:", id, " val:", value)
       addon.settings[id] = value
       addon.settings_save() # TODO really save at every set ?
+
+   def _Addon_openSettings(self, addon_id):
+      DBG("NOT IMPLEMENTED _Addon_openSettings")
 
    ###  xbmclib.gui proxied functions  #########################################
    
@@ -446,7 +449,7 @@ class KodiPluginSource(KodiAddonBase):
       else:
          pass # TODO ALERT
 
-   def _setResolvedUrl(self, succeeded, listitem):
+   def _setResolvedUrl(self, handle, succeeded, listitem):
       self.hide_run_dialog()
       if succeeded:
          listitem_play(listitem)

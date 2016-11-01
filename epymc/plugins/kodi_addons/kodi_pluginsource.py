@@ -61,7 +61,7 @@ def return_to_addon(meth):
    return func_wrapper
 
 
-### listitem utils ############################################################
+#  listitem utils  #############################################################
 """ listitem reference:
 {
    url: ''             # those 2 are added by emc in _addDirectoryItem
@@ -85,7 +85,8 @@ def return_to_addon(meth):
 
    infoLabels: {
       # All types:
-      count: integer (12) - can be used to store an id for later, or for sorting purposes
+      count: integer (12) - can be used to store an id for later, or for
+                            sorting purposes
       size: long (1024) - size in bytes
       date: string (d.m.Y / 01.01.2009) - file date
 
@@ -101,8 +102,10 @@ def return_to_addon(meth):
       watched: depreciated - use playcount instead
       playcount: integer (2) - number of times this item has been played
       overlay: integer (2) - range is 0..8. See GUIListItem.h for values
-      cast: list (["Michal C. Hall","Jennifer Carpenter"]) - if provided a list of tuples cast will be interpreted as castandrole
-      castandrole: list of tuples ([("Michael C. Hall","Dexter"),("Jennifer Carpenter","Debra")])
+      cast: list (["Michal C. Hall","Jennifer Carpenter"]) - if provided a list
+                  of tuples cast will be interpreted as castandrole
+      castandrole: list of tuples ([("Michael C. Hall","Dexter"),
+                   ("Jennifer Carpenter","Debra")])
       director: string (Dagur Kari)
       mpaa: string (PG-13)
       plot: string (Long Description)
@@ -126,7 +129,8 @@ def return_to_addon(meth):
       votes: string (12345 votes)
       trailer: string (/home/user/trailer.avi)
       dateadded: string (Y-m-d h:m:s = 2009-04-05 23:16:04)
-      mediatype: string - "video", "movie", "tvshow", "season", "episode" or "musicvideo"
+      mediatype: string - "video", "movie", "tvshow", "season",
+                          "episode" or "musicvideo"
 
       # Music values:
       tracknumber: integer (8)
@@ -145,7 +149,8 @@ def return_to_addon(meth):
       # Picture values:
       title: string (In the last summer-1)
       picturepath: string (/home/username/pictures/img001.jpg)
-      exif: string (See CPictureInfoTag::TranslateString in PictureInfoTag.cpp for valid strings) 
+      exif: string (See CPictureInfoTag::TranslateString in PictureInfoTag.cpp
+                   or valid strings)
    }
 
    properties: { # Always lowercase, here use camel only for readability
@@ -160,9 +165,11 @@ def return_to_addon(meth):
 }
 """
 
+
 def listitem_best_label(listitem):
    if listitem:
       return listitem.get('label') or listitem['infoLabels'].get('title')
+
 
 def listitem_best_icon(listitem):
    if listitem:
@@ -172,18 +179,22 @@ def listitem_best_icon(listitem):
          return 'icon/play'
       # TODO search in art
 
+
 def listitem_best_poster(listitem):
    if listitem:
       return listitem['art'].get('thumb')
+
 
 def listitem_best_fanart(listitem):
    if listitem:
       return listitem['art'].get('fanart')
 
+
 def listitem_best_info(listitem):
    if listitem:
       return listitem['infoLabels'].get('plot', '').replace('&', '&amp;')
       # TODO show all available infoLabels
+
 
 def listitem_play(listitem, media_url=None):
    if listitem:
@@ -255,8 +266,7 @@ class KodiPluginSource(KodiAddonBase):
       """ ['video', 'audio', 'image', 'executable'] """
       return self._provides.split()
 
-
-   ###  Addon runner  ##########################################################
+   #  Addon runner  ############################################################
    def show_run_dialog(self):
       if self._run_dialog_timer is not None:
          self._run_dialog_timer.delete()
@@ -308,11 +318,11 @@ class KodiPluginSource(KodiAddonBase):
       for require_id, min_version in self.requires:
          mod = get_installed_addon(require_id)
          if mod is None:
-            EmcDialog(style='error', text='Missing dep') # TODO better dialog
+            EmcDialog(style='error', text='Missing dep')  # TODO better dialog
             return
 
          if mod.check_version(min_version) is False:
-            EmcDialog(style='error', text='Dep too old') # TODO better dialog
+            EmcDialog(style='error', text='Dep too old')  # TODO better dialog
             return
 
          if type(mod) == KodiPythonModule:
@@ -320,17 +330,18 @@ class KodiPluginSource(KodiAddonBase):
 
       # build (and run) the plugin command line
       cmd = 'env PYTHONPATH="{}" python2 "{}" "{}" "{}" "{}"'.format(
-             ':'.join(PYTHONPATH), self.main_exe, arg1, arg2, arg3)
+            ':'.join(PYTHONPATH), self.main_exe, arg1, arg2, arg3)
       self._stderr_lines = []
       self._page_items = []
       self._page_url = url
 
-      self._exe = ecore.Exe(cmd, ecore.ECORE_EXE_PIPE_READ |
-                                 ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED |
-                                 ecore.ECORE_EXE_PIPE_ERROR |
-                                 ecore.ECORE_EXE_PIPE_ERROR_LINE_BUFFERED |
-                                 ecore.ECORE_EXE_PIPE_WRITE |
-                                 ecore.ECORE_EXE_TERM_WITH_PARENT)
+      self._exe = ecore.Exe(cmd,
+                            ecore.ECORE_EXE_PIPE_READ |
+                            ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED |
+                            ecore.ECORE_EXE_PIPE_ERROR |
+                            ecore.ECORE_EXE_PIPE_ERROR_LINE_BUFFERED |
+                            ecore.ECORE_EXE_PIPE_WRITE |
+                            ecore.ECORE_EXE_TERM_WITH_PARENT)
       self._exe.on_data_event_add(self._addon_stdout_cb)
       self._exe.on_error_event_add(self._addon_stderr_cb)
       self._exe.on_del_event_add(self._addon_complete_cb)
@@ -369,7 +380,7 @@ class KodiPluginSource(KodiAddonBase):
       if event.exit_code != 0:
          txt = '<small>{}</small>'.format('<br>'.join(self._stderr_lines))
          EmcDialog(style='error', text=txt)
-         DBG('\n'.join(self._stderr_lines)) # TODO remove me?
+         DBG('\n'.join(self._stderr_lines))  # TODO remove me?
       else:
          DBG("OK, DONE")
          self._page_items = None
@@ -378,9 +389,10 @@ class KodiPluginSource(KodiAddonBase):
    def _populate_requested_page(self, browser, page_url, items):
       self.hide_run_dialog()
       for listitem in items:
-         self._browser.item_add(StandardItemClass(), listitem['url'], (self, listitem))
+         self._browser.item_add(StandardItemClass(), listitem['url'],
+                                (self, listitem))
 
-   ###  xbmclib.xbmc proxied functions  ########################################
+   #  xbmclib.xbmc proxied functions  ##########################################
    @return_to_addon
    def _getInfoLabel(self, infotag):
       """ http://kodi.wiki/view/InfoLabels """
@@ -402,11 +414,12 @@ class KodiPluginSource(KodiAddonBase):
    def _executeJSONRPC(self, jsonrpccommand):
       return JSONRPC_execute(jsonrpccommand)
 
-   def _Player_play(self, player_id, item=None, listitem=None, windowed=False, startpos=-1):
+   def _Player_play(self, player_id, item=None, listitem=None,
+                    windowed=False, startpos=-1):
       self.hide_run_dialog()
       listitem_play(listitem, item)
 
-   ###  xbmclib.addon proxied functions  #######################################
+   #  xbmclib.addon proxied functions  #########################################
    @return_to_addon
    def _Addon_getAddonInfo(self, addon_id, id):
       addon = get_installed_addon(addon_id)
@@ -426,40 +439,43 @@ class KodiPluginSource(KodiAddonBase):
       addon = get_installed_addon(addon_id)
       val = addon.settings.get(id)
       # DBG("GET SETTING:", id, " val:", val)
-      return val # TODO not sure if need to return None or '' for unknown id 
+      return val  # TODO not sure if need to return None or '' for unknown id
 
    def _Addon_setSetting(self, addon_id, id, value):
       addon = get_installed_addon(addon_id)
       # DBG("SET SETTING:", id, " val:", value)
       addon.settings[id] = value
-      addon.settings_save() # TODO really save at every set ?
+      addon.settings_save()  # TODO really save at every set ?
 
    def _Addon_openSettings(self, addon_id):
       DBG("NOT IMPLEMENTED _Addon_openSettings")
 
-   ###  xbmclib.gui proxied functions  #########################################
-   
-   ###  xbmclib.xbmcplugin proxied functions  ##################################
-   def _addDirectoryItem(self, handle, url, listitem, isFolder=False, totalItems=1):
+   #  xbmclib.gui proxied functions  ###########################################
+
+   #  xbmclib.xbmcplugin proxied functions  ####################################
+   def _addDirectoryItem(self, handle, url, listitem,
+                         isFolder=False, totalItems=1):
       listitem['url'] = url
       listitem['isFolder'] = isFolder
       self._page_items.append(listitem)
 
-   def _endOfDirectory(self, handle, succeeded=True, updateListing=False, cacheToDisc=True):
+   def _endOfDirectory(self, handle, succeeded=True,
+                       updateListing=False, cacheToDisc=True):
       self.hide_run_dialog()
-      if succeeded == True:
-         self._browser.page_add(self._page_url, 'page label', None, # TODO item styles
-                                 self._populate_requested_page, items=self._page_items)
+      if succeeded is True:
+         self._browser.page_add(self._page_url, 'page label', None,  # TODO
+                                self._populate_requested_page,
+                                items=self._page_items)
          self._page_items = None
       else:
-         pass # TODO ALERT
+         pass  # TODO ALERT
 
    def _setResolvedUrl(self, handle, succeeded, listitem):
       self.hide_run_dialog()
       if succeeded:
          listitem_play(listitem)
       else:
-         EmcDialog(style='error', text='Addon error') # TODO better dialog
+         EmcDialog(style='error', text='Addon error')  # TODO better dialog
 
 
 

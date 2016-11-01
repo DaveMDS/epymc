@@ -27,6 +27,8 @@ import sys
 import json
 import pprint
 
+import epymc.browser
+
 
 thismodule = sys.modules[__name__]
 
@@ -94,7 +96,12 @@ def execute(json_request):
       return _build_error_response(METHOD_NOT_FOUND)
 
    # execute the class method
-   result = meth(**request.get('params'))
+   try:
+      result = meth(**request.get('params'))
+   except TypeError:
+      return _build_error_response(INVALID_PARAMS)
+   except Exception:
+      return _build_error_response(INTERNAL_ERROR)
 
    # return the result json string
    return _build_success_response(result)
@@ -119,5 +126,34 @@ class Application():
             continue  # TODO report error
 
          ret[prop] = val
+
+      return ret
+
+
+class XBMC():
+
+   @staticmethod
+   def GetInfoLabels(labels):
+      """ http://kodi.wiki/view/InfoLabels """
+      ret = dict()
+
+      for label in labels:
+         ctx, key = label.split('.', 1)
+         ret[label] = ''
+
+         if ctx == 'ListItem':
+            browser = epymc.browser.current_browser_get()
+            if not browser:
+               continue
+
+            listitem = browser.selected_item_data_get()
+            if listitem.__class__.__name__ != 'ListItem':
+               continue
+
+            ret[label] = listitem['infoLabels'].get(key.lower(), '')
+
+         else:
+            # TODO more InfoLabel support
+            print("NOT SUPPORTED InfoLabel: {}".format(label))
 
       return ret

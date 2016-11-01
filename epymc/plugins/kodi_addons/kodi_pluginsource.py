@@ -344,20 +344,10 @@ class KodiPluginSource(KodiAddonBase):
    @return_to_addon
    def _getInfoLabel(self, infotag):
       """ http://kodi.wiki/view/InfoLabels """
-      ctx, key = infotag.split('.', 1)
-      val = None
+      from .epymc_jsonrpc import XBMC
 
-      if ctx == 'ListItem':
-         # !!!!!!!!!   BROKEN     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         listitem = self._selected_listitem
-         val = listitem['infoLabels'].get(key.lower())
-
-      # TODO implement more context
-
-      if val is None:
-         DBG('ERROR: cannot resolve InfoLabel: {}'.format(infotag))
-
-      return val or 'Unknown'
+      result = XBMC.GetInfoLabels((infotag, ))
+      return result[infotag]
 
    @return_to_addon
    def _executeJSONRPC(self, jsonrpccommand):

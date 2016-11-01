@@ -47,6 +47,7 @@ _views = {}       # key=>view_name  value=>view class instance
 _memorydb = None  # EmcDatabase  key=>page_url  value=style_name
 _instances = []   # keep track of EmcBrowser instances. just for dump_all()
 _topbar_btns = [] # Topbar buttons
+_active_one = None  # Currently visible/active browser
 
 BROWSER_MEMORY_DB_VERSION = 2
 
@@ -75,12 +76,14 @@ def init():
    topbar_button_add(icon='icon/view_covergrid',
                      cb=lambda b: input_events.event_emit('VIEW_COVERGRID'))
 
+
 def shutdown():
    for name, view in _views.items():
       view.__shutdown__()
 
    global _memorydb
    del _memorydb
+
 
 def topbar_button_add(label=None, icon=None, cb=None, cb_data=None):
    bt = EmcButton(label=label, icon=icon, cb=cb, cb_data=cb_data,
@@ -89,12 +92,22 @@ def topbar_button_add(label=None, icon=None, cb=None, cb_data=None):
    _topbar_btns.append(bt)
    return bt
 
+
 def dump_everythings():
    print('*' * 70)
    for v in _views:
       print('loaded view: ' + str(v))
    for b in _instances:
       print(b)
+
+
+def current_browser_set(instance):
+   global _active_one
+   _active_one = instance
+
+
+def current_browser_get():
+   return _active_one
 
 
 class EmcItemClass(Singleton):
@@ -376,6 +389,7 @@ class EmcBrowser(object):
       input_events.listener_add('browser-' + self.name, self._input_event_cb)
       for b in _topbar_btns:
          b.focus_allow = True
+      current_browser_set(self)
 
    def hide(self):
       """ TODO Function doc """
@@ -384,12 +398,21 @@ class EmcBrowser(object):
       self.current_view.hide()
       for b in _topbar_btns:
          b.focus_allow = False
+      current_browser_set(None)
 
    def item_bring_in(self, pos='top', animated=True):
       """ Move the view so that the currently selected item will go on 'pos'
       pos can be: 'in', ', top', 'mid'
       """
       self.current_view.item_bring_in(pos, animated)
+
+   def selected_item_url_get(self):
+      """ Get the url of the currently selected item """
+      return self.current_view.selected_url_get()
+
+   def selected_item_data_get(self):
+      """ Get the item_data of the currently selected item """
+      return self.current_view.selected_data_get()
 
    # private stuff
    def _populate_page(self, page, is_back=False, is_refresh=False):
@@ -644,6 +667,13 @@ class ViewList(object):
          (item_class, url, user_data) = item.data_get()                         # 3 #
          return url
 
+   def selected_data_get(self):
+      """ return the item_data of the currently hilighted item """
+      item = self.current_list.selected_item_get()
+      if item:
+         (item_class, url, user_data) = item.data_get()                         # 3 #
+         return user_data
+
    def input_event_cb(self, event):
       """ Here you can manage input events for the view """
       if event == 'OK' and self.current_list.focus == True:
@@ -872,6 +902,13 @@ class ViewPosterGrid(object):
       if item:
          (item_class, url, user_data) = item.data_get()                         # 3 #
          return url
+
+   def selected_data_get(self):
+      """ return the item_data of the currently hilighted item """
+      item = self.gg.selected_item_get()
+      if item:
+         (item_class, url, user_data) = item.data_get()                         # 3 #
+         return user_data
 
    def input_event_cb(self, event):
       if event == 'OK' and self.gg.focus == True:

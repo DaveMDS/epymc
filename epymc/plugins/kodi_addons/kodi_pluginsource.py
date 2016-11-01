@@ -64,7 +64,8 @@ def return_to_addon(meth):
 #  listitem utils  #############################################################
 """ listitem reference:
 {
-   url: ''             # those 2 are added by emc in _addDirectoryItem
+   addon_id: ''        # those 3 are added by emc in _addDirectoryItem
+   url: ''             #
    isFolder: bool      #
 
    path: ''
@@ -166,73 +167,43 @@ def return_to_addon(meth):
 """
 
 
-def listitem_best_label(listitem):
-   if listitem:
-      return listitem.get('label') or listitem['infoLabels'].get('title')
+class ListItem(dict):
+   """ Utility class that wrap the listitem dict received from addons """
 
+   def __init__(self, listitem):
+      dict.__init__(self)
+      self.update(listitem)
 
-def listitem_best_icon(listitem):
-   if listitem:
-      if listitem['isFolder']:
+   def play(self, mediaurl=None):
+      url = mediaurl or self.get('url') or self.get('path')
+      mediaplayer.play_url(url)
+      mediaplayer.title_set(self.best_label)
+      mediaplayer.poster_set(self.best_poster)
+
+   @property
+   def best_label(self):
+      return self.get('label') or self['infoLabels'].get('title')
+
+   @property
+   def best_icon(self):
+      if self['isFolder']:
          return 'icon/folder'
       else:
          return 'icon/play'
       # TODO search in art
 
+   @property
+   def best_poster(self):
+      return self['art'].get('thumb')
 
-def listitem_best_poster(listitem):
-   if listitem:
-      return listitem['art'].get('thumb')
+   @property
+   def best_fanart(self):
+      return self['art'].get('fanart')
 
-
-def listitem_best_fanart(listitem):
-   if listitem:
-      return listitem['art'].get('fanart')
-
-
-def listitem_best_info(listitem):
-   if listitem:
-      return listitem['infoLabels'].get('plot', '').replace('&', '&amp;')
+   @property
+   def best_info(self):
+      return self['infoLabels'].get('plot', '').replace('&', '&amp;')
       # TODO show all available infoLabels
-
-
-def listitem_play(listitem, media_url=None):
-   if listitem:
-      url = media_url or listitem.get('url') or listitem.get('path')
-      title = listitem_best_label(listitem)
-      poster = listitem_best_poster(listitem)
-
-      mediaplayer.play_url(url)
-      mediaplayer.title_set(title)
-      mediaplayer.poster_set(poster)
-
-
-class StandardItemClass(EmcItemClass):
-   def item_selected(self, url, item_data):
-      addon, listitem = item_data
-      addon._item_selected_cb(url, listitem)
-
-   def label_get(self, url, item_data):
-      addon, listitem = item_data
-      return listitem_best_label(listitem).replace('&', '&amp;')
-
-   def icon_get(self, url, item_data):
-      addon, listitem = item_data
-      return listitem_best_icon(listitem)
-
-   def poster_get(self, url, item_data):
-      addon, listitem = item_data
-      return listitem_best_poster(listitem)
-
-   def fanart_get(self, url, item_data):
-      addon, listitem = item_data
-      return listitem_best_fanart(listitem) or addon.fanart
-
-   def info_get(self, url, item_data):
-      addon, listitem = item_data
-      import pprint  # usefull for debug
-      pprint.pprint(listitem)
-      return listitem_best_info(listitem)
 
 
 class KodiPluginSource(KodiAddonBase):
@@ -243,7 +214,6 @@ class KodiPluginSource(KodiAddonBase):
       KodiAddonBase.__init__(self, *args)
       self._run_dialog = None
       self._run_dialog_timer = None
-      self._selected_listitem = None
 
       ext = self._root.find(self.extension_point)
       self._main_exe = ext.get('library')
@@ -281,27 +251,8 @@ class KodiPluginSource(KodiAddonBase):
          self._run_dialog.delete()
          self._run_dialog = None
 
-   def _item_selected_cb(self, url, listitem):
-      self._selected_listitem = listitem
-
-      # addons can request pages from another addons!
-      addon = self
-      if url.startswith('plugin://'):
-         addon_id = url[9:url.index('/', 10)]
-         if addon_id != self.id:
-            addon = get_installed_addon(addon_id)
-
-      if listitem.get('isFolder') or url.startswith('plugin://'):
-         addon.request_page(url)
-      else:
-         listitem_play(listitem)
-
-   def request_page(self, url=None, browser=None):
-
-      if url is None:
-         url = self.root_url
-      if browser is not None:
-         self._browser = browser
+   def request_page(self, url, page_done_cb):
+      self._page_done_cb = page_done_cb
 
       DBG('running: "{}" with url: "{}"'.format(self.name, url))
 
@@ -386,11 +337,8 @@ class KodiPluginSource(KodiAddonBase):
          self._page_items = None
          self._page_url = None
 
-   def _populate_requested_page(self, browser, page_url, items):
-      self.hide_run_dialog()
-      for listitem in items:
-         self._browser.item_add(StandardItemClass(), listitem['url'],
-                                (self, listitem))
+   def _addon_listing_complete(self):
+      self._page_done_cb(self, self._page_url, self._page_items)
 
    #  xbmclib.xbmc proxied functions  ##########################################
    @return_to_addon
@@ -400,6 +348,7 @@ class KodiPluginSource(KodiAddonBase):
       val = None
 
       if ctx == 'ListItem':
+         # !!!!!!!!!   BROKEN     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          listitem = self._selected_listitem
          val = listitem['infoLabels'].get(key.lower())
 
@@ -417,7 +366,7 @@ class KodiPluginSource(KodiAddonBase):
    def _Player_play(self, player_id, item=None, listitem=None,
                     windowed=False, startpos=-1):
       self.hide_run_dialog()
-      listitem_play(listitem, item)
+      ListItem(listitem).play(item)
 
    #  xbmclib.addon proxied functions  #########################################
    @return_to_addon
@@ -457,23 +406,21 @@ class KodiPluginSource(KodiAddonBase):
                          isFolder=False, totalItems=1):
       listitem['url'] = url
       listitem['isFolder'] = isFolder
-      self._page_items.append(listitem)
+      listitem['addon_id'] = self.id
+      self._page_items.append(ListItem(listitem))
 
    def _endOfDirectory(self, handle, succeeded=True,
                        updateListing=False, cacheToDisc=True):
       self.hide_run_dialog()
       if succeeded is True:
-         self._browser.page_add(self._page_url, 'page label', None,  # TODO
-                                self._populate_requested_page,
-                                items=self._page_items)
-         self._page_items = None
+         self._addon_listing_complete()
       else:
          pass  # TODO ALERT
 
    def _setResolvedUrl(self, handle, succeeded, listitem):
       self.hide_run_dialog()
       if succeeded:
-         listitem_play(listitem)
+         ListItem(listitem).play()
       else:
          EmcDialog(style='error', text='Addon error')  # TODO better dialog
 

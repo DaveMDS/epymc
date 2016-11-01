@@ -12,6 +12,7 @@ TMP
  * use new Emc*Dialog everywhere !
  * For 1.3 release:
    * raise theme generation
+   * remove the "silent subs on start" hack, efl 1.19 fixed this
 
 BUGS
 =====

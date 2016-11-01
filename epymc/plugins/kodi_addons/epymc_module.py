@@ -102,7 +102,7 @@ class RepoItemClass(EmcItemClass):
 class AddonItemClass(EmcItemClass):
    def item_selected(self, url, addon):
       if addon.is_installed:
-         addon.request_page(None, _mod._browser)
+         _mod.request_addon_page(url)
       else:
          AddonInfoPanel(addon)
 
@@ -138,6 +138,30 @@ class AddonItemClass(EmcItemClass):
 
    def fanart_get(self, url, addon):
       return addon.fanart
+
+
+class StandardItemClass(EmcItemClass):
+   def item_selected(self, url, listitem):
+      if listitem['isFolder'] or url.startswith('plugin://'):
+         _mod.request_addon_page(url, listitem)
+      else:
+         listitem.play()
+
+   def label_get(self, url, listitem):
+      return listitem.best_label
+
+   def icon_get(self, url, listitem):
+      return listitem.best_icon
+
+   def poster_get(self, url, listitem):
+      return listitem.best_poster
+
+   def fanart_get(self, url, listitem):
+      return listitem.best_fanart
+
+   def info_get(self, url, listitem):
+      return listitem.best_info
+
 
 
 #  The epymc module  ###########################################################
@@ -201,20 +225,41 @@ class KodiAddonsModule(EmcModule):
    def populate_root_page(self, browser, url):
       for addon in get_installed_addons(KodiPluginSource):
          if not addon.disabled:
-            browser.item_add(AddonItemClass(), None, addon)
+            browser.item_add(AddonItemClass(), addon.root_url, addon)
       browser.item_add(GetMoreItemClass(), 'kodi_addons://manage', self)
+
+   def request_addon_page(self, url, listitem=None):
+      # addons can request pages from other addons!
+      if url.startswith('plugin://'):
+         addon_id = url[9:url.index('/', 10)]
+      elif listitem:
+         addon_id = listitem['addon_id']
+      else:
+         print("ERROR (this should never happend)")
+         return
+
+      addon = get_installed_addon(addon_id)
+      addon.request_page(url, self._request_page_done_cb)
+
+   def _request_page_done_cb(self, addon, page_url, listitems):
+      self._browser.page_add(page_url, addon.name, None,
+                             self.populate_addon_page, listitems)
+
+   def populate_addon_page(self, browser, url, listitems):
+      for listitem in listitems:
+         self._browser.item_add(StandardItemClass(), listitem['url'], listitem)
 
    def populate_repositories_page(self, browser, url):
       for repo in get_installed_addons(KodiRepository):
          if not repo.disabled:
-            browser.item_add(RepoItemClass(), url + '/repo_name', repo)
-            # TODO fix repo_name
+            browser.item_add(RepoItemClass(), url + '/' + repo.id, repo)
 
    def populate_repository_page(self, browser, url, repo):
       repo.get_addons(self._repo_get_addons_done)
+      # TODO show a dialog when downloading repo addons.xml !!
 
    def _repo_get_addons_done(self, repo, addons):
-      L = [a for a in a.values() if type(a) == KodiPluginSource]
+      L = [a for a in addons.values() if type(a) == KodiPluginSource]
       for addon in sorted(L):
          self._browser.item_add(AddonItemClass(), 'url', addon)  # TODO fix url
 

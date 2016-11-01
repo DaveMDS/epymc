@@ -3,10 +3,26 @@
 import os
 import locale
 import polib
+import io
 from xml.etree import ElementTree 
 
 user_dir = os.path.expanduser('~/.config/epymc/kodi')
 addons_dir = os.path.expanduser('~/.config/epymc/kodi/addons')
+
+
+def safe_po_parser(pofile):
+   """ Remove unwanted comments from a po file before passing it to polib
+   Kodi po files use non-standard comment lines, like:
+
+   #YouTube
+   #empty strings from id 30121 to 30199
+
+   So we need to strip those lines that otherwise will make polib parse fail
+   """
+   fhandle = io.open(pofile, 'rt', encoding='utf-8')
+   lines = [line for line in fhandle if line[0] != '#']
+   fhandle.close()
+   return polib.pofile(''.join(lines))
 
 
 class Addon(object):
@@ -40,7 +56,7 @@ class Addon(object):
             po_file = os.path.join(addons_dir, self.id, 'resources',
                                   'language', lang, 'strings.po')
             try:
-               self._strings_po = polib.pofile(po_file)
+               self._strings_po = safe_po_parser(po_file)
             except IOError:
                continue
             else:

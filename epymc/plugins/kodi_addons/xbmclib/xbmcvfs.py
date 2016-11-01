@@ -80,10 +80,14 @@ def rmdir(path):
 
 
 class File(object):
+
+   @NOT_IMPLEMENTED
    def __init__(self, *args, **kargs):
-      print("VFS NOT IMPLEMENTED: File class")
+      pass
 
 
 class Stat(object):
+
+   @NOT_IMPLEMENTED
    def __init__(self, *args, **kargs):
-      print("VFS NOT IMPLEMENTED: Stat class")
+      pass

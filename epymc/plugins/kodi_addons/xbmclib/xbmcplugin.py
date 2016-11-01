@@ -1,7 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
 
-
 SORT_METHOD_ALBUM = 14
 SORT_METHOD_ALBUM_IGNORE_THE = 15
 SORT_METHOD_ARTIST = 11
@@ -45,29 +44,60 @@ SORT_METHOD_VIDEO_TITLE = 25
 SORT_METHOD_VIDEO_USER_RATING = 20
 SORT_METHOD_VIDEO_YEAR = 18
 
-def addSortMethod(handle, sortMethod, label2Mask=None):
-   print('NOT IMPLEMENTED: addSortMethod')
-
 
 @emc_function_call
 def addDirectoryItem(handle, url, listitem, isFolder=False, totalItems=1):
    return True
+
 
 def addDirectoryItems(handle, items, totalItems=1):
    for url, listitem, isFolder in items:
       addDirectoryItem(handle, url, listitem, isFolder, totalItems)
    return True
 
-def setContent(handle, content):
-   print('NOT IMPLEMENTED: setContent ("{}")'.format(content))
-   # content: files, songs, artists, albums, movies, tvshows, episodes, musicvideos
+
+@NOT_IMPLEMENTED
+def addSortMethod(handle, sortMethod, label2Mask=None):
+   pass
+
 
 @emc_function_call
-def endOfDirectory(handle, succeeded=True, updateListing=False, cacheToDisc=True):
+def endOfDirectory(handle, succeeded=True, updateListing=False,
+                   cacheToDisc=True):
    pass
+
+
+@NOT_IMPLEMENTED
+def getSetting(handle, id):
+   return ''
+
+
+@NOT_IMPLEMENTED
+def setContent(handle, content):
+   pass
+
+
+@NOT_IMPLEMENTED
+def setPluginCategory(handle, category):
+   pass
+
+
+@NOT_IMPLEMENTED
+def setPluginFanart(handle, image, color1=None, color2=None, color3=None):
+   pass
+
+
+@NOT_IMPLEMENTED
+def setProperty(handle, key, value):
+   pass
+
 
 @emc_function_call
 def setResolvedUrl(handle, succeeded, listitem):
    pass
-   
-   
+
+
+@NOT_IMPLEMENTED
+def setSetting(handle, id, value):
+   pass
+

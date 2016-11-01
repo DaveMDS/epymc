@@ -68,8 +68,9 @@ class ListItem(object):
    def getProperty(self, key):
       return self.properties.get(key)
 
+   @NOT_IMPLEMENTED
    def addContextMenuItems(self, items, replaceItems=False):
-      print('NOT IMPLEMENTED: addContextMenuItems(items:{})'.format(len(items)))
+      print('NOT IMPLEMENTED: addContextMenuItems(...)')
 
    def setThumbnailImage(self, thumb):
       """ deprecated  (use art instead) """
@@ -95,93 +96,103 @@ PASSWORD_VERIFY = 1
 
 class Dialog(object):
 
+   @NOT_IMPLEMENTED
    def __init__(self):
       self._class_id = str(random.randint(1, 2**32))
-      print("NOT IMPLEMENTED: Dialog()")
 
+   @NOT_IMPLEMENTED
    def browse(self, type, heading, shares, mask=None, useThumb=False,
               treatAsFolder=False, default=None, enableMultiple=False):
-      print("NOT IMPLEMENTED: Dialog.browse()")
       return None
 
+   @NOT_IMPLEMENTED
    def browseMultiple(self, type, heading, shares, mask=None, useThumb=False,
                       treatAsFolder=False, default=None):
-      print("NOT IMPLEMENTED: Dialog.browseMultiple()")
       return None
 
+   @NOT_IMPLEMENTED
    def browseSingle(self, type, heading, shares, mask=None, useThumb=False,
                     treatAsFolder=False, default=None):
-      print("NOT IMPLEMENTED: Dialog.browseSingle()")
       return None
 
+   @NOT_IMPLEMENTED
    def input(self, heading, default='', type=INPUT_ALPHANUM, option=None,
              autoclose=0):
-      print("NOT IMPLEMENTED: Dialog.input()")
       return ''
 
+   @NOT_IMPLEMENTED
    def multiselect(self, heading, list, autoclose=0):
-      print("NOT IMPLEMENTED: Dialog.multiselect()")
       return None
 
+   @NOT_IMPLEMENTED
    def notification(self, heading, message, icon=NOTIFICATION_INFO, time=5000,
                     sound=True):
-      print("NOT IMPLEMENTED: Dialog.notification()")
+      pass
 
+   @NOT_IMPLEMENTED
    def numeric(self, type, heading, default=None):
-      print("NOT IMPLEMENTED: Dialog.numeric()")
       return default
 
+   @NOT_IMPLEMENTED
    def ok(self, heading, line1, line2=None, line3=None):
-      print("NOT IMPLEMENTED: Dialog.ok()")
       return False
 
+   @NOT_IMPLEMENTED
    def select(self, heading, list):
-      print("NOT IMPLEMENTED: Dialog.select()")
       return 0
 
+   @NOT_IMPLEMENTED
    def textviewer(self, heading, text):
-      print("NOT IMPLEMENTED: Dialog.textviewer()")
+      pass
 
+   @NOT_IMPLEMENTED
    def yesno(self, heading, line1, line2=None, line3=None, nolabel=None,
              yeslabel=None, autoclose=0):
-      print("NOT IMPLEMENTED: Dialog.yesno()")
       return False
 
 
 class DialogProgress(object):
 
+   @NOT_IMPLEMENTED
    def __init__(self):
       self._class_id = str(random.randint(1, 2**32))
-      print("NOT IMPLEMENTED: DialogProgress()")
 
+   @NOT_IMPLEMENTED
    def close(self):
-      print("NOT IMPLEMENTED: DialogProgress.close()")
+      pass
 
+   @NOT_IMPLEMENTED
    def create(self, heading, line1=None, line2=None, line3=None):
-      print("NOT IMPLEMENTED: DialogProgress.create()")
+      pass
 
+   @NOT_IMPLEMENTED
    def iscanceled(self):
-      print("NOT IMPLEMENTED: DialogProgress.iscanceled()")
       return False
 
+   @NOT_IMPLEMENTED
    def update(self, pecent, line1=None, line2=None, line3=None):
-      print("NOT IMPLEMENTED: DialogProgress.update()")
+      pass
 
 
 class DialogProgressBG(object):
 
+   @NOT_IMPLEMENTED
    def __init__(self):
       self._class_id = str(random.randint(1, 2**32))
-      print("NOT IMPLEMENTED: DialogProgressBG()")
 
+   @NOT_IMPLEMENTED
    def close(self):
-      print("NOT IMPLEMENTED: DialogProgressBG.close()")
+      pass
 
+   @NOT_IMPLEMENTED
    def create(self, heading, message=None):
-      print("NOT IMPLEMENTED: DialogProgressBG.create()")
+      pass
 
+   @NOT_IMPLEMENTED
    def isFinished(self):
-      print("NOT IMPLEMENTED: DialogProgressBG.isFinished()")
+      pass
 
+   @NOT_IMPLEMENTED
    def update(self, percent=None, heading=None, message=None):
-      print("NOT IMPLEMENTED: DialogProgressBG.update()")
+      pass
+

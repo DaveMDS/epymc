@@ -68,7 +68,7 @@ class ListItem(object):
    def getProperty(self, key):
       return self.properties.get(key)
 
-   @NOT_IMPLEMENTED
+   # @NOT_IMPLEMENTED
    def addContextMenuItems(self, items, replaceItems=False):
       print('NOT IMPLEMENTED: addContextMenuItems(...)')
 

@@ -62,9 +62,9 @@ def enableNavSounds(yesNo):
    pass
 
 
-@NOT_IMPLEMENTED
+@emc_function_call
 def executeJSONRPC(jsonrpccommand):
-   pass
+   return emc_wait_replay()
 
 
 @NOT_IMPLEMENTED

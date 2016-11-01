@@ -42,6 +42,7 @@ from epymc.gui import EmcDialog, EmcWaitDialog
 
 from .kodi_addon_base import KodiAddonBase, get_installed_addon
 from .kodi_pythonmodule import KodiPythonModule
+from .epymc_jsonrpc import execute as JSONRPC_execute
 
 
 def DBG(*args):
@@ -396,6 +397,10 @@ class KodiPluginSource(KodiAddonBase):
          DBG('ERROR: cannot resolve InfoLabel: {}'.format(infotag))
 
       return val or 'Unknown'
+
+   @return_to_addon
+   def _executeJSONRPC(self, jsonrpccommand):
+      return JSONRPC_execute(jsonrpccommand)
 
    def _Player_play(self, player_id, item=None, listitem=None, windowed=False, startpos=-1):
       self.hide_run_dialog()

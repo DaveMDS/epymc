@@ -88,11 +88,12 @@ class Addon(object):
 
       # already parsed po file
       if self._strings_po is not None:
-         ctx = '#{}'.format(id)
-         for entry in self._strings_po:
-            if entry.msgctxt == ctx:
-               return entry.msgstr
-         return 'Localize ERROR1 {}'.format(id)
+         entry = self._strings_po.find('#' + str(id), by='msgctxt',
+                                       include_obsolete_entries=True)
+         if entry:
+            return entry.msgstr or entry.msgid
+         else:
+            return 'Localize ERROR1 {}'.format(id)
 
       # already parsed xml lang file
       elif self._strings_et is not None:

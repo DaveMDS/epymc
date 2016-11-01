@@ -4,7 +4,7 @@ import os
 import locale
 import polib
 import io
-from xml.etree import ElementTree 
+from xml.etree import ElementTree
 
 user_dir = os.path.expanduser('~/.config/epymc/kodi')
 addons_dir = os.path.expanduser('~/.config/epymc/kodi/addons')
@@ -28,10 +28,10 @@ def safe_po_parser(pofile):
 class Addon(object):
 
    def __init__(self, id=None):
-      self.id = id or addon_id # addon_id comes from sitecustomize.py
-      self._class_id = self.id # this will be passed back in methods to emc
-      self._strings_po = None  # already parsed POFile instance
-      self._strings_et = None  # already parsed xml lang file (ElementTree)
+      self.id = id or addon_id  # addon_id comes from sitecustomize.py
+      self._class_id = self.id  # this will be passed back in methods to emc
+      self._strings_po = None   # already parsed POFile instance
+      self._strings_et = None   # already parsed xml lang file (ElementTree)
 
    @emc_method_call
    def getAddonInfo(self, id):
@@ -45,16 +45,20 @@ class Addon(object):
    def setSetting(self, id, value):
       pass
 
+   @emc_method_call
+   def openSettings(self):
+      pass
+
    def getLocalizedString(self, id):
       # search and parse strings.po (or string.xml)
       if self._strings_po is None and self._strings_et is None:
          # TODO also support: "en_US" (only "en" atm)
          lang, encoding = locale.getdefaultlocale()
-         lang_name = iso639_table.get(lang[:2], 'English') if lang else 'English'
+         langname = iso639_table.get(lang[:2], 'English') if lang else 'English'
          # po file
-         for lang in (lang_name, 'English'):
+         for lang in (langname, 'English'):
             po_file = os.path.join(addons_dir, self.id, 'resources',
-                                  'language', lang, 'strings.po')
+                                   'language', lang, 'strings.po')
             try:
                self._strings_po = safe_po_parser(po_file)
             except IOError:
@@ -63,16 +67,17 @@ class Addon(object):
                break
          # or xml file
          if self._strings_po is None:
-            for lang in (lang_name, 'English'):
+            for lang in (langname, 'English'):
                xml_file = os.path.join(addons_dir, self.id, 'resources',
-                                      'language', lang, 'strings.xml')
+                                       'language', lang, 'strings.xml')
                if not os.path.exists(xml_file):
                   continue
                # try different encoding (if encoding not provided in xml)
                for enc in (None, 'utf-8', 'iso-8859-1'):
                   parser = ElementTree.XMLParser(encoding=enc)
                   try:
-                     self._strings_et = ElementTree.parse(xml_file, parser=parser)
+                     self._strings_et = ElementTree.parse(xml_file,
+                                                          parser=parser)
                   except ElementTree.ParseError:
                      pass
                   else:
@@ -98,8 +103,8 @@ class Addon(object):
 
       return 'Localize ERROR3 {}'.format(id)
 
-iso639_table = {
 # From http://kodi.wiki/view/List_of_language_codes_(ISO-639:1988)
+iso639_table = {
    'aa': 'Afar',
    'ab': 'Abkhazian',
    'af': 'Afrikaans',

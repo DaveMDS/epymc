@@ -38,7 +38,7 @@ from efl import ecore
 
 import epymc.mediaplayer as mediaplayer
 from epymc.browser import EmcItemClass
-from epymc.gui import EmcDialog, EmcWaitDialog, EmcYesNoDialog
+from epymc.gui import EmcDialog, EmcWaitDialog, EmcYesNoDialog, EmcOkDialog
 
 from .kodi_addon_base import KodiAddonBase, get_installed_addon
 from .kodi_pythonmodule import KodiPythonModule
@@ -408,6 +408,18 @@ class KodiPluginSource(KodiAddonBase):
       def dialog_cb(yes_pressed):
          self.send_to_addon('True' if yes_pressed else 'False')
       EmcYesNoDialog(heading, line1, dialog_cb, yeslabel, nolabel)
+
+   def _Dialog_ok(self, dialog_id, heading, line1, line2=None, line3=None):
+      self.hide_run_dialog()
+      if line2 is not None:
+         line1 += '<br>' + line2
+      if line3 is not None:
+         line1 += '<br>' + line3
+
+      # TODO convert kodi tags [CR] etc...
+      def dialog_cb(ok_pressed):
+         self.send_to_addon('True' if ok_pressed else 'False')
+      EmcOkDialog(heading, line1, dialog_cb)
 
    #  xbmclib.xbmcplugin proxied functions  ####################################
    def _addDirectoryItem(self, handle, url, listitem,

@@ -1523,6 +1523,22 @@ class EmcWaitDialog(EmcDialog):
       if callable(self._user_cb):
          self._user_cb(**self._user_cb_kargs)
 
+class EmcOkDialog(EmcDialog):
+   def __init__(self, title, text, cb, oklabel=None, **kargs):
+      self._user_cb = cb
+      self._user_cb_kargs = kargs
+      EmcDialog.__init__(self, style='minimal', title=title, text=text,
+                         canc_cb=self._ok_canc_cb)
+      self.button_add(oklabel or _('Ok'), self._ok_cb)
+
+   def _ok_cb(self, bnt):
+      self.delete()
+      self._user_cb(True, **self._user_cb_kargs)
+
+   def _ok_canc_cb(self, dialog):
+      self.delete()
+      self._user_cb(False, **self._user_cb_kargs)
+
 class EmcYesNoDialog(EmcDialog):
    # TODO remove yesno style and logic from parent when this used everywhere
    def __init__(self, title, text, cb, yeslabel=None, nolabel=None, **kargs):

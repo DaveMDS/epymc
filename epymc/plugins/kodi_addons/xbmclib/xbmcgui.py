@@ -132,9 +132,10 @@ class Dialog(object):
    def numeric(self, type, heading, default=None):
       return default
 
-   @NOT_IMPLEMENTED
+   @emc_method_call
    def ok(self, heading, line1, line2=None, line3=None):
-      return False
+      retstr = emc_wait_replay()
+      return True if retstr == 'True' else False
 
    @NOT_IMPLEMENTED
    def select(self, heading, list):

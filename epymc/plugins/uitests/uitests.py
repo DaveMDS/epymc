@@ -32,7 +32,7 @@ from efl.evas import EXPAND_BOTH, FILL_BOTH, FILL_HORIZ
 from epymc.modules import EmcModule
 from epymc.gui import EmcSlider, EmcVKeyboard, EmcFileSelector, EmcButton, \
    EmcDialog, EmcInfoDialog, EmcWarningDialog, EmcErrorDialog, EmcYesNoDialog, \
-   EmcNotify, EmcMenu, DownloadManager
+   EmcOkDialog, EmcNotify, EmcMenu, DownloadManager
 
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
@@ -349,6 +349,12 @@ class MyItemClass(EmcItemClass):
       # Dialog - Error
       elif url == 'uitests://dlg-error':
          EmcErrorDialog('This is an <br><br><b>Error</><br>dialog<br>')
+
+      # Dialog - Ok
+      elif url == 'uitests://dlg-ok':
+         text = 'This is an <br><br><b>Ok</><br><br>dialog<br>'
+         EmcOkDialog('Dialog - Ok', text, lambda res: DBG(res),
+                     oklabel='Custom label')
 
       # Dialog - YesNo
       elif url == 'uitests://dlg-yesno':
@@ -704,6 +710,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://dlg-warning', 'Dialog - Warning')
       browser.item_add(MyItemClass(), 'uitests://dlg-warning2', 'Dialog - Warning (custom title)')
       browser.item_add(MyItemClass(), 'uitests://dlg-error', 'Dialog - Error')
+      browser.item_add(MyItemClass(), 'uitests://dlg-ok', 'Dialog - Ok')
       browser.item_add(MyItemClass(), 'uitests://dlg-yesno', 'Dialog - YesNo')
       browser.item_add(MyItemClass(), 'uitests://dlg-cancel', 'Dialog - Cancel')
       browser.item_add(MyItemClass(), 'uitests://dlg-progress', 'Dialog - Progress')

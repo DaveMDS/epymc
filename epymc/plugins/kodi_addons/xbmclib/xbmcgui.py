@@ -96,7 +96,6 @@ PASSWORD_VERIFY = 1
 
 class Dialog(object):
 
-   @NOT_IMPLEMENTED
    def __init__(self):
       self._class_id = str(random.randint(1, 2**32))
 
@@ -145,10 +144,11 @@ class Dialog(object):
    def textviewer(self, heading, text):
       pass
 
-   @NOT_IMPLEMENTED
+   @emc_method_call
    def yesno(self, heading, line1, line2=None, line3=None, nolabel=None,
              yeslabel=None, autoclose=0):
-      return False
+      retstr = emc_wait_replay()
+      return True if retstr == 'True' else False
 
 
 class DialogProgress(object):

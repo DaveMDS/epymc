@@ -38,7 +38,7 @@ from efl import ecore
 
 import epymc.mediaplayer as mediaplayer
 from epymc.browser import EmcItemClass
-from epymc.gui import EmcDialog, EmcWaitDialog
+from epymc.gui import EmcDialog, EmcWaitDialog, EmcYesNoDialog
 
 from .kodi_addon_base import KodiAddonBase, get_installed_addon
 from .kodi_pythonmodule import KodiPythonModule
@@ -303,6 +303,10 @@ class KodiPluginSource(KodiAddonBase):
    def _cmd_canc_cb(self):
       self._exe.delete()
 
+   def send_to_addon(self, value):
+      """ Send value to the currently running addon """
+      self._exe.send('{}\n'.format(value))
+
    def _addon_stdout_cb(self, exe, event):
       """ Lines from addon stdout use this protocol:
 
@@ -390,6 +394,20 @@ class KodiPluginSource(KodiAddonBase):
       DBG("NOT IMPLEMENTED _Addon_openSettings")
 
    #  xbmclib.gui proxied functions  ###########################################
+   def _Dialog_yesno(self, dialog_id, heading, line1, line2=None, line3=None,
+                     nolabel=None, yeslabel=None, autoclose=0):
+      self.hide_run_dialog()
+      if line2 is not None:
+         line1 += '<br>' + line2
+      if line3 is not None:
+         line1 += '<br>' + line3
+      if autoclose != 0:
+         print('NOT IMPLEMENTED Dialog autoclose')
+
+      # TODO convert kodi tags [CR] etc...
+      def dialog_cb(yes_pressed):
+         self.send_to_addon('True' if yes_pressed else 'False')
+      EmcYesNoDialog(heading, line1, dialog_cb, yeslabel, nolabel)
 
    #  xbmclib.xbmcplugin proxied functions  ####################################
    def _addDirectoryItem(self, handle, url, listitem,

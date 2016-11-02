@@ -1538,6 +1538,25 @@ class EmcWaitDialog(EmcDialog):
       self.delete()
       if callable(self._user_cb):
          self._user_cb(**self._user_cb_kargs)
+
+class EmcYesNoDialog(EmcDialog):
+   # TODO remove yesno style and logic from parent when this used everywhere
+   def __init__(self, title, text, cb, yeslabel=None, nolabel=None, **kargs):
+      self._user_cb = cb
+      self._user_cb_kargs = kargs
+      EmcDialog.__init__(self, style='minimal', title=title, text=text,
+                         done_cb=self._yes_cb, canc_cb=self._no_cb)
+      self.button_add(nolabel or _('No'), self._no_cb)
+      self.button_add(yeslabel or _('Yes'), self._yes_cb)
+
+   def _yes_cb(self, btn):
+      self.delete()
+      self._user_cb(True, **self._user_cb_kargs)
+
+   def _no_cb(self, btn):
+      self.delete()
+      self._user_cb(False, **self._user_cb_kargs)
+
    
 ################################################################################
 class EmcNotify(edje.Edje):

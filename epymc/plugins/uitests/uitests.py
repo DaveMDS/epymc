@@ -32,7 +32,7 @@ from efl.evas import EXPAND_BOTH, FILL_BOTH, FILL_HORIZ
 from epymc.modules import EmcModule
 from epymc.gui import EmcSlider, EmcVKeyboard, EmcFileSelector, EmcButton, \
    EmcDialog, EmcInfoDialog, EmcWarningDialog, EmcErrorDialog, EmcYesNoDialog, \
-   EmcConfirmDialog, EmcNotify, EmcMenu, DownloadManager
+   EmcNotify, EmcMenu, DownloadManager
 
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
@@ -350,13 +350,6 @@ class MyItemClass(EmcItemClass):
       elif url == 'uitests://dlg-error':
          EmcErrorDialog('This is an <br><br><b>Error</><br>dialog<br>')
 
-      # Dialog - Confirm
-      elif url == 'uitests://dlg-confirm':
-         def _confirm_cb(confirmed, asd_1, asd_2):
-            print('Confirmed:', confirmed, 'kargs:', asd_1, asd_2)
-         EmcConfirmDialog('This is a <br><br><b>confirmation</><br><br>dialog<br>',
-                          _confirm_cb, asd_1='asd1', asd_2='asd2')
-      
       # Dialog - YesNo
       elif url == 'uitests://dlg-yesno':
          text = 'This is a <br><br><b>Yes/No</><br><br>dialog<br>'
@@ -711,7 +704,6 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://dlg-warning', 'Dialog - Warning')
       browser.item_add(MyItemClass(), 'uitests://dlg-warning2', 'Dialog - Warning (custom title)')
       browser.item_add(MyItemClass(), 'uitests://dlg-error', 'Dialog - Error')
-      browser.item_add(MyItemClass(), 'uitests://dlg-confirm', 'Dialog - Confirm')
       browser.item_add(MyItemClass(), 'uitests://dlg-yesno', 'Dialog - YesNo')
       browser.item_add(MyItemClass(), 'uitests://dlg-cancel', 'Dialog - Cancel')
       browser.item_add(MyItemClass(), 'uitests://dlg-progress', 'Dialog - Progress')

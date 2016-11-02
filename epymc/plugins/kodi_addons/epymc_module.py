@@ -38,7 +38,7 @@ import epymc.ini as ini
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
-from epymc.gui import EmcDialog, EmcConfirmDialog, EmcErrorDialog, \
+from epymc.gui import EmcDialog, EmcYesNoDialog, EmcErrorDialog, \
     EmcImage, EmcNotify, EmcVKeyboard, EmcFileSelector
 
 from .kodi_addon_base import load_installed_addons, load_single_addon, \
@@ -425,7 +425,7 @@ class AddonInfoPanel(EmcDialog):
    def uninstall_btn_cb(self, btn):
       txt = '{0}<br><br><hilight>{1.name} v.{1.version}</hilight>'.format(
             _('Are you sure you want to delete this addon?'), self.addon)
-      EmcConfirmDialog(txt, self.uninstall_confirmed_cb)
+      EmcYesNoDialog(_('Remove addon'), txt, self.uninstall_confirmed_cb)
 
    def uninstall_confirmed_cb(self, confirmed):
       if not confirmed:

@@ -1510,22 +1510,6 @@ class EmcInfoDialog(EmcDialog):
    def __init__(self, text, **kargs):
       EmcDialog.__init__(self, style='info', text=text, **kargs)
 
-class EmcConfirmDialog(EmcDialog):
-   def __init__(self, text, cb, title=_('Confirm'), **kargs):
-      self.confirm_cb = cb
-      self.confirm_cb_kargs = kargs
-      EmcDialog.__init__(self, style='yesno', text=text, title=title,
-                         done_cb=self.dialog_done_cb,
-                         canc_cb=self.dialog_canc_cb)
-
-   def dialog_done_cb(self, dialog):
-      dialog.delete()
-      self.confirm_cb(True, **self.confirm_cb_kargs)
-
-   def dialog_canc_cb(self, dialog):
-      dialog.delete()
-      self.confirm_cb(False, **self.confirm_cb_kargs)
-
 class EmcWaitDialog(EmcDialog):
    def __init__(self, text, canc_cb, title=_('Please wait'), **kargs):
       self._user_cb = canc_cb

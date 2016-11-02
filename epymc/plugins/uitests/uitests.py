@@ -31,8 +31,8 @@ from efl.evas import EXPAND_BOTH, FILL_BOTH, FILL_HORIZ
 
 from epymc.modules import EmcModule
 from epymc.gui import EmcSlider, EmcVKeyboard, EmcFileSelector, EmcButton, \
-   EmcDialog, EmcInfoDialog, EmcWarningDialog, EmcErrorDialog, EmcConfirmDialog, \
-   EmcNotify, EmcMenu, DownloadManager
+   EmcDialog, EmcInfoDialog, EmcWarningDialog, EmcErrorDialog, EmcYesNoDialog, \
+   EmcConfirmDialog, EmcNotify, EmcMenu, DownloadManager
 
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
@@ -359,9 +359,9 @@ class MyItemClass(EmcItemClass):
       
       # Dialog - YesNo
       elif url == 'uitests://dlg-yesno':
-         text = 'This is an <br><br><b>Yes/No</><br>dialog<br>'
-         EmcDialog(title='Dialog - YesNo', text=text, style='yesno',
-                   done_cb=lambda btn: DBG('done'))
+         text = 'This is a <br><br><b>Yes/No</><br><br>dialog<br>'
+         EmcYesNoDialog('Dialog - YesNo', text, lambda res: DBG(res),
+                        yeslabel='Custom yes label')
 
       # Dialog - Cancel
       elif url == 'uitests://dlg-cancel':

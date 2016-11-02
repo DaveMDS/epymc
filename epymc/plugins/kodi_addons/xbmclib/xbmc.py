@@ -67,7 +67,7 @@ def executeJSONRPC(jsonrpccommand):
    return emc_wait_replay()
 
 
-@NOT_IMPLEMENTED
+@emc_function_call
 def executebuiltin(function):
    pass
 

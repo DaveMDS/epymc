@@ -43,6 +43,7 @@ from epymc.gui import EmcDialog, EmcWaitDialog, EmcYesNoDialog, EmcOkDialog
 from .kodi_addon_base import KodiAddonBase, get_installed_addon
 from .kodi_pythonmodule import KodiPythonModule
 from .epymc_jsonrpc import execute as JSONRPC_execute
+from .kodi_builtin import execute_builtin
 
 
 def DBG(*args):
@@ -356,6 +357,9 @@ class KodiPluginSource(KodiAddonBase):
    @return_to_addon
    def _executeJSONRPC(self, jsonrpccommand):
       return JSONRPC_execute(jsonrpccommand)
+
+   def _executebuiltin(self, builtin_command):
+      execute_builtin(builtin_command)
 
    def _Player_play(self, player_id, item=None, listitem=None,
                     windowed=False, startpos=-1):

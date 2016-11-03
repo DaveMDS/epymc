@@ -114,10 +114,10 @@ class Dialog(object):
                     treatAsFolder=False, default=None):
       return None
 
-   @NOT_IMPLEMENTED
+   @emc_method_call
    def input(self, heading, default='', type=INPUT_ALPHANUM, option=None,
              autoclose=0):
-      return ''
+      return emc_wait_reply()
 
    @NOT_IMPLEMENTED
    def multiselect(self, heading, list, autoclose=0):

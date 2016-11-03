@@ -64,7 +64,7 @@ def enableNavSounds(yesNo):
 
 @emc_function_call
 def executeJSONRPC(jsonrpccommand):
-   return emc_wait_replay()
+   return emc_wait_reply()
 
 
 @emc_function_call
@@ -119,7 +119,7 @@ def getInfoImage(infotag):
 
 @emc_function_call
 def getInfoLabel(infotag):
-   return emc_wait_replay()
+   return emc_wait_reply()
 
 
 @NOT_IMPLEMENTED
@@ -137,9 +137,8 @@ def getRegion(id):
    pass
 
 
-@NOT_IMPLEMENTED
 def getSkinDir():
-   return 'MediaCenter'
+   return 'skin.confluence'
 
 
 @NOT_IMPLEMENTED

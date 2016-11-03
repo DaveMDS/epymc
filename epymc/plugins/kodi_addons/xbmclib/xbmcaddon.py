@@ -35,11 +35,11 @@ class Addon(object):
 
    @emc_method_call
    def getAddonInfo(self, id):
-      return emc_wait_replay()
+      return emc_wait_reply()
 
    @emc_method_call
    def getSetting(self, id):
-      return emc_wait_replay()
+      return emc_wait_reply()
 
    @emc_method_call
    def setSetting(self, id, value):

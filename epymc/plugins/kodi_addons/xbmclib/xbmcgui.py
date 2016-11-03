@@ -134,12 +134,11 @@ class Dialog(object):
 
    @emc_method_call
    def ok(self, heading, line1, line2=None, line3=None):
-      retstr = emc_wait_replay()
+      retstr = emc_wait_reply()
       return True if retstr == 'True' else False
 
-   @NOT_IMPLEMENTED
    def select(self, heading, list):
-      return 0
+      return emc_wait_reply()
 
    @NOT_IMPLEMENTED
    def textviewer(self, heading, text):
@@ -148,7 +147,7 @@ class Dialog(object):
    @emc_method_call
    def yesno(self, heading, line1, line2=None, line3=None, nolabel=None,
              yeslabel=None, autoclose=0):
-      retstr = emc_wait_replay()
+      retstr = emc_wait_reply()
       return True if retstr == 'True' else False
 
 

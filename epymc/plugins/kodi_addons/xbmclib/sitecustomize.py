@@ -27,8 +27,8 @@ def emc_method_call(meth):
    return func_wrapper
 
 
-def emc_wait_replay():
-   """ Wait for a replay from epymc and return the received data """
+def emc_wait_reply():
+   """ Wait for a reply from epymc and return the received data """
    return sys.stdin.readline().rstrip('\n')
 
 
@@ -42,7 +42,7 @@ def NOT_IMPLEMENTED(func):
 
 __builtin__.emc_function_call = emc_function_call
 __builtin__.emc_method_call = emc_method_call
-__builtin__.emc_wait_replay = emc_wait_replay
+__builtin__.emc_wait_reply = emc_wait_reply
 __builtin__.NOT_IMPLEMENTED = NOT_IMPLEMENTED
 
 

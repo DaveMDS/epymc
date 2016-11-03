@@ -32,7 +32,7 @@ from efl.evas import EXPAND_BOTH, FILL_BOTH, FILL_HORIZ
 from epymc.modules import EmcModule
 from epymc.gui import EmcSlider, EmcVKeyboard, EmcFileSelector, EmcButton, \
    EmcDialog, EmcInfoDialog, EmcWarningDialog, EmcErrorDialog, EmcYesNoDialog, \
-   EmcOkDialog, EmcNotify, EmcMenu, DownloadManager
+   EmcOkDialog, EmcSelectDialog, EmcNotify, EmcMenu, DownloadManager
 
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
@@ -181,7 +181,7 @@ class ViewsItemClass(EmcItemClass):
    def cover_get(self, url, user_data):
       if url in ('cover', 'poster_cover'):
          return os.path.join(self.path, 'cover.jpg')
-         
+
 
 class MyItemClass(EmcItemClass):
 
@@ -361,6 +361,13 @@ class MyItemClass(EmcItemClass):
          text = 'This is a <br><br><b>Yes/No</><br><br>dialog<br>'
          EmcYesNoDialog('Dialog - YesNo', text, lambda res: DBG(res),
                         yeslabel='Custom yes label')
+
+      # Dialog - Select
+      elif url == 'uitests://dlg-select':
+         def _sel_cb(item_num, item_label):
+            print('Selected idx:', item_num, 'label:', item_label)
+         items = ['Item 1', '<info>item 2</info>', 'item 3', 'item 4']
+         EmcSelectDialog('Dialog - Select', items, _sel_cb, preselect=2)
 
       # Dialog - Cancel
       elif url == 'uitests://dlg-cancel':
@@ -712,6 +719,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://dlg-error', 'Dialog - Error')
       browser.item_add(MyItemClass(), 'uitests://dlg-ok', 'Dialog - Ok')
       browser.item_add(MyItemClass(), 'uitests://dlg-yesno', 'Dialog - YesNo')
+      browser.item_add(MyItemClass(), 'uitests://dlg-select', 'Dialog - Select')
       browser.item_add(MyItemClass(), 'uitests://dlg-cancel', 'Dialog - Cancel')
       browser.item_add(MyItemClass(), 'uitests://dlg-progress', 'Dialog - Progress')
       browser.item_add(MyItemClass(), 'uitests://dlg-progress-btn', 'Dialog - Progress with buttons')

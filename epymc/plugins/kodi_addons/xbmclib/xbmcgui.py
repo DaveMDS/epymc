@@ -137,7 +137,8 @@ class Dialog(object):
       retstr = emc_wait_reply()
       return True if retstr == 'True' else False
 
-   def select(self, heading, list):
+   @emc_method_call
+   def select(self, heading, list, autoclose=0, preselect=-1):
       return emc_wait_reply()
 
    @NOT_IMPLEMENTED

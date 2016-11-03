@@ -1389,13 +1389,13 @@ class EmcDialog(elm.Layout):
    def text_append(self, text):
       self._textentry.text_set(self._textentry.text_get() + text)
 
-   def list_item_append(self, label, icon=None, end=None, *args, **kwargs):
+   def list_item_append(self, label, icon=None, end=None, selected=False, *args, **kwargs):
       if self._list:
          if isinstance(end, str) and end.startswith('text/'):
             end = elm.Label(self, style='dia_list', text=end[5:])
          it = self._list.item_append(label, load_icon(icon), load_icon(end), None)
          it.data['_user_item_data_'] = (args, kwargs)
-         if not self._list.selected_item_get():
+         if selected or not self._list.selected_item_get():
             it.selected = True
          return it
 
@@ -1499,18 +1499,22 @@ class EmcDialog(elm.Layout):
       return input_events.EVENT_CONTINUE
 
 class EmcErrorDialog(EmcDialog):
+   """ TODO doc """
    def __init__(self, text, **kargs):
       EmcDialog.__init__(self, style='error', text=text, **kargs)
 
 class EmcWarningDialog(EmcDialog):
+   """ TODO doc """
    def __init__(self, text, **kargs):
       EmcDialog.__init__(self, style='warning', text=text, **kargs)
 
 class EmcInfoDialog(EmcDialog):
+   """ TODO doc """
    def __init__(self, text, **kargs):
       EmcDialog.__init__(self, style='info', text=text, **kargs)
 
 class EmcWaitDialog(EmcDialog):
+   """ TODO doc """
    def __init__(self, text, canc_cb, title=_('Please wait'), **kargs):
       self._user_cb = canc_cb
       self._user_cb_kargs = kargs
@@ -1524,6 +1528,7 @@ class EmcWaitDialog(EmcDialog):
          self._user_cb(**self._user_cb_kargs)
 
 class EmcOkDialog(EmcDialog):
+   """ TODO doc """
    def __init__(self, title, text, cb, oklabel=None, **kargs):
       self._user_cb = cb
       self._user_cb_kargs = kargs
@@ -1540,6 +1545,7 @@ class EmcOkDialog(EmcDialog):
       self._user_cb(False, **self._user_cb_kargs)
 
 class EmcYesNoDialog(EmcDialog):
+   """ TODO doc """
    # TODO remove yesno style and logic from parent when this used everywhere
    def __init__(self, title, text, cb, yeslabel=None, nolabel=None, **kargs):
       self._user_cb = cb
@@ -1557,6 +1563,34 @@ class EmcYesNoDialog(EmcDialog):
       self.delete()
       self._user_cb(False, **self._user_cb_kargs)
 
+class EmcSelectDialog(EmcDialog):
+   """ A simple selection dialog
+   Args:
+      title (str): Dialog title
+      items (str list): The items to show in the dialog
+      cb: The function to call when the dialog is done
+         signature: func(item_num, item_label, **kargs)
+      preselect (int): The index of the item to preselected
+      **kargs: Any other keyword arguments will be passed back in cb
+   """
+   def __init__(self, title, items, cb, preselect=-1, **kargs):
+      self._user_cb = cb
+      self._user_cb_kargs = kargs
+      EmcDialog.__init__(self, style='list', title=title,
+                         done_cb=self._select_cb, canc_cb=self._select_canc_cb)
+      for i, item in enumerate(items):
+         sel = (i == preselect)
+         self.list_item_append(item, selected=sel, item_label=item, item_num=i)
+      self.list_go()
+
+   def _select_cb(self, dialog, item_label, item_num):
+      self.delete()
+      self._user_cb(item_num, item_label, **self._user_cb_kargs)
+
+   def _select_canc_cb(self, dialog):
+      self.delete()
+      self._user_cb(-1, None, **self._user_cb_kargs)
+      
    
 ################################################################################
 class EmcNotify(edje.Edje):

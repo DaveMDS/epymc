@@ -21,6 +21,7 @@
 # Kodi references:
 #  http://kodi.wiki/view/Python_development
 #  http://mirrors.kodi.tv/docs/python-docs/16.x-jarvis/xbmc.html
+#  http://romanvm.github.io/Kodistubs/modules.html
 
 
 # Require:
@@ -38,7 +39,8 @@ from efl import ecore
 
 import epymc.mediaplayer as mediaplayer
 from epymc.browser import EmcItemClass
-from epymc.gui import EmcDialog, EmcWaitDialog, EmcYesNoDialog, EmcOkDialog
+from epymc.gui import EmcDialog, EmcWaitDialog, EmcYesNoDialog, EmcOkDialog, \
+   EmcSelectDialog
 
 from .kodi_addon_base import KodiAddonBase, get_installed_addon
 from .kodi_pythonmodule import KodiPythonModule
@@ -424,6 +426,12 @@ class KodiPluginSource(KodiAddonBase):
       def dialog_cb(ok_pressed):
          self.send_to_addon('True' if ok_pressed else 'False')
       EmcOkDialog(heading, line1, dialog_cb)
+
+   def _Dialog_select(self, dialog_id, heading, list, autoclose=0,
+                      preselect=-1):
+      def dialog_cb(item_idx, item_label):
+         self.send_to_addon(item_idx)
+      EmcSelectDialog(heading, list, dialog_cb, autoclose)
 
    #  xbmclib.xbmcplugin proxied functions  ####################################
    def _addDirectoryItem(self, handle, url, listitem,

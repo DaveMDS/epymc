@@ -387,9 +387,9 @@ class KodiPluginSource(KodiAddonBase):
    @return_to_addon
    def _Addon_getSetting(self, addon_id, id):
       addon = get_installed_addon(addon_id)
-      val = addon.settings.get(id)
+      val = addon.settings.get(id, '')
       # DBG("GET SETTING:", id, " val:", val)
-      return val  # TODO not sure if need to return None or '' for unknown id
+      return val
 
    def _Addon_setSetting(self, addon_id, id, value):
       addon = get_installed_addon(addon_id)

@@ -46,7 +46,7 @@ base_temp_path = os.path.join(base_kodi_path, 'temp')
 base_repos_path = os.path.join(base_kodi_path, 'repos')
 sys_addons_path = os.path.join(os.path.dirname(__file__), 'addons')
 
-installed_addons = {} # key: addon_in  val: KodiAddon instance
+installed_addons = {}  # key: addon_in  val: KodiAddon instance
 
 
 def addon_factory(xml_info, repository=None):
@@ -130,7 +130,7 @@ def get_installed_addons(cls=None):
    if cls is None:
       return sorted(installed_addons.values())
    else:
-      return sorted([ a for a in installed_addons.values() if type(a) == cls ])
+      return sorted([a for a in installed_addons.values() if type(a) == cls])
 
 
 def install_from_local_zip(zip_file):
@@ -141,7 +141,7 @@ def install_from_local_zip(zip_file):
       The new installed addon instance or None on errors
    """
    addon_id = os.path.basename(zip_file).split('-')[0]
-   
+
    # TODO check errors
    with zipfile.ZipFile(zip_file, 'r') as z:
       z.extractall(base_addons_path)
@@ -163,11 +163,10 @@ def uninstall_addon(addon):
 
    del installed_addons[addon.id]
    return True
-   
-   
+
 
 class KodiAddonBase(object):
-   """ Base class for any kodi addon: pluginsource, repository or python module """
+   """ Base class for any type of kodi addon """
 
    def __init__(self, xml_root, folder=None, repository=None):
       self._root = xml_root
@@ -178,12 +177,12 @@ class KodiAddonBase(object):
       self._name = xml_root.get('name')
       self._version = xml_root.get('version', '0.0.1')
       self._author = xml_root.get('provider-name')
-      self._metadata = None # will be lazily parsed
-      self._requires = None # will be lazily parsed
-      self._settings = None # will be lazily loaded
+      self._metadata = None  # will be lazily parsed
+      self._requires = None  # will be lazily parsed
+      self._settings = None  # will be lazily loaded
 
    def __str__(self):
-      return '<{0.__class__.__name__} id={0.id} version={0.version}>'.format(self)
+      return '<{0.__class__.__name__} id={0.id} v={0.version}>'.format(self)
 
    def __lt__(self, other):
       return self.name.lower() < other.name.lower()
@@ -192,7 +191,7 @@ class KodiAddonBase(object):
       return self.name.lower() > other.name.lower()
 
    @property
-   def is_installed(self): # TODO rename to "installed"
+   def is_installed(self):  # TODO rename to "installed"
       return self._folder is not None
 
    @property
@@ -204,14 +203,14 @@ class KodiAddonBase(object):
    def disabled(self, disable):
       """ Disable (True) or enable (False) the addon """
       L = ini.get_string_list('kodiaddons', 'disabled_addons')
-      if disable == True and self._id not in L:
+      if disable is True and self._id not in L:
          L.append(self._id)
-      elif disable == False and self._id in L:
+      elif disable is False and self._id in L:
          L.remove(self._id)
       else:
          return
       ini.set_string_list('kodiaddons', 'disabled_addons', L)
-      
+
    @property
    def path(self):
       """ full path of the installed addon """
@@ -254,7 +253,8 @@ class KodiAddonBase(object):
          if os.path.exists(icon):
             return icon
       else:
-         return os.path.join(self._repo.base_url, self._id, self.metadata.get('icon'))
+         return os.path.join(self._repo.base_url, self._id,
+                             self.metadata.get('icon'))
 
    @property
    def fanart(self):
@@ -293,20 +293,22 @@ class KodiAddonBase(object):
                for ass_elem in elem.iterchildren():
                   if ass_elem.tag == 'screenshot':
                      self._metadata['screenshots'].append(ass_elem.text)
-                  else: # 'icon' or 'fanart'
+                  else:  # 'icon' or 'fanart'
                      self._metadata[ass_elem.tag] = ass_elem.text
             else:
                lang = elem.get('lang', 'en_GB')
                if lang == syslang or lang == syslang[:2] or lang[:2] == 'en':
                   t = elem.text
                   if t:
-                     self._metadata[elem.tag] = t.strip().replace('[CR]', '\n') # TODO better replace
+                      # TODO better replace
+                     self._metadata[elem.tag] = t.strip().replace('[CR]', '\n')
 
          # old style assets
          if not self._metadata.get('icon'):
             self._metadata['icon'] = 'icon.png'
-         if not self._metadata.get('fanart') and self._metadata.get('nofanart') != 'true':
-            self._metadata['fanart'] = 'fanart.jpg'
+         if not self._metadata.get('fanart'):
+            if self._metadata.get('nofanart') != 'true':
+               self._metadata['fanart'] = 'fanart.jpg'
 
       return self._metadata
 
@@ -328,7 +330,7 @@ class KodiAddonBase(object):
 
    @property
    def info_text_short(self):
-      pass # TODO
+      pass  # TODO
 
    @property
    def info_text_long(self):
@@ -338,15 +340,14 @@ class KodiAddonBase(object):
       if summary:
          txt.append('<big>{}</big><br>'.format(utf8_to_markup(summary)))
 
-      mapp = (
-         ('author', _('Author')),
-         ('version', _('Version')),
-         ('language', _('Content language')),
-         ('license', _('License')),
-         ('description', _('Description')),
-         ('disclaimer', _('Disclaimer')),
-         ('news', _('News')),
-      )
+      mapp = (('author', _('Author')),
+              ('version', _('Version')),
+              ('language', _('Content language')),
+              ('license', _('License')),
+              ('description', _('Description')),
+              ('disclaimer', _('Disclaimer')),
+              ('news', _('News')))
+
       for key, label in mapp:
          val = self.metadata.get(key) or getattr(self, key, None)
          if val:
@@ -357,7 +358,7 @@ class KodiAddonBase(object):
 
       return '<br>'.join(txt)
 
-   ### Settings stuff
+   # # #  Settings stuff  # # # # # # # # # # # # # # # # # # # # # # # # # # #
    @property
    def settings(self):
       """ A dict with all the actual user settings values """
@@ -367,7 +368,7 @@ class KodiAddonBase(object):
 
    @property
    def master_settings_file(self):
-      """ The main settings xml file path, or None if addon do not have options """
+      """ The main settings xml file path, None if addon have no options """
       path = os.path.join(self.path, 'resources', 'settings.xml')
       return path if os.path.exists(path) else None
 
@@ -419,7 +420,7 @@ class KodiAddonBase(object):
 
       # prettify the tree
       from xml.dom import minidom
-      rough_str = ElementTree.tostring(root) # , 'utf-8')
+      rough_str = ElementTree.tostring(root)  # , 'utf-8')
       reparsed = minidom.parseString(rough_str)
       pretty_str = reparsed.toprettyxml(indent='    ')
 

@@ -475,7 +475,9 @@ class AddonSettingsPanel(EmcDialog):
    def _gl_text_get(self, obj, part, xml_elem):
       setting_id = xml_elem.get('id')
       if part == 'elm.text.main':
-         return xml_elem.get('type') + ' - ' + setting_id
+         label = self.addon.localized_string(xml_elem.get('label'))
+         return xml_elem.get('type') + ' - ' + label
+
       if part == 'elm.text.end':
          typ = xml_elem.get('type')
 
@@ -483,9 +485,10 @@ class AddonSettingsPanel(EmcDialog):
             val_idx = int(self.addon.settings.get(setting_id, '0'))
             labels = xml_elem.get('values')
             if labels is None:
-               # TODO translate
-               labels = xml_elem.get('lvalues')
-            labels = labels.split('|')
+               labels = xml_elem.get('lvalues').split('|')
+               labels = list(map(self.addon.localized_string, labels))
+            else:
+               labels = labels.split('|')
             return labels[val_idx]
 
          elif typ != 'bool':
@@ -515,7 +518,8 @@ class AddonSettingsPanel(EmcDialog):
       categories = list(root.iter('category')) or [None]
       for cat_elem in categories:
          if cat_elem is not None:
-            cat_it = self._gl.item_append(self._itc_g, '#' + cat_elem.get('label', ''),
+            label = self.addon.localized_string(cat_elem.get('label'))
+            cat_it = self._gl.item_append(self._itc_g, label,
                                           flags=elm.ELM_GENLIST_ITEM_GROUP)
             cat_it.select_mode = elm.ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY
             elements = cat_elem.iter('setting')
@@ -571,19 +575,21 @@ class AddonSettingsPanel(EmcDialog):
       elif typ == 'enum':
          values = xml_elem.get('values')
          if values is None:
-            values = xml_elem.get('lvalues')
-            # TODO translate
+            values = xml_elem.get('lvalues').split('|')
+            values = list(map(self.addon.localized_string, values))
+         else:
+            values = values.split('|')
 
-         values = values.split('|')
          gui.EmcSelectDialog(setting_id, values, self._enum_select_cb, int(val),
                              setting_id=setting_id)
 
       elif typ in ('select', 'enum', 'labelenum'):
          values = xml_elem.get('values')
          if values is None:
-            values = xml_elem.get('lvalues')
-            # TODO translate
-         values = values.split('|')
+            values = xml_elem.get('lvalues').split('|')
+            values = list(map(self.addon.localized_string, values))
+         else:
+            values = values.split('|')
          if typ == 'enum':
             gui.EmcSelectDialog(setting_id, values, self._enum_select_cb,
                                 int(val), setting_id=setting_id)

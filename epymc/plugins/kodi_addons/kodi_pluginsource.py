@@ -385,6 +385,10 @@ class KodiPluginSource(KodiAddonBase):
          return val
 
    @return_to_addon
+   def _Addon_getLocalizedString(self, addon_id, id):
+      return self.localized_string(id)
+
+   @return_to_addon
    def _Addon_getSetting(self, addon_id, id):
       addon = get_installed_addon(addon_id)
       val = addon.settings.get(id, '')

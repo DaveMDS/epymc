@@ -21,9 +21,11 @@
 from __future__ import absolute_import, print_function
 
 import os
+import io
 import locale
 import zipfile
 import shutil
+import polib
 from xml.etree import ElementTree
 from distutils.version import StrictVersion
 
@@ -47,6 +49,21 @@ base_repos_path = os.path.join(base_kodi_path, 'repos')
 sys_addons_path = os.path.join(os.path.dirname(__file__), 'addons')
 
 installed_addons = {}  # key: addon_in  val: KodiAddon instance
+
+
+def safe_po_parser(pofile):
+   """ Remove unwanted comments from a po file before passing it to polib
+   Kodi po files use non-standard comment lines, like:
+
+   #YouTube
+   #empty strings from id 30121 to 30199
+
+   So we need to strip those lines that otherwise will make polib parse fail
+   """
+   fhandle = io.open(pofile, 'rt', encoding='utf-8')
+   lines = [line for line in fhandle if line[0] != '#']
+   fhandle.close()
+   return polib.pofile(''.join(lines))
 
 
 def addon_factory(xml_info, repository=None):
@@ -180,6 +197,7 @@ class KodiAddonBase(object):
       self._metadata = None  # will be lazily parsed
       self._requires = None  # will be lazily parsed
       self._settings = None  # will be lazily loaded
+      self._localize = None  # will be lazily loaded
 
    def __str__(self):
       return '<{0.__class__.__name__} id={0.id} v={0.version}>'.format(self)
@@ -428,3 +446,62 @@ class KodiAddonBase(object):
       os.makedirs(os.path.dirname(user_xml_file), exist_ok=True)
       with open(user_xml_file, 'w') as f:
          f.write(pretty_str)
+
+   # # #  Translation stuff   # # # # # # # # # # # # # # # # # # # # # # # # #
+   @property
+   def localized(self):
+      """ Dict with localized strings (key: '#30000'  val: 'local. string') """
+      if self._localize is None:
+         self._search_and_parse_localization_file()
+      return self._localize
+
+   def localized_string(self, string_id):
+      """ Get a localized string, string_id: 30000 or '30000' or '#30000' """
+      if isinstance(string_id, int):
+         string_id = str(string_id)
+      if not string_id.startswith('#'):
+         string_id = '#' + string_id
+      return self.localized.get(string_id, '')
+
+   def _search_and_parse_localization_file(self):
+      # TODO also support: "en_US" (only "en" atm)
+      lang, encoding = locale.getdefaultlocale()
+      lname = utils.iso639_1_to_name(lang[:2], 'English') if lang else 'English'
+
+      # search a po file
+      for lang in (lname, 'English'):
+         po_file = os.path.join(self.path, 'resources', 'language', lang,
+                                'strings.po')
+         try:
+            po = safe_po_parser(po_file)
+         except IOError:
+            continue
+         else:
+            self._localize = self._extract_strings_from_po(po)
+            return
+
+      # or seach an xml file
+      for lang in (lname, 'English'):
+         xml_file = os.path.join(self.path, 'resources', 'language', lang,
+                                 'strings.xml')
+         if not os.path.exists(xml_file):
+            continue
+         # try different encoding (if encoding not provided in xml)
+         for enc in (None, 'utf-8', 'iso-8859-1'):
+            parser = ElementTree.XMLParser(encoding=enc)
+            try:
+               et = ElementTree.parse(xml_file, parser=parser)
+            except ElementTree.ParseError:
+               continue
+            else:
+               self._localize = self._extract_strings_from_xml(et)
+               return
+
+      # no language file available, do not search again the next time
+      self._localize = {}
+
+   def _extract_strings_from_po(self, po):
+      return {i.msgctxt: i.msgstr or i.msgid for i in po}
+
+   def _extract_strings_from_xml(self, et):
+      return {'#' + e.get('id'): e.text for e in et.getroot()}

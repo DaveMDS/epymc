@@ -12,6 +12,7 @@ TMP
  * cast panel: movie list is not complete, see directors panel
  * use new Emc*Dialog everywhere !
  * For 1.3 release:
+   * add python3-polib to requirements
    * raise theme generation
    * remove the "silent subs on start" hack, efl 1.19 fixed this
 

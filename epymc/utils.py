@@ -260,13 +260,17 @@ iso639_table = {
    'aa': ('aar', 'aar', 'Afar'),
 }
 
-def iso639_1_to_3(iso1):
+def iso639_1_to_3(iso1, default=None):
    """ Convert ISO 639-1 lanuage code to ISO 639-3 (ex: "it" to "ita") """
-   return iso639_table[iso1][0] if iso1 in iso639_table else None
+   return iso639_table[iso1][0] if iso1 in iso639_table else default
 
-def iso639_1_to_5(iso1):
+def iso639_1_to_5(iso1, default=None):
    """ Convert ISO 639-1 lanuage code to ISO 639-5 (ex: "it" to "ita") """
-   return iso639_table[iso1][1] if iso1 in iso639_table else None
+   return iso639_table[iso1][1] if iso1 in iso639_table else default
+
+def iso639_1_to_name(iso1, default=None):
+   """ Convert ISO 639-1 lanuage code to name (ex: "it" to "Italian") """
+   return iso639_table[iso1][2] if iso1 in iso639_table else default
 
 def is_py3():
    return sys.version_info.major > 2

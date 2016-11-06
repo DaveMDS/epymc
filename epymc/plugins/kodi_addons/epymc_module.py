@@ -30,6 +30,7 @@ from __future__ import absolute_import, print_function
 
 import os
 import re
+from xml.etree import ElementTree
 
 import epymc.config_gui as config_gui
 import epymc.mainmenu as mainmenu
@@ -161,7 +162,6 @@ class StandardItemClass(EmcItemClass):
 
    def info_get(self, url, listitem):
       return listitem.best_info
-
 
 
 #  The epymc module  ###########################################################
@@ -305,7 +305,7 @@ class KodiAddonsModule(EmcModule):
          config_gui.standard_item_action_add(repo.name, repo.icon, r=repo,
                                              cb=lambda r:
                                              AddonInfoPanel(r, browser))
-      config_gui.standard_item_action_add(_('Add a new repository from zip file'),
+      config_gui.standard_item_action_add(_('Add new repository from zip file'),
                                           icon='icon/plus',
                                           cb=lambda: AddonFromZipDialog(_cb))
 
@@ -331,7 +331,10 @@ class AddonInfoPanel(EmcDialog):
                          content=EmcImage(addon.icon),
                          text=addon.info_text_long)
       if addon.is_installed:
-         self.button_add(_('Options')).disabled = True
+         b = self.button_add(_('Options'),
+                             selected_cb=lambda b: AddonSettingsPanel(addon))
+         if addon.master_settings_file is None:
+            b.disabled = True
          self.button_add(_('Enable') if addon.disabled else _('Disable'),
                          selected_cb=self.enable_disable_btn_cb,
                          cb_data=not addon.disabled)
@@ -436,6 +439,184 @@ class AddonInfoPanel(EmcDialog):
          self.delete()
          if self.browser is not None:
             self.browser.refresh(True)
+
+
+#  Addon options panel  ########################################################
+from efl.evas import FILL_BOTH, EXPAND_BOTH
+from efl import elementary as elm
+from epymc import gui
+
+class AddonSettingsPanel(EmcDialog):
+   def __init__(self, addon):
+
+      self.addon = addon
+
+      self._gl = elm.Genlist(gui.layout, style='browser', homogeneous=True,
+                             focus_allow=False, mode=elm.ELM_LIST_COMPRESS,
+                             size_hint_align=FILL_BOTH,
+                             size_hint_weight=EXPAND_BOTH)
+      self._gl.callback_realized_add(self._gl_item_realized_cb)
+      self._gl.callback_clicked_double_add(self.modify_selected_item)
+
+      self._itc = elm.GenlistItemClass(item_style='default',
+                                       text_get_func=self._gl_text_get,
+                                       content_get_func=self._gl_content_get)
+      self._itc_g = elm.GenlistItemClass(item_style='group_index',
+                                         text_get_func=self._gl_group_text_get)
+
+      EmcDialog.__init__(self, style='panel', title=addon.name, content=self._gl)
+      self.button_add(_('Modify'), selected_cb=self.modify_selected_item)
+      self.button_add(_('Save'))
+      self.button_add(_('Cancel'), selected_cb=lambda b: self.delete())
+      self.button_add(_('Restore default')).disabled = True
+
+      self.build_list_from_xml()
+
+   def _gl_text_get(self, obj, part, xml_elem):
+      setting_id = xml_elem.get('id')
+      if part == 'elm.text.main':
+         return xml_elem.get('type') + ' - ' + setting_id
+      if part == 'elm.text.end':
+         typ = xml_elem.get('type')
+
+         if typ == 'enum':
+            val_idx = int(self.addon.settings.get(setting_id, '0'))
+            labels = xml_elem.get('values')
+            if labels is None:
+               # TODO translate
+               labels = xml_elem.get('lvalues')
+            labels = labels.split('|')
+            return labels[val_idx]
+
+         elif typ != 'bool':
+            return self.addon.settings.get(setting_id, '')
+
+   def _gl_content_get(self, obj, part, xml_elem):
+      if part == 'elm.swallow.end':
+         if xml_elem.get('type') == 'bool':
+            setting_id = xml_elem.get('id')
+            if self.addon.settings.get(setting_id) == 'true':
+               return gui.EmcImage('icon/check_on')
+            else:
+               return gui.EmcImage('icon/check_off')
+
+   def _gl_group_text_get(self, obj, part, label_id):
+      return label_id
+
+   def _gl_item_realized_cb(self, gl, item):
+      # force show/hide of icons, otherwise the genlist cache mechanism will
+      # remember icons from previus usage of the item
+      item.signal_emit('end,show' if item.part_content_get('elm.swallow.end') \
+                       else 'end,hide', 'emc')
+      
+   def build_list_from_xml(self):
+
+      root = ElementTree.parse(self.addon.master_settings_file).getroot()
+      categories = list(root.iter('category')) or [None]
+      for cat_elem in categories:
+         if cat_elem is not None:
+            cat_it = self._gl.item_append(self._itc_g, '#' + cat_elem.get('label', ''),
+                                          flags=elm.ELM_GENLIST_ITEM_GROUP)
+            cat_it.select_mode = elm.ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY
+            elements = cat_elem.iter('setting')
+         else:
+            cat_it = None
+            elements = root.iter('setting')
+
+         for elem in elements:
+            if elem.get('type') in ('sep', 'lsep'):
+               # TODO separators
+               continue
+
+            if elem.get('visible', 'true') == 'false':
+               # TODO this can be a conditional
+               continue
+
+            it = self._gl.item_append(self._itc, elem, cat_it)
+            if self._gl.selected_item is None:
+               it.selected = True
+
+   def modify_selected_item(self, *args):
+      item = self._gl.selected_item
+      xml_elem = item.data_get()
+      typ = xml_elem.get('type')
+      setting_id = xml_elem.get('id')
+      val = self.addon.settings.get(setting_id, '')
+
+      if typ == 'bool':
+         self.addon.settings[setting_id] = 'true' if val == 'false' else 'false'
+         item.update()
+
+      elif typ == 'slider':
+         rng = xml_elem.get('range', '1,1,100').split(',')
+         opt = xml_elem.get('option', 'int')
+         if opt == 'float':
+            rng = list(map(float, rng))
+            val = float(val)
+            fmt = '%1.3f'
+         else:
+            rng = list(map(int, rng))
+            val = int(val)
+            fmt = '%1.0f'
+         if len(rng) == 3:
+            min_val, step, max_val = rng
+         else:
+            min_val, max_val = rng
+            step = 1
+         gui.EmcSliderDialog(setting_id, self._slider_cb, val,
+                             min_val, max_val, step, fmt,
+                             setting_id=setting_id,
+                             option=opt)
+
+      elif typ == 'enum':
+         values = xml_elem.get('values')
+         if values is None:
+            values = xml_elem.get('lvalues')
+            # TODO translate
+
+         values = values.split('|')
+         gui.EmcSelectDialog(setting_id, values, self._enum_select_cb, int(val),
+                             setting_id=setting_id)
+
+      elif typ in ('select', 'enum', 'labelenum'):
+         values = xml_elem.get('values')
+         if values is None:
+            values = xml_elem.get('lvalues')
+            # TODO translate
+         values = values.split('|')
+         if typ == 'enum':
+            gui.EmcSelectDialog(setting_id, values, self._enum_select_cb,
+                                int(val), setting_id=setting_id)
+         else:
+            gui.EmcSelectDialog(setting_id, values, self._enum_select_cb2,
+                                setting_id=setting_id)
+         
+      elif typ in ('text', 'number', 'ipaddress'):
+         # TODO number/ipaddress special keyb
+         EmcVKeyboard(title=setting_id, text=val, accept_cb=self._vkeyb_cb,
+                      user_data=setting_id)
+
+      else:
+         DBG('Unsupported type: "{}"'.format(typ))
+
+   def _vkeyb_cb(self, vkeyb, new_val, setting_id):
+      self.addon.settings[setting_id] = new_val
+      self._gl.selected_item.update()
+
+   def _slider_cb(self, new_val, setting_id, option):
+      if new_val is not None:
+         if option != 'float':
+            new_val = int(new_val)
+         self.addon.settings[setting_id] = str(new_val)
+         self._gl.selected_item.update()
+
+   def _enum_select_cb(self, val_idx, val, setting_id):
+      self.addon.settings[setting_id] = str(val_idx)
+      self._gl.selected_item.update()
+      
+   def _enum_select_cb2(self, val_idx, val, setting_id):
+      self.addon.settings[setting_id] = val_idx
+      self._gl.selected_item.update()
 
 
 #  Addon install panel  ########################################################

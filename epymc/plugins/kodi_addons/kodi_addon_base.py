@@ -384,6 +384,11 @@ class KodiAddonBase(object):
          self.settings_load()
       return self._settings
 
+   @settings.setter
+   def settings(self, settings_dict):
+      self._settings = settings_dict
+      self.settings_save()
+
    @property
    def master_settings_file(self):
       """ The main settings xml file path, None if addon have no options """

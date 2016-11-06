@@ -30,12 +30,17 @@ from __future__ import absolute_import, print_function
 
 import os
 import re
+import copy
 from xml.etree import ElementTree
+
+from efl.evas import FILL_BOTH, EXPAND_BOTH
+from efl import elementary as elm
 
 import epymc.config_gui as config_gui
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
 import epymc.ini as ini
+import epymc.gui as gui
 
 from epymc.modules import EmcModule
 from epymc.browser import EmcBrowser, EmcItemClass
@@ -442,15 +447,14 @@ class AddonInfoPanel(EmcDialog):
 
 
 #  Addon options panel  ########################################################
-from efl.evas import FILL_BOTH, EXPAND_BOTH
-from efl import elementary as elm
-from epymc import gui
-
 class AddonSettingsPanel(EmcDialog):
    def __init__(self, addon):
 
+      # work a local copy of the addon settings (so we can cancel or save)
+      self.settings = copy.deepcopy(addon.settings)
       self.addon = addon
 
+      # create the genlist and the item classes
       self._gl = elm.Genlist(gui.layout, style='browser', homogeneous=True,
                              focus_allow=False, mode=elm.ELM_LIST_COMPRESS,
                              size_hint_align=FILL_BOTH,
@@ -464,58 +468,58 @@ class AddonSettingsPanel(EmcDialog):
       self._itc_g = elm.GenlistItemClass(item_style='group_index',
                                          text_get_func=self._gl_group_text_get)
 
-      EmcDialog.__init__(self, style='panel', title=addon.name, content=self._gl)
+      # create the panel dialog
+      EmcDialog.__init__(self, style='panel', title=addon.name,
+                         content=self._gl)
       self.button_add(_('Modify'), selected_cb=self.modify_selected_item)
-      self.button_add(_('Save'))
+      self.button_add(_('Save'), selected_cb=self.save_settings)
       self.button_add(_('Cancel'), selected_cb=lambda b: self.delete())
-      self.button_add(_('Restore default')).disabled = True
+      self.button_add(_('Defaults'), selected_cb=self.default_values)
 
+      # populate the list from the addon master xml settings file
       self.build_list_from_xml()
+
+   def _gl_item_realized_cb(self, gl, item):
+      # force show/hide of icons, otherwise the genlist cache mechanism will
+      # remember icons from previus usage of the item
+      item.signal_emit('end,show' if item.part_content_get('elm.swallow.end')
+                       else 'end,hide', 'emc')
 
    def _gl_text_get(self, obj, part, xml_elem):
       setting_id = xml_elem.get('id')
       if part == 'elm.text.main':
-         label = self.addon.localized_string(xml_elem.get('label'))
-         return xml_elem.get('type') + ' - ' + label
+         return self.addon.localized_string(xml_elem.get('label'))
 
       if part == 'elm.text.end':
          typ = xml_elem.get('type')
 
          if typ == 'enum':
-            val_idx = int(self.addon.settings.get(setting_id, '0'))
+            val_idx = int(self.settings.get(setting_id, '0'))
+            # direct labels
             labels = xml_elem.get('values')
-            if labels is None:
-               labels = xml_elem.get('lvalues').split('|')
-               labels = list(map(self.addon.localized_string, labels))
-            else:
-               labels = labels.split('|')
-            return labels[val_idx]
+            if labels is not None:
+               return labels.split('|')[val_idx]
+            # or translated labels
+            label = xml_elem.get('lvalues').split('|')[val_idx]
+            return self.addon.localized_string(label)
 
          elif typ != 'bool':
-            return self.addon.settings.get(setting_id, '')
+            return self.settings.get(setting_id, '')
 
    def _gl_content_get(self, obj, part, xml_elem):
-      if part == 'elm.swallow.end':
-         if xml_elem.get('type') == 'bool':
-            setting_id = xml_elem.get('id')
-            if self.addon.settings.get(setting_id) == 'true':
-               return gui.EmcImage('icon/check_on')
-            else:
-               return gui.EmcImage('icon/check_off')
+      if part == 'elm.swallow.end' and xml_elem.get('type') == 'bool':
+         setting_id = xml_elem.get('id')
+         if self.settings.get(setting_id) == 'true':
+            return gui.EmcImage('icon/check_on')
+         else:
+            return gui.EmcImage('icon/check_off')
 
-   def _gl_group_text_get(self, obj, part, label_id):
-      return label_id
+   def _gl_group_text_get(self, obj, part, label):
+      return label
 
-   def _gl_item_realized_cb(self, gl, item):
-      # force show/hide of icons, otherwise the genlist cache mechanism will
-      # remember icons from previus usage of the item
-      item.signal_emit('end,show' if item.part_content_get('elm.swallow.end') \
-                       else 'end,hide', 'emc')
-      
    def build_list_from_xml(self):
-
-      root = ElementTree.parse(self.addon.master_settings_file).getroot()
-      categories = list(root.iter('category')) or [None]
+      self._root = ElementTree.parse(self.addon.master_settings_file).getroot()
+      categories = list(self._root.iter('category')) or [None]
       for cat_elem in categories:
          if cat_elem is not None:
             label = self.addon.localized_string(cat_elem.get('label'))
@@ -525,7 +529,7 @@ class AddonSettingsPanel(EmcDialog):
             elements = cat_elem.iter('setting')
          else:
             cat_it = None
-            elements = root.iter('setting')
+            elements = self._root.iter('setting')
 
          for elem in elements:
             if elem.get('type') in ('sep', 'lsep'):
@@ -540,15 +544,26 @@ class AddonSettingsPanel(EmcDialog):
             if self._gl.selected_item is None:
                it.selected = True
 
+   def save_settings(self, *args):
+      self.addon.settings = self.settings
+      self.delete()
+
+   def default_values(self, *args):
+      for elem in self._root.iter('setting'):
+         key, val = elem.get('id'), elem.get('default')
+         if key and val:
+            self.settings[key] = val
+      self._gl.realized_items_update()
+
    def modify_selected_item(self, *args):
       item = self._gl.selected_item
       xml_elem = item.data_get()
       typ = xml_elem.get('type')
       setting_id = xml_elem.get('id')
-      val = self.addon.settings.get(setting_id, '')
+      val = self.settings.get(setting_id, '')
 
       if typ == 'bool':
-         self.addon.settings[setting_id] = 'true' if val == 'false' else 'false'
+         self.settings[setting_id] = 'true' if val == 'false' else 'false'
          item.update()
 
       elif typ == 'slider':
@@ -596,7 +611,7 @@ class AddonSettingsPanel(EmcDialog):
          else:
             gui.EmcSelectDialog(setting_id, values, self._enum_select_cb2,
                                 setting_id=setting_id)
-         
+
       elif typ in ('text', 'number', 'ipaddress'):
          # TODO number/ipaddress special keyb
          EmcVKeyboard(title=setting_id, text=val, accept_cb=self._vkeyb_cb,
@@ -606,22 +621,22 @@ class AddonSettingsPanel(EmcDialog):
          DBG('Unsupported type: "{}"'.format(typ))
 
    def _vkeyb_cb(self, vkeyb, new_val, setting_id):
-      self.addon.settings[setting_id] = new_val
+      self.settings[setting_id] = new_val
       self._gl.selected_item.update()
 
    def _slider_cb(self, new_val, setting_id, option):
       if new_val is not None:
          if option != 'float':
             new_val = int(new_val)
-         self.addon.settings[setting_id] = str(new_val)
+         self.settings[setting_id] = str(new_val)
          self._gl.selected_item.update()
 
    def _enum_select_cb(self, val_idx, val, setting_id):
-      self.addon.settings[setting_id] = str(val_idx)
+      self.settings[setting_id] = str(val_idx)
       self._gl.selected_item.update()
-      
+
    def _enum_select_cb2(self, val_idx, val, setting_id):
-      self.addon.settings[setting_id] = val_idx
+      self.settings[setting_id] = val_idx
       self._gl.selected_item.update()
 
 

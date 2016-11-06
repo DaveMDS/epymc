@@ -404,13 +404,19 @@ class MyItemClass(EmcItemClass):
             print('Selected: ' + str(item))
             # dia.delete()
          d = EmcDialog(title='Dialog - List', style='list', done_cb=_dia_list_cb)
+         d.button_add('Button 1')
+         d.button_add('Button 2')
+         d.button_add('Button 3')
          d.list_item_append('item 1', 'icon/home')
          d.list_item_append('item 2', 'icon/star', 'icon/check_on')
          d.list_item_append('item 3 <b>bold</> <info>info</> <success>success</> <failure>failure</> <i>etc...</>',
                             'icon/star', 'icon/check_on')
          d.list_item_append('item 4', 'icon/tag', 'text/End Text')
          d.list_item_append('item 5', 'icon/tag', 'text/<b>End</> <info>Text</>')
-         for i in range(6, 101):
+         d.list_item_append().separator = True
+         d.list_item_append('item 6 (disabled)').disabled = True
+         d.list_item_append('item 7 (disabled)').disabled = True
+         for i in range(8, 101):
             d.list_item_append('item %d'%i)
          d.list_go()
 

@@ -1389,7 +1389,8 @@ class EmcDialog(elm.Layout):
    def text_append(self, text):
       self._textentry.text_set(self._textentry.text_get() + text)
 
-   def list_item_append(self, label, icon=None, end=None, selected=False, *args, **kwargs):
+   def list_item_append(self, label=None, icon=None, end=None, selected=False,
+                        *args, **kwargs):
       if self._list:
          if isinstance(end, str) and end.startswith('text/'):
             end = elm.Label(self, style='dia_list', text=end[5:])
@@ -1454,20 +1455,39 @@ class EmcDialog(elm.Layout):
          return input_events.EVENT_BLOCK
 
       # if content is List or Genlist then automanage the events
-      if self._list or (self._content and type(self._content) in (elm.List, elm.Genlist)):
+      if self._list or isinstance(self._content, elm.List):
          li = self._list or self._content
          item = li.selected_item
-         if item:
-            new_it = None
-            horiz = li.horizontal if type(li) is elm.List else False
-            if (horiz and event == 'RIGHT') or (not horiz and event == 'DOWN'):
-               new_it = item.next
-            if (horiz and event == 'LEFT') or (not horiz and event == 'UP'):
-               new_it = item.prev
-            if new_it:
-               new_it.selected = True
-               new_it.bring_in()
-               return input_events.EVENT_BLOCK
+         horiz = li.horizontal
+         to_item = None
+         if (horiz and event == 'RIGHT') or (not horiz and event == 'DOWN'):
+            to_item = item.next
+            while to_item and (to_item.separator or to_item.disabled):
+               to_item = to_item.next
+         if (horiz and event == 'LEFT') or (not horiz and event == 'UP'):
+            to_item = item.prev
+            while to_item and (to_item.separator or to_item.disabled):
+               to_item = to_item.prev
+         if to_item:
+            to_item.selected = True
+            to_item.bring_in()
+            return input_events.EVENT_BLOCK
+
+      elif isinstance(self._content, elm.Genlist) and event in ('UP', 'DOWN'):
+         item = self._content.selected_item
+         to_item = None
+         if event == 'DOWN':
+            to_item = item.next
+            while to_item and to_item.type == elm.ELM_GENLIST_ITEM_GROUP:
+               to_item = to_item.next
+         elif event == 'UP':
+            to_item = item.prev
+            while to_item and to_item.type == elm.ELM_GENLIST_ITEM_GROUP:
+               to_item = to_item.prev
+         if to_item:
+            to_item.selected = True
+            to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
+            return input_events.EVENT_BLOCK
 
       # try to scroll the text entry
       if self._textentry:

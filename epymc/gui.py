@@ -1489,6 +1489,16 @@ class EmcDialog(elm.Layout):
             to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
             return input_events.EVENT_BLOCK
 
+      # if content is Slider automanage the LEFT, RIGHT events
+      elif isinstance(self._content, elm.Slider) and event in ('LEFT', 'RIGHT'):
+         sl = self._content
+         step = sl.data.get('step', 1)
+         if event == 'RIGHT':
+            sl.value += step
+         elif event == 'LEFT':
+            sl.value -= step
+         return input_events.EVENT_BLOCK
+
       # try to scroll the text entry
       if self._textentry:
          if event == 'UP':
@@ -1610,8 +1620,47 @@ class EmcSelectDialog(EmcDialog):
    def _select_canc_cb(self, dialog):
       self.delete()
       self._user_cb(-1, None, **self._user_cb_kargs)
-      
-   
+
+class EmcSliderDialog(EmcDialog):
+   """ A simple dialog with a slider
+   Args:
+      title (str): Dialog title
+      cb: The function to call when the dialog is done
+         signature: func(new_val, **kargs) # new_val will be None if cancelled
+      val (number): Initial value for the slider
+      min_val (number): Minimum value
+      max_val (number): Maximum value
+      step (number): Step to move the slider by
+      fmt (str): Format string for the indicator, ex: '%1.2f'
+      **kargs: Any other keyword arguments will be passed back in cb
+   """
+   def __init__(self, title, cb, val=50, min_val=0, max_val=100, step=1,
+                fmt='%1.0f', **kargs):
+      self._user_cb = cb
+      self._user_cb_kargs = kargs
+
+      self._sl = elm.Slider(layout, style='emc', focus_allow=False,
+                            min_max=(min_val, max_val))
+      self._sl.indicator_visible_mode = elm.ELM_SLIDER_INDICATOR_VISIBLE_MODE_ALWAYS
+      self._sl.indicator_format = fmt
+      self._sl.text = str(min_val)
+      self._sl.unit_format = str(max_val)
+      # self._sl.step = step # step is weird in elm, see T4834
+      self._sl.data['step'] = step
+      self._sl.value = val
+
+      EmcDialog.__init__(self, style='minimal', title=title, content=self._sl,
+                         canc_cb=self._dialog_cancel_cb)
+      self.button_add(_('Accept'), selected_cb=self._accept_cb)
+
+   def _accept_cb(self, btn):
+      self.delete()
+      self._user_cb(self._sl.value, **self._user_cb_kargs)
+
+   def _dialog_cancel_cb(self, dialog):
+      self.delete()
+      self._user_cb(None, **self._user_cb_kargs)
+
 ################################################################################
 class EmcNotify(edje.Edje):
    """ TODO doc this"""

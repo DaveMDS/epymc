@@ -32,7 +32,8 @@ from efl.evas import EXPAND_BOTH, FILL_BOTH, FILL_HORIZ
 from epymc.modules import EmcModule
 from epymc.gui import EmcSlider, EmcVKeyboard, EmcFileSelector, EmcButton, \
    EmcDialog, EmcInfoDialog, EmcWarningDialog, EmcErrorDialog, EmcYesNoDialog, \
-   EmcOkDialog, EmcSelectDialog, EmcNotify, EmcMenu, DownloadManager
+   EmcOkDialog, EmcSelectDialog, EmcSliderDialog, EmcNotify, EmcMenu, \
+   DownloadManager
 
 import epymc.mainmenu as mainmenu
 import epymc.utils as utils
@@ -368,6 +369,17 @@ class MyItemClass(EmcItemClass):
             print('Selected idx:', item_num, 'label:', item_label)
          items = ['Item 1', '<info>item 2</info>', 'item 3', 'item 4']
          EmcSelectDialog('Dialog - Select', items, _sel_cb, preselect=2)
+
+      # Dialog - Slider
+      elif url == 'uitests://dlg-slider1':
+         EmcSliderDialog('Dialog - Slider (int)',
+                         lambda new_val: DBG('New val: {}'.format(new_val)),
+                         val=23, min_val=2, max_val=50, step=3)
+
+      elif url == 'uitests://dlg-slider2':
+         EmcSliderDialog('Dialog - Slider (float)',
+                         lambda new_val: DBG('New val: {}'.format(new_val)),
+                         val=0.5, max_val=2.0, step=0.1, fmt='%1.2f')
 
       # Dialog - Cancel
       elif url == 'uitests://dlg-cancel':
@@ -726,6 +738,8 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://dlg-ok', 'Dialog - Ok')
       browser.item_add(MyItemClass(), 'uitests://dlg-yesno', 'Dialog - YesNo')
       browser.item_add(MyItemClass(), 'uitests://dlg-select', 'Dialog - Select')
+      browser.item_add(MyItemClass(), 'uitests://dlg-slider1', 'Dialog - Slider (int)')
+      browser.item_add(MyItemClass(), 'uitests://dlg-slider2', 'Dialog - Slider (float)')
       browser.item_add(MyItemClass(), 'uitests://dlg-cancel', 'Dialog - Cancel')
       browser.item_add(MyItemClass(), 'uitests://dlg-progress', 'Dialog - Progress')
       browser.item_add(MyItemClass(), 'uitests://dlg-progress-btn', 'Dialog - Progress with buttons')

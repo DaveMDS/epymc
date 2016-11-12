@@ -68,6 +68,23 @@ def notify_addon_installed(addon):
    EmcNotify(txt, icon=addon.icon)
 
 
+kodi_tags_replace_map = {'[CR]': '<br>',
+                         '[B]': '<b>', '[/B]': '</b>',
+                         '[I]': '<em>', '[/I]': '</em>',
+                         '[UPPERCASE]': '<title>', '[/UPPERCASE]': '</title>'}
+
+
+def _replace_func(matchobj):
+   tag = matchobj.group(0)
+   return kodi_tags_replace_map.get(tag) or tag
+
+
+def convert_kodi_tags(text):
+   """ http://kodi.wiki/view/Label_Formatting """
+   t = re.sub('\[[A-Z//]*\]', _replace_func, text)
+   return t
+
+
 #  Browser ItemClass  ##########################################################
 class GetMoreItemClass(EmcItemClass):
    def item_selected(self, url, mod):
@@ -154,7 +171,7 @@ class StandardItemClass(EmcItemClass):
          listitem.play()
 
    def label_get(self, url, listitem):
-      return listitem.best_label
+      return convert_kodi_tags(listitem.best_label)
 
    def icon_get(self, url, listitem):
       return listitem.best_icon
@@ -166,7 +183,7 @@ class StandardItemClass(EmcItemClass):
       return listitem.best_fanart
 
    def info_get(self, url, listitem):
-      return listitem.best_info
+      return convert_kodi_tags(listitem.best_info)
 
 
 #  The epymc module  ###########################################################

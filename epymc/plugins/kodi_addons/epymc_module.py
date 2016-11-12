@@ -455,7 +455,7 @@ class AddonSettingsPanel(EmcDialog):
       self.addon = addon
 
       # create the genlist and the item classes
-      self._gl = elm.Genlist(gui.layout, style='browser', homogeneous=True,
+      self._gl = elm.Genlist(gui.layout, style='dialog', homogeneous=True,
                              focus_allow=False, mode=elm.ELM_LIST_COMPRESS,
                              size_hint_align=FILL_BOTH,
                              size_hint_weight=EXPAND_BOTH)

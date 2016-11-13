@@ -122,9 +122,9 @@ def getInfoLabel(infotag):
    return emc_wait_reply()
 
 
-@NOT_IMPLEMENTED
-def getLanguage(format, region):
-   pass
+@emc_function_call
+def getLanguage(format=ENGLISH_NAME, region=False):
+   return emc_wait_reply()
 
 
 @NOT_IMPLEMENTED

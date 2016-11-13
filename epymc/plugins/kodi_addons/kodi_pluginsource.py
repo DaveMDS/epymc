@@ -35,10 +35,12 @@ from __future__ import absolute_import, print_function
 
 import os
 import ast
+import locale
 
 from efl import ecore
 
 import epymc.mediaplayer as mediaplayer
+import epymc.utils as utils
 from epymc.browser import EmcItemClass
 from epymc.gui import EmcDialog, EmcWaitDialog, EmcYesNoDialog, EmcOkDialog, \
    EmcSelectDialog, EmcVKeyboard
@@ -221,8 +223,9 @@ class KodiPluginSource(KodiAddonBase):
 
       ext = self._root.find(self.extension_point)
       self._main_exe = ext.get('library')
+      self._provides = ''
       for elem in ext:
-         if elem.tag == 'provides':
+         if elem.tag == 'provides' and elem.text:
             self._provides = elem.text
 
    @property
@@ -364,6 +367,25 @@ class KodiPluginSource(KodiAddonBase):
    def _executebuiltin(self, builtin_command):
       execute_builtin(builtin_command)
 
+   @return_to_addon
+   def _getLanguage(self, format=2, region=False):
+      lang, encoding = locale.getdefaultlocale()
+      if not lang or len(lang) < 2:
+         lang = 'en'
+      lang = lang[:2]
+
+      if region:  # TODO
+         DBG("NOT IMPLEMENTED: region param")
+
+      if format == 0:  # xbmc.ISO_639_1
+         return lang
+      elif format == 1:  # xbmc.ISO_639_2
+         return utils.iso639_1_to_3(lang, 'eng')
+      elif format == 2:  # xbmc.ENGLISH_NAME
+         return utils.iso639_1_to_name(lang, 'English')
+
+      return lang
+
    def _Player_play(self, player_id, item=None, listitem=None,
                     windowed=False, startpos=-1):
       self.hide_run_dialog()
@@ -402,7 +424,9 @@ class KodiPluginSource(KodiAddonBase):
       addon.settings_save()  # TODO really save at every set ?
 
    def _Addon_openSettings(self, addon_id):
-      DBG("NOT IMPLEMENTED _Addon_openSettings")
+      from .epymc_module import AddonSettingsPanel
+      addon = get_installed_addon(addon_id)
+      AddonSettingsPanel(addon)
 
    #  xbmclib.gui proxied functions  ###########################################
    def _Dialog_yesno(self, dialog_id, heading, line1, line2=None, line3=None,

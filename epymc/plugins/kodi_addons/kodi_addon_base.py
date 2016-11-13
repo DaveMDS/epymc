@@ -266,13 +266,14 @@ class KodiAddonBase(object):
    @property
    def icon(self):
       """ full path (or url) of the png icon """
-      if self.is_installed:
-         icon = os.path.join(self._folder, self.metadata.get('icon'))
-         if os.path.exists(icon):
-            return icon
-      else:
-         return os.path.join(self._repo.base_url, self._id,
-                             self.metadata.get('icon'))
+      icon = self.metadata.get('icon')
+      if icon:
+         if self.is_installed:
+            icon = os.path.join(self._folder, icon)
+            if os.path.exists(icon):
+               return icon
+         else:
+            return os.path.join(self._repo.base_url, self._id, icon)
 
    @property
    def fanart(self):
@@ -306,9 +307,11 @@ class KodiAddonBase(object):
          syslang, encoding = locale.getdefaultlocale()
 
          meta = self._root.find(".//extension[@point='xbmc.addon.metadata']")
+         if meta is None:
+            return self._metadata
          for elem in meta:
             if elem.tag == 'assets':
-               for ass_elem in elem.iterchildren():
+               for ass_elem in elem:
                   if ass_elem.tag == 'screenshot':
                      self._metadata['screenshots'].append(ass_elem.text)
                   else:  # 'icon' or 'fanart'

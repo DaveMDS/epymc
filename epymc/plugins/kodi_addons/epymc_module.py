@@ -133,12 +133,13 @@ class AddonItemClass(EmcItemClass):
       return addon.name.replace('&', '&amp;')
 
    def label_end_get(self, url, addon):
+      provides = ' '.join(addon.provides)
       if addon.is_installed:
-         return ' '.join(addon.provides)
+         return provides
       else:
          size = int(addon.metadata.get('size', 0))
          if size > 0:
-            return utils.hum_size(size)
+            return provides + ' ' + utils.hum_size(size)
 
    def info_get(self, url, addon):
       txt = []
@@ -653,7 +654,7 @@ class AddonSettingsPanel(EmcDialog):
       self._gl.selected_item.update()
 
    def _enum_select_cb2(self, val_idx, val, setting_id):
-      self.settings[setting_id] = val_idx
+      self.settings[setting_id] = val
       self._gl.selected_item.update()
 
 

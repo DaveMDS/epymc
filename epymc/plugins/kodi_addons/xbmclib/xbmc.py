@@ -484,32 +484,40 @@ class Monitor(object):
 #  The Keyboard class  #########################################################
 class Keyboard(object):
 
-   def __init__(self, default=None, heading=None, hidden=None):
+   def __init__(self, default='', heading=None, hidden=False):
       self._class_id = None  # this will be passed back in methods to emc
+      self._default = default
+      self._heading = heading
+      self._hidden = hidden
+      self._is_confirmed = False
+      self._text = ''
 
-   @NOT_IMPLEMENTED
    def doModal(self, autoclose=-1):
-      pass
+      self.doModalInternal(self._heading, self._default, autoclose)
 
-   @NOT_IMPLEMENTED
+   @emc_method_call
+   def doModalInternal(self, heading, default, autoclose):
+      reply = emc_wait_reply()
+      if reply:
+         self._is_confirmed = True
+         self._text = reply
+      else:
+         self._is_confirmed = False
+
    def getText(self):
-      return ''
+      return self._text
 
-   @NOT_IMPLEMENTED
    def isConfirmed(self):
-      return False
+      return self._is_confirmed
 
-   @NOT_IMPLEMENTED
    def setDefault(self, default):
-      pass
+      self._default = default
 
-   @NOT_IMPLEMENTED
    def setHeading(self, heading):
-      pass
+      self._heading = heading
 
-   @NOT_IMPLEMENTED
    def setHiddenInput(self, hidden):
-      pass
+      self._hidden = hidden
 
 
 #  The InfoTagVideo class  #####################################################

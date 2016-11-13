@@ -55,6 +55,7 @@ class bcolors:
    PURPLE = '\033[95m'
    BLUE = '\033[94m'
    GREEN = '\033[92m'
+   RED = '\033[91m'
    ENDC = '\033[0m'
    BOLD = '\033[1m'
    UNDERLINE = '\033[4m'
@@ -66,7 +67,10 @@ def DBG(*args):
 
 
 def ADDON_DBG(text):
-   print(bcolors.BLUE + text + bcolors.ENDC)
+   if text.startswith('NOT IMPLEMENTED'):
+      print(bcolors.RED + text + bcolors.ENDC)
+   else:
+      print(bcolors.BLUE + text + bcolors.ENDC)
 
 xbmclib_path = os.path.join(os.path.dirname(__file__), 'xbmclib')
 
@@ -398,6 +402,13 @@ class KodiPluginSource(KodiAddonBase):
 
       return lang
 
+   def _Keyboard_doModalInternal(self, keyb_id, heading, default, autoclose):
+      self.hide_run_dialog()
+      # TODO autoclose
+      EmcVKeyboard(lambda keyb, text: self.send_to_addon(text),
+                   lambda keyb: self.send_to_addon(''),
+                   heading, default)
+      
    def _Player_play(self, player_id, item=None, listitem=None,
                     windowed=False, startpos=-1):
       self.hide_run_dialog()

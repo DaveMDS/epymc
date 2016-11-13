@@ -43,7 +43,7 @@ import epymc.mediaplayer as mediaplayer
 import epymc.utils as utils
 from epymc.browser import EmcItemClass
 from epymc.gui import EmcDialog, EmcWaitDialog, EmcYesNoDialog, EmcOkDialog, \
-   EmcSelectDialog, EmcVKeyboard
+    EmcSelectDialog, EmcVKeyboard
 
 from .kodi_addon_base import KodiAddonBase, get_installed_addon
 from .kodi_pythonmodule import KodiPythonModule
@@ -51,10 +51,22 @@ from .epymc_jsonrpc import execute as JSONRPC_execute
 from .kodi_builtin import execute_builtin
 
 
+class bcolors:
+   PURPLE = '\033[95m'
+   BLUE = '\033[94m'
+   GREEN = '\033[92m'
+   ENDC = '\033[0m'
+   BOLD = '\033[1m'
+   UNDERLINE = '\033[4m'
+
+
 def DBG(*args):
    print('KODI SOURCE:', *args)
    pass
 
+
+def ADDON_DBG(text):
+   print(bcolors.BLUE + text + bcolors.ENDC)
 
 xbmclib_path = os.path.join(os.path.dirname(__file__), 'xbmclib')
 
@@ -329,7 +341,7 @@ class KodiPluginSource(KodiAddonBase):
             func_name, args_and_kargs = line.split(' ', 1)
             method = getattr(self, func_name)
          except (AttributeError, ValueError):
-            DBG("-->", line)
+            ADDON_DBG(line)
          else:
             args_and_kargs = ast.literal_eval(args_and_kargs)
             method(*args_and_kargs['args'], **args_and_kargs['kargs'])

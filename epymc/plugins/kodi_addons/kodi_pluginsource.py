@@ -43,7 +43,7 @@ import epymc.mediaplayer as mediaplayer
 import epymc.utils as utils
 from epymc.browser import EmcItemClass
 from epymc.gui import EmcDialog, EmcWaitDialog, EmcYesNoDialog, EmcOkDialog, \
-    EmcSelectDialog, EmcVKeyboard
+    EmcSelectDialog, EmcErrorDialog, EmcVKeyboard
 
 from .kodi_addon_base import KodiAddonBase, get_installed_addon
 from .kodi_pythonmodule import KodiPythonModule
@@ -203,6 +203,10 @@ class ListItem(dict):
       mediaplayer.poster_set(self.best_poster)
 
    @property
+   def best_url(self):
+      return self.get('url') or self.get('path')
+
+   @property
    def best_label(self):
       return self.get('label') or self['infoLabels'].get('title')
 
@@ -274,7 +278,7 @@ class KodiPluginSource(KodiAddonBase):
          self._run_dialog.delete()
          self._run_dialog = None
 
-   def request_page(self, url, page_done_cb):
+   def request_page(self, url, page_done_cb=None):
       self._page_done_cb = page_done_cb
 
       DBG('running: "{}" with url: "{}"'.format(self.name, url))
@@ -365,7 +369,8 @@ class KodiPluginSource(KodiAddonBase):
          self._page_url = None
 
    def _addon_listing_complete(self):
-      self._page_done_cb(self, self._page_url, self._page_items)
+      if callable(self._page_done_cb):
+         self._page_done_cb(self, self._page_url, self._page_items)
 
    #  xbmclib.xbmc proxied functions  ##########################################
    @return_to_addon
@@ -510,10 +515,28 @@ class KodiPluginSource(KodiAddonBase):
 
    def _setResolvedUrl(self, handle, succeeded, listitem):
       self.hide_run_dialog()
-      if succeeded:
-         ListItem(listitem).play()
-      else:
-         EmcDialog(style='error', text='Addon error')  # TODO better dialog
+
+      if succeeded and listitem:
+         listitem = ListItem(listitem)
+         url = listitem.best_url
+         if url and url.startswith('plugin://'):
+            # run another addon instance
+            addon_id = url[9:url.index('/', 10)]
+            addon = get_installed_addon(addon_id)
+            if addon:
+               addon.request_page(url)
+            else:
+               EmcErrorDialog('{}<br><br><hilight>{}</hilight>'.format(
+                              _('Cannot find the additional addon:'),
+                              addon_id))
+            return
+
+         elif url:
+            # directly play this item
+            listitem.play(url)
+            return
+
+      EmcErrorDialog(_('Addon failed to fetch the requested resource'))
 
 
 

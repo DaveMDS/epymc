@@ -157,7 +157,8 @@ def install_from_local_zip(zip_file):
    Return:
       The new installed addon instance or None on errors
    """
-   addon_id = os.path.basename(zip_file).split('-')[0]
+   addon_id = os.path.basename(zip_file)
+   addon_id = addon_id[0:addon_id.rindex('-')]
 
    # TODO check errors
    with zipfile.ZipFile(zip_file, 'r') as z:

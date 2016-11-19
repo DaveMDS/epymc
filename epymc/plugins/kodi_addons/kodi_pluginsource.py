@@ -417,7 +417,11 @@ class KodiPluginSource(KodiAddonBase):
    def _Player_play(self, player_id, item=None, listitem=None,
                     windowed=False, startpos=-1):
       self.hide_run_dialog()
-      ListItem(listitem).play(item)
+      listitem = ListItem(listitem)
+      if listitem.best_url:
+         listitem.play(item)
+      else:
+         EmcErrorDialog(_('Addon failed to fetch the requested resource'))
 
    #  xbmclib.addon proxied functions  #########################################
    @return_to_addon

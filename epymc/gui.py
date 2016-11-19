@@ -1672,7 +1672,7 @@ class EmcNotify(edje.Edje):
       edje.Edje.__init__(self, layout.evas, file=theme_file,
                          group='emc/notify/default')
       self.part_text_set('emc.text.caption', text)
-      self._icon = load_image(icon)
+      self._icon = load_image(icon) if icon else None
       self.part_swallow('emc.swallow.icon', self._icon)
       box_append('notify.box.stack', self)
 
@@ -1688,7 +1688,8 @@ class EmcNotify(edje.Edje):
 
    def _hide_timer_cb(self):
       box_remove('notify.box.stack', self)
-      self._icon.delete()
+      if self._icon:
+         self._icon.delete()
       self.delete()
       if callable(self.close_cb):
          self.close_cb()

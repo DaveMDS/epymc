@@ -81,8 +81,8 @@ def _replace_func(matchobj):
 
 def convert_kodi_tags(text):
    """ http://kodi.wiki/view/Label_Formatting """
-   t = re.sub('\[[A-Z//]*\]', _replace_func, text)
-   return t
+   if text is not None:
+      return re.sub('\[[A-Z//]*\]', _replace_func, text)
 
 
 #  Browser ItemClass  ##########################################################
@@ -661,7 +661,7 @@ class AddonSettingsPanel(EmcDialog):
 #  Addon install panel  ########################################################
 class AddonFromZipDialog(EmcDialog):
 
-   zipfile_regexp = '[a-z0-9.]+-[0-9]+\.[0-9]+\.[0-9]+\.zip'
+   zipfile_regexp = '[a-z0-9.-]+-[0-9]+\.[0-9]+\.[0-9]+\.zip'
 
    def __init__(self, success_cb, **kargs):
       self._success_cb = success_cb

@@ -192,9 +192,15 @@ def return_to_addon(meth):
 class ListItem(dict):
    """ Utility class that wrap the listitem dict received from addons """
 
-   def __init__(self, listitem):
+   def __init__(self, listitem, url=None):
       dict.__init__(self)
-      self.update(listitem)
+      self['url'] = url
+
+      if listitem:
+         self.update(listitem)
+      else:
+         self['art'] = {}
+         self['infoLabels'] = {}
 
    def play(self, mediaurl=None):
       url = mediaurl or self.get('url') or self.get('path')
@@ -417,7 +423,7 @@ class KodiPluginSource(KodiAddonBase):
    def _Player_play(self, player_id, item=None, listitem=None,
                     windowed=False, startpos=-1):
       self.hide_run_dialog()
-      listitem = ListItem(listitem)
+      listitem = ListItem(listitem, item)
       if listitem.best_url:
          listitem.play(item)
       else:

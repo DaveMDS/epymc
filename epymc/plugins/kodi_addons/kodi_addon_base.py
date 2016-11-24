@@ -31,8 +31,8 @@ from distutils.version import StrictVersion
 
 from efl.elementary import utf8_to_markup
 
-import epymc.utils as utils
-import epymc.ini as ini
+from epymc import utils
+from epymc import ini
 
 
 def DBG(*args):
@@ -150,21 +150,35 @@ def get_installed_addons(cls=None):
       return sorted([a for a in installed_addons.values() if type(a) == cls])
 
 
-def install_from_local_zip(zip_file):
-   """ Install (and load) any type of addons from a local zip file
+def install_from_local_zip(zip_file, preinstall=False):
+   """ Install (and load if preinstall is False) any type of addons
+   from a local zip file
+
    Args:
       zip_file (str): Full path of the zip to install
+      preinstall (bool): If True addon will be installed in a temp folder and
+                         will not be included in the list of addons (loaded)
    Return:
-      The new installed addon instance or None on errors
+      The new addon instance or None on errors
    """
    addon_id = os.path.basename(zip_file)
    addon_id = addon_id[0:addon_id.rindex('-')]
+   dest_folder = base_temp_path if preinstall else base_addons_path
 
-   # TODO check errors
-   with zipfile.ZipFile(zip_file, 'r') as z:
-      z.extractall(base_addons_path)
+   try:
+      with zipfile.ZipFile(zip_file, 'r') as zf:
+         zf.extractall(dest_folder)
+   except zipfile.BadZipfile:
+      return None
 
-   return load_single_addon(addon_id)
+   if preinstall:
+      xml_path = os.path.join(base_temp_path, addon_id, 'addon.xml')
+      addon = addon_factory(xml_path)
+      addon.preinstall = True
+      addon.preinstall_zipfile = zip_file
+      return addon
+   else:
+      return load_single_addon(addon_id)
 
 
 def uninstall_addon(addon):
@@ -195,12 +209,14 @@ class KodiAddonBase(object):
       self._name = xml_root.get('name')
       self._version = xml_root.get('version', '0.0.1')
       self._author = xml_root.get('provider-name')
+      self._preinstall = False
+      self._preinstall_zipfile = None
       self._metadata = None  # will be lazily parsed
       self._requires = None  # will be lazily parsed
       self._settings = None  # will be lazily loaded
       self._localize = None  # will be lazily loaded
 
-   def __str__(self):
+   def __repr__(self):
       return '<{0.__class__.__name__} id={0.id} v={0.version}>'.format(self)
 
    def __lt__(self, other):
@@ -211,7 +227,26 @@ class KodiAddonBase(object):
 
    @property
    def is_installed(self):  # TODO rename to "installed"
+      """ Whenever the addon is already installed """
       return self._folder is not None
+
+   @property
+   def preinstall(self):
+      """ True when we are in the preinstall phase """
+      return self._preinstall
+
+   @preinstall.setter
+   def preinstall(self, value):
+      self._preinstall = value
+
+   @property
+   def preinstall_zipfile(self):
+      """ In pre-install mode this is the source zip file """
+      return self._preinstall_zipfile
+
+   @preinstall_zipfile.setter
+   def preinstall_zipfile(self, value):
+      self._preinstall_zipfile = value
 
    @property
    def disabled(self):
@@ -293,7 +328,7 @@ class KodiAddonBase(object):
       """ [ (id, vers), ... ] """
       if self._requires is None:
          self._requires = []
-         for require in self._root.find('requires'):
+         for require in self._root.find('requires') or []:
             id = require.get('addon')
             ver = require.get('version')
             if id and ver and id != 'xbmc.python':

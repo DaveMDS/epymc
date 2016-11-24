@@ -109,6 +109,10 @@ def current_browser_set(instance):
 def current_browser_get():
    return _active_one
 
+def current_browser_refresh(hard=False):
+   if _active_one:
+      _active_one.refresh(hard)
+
 
 class EmcItemClass(Singleton):
    """ TODO Class doc """

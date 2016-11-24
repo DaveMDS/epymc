@@ -316,7 +316,10 @@ def in_use_theme_file_set(theme_file):
 
 def url2path(url):
    # TODO ... convert the url to a local path !!
-   return url[7:]
+   if url.startswith('file://'):
+      return url[7:]
+   else:
+      return url
 
 def hum_size(bytes):
    bytes = float(bytes)

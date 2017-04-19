@@ -185,9 +185,9 @@ def init():
    # set efl frames per second
    fps_set(fps)
 
-   # an invisible rect used to block mouse events when mouse is hidden
-   r = evas.Rectangle(win.evas, color=(0, 0, 0, 0),
-                      size_hint_expand=EXPAND_BOTH)
+   # an invisible label used to hide the mouse cursor and block mouse events
+   r = elm.Label(win, color=(0, 0, 0, 0), cursor='blank', name='mouse_blocker',
+                      focus_allow=False, size_hint_expand=EXPAND_BOTH)
    r.on_mouse_move_add(lambda o,e: mouse_show())
    win.resize_object_add(r)
    win.data['mouse_blocker'] = r
@@ -405,14 +405,12 @@ def mouse_show():
    if win.data['mouse_blocker'].visible:
       DBG("Mouse pointer show")
       win.data['mouse_blocker'].hide()
-      layout.cursor = None
 
 def mouse_hide():
    if ini.get_bool('general', 'hide_mouse') and \
          not win.data['mouse_blocker'].visible:
       DBG("Mouse pointer hide")
       win.data['mouse_blocker'].show()
-      layout.cursor = 'blank'
 
 ### Simple edje abstraction ###
 def part_get(name):

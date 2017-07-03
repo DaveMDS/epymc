@@ -319,7 +319,7 @@ msgstr "Data di nascita"
 
 #: epymc/themoviedb.py:547
 msgid "Deathday"
-msgstr "Data di morte"
+msgstr "Data decesso"
 
 #: epymc/themoviedb.py:549
 msgid "Place of birth"

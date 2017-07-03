@@ -1,14 +1,14 @@
 
 
 ===============================================================================
-Changes in version 1.3.0 (TO BE RELEASED)
+Changes in version 1.3.0
 ===============================================================================
 
 New features:
 
  * Storage device support, using udev and udisks2
  * Full DVD playback support, including DVD menu navigation
- * Audio CD playback support, including MusicBrainz album info
+ * Audio CD playback support, including MusicBrainz album info fetching
  * MusicBrainz integration
  * Movies: tagging ability. You can now organize your library using custom tags
  * Movies: you can now choose favorite actors/directors for faster browsing
@@ -31,7 +31,7 @@ New Translations:
 
 Changes:
 
- *
+ * Better and more flexible EmcMenu implementation
 
 
 Bug fixed:
@@ -39,6 +39,8 @@ Bug fixed:
  * Remove screensaver config item on module shutdown
  * Fixed menu icons when using a FDO icon theme in elm config
  * Fixed mouse hide feature when running on top of efl 1.19
+ * Fixed efl 1.19 compat (menu size, mouse hide)
+ * Fixed (again) mouse hide feature when running on top of efl 1.20
 
 
 ===============================================================================

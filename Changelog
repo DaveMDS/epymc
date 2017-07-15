@@ -40,7 +40,6 @@ Bug fixed:
  * Fixed menu icons when using a FDO icon theme in elm config
  * Fixed mouse hide feature when running on top of efl 1.19
  * Fixed efl 1.19 compat (menu size, mouse hide)
- * Fixed (again) mouse hide feature when running on top of efl 1.20
 
 
 ===============================================================================

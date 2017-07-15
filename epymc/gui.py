@@ -404,16 +404,14 @@ def clock_update():
 
 def mouse_show():
    if win.data['mouse_blocker'].visible:
-      if win.data['mouse_blocker_pos'] != win.evas.pointer_output_xy_get():
-         DBG("Mouse pointer show")
-         win.data['mouse_blocker'].hide()
+      DBG("Mouse pointer show")
+      win.data['mouse_blocker'].hide()
 
 def mouse_hide():
    if ini.get_bool('general', 'hide_mouse') and \
          not win.data['mouse_blocker'].visible:
       DBG("Mouse pointer hide")
       win.data['mouse_blocker'].show()
-      win.data['mouse_blocker_pos'] = win.evas.pointer_output_xy_get()
 
 ### Simple edje abstraction ###
 def part_get(name):

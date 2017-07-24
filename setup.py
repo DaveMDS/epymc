@@ -26,13 +26,13 @@ from distutils.file_util import copy_file
 from distutils.command.install_lib import install_lib
 from distutils.command.build import build
 from distutils.dep_util import newer, newer_group
-from distutils.version import StrictVersion
+from distutils.version import LooseVersion
 from epymc import __version__ as emc_version
 from efl import __version__ as efl_version
 
 
-MIN_EFL = '1.18.0'
-if StrictVersion(efl_version) < MIN_EFL:
+MIN_EFL = '1.20.0'
+if LooseVersion(efl_version) < MIN_EFL:
    print('Your python-efl version is too old! Found: ' + efl_version)
    print('You need at least version ' + MIN_EFL)
    exit(1)

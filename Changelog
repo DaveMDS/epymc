@@ -31,6 +31,7 @@ New Translations:
 
 Changes:
 
+ * Now require efl 1.20 (to fix the standalone mode)
  * Better and more flexible EmcMenu implementation
 
 
@@ -40,6 +41,7 @@ Bug fixed:
  * Fixed menu icons when using a FDO icon theme in elm config
  * Fixed mouse hide feature when running on top of efl 1.19
  * Fixed efl 1.19 compat (menu size, mouse hide)
+ * Fixed standalone mode (requiring efl 1.20)
  * Fixed Virtual Keybord oversize when display the % character
 
 

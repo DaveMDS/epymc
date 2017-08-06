@@ -1,13 +1,28 @@
 
+EPYMC RELEASE PROCESS
+======================
+ * update i18n stuff
+ * update the Changelog file
+ * change version in epymc/__init__.py
+ * check efl min requirement in setup.py
+
+ !!!!! TODO BEFORE 1.3  !!!!!!!!
+
+ - attors info missing ?
+ - EFL ERROR dialer=0x80000053ad4bf281 could not get effective HTTP version: An unknown option was passed in to libcurl
+
+ - playlist editor in a separate dialog, with the songs list and the buttons:
+   remove/moveup/movedown/close
+   In another release we can also add save/load and edit id3
+
+
 TMP
 ====
  * report on phab the Ethumb Client instability
  * ethumb: frame cannot be unset...witout an error
 
  * use the new sdb.items() generator where needed, it's fastest
- * config -> general -> date format  Wrong entry size !!
  * clean dead files in music db like in movies
- * uitests -> sorage device -> up, up, up ... below browser move focus
  * cast panel: movie list is not complete, see directors panel
 
 BUGS
@@ -55,6 +70,7 @@ TVSHOW
 MUSIC
 =====
  * playlist item remove/reorder
+ * id3 tag editor
 
 MAME
 =====

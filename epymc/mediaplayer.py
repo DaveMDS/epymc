@@ -561,16 +561,16 @@ class EmcPlayerBase(object):
    @property
    def position_percent(self):
       """ the playback position in the range 0.0 -> 1.0 """
-      pos, len = self._emotion.position, self._emotion.play_length
+      pos, len = self.position, self.play_length
       return (pos / len) if len > 0 else 0.0
 
    @position_percent.setter
    def position_percent(self, val):
-      self.position = self._emotion.play_length * val
+      self.position = self.play_length * val
 
    def seek(self, offset):
       """ offset in seconds (float) """
-      newpos = self._emotion.position + offset
+      newpos = self.position + offset
       self.position = max(0.0, newpos)
 
    def forward(self):
@@ -599,6 +599,14 @@ class EmcPlayerBase(object):
 
    def pause_toggle(self):
       self.unpause() if self.paused else self.pause()
+
+   @property
+   def buffer_size(self):
+      return self._emotion.buffer_size
+
+   @buffer_size.setter
+   def buffer_size(self, value):
+      self._emotion.buffer_size = value
 
    ### emotion obj callbacks (implemented in subclasses)
    def _playback_started_cb(self, vid):
@@ -920,7 +928,8 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
 
       ### init the base player class
       EmcPlayerBase.__init__(self)
-      self.content_set('video.swallow', self._emotion)
+      if hasattr(self, '_emotion'):  # TODO FIXME
+         self.content_set('video.swallow', self._emotion)
       self.url = url
 
       ### control buttons
@@ -1094,8 +1103,8 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
    ### internals
    def _update_slider(self):
       pos = self.position_percent
-      pos_str = utils.seconds_to_duration(self._emotion.position, True)
-      len_str = utils.seconds_to_duration(self._emotion.play_length, True)
+      pos_str = utils.seconds_to_duration(self.position, True)
+      len_str = utils.seconds_to_duration(self.play_length, True)
 
       if self._controls_visible:
          self._pos_slider.value = pos
@@ -1110,20 +1119,23 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
 
    def _update_timer_cb(self):
       if self._buffer_dialog is not None:
-         self._buffer_dialog.progress_set(self._emotion.buffer_size)
-         if self._emotion.buffer_size >= 1.0:
-            self._emotion.play = True
+         self._buffer_dialog.progress_set(self.buffer_size)
+         if self.buffer_size >= 1.0:
+            # self._emotion.play = True
+            self.unpause()
             self._buffer_dialog.delete()
             self._buffer_dialog = None
 
-      elif self._emotion.buffer_size < 1.0:
+      elif self.buffer_size < 1.0:
          self._buffer_dialog = EmcDialog(title=_('Buffering'), style='buffering')
-         self._emotion.play = False
+         # self._emotion.play = False
+         self.pause()
 
       self._update_slider()
 
       # keep the screensaver out while playing videos
-      if self._emotion.play == True:
+      # if self._emotion.play == True:
+      if self.paused == False:
          events.event_emit('KEEP_ALIVE')
 
       return ecore.ECORE_CALLBACK_RENEW

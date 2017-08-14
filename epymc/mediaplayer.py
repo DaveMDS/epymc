@@ -517,6 +517,9 @@ class EmcPlayerBase(object):
       events.listener_del(self.__class__.__name__ + 'Base')
       self._emotion.delete()
 
+   def video_object_get(self):
+      return self._emotion
+
    @property
    def url(self):
       return self._url
@@ -601,6 +604,22 @@ class EmcPlayerBase(object):
       self.unpause() if self.paused else self.pause()
 
    @property
+   def volume(self):
+      return int(self._emotion.audio_volume * 100)
+
+   @volume.setter
+   def volume(self, value):
+      self._emotion.audio_volume = float(value) / 100
+
+   @property
+   def muted(self):
+      return self._emotion.audio_mute
+
+   @muted.setter
+   def muted(self, value):
+      self._emotion.audio_mute = bool(value)
+
+   @property
    def buffer_size(self):
       return self._emotion.buffer_size
 
@@ -653,8 +672,8 @@ class EmcPlayerBase(object):
 
    def _base_events_cb(self, event):
       if event == 'VOLUME_CHANGED':
-         self._emotion.audio_volume = volume_get() / 100.0
-         self._emotion.audio_mute = volume_mute_get()
+         self.volume = volume_get()
+         self.muted = volume_mute_get()
 
 
 ###############################################################################
@@ -928,8 +947,8 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
 
       ### init the base player class
       EmcPlayerBase.__init__(self)
-      if hasattr(self, '_emotion'):  # TODO FIXME
-         self.content_set('video.swallow', self._emotion)
+      if self.video_object_get():
+         self.content_set('video.swallow', self.video_object_get())
       self.url = url
 
       ### control buttons

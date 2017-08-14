@@ -23,18 +23,15 @@ from __future__ import absolute_import, print_function
 from omxplayer import OMXPlayer
 
 from efl import ecore
+from efl import evas
 from efl import elementary as elm
-# from efl.elementary.list import List
 
 from epymc.modules import EmcModule
 from epymc.mediaplayer import EmcPlayerBase
+from epymc import mediaplayer
 from epymc import events
-# import epymc.input_events as input_events
-# from epymc.gui import EmcVKeyboard, EmcDialog
-# from epymc.browser import EmcItemClass
-# import epymc.ini as ini
-# import epymc.gui as gui
-# import epymc.config_gui as config_gui
+from epymc import input_events
+from epymc import gui
 
 
 def DBG(msg):
@@ -45,43 +42,55 @@ class OmxPlayerModule(EmcModule):
    name = 'mp_omxplayer'
    label = _('Media Player - OMX external player')
    icon = 'icon/remote'
-   info = _('Use an external omx_player instance to play videos.')
+   info = _('Use an external omx_player process to play videos. Only usable '
+            'on RaspberryPI, make sure you have omxplayer installed.')
 
    def __init__(self):
       DBG('Init module')
 
-   
-      # get lirc socket from config
-      # ini.add_section('lirc')
-      # self.device = ini.get('lirc', 'device', self.DEFAULT_LIRC_SOCKET)
-      
-      # add an entry in the config section
-      # config_gui.root_item_add('lirc', 51, _('Remote'), icon='icon/remote',
-                               # callback=self.config_panel_cb)
-
-
-
-
    def __shutdown__(self):
       DBG('Shutdown module')
-      # config_gui.root_item_del('lirc')
-
-
 
 
 class EmcPlayerBase_OMX(EmcPlayerBase):
    def __init__(self):
       self._url = None
       self._OMP = None
-      DBG("CUSTOM PLAYER")
+      self._OMP_sizer_rect = None
+      self._OMP_muted = False
+      DBG("CUSTOM OMX PLAYER")
+
+      # invisible rect to track the wanted position of the player and
+      # mimic the position in the omx_player process
+      def _sizer_cb(self, obj):
+         x, y, w, h = obj.geometry
+         self._OMP.set_video_pos(x, y, x + w, y + h)
+      r = evas.Rectangle(gui.layout.evas, color=(0, 255, 0, 0))
+      r.on_resize_add(_sizer_cb)
+      self._OMP_sizer_rect = r
+
+      # self._emotion.callback_add('playback_started', self._playback_started_cb)
+      # self._emotion.callback_add('playback_finished', self._playback_finished_cb)
+
+      # listen to input and generic events (cb implemented in the base class)
+      input_events.listener_add(self.__class__.__name__ + 'Base_OMX',
+                                self._base_input_events_cb)
+      events.listener_add(self.__class__.__name__ + 'Base_OMX',
+                                self._base_events_cb)
 
    def delete(self):
-      # input_events.listener_del(self.__class__.__name__ + 'Base')
-      # events.listener_del(self.__class__.__name__ + 'Base')
-      # self._emotion.delete()
-      DBG("CUSTOM PLAYER  DELETE !!!")
+      DBG("DELETE")
+      input_events.listener_del(self.__class__.__name__ + 'Base_OMX')
+      events.listener_del(self.__class__.__name__ + 'Base_OMX')
       self._OMP.quit()
       self._OMP = None
+      if self._OMP_sizer_rect is None:
+         self._OMP_sizer_rect.delete()
+         self._OMP_sizer_rect = None
+
+   def video_object_get(self):
+      DBG("VIDEO OBJECT GET")
+      return self._OMP_sizer_rect
 
    @property
    def url(self):
@@ -89,74 +98,91 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
 
    @url.setter
    def url(self, url):
-      DBG("CUSTOM PLAYER:  URL SET: %s" % url)
-      # default to 'file://' if not given
-      # if url.find('://', 2, 15) == -1:
-         # url = 'file://' + url
+      DBG("URL SET: %s" % url)
       self._url = url
 
       if self._OMP is None:
          self._OMP = OMXPlayer(url)
-         self._OMP.set_alpha(250)  # TODO REMOVE ME !!!!
       else:
          self._OMP.load(url)
 
+      self.volume = mediaplayer.volume_get()
+      self.muted = mediaplayer.volume_mute_get()
+      self._OMP.set_aspect_mode("letterbox")
+      # self._OMP.set_alpha(128)
+      self._OMP.pause()
       self._OMP.play()
-
-      # Do not pass "file://" to emotion. Vlc has a bug somewhere that prevent
-      # files with special chars in them to play (the bug don't appear if no
-      # "file://" is given. The bug can be seen also using normal vlc from
-      # the command line.
-      # self._emotion.file_set(url[7:] if url.startswith('file://') else url)
-      # self._emotion.play = True
-      # self._emotion.audio_volume = volume_get() / 100.0
-      # self._emotion.audio_mute = volume_mute_get()
-      # if not url.startswith('dvd://'): # spu used in dvdnav
-         # self._emotion.spu_mute = True
-         # self._emotion.spu_channel = -1
 
    @property
    def seekable(self):
-      return True
+      return self._OMP.can_seek()
 
    @property
    def position(self):
       """ the playback position in seconds (float) from the start """
-      DBG("CUSTOM PLAYER:  POS %s" % self._OMP.position())
-      return self._OMP.position()
+      # DBG("POS %s" % self._OMP.position())
+      return self._OMP.position() or 0
 
    @position.setter
    def position(self, pos):
+      DBG("POS SET %s" % str(pos))
       self._OMP.set_position(pos)
       events.event_emit('PLAYBACK_SEEKED')
 
    @property
    def play_length(self):
-      DBG("CUSTOM PLAYER:  PLAY LEN %s" % self._OMP.duration())
-      return self._OMP.duration()
+      # DBG("PLAY LEN %s" % self._OMP.duration())
+      return self._OMP.duration() or 0
 
    @property
    def paused(self):
-      DBG("CUSTOM PLAYER:  PAUSED %s" % (not self._OMP.is_playing()))
+      DBG("PAUSED %s" % (not self._OMP.is_playing()))
       return not self._OMP.is_playing()
 
    def pause(self):
-      DBG("CUSTOM PLAYER:  PAUSE")
+      DBG("PAUSE")
       self._OMP.pause()
       events.event_emit('PLAYBACK_PAUSED')
 
    def unpause(self):
-      DBG("CUSTOM PLAYER:  UNPAUSE")
+      DBG("UNPAUSE")
       self._OMP.play()
       events.event_emit('PLAYBACK_UNPAUSED')
 
    @property
+   def volume(self):
+      DBG("VOLUME")
+      return self._OMP.volume() / 10  # TODO millibels ??
+
+   @volume.setter
+   def volume(self, value):
+      DBG("VOLUME SET")
+      self._OMP.set_volume(value * 10)  # TODO millibels ??
+
+   @property
+   def muted(self):
+      DBG("MUTED")
+      return self._OMP_muted
+
+   @muted.setter
+   def muted(self, value):
+      DBG("MUTED SET")
+      if value:
+         self._OMP.mute()
+         self._OMP_muted = True
+      else:
+         self._OMP.unmute()
+         self._OMP_muted = False
+
+   @property
    def buffer_size(self):
+      # TODO ???
       # return self._emotion.buffer_size
       return 1.0
 
    @buffer_size.setter
    def buffer_size(self, value):
+      # TODO ???
       # self._emotion.buffer_size = value
       pass
 

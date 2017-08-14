@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import, print_function
 
+import math
 from collections import namedtuple
 
 from efl import ecore
@@ -165,12 +166,14 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
    @property
    def volume(self):
       DBG("VOLUME")
-      return self._OMP.volume() / 10  # TODO millibels ??
+      mb = self._OMP.volume()  # Millibels
+      return  int((10 ** (mb / 2000.0)) * 100)
 
    @volume.setter
    def volume(self, value):
       DBG("VOLUME SET")
-      self._OMP.set_volume(value * 10)  # TODO millibels ??
+      mb = 2000.0 * math.log10(float(value) / 100)  # Millibels
+      self._OMP.set_volume(mb)
 
    @property
    def muted(self):

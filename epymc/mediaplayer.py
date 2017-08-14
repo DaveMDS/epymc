@@ -23,6 +23,7 @@ from __future__ import absolute_import, print_function
 import os
 import random
 from datetime import datetime
+from collections import namedtuple
 
 from efl import evas, ecore, edje, emotion, elementary as elm
 
@@ -627,6 +628,46 @@ class EmcPlayerBase(object):
    def buffer_size(self, value):
       self._emotion.buffer_size = value
 
+   @property
+   def audio_tracks(self):
+      """ list of (index, lang, name, codec, active) """
+      Track = namedtuple('Track', 'idx lang name codec active')
+      current = self._emotion.audio_channel
+      count = self._emotion.audio_channel_count()
+      return [ Track(i, None, self._emotion.audio_channel_name_get(i),
+                     None, i == current)
+               for i in range(count) ]
+
+   @property
+   def selected_audio_track(self):
+      """ index of the selected audio track """
+      return self._emotion.audio_channel
+
+   @selected_audio_track.setter
+   def selected_audio_track(self, index):
+      index = max(0, min(index, self._emotion.audio_channel_count()))
+      self._emotion.audio_channel = index
+
+   @property
+   def video_tracks(self):
+      """ list of (index, lang, name, codec, active) """
+      Track = namedtuple('Track', 'idx lang name codec active')
+      current = self._emotion.video_channel
+      count = self._emotion.video_channel_count()
+      return [ Track(i, None, self._emotion.video_channel_name_get(i),
+                     None, i == current)
+               for i in range(count) ]
+
+   @property
+   def selected_video_track(self):
+      """ index of the selected video track """
+      return self._emotion.video_channel
+
+   @selected_video_track.setter
+   def selected_video_track(self, index):
+      index = max(0, min(index, self._emotion.video_channel_count()))
+      self._emotion.video_channel = index
+
    ### emotion obj callbacks (implemented in subclasses)
    def _playback_started_cb(self, vid):
       pass
@@ -1164,16 +1205,13 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       menu = EmcMenu(relto=btn)
 
       # audio channels
-      trk_cnt = self._emotion.audio_channel_count()
-      current = self._emotion.audio_channel
-      for n in range(trk_cnt):
-         name = self._emotion.audio_channel_name_get(n)
-         if name:
-            name = _('Audio track: %s') % name
+      for trk in self.audio_tracks:
+         if trk.name:
+            name = _('Audio track: %s') % trk.name
          else:
-            name = _('Audio track #%d') % (n + 1)
-         icon = 'icon/item_sel' if n == current else 'icon/item_nosel'
-         menu.item_add(name, icon, None, self._audio_menu_track_cb, n)
+            name = _('Audio track #%d') % (trk.idx + 1)
+         icon = 'icon/item_sel' if trk.active else 'icon/item_nosel'
+         menu.item_add(name, icon, None, self._audio_menu_track_cb, trk.idx)
 
       # mute / unmute
       menu.item_separator_add()
@@ -1184,23 +1222,20 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       menu.show()
 
    def _audio_menu_track_cb(self, menu, item, track_num):
-      self._emotion.audio_channel_set(track_num)
+      self.selected_audio_track = track_num
 
    ### video menu
    def _video_menu_build(self, btn):
       menu = EmcMenu(relto=btn)
 
       # video channels
-      trk_cnt = self._emotion.video_channel_count()
-      current = self._emotion.video_channel
-      for n in range(trk_cnt):
-         name = self._emotion.video_channel_name_get(n)
-         if name:
-            name = _('Video track: %s') % name
+      for trk in self.video_tracks:
+         if trk.name:
+            name = _('Video track: %s') % trk.name
          else:
-            name = _('Video track #%d') % (n + 1)
-         icon = 'icon/item_sel' if n == current else 'icon/item_nosel'
-         item = menu.item_add(name, icon, None, self._video_menu_track_cb, n)
+            name = _('Video track #%d') % (trk.idx + 1)
+         icon = 'icon/item_sel' if trk.active else 'icon/item_nosel'
+         item = menu.item_add(name, icon, None, self._video_menu_track_cb, trk.idx)
 
       # download
       menu.item_separator_add()
@@ -1213,7 +1248,7 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       menu.show()
 
    def _video_menu_track_cb(self, menu, item, track_num):
-      self._emotion.video_channel_set(track_num)
+      self.selected_video_track = track_num
 
    def _video_menu_download_cb(self, menu, item):
       DownloadManager().queue_download(self.url, self._title)

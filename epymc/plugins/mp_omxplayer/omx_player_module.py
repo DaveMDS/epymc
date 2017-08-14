@@ -20,7 +20,7 @@
 
 from __future__ import absolute_import, print_function
 
-from omxplayer import OMXPlayer
+from collections import namedtuple
 
 from efl import ecore
 from efl import evas
@@ -38,6 +38,7 @@ def DBG(msg):
    print('OMX: %s' % msg)
    # pass
 
+
 class OmxPlayerModule(EmcModule):
    name = 'mp_omxplayer'
    label = _('Media Player - OMX external player')
@@ -47,9 +48,20 @@ class OmxPlayerModule(EmcModule):
 
    def __init__(self):
       DBG('Init module')
+      # monkey-patch the original EmcPlayer implementation
+      self.EmcPlayerBase_ORIG = mediaplayer.EmcPlayerBase
+      self.EmcVideoPlayer_ORIG = mediaplayer.EmcVideoPlayer
+      self.EmcAudioPlayer_ORIG = mediaplayer.EmcAudioPlayer
+      mediaplayer.EmcPlayerBase = EmcPlayerBase_OMX
+      mediaplayer.EmcVideoPlayer = EmcVideoPlayer_OMX
+      mediaplayer.EmcAudioPlayer = EmcAudioPlayer_OMX
 
    def __shutdown__(self):
       DBG('Shutdown module')
+      # un-monkey-patch
+      mediaplayer.EmcPlayerBase = self.EmcPlayerBase_ORIG
+      mediaplayer.EmcVideoPlayer = self.EmcVideoPlayer_ORIG
+      mediaplayer.EmcAudioPlayer = self.EmcAudioPlayer_ORIG
 
 
 class EmcPlayerBase_OMX(EmcPlayerBase):
@@ -62,10 +74,10 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
 
       # invisible rect to track the wanted position of the player and
       # mimic the position in the omx_player process
-      def _sizer_cb(self, obj):
+      def _sizer_cb(obj):
          x, y, w, h = obj.geometry
          self._OMP.set_video_pos(x, y, x + w, y + h)
-      r = evas.Rectangle(gui.layout.evas, color=(0, 255, 0, 0))
+      r = evas.Rectangle(gui.layout.evas, color=(0, 0, 0, 0))
       r.on_resize_add(_sizer_cb)
       self._OMP_sizer_rect = r
 
@@ -102,6 +114,7 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
       self._url = url
 
       if self._OMP is None:
+         from omxplayer import OMXPlayer
          self._OMP = OMXPlayer(url)
       else:
          self._OMP.load(url)
@@ -186,18 +199,60 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
       # self._emotion.buffer_size = value
       pass
 
+   @property
+   def audio_tracks(self):
+      """ line format  <index>:<language>:<name>:<codec>:<active> """
+      Track = namedtuple('Track', 'idx lang name codec active')
+      L = []
+      for line in self._OMP.list_audio():
+         idx, lang, name, codec, active = line.split(':')
+         L.append(Track(int(idx), lang, name, codec, (active == 'active')))
+      return L
 
-###
-### monkey patch the core Player classes with the OMX specific implementation
-###
-from epymc import mediaplayer
+   @property
+   def selected_audio_track(self):
+      """ index of the selected audio track """
+      idx = 0
+      for e in self._OMP.list_audio():
+         if e.endswith(':active'):
+            return idx
+         idx += 1
+      return 0
+
+   @selected_audio_track.setter
+   def selected_audio_track(self, index):
+      self._OMP.select_audio(max(0, index))
+
+   @property
+   def video_tracks(self):
+      """ line format  <index>:<language>:<name>:<codec>:<active> """
+      Track = namedtuple('Track', 'idx lang name codec active')
+      L = []
+      for line in self._OMP.list_video():
+         idx, lang, name, codec, active = line.split(':')
+         L.append(Track(int(idx), lang, name, codec, (active == 'active')))
+      return L
+
+   @property
+   def selected_video_track(self):
+      """ index of the selected video track """
+      idx = 0
+      for e in self._OMP.list_video():
+         if e.endswith(':active'):
+            return idx
+         idx += 1
+      return 0
+
+   @selected_video_track.setter
+   def selected_video_track(self, index):
+      print('Video track selection not implemented in omx_player')
+      # self._OMP.select_video(max(0, index))
+
 
 class EmcVideoPlayer_OMX(mediaplayer.EmcVideoPlayer, EmcPlayerBase_OMX):
    pass
 
+
 class EmcAudioPlayer_OMX(mediaplayer.EmcAudioPlayer, EmcPlayerBase_OMX):
    pass
 
-mediaplayer.EmcPlayerBase = EmcPlayerBase_OMX
-mediaplayer.EmcVideoPlayer = EmcVideoPlayer_OMX
-mediaplayer.EmcAudioPlayer = EmcAudioPlayer_OMX

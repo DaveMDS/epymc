@@ -1,0 +1,246 @@
+#!/usr/bin/env python
+# This Python file uses the following encoding: utf-8
+#
+# Copyright (C) 2010-2016 Davide Andreoli <dave@gurumeditation.it>
+#
+# This file is part of EpyMC, an EFL based Media Center written in Python.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import absolute_import, print_function
+
+import os
+import dbus
+from dbus import Int32, Int64, String, ObjectPath
+from dbus.connection import Connection as DBusConnection
+
+from efl import ecore
+from efl.dbus_mainloop import DBusEcoreMainLoop
+
+from epymc import utils
+
+
+def DBG(msg):
+   print('OMX_PLAYER: %s' % msg)
+   # pass
+
+
+class OMXPlayer(object):
+   """ Wrapper around the omxplayer binary
+
+   Run an omxplayer instance in an external process and speak with it using
+   the MPRIS DBus interface on the SessionBus.
+
+   """
+   DBUS_NAME = 'org.mpris.MediaPlayer2.omxplayer'
+   ROOT_IFACE = 'org.mpris.MediaPlayer2'
+   PLAYER_IFACE = 'org.mpris.MediaPlayer2.Player'
+   PROPS_IFACE = 'org.freedesktop.DBus.Properties'
+   
+
+   def __init__(self, url, args=[]):
+      DBG('__init__')
+      self._exe = None
+      self._conn = None
+      self._root_iface = None
+      self._player_iface = None
+      self._props_iface = None
+      self._process_spawn(url, args)
+
+      self._cached_commands = []
+
+   def _process_spawn(self, url, args):
+      # args.append('--dbus_name')
+      # args.append(self.DBUS_NAME)
+      cmd = 'omxplayer.bin %s "%s"' % (' '.join(args), url)
+      DBG('cmd: %s' % cmd)
+
+      def add_cb(exe, event):
+         DBG("omx process started")
+         ecore.Timer(0.2, self._dbus_connect_try)
+
+      def del_cb(exe, event):
+         DBG("omx process died")
+         # self._exe.delete()    ?????
+         self._exe = None
+         self._conn = None
+         self._cached_commands = []
+
+      self._exe = ecore.Exe(cmd, ecore.ECORE_EXE_TERM_WITH_PARENT)
+      self._exe.on_add_event_add(add_cb)
+      self._exe.on_del_event_add(del_cb)
+
+   def _dbus_connect_try(self):
+      DBG("connect try")
+
+      # get the omxplayer private bus address from the file created in tmp
+      # fname = '/tmp/omxplayerdbus.%s' % utils.user_name()
+      # if not os.path.exists(fname) or not os.path.getsize(fname):
+         # ecore.Timer(0.2, self._dbus_connect_try)
+         # return ecore.ECORE_CALLBACK_CANCEL
+      # bus_address = open(fname).read().strip()
+      # DBG('dbus address: %s' % bus_address)
+
+      # connect to the bus
+      try:
+         # self._conn = DBusConnection(bus_address, mainloop=DBusEcoreMainLoop())
+         self._conn = dbus.SessionBus(mainloop=DBusEcoreMainLoop())
+      except:
+         print("CONNECTION ERROR")
+         ecore.Timer(0.2, self._dbus_connect_try)
+         return ecore.ECORE_CALLBACK_CANCEL
+
+      # get the 3 usefull interfaces
+      obj = self._conn.get_object(self.DBUS_NAME, '/org/mpris/MediaPlayer2',
+                                  introspect=False)
+      self._root_iface = dbus.Interface(obj, self.ROOT_IFACE)
+      self._player_iface = dbus.Interface(obj, self.PLAYER_IFACE)
+      self._props_iface = dbus.Interface(obj, self.PROPS_IFACE)
+      # DBG("connection ok, dbus: %s" % bus_address)
+      DBG("connection ok")
+
+      # execute all commands received while starting up (only valid for setters)
+      for fn, args, kargs in self._cached_commands:
+         fn(self, *args, **kargs)
+
+      return ecore.ECORE_CALLBACK_CANCEL
+
+   def _check_player_is_active(f):
+      def wrapper(self, *args, **kargs):
+         if self._conn and self._exe and not self._exe.is_deleted():
+            return f(self, *args, **kargs)
+         else:
+            DBG('WARNING: player not active, caching command for later')
+            self._cached_commands.append((f, args, kargs))
+            
+      return wrapper
+
+
+   ######  Public API  #######
+
+   def quit(self):
+      if self._exe:
+         self._exe.terminate()
+
+   @_check_player_is_active
+   def play(self):
+      self._player_iface.Play()
+
+   @_check_player_is_active
+   def pause(self):
+      self._player_iface.Pause()
+
+   @_check_player_is_active
+   def play_pause(self):
+      self._player_iface.PlayPause()
+
+   @_check_player_is_active
+   def stop(self):
+      self._player_iface.Stop()
+
+   @_check_player_is_active
+   def is_paused(self):
+      """ Whether the player is paused (bool) """
+      return str(self._props_iface.PlaybackStatus()) == "Paused"
+
+   @_check_player_is_active
+   def is_playing(self):
+      """ Whether the player is playing (bool) """
+      return str(self._props_iface.PlaybackStatus()) == "Playing"
+
+   @_check_player_is_active
+   def position(self):
+      """ Get the position in seconds (float) """
+      return self._props_iface.Position() / (1000 * 1000.0)
+
+   @_check_player_is_active
+   def set_position(self, pos):
+      """ Set the position in seconds (float) """
+      self._player_iface.SetPosition(ObjectPath("/not/used"),
+                                     Int64(pos * 1000 * 1000))
+
+   @_check_player_is_active
+   def duration(self):
+      """ Get the duration in seconds (float) """
+      return self._props_iface.Duration() / (1000 * 1000.0)
+
+   @_check_player_is_active
+   def volume(self):
+      """ Get volume in range 0.0 -> 1.0 (float) """
+      return float(self._props_iface.Volume())
+
+   @_check_player_is_active
+   def set_volume(self, volume):
+      """ Set volume in range 0.0 -> 1.0 (float) """
+      DBG("VOLUME SET %.3f" % volume)
+      self._props_iface.Volume(volume)
+
+   @_check_player_is_active
+   def mute(self):
+      """ Turns mute on, if the audio is already muted nothing is done """
+      self._props_iface.Mute()
+
+   @_check_player_is_active
+   def unmute(self):
+      """ Turns mute off, if the audio is already unmuted, nothing is done """
+      self._props_iface.Unmute()
+
+   @_check_player_is_active
+   def set_aspect_mode(self, mode):
+      """ One of ("letterbox" | "fill" | "stretch") """
+      self._player_iface.SetAspectMode(ObjectPath('/not/used'), String(mode))
+
+   @_check_player_is_active
+   def set_video_pos(self, x1, y1, x2, y2):
+      """ Video image position """
+      pos = '%s %s %s %s' % (str(x1),str(y1),str(x2),str(y2))
+      self._player_iface.VideoPos(ObjectPath('/not/used'), String(pos))
+
+   @_check_player_is_active
+   def set_video_crop(self, x1, y1, x2, y2):
+      """ Video image crop """
+      crop = '%s %s %s %s' % (str(x1),str(y1),str(x2),str(y2))
+      self._player_iface.SetVideoCropPos(ObjectPath('/not/used'), String(crop))
+
+   @_check_player_is_active
+   def list_video(self):
+      """ A list of all known video streams (str)
+            format: ``<index>:<language>:<name>:<codec>:<active>``
+      """
+      return map(str, self._player_iface.ListVideo())
+
+   @_check_player_is_active
+   def list_audio(self):
+      """ A list of all known audio streams
+            format: ``<index>:<language>:<name>:<codec>:<active>``
+      """
+      return map(str, self._player_iface.ListAudio())
+
+   @_check_player_is_active
+   def select_audio(self, index):
+      """ The index of the audio stream to select """
+      return bool(self._player_iface.SelectAudio(Int32(index)))
+
+   @_check_player_is_active
+   def list_subtitles(self):
+      """ A list of all known subtitles
+            format: ``<index>:<language>:<name>:<codec>:<active>``
+      """
+      return map(str, self._player_iface.ListSubtitles())
+
+   @_check_player_is_active
+   def select_subtitle(self, index):
+      """ The index of the subtitle to select """
+      return bool(self._player_iface.SelectSubtitle(Int32(index)))
+

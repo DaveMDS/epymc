@@ -20,7 +20,6 @@
 
 from __future__ import absolute_import, print_function
 
-import math
 from collections import namedtuple
 
 from efl import ecore
@@ -34,6 +33,7 @@ from epymc import events
 from epymc import input_events
 from epymc import gui
 
+from .omx_player import OMXPlayer
 
 def DBG(msg):
    print('OMX: %s' % msg)
@@ -113,13 +113,8 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
    def url(self, url):
       DBG("URL SET: %s" % url)
       self._url = url
-
-      if self._OMP is None:
-         from omxplayer import OMXPlayer
-         self._OMP = OMXPlayer(url, args=['--no-osd', '--no-key'])
-      else:
-         self._OMP.load(url)
-
+      self._OMP = OMXPlayer(url, args=['--no-osd', '--no-key'])
+      
       self.volume = mediaplayer.volume_get()
       self.muted = mediaplayer.volume_mute_get()
       self._OMP.set_aspect_mode("letterbox")
@@ -133,13 +128,10 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
 
    @property
    def position(self):
-      """ the playback position in seconds (float) from the start """
-      # DBG("POS %s" % self._OMP.position())
       return self._OMP.position() or 0
 
    @position.setter
    def position(self, pos):
-      DBG("POS SET %s" % str(pos))
       self._OMP.set_position(pos)
       events.event_emit('PLAYBACK_SEEKED')
 
@@ -150,39 +142,30 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
 
    @property
    def paused(self):
-      DBG("PAUSED %s" % (not self._OMP.is_playing()))
-      return not self._OMP.is_playing()
+      return self._OMP.is_paused()
 
    def pause(self):
-      DBG("PAUSE")
       self._OMP.pause()
       events.event_emit('PLAYBACK_PAUSED')
 
    def unpause(self):
-      DBG("UNPAUSE")
       self._OMP.play()
       events.event_emit('PLAYBACK_UNPAUSED')
 
    @property
    def volume(self):
-      DBG("VOLUME")
-      mb = self._OMP.volume()  # Millibels
-      return  int((10 ** (mb / 2000.0)) * 100)
+      return int(self._OMP.volume() * 100)
 
    @volume.setter
    def volume(self, value):
-      DBG("VOLUME SET")
-      mb = 2000.0 * math.log10(float(value) / 100)  # Millibels
-      self._OMP.set_volume(mb)
+      self._OMP.set_volume(value / 100.0)
 
    @property
    def muted(self):
-      DBG("MUTED")
       return self._OMP_muted
 
    @muted.setter
    def muted(self, value):
-      DBG("MUTED SET")
       if value:
          self._OMP.mute()
          self._OMP_muted = True

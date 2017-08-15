@@ -20,7 +20,7 @@
 
 from __future__ import absolute_import, print_function
 
-import sys, os, tempfile, glob, re, hashlib
+import sys, os, tempfile, glob, re, hashlib, pwd
 
 try:
    from urllib.parse import quote as urllib_quote
@@ -368,6 +368,9 @@ def md5(txt):
       txt = bytes(txt,'utf-8')
    return hashlib.md5(txt).hexdigest()
 
+def user_name():
+   return pwd.getpwuid(os.getuid())[0]
+   
 def natural_sort(l): 
    convert = lambda text: int(text) if text.isdigit() else text.lower() 
    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)] 

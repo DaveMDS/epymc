@@ -959,6 +959,10 @@ emotion_events_map = {
 }
 
 class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
+
+   # This will be overridden by the omx_player
+   video_player_cannot_be_covered = False
+
    def __init__(self, url=None):
 
       self._play_pause_btn = None
@@ -1082,16 +1086,23 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
 
    ### controls
    def controls_show(self):
-      self.signal_emit('controls,show', 'emc')
-      self._controls_visible = True
       self.minipos_hide()
+      if self.video_player_cannot_be_covered:
+         self.signal_emit('controls,show,no_overlap', 'emc')
+      else:
+         self.signal_emit('controls,show', 'emc')
+      self._controls_visible = True
+      
       self._update_slider()
       gui.volume_show(persistent=True)
       if self.focused_object is None:
          self._play_pause_btn.focus = True
 
    def controls_hide(self):
-      self.signal_emit('controls,hide', 'emc')
+      if self.video_player_cannot_be_covered:
+         self.signal_emit('controls,hide,no_overlap', 'emc')
+      else:
+         self.signal_emit('controls,hide', 'emc')
       self._controls_visible = False
       gui.volume_hide()
 
@@ -1104,7 +1115,10 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
    ### minipos
    def minipos_show(self):
       if not self._controls_visible:
-         self.signal_emit('minipos,show', 'emc')
+         if self.video_player_cannot_be_covered:
+            self.signal_emit('minipos,show,no_overlap', 'emc')
+         else:
+            self.signal_emit('minipos,show', 'emc')
          self._minipos_visible = True
          self._update_slider()
 
@@ -1114,7 +1128,10 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
             self._minipos_timer.reset()
 
    def minipos_hide(self):
-      self.signal_emit('minipos,hide', 'emc')
+      if self.video_player_cannot_be_covered:
+         self.signal_emit('minipos,hide,no_overlap', 'emc')
+      else:
+         self.signal_emit('minipos,hide', 'emc')
       self._minipos_visible = False
       if self._minipos_timer:
          self._minipos_timer.delete()

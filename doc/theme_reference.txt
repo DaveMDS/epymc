@@ -177,12 +177,17 @@
       "minipos.length" -> edje TEXT
 
    * Signals received from the application:
+      "minipos,play,set" "emc"
+      "minipos,pause,set" "emc"
       "controls,show" "emc"
       "controls,hide" "emc"
       "minipos,show" "emc"
       "minipos,hide" "emc"
-      "minipos,play,set" "emc"
-      "minipos,pause,set" "emc"
+     Or, in OMX-Player mode:
+      "controls,show,no_overlap" "emc"
+      "controls,hide,no_overlap" "emc"
+      "minipos,show,no_overlap" "emc"
+      "minipos,hide,no_overlap" "emc"
 
 
 ### Audio Player ##############################################################

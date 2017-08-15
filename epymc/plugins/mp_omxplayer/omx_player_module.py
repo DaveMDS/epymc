@@ -116,7 +116,7 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
 
       if self._OMP is None:
          from omxplayer import OMXPlayer
-         self._OMP = OMXPlayer(url)
+         self._OMP = OMXPlayer(url, args=['--no-osd', '--no-key'])
       else:
          self._OMP.load(url)
 
@@ -253,7 +253,7 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
 
 
 class EmcVideoPlayer_OMX(mediaplayer.EmcVideoPlayer, EmcPlayerBase_OMX):
-   pass
+   video_player_cannot_be_covered = True
 
 
 class EmcAudioPlayer_OMX(mediaplayer.EmcAudioPlayer, EmcPlayerBase_OMX):

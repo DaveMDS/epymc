@@ -2321,6 +2321,18 @@ collections {
          }
          part { name: "video.swallow"; type: SWALLOW;  /* API */
             description { state: "default" 0.0;
+               rel1.relative: 0.0 0.0;
+               rel2.relative: 1.0 1.0;
+            }
+            // following 2 states are used when the controls are visible for the
+            // OMX player, that is on a higher layer and cannot be covered
+            description { state: "controls_visible" 0.0;
+               rel1.relative: 0.25 0.4;
+               rel2.relative: 0.75 0.9;
+            }
+            description { state: "minipos_visible" 0.0;
+               rel1.relative: 0.0 0.1;
+               rel2.relative: 1.0 0.9;
             }
          }
          part { name: "events.rect"; type: RECT;  /* API */
@@ -2574,6 +2586,27 @@ collections {
             target: "controls.bg";
             target: "controls.poster";
          }
+         program { name: "controls_show_no_overlap";  /* API TODOC */
+            signal: "controls,show,no_overlap"; source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.4;
+            target: "controls.bg";
+            target: "controls.poster";
+         }
+         program {
+            signal: "controls,show,no_overlap"; source: "emc";
+            action: STATE_SET "controls_visible" 0.0;
+            transition: DECELERATE 0.4;
+            target: "video.swallow";
+         }
+         program { name: "controls_hide_no_overlap";  /* API TODOC */
+            signal: "controls,hide,no_overlap"; source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.4;
+            target: "controls.bg";
+            target: "controls.poster";
+            target: "video.swallow";
+         }
          /// minipos
          part { name: "minipos.bg.shadow"; type: IMAGE;
             mouse_events: 0;
@@ -2729,6 +2762,27 @@ collections {
             transition: ACCELERATE 0.3;
             target: "minipos.bg";
             target: "minipos.bg.shadow";
+         }
+         program { name: "minipos_show_no_overlap";  /* API TODOC */
+            signal: "minipos,show,no_overlap"; source: "emc";
+            action: STATE_SET "visible" 0.0;
+            transition: DECELERATE 0.3;
+            target: "minipos.bg";
+            target: "minipos.bg.shadow";
+         }
+         program {
+            signal: "minipos,show,no_overlap"; source: "emc";
+            action: STATE_SET "minipos_visible" 0.0;
+            transition: DECELERATE 0.3;
+            target: "video.swallow";
+         }
+         program { name: "minipos_hide_no_overlap";  /* API TODOC */
+            signal: "minipos,hide,no_overlap"; source: "emc";
+            action: STATE_SET "default" 0.0;
+            transition: ACCELERATE 0.3;
+            target: "minipos.bg";
+            target: "minipos.bg.shadow";
+            target: "video.swallow";
          }
          program { name: "minipos_set_play";  /* API */
             signal: "minipos,play,set"; source: "emc";

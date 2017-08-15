@@ -2586,7 +2586,7 @@ collections {
             target: "controls.bg";
             target: "controls.poster";
          }
-         program { name: "controls_show_no_overlap";  /* API TODOC */
+         program { name: "controls_show_no_overlap";  /* API */
             signal: "controls,show,no_overlap"; source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.4;
@@ -2599,7 +2599,7 @@ collections {
             transition: DECELERATE 0.4;
             target: "video.swallow";
          }
-         program { name: "controls_hide_no_overlap";  /* API TODOC */
+         program { name: "controls_hide_no_overlap";  /* API */
             signal: "controls,hide,no_overlap"; source: "emc";
             action: STATE_SET "default" 0.0;
             transition: ACCELERATE 0.4;
@@ -2763,7 +2763,7 @@ collections {
             target: "minipos.bg";
             target: "minipos.bg.shadow";
          }
-         program { name: "minipos_show_no_overlap";  /* API TODOC */
+         program { name: "minipos_show_no_overlap";  /* API */
             signal: "minipos,show,no_overlap"; source: "emc";
             action: STATE_SET "visible" 0.0;
             transition: DECELERATE 0.3;
@@ -2776,7 +2776,7 @@ collections {
             transition: DECELERATE 0.3;
             target: "video.swallow";
          }
-         program { name: "minipos_hide_no_overlap";  /* API TODOC */
+         program { name: "minipos_hide_no_overlap";  /* API */
             signal: "minipos,hide,no_overlap"; source: "emc";
             action: STATE_SET "default" 0.0;
             transition: ACCELERATE 0.3;

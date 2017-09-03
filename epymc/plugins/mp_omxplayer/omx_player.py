@@ -39,30 +39,28 @@ def DBG(msg):
 class OMXPlayer(object):
    """ Wrapper around the omxplayer binary
 
-   Run an omxplayer instance in an external process and speak with it using
+   Run an omxplayer instance in an external process and communicate using
    the MPRIS DBus interface on the SessionBus.
+
+   HIGHLY inspired by github.com/willprice/python-omxplayer-wrapper
 
    """
    DBUS_NAME = 'org.mpris.MediaPlayer2.omxplayer'
    ROOT_IFACE = 'org.mpris.MediaPlayer2'
    PLAYER_IFACE = 'org.mpris.MediaPlayer2.Player'
    PROPS_IFACE = 'org.freedesktop.DBus.Properties'
-   
 
    def __init__(self, url, args=[]):
       DBG('__init__')
       self._exe = None
-      self._conn = None
       self._root_iface = None
       self._player_iface = None
       self._props_iface = None
-      self._process_spawn(url, args)
-
       self._cached_commands = []
 
+      self._process_spawn(url, args)
+
    def _process_spawn(self, url, args):
-      # args.append('--dbus_name')
-      # args.append(self.DBUS_NAME)
       cmd = 'omxplayer.bin %s "%s"' % (' '.join(args), url)
       DBG('cmd: %s' % cmd)
 
@@ -72,9 +70,8 @@ class OMXPlayer(object):
 
       def del_cb(exe, event):
          DBG("omx process died")
-         # self._exe.delete()    ?????
          self._exe = None
-         self._conn = None
+         self._root_iface = self._player_iface = self._props_iface = None
          self._cached_commands = []
 
       self._exe = ecore.Exe(cmd, ecore.ECORE_EXE_TERM_WITH_PARENT)
@@ -84,46 +81,50 @@ class OMXPlayer(object):
    def _dbus_connect_try(self):
       DBG("connect try")
 
-      # get the omxplayer private bus address from the file created in tmp
-      # fname = '/tmp/omxplayerdbus.%s' % utils.user_name()
-      # if not os.path.exists(fname) or not os.path.getsize(fname):
-         # ecore.Timer(0.2, self._dbus_connect_try)
-         # return ecore.ECORE_CALLBACK_CANCEL
-      # bus_address = open(fname).read().strip()
-      # DBG('dbus address: %s' % bus_address)
-
-      # connect to the bus
+      """
+      # conect the omxplayer private bus address from the file created in tmp
+      fname = '/tmp/omxplayerdbus.%s' % utils.user_name()
+      if not os.path.exists(fname) or not os.path.getsize(fname):
+         return ecore.ECORE_CALLBACK_RENEW  # retry on next timer tick
+      bus_address = open(fname).read().strip()
+      DBG('dbus address: %s' % bus_address)
       try:
-         # self._conn = DBusConnection(bus_address, mainloop=DBusEcoreMainLoop())
-         self._conn = dbus.SessionBus(mainloop=DBusEcoreMainLoop())
-      except:
-         print("CONNECTION ERROR")
-         ecore.Timer(0.2, self._dbus_connect_try)
-         return ecore.ECORE_CALLBACK_CANCEL
+         bus = DBusConnection(bus_address, mainloop=DBusEcoreMainLoop())
+         obj = bus.get_object(self.DBUS_NAME, '/org/mpris/MediaPlayer2',
+                              introspect=False)
+      except dbus.exceptions.DBusException as e:
+         DBG("DBUS CONNECTION ERROR: %s" % e)
+         return ecore.ECORE_CALLBACK_RENEW  # retry on next timer tick
+      """
+
+      # connect to the standard Session bus
+      try:
+         bus = dbus.SessionBus(mainloop=DBusEcoreMainLoop())
+         obj = bus.get_object(self.DBUS_NAME, '/org/mpris/MediaPlayer2',
+                              introspect=False)
+      except dbus.exceptions.DBusException as e:
+         DBG("DBUS CONNECTION ERROR: %s" % e)
+         return ecore.ECORE_CALLBACK_RENEW  # retry on next timer tick
 
       # get the 3 usefull interfaces
-      obj = self._conn.get_object(self.DBUS_NAME, '/org/mpris/MediaPlayer2',
-                                  introspect=False)
       self._root_iface = dbus.Interface(obj, self.ROOT_IFACE)
       self._player_iface = dbus.Interface(obj, self.PLAYER_IFACE)
       self._props_iface = dbus.Interface(obj, self.PROPS_IFACE)
-      # DBG("connection ok, dbus: %s" % bus_address)
       DBG("connection ok")
 
       # execute all commands received while starting up (only valid for setters)
       for fn, args, kargs in self._cached_commands:
          fn(self, *args, **kargs)
 
-      return ecore.ECORE_CALLBACK_CANCEL
+      return ecore.ECORE_CALLBACK_CANCEL  # stop the timer
 
    def _check_player_is_active(f):
       def wrapper(self, *args, **kargs):
-         if self._conn and self._exe and not self._exe.is_deleted():
+         if self._root_iface and self._exe and not self._exe.is_deleted():
             return f(self, *args, **kargs)
          else:
-            DBG('WARNING: player not active, caching command for later')
+            DBG('WARNING: player not active, caching command: %s' % f.__name__)
             self._cached_commands.append((f, args, kargs))
-            
       return wrapper
 
 

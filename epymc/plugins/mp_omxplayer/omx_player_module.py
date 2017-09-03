@@ -110,7 +110,7 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
    def url(self, url):
       DBG("URL SET: %s" % url)
       self._url = url
-      self._OMP = OMXPlayer(url, ['--no-osd', '--no-key'],
+      self._OMP = OMXPlayer(url, ['--no-osd', '--no-key', '--adev both'],
                             self._playback_started_cb,
                             self._playback_finished_cb)
 

@@ -43,9 +43,9 @@ def DBG(msg):
 class OmxPlayerModule(EmcModule):
    name = 'mp_omxplayer'
    label = _('Media Player - OMX external player')
-   icon = 'icon/remote'
+   icon = 'icon/rpi'
    info = _('Use an external omx_player process to play videos. Only usable '
-            'on RaspberryPI, make sure you have omxplayer installed.')
+            'on RaspberryPI. Make sure you have omxplayer installed.')
 
    def __init__(self):
       DBG('Init module')

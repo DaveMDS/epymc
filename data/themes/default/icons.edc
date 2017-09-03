@@ -102,6 +102,7 @@ ICON("tv")
 ICON("calib")
 ICON("olvideo")
 ICON("watchdog")
+ICON("rpi")
 
 
 #undef ICON

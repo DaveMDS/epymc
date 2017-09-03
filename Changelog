@@ -1,7 +1,7 @@
 
 
 ===============================================================================
-Changes in version 1.3.0
+Changes in version 1.3.0  (TO BE RELEASED)
 ===============================================================================
 
 New features:
@@ -9,6 +9,8 @@ New features:
  * Storage device support, using udev and udisks2
  * Full DVD playback support, including DVD menu navigation
  * Audio CD playback support, including MusicBrainz album info fetching
+ * RaspberryPI: use an external omx_player instance to play videos,
+                this enable FULL-HD playback on RPI !!
  * MusicBrainz integration
  * Movies: tagging ability. You can now organize your library using custom tags
  * Movies: you can now choose favorite actors/directors for faster browsing

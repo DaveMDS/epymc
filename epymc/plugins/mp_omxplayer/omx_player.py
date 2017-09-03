@@ -69,6 +69,7 @@ class OMXPlayer(object):
       self._cached_commands = LastUpdatedOrderedDict()
       self._playback_started_cb = playback_started_cb
       self._playback_finished_cb = playback_finished_cb
+      self._explicit_quitted = False
 
       self._process_spawn(url, omx_args)
 
@@ -85,7 +86,8 @@ class OMXPlayer(object):
          self._exe = None
          self._root_iface = self._player_iface = self._props_iface = None
          self._cached_commands.clear()
-         self._playback_finished_cb(None)
+         if not self._explicit_quitted:
+            self._playback_finished_cb(None)
 
       self._exe = ecore.Exe(cmd, ecore.ECORE_EXE_TERM_WITH_PARENT)
       self._exe.on_add_event_add(add_cb)
@@ -149,7 +151,7 @@ class OMXPlayer(object):
                return fn(self, *args, **kargs)
             except dbus.exceptions.DBusException:
                pass  # can fail while omx_player is shutting down
-         else:
+         elif self._exe:
             DBG('WARNING: player not active, caching command: %s' % fn.__name__)
             self._cached_commands[fn] = (args, kargs)
       return wrapper
@@ -159,6 +161,7 @@ class OMXPlayer(object):
 
    def quit(self):
       if self._exe:
+         self._explicit_quitted = True
          self._exe.terminate()
 
    @_check_player_is_active

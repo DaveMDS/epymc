@@ -163,7 +163,7 @@ class Playlist(utils.Singleton):
             self.cur_idx = 0
          else:
             self.cur_idx = len(self.items) - 1
-            if _player.position_percent > 0.99:
+            if _player and _player.position_percent > 0.99:
                _player.pause()
             return
 

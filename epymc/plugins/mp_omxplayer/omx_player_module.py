@@ -71,16 +71,18 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
       self._OMP = None
       self._OMP_sizer_rect = None
       self._OMP_muted = False
-      DBG("CUSTOM OMX PLAYER")
+      DBG("CUSTOM OMX PLAYER %s" % self.__class__.__name__)
 
       # invisible rect to track the wanted position of the player and
-      # mimic the position in the omx_player process
+      # mimic the position in the omx_player process (not for Audio only)
       def _sizer_cb(obj):
          x, y, w, h = obj.geometry
          self._OMP.set_video_pos(x, y, x + w, y + h)
-      r = evas.Rectangle(gui.layout.evas, color=(0, 0, 0, 0))
-      r.on_resize_add(_sizer_cb)
-      self._OMP_sizer_rect = r
+
+      if self.__class__.__name__.startswith('EmcVideoPlayer'):
+         r = evas.Rectangle(gui.layout.evas, color=(0, 0, 0, 0))
+         r.on_resize_add(_sizer_cb)
+         self._OMP_sizer_rect = r
 
       # listen to input and generic events (cb implemented in the base class)
       input_events.listener_add(self.__class__.__name__ + 'Base_OMX',
@@ -94,7 +96,7 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
       events.listener_del(self.__class__.__name__ + 'Base_OMX')
       self._OMP.quit()
       self._OMP = None
-      if self._OMP_sizer_rect is None:
+      if self._OMP_sizer_rect is not None:
          self._OMP_sizer_rect.delete()
          self._OMP_sizer_rect = None
 
@@ -109,6 +111,10 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
    @url.setter
    def url(self, url):
       DBG("URL SET: %s" % url)
+      if self._OMP is not None:
+         self._OMP.quit()
+         self._OMP = None
+
       self._url = url
       self._OMP = OMXPlayer(url, ['--no-osd', '--no-key', '--adev both'],
                             self._playback_started_cb,
@@ -116,9 +122,9 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
 
       self.volume = mediaplayer.volume_get()
       self.muted = mediaplayer.volume_mute_get()
-      self._OMP.set_aspect_mode("letterbox")
-      # self._OMP.set_alpha(128)
-      self._OMP.pause()
+      if self.__class__.__name__.startswith('EmcVideoPlayer'):
+         self._OMP.set_aspect_mode('letterbox')
+         # self._OMP.set_alpha(128)
       self._OMP.play()
 
    @property

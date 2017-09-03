@@ -22,6 +22,7 @@ from __future__ import absolute_import, print_function
 
 import os
 import dbus
+from collections import OrderedDict
 from dbus import Int32, Int64, String, ObjectPath
 from dbus.connection import Connection as DBusConnection
 
@@ -34,6 +35,14 @@ from epymc import utils
 def DBG(msg):
    print('OMX_PLAYER: %s' % msg)
    # pass
+
+
+class LastUpdatedOrderedDict(OrderedDict):
+   """ Store items in the order the keys were last added """
+   def __setitem__(self, key, value):
+      if key in self:
+         del self[key]
+      OrderedDict.__setitem__(self, key, value)
 
 
 class OMXPlayer(object):
@@ -56,7 +65,7 @@ class OMXPlayer(object):
       self._root_iface = None
       self._player_iface = None
       self._props_iface = None
-      self._cached_commands = []
+      self._cached_commands = LastUpdatedOrderedDict()
 
       self._process_spawn(url, args)
 
@@ -72,7 +81,7 @@ class OMXPlayer(object):
          DBG("omx process died")
          self._exe = None
          self._root_iface = self._player_iface = self._props_iface = None
-         self._cached_commands = []
+         self._cached_commands.clear()
 
       self._exe = ecore.Exe(cmd, ecore.ECORE_EXE_TERM_WITH_PARENT)
       self._exe.on_add_event_add(add_cb)
@@ -113,18 +122,23 @@ class OMXPlayer(object):
       DBG("connection ok")
 
       # execute all commands received while starting up (only valid for setters)
-      for fn, args, kargs in self._cached_commands:
+      while self._cached_commands:
+         fn, (args, kargs) = self._cached_commands.popitem(last=False)
+         DBG("running cached command: %s" % fn.__name__)
          fn(self, *args, **kargs)
 
       return ecore.ECORE_CALLBACK_CANCEL  # stop the timer
 
-   def _check_player_is_active(f):
+   def _check_player_is_active(fn):
+      """ Decorator that execute the decorated function if the dbus connection
+          is alive, otherwise the function call is cached to run when the
+          connection will be available """
       def wrapper(self, *args, **kargs):
          if self._root_iface and self._exe and not self._exe.is_deleted():
-            return f(self, *args, **kargs)
+            return fn(self, *args, **kargs)
          else:
-            DBG('WARNING: player not active, caching command: %s' % f.__name__)
-            self._cached_commands.append((f, args, kargs))
+            DBG('WARNING: player not active, caching command: %s' % fn.__name__)
+            self._cached_commands[fn] = (args, kargs)
       return wrapper
 
 

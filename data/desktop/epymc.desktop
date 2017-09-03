@@ -28,7 +28,7 @@ Name=Tv Shows
 Icon=epymc-tv
 
 [Desktop Action OnlineChannels]
-Exec=epymc --activity onlinechannels
+Exec=epymc --activity videochannels
 Name=Online Channels
 Icon=epymc-olvideos
 

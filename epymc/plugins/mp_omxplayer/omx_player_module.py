@@ -82,9 +82,6 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
       r.on_resize_add(_sizer_cb)
       self._OMP_sizer_rect = r
 
-      # self._emotion.callback_add('playback_started', self._playback_started_cb)
-      # self._emotion.callback_add('playback_finished', self._playback_finished_cb)
-
       # listen to input and generic events (cb implemented in the base class)
       input_events.listener_add(self.__class__.__name__ + 'Base_OMX',
                                 self._base_input_events_cb)
@@ -113,8 +110,10 @@ class EmcPlayerBase_OMX(EmcPlayerBase):
    def url(self, url):
       DBG("URL SET: %s" % url)
       self._url = url
-      self._OMP = OMXPlayer(url, args=['--no-osd', '--no-key'])
-      
+      self._OMP = OMXPlayer(url, ['--no-osd', '--no-key'],
+                            self._playback_started_cb,
+                            self._playback_finished_cb)
+
       self.volume = mediaplayer.volume_get()
       self.muted = mediaplayer.volume_mute_get()
       self._OMP.set_aspect_mode("letterbox")

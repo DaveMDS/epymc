@@ -59,18 +59,21 @@ class OMXPlayer(object):
    PLAYER_IFACE = 'org.mpris.MediaPlayer2.Player'
    PROPS_IFACE = 'org.freedesktop.DBus.Properties'
 
-   def __init__(self, url, args=[]):
+   def __init__(self, url, omx_args=[],
+                playback_started_cb=None, playback_finished_cb=None):
       DBG('__init__')
       self._exe = None
       self._root_iface = None
       self._player_iface = None
       self._props_iface = None
       self._cached_commands = LastUpdatedOrderedDict()
+      self._playback_started_cb = playback_started_cb
+      self._playback_finished_cb = playback_finished_cb
 
-      self._process_spawn(url, args)
+      self._process_spawn(url, omx_args)
 
-   def _process_spawn(self, url, args):
-      cmd = 'omxplayer.bin %s "%s"' % (' '.join(args), url)
+   def _process_spawn(self, url, omx_args):
+      cmd = 'omxplayer.bin %s "%s"' % (' '.join(omx_args), url)
       DBG('cmd: %s' % cmd)
 
       def add_cb(exe, event):
@@ -82,6 +85,7 @@ class OMXPlayer(object):
          self._exe = None
          self._root_iface = self._player_iface = self._props_iface = None
          self._cached_commands.clear()
+         self._playback_finished_cb(None)
 
       self._exe = ecore.Exe(cmd, ecore.ECORE_EXE_TERM_WITH_PARENT)
       self._exe.on_add_event_add(add_cb)
@@ -89,6 +93,9 @@ class OMXPlayer(object):
 
    def _dbus_connect_try(self):
       DBG("connect try")
+
+      if self._exe is None:  # process already died ?
+         return ecore.ECORE_CALLBACK_CANCEL
 
       """
       # conect the omxplayer private bus address from the file created in tmp
@@ -127,6 +134,9 @@ class OMXPlayer(object):
          DBG("running cached command: %s" % fn.__name__)
          fn(self, *args, **kargs)
 
+      # notify epymc
+      self._playback_started_cb(None)
+
       return ecore.ECORE_CALLBACK_CANCEL  # stop the timer
 
    def _check_player_is_active(fn):
@@ -135,7 +145,10 @@ class OMXPlayer(object):
           connection will be available """
       def wrapper(self, *args, **kargs):
          if self._root_iface and self._exe and not self._exe.is_deleted():
-            return fn(self, *args, **kargs)
+            try:
+               return fn(self, *args, **kargs)
+            except dbus.exceptions.DBusException:
+               pass  # can fail while omx_player is shutting down
          else:
             DBG('WARNING: player not active, caching command: %s' % fn.__name__)
             self._cached_commands[fn] = (args, kargs)

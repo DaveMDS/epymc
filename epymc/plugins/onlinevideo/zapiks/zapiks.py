@@ -43,7 +43,7 @@ if STATE == ST_HOME:
    b = base
    u = '/popular_1.php'
    d = os.path.dirname(__file__)
-   item_add(ST_VIDEO_LIST, 'Brand New Videos', b+'p_', action=ACT_FOLDER)
+   item_add(ST_VIDEO_LIST, 'Brand New Videos', b+'p_1', action=ACT_FOLDER)
    item_add(ST_VIDEO_LIST, 'Surf', b+'surf_'+u, poster=os.path.join(d,'surf.png'), action=ACT_FOLDER)
    item_add(ST_VIDEO_LIST, 'Snowboard', b+'snowboard_'+u, poster=os.path.join(d,'snowboard.png'), action=ACT_FOLDER)
    item_add(ST_VIDEO_LIST, 'Mountain Bike', b+'mountainbike_'+u, poster=os.path.join(d,'vtt.png'), action=ACT_FOLDER)
@@ -61,7 +61,7 @@ elif STATE == ST_VIDEO_LIST:
    # the zapiks page have an erroneous auto closing div tag
    # so wee need this hack to let bs4 correctly parse the html
    html = fetch_url(URL)
-   soup = BeautifulSoup(html.replace('/>', '>'))
+   soup = BeautifulSoup(html.replace('/>', '>'), 'lxml')
 
    videos = soup.findAll('a', class_='teaser-video-content')
    for video in videos:
@@ -74,9 +74,9 @@ elif STATE == ST_VIDEO_LIST:
          user = video.find('span', class_='teaser-user').string.strip().replace('from ', '')
          uploaded = video.find('span', class_='teaser-date')['datetime']
          views = list(video.find('span', class_='teaser-counter').strings)[0]
-         views = views.strip().replace('Views', '').replace(' ', '')
+         views = int(views.strip().replace('Views', '').replace(' ', ''))
          try:
-            likes = video.find('span', class_='teaser-counter-likes').string.strip()
+            likes = int(video.find('span', class_='teaser-counter-likes').string.strip())
          except:
             likes = 0
          info = '<title>{}</title><br>' \

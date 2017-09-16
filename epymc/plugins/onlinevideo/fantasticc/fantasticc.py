@@ -21,6 +21,7 @@
 from __future__ import absolute_import, print_function, unicode_literals, division
 
 import re
+import json
 
 from epymc.extapi.onlinevideo import api_version, state_get, \
    fetch_url, play_url, item_add, call_ydl, report_error, \
@@ -104,14 +105,14 @@ elif STATE == ST_COLLECTION_LIST:
    soup = fetch_url(URL, parser='bs4')
 
    for div in soup.findAll('div', class_='submitted-videos'):
-      num_vids = div.find('div', class_='counter-right').string
-      num_vids = re.compile('([0-9]+)').search(num_vids).group(1)
-      if int(num_vids) < 1:
-         continue
+      try:
+         num_vids = div.find('span', class_='videosListNumber').find('b').string
+      except:
+         num_vids = 1
       title = div.find('a', class_='clnk').string
       title = '%s (%s vids)' % (title, num_vids)
       thumb = div.find('div', class_='item').find('a')['style']
-      thumb = thumb.split('(', 1)[1].split(')')[0]
+      thumb = thumb.split("('", 1)[1].split("')", 1)[0]
       url = url_base + div.find('a', class_='clnk')['href']
       item_add(ST_COLLECTION_VIDEO_LIST, title, url, poster=thumb)
 
@@ -125,20 +126,18 @@ elif STATE == ST_COLLECTION_LIST:
 
 # handle a page with the videos of a given collection
 elif STATE == ST_COLLECTION_VIDEO_LIST:
-   soup = fetch_url(URL, parser='bs4')
+   html = fetch_url(URL)
 
-   for div in soup.find_all('div', class_='submitted-video-item'):
-      title = div.find('div', class_='submitted-video__name').string
-      thumb = div.img['src']
-      url = url_base + div.find('a', class_='submitted-video-open')['href']
+   start = html.find('videosJSON = [')
+   end = html.find('}];', start)
+   json_str = html[start+13:end+2]
+   data = json.loads(json_str)
+
+   for vid in data:
+      title = vid['title']
+      url = url_base + vid['url']
+      thumb = vid['rawThumb']
       item_add(ST_PLAY, title, url, poster=thumb)
-
-   # more items... (TODO this do not work)
-   # try:
-      # url = 'http://fantasti.cc/' + soup.find('a', text='next >>')['href']
-      # item_add(ST_COLLECTION_VIDEO_LIST, 'More items...', url, action=ACT_MORE)
-   # except:
-      # pass
 
 
 # 4 handle the first search query (only page 1)
@@ -146,23 +145,15 @@ elif STATE == ST_COLLECTION_VIDEO_LIST:
 elif STATE in (ST_SEARCH, ST_SEARCH_RES):
    if STATE == ST_SEARCH:
       URL = URL.replace(' ', '+')
-      URL = 'http://fantasti.cc/search/' + URL + '/videos/'
+      URL = 'http://fantasti.cc/search/' + URL + '/tube/'
 
    soup = fetch_url(URL, parser='bs4')
 
-   for div in soup.findAll('div', class_='video_thumb'):
-      title = div.find('h2', class_='video_h2').string
-      url = div.find('a', class_='xxx')['href']
-      thumb = div.find('img', class_='img_100')['src']
-
-      duration = div.find('span', class_='v_lenght').string
-      from_ = div.find('span', class_='video_tube').string
-      info = '<title>%s</title><br>' \
-             '<name>Duration: </name>%s<br>' \
-             '<name>Source: </name>%s' % \
-              (title, duration, from_)
-
-      item_add(ST_PLAY, title, 'http://fantasti.cc' + url, poster=thumb, info=info)
+   for div in soup.findAll('div', class_='searchVideo'):
+      title = div.find('span').string
+      url = div.find('a')['href']
+      thumb = div.find('img')['src']
+      item_add(ST_PLAY, title, 'http://fantasti.cc' + url, poster=thumb)
 
    # more items...
    try:
@@ -178,8 +169,17 @@ elif STATE == ST_CATEGORIES_LIST:
 
    for div in soup.findAll('div', class_='content-block-category'):
       name = div.find('span', class_='category-name').string
-      url = url_base + div.find('a')['href'] + 'videos/'
-      item_add(ST_SEARCH_RES, name, url) 
+      url = url_base + div.find('a')['href']
+      url = url.replace('category', 'search') + 'tube/'
+      try:
+         thumb = div.find('div', class_='thumb')['data-src']
+      except KeyError:
+         try:
+            thumb = div.find('div', class_='thumb')['style']
+            thumb = thumb.split("('", 1)[1].split("')")[0]
+         except:
+            thumb = None
+      item_add(ST_SEARCH_RES, name, url, icon=thumb, poster=thumb) 
 
 
 # read a page with a single video and play the video
@@ -187,6 +187,8 @@ elif STATE == ST_PLAY:
    soup = fetch_url(URL, parser='bs4')
    link = soup.find('div', class_='video-wrap')['data-origin-source']
    url = call_ydl(link)
+   if not url:
+      url = call_ydl(URL)
    if url:
       play_url(url)
    else:

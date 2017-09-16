@@ -1078,7 +1078,7 @@ class EmcImage(elm.Image):
             self.file_set(dest)
          else:
             try:
-               utils.download_url_async(url, dest,
+               utils.download_url_async(url, dest, urlencode=False,
                                         complete_cb=self._download_complete_cb)
                self.file_set(theme_file, 'emc/image/downloading')
             except:

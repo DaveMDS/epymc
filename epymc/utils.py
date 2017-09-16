@@ -29,8 +29,6 @@ except:
 
 from efl import ecore
 from efl import ecore_con
-from efl.ecore import FileDownload, Exe, \
-   ECORE_EXE_PIPE_READ, ECORE_EXE_PIPE_READ_LINE_BUFFERED
 
 
 def DBG(msg):
@@ -505,8 +503,9 @@ def download_url_async(url, dest='tmp', min_size=0,
    dwl_data = (complete_cb, progress_cb, min_size)
 
    # start the download
-   return FileDownload(encoded, dest, _cb_download_complete,
-                  _cb_download_progress, dwl_data=dwl_data, *args, **kargs)
+   return ecore.FileDownload(encoded, dest,
+                             _cb_download_complete, _cb_download_progress,
+                             dwl_data=dwl_data, *args, **kargs)
 
 def download_abort(dwl_handler):
    ecore.file_download_abort(dwl_handler)
@@ -520,6 +519,7 @@ def http_error_code_to_str(code):
       return BaseHTTPServer.BaseHTTPRequestHandler.responses[code][0]
    except:
       return _('Unknown')
+
 
 class Singleton(object):
    __single = None
@@ -547,10 +547,13 @@ class EmcExec(object):
       self.grab_output = grab_output
       self.outbuffer = ''
       if grab_output:
-         self.exe = Exe(cmd, ECORE_EXE_PIPE_READ | ECORE_EXE_PIPE_READ_LINE_BUFFERED)
+         self.exe = ecore.Exe(cmd,
+                              ecore.ECORE_EXE_PIPE_READ |
+                              ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED |
+                              ecore.ECORE_EXE_TERM_WITH_PARENT)
          self.exe.on_data_event_add(self.data_cb)
       else:
-         self.exe = ecore.Exe(cmd)
+         self.exe = ecore.Exe(cmd, ecore.ECORE_EXE_TERM_WITH_PARENT)
       if done_cb:
          self.exe.on_del_event_add(self.del_cb)
 

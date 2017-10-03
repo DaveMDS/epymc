@@ -35,6 +35,7 @@ Changes:
 
  * Now require efl 1.20 (to fix the standalone mode)
  * Better and more flexible EmcMenu implementation
+ * Check for runtime dependencies on install (--no-runtime-deps-check to disable)
 
 
 Bug fixed:

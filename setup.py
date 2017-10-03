@@ -23,19 +23,12 @@ from distutils.core import setup, Command
 from distutils.log import warn, info, error
 from distutils.dir_util import remove_tree, mkpath
 from distutils.file_util import copy_file
-from distutils.command.install_lib import install_lib
 from distutils.command.build import build
+from distutils.command.install import install
+from distutils.command.install_lib import install_lib
 from distutils.dep_util import newer, newer_group
 from distutils.version import LooseVersion
 from epymc import __version__ as emc_version
-from efl import __version__ as efl_version
-
-
-MIN_EFL = '1.20.0'
-if LooseVersion(efl_version) < MIN_EFL:
-   print('Your python-efl version is too old! Found: ' + efl_version)
-   print('You need at least version ' + MIN_EFL)
-   exit(1)
 
 
 class build_themes(Command):
@@ -198,6 +191,79 @@ class Uninstall(Command):
                 self.remove_entry(entry)
 
 
+class check_runtime_deps(Command):
+   description = 'Search for all needed runtime dependencies (and abort if not found)'
+   user_options = []
+
+   def initialize_options(self):
+      pass
+
+   def finalize_options(self):
+      pass
+
+   def check_failed(self, msg):
+      raise SystemExit(
+         "error: runtime dependency not found!" \
+         "\n\n" + msg + "\n\n" \
+         "NOTE: this dependency is not needed for building, but " \
+         "is mandatory at runtime.\n\n" \
+         "You can skip this test for the build/install stages using: \n"
+         "setup.py install --no-runtime-deps-check\n")
+
+   def run(self):
+      import importlib
+
+      # checking for python
+      minv = (3,4,0)
+      if sys.version_info < minv:
+         py_ver = sys.version_info
+         py_ver = "%s.%s.%s" % (py_ver[0], py_ver[1], py_ver[2])
+         msg = "This python version is too old. " \
+               "Found: %s  (need >= %d.%d.%d)" % (py_ver, *minv)
+         self.check_failed(msg)
+
+      # checking for python-efl
+      minv = '1.20.0'
+      try:
+         from efl import __version__ as efl_version
+      except ImportError:
+         self.check_failed("Cannot find python-efl on this system.")
+
+      if LooseVersion(efl_version) < minv:
+         msg = "Your python-efl version is too old. " \
+               "Found: %s  (need >= %s)" % (efl_version, minv)
+         self.check_failed(msg)
+
+      # checking for disc id (or libdiscid)
+      try:
+         from libdiscid.compat import discid
+      except ImportError:
+         try:
+            import discid
+         except ImportError:
+            msg = "Cannot find DiscID on this system. " \
+                  "You must install the package: python-discid or python-libdiscid"
+            self.check_failed(msg)
+
+      # checking all other simpler deps
+      deps = [
+         ('DBus', 'dbus', 'python-dbus'),
+         ('PyUdev', 'pyudev', 'python-pyudev'),
+         ('DiscID', 'discid', 'python-discid'),
+         ('Mutagen', 'mutagen', 'python-mutagen'),
+         ('BeautifulSoup', 'bs4', 'python-bs4 or python-beautifulsoup4'),
+         ('LXML', 'lxml', 'python-lxml'),
+         ('PIL', 'PIL', 'python-pillow or python-pil'),
+      ]
+      for name, module, pkg in deps:
+         try:
+            importlib.import_module(module)
+         except ImportError:
+            msg = "Cannot find %s on this system. " \
+                  "You must install the package: %s" % (name, pkg)
+            self.check_failed(msg)
+
+
 class Build(build):
    def run(self):
       self.run_command("build_themes")
@@ -205,7 +271,25 @@ class Build(build):
       build.run(self)
 
 
-class Install(install_lib):
+class Install(install):
+   user_options = install.user_options + [
+                  ('no-runtime-deps-check', None,
+                   'disable the check for runtime dependencies')]
+
+   def initialize_options(self):
+      install.initialize_options(self)
+      self.no_runtime_deps_check = False
+
+   def finalize_options(self):
+      install.finalize_options(self)
+
+   def run(self):
+      if not self.no_runtime_deps_check:
+         self.run_command("check_runtime_deps")
+      install.run(self)
+ 
+
+class InstallLib(install_lib):
    executables = [
       '*/onlinevideo/*/*.py'
    ]
@@ -309,24 +393,14 @@ setup (
       'build_themes': build_themes,
       'build_i18n': build_i18n,
       'build': Build,
-      'install_lib': Install,
+      'install': Install,
+      'install_lib': InstallLib,
       'uninstall': Uninstall,
       'update_po': update_po,
       'check_po': check_po,
+      'check_runtime_deps': check_runtime_deps,
    },
    command_options = {
       'install': {'record': ('setup.py', RECORD_FILE)}
    },
 )
-
-
-# alert if run from python < 3 (lots of translation issue with 2.7)
-if sys.version_info.major == 2:
-   print('')
-   print('##########################################################')
-   print('PYTHON 2.X IS NOT SUPPORTED ANYMORE')
-   print('You are using python2! It is old! EpyMC works much better')
-   print('with py3, even more if you are not using the english texts.')
-   print('YOU MUST SWITCH TO PYTHON 3 !!!')
-   print('##########################################################')
-   print('')

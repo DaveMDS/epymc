@@ -214,12 +214,12 @@ class check_runtime_deps(Command):
       import importlib
 
       # checking for python
-      minv = (3,4,0)
-      if sys.version_info < minv:
-         py_ver = sys.version_info
-         py_ver = "%s.%s.%s" % (py_ver[0], py_ver[1], py_ver[2])
+      min_py_version = (3,4,0)
+      if sys.version_info < min_py_version:
          msg = "This python version is too old. " \
-               "Found: %s  (need >= %d.%d.%d)" % (py_ver, *minv)
+               "Found: %d.%d.%d  (need >= %d.%d.%d)" % (
+               sys.version_info[0], sys.version_info[1], sys.version_info[2],
+               min_py_version[0],   min_py_version[1],   min_py_version[2])
          self.check_failed(msg)
 
       # checking for python-efl

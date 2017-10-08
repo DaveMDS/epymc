@@ -211,6 +211,8 @@ def init():
       ini.set('mediaplayer', 'video_extensions', '')
    if not ini.has_option('mediaplayer', 'audio_extensions'):
       ini.set('mediaplayer', 'audio_extensions', '')
+   if not ini.has_option('mediaplayer', 'volume_adjust_step'):
+      ini.set('mediaplayer', 'volume_adjust_step', '5')
 
    if not ini.has_option('subtitles', 'langs'):
       ini.set('subtitles', 'langs', 'en')
@@ -479,9 +481,11 @@ def volume_mute_toggle():
 ### input events ###
 def input_event_cb(event):
    if event == 'VOLUME_UP':
-      volume_set(_volume + 5)
+      inc = ini.get_int('mediaplayer', 'volume_adjust_step')
+      volume_set(_volume + inc)
    elif event == 'VOLUME_DOWN':
-      volume_set(_volume - 5)
+      inc = ini.get_int('mediaplayer', 'volume_adjust_step')
+      volume_set(_volume - inc)
    elif event == 'VOLUME_MUTE':
       volume_mute_toggle()
    else:

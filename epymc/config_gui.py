@@ -320,11 +320,12 @@ def init():
    _browser = EmcBrowser(_('Configuration'), 'List', 'icon/config')
 
    root_item_add('config://general/', 1, _('General'), 'icon/emc', _general_list)
-   root_item_add('config://modules/', 2, _('Modules'), 'icon/module', _modules_list)
-   root_item_add('config://themes/', 3, _('Themes'), 'icon/theme', _themes_list)
-   root_item_add('config://views/', 4, _('Views'), 'icon/views', _views_list)
-   root_item_add('config://storage/', 5, _('Storage devices'), 'icon/harddisk', _storage_list)
-   root_item_add('config://subtitles/', 6, _('Subtitles'), 'icon/subs', _subtitles_list)
+   root_item_add('config://audio/', 2, _('Audio'), 'icon/music', _audio_list)
+   root_item_add('config://modules/', 3, _('Modules'), 'icon/module', _modules_list)
+   root_item_add('config://themes/', 4, _('Themes'), 'icon/theme', _themes_list)
+   root_item_add('config://views/', 5, _('Views'), 'icon/views', _views_list)
+   root_item_add('config://storage/', 6, _('Storage devices'), 'icon/harddisk', _storage_list)
+   root_item_add('config://subtitles/', 7, _('Subtitles'), 'icon/subs', _subtitles_list)
    root_item_add('config://sysinfo/', 90, _('System info'), 'icon/info', _sys_info)
 
 def shutdown():
@@ -538,6 +539,16 @@ def _vkeyb_layouts_select_cb(obj, dia=None):
 
 def _vkeyb_layouts_close_cb(btn, dia):
    dia.delete()
+
+##############  AUDIO  ########################################################
+
+def _audio_list():
+   _browser.page_add('config://audio/', _('Audio'), None, _audio_populate)
+
+def _audio_populate(browser, url):
+   standard_item_number_add('mediaplayer', 'volume_adjust_step',
+                            _('Volume adjustment step'), 'icon/volume',
+                            fmt='%.0f', udm='%', min=1, max=15, step=1)
 
 ##############  VIEWS  ########################################################
 

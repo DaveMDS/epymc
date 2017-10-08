@@ -17,6 +17,7 @@ New features:
  * Movies: while browsing by actor/director you can now see the person info panel
  * Auto play media url (http/https) passed on command line
  * Auto-scrape youtube-dl links passed on command line (epymc -y any_supported_url)
+ * Configurable volume adjustment step
 
 
 Improvements:

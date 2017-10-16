@@ -18,6 +18,7 @@ New features:
  * Auto play media url (http/https) passed on command line
  * Auto-scrape youtube-dl links passed on command line (epymc -y any_supported_url)
  * Configurable volume adjustment step
+ * Configurable Volume logarithmic adjustment
 
 
 Improvements:

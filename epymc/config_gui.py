@@ -550,6 +550,11 @@ def _audio_populate(browser, url):
                             _('Volume adjustment step'), 'icon/volume',
                             fmt='%.0f', udm='%', min=1, max=15, step=1)
 
+   vals = (_('None'), _('Too low'), _('A bit'), _('Normal'), _('Too much'))
+   standard_item_int_meaning_add('mediaplayer', 'volume_exponent',
+                                _('Volume logarithmic adjustment'),
+                                icon='icon/volume', values=vals)
+
 ##############  VIEWS  ########################################################
 
 def _views_list():

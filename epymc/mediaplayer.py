@@ -212,7 +212,9 @@ def init():
    if not ini.has_option('mediaplayer', 'audio_extensions'):
       ini.set('mediaplayer', 'audio_extensions', '')
    if not ini.has_option('mediaplayer', 'volume_adjust_step'):
-      ini.set('mediaplayer', 'volume_adjust_step', '5')
+      ini.set('mediaplayer', 'volume_adjust_step', '3')
+   if not ini.has_option('mediaplayer', 'volume_exponent'):
+      ini.set('mediaplayer', 'volume_exponent', '2')
 
    if not ini.has_option('subtitles', 'langs'):
       ini.set('subtitles', 'langs', 'en')
@@ -454,16 +456,39 @@ def position_get():
    if _player: return _player.position
 
 def volume_set(vol):
-   """ between 0 and 100 """
+   """ set linear volume. Int, between 0 and 100 """
    global _volume
 
-   _volume = max(0, min(int(vol), 100))
-   ini.set('mediaplayer', 'volume', _volume)
-   gui.volume_set(_volume / 100.0)
-   events.event_emit('VOLUME_CHANGED')
+   vol = max(0, min(int(vol), 100))
+   if vol != _volume:
+      _volume = vol
+      ini.set('mediaplayer', 'volume', _volume)
+      gui.volume_set(_volume / 100.0)
+      events.event_emit('VOLUME_CHANGED')
 
 def volume_get():
+   """ get linear volume, Int, between 0 and 100 """
    return _volume
+
+def volume_adjusted_get():
+   """ logarithmic adjusted volume. Float, between 0.0 and 100.0
+   https://www.dr-lex.be/info-stuff/volumecontrols.html
+   """
+   exp = ini.get_int('mediaplayer', 'volume_exponent')
+   if 1 < exp < 5:
+      adjusted = ((float(_volume) / 100) ** exp) * 100
+   else:
+      adjusted = float(_volume)
+
+   return adjusted
+
+def volume_inc():
+   step = ini.get_int('mediaplayer', 'volume_adjust_step')
+   volume_set(_volume + step)
+
+def volume_dec():
+   step = ini.get_int('mediaplayer', 'volume_adjust_step')
+   volume_set(_volume - step)
 
 def volume_mute_set(mute):
    global _volume_muted
@@ -481,11 +506,9 @@ def volume_mute_toggle():
 ### input events ###
 def input_event_cb(event):
    if event == 'VOLUME_UP':
-      inc = ini.get_int('mediaplayer', 'volume_adjust_step')
-      volume_set(_volume + inc)
+      volume_inc()
    elif event == 'VOLUME_DOWN':
-      inc = ini.get_int('mediaplayer', 'volume_adjust_step')
-      volume_set(_volume - inc)
+      volume_dec()
    elif event == 'VOLUME_MUTE':
       volume_mute_toggle()
    else:
@@ -717,7 +740,7 @@ class EmcPlayerBase(object):
 
    def _base_events_cb(self, event):
       if event == 'VOLUME_CHANGED':
-         self.volume = volume_get()
+         self.volume = volume_adjusted_get()
          self.muted = volume_mute_get()
 
 

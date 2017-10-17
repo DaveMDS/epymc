@@ -663,7 +663,11 @@ def _input_event_cb(event):
 
 def _event_cb(event):
    if event == 'VOLUME_CHANGED':
-      volume_show(hidein = 3)
+      # mediaplayer imported here to avoid recursive imports
+      from epymc import mediaplayer as MP
+      volume_set(MP.volume_get() / 100.0)
+      signal_emit('volume,mute,' + ('on' if MP.volume_mute_get() else 'off'))
+      volume_show(hidein=3)
    elif event == 'KEEP_ALIVE':
       mouse_hide()
 

@@ -466,7 +466,6 @@ def volume_set(vol):
    if vol != _volume:
       _volume = vol
       ini.set('mediaplayer', 'volume', _volume)
-      gui.volume_set(volume_get() / 100.0) # TODO: move in gui.py !!
       events.event_emit('VOLUME_CHANGED')
 
 def volume_get():
@@ -498,7 +497,6 @@ def volume_mute_set(mute):
    global _volume_muted
 
    _volume_muted = bool(mute)
-   gui.signal_emit('volume,mute,' + ('on' if mute else 'off'))
    events.event_emit('VOLUME_CHANGED')
 
 def volume_mute_get():

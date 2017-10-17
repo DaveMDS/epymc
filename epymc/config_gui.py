@@ -332,15 +332,6 @@ def shutdown():
    _browser.delete()
 
 def root_item_add(name, weight, label, icon=None, callback=None):
-   """
-      weight used:
-         1, 2, 3: General, Themes, Modules
-         10, 11: movies, tvshows
-         15: subtitles
-         20: screensaver
-         50, 51, 52, 53: keyboard, lirc, joy, webserver
-         100: screen calibrator
-   """
    # search an item with an higer weight
    pos = 0
    for (_name, _label, _weight, _ic, _cb) in _root_items:
@@ -549,6 +540,9 @@ def _audio_populate(browser, url):
    standard_item_number_add('mediaplayer', 'volume_adjust_step',
                             _('Volume adjustment step'), 'icon/volume',
                             fmt='%.0f', udm='%', min=1, max=15, step=1)
+   standard_item_number_add('mediaplayer', 'volume_maximum',
+                            _('Volume maximum value'), 'icon/volume',
+                            fmt='%.0f', udm='%', min=50, max=200, step=10)
 
    vals = (_('None'), _('Too low'), _('A bit'), _('Normal'), _('Too much'))
    standard_item_int_meaning_add('mediaplayer', 'volume_exponent',

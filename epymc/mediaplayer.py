@@ -47,7 +47,7 @@ video_extensions = ['.avi','.mpg','.mpeg','.mpe','.ogv','.mkv','.divx','.xvid',
                     '.mpeg4','.dv','.rv','.webm','.vid','.h264','.rm']
 audio_extensions = ['.mp3','.ogg','.oga','.flac','.m4a','.wav','.opus']
 
-_volume = 0
+_volume = 0.0  # Linear volume between 0 and MAX (100 by default)
 _volume_muted = False
 _player = None # EmcVideoPlayer or EmcAudioPlayer instance, or None
 _saved_player = None # EmcAudioPlayer while EmcVideoPlayer is active
@@ -215,6 +215,8 @@ def init():
       ini.set('mediaplayer', 'volume_adjust_step', '3')
    if not ini.has_option('mediaplayer', 'volume_exponent'):
       ini.set('mediaplayer', 'volume_exponent', '2')
+   if not ini.has_option('mediaplayer', 'volume_maximum'):
+      ini.set('mediaplayer', 'volume_maximum', '100')
 
    if not ini.has_option('subtitles', 'langs'):
       ini.set('subtitles', 'langs', 'en')
@@ -231,7 +233,7 @@ def init():
    video_extensions += ini.get_string_list('mediaplayer', 'video_extensions')
 
    # restore volume from previous session
-   _volume = ini.get_int('mediaplayer', 'volume')
+   _volume = ini.get_float('mediaplayer', 'volume')
    gui.volume_set(_volume / 100.0)
 
    # simple db to store the count of played files
@@ -456,22 +458,24 @@ def position_get():
    if _player: return _player.position
 
 def volume_set(vol):
-   """ set linear volume. Int, between 0 and 100 """
+   """ set linear volume. Float, always between 0 and 100 """
    global _volume
 
-   vol = max(0, min(int(vol), 100))
+   vol = max(0, min(vol, 100))
+   vol = vol / 100.0 * ini.get_int('mediaplayer', 'volume_maximum')
    if vol != _volume:
       _volume = vol
       ini.set('mediaplayer', 'volume', _volume)
-      gui.volume_set(_volume / 100.0)
+      gui.volume_set(volume_get() / 100.0) # TODO: move in gui.py !!
       events.event_emit('VOLUME_CHANGED')
 
 def volume_get():
-   """ get linear volume, Int, between 0 and 100 """
-   return _volume
+   """ get linear volume. Float, always between 0 and 100 """
+   maximum = ini.get_int('mediaplayer', 'volume_maximum')
+   return _volume / maximum * 100.0
 
 def volume_adjusted_get():
-   """ logarithmic adjusted volume. Float, between 0.0 and 100.0
+   """ logarithmic adjusted volume. Float, between 0.0 and MAX (100 by default)
    https://www.dr-lex.be/info-stuff/volumecontrols.html
    """
    exp = ini.get_int('mediaplayer', 'volume_exponent')
@@ -484,11 +488,11 @@ def volume_adjusted_get():
 
 def volume_inc():
    step = ini.get_int('mediaplayer', 'volume_adjust_step')
-   volume_set(_volume + step)
+   volume_set(volume_get() + step)
 
 def volume_dec():
    step = ini.get_int('mediaplayer', 'volume_adjust_step')
-   volume_set(_volume - step)
+   volume_set(volume_get() - step)
 
 def volume_mute_set(mute):
    global _volume_muted

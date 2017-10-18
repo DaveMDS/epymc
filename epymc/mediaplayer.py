@@ -478,13 +478,15 @@ def volume_adjusted_get():
 
    return adjusted
 
+def volume_step_get():
+   """ volume adjustament step. Int, between 1 and 100 """
+   return ini.get_int('mediaplayer', 'volume_adjust_step')
+
 def volume_inc():
-   step = ini.get_int('mediaplayer', 'volume_adjust_step')
-   volume_set(volume_get() + step)
+   volume_set(volume_get() + volume_step_get())
 
 def volume_dec():
-   step = ini.get_int('mediaplayer', 'volume_adjust_step')
-   volume_set(volume_get() - step)
+   volume_set(volume_get() - volume_step_get())
 
 def volume_mute_set(mute):
    global _volume_muted
@@ -785,7 +787,8 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       self._vol_slider.content_set('end', gui.load_icon('icon/volume'))
       self._vol_slider.callback_changed_add(self._vol_slider_changed_cb)
       self.content_set('vol.slider', self._vol_slider)
-      self._vol_slider.value = volume_get() / 100
+      self._vol_slider.step = volume_step_get() / 100.0
+      self._vol_slider.value = volume_get() / 100.0
 
       ### position slider
       self._pos_slider = EmcSlider(self, indicator_show_on_focus=True)
@@ -962,6 +965,7 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
          self._gl_populate()
 
       elif event == 'VOLUME_CHANGED':
+         self._vol_slider.step = volume_step_get() / 100.0
          self._vol_slider.value = volume_get() / 100.0
 
       elif event == 'PLAYBACK_SEEKED':

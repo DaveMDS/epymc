@@ -177,6 +177,7 @@ def init():
 
    _volume_slider = EmcSlider(layout, name='VolumeSlider',
                               indicator_show=False, focus_allow=False)
+   _volume_slider.step = ini.get_int('mediaplayer', 'volume_adjust_step') / 100.0
    swallow_set('volume.slider', _volume_slider)
    _volume_slider.callback_changed_add(_volume_slider_changed_cb)
 
@@ -678,9 +679,12 @@ def _event_cb(event):
    if event == 'VOLUME_CHANGED':
       # mediaplayer imported here to avoid recursive imports
       from epymc import mediaplayer as MP
+
+      _volume_slider.step = MP.volume_step_get() / 100.0
       volume_set(MP.volume_get() / 100.0)
       signal_emit('volume,mute,' + ('on' if MP.volume_mute_get() else 'off'))
       volume_show(hidein=3)
+
    elif event == 'KEEP_ALIVE':
       mouse_hide()
 

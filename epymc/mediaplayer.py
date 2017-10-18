@@ -234,20 +234,13 @@ def init():
 
    # restore volume from previous session
    _volume = ini.get_float('mediaplayer', 'volume')
-   gui.volume_set(_volume / 100.0)
+   gui.volume_set(volume_get() / 100.0)
 
    # simple db to store the count of played files
    _play_db = EmcDatabase('playcount')
 
    # input events
    input_events.listener_add("mediaplayer", input_event_cb)
-
-   # update volume when mouse drag the volume slider
-   gui._volume_slider.callback_changed_add(lambda s: volume_set(s.value * 100))
-
-   # click the volume icon to toggle mute
-   gui.signal_cb_add('emc,mute,toggle', '',
-                     lambda a,s,d: volume_mute_toggle())
 
 def shutdown():
    global _play_db
@@ -567,7 +560,7 @@ class EmcPlayerBase(object):
       # the command line.
       self._emotion.file_set(url[7:] if url.startswith('file://') else url)
       self._emotion.play = True
-      self._emotion.audio_volume = volume_get() / 100.0
+      self._emotion.audio_volume = volume_adjusted_get() / 100.0
       self._emotion.audio_mute = volume_mute_get()
       if not url.startswith('dvd://'): # spu used in dvdnav
          self._emotion.spu_mute = True

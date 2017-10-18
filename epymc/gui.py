@@ -170,9 +170,22 @@ def init():
    _backdrop_curr = _backdrop_im2
 
    # volume slider
+   def _volume_slider_changed_cb(slider):
+      # mediaplayer imported here to avoid recursive imports
+      from epymc import mediaplayer as MP
+      MP.volume_set(slider.value * 100)
+
    _volume_slider = EmcSlider(layout, name='VolumeSlider',
                               indicator_show=False, focus_allow=False)
    swallow_set('volume.slider', _volume_slider)
+   _volume_slider.callback_changed_add(_volume_slider_changed_cb)
+
+   # click the volume icon to toggle mute
+   def _mute_toggle_signal_cb(a,s,d):
+      # mediaplayer imported here to avoid recursive imports
+      from epymc import mediaplayer as MP
+      MP.volume_mute_toggle()
+   signal_cb_add('emc,mute,toggle', '', _mute_toggle_signal_cb)
 
    # show the main window
    win.show()

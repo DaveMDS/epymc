@@ -27,40 +27,206 @@ import epymc.utils as utils
 
 
 def DBG(*args):
-   # print('THUMBNAILER:', *args)
+   print('THUMBNAILER:', *args)
    pass
 
 def ERR(*args):
-   print('THUMBNAILER:', *args)
+   print('THUMBNAILER ERROR:', *args)
 
 
-class ThumbItem(object):
-   def __init__(self, req_id, url, dst, frame, func, **kargs):
-      self.req_id = req_id
+class EmcThumbItem(object):
+   id_counter = 1
+
+   def __init__(self, url, dst, frame, func, **kargs):
       self.url = url
       self.dst = dst
       self.frame = frame
       self.func = func
       self.kargs = kargs
+      self.req_id = EmcThumbItem.id_counter
+      EmcThumbItem.id_counter += 1
+
+   def __repr__(self):
+      return "<ThumbItem req_id={0.req_id}, url='{0.url}'>".format(self)
+
+   def __eq__(self, other):
+      if isinstance(other, EmcThumbItem):
+         return self.req_id == other.req_id
+      elif isinstance(other, int):
+         return self.req_id == other
+      return False
+
+   def __hash__(self):
+      return self.req_id
+
+
+class EmcThumbWorker_Base(object):
+   """ Thumbnail Worker base class, all workers must be based on this class """
+   can_do_image = False
+   can_do_video = False
+   response_timeout = 15  # TODO make this configurable
+   _id_counter = 1
+
+   def __init__(self, done_cb=None):
+      self._done_cb = done_cb
+      self._item = None
+      self._response_timer = None
+      self._id = EmcThumbWorker_Base._id_counter
+      EmcThumbWorker_Base._id_counter += 1
+
+   @property
+   def id(self):
+      """ only used for debug """
+      return self._id
+
+   @property
+   def is_idle(self):
+      """ True if the worker is not busy and can accept a new request """
+      return self._item is None
+
+   @property
+   def item_in_process(self):
+      """ the item currently being processed, or None if idle """
+      return self._item
+
+   def generate_item(self, item):
+      """ called by the manager to request a new thumb """
+      if self.is_idle:
+         self._item = item
+         if self._response_timer is not None:
+            self._response_timer.reset()
+         else:
+            self._response_timer = ecore.Timer(self.response_timeout,
+                                               self._timeout_cb)
+         return True
+      else:
+         DBG('ERROR, another request already in progress')
+         return False
+
+   def item_completed(self, success):
+      """ called by the workers to notify the manager """
+      if self._response_timer is not None:
+         self._response_timer.delete()
+         self._response_timer = None
+
+      item = self._item
+      self._item = None
+      if callable(self._done_cb):
+         self._done_cb(self, item, success)
+
+   def kill(self):
+      """ called in sub-classes after the timeout occur """
+      raise NotImplementedError("kill() must be implemented in sub-classes")
+
+   def _timeout_cb(self):
+      DBG("RESPONSE TIMEOUT EXPIRED !!!")
+      self.kill()
+      self.item_completed(False)
+      return ecore.ECORE_CALLBACK_CANCEL
+
+
+class EmcThumbWorker_EThumbInASubrocess(EmcThumbWorker_Base):
+   """ EThumb Worker in a slave process (bin/epymc_thumbnailer)  """
+   can_do_image = True
+   can_do_video = True
+
+   def __init__(self, *args):
+      super().__init__(*args)
+      self._exe = None
+      self._starting = False
+
+   def generate_item(self, item):
+      if super().generate_item(item) is False:
+         return False
+
+      if not self._exe:
+         self._slave_process_start()
+         return True
+
+      if not self._starting:
+         self._send_request()
+
+      return True
+
+   def kill(self):
+      if self._exe:
+         self._exe.on_del_event_del(self._slave_died_cb)
+         self._exe.kill()
+         self._exe.delete()
+         self._exe = None
+         self._starting = False
+
+   def _slave_process_start(self):
+      DBG('starting slave')
+      self._starting = True
+      self._exe = ecore.Exe('epymc_thumbnailer "%s"' % utils.in_use_theme_file,
+                            ecore.ECORE_EXE_PIPE_READ |
+                            ecore.ECORE_EXE_PIPE_WRITE |
+                            ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED |
+                            ecore.ECORE_EXE_TERM_WITH_PARENT |
+                            ecore.ECORE_EXE_USE_SH)
+      self._exe.on_add_event_add(self._slave_started_cb)
+      self._exe.on_del_event_add(self._slave_died_cb)
+      self._exe.on_data_event_add(self._slave_stdout_cb)
+
+   def _slave_started_cb(self, exe, event):
+      DBG('slave started succesfully')
+      self._starting = False
+      if self._item is not None:
+         self._send_request()
+
+   def _slave_died_cb(self, exe, event):
+      DBG('slave exited')
+      self._exe = None
+      self._starting = False
+
+   def _slave_stdout_cb(self, exe, event):
+      for line in event.lines:
+         self._parse_response(line)
+
+   def _send_request(self):
+      item = self._item
+      DBG('send request', item.req_id, item.url, item.dst)
+      self._exe.send('GEN|{0.url}|{0.dst}|{0.frame}\n'.format(item))
+
+   def _parse_response(self, msg):
+      if msg == 'OK':
+         success = True
+      else:
+         success = False
+         ERR('error or unknown msg from slave "%s"' % msg)
+
+      self.item_completed(success)
 
 
 class EmcThumbnailer(utils.Singleton):
-   """ Thumbnailer that use epymc_thumbnailer bin in a separate process
+   """ Thumbnailer Workers Manager
 
-   Do not instantiate this class directly,
-   instead use the module level emc_thumbnailer instance.
+   Never instantiate this class directly !!
+
+   Instead use the module level emc_thumbnailer instance.
 
    """
 
+   known_workers = [EmcThumbWorker_EThumbInASubrocess, ]
+   NUM_WORKERS = 3  # TODO make this configurable
+
    def __init__(self):
-      DBG('init')
-      self._slave = None # EcoreExe instance
-      self._slave_starting = False
-      self._id = 0       # incremental requests ids
-      self._item = None  # ThumbItem currently in process (None if slave is ready)
-      self._requests = OrderedDict() # key: req_id  val: ThumbItem instance
+      DBG('manager init')
+      self._workers_pool = []
+      self._queue = OrderedDict() # key: req_id  val: ThumbItem instance
+
+      for w in self.known_workers * self.NUM_WORKERS:
+         self._workers_pool.append(w(self._worker_done_cb))
+
+      print("POOL", self._workers_pool)
 
    ### public api
+   def thumb_path_get(self, url):
+      """ Generate and return the thumbnail path for the given uri """
+      fname = utils.md5(url) + '.jpg'
+      return os.path.join(utils.user_cache_dir, 'thumbs', fname[:2], fname)
+
    def generate(self, url, func, frame=None, **kargs):
       """ Ask the thumbnailer to generate a thumbnail
 
@@ -84,21 +250,23 @@ class EmcThumbnailer(utils.Singleton):
       if os.path.exists(thumb) and os.path.getmtime(thumb) > os.path.getmtime(url):
          return thumb
 
-      # start the slave process if necessary
-      if self._slave is None and not self._slave_starting:
-         self._start_slave()
+      # url is already in queue ?   TODO optimize ? NEED TO CALL 2 DONE CB ?
+      for item in self._queue.values():
+         if item.url == url:
+            return item.req_id
 
-      # generate a new request id + item
-      self._id += 1
-      self._requests[self._id] = ThumbItem(self._id, url, thumb, frame, func, **kargs)
+      # url is already in process ?   TODO optimize ? NEED TO CALL 2 DONE CB ?
+      for worker in self._workers_pool:
+         item = worker.item_in_process
+         if item and item.url == url:
+            return item.req_id
 
-      # TODO url is already in queue ?
+      # generate a new item, put it on queue and process the queue
+      item = EmcThumbItem(url, thumb, frame, func, **kargs)
+      self._queue[item.req_id] = item
+      self._process_queue()
 
-      # process next item in the queue (if not busy)
-      if self._item is None:
-         self._send_next_request()
-
-      return self._id
+      return item.req_id
 
    def cancel_request(self, req_id):
       """ Cancel a previous request.
@@ -107,83 +275,44 @@ class EmcThumbnailer(utils.Singleton):
          req_id (int): the id as returned by generate()
 
       """
-      if self._item is not None and self._item.req_id == req_id:
-         # currently in progress, finish it but do not call the user func
-         self._item.func = None
-         self._item.kargs = None
-         DBG('cancelled request', req_id)
-      else:
-         # or just remove from the queue (if there)
-         try:
-            self._requests.pop(req_id)
-            DBG('cancelled request', req_id)
-         except KeyError:
-            pass
-
-   def thumb_path_get(self, url):
-      """ Generate the path thumb for the give url (internally used) """
-      fname = utils.md5(url) + '.jpg'
-      return os.path.join(utils.user_cache_dir, 'thumbs', fname[:2], fname)
-
-   ### slave communication management
-   def _send_next_request(self):
-      if not self._slave or self._slave_starting:
-         return
-
       try:
-         req_id, item = self._requests.popitem(last=False)
-      except KeyError:
-         return
+         # remove from the waiting queue
+         self._queue.pop(req_id)
+         DBG('cancelled request', req_id)
+      except KeyError: # not in queue, currently generating ?
+         for w in self._workers_pool:
+            if w.item_in_process == req_id:
+               # in progress, finish it but do not call the user func
+               w.item_in_process.func = None
+               w.item_in_process.kargs = None
 
-      DBG('send request', item.req_id, item.url, item.dst)
-      self._slave.send('GEN|%s|%s|%s\n' % (item.url, item.dst, item.frame))
-      self._item = item
+   def _process_queue(self):
+      for worker in self._workers_pool:
+         if worker.is_idle:
+            # do we have an item in the queue to process ?
+            try:
+               item = next(iter(self._queue.values()))  # take the first item
+            except StopIteration:  # no items in queue
+               return
 
-   def _process_slave_msg(self, msg):
-      if msg == 'OK':
-         success = True
-      elif msg == 'ERR':
-         success = False
-      else:
-         ERR('unknown msg from slave "%s"' % msg)
-         return
+            if worker.generate_item(item):
+               # ok, successfully started, remove item from the waiting queue
+               DBG('sent request (to worker {}) {}'.format(worker.id, item))
+               self._queue.pop(item)
 
+   def _worker_done_cb(self, worker, item, success):
+      DBG('WORKER {} DONE {} {}'.format(worker.id, success, item))
       # call user callback
-      item = self._item
-      self._item = None
       if item and callable(item.func):
          item.func(success, item.url, item.dst, **item.kargs)
 
-      # process next item (if available)
-      self._send_next_request()
+      # this should never happend
+      if item.req_id in self._queue:
+         ERR('Completed item still in queue!!')
+         del self._queue[item.req_id]
 
-   ### slave process management
-   def _start_slave(self):
-      DBG('starting slave')
-      self._slave_starting = True
-      exe = ecore.Exe('epymc_thumbnailer "%s"' % utils.in_use_theme_file,
-                      ecore.ECORE_EXE_PIPE_READ |
-                      ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED |
-                      ecore.ECORE_EXE_PIPE_WRITE |
-                      ecore.ECORE_EXE_TERM_WITH_PARENT)
-      exe.on_add_event_add(self._slave_started_cb)
-      exe.on_del_event_add(self._slave_died_cb)
-      exe.on_data_event_add(self._slave_stdout_cb)
-
-   def _slave_started_cb(self, exe, event):
-      DBG('slave started succesfully')
-      self._slave = exe
-      self._slave_starting = False
-      self._send_next_request()
-
-   def _slave_died_cb(self, exe, event):
-      ERR('slave exited')
-      self._slave = None
-      self._slave_starting = False
-
-   def _slave_stdout_cb(self, exe, event):
-      for line in event.lines:
-         self._process_slave_msg(line)
+      # process another item (if available)
+      self._process_queue()
 
 
 emc_thumbnailer = EmcThumbnailer()

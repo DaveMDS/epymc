@@ -446,9 +446,13 @@ def _general_populate(browser, url):
                             _('Frames per second'), 'icon/evas',
                             fmt='%.0f', udm='fps', min=10, max=120, step=10,
                             cb=_change_fps)
-   standard_item_number_add('general', 'max_concurrent_thumb',
+   standard_item_number_add('thumbnailer', 'max_concurrent_thumb',
                             _('Max concurrent thumbnails'), fmt='%.0f',
-                            min=1, max=10, step=1, cb=_change_max_thumbs)
+                            min=1, max=10, step=1, cb=_change_thumbs)
+   standard_item_number_add('thumbnailer', 'max_generation_time',
+                            _('Max thumbnails generation time'), fmt='%.0f',
+                            udm=_('seconds'), min=5, max=60, step=5,
+                            cb=_change_thumbs)
    standard_item_action_add(_('Clear thumbnails cache'), icon='icon/refresh',
                             cb=_clear_thumbnails_cache)
    standard_item_action_add(_('Clear online images cache'), icon='icon/refresh',
@@ -464,7 +468,7 @@ def _change_fps():
 def _change_scale():
    gui.scale_set(ini.get_float('general', 'scale'))
 
-def _change_max_thumbs():
+def _change_thumbs():
    emc_thumbnailer.rebuild_workers_pool()
    
 def _clear_thumbnails_cache():

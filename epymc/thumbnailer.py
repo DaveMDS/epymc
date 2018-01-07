@@ -37,8 +37,9 @@ def ERR(*args):
 
 def init():
    # setup default config values
-   ini.get('general', 'max_concurrent_thumb', default_value=3)
-   
+   ini.add_section('thumbnailer')
+   ini.get('thumbnailer', 'max_concurrent_thumb', default_value=3)
+   ini.get('thumbnailer', 'max_generation_time', default_value=15)
 
 def shutdown():
    pass
@@ -74,14 +75,14 @@ class EmcThumbWorker_Base(object):
    """ Thumbnail Worker base class, all workers must be based on this class """
    can_do_image = False
    can_do_video = False
-   response_timeout = 15  # TODO make this configurable
    _id_counter = 1
 
    def __init__(self, done_cb=None):
+      self._id = EmcThumbWorker_Base._id_counter
       self._done_cb = done_cb
       self._item = None
       self._response_timer = None
-      self._id = EmcThumbWorker_Base._id_counter
+      self._max_gen_time = ini.get_int('thumbnailer', 'max_generation_time')
       EmcThumbWorker_Base._id_counter += 1
 
    @property
@@ -106,7 +107,7 @@ class EmcThumbWorker_Base(object):
          if self._response_timer is not None:
             self._response_timer.reset()
          else:
-            self._response_timer = ecore.Timer(self.response_timeout,
+            self._response_timer = ecore.Timer(self._max_gen_time,
                                                self._timeout_cb)
          return True
       else:
@@ -135,7 +136,7 @@ class EmcThumbWorker_Base(object):
       return ecore.ECORE_CALLBACK_CANCEL
 
 
-class EmcThumbWorker_EThumbSubprocess(EmcThumbWorker_Base):  # TODO FIX NAME !!!
+class EmcThumbWorker_EThumbSubprocess(EmcThumbWorker_Base):
    """ EThumb Worker in a slave process (bin/epymc_thumbnailer)  """
    can_do_image = True
    can_do_video = True
@@ -295,7 +296,7 @@ class EmcThumbnailer(utils.Singleton):
    def rebuild_workers_pool(self): # this is used in config_gui
       for w in self._workers_pool:
          w.kill()
-      num = ini.get_int('general', 'max_concurrent_thumb')
+      num = ini.get_int('thumbnailer', 'max_concurrent_thumb')
       w_class = EmcThumbWorker_EThumbSubprocess
       self._workers_pool = [ w_class(self._worker_done_cb) for i in range(num) ]
 

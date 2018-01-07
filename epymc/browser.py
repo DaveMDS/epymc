@@ -207,6 +207,7 @@ class EmcBrowser(object):
       self.pages = []
       self.current_view = None
       self.autoselect_url = None
+      self._freezed = False
 
    def __str__(self):
       text  = '=' * 70 + '\n'
@@ -308,7 +309,6 @@ class EmcBrowser(object):
       # no more page to go back, hide the view and return to main menu
       if len(self.pages) == 0:
          self.hide()
-         # self.current_view.clear() # this fix the double click-in-back segfault :)
          mainmenu.show()
          return
 
@@ -366,7 +366,10 @@ class EmcBrowser(object):
 
    def clear(self):
       """ TODO Function doc """
-      pass #TODO implement
+      self.current_view = None
+      self.autoselect_url = None
+      self._freezed = False
+      self.pages = []
 
    def show(self):
       """ TODO Function doc """
@@ -385,6 +388,25 @@ class EmcBrowser(object):
       for b in _topbar_btns:
          b.focus_allow = False
 
+   @property
+   def freezed(self):
+      """ TODO Function doc """
+      return self._freezed
+
+   def freeze(self):
+      """ TODO Function doc """
+      self.autoselect_url = self.current_view.selected_url_get()
+      self.hide()
+      mainmenu.show()
+      self._freezed = True
+
+   def unfreeze(self):
+      """ TODO Function doc """
+      mainmenu.hide()
+      self._populate_page(self.pages[-1], is_unfreeze=True)
+      self.show()
+      self._freezed = False
+
    def item_bring_in(self, pos='top', animated=True):
       """ Move the view so that the currently selected item will go on 'pos'
       pos can be: 'in', ', top', 'mid'
@@ -392,14 +414,14 @@ class EmcBrowser(object):
       self.current_view.item_bring_in(pos, animated)
 
    # private stuff
-   def _populate_page(self, page, is_back=False, is_refresh=False):
+   def _populate_page(self, page, is_back=False, is_refresh=False, is_unfreeze=False):
       full = ' > '.join([p['title'] for p in self.pages])
       gui.text_set('topbar.title', full)
 
       view = page['view']
       if (view == self.current_view):
          # same style for the 2 pages, ask the view to perform the correct anim
-         if is_refresh:
+         if is_refresh or is_unfreeze:
             view.page_show(page['title'], ANIM_NONE)
          elif is_back:
             view.page_show(page['title'], ANIM_BACK)
@@ -441,6 +463,9 @@ class EmcBrowser(object):
       # always
       if event == 'BACK':
          self.back()
+         return input_events.EVENT_BLOCK
+      if event == 'EXIT':
+         self.freeze()
          return input_events.EVENT_BLOCK
       elif event == 'VIEW_LIST':
          self.change_style('List')

@@ -195,6 +195,12 @@ class PhotosModule(EmcModule):
       # if not self._folders:
          #TODO alert the user. and instruct how to add folders
 
+      # restore a previous browser state (if available)
+      if self._browser.freezed:
+         self._browser.unfreeze()
+         return
+
+      self._browser.clear()
       self._browser.page_add('photos://root', _('Photos'), self._styles,
                              self.populate_root_page)
       self._browser.show()

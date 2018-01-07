@@ -166,6 +166,11 @@ class MameModule(EmcModule):
       if not self._favorites:
          self._favorites = ini.get_string_list('mame', 'favorites', ',')
 
+      # restore a previous browser state (if available)
+      if self._browser.freezed:
+         self._browser.unfreeze()
+         return
+
       # show the spinning dialog
       self.dialog = EmcDialog(title=_('Searching games, please wait...'),
                               spinner=True, style='cancel')

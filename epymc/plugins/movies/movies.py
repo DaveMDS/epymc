@@ -429,8 +429,18 @@ class MoviesModule(EmcModule):
          self._fav_actors_db = EmcDatabase('moviefavactors', MOVIE_FAV_PEOPLE_DB_VERSION)
          self._fav_directors_db = EmcDatabase('moviefavdirectors', MOVIE_FAV_PEOPLE_DB_VERSION)
 
+      # restore a previous browser state (if available)
+      if self._browser.freezed and not url:
+         self._browser.unfreeze()
+         return
+
+      # destory the browser state (if an url is requested)
+      if self._browser.freezed and url:
+         self._browser.clear()
+
       # start the browser in the wanted page
       if url is None:
+         self._browser.clear()
          self._browser.page_add('movies://root', _('Movies'),
                                 self._styles_for_folders,
                                 self.populate_root_page)
@@ -438,7 +448,7 @@ class MoviesModule(EmcModule):
          self._browser.page_add(url, os.path.basename(url),
                                 self._styles_for_folders,
                                 self.populate_url)
-         
+
       self._browser.show()
       mainmenu.hide()
 

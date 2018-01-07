@@ -316,8 +316,18 @@ class MusicModule(EmcModule):
       if self._artists_db is None:
          self._artists_db = EmcDatabase('music_artists')
 
+      # restore a previous browser state (if available)
+      if self._browser.freezed and not url:
+         self._browser.unfreeze()
+         return
+
+      # clear the browser state (if an url is requested)
+      if self._browser.freezed and url:
+         self._browser.clear()
+
       # start the browser in the requested page
       if url is None:
+         self._browser.clear()
          self._browser.page_add('music://root', _('Music'), self._styles, self.populate_root_page)
       elif url == 'music://artists':
          self._browser.page_add(url, _('Artists'), self._styles, self.populate_artists_page)

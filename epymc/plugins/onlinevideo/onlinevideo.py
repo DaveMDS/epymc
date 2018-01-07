@@ -204,6 +204,12 @@ class OnlinevideoModule(EmcModule):
       return source
 
    def cb_mainmenu(self):
+      # restore a previous browser state (if available)
+      if self._browser.freezed:
+         self._browser.unfreeze()
+         return
+
+      self._browser.clear()
       self._browser.page_add('olvid://root', _('Channels'), self._styles,
                              self.populate_root_page)
       self._browser.show()

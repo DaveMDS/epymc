@@ -12,6 +12,9 @@ New features:
  * RaspberryPI: use an external omx_player instance to play videos,
                 this enable FULL-HD playback on RPI !!
  * MusicBrainz integration
+ * Activity Multitasking:
+   Using the EXIT action (ESC key) is now possible to jump to mainmenu; the
+   current state will be restored next time the activity is launched
  * Movies: tagging ability. You can now organize your library using custom tags
  * Movies: you can now choose favorite actors/directors for faster browsing
  * Movies: while browsing by actor/director you can now see the person info panel

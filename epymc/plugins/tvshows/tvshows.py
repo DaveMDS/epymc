@@ -357,7 +357,13 @@ class TvShowsModule(EmcModule):
       if self._idler_db is None:
          self._idler_db = EmcDatabase('tvidlercache', TVSHOWS_DB_VERSION)
 
+      # restore a previous browser state (if available)
+      if self._browser.freezed:
+         self._browser.unfreeze()
+         return
+
       # populate and show root page
+      self._browser.clear()
       self._browser.page_add('tvshows://root', _('TV Shows'),
                              self._styles_for_folders, self.populate_root_page)
       self._browser.show()

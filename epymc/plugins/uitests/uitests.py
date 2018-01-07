@@ -680,6 +680,12 @@ class UiTestsModule(EmcModule):
       self._browser.delete()
 
    def cb_mainmenu(self):
+      # restore a previous browser state (if available)
+      if self._browser.freezed:
+         self._browser.unfreeze()
+         return
+
+      self._browser.clear()
       self._browser.page_add('uitests://root', 'UI tests', None, self.populate_root)
       mainmenu.hide()
       self._browser.show()

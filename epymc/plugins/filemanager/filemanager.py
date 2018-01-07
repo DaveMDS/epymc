@@ -389,7 +389,7 @@ class FileManagerModule(EmcModule):
             focused.item_activated_cb()
             return input_events.EVENT_BLOCK
 
-      elif event == 'BACK':
+      elif event in ('BACK', 'EXIT'):
          self.hide()
          return input_events.EVENT_BLOCK
 

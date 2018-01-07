@@ -135,7 +135,7 @@ class EmcThumbWorker_Base(object):
       return ecore.ECORE_CALLBACK_CANCEL
 
 
-class EmcThumbWorker_EThumbInASubrocess(EmcThumbWorker_Base):  # TODO FIX NAME !!!
+class EmcThumbWorker_EThumbSubprocess(EmcThumbWorker_Base):  # TODO FIX NAME !!!
    """ EThumb Worker in a slave process (bin/epymc_thumbnailer)  """
    can_do_image = True
    can_do_video = True
@@ -296,7 +296,7 @@ class EmcThumbnailer(utils.Singleton):
       for w in self._workers_pool:
          w.kill()
       num = ini.get_int('general', 'max_concurrent_thumb')
-      w_class = EmcThumbWorker_EThumbInASubrocess
+      w_class = EmcThumbWorker_EThumbSubprocess
       self._workers_pool = [ w_class(self._worker_done_cb) for i in range(num) ]
 
    def _process_queue(self):

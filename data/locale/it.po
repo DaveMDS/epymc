@@ -1949,7 +1949,7 @@ msgstr "Scansione delle serie avviata"
 
 #: epymc/plugins/tvshows/tvshows.py:725
 msgid "TvShows scanner done"
-msgstr "Scansioen delle serie completata"
+msgstr "Scansione delle serie completata"
 
 #: epymc/plugins/tvshows/tvshows.py:766
 #, python-format

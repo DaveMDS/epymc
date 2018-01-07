@@ -45,15 +45,16 @@ gettext.install('epymc', names='ngettext', localedir=localedir)
 locale.setlocale(locale.LC_ALL, '')
 
 from epymc import __version__ as emc_v
-import epymc.modules as modules
-import epymc.gui as gui
-import epymc.mainmenu as mainmenu
-import epymc.config_gui as config_gui
-import epymc.mediaplayer as mediaplayer
-import epymc.ini as ini
-import epymc.sdb as sdb
-import epymc.browser as browser
-import epymc.storage as storage
+from epymc import modules
+from epymc import gui
+from epymc import mainmenu
+from epymc import config_gui
+from epymc import mediaplayer
+from epymc import ini
+from epymc import sdb
+from epymc import browser
+from epymc import storage
+from epymc import thumbnailer
 
 
 
@@ -110,6 +111,7 @@ def start_epymc(standalone=False):
 
    # init stuff
    sdb.init()
+   thumbnailer.init()
    if not gui.init():
       return 1
    browser.init()
@@ -198,6 +200,7 @@ def start_epymc(standalone=False):
    mediaplayer.shutdown()
    browser.shutdown()
    gui.shutdown()
+   thumbnailer.shutdown()
    sdb.shutdown()
 
    print('Bye Bye...')

@@ -29,6 +29,7 @@ from efl import evas, ecore
 from epymc import gui, mainmenu, input_events, ini, modules, utils
 from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.gui import EmcDialog, EmcVKeyboard
+from epymc.thumbnailer import emc_thumbnailer
 
 def DBG(msg):
    # print('CONFIG_GUI: %s' % msg)
@@ -445,6 +446,9 @@ def _general_populate(browser, url):
                             _('Frames per second'), 'icon/evas',
                             fmt='%.0f', udm='fps', min=10, max=120, step=10,
                             cb=_change_fps)
+   standard_item_number_add('general', 'max_concurrent_thumb',
+                            _('Max concurrent thumbnails'), fmt='%.0f',
+                            min=1, max=10, step=1, cb=_change_max_thumbs)
    standard_item_action_add(_('Clear thumbnails cache'), icon='icon/refresh',
                             cb=_clear_thumbnails_cache)
    standard_item_action_add(_('Clear online images cache'), icon='icon/refresh',
@@ -460,6 +464,9 @@ def _change_fps():
 def _change_scale():
    gui.scale_set(ini.get_float('general', 'scale'))
 
+def _change_max_thumbs():
+   emc_thumbnailer.rebuild_workers_pool()
+   
 def _clear_thumbnails_cache():
    def _idler_cb(generator):
       try:

@@ -23,7 +23,8 @@ from collections import OrderedDict
 
 from efl import ecore
 
-import epymc.utils as utils
+from epymc import utils
+from epymc import ini
 
 
 def DBG(*args):
@@ -32,6 +33,15 @@ def DBG(*args):
 
 def ERR(*args):
    print('THUMBNAILER ERROR:', *args)
+
+
+def init():
+   # setup default config values
+   ini.get('general', 'max_concurrent_thumb', default_value=3)
+   
+
+def shutdown():
+   pass
 
 
 class EmcThumbItem(object):
@@ -125,7 +135,7 @@ class EmcThumbWorker_Base(object):
       return ecore.ECORE_CALLBACK_CANCEL
 
 
-class EmcThumbWorker_EThumbInASubrocess(EmcThumbWorker_Base):
+class EmcThumbWorker_EThumbInASubrocess(EmcThumbWorker_Base):  # TODO FIX NAME !!!
    """ EThumb Worker in a slave process (bin/epymc_thumbnailer)  """
    can_do_image = True
    can_do_video = True
@@ -208,18 +218,10 @@ class EmcThumbnailer(utils.Singleton):
 
    """
 
-   known_workers = [EmcThumbWorker_EThumbInASubrocess, ]
-   NUM_WORKERS = 3  # TODO make this configurable
-
    def __init__(self):
       DBG('manager init')
       self._workers_pool = []
       self._queue = OrderedDict() # key: req_id  val: ThumbItem instance
-
-      for w in self.known_workers * self.NUM_WORKERS:
-         self._workers_pool.append(w(self._worker_done_cb))
-
-      print("POOL", self._workers_pool)
 
    ### public api
    def thumb_path_get(self, url):
@@ -242,6 +244,10 @@ class EmcThumbnailer(utils.Singleton):
          request id (int) if the thumb has been queued
 
       """
+      # on first request populate the workers pool
+      if not self._workers_pool:
+         self.rebuild_workers_pool()
+
       if url.startswith('file://'):
          url = url[7:]
 
@@ -285,6 +291,13 @@ class EmcThumbnailer(utils.Singleton):
                # in progress, finish it but do not call the user func
                w.item_in_process.func = None
                w.item_in_process.kargs = None
+
+   def rebuild_workers_pool(self): # this is used in config_gui
+      for w in self._workers_pool:
+         w.kill()
+      num = ini.get_int('general', 'max_concurrent_thumb')
+      w_class = EmcThumbWorker_EThumbInASubrocess
+      self._workers_pool = [ w_class(self._worker_done_cb) for i in range(num) ]
 
    def _process_queue(self):
       for worker in self._workers_pool:

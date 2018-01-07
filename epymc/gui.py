@@ -611,7 +611,7 @@ def focus_move(direction, root_obj=None):
    DBG("Focus move  ROOT:%s  OLD:%s  NEW:%s" % (
        (root_obj.name or '<%s>' % root_obj.__class__.__name__) if root_obj else None,
        (focused.name or '<%s>' % focused.__class__.__name__) if focused else None,
-       (new_focused.name or '<%s>' % new_focused.__class__.__name__)) if new_focused else None)
+       (new_focused.name or '<%s>' % new_focused.__class__.__name__) if new_focused else None))
 
 
    if focused == new_focused:
@@ -1691,7 +1691,7 @@ class EmcSlideshow(elm.Slideshow):
    def _input_event_cb(self, event):
 
       if self._controls_visible:
-         if event in ('EXIT', 'BACK'):
+         if event == 'BACK':
             self.controls_hide()
             return input_events.EVENT_BLOCK
 
@@ -1708,11 +1708,15 @@ class EmcSlideshow(elm.Slideshow):
             self.controls_show()
             return input_events.EVENT_BLOCK
 
-         elif event in ('EXIT', 'BACK'):
+         elif event == 'BACK':
             self.delete()
             return input_events.EVENT_BLOCK
 
-      if event == 'TOGGLE_PAUSE':
+      if event == 'EXIT':
+         self.delete()
+         return input_events.EVENT_BLOCK
+
+      elif event == 'TOGGLE_PAUSE':
          self.pause_toggle()
          return input_events.EVENT_BLOCK
 

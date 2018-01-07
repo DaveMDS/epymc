@@ -391,6 +391,10 @@ def browser_get():
 
 ### private stuff
 def _mainmenu_cb():
+   if _browser.freezed:
+      _browser.unfreeze()
+      return
+
    _browser.page_add('config://root', _('Configuration'), None, _populate_root)
    _browser.show()
    mainmenu.hide()

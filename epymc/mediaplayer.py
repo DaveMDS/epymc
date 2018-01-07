@@ -1414,7 +1414,11 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
             self.subs_delay_zero()
             self._subtitles_delay_notify()
          return input_events.EVENT_BLOCK
-         
+
+      elif event == 'EXIT':
+         stop(True)
+         return input_events.EVENT_BLOCK
+
       if self._controls_visible:
          if event == 'OK':
             pass

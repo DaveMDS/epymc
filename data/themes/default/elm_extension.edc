@@ -623,6 +623,20 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
       target: "focus_pulse2"; \
    }
 
+
+/* Remove this comment to temporary disable in-theme focus highlight
+#undef FOCUS_HIGHLIGHT_INTRO
+#define FOCUS_HIGHLIGHT_INTRO() \
+   data.item: "focus_highlight" "off";
+
+#undef FOCUS_HIGHLIGHT_PARTS
+#define FOCUS_HIGHLIGHT_PARTS(_R1_OFFSET, _R2_OFFSET)
+
+#undef FOCUS_HIGHLIGHT_PROGRAMS
+#define FOCUS_HIGHLIGHT_PROGRAMS(_SIG_ON, _SIG_OFF)
+*/
+
+
 //// MAINMENU LISTS ///////////////////////////////////////////////////////////
 group { name: "elm/list/base/mainmenu";         // Scroller for horizontal list
    parts {

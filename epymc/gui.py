@@ -177,7 +177,6 @@ def init():
 
    _volume_slider = EmcSlider(layout, name='VolumeSlider',
                               indicator_show=False, focus_allow=False)
-   _volume_slider.step = ini.get_int('mediaplayer', 'volume_adjust_step') / 100.0
    swallow_set('volume.slider', _volume_slider)
    _volume_slider.callback_changed_add(_volume_slider_changed_cb)
 

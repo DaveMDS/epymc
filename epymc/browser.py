@@ -645,8 +645,9 @@ class ViewList(object):
          item.update()
       # also request new poster, info and backdrop
       item =  self.current_list.selected_item
-      self._info_timer_cb(item.data_get())
-      self._backdrop_timer_cb(item.data_get())
+      if item:
+         self._info_timer_cb(item.data_get())
+         self._backdrop_timer_cb(item.data_get())
 
    def item_bring_in(self, pos='top', animated=True):
       try:
@@ -874,8 +875,9 @@ class ViewPosterGrid(object):
       self.gg.realized_items_update()
       # also request new info and backdrop
       item =  self.gg.selected_item
-      self._info_timer_cb(item.data_get())
-      self._backdrop_timer_cb(item.data_get())
+      if item:
+         self._info_timer_cb(item.data_get())
+         self._backdrop_timer_cb(item.data_get())
 
    def item_bring_in(self, pos='top', animated=True):
       try:

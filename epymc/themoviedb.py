@@ -555,13 +555,13 @@ class CastPanel(EmcDialog):
       self._dia.delete()
 
       text = '<title>%s</><br>' % self.info['name']
-      if self.info['biography']:
+      if self.info.get('biography'):
          text += '%s<br><br>' % self.info['biography'].replace('\n', '<br>')
-      if self.info['birthday']:
+      if self.info.get('birthday'):
          text += '<name>%s:</> %s<br>' % (_('Birthday'), self.info['birthday'])
-      if self.info['deathday']:
+      if self.info.get('deathday'):
          text += '<name>%s:</> %s<br>' % (_('Deathday'), self.info['deathday'])
-      if self.info['place_of_birth']:
+      if self.info.get('place_of_birth'):
          text += '<name>%s:</> %s<br>' % (_('Place of birth'), self.info['place_of_birth'])
 
       image = EmcImage(self.info['profile_path'])

@@ -82,6 +82,15 @@ def DBG(msg):
    # print('GUI: %s' % msg)
    pass
 
+def DBG_FOCUS(msg, obj=None):
+   '''  export EINA_LOG_LEVELS="elementary-focus:10"  '''
+   if obj:
+      print('FOCUS: %s <%s name=%s>' % (msg, obj.__class__.__name__,
+                                        getattr(obj, 'name', 'None')))
+   else:
+      print('FOCUS: %s' % msg)
+   #  pass
+
 
 def init():
    """ return: False=failed True=ok """
@@ -496,9 +505,15 @@ def focus_move(direction, root_obj=None):
       root_obj = layout
 
    focused = win.focused_object
+   DBG_FOCUS('==== FOCUS MOVE ==============================================')
+   DBG_FOCUS('ROOT:', root_obj)
+   DBG_FOCUS('FOCUSED:', focused)
+   if focused and getattr(focused, 'focused_item', None):
+      DBG_FOCUS('FOCUSED ITEM:', focused.focused_item)
 
    # move between List items...
    if isinstance(focused, elm.List) and focused.focus_allow:
+      DBG_FOCUS('Moving focus in List...')
       item = focused.focused_item
       to_item = None
       horiz = focused.horizontal
@@ -518,6 +533,7 @@ def focus_move(direction, root_obj=None):
 
    # move between Genlist items...
    elif isinstance(focused, elm.Genlist) and focused.focus_allow:
+      DBG_FOCUS('Moving focus in GenList...')
       item = focused.focused_item or focused.selected_item
       to_item = None
       if direction == 'DOWN':
@@ -536,6 +552,7 @@ def focus_move(direction, root_obj=None):
 
    # move between Gengrid items...
    elif isinstance(focused, elm.Gengrid) and focused.focus_allow:
+      DBG_FOCUS('Moving focus in GenGrid...')
       item = focused.focused_item or focused.selected_item
       x1, y1 = item.pos
       to_item = None
@@ -592,6 +609,7 @@ def focus_move(direction, root_obj=None):
 
    # change sliders value
    elif isinstance(focused, EmcSlider) and focused.focus_allow:
+      DBG_FOCUS('Moving focus in EmcSlider...')
       sl = focused
       if direction == 'RIGHT': # TODO support vertical
          sl.value += sl.step
@@ -603,51 +621,47 @@ def focus_move(direction, root_obj=None):
          return True
 
    # or just let elm move the focus between objects...
+   DBG_FOCUS('Let ELM move the focus for us...')
    root_obj.focus_next(focus_directions[direction])
 
-   # ... and now various fixes on the work done by elm
    new_focused = win.focused_object
-   DBG("Focus move  ROOT:%s  OLD:%s  NEW:%s" % (
-       (root_obj.name or '<%s>' % root_obj.__class__.__name__) if root_obj else None,
-       (focused.name or '<%s>' % focused.__class__.__name__) if focused else None,
-       (new_focused.name or '<%s>' % new_focused.__class__.__name__) if new_focused else None))
+   DBG_FOCUS('Focus moved TO:', new_focused)
 
-
+   # ... and now various fixes on the work done by elm
    if focused == new_focused:
       # FOCUS FIX: UP/DOWN on VideoPlayer.PosSlider do not work
       if focused.name == 'VideoPlayer.PosSlider':
          if direction == 'UP':
-            DBG("FOCUS FIX: UP on VideoPlayer.PosSlider do not work")
+            DBG_FOCUS('FOCUS FIX: UP on VideoPlayer.PosSlider do not work')
             root_obj.evas.object_name_find('VideoPlayer.PlayBtn').focus = True
          elif direction == 'DOWN':
-            DBG("FOCUS FIX: DOWN on VideoPlayer.PosSlider do not work (root is different)")
+            DBG_FOCUS('FOCUS FIX: DOWN on VideoPlayer.PosSlider do not work (root is different)')
             root_obj.evas.object_name_find('VolumeSlider').focus = True
 
       # FOCUS FIX: always close AudioPlayer on LEFT event
       if direction == 'LEFT' and focused.parent.name == 'AudioPlayer':
          # TODO: "LEFT" should be taken from the theme, or the position
-         DBG("FOCUS FIX: always close AudioPlayer on LEFT event")
+         DBG_FOCUS('FOCUS FIX: always close AudioPlayer on LEFT event')
          focused.parent.focus = False # this will make the player hide
          new_focused = win.focused_object
 
    # FOCUS FIX: expand/contract AudioPlayer on focus/unfocus
    if focused.parent.name == 'AudioPlayer' and new_focused.parent.name != 'AudioPlayer':
-      DBG("FOCUS FIX: contract AudioPlayer when he lost focus")
+      DBG_FOCUS('FOCUS FIX: contract AudioPlayer when he lost focus')
       focused.parent.controls_hide()
    elif focused.parent.name != 'AudioPlayer' and new_focused.parent.name == 'AudioPlayer':
-      DBG("FOCUS FIX: expand AudioPlayer on focus")
+      DBG_FOCUS('FOCUS FIX: expand AudioPlayer on focus')
       new_focused.parent.controls_show()
 
    # FOCUS FIX: remove focus from MainLayout or MainWin
    if new_focused.name == 'MainLayout' or new_focused.__class__.__name__ == 'Window':
       root_obj.focus_next(elm.ELM_FOCUS_PREVIOUS)
       new_focused = win.focused_object
-      DBG('FOCUS FIX: remove focus from MainLayout or MainWin (new: %s)' % \
-          new_focused.name or '<%s>' % new_focused.__class__.__name__)
+      DBG_FOCUS('FOCUS FIX: remove focus from MainLayout or MainWin - NEW:', new_focused)
 
    # FOCUS FIX: focus to gengrid item
    if isinstance(new_focused, elm.Gengrid) and new_focused.focused_item is None:
-      DBG('FOCUS FIX: give focus to the selected item in a focused Gengrid')
+      DBG_FOCUS('FOCUS FIX: give focus to the selected item in a focused Gengrid')
       new_focused.selected_item.focus = True
 
    return False

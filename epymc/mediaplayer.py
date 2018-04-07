@@ -254,7 +254,6 @@ def shutdown():
 ### gui API ###
 def audio_player_show():
    if isinstance(_player, EmcAudioPlayer):
-      _player.controls_show()
       _player.focus = True
 
 
@@ -742,18 +741,20 @@ class EmcPlayerBase(object):
 
 
 ###############################################################################
-class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
+class EmcAudioPlayer(gui.EmcLayout, EmcPlayerBase):
    def __init__(self, url=None):
       self._controls_visible = False
       self._slider_timer = None
 
       ### init the layout
-      elm.Layout.__init__(self, gui.layout, focus_allow=False, name='AudioPlayer',
-                          file=(gui.theme_file, 'emc/audioplayer/default'))
+      gui.EmcLayout.__init__(self, gui.layout, name='AudioPlayer',
+                             is_focus_manager=True, focus_history_allow=False,
+                             file=(gui.theme_file, 'emc/audioplayer/default'))
       self.signal_callback_add('audioplayer,expand,request', '',
                                lambda a,s,d: self.controls_show())
       self.signal_callback_add('audioplayer,contract,request', '',
                                lambda a,s,d: self.controls_hide())
+      self.callback_focused_add(self._focused_cb)
 
       ### setup the playlist
       playlist.loop = ini.get_bool('mediaplayer', 'playlist_loop')
@@ -798,8 +799,9 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       ### playlist genlist
       self._itc = elm.GenlistItemClass(item_style='default',
                                        text_get_func=self._gl_text_get)
-      self._gl = elm.Genlist(self, style='playlist', name='AudioPlayerGL',
-                             homogeneous=True, mode=elm.ELM_LIST_COMPRESS)
+      self._gl = gui.EmcGenlist(self, style='playlist', name='AudioPlayerGL',
+                                homogeneous=True, mode=elm.ELM_LIST_COMPRESS,
+                                select_on_focus=False, focus_on_select=False)
       self._gl.callback_activated_add(self._genlist_item_activated_cb)
       self.content_set('playlist.swallow', self._gl)
       self._gl_populate()
@@ -818,17 +820,21 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
 
    def _delete_real(self, obj, sig, src):
       EmcPlayerBase.delete(self)
-      elm.Layout.delete(self)
+      gui.EmcLayout.delete(self)
 
    def show(self):
       input_events.listener_add('EmcAudioPlayer', self._input_events_cb)
       events.listener_add('EmcAudioPlayer', self._events_cb)
       self.signal_emit('audioplayer,show', 'emc')
+      self.focus_allow = True
+      self.tree_focus_allow = False
       
    def hide(self):
       input_events.listener_del('EmcAudioPlayer')
       events.listener_del('EmcAudioPlayer')
       self.signal_emit('audioplayer,hide', 'emc')
+      self.focus_allow = False
+      self.tree_focus_allow = False
 
    def controls_show(self):
       if not self._controls_visible:
@@ -838,6 +844,7 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
          if self._slider_timer is None:
             self._slider_timer = ecore.Timer(1.0, self._update_timer)
          self._update_timer(single=True)
+         self.tree_focus_allow = True
 
    def controls_hide(self):
       if self._controls_visible:
@@ -846,16 +853,15 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
          if self._slider_timer:
             self._slider_timer.delete()
             self._slider_timer = None
+         self.tree_focus_allow = False
 
    def _gl_populate(self):
       self._gl.clear()
       for item in playlist.items:
          it = self._gl.item_append(self._itc, item)
          if item == playlist.onair_item:
-            self._gl.focus_allow = False
             it.selected = True
             it.show()
-            self._gl.focus_allow = True
 
    def _info_update(self):
       # update metadata infos
@@ -875,10 +881,8 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       # update selected playlist item
       it = self._gl.nth_item_get(playlist.cur_idx)
       if it:
-         self._gl.focus_allow = False
          it.selected = True
          it.show()
-         self._gl.focus_allow = True
 
       # update the slider and the play/pause button
       self._update_timer(single=True)
@@ -933,6 +937,21 @@ class EmcAudioPlayer(elm.Layout, EmcPlayerBase):
       events.event_emit('PLAYBACK_FINISHED')
       playlist.play_next()
 
+   ### focus manager
+   def _focused_cb(self, obj):
+      if self._controls_visible:
+         self.controls_hide()
+      else:
+         self.controls_show()
+         self._gl.focus = True
+
+   def focus_move_internal(self, direction):
+      if self.focus_move(direction) == False:
+         if direction == 'LEFT':  # TODO: this is not themeable !!
+            self.controls_hide()
+            return True
+      return True
+   
    ### input events
    def _input_events_cb(self, event):
       if event == 'OK':
@@ -984,7 +1003,7 @@ emotion_events_map = {
    'TOGGLE_DVD_MENU': emotion.EMOTION_EVENT_MENU1,
 }
 
-class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
+class EmcVideoPlayer(gui.EmcLayout, EmcPlayerBase):
 
    # This will be overridden by the omx_player
    video_player_cannot_be_covered = False
@@ -1005,8 +1024,10 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       self._subs_notify = None # EmcNotify for subtitles delay changes
 
       ### init the layout
-      elm.Layout.__init__(self, gui.layout,
-                          file=(gui.theme_file, 'emc/videoplayer/default'))
+      gui.EmcLayout.__init__(self, gui.layout, name='VideoPlayerLayout',
+                             file=(gui.theme_file, 'emc/videoplayer/default'),
+                             focus_allow=True, is_focus_manager=True)
+      self.focus = True
 
       # left click on video to show/hide the controls
       self.signal_callback_add('mouse,down,1', 'events.rect',
@@ -1023,33 +1044,33 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       self.url = url
 
       ### control buttons
-      bt = EmcButton(icon='icon/fbwd', cb=lambda b: self.fbackward())
+      bt = EmcButton(icon='icon/fbwd', parent=self, cb=lambda b: self.fbackward())
       self.box_append('controls.btn_box', bt)
 
-      bt = EmcButton(icon='icon/bwd', cb=lambda b: self.backward())
+      bt = EmcButton(icon='icon/bwd', parent=self, cb=lambda b: self.backward())
       self.box_append('controls.btn_box', bt)
 
-      bt = EmcButton(icon='icon/stop', cb=lambda b: stop(True))
+      bt = EmcButton(icon='icon/stop', parent=self, cb=lambda b: stop(True))
       self.box_append('controls.btn_box', bt)
 
-      bt = EmcButton(icon='icon/pause', cb=lambda b: self.pause_toggle())
+      bt = EmcButton(icon='icon/pause', parent=self, cb=lambda b: self.pause_toggle())
       self.box_append('controls.btn_box', bt)
       self._play_pause_btn = bt
       bt.name = 'VideoPlayer.PlayBtn'
 
-      bt = EmcButton(icon='icon/fwd', cb=lambda b: self.forward())
+      bt = EmcButton(icon='icon/fwd', parent=self, cb=lambda b: self.forward())
       self.box_append('controls.btn_box', bt)
       
-      bt = EmcButton(icon='icon/ffwd', cb=lambda b: self.fforward())
+      bt = EmcButton(icon='icon/ffwd', parent=self, cb=lambda b: self.fforward())
       self.box_append('controls.btn_box', bt)
 
-      bt = EmcButton(_('Audio'), cb=self._audio_menu_build)
+      bt = EmcButton(_('Audio'), parent=self, cb=self._audio_menu_build)
       self.box_append('controls.btn_box2', bt)
 
-      bt = EmcButton(_('Video'), cb=self._video_menu_build)
+      bt = EmcButton(_('Video'), parent=self, cb=self._video_menu_build)
       self.box_append('controls.btn_box2', bt)
 
-      bt = EmcButton(_('Subtitles'), cb=self._subs_menu_build)
+      bt = EmcButton(_('Subtitles'), parent=self, cb=self._subs_menu_build)
       self.box_append('controls.btn_box2', bt)
 
       ### position slider
@@ -1121,7 +1142,7 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
       
       self._update_slider()
       gui.volume_show(persistent=True)
-      if self.focused_object is None:
+      if self.focused_object in (None, self):
          self._play_pause_btn.focus = True
 
    def controls_hide(self):
@@ -1424,9 +1445,6 @@ class EmcVideoPlayer(elm.Layout, EmcPlayerBase):
             pass
          elif event == 'BACK':
             self.controls_hide()
-            return input_events.EVENT_BLOCK
-         elif event in gui.focus_directions:
-            gui.focus_move(event, self)
             return input_events.EVENT_BLOCK
 
       else:

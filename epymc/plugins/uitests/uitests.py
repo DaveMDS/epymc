@@ -26,6 +26,7 @@ import pprint
 
 from efl import ecore, edje, elementary
 from efl.elementary.box import Box
+from efl.elementary.grid import Grid
 from efl.elementary.entry import utf8_to_markup
 from efl.evas import EXPAND_BOTH, FILL_BOTH, FILL_HORIZ
 
@@ -547,6 +548,39 @@ class MyItemClass(EmcItemClass):
                hbox2.pack_end(b)
                i += 1
 
+      elif url.startswith('uitests://focus_'):
+         grid = Grid(gui.win, size=(100, 100))
+         d = EmcDialog(title='Focus corner cases', content=grid, style='panel')
+
+         def btn_add(label, x, y, w, h, focus=False):
+            bt = EmcButton(parent=d, text=label)
+            grid.pack(bt, x, y, w, h)
+            bt.focus = focus
+
+         if url.endswith('1'):
+            btn_add('top',    40,  0, 20, 10, True)
+            btn_add('bottom', 40, 90, 20, 10)
+            btn_add('left',    0, 45, 20, 10)
+            btn_add('right',  80, 45, 20, 10)
+
+         elif url.endswith('2'):
+            btn_add('top L',   0,  0, 20, 10)
+            btn_add('top R',  80,  0, 20, 10)
+            btn_add('bot L',   0, 90, 20, 10)
+            btn_add('bot R',  80, 90, 20, 10)
+            btn_add('center', 40, 40, 20, 10, True)
+
+         elif url.endswith('3'):
+             btn_add('top',    40,  0, 20, 10)
+             btn_add('bottom', 40, 90, 20, 10)
+             btn_add('left',    0, 45, 20, 10)
+             btn_add('right',  80, 45, 20, 10)
+             btn_add('top L',   0,  0, 20, 10)
+             btn_add('top R',  80,  0, 20, 10)
+             btn_add('bot L',   0, 90, 20, 10)
+             btn_add('bot R',  80, 90, 20, 10)
+             btn_add('center', 40, 45, 20, 10, True)
+
       # Sliders
       elif url == 'uitests://sliders':
          vbox = Box(gui.win)
@@ -702,6 +736,9 @@ class UiTestsModule(EmcModule):
 
    def populate_root(self, browser, url):
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + Focus')
+      browser.item_add(MyItemClass(), 'uitests://focus_1', 'Focus corner case 1')
+      browser.item_add(MyItemClass(), 'uitests://focus_2', 'Focus corner case 2')
+      browser.item_add(MyItemClass(), 'uitests://focus_3', 'Focus corner case 3')
       browser.item_add(MyItemClass(), 'uitests://storage', 'Storage devices')
       browser.item_add(MyItemClass(), 'uitests://sselector', 'Folder Selector')
       browser.item_add(MyItemClass(), 'uitests://mbrainz', 'Music Brainz AudioCD (/dev/cdrom)')

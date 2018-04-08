@@ -959,8 +959,12 @@ class _EmcFocusable(object):
       elif direction == 'RIGHT':  focus_point = focused.right_center
       elif direction == 'UP':     focus_point = focused.top_center
       elif direction == 'DOWN':   focus_point = focused.bottom_center
-      nearest = None
-      distance = 9999999
+
+      x1, x2 = focused.left_center[0], focused.right_center[0]
+      y1, y2 = focused.top_center[1], focused.bottom_center[1]
+
+      nearest = nearest_linear = None
+      distance = distance_linear = 9999999
 
       for obj in manager.focusable_children:
          # ignore the current focused obj
@@ -992,8 +996,24 @@ class _EmcFocusable(object):
             distance = dis
             nearest = obj
 
+         # also remember the "linear nearest", that have higher priority
+         # (only counting obj perfectly aligned in the given direction)
+         if nearest_linear is None or dis < distance_linear:
+            if direction in ('UP', 'DOWN'):
+               a1, a2, b1, b2 = x1, x2, obj.left_center[0], obj.right_center[0]
+            else:
+               a1, a2, b1, b2 = y1, y2, obj.top_center[1], obj.bottom_center[1]
+
+            if (a1 <= b1 < a2 or a1 < b2 <= a2) or (b1 <= a1 and b2 >= a2):
+               distance_linear = dis
+               nearest_linear = obj
+
       # focus the new object if found, otherwise do nothing
-      if nearest is not None:
+      if nearest_linear is not None:
+         DBG_FOCUS('FOUND LINEAR \o/', nearest_linear)
+         nearest_linear.focus = True
+         return True
+      elif nearest is not None:
          DBG_FOCUS('FOUND \o/', nearest)
          nearest.focus = True
          return True

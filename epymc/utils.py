@@ -520,6 +520,42 @@ def http_error_code_to_str(code):
    except:
       return _('Unknown')
 
+def distance_between_point_and_segment(point, segment_p1, segment_p2, real=False):
+   """ Calculate the minimum distance between a point and a segment
+   Args:
+      point: (x, y) The point
+      segment_p1: (x, y) The start point of the segment
+      segment_p2: (x, y) The end point of the segment
+      real: bool, if True then the real distance is returned, otherwise a
+         "virtual" distance is returned, that can still be used if you only
+         need to compare the results. The virtual distance is sensiby faster to
+         compute.
+   Return:
+      A single number (int or float) representing the distance (real or virtual)
+   """
+   x, y = point
+   x1, y1, x2, y2 = *segment_p1, *segment_p2
+
+   A, B, C, D = x - x1, y - y1, x2 - x1, y2 - y1
+   dot = A * C + B * D
+   len_sqr = C * C + D * D
+   param = (dot / len_sqr) if len_sqr != 0 else -1
+
+   if param < 0:
+      xx, yy = x1, y1
+   elif param > 1:
+      xx, yy = x2, y2
+   else:
+      xx, yy = x1 + param * C, y1 + param * D
+
+   dx, dy = x - xx, y - yy
+
+   if real is False:
+      return dx * dx + dy * dy
+   else:
+      import math
+      return math.sqrt(dx * dx + dy * dy)
+
 
 class Singleton(object):
    __single = None

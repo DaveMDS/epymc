@@ -24,10 +24,10 @@ import os
 import sys
 
 from efl import evas, ecore, elementary as elm
-from efl.elementary.genlist import Genlist, GenlistItem, GenlistItemClass,\
+from efl.elementary.genlist import GenlistItem, GenlistItemClass,\
    ELM_OBJECT_SELECT_MODE_ALWAYS, ELM_LIST_COMPRESS, ELM_GENLIST_ITEM_SCROLLTO_TOP, \
    ELM_GENLIST_ITEM_SCROLLTO_MIDDLE, ELM_GENLIST_ITEM_SCROLLTO_IN
-from efl.elementary.gengrid import Gengrid, GengridItem, GengridItemClass
+from efl.elementary.gengrid import GengridItem, GengridItemClass
 from efl.elementary.layout import Layout
 from efl.elementary.label import Label, ELM_WRAP_NONE, \
    ELM_LABEL_SLIDE_MODE_NONE, ELM_LABEL_SLIDE_MODE_AUTO
@@ -83,7 +83,8 @@ def shutdown():
    del _memorydb
 
 def topbar_button_add(label=None, icon=None, cb=None, cb_data=None):
-   bt = EmcButton(label=label, icon=icon, cb=cb, cb_data=cb_data,
+   bt = EmcButton(parent=gui.layout, label=label, icon=icon,
+                  cb=cb, cb_data=cb_data,
                   focus_allow=False, name=label or icon)
    gui.box_append('topbar.box', bt)
    _topbar_btns.append(bt)
@@ -515,9 +516,9 @@ class ViewList(object):
       self.items_count = 0;            # This is accessed from the browser
 
       # EXTERNAL Genlists
-      self.gl1 = Genlist(gui.layout, name='ViewGenlist1')
+      self.gl1 = gui.EmcGenlist(gui.layout, name='ViewGenlist1')
       gui.swallow_set('browser.list.genlist1', self.gl1)
-      self.gl2 = Genlist(gui.layout, name='ViewGenlist2')
+      self.gl2 = gui.EmcGenlist(gui.layout, name='ViewGenlist2')
       gui.swallow_set('browser.list.genlist2', self.gl2)
       self.current_list = self.gl1
 
@@ -531,7 +532,6 @@ class ViewList(object):
          gl.callback_selected_add(self._cb_item_hilight)
          gl.callback_unselected_add(self._cb_item_unhilight)
          gl.callback_realized_add(self._cb_item_realized)
-         gl.callback_item_focused_add(lambda l,i: i.selected_set(True))
 
       # genlist item class
       self.itc = GenlistItemClass(item_style='default',
@@ -581,6 +581,7 @@ class ViewList(object):
       self.current_list.clear()
       self.items_count = 0
       self.current_list.focus_allow = True
+      self.current_list.focus = True
 
    def item_add(self, item_class, url, user_data, selected=False):
       """
@@ -720,9 +721,6 @@ class ViewList(object):
                        else 'icon,hide', 'emc')
       item.signal_emit('end,show' if item.part_content_get('elm.swallow.end') \
                        else 'end,hide', 'emc')
-      # give focus if the item is selected
-      if item.selected:
-         item.focus = True
 
    def _cb_item_selected(self, gl, item):
       (item_class, url, user_data) = item.data_get()                            # 3 #
@@ -796,13 +794,12 @@ class ViewPosterGrid(object):
       self.itc_g = GengridItemClass(item_style='group_index',
                                     text_get_func=self.gg_group_text_get,
                                     content_get_func=self.gg_group_content_get)
-      self.gg = Gengrid(gui.win, style='browser', focus_allow=False,
-                        align=(0.5, 0.0),
-                        size_hint_expand=EXPAND_BOTH, size_hint_fill=FILL_BOTH)
+      self.gg = gui.EmcGengrid(gui.layout, style='browser', focus_allow=False,
+                               name='ViewGengrid', align=(0.5, 0.0),
+                               size_hint_expand=EXPAND_BOTH,
+                               size_hint_fill=FILL_BOTH)
       self.gg.callback_selected_add(self.gg_higlight)
       self.gg.callback_clicked_double_add(self.gg_selected)
-      self.gg.callback_realized_add(self._cb_item_realized)
-      self.gg.callback_item_focused_add(lambda g,i: i.selected_set(True))
       gui.swallow_set(self._grid_swallow, self.gg)
 
       # RemoteImage (cover)
@@ -830,6 +827,8 @@ class ViewPosterGrid(object):
    def page_show(self, title, anim):
       self.gg.clear()
       self.items_count = 0
+      self.gg.focus_allow = True
+      self.gg.focus = True
 
    def item_add(self, item_class, url, user_data, selected=False):
       item_data = (item_class, url, user_data)                                  # 3 #
@@ -947,10 +946,6 @@ class ViewPosterGrid(object):
    def gg_selected(self, gg, item, *args, **kwargs):
       (item_class, url, user_data) = item.data_get()                            # 3 #
       item_class.item_selected(url, user_data)
-
-   def _cb_item_realized(self, gg, item):
-      if item.selected:
-         item.focus = True
 
    def _info_timer_cb(self, item_data):
       (item_class, url, user_data) = item_data                                  # 3 #

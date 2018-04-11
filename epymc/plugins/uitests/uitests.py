@@ -26,6 +26,7 @@ import pprint
 
 from efl import ecore, edje, elementary
 from efl.elementary.box import Box
+from efl.elementary.grid import Grid
 from efl.elementary.entry import utf8_to_markup
 from efl.evas import EXPAND_BOTH, FILL_BOTH, FILL_HORIZ
 
@@ -392,6 +393,15 @@ class MyItemClass(EmcItemClass):
             d.list_item_append('item %d'%i)
          d.list_go()
 
+      elif url == 'uitests://dlg-list-btn':
+         d = EmcDialog(title='Dialog - List with buttons', style='list')
+         for i in range(1, 40):
+            d.list_item_append('item %d'%i)
+         d.button_add('One', selected_cb=lambda b: print('btn1 callback'))
+         d.button_add('Two', selected_cb=lambda b: print('btn2 callback'))
+         d.button_add('Tree', selected_cb=lambda b: print('btn3 callback'))
+         d.list_go()
+
       # Dialog - Panel full
       elif url == 'uitests://dlg-panel1':
          text = LOREM*4
@@ -461,13 +471,14 @@ class MyItemClass(EmcItemClass):
          vbox = Box(gui.win)
          vbox.show()
          # label
-         b = EmcButton('only label', cb=_buttons_cb)
+         b = EmcButton('only label', parent=d, cb=_buttons_cb)
          vbox.pack_end(b)
          # icon
-         b = EmcButton(icon='icon/star', cb=_buttons_cb)
+         b = EmcButton(icon='icon/star', parent=d, cb=_buttons_cb)
+         b.focus = True
          vbox.pack_end(b)
          # label + icon
-         b = EmcButton('label + icon', 'icon/star', cb=_buttons_cb)
+         b = EmcButton('label + icon', 'icon/star', parent=d, cb=_buttons_cb)
          vbox.pack_end(b)
          hbox.pack_end(vbox)
 
@@ -475,15 +486,15 @@ class MyItemClass(EmcItemClass):
          vbox = Box(gui.win)
          vbox.show()
          # label
-         b = EmcButton('only label disabled', cb=_buttons_cb)
+         b = EmcButton('only label disabled', parent=d, cb=_buttons_cb)
          b.disabled_set(True)
          vbox.pack_end(b)
          # icon
-         b = EmcButton(icon='icon/mame', cb=_buttons_cb)
+         b = EmcButton(icon='icon/mame', parent=d, cb=_buttons_cb)
          b.disabled_set(True)
          vbox.pack_end(b)
          # label + icon
-         b = EmcButton('label + icon disabled', 'icon/back', cb=_buttons_cb)
+         b = EmcButton('label + icon disabled', 'icon/back', parent=d, cb=_buttons_cb)
          b.disabled_set(True)
          vbox.pack_end(b)
          hbox.pack_end(vbox)
@@ -492,16 +503,16 @@ class MyItemClass(EmcItemClass):
          hbox2 = Box(gui.win)
          hbox2.horizontal_set(True)
          hbox2.show()
-         b = EmcButton('toggle label', toggle=True, cb=_buttons_cb)
+         b = EmcButton('toggle label', parent=d, toggle=True, cb=_buttons_cb)
          hbox2.pack_end(b)
-         b = EmcButton('toggle label + icon', 'icon/star', toggle=True, cb=_buttons_cb)
+         b = EmcButton('toggle label + icon', 'icon/star', parent=d, toggle=True, cb=_buttons_cb)
          hbox2.pack_end(b)
-         b = EmcButton(icon='icon/star', toggle=True, cb=_buttons_cb)
+         b = EmcButton(icon='icon/star', parent=d, toggle=True, cb=_buttons_cb)
          hbox2.pack_end(b)
-         b = EmcButton(icon='icon/star', toggle=True, cb=_buttons_cb)
+         b = EmcButton(icon='icon/star', parent=d, toggle=True, cb=_buttons_cb)
          b.toggled = True
          hbox2.pack_end(b)
-         b = EmcButton('toggle disabled', 'icon/star', toggle=True, cb=_buttons_cb)
+         b = EmcButton('toggle disabled', 'icon/star', parent=d, toggle=True, cb=_buttons_cb)
          b.disabled_set(True)
          hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
@@ -511,7 +522,7 @@ class MyItemClass(EmcItemClass):
          hbox2.horizontal_set(True)
          hbox2.show()
          for i in range(0,8):
-            b = EmcButton(str(i), cb=_buttons_cb)
+            b = EmcButton(str(i), parent=d, cb=_buttons_cb)
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
 
@@ -521,7 +532,7 @@ class MyItemClass(EmcItemClass):
          hbox2.show()
          icons = ['icon/prev', 'icon/fbwd','icon/bwd','icon/stop','icon/play','icon/fwd','icon/ffwd','icon/next']
          for i in icons:
-            b = EmcButton(icon=i, cb=_buttons_cb)
+            b = EmcButton(parent=d, icon=i, cb=_buttons_cb)
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
 
@@ -533,9 +544,42 @@ class MyItemClass(EmcItemClass):
                   hbox2 = Box(gui.win, horizontal=True)
                   vbox0.pack_end(hbox2)
                   hbox2.show()
-               b = EmcButton(icon=group, cb=_buttons_cb)
+               b = EmcButton(parent=d, icon=group, cb=_buttons_cb)
                hbox2.pack_end(b)
                i += 1
+
+      elif url.startswith('uitests://focus_'):
+         grid = Grid(gui.win, size=(100, 100))
+         d = EmcDialog(title='Focus corner cases', content=grid, style='panel')
+
+         def btn_add(label, x, y, w, h, focus=False):
+            bt = EmcButton(parent=d, text=label)
+            grid.pack(bt, x, y, w, h)
+            bt.focus = focus
+
+         if url.endswith('1'):
+            btn_add('top',    40,  0, 20, 10, True)
+            btn_add('bottom', 40, 90, 20, 10)
+            btn_add('left',    0, 45, 20, 10)
+            btn_add('right',  80, 45, 20, 10)
+
+         elif url.endswith('2'):
+            btn_add('top L',   0,  0, 20, 10)
+            btn_add('top R',  80,  0, 20, 10)
+            btn_add('bot L',   0, 90, 20, 10)
+            btn_add('bot R',  80, 90, 20, 10)
+            btn_add('center', 40, 40, 20, 10, True)
+
+         elif url.endswith('3'):
+             btn_add('top',    40,  0, 20, 10)
+             btn_add('bottom', 40, 90, 20, 10)
+             btn_add('left',    0, 45, 20, 10)
+             btn_add('right',  80, 45, 20, 10)
+             btn_add('top L',   0,  0, 20, 10)
+             btn_add('top R',  80,  0, 20, 10)
+             btn_add('bot L',   0, 90, 20, 10)
+             btn_add('bot R',  80, 90, 20, 10)
+             btn_add('center', 40, 45, 20, 10, True)
 
       # Sliders
       elif url == 'uitests://sliders':
@@ -543,37 +587,37 @@ class MyItemClass(EmcItemClass):
          d = EmcDialog(title='Slider test', content=vbox, style='panel')
 
          # normal
-         sl = EmcSlider(vbox, value=0.5, indicator_show=False,
+         sl = EmcSlider(d, value=0.5, indicator_show=False,
                         size_hint_fill=FILL_HORIZ)
          vbox.pack_end(sl)
          sl.focus = True
 
          # icons
-         sl = EmcSlider(vbox, value=0.5,  indicator_show=False,
+         sl = EmcSlider(d, value=0.5,  indicator_show=False,
                         size_hint_fill=FILL_HORIZ)
          sl.part_content_set('icon', gui.load_icon('icon/evas'))
          sl.part_content_set('end', gui.load_icon('icon/check_on'))
          vbox.pack_end(sl)
 
          # with text
-         sl = EmcSlider(vbox, text='with text', value=0.5, indicator_show=False,
+         sl = EmcSlider(d, text='with text', value=0.5, indicator_show=False,
                         size_hint_fill=FILL_HORIZ)
          vbox.pack_end(sl)
 
          # no focus
-         sl = EmcSlider(vbox, text='no focus', value=0.5, indicator_show=False,
-                        focus_allow=False, size_hint_fill=FILL_HORIZ)
+         sl = EmcSlider(d, text='no focus', value=0.5, indicator_show=False,
+                        focusable=False, size_hint_fill=FILL_HORIZ)
          vbox.pack_end(sl)
 
          # unit + indicator format
-         sl = EmcSlider(vbox, text='indicator', min_max=(-1.0, 3.0),
+         sl = EmcSlider(d, text='indicator', min_max=(-1.0, 3.0),
                         unit_format='%.2f u', indicator_format='%.1f u',
                         indicator_show_on_focus=True,
                         size_hint_fill=FILL_HORIZ)
          vbox.pack_end(sl)
 
          # disabled
-         sl = EmcSlider(vbox, text='disabled', unit_format='unit', value=0.5,
+         sl = EmcSlider(d, text='disabled', unit_format='unit', value=0.5,
                         disabled=True, size_hint_fill=FILL_HORIZ)
          vbox.pack_end(sl)
 
@@ -692,6 +736,9 @@ class UiTestsModule(EmcModule):
 
    def populate_root(self, browser, url):
       browser.item_add(MyItemClass(), 'uitests://buttons', 'Buttons + Focus')
+      browser.item_add(MyItemClass(), 'uitests://focus_1', 'Focus corner case 1')
+      browser.item_add(MyItemClass(), 'uitests://focus_2', 'Focus corner case 2')
+      browser.item_add(MyItemClass(), 'uitests://focus_3', 'Focus corner case 3')
       browser.item_add(MyItemClass(), 'uitests://storage', 'Storage devices')
       browser.item_add(MyItemClass(), 'uitests://sselector', 'Folder Selector')
       browser.item_add(MyItemClass(), 'uitests://mbrainz', 'Music Brainz AudioCD (/dev/cdrom)')
@@ -726,6 +773,7 @@ class UiTestsModule(EmcModule):
       browser.item_add(MyItemClass(), 'uitests://dlg-progress', 'Dialog - Progress')
       browser.item_add(MyItemClass(), 'uitests://dlg-progress-btn', 'Dialog - Progress with buttons')
       browser.item_add(MyItemClass(), 'uitests://dlg-list', 'Dialog - List')
+      browser.item_add(MyItemClass(), 'uitests://dlg-list-btn', 'Dialog - List with buttons')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel1', 'Dialog - Panel full')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel4', 'Dialog - Panel full more')
       browser.item_add(MyItemClass(), 'uitests://dlg-panel2', 'Dialog - Panel no buttons')

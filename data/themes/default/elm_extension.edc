@@ -552,7 +552,7 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
 #define FOCUS_HIGHLIGHT_INTRO() \
    images.image: "box_glow.png" COMP; \
    images.image: "box_outline.png" COMP; \
-   data.item: "focus_highlight" "on";
+   // data.item: "focus_highlight" "on";
 
 #define FOCUS_HIGHLIGHT_PARTS(_R1_OFFSET, _R2_OFFSET) \
    image { "focus_hilight"; nomouse; \
@@ -586,13 +586,13 @@ group { name: "elm/scroller/base/dialog";     // dialog text scroller
       } \
    }
 
-#define FOCUS_HIGHLIGHT_PROGRAMS(_SIG_ON, _SIG_OFF) \
-   program { signal: _SIG_ON; source: "elm"; \
+#define FOCUS_HIGHLIGHT_PROGRAMS() \
+   program { signal: "emc,action,focus"; source: "emc"; \
       action: STATE_SET "visible" 0.0; \
       target: "focus_hilight"; \
       after: "focus_pulse_start"; \
    } \
-   program { signal: _SIG_OFF; source: "elm"; \
+   program { signal: "emc,action,unfocus"; source: "emc"; \
       action: STATE_SET "default" 0.0; \
       target: "focus_hilight"; \
       target: "focus_hilight_pulse"; \
@@ -1380,7 +1380,7 @@ group { name: "elm/list/item/browser"; alias: "elm/list/item_odd/browser";
          action:  STATE_SET "default" 0.0;
          target:  "disclip";
       }
-      FOCUS_HIGHLIGHT_PROGRAMS("elm,state,focused", "elm,state,unfocused")
+      FOCUS_HIGHLIGHT_PROGRAMS()
    }
 }
 
@@ -1680,7 +1680,7 @@ group { name: "elm/genlist/item_compress/default/browser";
          action: STATE_SET "default" 0.0;
          target: "elm.swallow.end";
       }
-      FOCUS_HIGHLIGHT_PROGRAMS("elm,state,focused", "elm,state,unfocused")
+      FOCUS_HIGHLIGHT_PROGRAMS()
    }
 }
 group { name: "elm/genlist/item/group_index/browser"; nomouse; program_source: "elm";
@@ -2008,7 +2008,7 @@ group { name: "elm/gengrid/item/default/browser";
          action:  STATE_SET "default" 0.0;
          target:  "disclip";
       }
-      FOCUS_HIGHLIGHT_PROGRAMS("elm,state,focused", "elm,state,unfocused")
+      FOCUS_HIGHLIGHT_PROGRAMS()
    }
 }
 group { name: "elm/gengrid/item/group_index/browser";
@@ -2211,7 +2211,7 @@ group { name: "elm/genlist/item_compress/default/playlist";
          action:  STATE_SET "default" 0.0;
          target:  "disclip";
       }
-      FOCUS_HIGHLIGHT_PROGRAMS("elm,state,focused", "elm,state,unfocused")
+      FOCUS_HIGHLIGHT_PROGRAMS()
    }
 }
 
@@ -2418,7 +2418,7 @@ group { name: "elm/genlist/item_compress/default/dman";
          action:  STATE_SET "default" 0.0;
          target:  "disclip";
       }
-      // FOCUS_HIGHLIGHT_PROGRAMS("elm,state,focused", "elm,state,unfocused")
+      // FOCUS_HIGHLIGHT_PROGRAMS()
    }
 }
 
@@ -2858,7 +2858,7 @@ group { name: "elm/entry/base-single/vkeyboard";
          action: FOCUS_SET;
          target: "elm.text";
       }
-      FOCUS_HIGHLIGHT_PROGRAMS("elm,action,focus", "elm,action,unfocus")
+      FOCUS_HIGHLIGHT_PROGRAMS()
    }
 }
 group { name: "elm/entry/selection/vkeyboard";
@@ -3386,7 +3386,7 @@ group { name: "elm/button/base/emc";
             eval_mode(m);
          }
       }
-      FOCUS_HIGHLIGHT_PROGRAMS("elm,action,focus", "elm,action,unfocus")
+      FOCUS_HIGHLIGHT_PROGRAMS()
    }
 #undef ICON
 #undef LABEL
@@ -4010,7 +4010,7 @@ group { name: "elm/slider/horizontal/emc";
             eval_mode(m);
          }
       }
-      FOCUS_HIGHLIGHT_PROGRAMS("elm,action,focus", "elm,action,unfocus")
+      FOCUS_HIGHLIGHT_PROGRAMS()
    }
 #undef ICON
 #undef LABEL

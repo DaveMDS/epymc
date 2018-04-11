@@ -28,29 +28,24 @@ from epymc import gui, input_events
 _list = None # MainmenuList widget (the main horizontal list)
 
 
-class MainmenuList(elm.List, elm.Scrollable):
-   def __init__(self):
-      elm.List.__init__(self, gui.layout, horizontal=True, focus_allow=False,
-                        select_mode=elm.ELM_OBJECT_SELECT_MODE_ALWAYS,
-                        style='mainmenu', name='MainMenuList')
-      self.policy = elm.ELM_SCROLLER_POLICY_OFF, elm.ELM_SCROLLER_POLICY_OFF
-
-
 def init():
    global _list
 
-   _list = MainmenuList()
+   _list = gui.EmcList(parent=gui.layout, horizontal=True, focus_allow=True,
+                       select_mode=elm.ELM_OBJECT_SELECT_MODE_ALWAYS,
+                       style='mainmenu', name='MainMenuList')
+   _list.policy = elm.ELM_SCROLLER_POLICY_OFF, elm.ELM_SCROLLER_POLICY_OFF
    gui.swallow_set('mainmenu.list.swallow', _list)
 
    item_add('exit', 200, _('Exit'), 'icon/exit', lambda: gui.ask_to_exit())
 
 def show():
    _list.focus_allow = True
+   _list.focus = True
    _list.callback_clicked_double_add(_cb_item_activated)
    _list.callback_selected_add(_cb_item_selected)
    if not _list.selected_item:
       _list.first_item.selected = True
-   _list.selected_item.focus = True
    _list.go()
    gui.signal_emit('mainmenu,show')
    input_events.listener_add('mainmenu', input_event_cb)
@@ -68,8 +63,8 @@ def item_add(name, weight, label, icon, callback, subitems=[]):
 
    img = gui.load_image(icon)
 
-   sublist = elm.List(_list, style='mainmenu_sublist',
-                      focus_allow=True, name='MainMenuSubList')
+   sublist = gui.EmcList(_list, style='mainmenu_sublist', focus_allow=False,
+                         name='MainMenuSubList')
    for _label, _icon, _url in subitems:
       si = sublist.item_append(_label, gui.load_icon(_icon) if _icon else None)
       si.data['url'] = _url
@@ -124,26 +119,6 @@ def input_event_cb(event):
    if not item:
       item = _list.first_item
       item.selected = True
-
-   if event == 'RIGHT':
-      if item.next:
-         item.next.selected = True
-         sublist = item.data['sublist']
-         if sublist and sublist.selected_item:
-            sublist.selected_item.selected = False
-         return input_events.EVENT_BLOCK
-      else:
-         return input_events.EVENT_CONTINUE
-
-   elif event == 'LEFT':
-      if item.prev:
-         item.prev.selected = True
-         sublist = item.data['sublist']
-         if sublist and sublist.selected_item:
-            sublist.selected_item.selected = False
-         return input_events.EVENT_BLOCK
-      else:
-         return input_events.EVENT_CONTINUE
 
    elif event == 'DOWN':
       sublist = item.data['sublist']

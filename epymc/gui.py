@@ -82,14 +82,9 @@ def DBG(msg):
    # print('GUI: %s' % msg)
    pass
 
-def DBG_FOCUS(msg, obj=None):
-   '''  export EINA_LOG_LEVELS="elementary-focus:10"  '''
-   if obj:
-      print('FOCUS: %s <%s name=%s>' % (msg, obj.__class__.__name__,
-                                        getattr(obj, 'name', 'None')))
-   else:
-      print('FOCUS: %s' % msg)
-   #  pass
+def DBG_FOCUS(*args):
+   print('FOCUS:', *args)
+   # pass  # don't forget to comment the dump_focus_tree call !!
 
 
 def init():
@@ -118,10 +113,10 @@ def init():
    conf = ElmConfig()
    conf.window_auto_focus_enable = False
    conf.window_auto_focus_animate = False
-   conf.focus_highlight_enabled = True
+   conf.focus_highlight_enabled = False
    conf.focus_highlight_animate = False
-   conf.focus_autoscroll_mode = elm.ELM_FOCUS_AUTOSCROLL_MODE_NONE #ELM_FOCUS_AUTOSCROLL_MODE_SHOW or ELM_FOCUS_AUTOSCROLL_MODE_BRING_IN
-   conf.item_select_on_focus_disabled = True # needed by AudioPlayer genlist
+   conf.focus_autoscroll_mode = elm.ELM_FOCUS_AUTOSCROLL_MODE_NONE
+   conf.item_select_on_focus_disabled = True
    conf.focus_highlight_clip_disabled = False
    if evas_accelerated == 'True':
       conf.accel_preference = 'accel'
@@ -149,16 +144,16 @@ def init():
    # custom elementary theme
    set_theme_file(theme_file)
 
-   # create the elm window
-   win = elm.Window('epymc', elm.ELM_WIN_BASIC, title=_('Emotion Media Center'),
-                focus_allow=False)
+   # create the emc window
+   win = EmcWindow('epymc', elm.ELM_WIN_BASIC, title=_('Emotion Media Center'))
    win.callback_delete_request_add(lambda w: ask_to_exit())
    if fullscreen == 'True':
       win.fullscreen_set(1)
 
    # main layout (main theme)
-   layout = elm.Layout(win, file=(theme_file, 'emc/main/layout'), focus_allow=False,
-                   size_hint_expand=EXPAND_BOTH, name='MainLayout')
+   layout = EmcLayout(win, name='MainLayout',
+                      file=(theme_file, 'emc/main/layout'),
+                      size_hint_expand=EXPAND_BOTH)
    win.resize_object_add(layout)
    layout.show()
 
@@ -483,7 +478,7 @@ def box_remove_all(part, clear=True):
 key_down_func = None
 
 def _on_key_down(event):
-   if isinstance(win.focused_object, elm.Entry):
+   if isinstance(win.focused_object, EmcTextEntry) and event.key not in ('Up', 'Down'):
       return ecore.ECORE_CALLBACK_PASS_ON
    if key_down_func:
       return key_down_func(event)
@@ -491,190 +486,27 @@ def _on_key_down(event):
 # hack end
 
 
-focus_directions = {
-   'UP':    elm.ELM_FOCUS_UP,
-   'DOWN':  elm.ELM_FOCUS_DOWN,
-   'LEFT':  elm.ELM_FOCUS_LEFT,
-   'RIGHT': elm.ELM_FOCUS_RIGHT,
-}
-
-def focus_move(direction, root_obj=None):
-   """ TODOC """
-
-   if root_obj is None:
-      root_obj = layout
-
+def focus_move(direction):
+   DBG_FOCUS('==== FOCUS MOVE ===========================================')
    focused = win.focused_object
-   DBG_FOCUS('==== FOCUS MOVE ==============================================')
-   DBG_FOCUS('ROOT:', root_obj)
    DBG_FOCUS('FOCUSED:', focused)
-   if focused and getattr(focused, 'focused_item', None):
-      DBG_FOCUS('FOCUSED ITEM:', focused.focused_item)
+   win.dump_focus_tree()  # TODO REMOVE ME !!!!
 
-   # move between List items...
-   if isinstance(focused, elm.List) and focused.focus_allow:
-      DBG_FOCUS('Moving focus in List...')
-      item = focused.focused_item
-      to_item = None
-      horiz = focused.horizontal
-      if (horiz and direction == 'RIGHT') or (not horiz and direction == 'DOWN'):
-         to_item = item.next
-         while to_item and to_item.disabled:
-            to_item = to_item.next
-      elif (horiz and direction == 'LEFT') or (not horiz and direction == 'UP'):
-         to_item = item.prev
-         while to_item and to_item.disabled:
-            to_item = to_item.prev
-      if to_item:
-         to_item.selected = True
-         to_item.focus = True
-         to_item.bring_in()
-         return True
+   # try to move all the focus managers (starting from nested one)
+   manager = focused if focused.is_focus_manager else focused.parent_manager
+   while manager:
+      DBG_FOCUS('Try moving focus in manager:', manager)
+      if manager.focus_move_internal(direction):
+         return
+      manager = manager.parent_manager
 
-   # move between Genlist items...
-   elif isinstance(focused, elm.Genlist) and focused.focus_allow:
-      DBG_FOCUS('Moving focus in GenList...')
-      item = focused.focused_item or focused.selected_item
-      to_item = None
-      if direction == 'DOWN':
-         to_item = item.next
-         while to_item and to_item.type == elm.ELM_GENLIST_ITEM_GROUP:
-            to_item = to_item.next
-      elif direction == 'UP':
-         to_item = item.prev
-         while to_item and to_item.type == elm.ELM_GENLIST_ITEM_GROUP:
-            to_item = to_item.prev
-      if to_item:
-         # to_item.selected = True
-         to_item.focus = True
-         to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
-         return True
-
-   # move between Gengrid items...
-   elif isinstance(focused, elm.Gengrid) and focused.focus_allow:
-      DBG_FOCUS('Moving focus in GenGrid...')
-      item = focused.focused_item or focused.selected_item
-      x1, y1 = item.pos
-      to_item = None
-
-      if direction in ('LEFT', 'RIGHT'):
-         to_item = item.next if direction == 'RIGHT' else item.prev
-         if to_item:
-            x2, y2 = to_item.pos
-            if y1 != y2:
-               to_item = None
-
-      elif direction == 'DOWN':
-         to_item = item
-         try:
-            while True:
-               to_item = to_item.next
-               x2, y2 = to_item.pos
-               # skip items on the same row of the start one
-               if y2 == y1:
-                  continue
-               # skip group items
-               if to_item.disabled:
-                  continue
-               # search the first item on the same col (or on the left)
-               if x2 == x1 or to_item.next.pos[1] > y2:
-                  break
-         except:
-            if to_item != focused.last_item:
-               to_item = None
-         
-      else: # UP
-         to_item = item
-         try:
-            while True:
-               to_item = to_item.prev
-               x2, y2 = to_item.pos
-               # skip items on the same row of the start one
-               if y2 == y1:
-                  continue
-               # skip group items
-               if to_item.disabled:
-                  continue
-               # search the first item on the same col (or on the left)
-               if x2 <= x1:
-                  break
-         except:
-            to_item = None
-
-      if to_item:
-         # to_item.selected = True
-         to_item.focus = True
-         to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
-         return True
-
-   # change sliders value
-   elif isinstance(focused, EmcSlider) and focused.focus_allow:
-      DBG_FOCUS('Moving focus in EmcSlider...')
-      sl = focused
-      if direction == 'RIGHT': # TODO support vertical
-         sl.value += sl.step
-         sl.callback_call('changed')
-         return True
-      elif direction == 'LEFT':
-         sl.value -= sl.step
-         sl.callback_call('changed')
-         return True
-
-   # or just let elm move the focus between objects...
-   DBG_FOCUS('Let ELM move the focus for us...')
-   root_obj.focus_next(focus_directions[direction])
-
-   new_focused = win.focused_object
-   DBG_FOCUS('Focus moved TO:', new_focused)
-
-   # ... and now various fixes on the work done by elm
-   if focused == new_focused:
-      # FOCUS FIX: UP/DOWN on VideoPlayer.PosSlider do not work
-      if focused.name == 'VideoPlayer.PosSlider':
-         if direction == 'UP':
-            DBG_FOCUS('FOCUS FIX: UP on VideoPlayer.PosSlider do not work')
-            root_obj.evas.object_name_find('VideoPlayer.PlayBtn').focus = True
-         elif direction == 'DOWN':
-            DBG_FOCUS('FOCUS FIX: DOWN on VideoPlayer.PosSlider do not work (root is different)')
-            root_obj.evas.object_name_find('VolumeSlider').focus = True
-
-      # FOCUS FIX: always close AudioPlayer on LEFT event
-      if direction == 'LEFT' and focused.parent.name == 'AudioPlayer':
-         # TODO: "LEFT" should be taken from the theme, or the position
-         DBG_FOCUS('FOCUS FIX: always close AudioPlayer on LEFT event')
-         focused.parent.focus = False # this will make the player hide
-         new_focused = win.focused_object
-
-   # FOCUS FIX: expand/contract AudioPlayer on focus/unfocus
-   if focused.parent.name == 'AudioPlayer' and new_focused.parent.name != 'AudioPlayer':
-      DBG_FOCUS('FOCUS FIX: contract AudioPlayer when he lost focus')
-      focused.parent.controls_hide()
-   elif focused.parent.name != 'AudioPlayer' and new_focused.parent.name == 'AudioPlayer':
-      DBG_FOCUS('FOCUS FIX: expand AudioPlayer on focus')
-      new_focused.parent.controls_show()
-
-   # FOCUS FIX: remove focus from MainLayout or MainWin
-   if new_focused.name == 'MainLayout' or new_focused.__class__.__name__ == 'Window':
-      root_obj.focus_next(elm.ELM_FOCUS_PREVIOUS)
-      new_focused = win.focused_object
-      DBG_FOCUS('FOCUS FIX: remove focus from MainLayout or MainWin - NEW:', new_focused)
-
-   # FOCUS FIX: focus to gengrid item
-   if isinstance(new_focused, elm.Gengrid) and new_focused.focused_item is None:
-      DBG_FOCUS('FOCUS FIX: give focus to the selected item in a focused Gengrid')
-      new_focused.selected_item.focus = True
-
-   return False
 
 def _input_event_cb(event):
    focused = win.focused_object
-
-   if event in focus_directions:
+   if event in ('UP', 'DOWN', 'LEFT', 'RIGHT'):
       focus_move(event)
-
    elif event == 'OK' and isinstance(focused, EmcButton):
       focused.activate()
-
    elif event == 'TOGGLE_FULLSCREEN':
       fullscreen_toggle()
    elif event == 'SCALE_BIGGER':
@@ -896,21 +728,529 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 
 ################################################################################
-class _ScrollableList(elm.List, elm.Scrollable):
-   def __init__(self, parent, **kargs):
-      elm.List.__init__(self, parent, **kargs)
+class _EmcFocusable(object):
+   """ Base class to be used for all focusable widgets """
+
+   _focused_object = None
+   _focus_history = []
+
+   def __init__(self, parent, focus_allow=True, is_focus_manager=False,
+                focus_history_allow=True):
+      if not isinstance(self, evas.Object):
+         raise TypeError('Focusable object must be evas.Object subclass')
+      if not parent and not isinstance(self, EmcWindow):
+         raise TypeError('Focusable parent must be given')
+      if parent and not isinstance(parent, _EmcFocusable):
+         raise TypeError('Parent must be a focusable object')
+      if is_focus_manager and not hasattr(self, 'focus_move_internal'):
+         raise NotImplementedError('A focus manager must implement ' \
+                                   'focus_move_internal()')
+
+      self._focus_allow = focus_allow
+      self._is_focus_manager = is_focus_manager
+      self._history_allow = focus_history_allow
+
+      self._focusable_children = []
+      self._cbs_focused = None
+      self._cbs_unfocused = None
+
+      if not isinstance(self, EmcTextEntry):
+         # TODO do this for entry on focus/unfocus ?
+         elm.Object.focus_allow_set(self, False)
+
+      # build the focusable tree hierarchy
+      if parent:
+         parent._focusable_children.append(self)
+         self.on_del_add(self._delete_cb)
+
+   def __repr__(self):
+      return '<{0} ({1}) focus_allow={2} is_manager={3}{4}{5}>'.format(
+               self.__class__.__name__, self.name,
+               self.focus_allow, self.is_focus_manager,
+               ' NO-HISTORY' if not self._history_allow else '',
+               ' FOCUSED' if self.focus else '')
+
+   def _delete_cb(self, obj):
+      self.focus = False
+      self.parent._focusable_children.remove(self)
+      self.focus_history_remove()
+
+   def callback_focused_add(self, cb, *args, **kargs):
+      """ Add a callback to be called on focus """
+      if self._cbs_focused is None:
+         self._cbs_focused = []
+      self._cbs_focused.append((cb, args, kargs))
+
+   def callback_unfocused_add(self, cb, *args, **kargs):
+      """ Add a callback to be called on unfocus """
+      if self._cbs_unfocused is None:
+         self._cbs_unfocused = []
+      self._cbs_unfocused.append((cb, args, kargs))
+
+   def _callbacks_call(self, cb_list):
+      if cb_list:
+         for cb, args, kargs in cb_list:
+            cb(self, *args, **kargs)
+
+   @staticmethod
+   def _get_children_recursive(obj, focusable_only, L):
+      for child in obj._focusable_children:
+         if not focusable_only or (child.focus_allow and not child.disabled):
+            L.append(child)
+         _EmcFocusable._get_children_recursive(child, focusable_only, L)
+      return L
+
+   @property
+   def focusable_children(self):
+      """ Flat list of all focusable children in obj tree (recursive) """
+      return _EmcFocusable._get_children_recursive(self, True, [])
+
+   @property
+   def children(self):
+      """ Flat list of all children in obj tree (recursive) """
+      return _EmcFocusable._get_children_recursive(self, False, [])
+
+   @property
+   def focus_allow(self):
+      """ Get if the object can receive the focus (bool) """
+      return self._focus_allow
+
+   @focus_allow.setter
+   def focus_allow(self, allow):
+      """ Set if the obj can receive the focus (bool) """
+      self._focus_allow = allow
+      if not allow:
+         self.focus = False
+
+   @property
+   def focus_history_allow(self):
+      """ Get if the object should go in focus history (bool) """
+      return self._history_allow
+
+   @focus_history_allow.setter
+   def focus_history_allow(self, allow):
+      """ Set if the object should go in the focus history (bool) """
+      self._history_allow = allow
+      if not allow:
+         self.focus_history_remove()
+
+   def focus_history_remove(self):
+      """ Remove all the occurence of this object from focus history """
+      while self in _EmcFocusable._focus_history:
+         _EmcFocusable._focus_history.remove(self)
+
+   @property
+   def tree_focus_allow(self):
+      """ Whenever at least one child is focusable (bool) """
+      return len(self.focusable_children) > 0
+
+   @tree_focus_allow.setter
+   def tree_focus_allow(self, allow):
+      """ Set/Unset focus_allow on the whole children tree (bool) """
+      children = self.children
+      for child in children:
+         child._focus_allow = allow
+      if not allow and self.focused_object in children:
+         self.focused_object.focus = False
+
+   @property
+   def focus(self):
+      """ Is this the currently focused object? (bool) """
+      return _EmcFocusable._focused_object == self
+
+   @focus.setter
+   def focus(self, focus):
+      """ Set/Unset the focus to this obj (bool) """
+      # do nothing if not changed
+      if focus == self.focus:
+         return
+
+      # cannot focus a not focusable object
+      if focus and not self.focus_allow:
+         raise RuntimeError('Cannot focus a non-focusable object: %s' % self)
+      
+      # un-focus currently focused object
+      if focus and _EmcFocusable._focused_object:
+         _EmcFocusable._focused_object.focus = False
+
+      # focus self
+      if focus == True:
+         DBG_FOCUS("FOCUS SET", self)
+         _EmcFocusable._focused_object = self
+         self.signal_emit('emc,action,focus', 'emc')
+         self._callbacks_call(self._cbs_focused)
+
+         # TODO limit this list in some way ??????
+         if self._history_allow:
+            _EmcFocusable._focus_history.append(self)
+
+      # un-focus self
+      else:
+         DBG_FOCUS("FOCUS UNSET", self)
+         self.signal_emit('emc,action,unfocus', 'emc')
+         self._callbacks_call(self._cbs_unfocused)
+
+         # nothing is focused now, which is bad. Check again in the next loop
+         _EmcFocusable._focused_object = None
+         ecore.Timer(0.0, self._delayed_history_pop)
+
+   def _delayed_history_pop(self):
+      if _EmcFocusable._focused_object is None:
+         DBG_FOCUS("FOCUS HISTORY POP !!!!!!!!!!!!!!!!!!!!!!!!!!")
+         while True and _EmcFocusable._focus_history:
+            obj = _EmcFocusable._focus_history.pop()
+            if obj.focus_allow:
+               obj.focus = True
+               break
+      return ecore.ECORE_CALLBACK_CANCEL
+
+   @property
+   def focused_object(self):
+      """ The currently focused object (in the whole tree) """
+      return _EmcFocusable._focused_object
+
+   @property
+   def focused_child(self):
+      """ The currently focused object (only in this object tree) """
+      if self.focused_object in self.focusable_children:
+         return _EmcFocusable._focused_object
+
+   @property
+   def is_focus_manager(self):
+      """ True If the object is a focus manager """
+      return self._is_focus_manager
+
+   @property
+   def parent_manager(self):
+      """ Get the first parent focus-manager object """
+      obj = self
+      while True:
+         if isinstance(obj, EmcWindow):
+            return obj
+         parent = obj.parent
+         if parent.is_focus_manager:
+            return parent
+         obj = parent
+
+   def dump_focus_tree(self, level=0):
+      """ Only used for debug purpose """
+      if level == 0:
+         print("\n===== FOCUS TREE FOR: %s =====" % self.__class__.__name__)
+
+      print(("  " * level) + str(self))
+      for child in self._focusable_children:
+         child.dump_focus_tree(level + 1)
+
+      if level == 0:
+         print("===== TREE END ==================\n")
+
+   def focus_move(self, direction):
+      """ Move the focus in the given direction (only between obj children) """
+
+      DBG_FOCUS('==== FOCUS MOVE 2 ===========================================')
+      focused = self if self.focus else self.focused_child
+      manager = focused.parent_manager
+      DBG_FOCUS('FOCUSED:', focused)
+      DBG_FOCUS('MANAGER:', manager)
+
+      # Search the nearest widget in the given direction
+      DBG_FOCUS('Search the nearest widget in direction: %s ...' % direction)
+      if   direction == 'LEFT':   focus_point = focused.left_center
+      elif direction == 'RIGHT':  focus_point = focused.right_center
+      elif direction == 'UP':     focus_point = focused.top_center
+      elif direction == 'DOWN':   focus_point = focused.bottom_center
+
+      x1, x2 = focused.left_center[0], focused.right_center[0]
+      y1, y2 = focused.top_center[1], focused.bottom_center[1]
+
+      nearest = nearest_linear = None
+      distance = distance_linear = 9999999
+
+      for obj in manager.focusable_children:
+         # ignore the current focused obj
+         if obj == focused:
+            continue
+
+         # ignore objects in the wrong direction
+         ox, oy = obj.center
+         if   direction == 'LEFT'  and ox >= focus_point[0]: continue
+         elif direction == 'RIGHT' and ox <= focus_point[0]: continue
+         elif direction == 'UP'    and oy >= focus_point[1]: continue
+         elif direction == 'DOWN'  and oy <= focus_point[1]: continue
+
+         # calc the distance between the focus point and the nearest obj side
+         if direction == 'LEFT':
+            segment_p1, segment_p2 = obj.top_right, obj.bottom_right
+         elif direction == 'RIGHT':
+            segment_p1, segment_p2 = obj.top_left, obj.bottom_left
+         elif direction == 'UP':
+            segment_p1, segment_p2 = obj.bottom_left, obj.bottom_right
+         elif direction == 'DOWN':
+            segment_p1, segment_p2 = obj.top_left, obj.top_right
+
+         dis = utils.distance_between_point_and_segment(focus_point,
+                                                        segment_p1, segment_p2)
+
+         # remember the nearest object
+         if nearest is None or dis < distance:
+            distance = dis
+            nearest = obj
+
+         # also remember the "linear nearest", that have higher priority
+         # (only counting obj perfectly aligned in the given direction)
+         if nearest_linear is None or dis < distance_linear:
+            if direction in ('UP', 'DOWN'):
+               a1, a2, b1, b2 = x1, x2, obj.left_center[0], obj.right_center[0]
+            else:
+               a1, a2, b1, b2 = y1, y2, obj.top_center[1], obj.bottom_center[1]
+
+            if (a1 <= b1 < a2 or a1 < b2 <= a2) or (b1 <= a1 and b2 >= a2):
+               distance_linear = dis
+               nearest_linear = obj
+
+      # focus the new object if found, otherwise do nothing
+      if nearest_linear is not None:
+         DBG_FOCUS('FOUND LINEAR \o/', nearest_linear)
+         nearest_linear.focus = True
+         return True
+      elif nearest is not None:
+         DBG_FOCUS('FOUND \o/', nearest)
+         nearest.focus = True
+         return True
+      else:
+         DBG_FOCUS('Nothing to focus!')
+         return False
 
 ################################################################################
-class EmcButton(elm.Button):
+class EmcWindow(_EmcFocusable, elm.Window):
+   def __init__(self, *args, **kargs):
+      elm.Window.__init__(self, *args, **kargs)
+      _EmcFocusable.__init__(self, parent=None, is_focus_manager=True,
+                             focus_allow=False, focus_history_allow=False)
+
+   def focus_move_internal(self, direction):
+      self.focus_move(direction)
+      return True
+
+################################################################################
+class EmcLayout(_EmcFocusable, elm.Layout):
+   def __init__(self, parent, focus_allow=False, is_focus_manager=False,
+                focus_history_allow=True, **kargs):
+      elm.Layout.__init__(self, parent, **kargs)
+      _EmcFocusable.__init__(self, parent, focus_allow=focus_allow,
+                             is_focus_manager=is_focus_manager,
+                             focus_history_allow=focus_history_allow)
+
+   def focus_move_internal(self, direction):
+      """ Default implementation for focus managers """
+      return self.focus_move(direction)
+
+################################################################################
+class EmcList(_EmcFocusable, elm.List, elm.Scrollable):
+   def __init__(self, parent, focus_allow=True, **kargs):
+      self._focused_item = None
+
+      elm.List.__init__(self, parent, **kargs)
+      _EmcFocusable.__init__(self, parent, focus_allow=focus_allow,
+                             is_focus_manager=True)
+      self.callback_highlighted_add(self._item_highlighted_cb)
+
+   @property
+   def focused_item(self):
+      return self._focused_item
+
+   @focused_item.setter
+   def focused_item(self, item):
+      item.selected = True
+      item.bring_in()
+
+   def _item_highlighted_cb(self, obj, item):
+      self._focused_item = item
+
+   def focus_move_internal(self, direction):
+      item = self.focused_item or self.selected_item or self.first_item
+      if not item:
+         return False
+      
+      to_item = None
+      horiz = self.horizontal
+      if (horiz and direction == 'RIGHT') or (not horiz and direction == 'DOWN'):
+         to_item = item.next
+         while to_item and to_item.disabled:
+            to_item = to_item.next
+      elif (horiz and direction == 'LEFT') or (not horiz and direction == 'UP'):
+         to_item = item.prev
+         while to_item and to_item.disabled:
+            to_item = to_item.prev
+      if to_item:
+         self.focused_item = to_item
+         return True
+
+################################################################################
+class _EmcGenBase(_EmcFocusable):
+   def __init__(self, parent, focus_allow=True,
+                select_on_focus=True, focus_on_select=True):
+      self._focused_item = None
+      self._select_on_focus = select_on_focus
+      self._focus_on_select = focus_on_select
+
+      _EmcFocusable.__init__(self, parent, is_focus_manager=True,
+                             focus_allow=focus_allow)
+
+      self.callback_selected_add(self._item_selected_cb)
+      self.callback_realized_add(self._item_realized_cb)
+      self.callback_focused_add(self._focused_cb)
+      self.callback_unfocused_add(self._unfocused_cb)
+
+   @property
+   def focused_item(self):
+      return self._focused_item
+
+   @focused_item.setter
+   def focused_item(self, item):
+      if self._focused_item:
+         self._focused_item.signal_emit('emc,action,unfocus', 'emc')
+      self._focused_item = item
+      item.signal_emit('emc,action,focus', 'emc')
+
+   def _focused_cb(self, obj):
+      item = self.focused_item or self.selected_item or self.first_item
+      if item:
+         self.focused_item = item
+
+   def _unfocused_cb(self, obj):
+      if self.focused_item:
+         self.focused_item.signal_emit('emc,action,unfocus', 'emc')
+
+   def _item_selected_cb(self, obj, item):
+      if self._focus_on_select:
+         self.focused_item = item
+         self.focus = True
+
+   def _item_realized_cb(self, obj, item):
+      if item == self.focused_item and self.focus == True:
+         item.signal_emit('emc,action,focus', 'emc')
+      else:
+         item.signal_emit('emc,action,unfocus', 'emc')
+
+################################################################################
+class EmcGenlist(_EmcGenBase, elm.Genlist):
+   def __init__(self, parent, focus_allow=True, select_on_focus=True,
+                focus_on_select=True, **kargs):
+      elm.Genlist.__init__(self, parent, **kargs)
+      _EmcGenBase.__init__(self, parent, focus_allow=focus_allow,
+                           focus_on_select=focus_on_select,
+                           select_on_focus=select_on_focus)
+
+   def clear(self):
+      self._focused_item = None
+      elm.Genlist.clear(self)
+
+   def focus_move_internal(self, direction):
+      item = self.focused_item or self.selected_item or self.first_item
+      to_item = None
+
+      if direction == 'DOWN':
+         to_item = item.next
+         while to_item and to_item.type == elm.ELM_GENLIST_ITEM_GROUP:
+            to_item = to_item.next
+
+      elif direction == 'UP':
+         to_item = item.prev
+         while to_item and to_item.type == elm.ELM_GENLIST_ITEM_GROUP:
+            to_item = to_item.prev
+
+      if to_item:
+         self.focused_item = to_item
+         if self._select_on_focus:
+            to_item.selected = True
+         to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
+         return True
+
+      return False
+
+################################################################################
+class EmcGengrid(_EmcGenBase, elm.Gengrid):
+   def __init__(self, parent, focus_allow=True, **kargs):
+      elm.Gengrid.__init__(self, parent, **kargs)
+      _EmcGenBase.__init__(self, parent, focus_allow=focus_allow)
+
+   def clear(self):
+      self._focused_item = None
+      elm.Gengrid.clear(self)
+
+   def focus_move_internal(self, direction):
+      item = self.focused_item or self.selected_item or self.first_item
+      x1, y1 = item.pos
+      to_item = None
+
+      if direction in ('LEFT', 'RIGHT'):
+         to_item = item.next if direction == 'RIGHT' else item.prev
+         if to_item:
+            x2, y2 = to_item.pos
+            if y1 != y2:
+               to_item = None
+
+      elif direction == 'DOWN':
+         to_item = item
+         try:
+            while True:
+               to_item = to_item.next
+               x2, y2 = to_item.pos
+               # skip items on the same row of the start one
+               if y2 == y1:
+                  continue
+               # skip group items
+               if to_item.disabled:
+                  continue
+               # search the first item on the same col (or on the left)
+               if x2 == x1 or to_item.next.pos[1] > y2:
+                  break
+         except:
+            if to_item != self.last_item:
+               to_item = None
+         
+      else: # UP
+         to_item = item
+         try:
+            while True:
+               to_item = to_item.prev
+               x2, y2 = to_item.pos
+               # skip items on the same row of the start one
+               if y2 == y1:
+                  continue
+               # skip group items
+               if to_item.disabled:
+                  continue
+               # search the first item on the same col (or on the left)
+               if x2 <= x1:
+                  break
+         except:
+            to_item = None
+
+      if to_item:
+         self.focused_item = to_item
+         to_item.selected = True
+         to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
+         return True
+
+      return False
+
+################################################################################
+class EmcButton(_EmcFocusable, elm.Button):
    """ A simple wrapper around the elm Button class """
 
    def __init__(self, label=None, icon=None, cb=None, cb_data=None,
-                      parent=None, toggle=False, **kargs):
+                      parent=None, toggle=False, focus_allow=True, **kargs):
+
+      elm.Button.__init__(self, parent, style='emc', **kargs)
+      _EmcFocusable.__init__(self, parent, focus_allow=focus_allow)
+
       self._cb = cb
       self._cb_data = cb_data
       self._is_toggle = toggle
       self._toggled = False
-      elm.Button.__init__(self, parent or layout, style='emc', **kargs)
+
       self.callback_clicked_add(self.activate)
       if label: self.text_set(label)
       if icon: self.icon_set(icon)
@@ -932,6 +1272,8 @@ class EmcButton(elm.Button):
          self.signal_emit('emc,state,untoggled', 'emc')
 
    def activate(self, obj=None):
+      self.focus = True
+
       if self._is_toggle:
          self.toggled = not self._toggled
       elif obj is None:
@@ -944,14 +1286,35 @@ class EmcButton(elm.Button):
             self._cb(self)
 
 ################################################################################
-class EmcSlider(elm.Slider):
+class EmcSlider(_EmcFocusable, elm.Slider):
    """ Simple wrapper around the elm Slider class """
-   def __init__(self, parent, **kargs):
+   def __init__(self, parent, focus_allow=True, **kargs):
       elm.Slider.__init__(self, parent, style='emc', **kargs)
+      _EmcFocusable.__init__(self, parent, focus_allow=focus_allow,
+                             is_focus_manager=True)
       self.show()
 
+   def focus_move_internal(self, direction):
+      if direction == 'RIGHT': # TODO support vertical
+         self.value += self.step
+         self.callback_call('changed')
+         return True
+
+      elif direction == 'LEFT':
+         self.value -= self.step
+         self.callback_call('changed')
+         return True
+
+      return False
+
 ################################################################################
-class EmcMenu(elm.Ctxpopup):
+class EmcTextEntry(_EmcFocusable, elm.Entry):
+   def __init__(self, parent, focus_allow=True, **kargs):
+      elm.Entry.__init__(self, parent, **kargs)
+      _EmcFocusable.__init__(self, parent, focus_allow=focus_allow)
+
+################################################################################
+class EmcMenu(_EmcFocusable, elm.Ctxpopup):
    """ Dont forget to call show() AFTER all items added """
    def __init__(self, relto=None, dismiss_on_select=True):
       self.dismiss_on_select = dismiss_on_select
@@ -961,10 +1324,13 @@ class EmcMenu(elm.Ctxpopup):
          elm.ELM_CTXPOPUP_DIRECTION_DOWN, elm.ELM_CTXPOPUP_DIRECTION_UP,
          elm.ELM_CTXPOPUP_DIRECTION_RIGHT, elm.ELM_CTXPOPUP_DIRECTION_LEFT)
       )
+      _EmcFocusable.__init__(self, layout, is_focus_manager=True,
+                             focus_allow=False)
       self.callback_dismissed_add(self._dismissed_cb)
 
       # Scrollable list as content
-      self.li = _ScrollableList(self, style='emc_menu', mode=elm.ELM_LIST_EXPAND)
+      self.li = EmcList(self, style='emc_menu', name='MenuList',
+                        mode=elm.ELM_LIST_EXPAND)
       self.li.content_min_limit(True, False)
       self.li.callback_activated_add(self._item_activated_cb)
       self.li.on_mouse_move_add(self._mouse_move_cb)
@@ -995,7 +1361,11 @@ class EmcMenu(elm.Ctxpopup):
          if item:
             item.selected = True
 
+      # give focus to the inner list
+      self.li.focus = True
+
    def close(self):
+      self.li.focus_allow = False
       self.dismiss()
 
    def item_add(self, label=None, icon=None, end=None, callback=None, *args, **kargs):
@@ -1025,7 +1395,7 @@ class EmcMenu(elm.Ctxpopup):
       if callable(cb):
          cb(self, item, *args, **kwargs)
       if self.dismiss_on_select:
-         self.dismiss()
+         self.close()
 
    def _mouse_move_cb(self, obj, event):
       item, pos = self.li.at_xy_item_get(*event.position.canvas)
@@ -1035,19 +1405,21 @@ class EmcMenu(elm.Ctxpopup):
    def _mouse_click_cb(self, obj, event):
       self._item_activated_cb(self.li, self.li.selected_item)
 
+   def focus_move_internal(self, direction):
+      if direction in ('LEFT', 'RIGHT'):
+         return True
+      d = self.direction
+      if (d == elm.ELM_CTXPOPUP_DIRECTION_DOWN and direction == 'UP') or \
+         (d == elm.ELM_CTXPOPUP_DIRECTION_UP and direction == 'DOWN'):
+         self.close()
+      return True
+   
    def _input_event_cb(self, event):
       if event == 'OK':
          self._item_activated_cb(self.li, self.li.selected_item)
          return input_events.EVENT_BLOCK
       elif event in ('BACK', 'EXIT'):
-         self.dismiss()
-         return input_events.EVENT_BLOCK
-      elif event in ('UP', 'DOWN', 'LEFT', 'RIGHT'):
-         if focus_move(event, self) == False:
-            d = self.direction
-            if (d == elm.ELM_CTXPOPUP_DIRECTION_DOWN and event == 'UP') or \
-               (d == elm.ELM_CTXPOPUP_DIRECTION_UP and event == 'DOWN'):
-               self.dismiss()
+         self.close()
          return input_events.EVENT_BLOCK
       return input_events.EVENT_CONTINUE
 
@@ -1202,7 +1574,7 @@ class EmcImage(elm.Image):
          self._thumb_request_id = None
 
 ################################################################################
-class EmcDialog(elm.Layout):
+class EmcDialog(EmcLayout):
    """ TODO doc this
    style can be 'panel' or 'minimal'
 
@@ -1225,8 +1597,10 @@ class EmcDialog(elm.Layout):
          group = 'emc/dialog/buffering'
       else:
          group = 'emc/dialog/panel'
-      elm.Layout.__init__(self, layout, file=(theme_file, group), focus_allow=False,
-                      size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH)
+      EmcLayout.__init__(self, layout, file=(theme_file, group),
+                         focus_allow=True, is_focus_manager=True,
+                         size_hint_align=FILL_BOTH,
+                         size_hint_weight=EXPAND_BOTH)
       self.signal_callback_add('emc,dialog,close', '', self._close_pressed)
       self.signal_callback_add('emc,dialog,hide,done', '',
                                (lambda a,s,d: self._delete_real()))
@@ -1248,10 +1622,9 @@ class EmcDialog(elm.Layout):
       self._textentry = None
       self._buttons = []
 
-      # remember last focused obj (under the dialog)
-      self._last_focused = win.focused_object
-      if self._last_focused:
-         self._last_focused.focus = False
+      # give focus to the dialog itself (for dialogs without any focusable)
+      if style != 'buffering':
+         self.focus = True
 
       # title
       if title is None:
@@ -1298,10 +1671,10 @@ class EmcDialog(elm.Layout):
 
       # automatic list
       if style in ['list', 'image_list_horiz', 'image_list_vert']:
-         self._list = elm.List(self, focus_allow=False,
-                           size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH,
-                           horizontal=True if style == 'image_list_horiz' else False,
-                           style='dialog' if style == 'list' else 'image_list')
+         self._list = EmcList(self, focus_allow=False,
+                     size_hint_align=FILL_BOTH, size_hint_weight=EXPAND_BOTH,
+                     horizontal=True if style == 'image_list_horiz' else False,
+                     style='dialog' if style == 'list' else 'image_list')
          self._list.callback_activated_add(self._list_item_activated_cb)
          self._list.show()
          self._vbox.pack_end(self._list)
@@ -1355,8 +1728,8 @@ class EmcDialog(elm.Layout):
    def delete(self):
       input_events.listener_del(self._name)
       self.signal_emit('emc,dialog,hide', 'emc')
-      if self._last_focused:
-         self._last_focused.focus = True
+      self.tree_focus_allow = False
+      self.focus_allow = False
       for b in self._buttons:
          b.disabled = True
 
@@ -1385,7 +1758,7 @@ class EmcDialog(elm.Layout):
       return self._user_data
 
    def button_add(self, label, selected_cb=None, cb_data=None, icon=None, default=False):
-      b = EmcButton(label, icon, selected_cb, cb_data)
+      b = EmcButton(label, icon, selected_cb, cb_data, parent=self)
       self.box_prepend('emc.box.buttons', b)
       self._buttons.append(b)
       if len(self._buttons) == 1:
@@ -1467,6 +1840,26 @@ class EmcDialog(elm.Layout):
       self._textentry.autoscroll_speed_scale = speed_scale
       self._textentry.autoscroll = True
 
+   def focus_move_internal(self, direction):
+      # try to move between list items
+      if self._list or isinstance(self._content, (EmcList, EmcGenlist)):
+         li = self._list or self._content
+         if li.focus_move_internal(direction):
+            return True
+
+      # try to scroll the text entry
+      if self._textentry:
+         if direction == 'UP':
+            self._textentry.scroll_by(0, -100)
+         if direction == 'DOWN':
+            self._textentry.scroll_by(0, +100)
+
+      # try to move between dialog widgets
+      self.focus_move(direction)
+
+      # never let the focus goes out of the dialog
+      return True
+
    def _input_event_cb(self, event):
 
       if not self.visible:
@@ -1477,33 +1870,6 @@ class EmcDialog(elm.Layout):
             self._canc_cb(self)
          else:
             self.delete()
-         return input_events.EVENT_BLOCK
-
-      # if content is List or Genlist then automanage the events
-      if self._list or (self._content and type(self._content) in (elm.List, elm.Genlist)):
-         li = self._list or self._content
-         item = li.selected_item
-         if item:
-            new_it = None
-            horiz = li.horizontal if type(li) is elm.List else False
-            if (horiz and event == 'RIGHT') or (not horiz and event == 'DOWN'):
-               new_it = item.next
-            if (horiz and event == 'LEFT') or (not horiz and event == 'UP'):
-               new_it = item.prev
-            if new_it:
-               new_it.selected = True
-               new_it.bring_in()
-               return input_events.EVENT_BLOCK
-
-      # try to scroll the text entry
-      if self._textentry:
-         if event == 'UP':
-            self._textentry.scroll_by(0, -100)
-         if event == 'DOWN':
-            self._textentry.scroll_by(0, +100)
-
-      if event in focus_directions:
-         focus_move(event, self)
          return input_events.EVENT_BLOCK
 
       if event == 'OK':
@@ -1588,7 +1954,7 @@ class EmcSlideshow(elm.Slideshow):
          self._folder, self._first_file = os.path.split(self._folder)
 
       # swallow our layout in the main layout
-      self._ly = elm.Layout(layout, file=(theme_file, 'emc/slideshow/default'))
+      self._ly = EmcLayout(layout, file=(theme_file, 'emc/slideshow/default'))
       swallow_set('slideshow.swallow', self._ly)
 
       # swallow the slideshow widget in our layout
@@ -1602,14 +1968,17 @@ class EmcSlideshow(elm.Slideshow):
       self._ly.signal_emit('show', 'emc')
 
       # fill the controls bar with buttons
-      bt = EmcButton(icon='icon/prev', cb=lambda b: self.previous())
+      bt = EmcButton(parent=self._ly, icon='icon/prev',
+                     cb=lambda b: self.previous())
       self._ly.box_append('controls.btn_box', bt)
 
-      bt = EmcButton(icon='icon/pause', cb=lambda b: self.pause_toggle())
+      bt = EmcButton(parent=self._ly, icon='icon/pause',
+                     cb=lambda b: self.pause_toggle())
       self._ly.box_append('controls.btn_box', bt)
       self._pause_btn = bt
 
-      bt = EmcButton(icon='icon/next', cb=lambda b: self.next())
+      bt = EmcButton(parent=self._ly, icon='icon/next',
+                     cb=lambda b: self.next())
       self._ly.box_append('controls.btn_box', bt)
 
       # fill the slideshow widget
@@ -1973,15 +2342,18 @@ class EmcVKeyboard(EmcDialog):
       self._current_layout = self._available_layouts[0] # TODO remember the last one used
 
       # table
-      tb = elm.Table(win, homogeneous=True)
+      tb = elm.Table(layout, homogeneous=True)
       tb.show()
       self._table = tb
+
+      # init the parent EmcDialog class
+      EmcDialog.__init__(self, title=title, style='minimal', content=tb)
 
       # set dialog title
       self.part_text_set('emc.text.title', title or _('Insert text'))
 
       # entry
-      self.entry = elm.Entry(win, style='vkeyboard', scrollable=True,
+      self.entry = EmcTextEntry(self, style='vkeyboard', scrollable=True,
                          single_line=True, editable=True,
                          context_menu_disabled=True, focus_allow=True,
                          size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
@@ -2012,15 +2384,13 @@ class EmcVKeyboard(EmcDialog):
                                      lambda b: self.entry.cursor_next())
       self._pack_btn(7, 6, 5, 1, _('Accept'),  'icon/ok', self._accept_cb)
 
-      # init the parent EmcDialog class
-      EmcDialog.__init__(self, title=title, style='minimal', content=tb)
-
       # catch input events
       input_events.listener_add('vkbd', self.input_event_cb)
       self.entry.focus = True
 
    def _pack_btn(self, x, y, w, h, label, icon=None, cb=None):
-      b = EmcButton(label=label, icon=icon, cb=cb, size_hint_align=FILL_HORIZ)
+      b = EmcButton(parent=self, label=label, icon=icon, cb=cb,
+                    size_hint_align=FILL_HORIZ)
       self._table.pack(b, x, y, w, h)
       self.buttons.append(b)
       return b

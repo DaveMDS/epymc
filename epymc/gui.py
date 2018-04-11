@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
 #
-# Copyright (C) 2010-2016 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2010-2018 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of EpyMC, an EFL based Media Center written in Python.
 #
@@ -430,7 +430,9 @@ def mouse_hide():
       DBG("Mouse pointer hide")
       win.data['mouse_blocker'].show()
 
+
 ### Simple edje abstraction ###
+
 def part_get(name):
    return layout.edje_get().part_external_object_get(name)
 
@@ -485,7 +487,6 @@ def _on_key_down(event):
    return ecore.ECORE_CALLBACK_DONE
 # hack end
 
-
 def focus_move(direction):
    DBG_FOCUS('==== FOCUS MOVE ===========================================')
    focused = win.focused_object
@@ -499,7 +500,6 @@ def focus_move(direction):
       if manager.focus_move_internal(direction):
          return
       manager = manager.parent_manager
-
 
 def _input_event_cb(event):
    focused = win.focused_object
@@ -532,200 +532,6 @@ def _event_cb(event):
 
    elif event == 'KEEP_ALIVE':
       mouse_hide()
-
-
-credits = """
-
-
-
-
-
-
-
-<info>code</>
-DAVIDE ANDREOLI
-
-<info>design</>
-DAVIDE ANDREOLI
-
-<info>i18n</>
-Wolfgang Morawetz - DE
-Kai Huuhko - FI
-Davide Andreoli - IT
-Niko2040 - RU
-
-<info>python efl team</>
-BORIS FAURE
-BRUNO DILLY
-DAVIDE ANDREOLI
-FABIANO FIDÊNCIO
-GUSTAVO SVERZUT BARBIERI
-JOOST ALBERS
-KAI HUUHKO
-SIMON BUSCH
-TIAGO FALCÃO
-
-<info>online sources</>
-themoviedb.org
-musicbrainz.org
-opensubtitles.org
-progettoemma.net
-freeroms.com
-southpark.cc.com
-youtube.com
-vimeo.com
-zapiks.com
-
-<info>efl team</>
-ADAM SIMPKINS
-AHARON HILLEL
-ALBIN TONNERRE
-ALEXANDRE BECOULET
-ALEXEY YAKOVENKO
-ANDRE DIEB
-ANDREW ELCOCK
-ARNAUD DE TURCKHEIM
-BERNHARD NEMEC
-BORIS FAURE
-BLUEZERY
-BRETT NASH
-BRIAN MATTERN
-BRUNO DILLY
-CARSTEN HAITZLER
-CEDRIC BAIL
-CHIDAMBAR ZINNOURY
-CHRIS ROSS
-CHRISTOPHE DUMEZ
-CHRISTOPHER MICHAEL
-CHRISTOPHE SADOINE
-CHUNEON PARK
-COREY DONOHOE
-DAN SINCLAIR
-DANIEL JUYUNG SEO
-DANIEL STENBERG
-DANIEL WILLMANN
-DANIEL ZAOUI
-DAN SINCLAIR
-DAVIDE ANDREOLI
-DAVID GOODLAD
-DAVID SEIKEL
-DOYOUN KANG
-EDUARDO LIMA
-FABIANO FIDÊNCIO
-FLAVIO CEOLIN
-GOVINDARAJU SM
-GUILHERME SILVEIRA
-GUILLAUME FRILOUX
-GUSTAVO CHAVES
-GUSTAVO LIMA CHAVES
-GUSTAVO SVERZUT BARBIERI
-GWANGLIM LEE
-HAIFENG DENG
-HISHAM MARDAM BEY
-HOWELL TAM
-HUGO CAMBOULIVE
-HYOYOUNG CHANG
-IBUKUN OLUMUYIWA
-IGOR MURZOV
-IVÁN BRIANO
-JAEHWAN KIM
-JÉRÉMY ZURCHER
-JÉRÔME PINOT
-JIHOON KIM
-JIM KUKUNAS
-JIYOUN PARK
-JONAS M. GASTAL
-JORGE LUIS ZAPATA
-JOSE O GONZALEZ
-JOSÉ ROBERTO DE SOUZA
-KEITH MARSHALL
-KIM SHINWOO
-KIM WOELDERS
-KIM YUNHAN
-LANCE FETTERS
-LARS MUNCH
-LEANDRO DORILEO
-LEANDRO PEREIRA
-LEANDRO SANTIAGO
-LEIF MIDDELSCHULTE
-LIONEL ORRY
-LUCAS DE MARCHI
-LUIS FELIPE STRANO MORAES
-MATHIEU TAILLEFUMIER
-MATT BARCLAY
-MICHAEL BOUCHAUD
-MICHAEL LAUER
-MICHAL PAKULA VEL RUTKA
-MIKAEL SANS
-MIKE BLUMENKRANTZ
-MIKE MCCORMACK
-MYOUNGWOON ROY KIM
-MYUNGJAE LEE
-NATHAN INGERSOLL
-NATHAN INGERSOLL
-NICHOLAS CURRAN
-NICHOLAS HUGHART
-NICOLAS AGUIRRE
-PATRYK KACZMAREK
-PAUL VIXIE
-PETER WEHRFRITZ
-PIERRE LE MAGOUROU
-PRINCE KUMAR DUBEY
-RAFAEL ANTOGNOLLI
-RAFAL KRYPA
-RAJEEV RANJAN
-RAPHAEL KUBO DA COSTA
-RICARDO DE ALMEIDA GONZAGA
-ROBERT DAVID
-RUI MIGUEL SILVA SEABRA
-SANGHO PARK
-SEBASTIAN DRANSFELD
-SEONG-HO CHO
-SEUNGSOO WOO
-SHILPA SINGH
-SIMON POOLE
-SOHYUN KIM
-STEFAN SCHMIDT
-STEPHEN HOUSTON
-STEVE IRELAND
-SUNG W. PARK
-THIERRY EL BORGI
-TIAGO FALCÃO
-TILL ADAM
-TILMAN SAUERBECK
-TIM HORTON
-TOM GILBERT
-TOM HACOHEN
-TOR LILLQVIST
-VIKRAM NARAYANAN
-VINCENT TORRI
-VINCENT RICHOMME
-WILLEM MONSUWE
-WOOHYUN JUNG
-YAKOV GOLDBERG
-YOUNESS ALAOUI
-YURI HUDOBIN
-ZBIGNIEW KOSINSKI
-ZIGSMCKENZIE
-
-
-<info>author special thanks</>
-SARA
-TEODORO
-MONOPOLIO DI STATO
-
-
-<info>license</>
-Copyright © 2010-2016 Davide Andreoli
-dave@gurumeditation.it
-
-EpyMC is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-
-EpyMC is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License along with EpyMC. If not, see http://www.gnu.org/licenses/
-"""
-
 
 ################################################################################
 class _EmcFocusable(object):
@@ -2878,3 +2684,197 @@ class DownloadManager(utils.Singleton):
             del item
       if gl.selected_item is None and gl.first_item:
          gl.first_item.selected = True
+
+
+################################################################################
+credits = """
+
+
+
+
+
+
+
+<info>code</>
+DAVIDE ANDREOLI
+
+<info>design</>
+DAVIDE ANDREOLI
+
+<info>i18n</>
+Wolfgang Morawetz - DE
+Kai Huuhko - FI
+Davide Andreoli - IT
+Niko2040 - RU
+
+<info>python efl team</>
+BORIS FAURE
+BRUNO DILLY
+DAVIDE ANDREOLI
+FABIANO FIDÊNCIO
+GUSTAVO SVERZUT BARBIERI
+JOOST ALBERS
+KAI HUUHKO
+SIMON BUSCH
+TIAGO FALCÃO
+
+<info>online sources</>
+themoviedb.org
+musicbrainz.org
+opensubtitles.org
+progettoemma.net
+freeroms.com
+southpark.cc.com
+youtube.com
+vimeo.com
+zapiks.com
+
+<info>efl team</>
+ADAM SIMPKINS
+AHARON HILLEL
+ALBIN TONNERRE
+ALEXANDRE BECOULET
+ALEXEY YAKOVENKO
+ANDRE DIEB
+ANDREW ELCOCK
+ARNAUD DE TURCKHEIM
+BERNHARD NEMEC
+BORIS FAURE
+BLUEZERY
+BRETT NASH
+BRIAN MATTERN
+BRUNO DILLY
+CARSTEN HAITZLER
+CEDRIC BAIL
+CHIDAMBAR ZINNOURY
+CHRIS ROSS
+CHRISTOPHE DUMEZ
+CHRISTOPHER MICHAEL
+CHRISTOPHE SADOINE
+CHUNEON PARK
+COREY DONOHOE
+DAN SINCLAIR
+DANIEL JUYUNG SEO
+DANIEL STENBERG
+DANIEL WILLMANN
+DANIEL ZAOUI
+DAN SINCLAIR
+DAVIDE ANDREOLI
+DAVID GOODLAD
+DAVID SEIKEL
+DOYOUN KANG
+EDUARDO LIMA
+FABIANO FIDÊNCIO
+FLAVIO CEOLIN
+GOVINDARAJU SM
+GUILHERME SILVEIRA
+GUILLAUME FRILOUX
+GUSTAVO CHAVES
+GUSTAVO LIMA CHAVES
+GUSTAVO SVERZUT BARBIERI
+GWANGLIM LEE
+HAIFENG DENG
+HISHAM MARDAM BEY
+HOWELL TAM
+HUGO CAMBOULIVE
+HYOYOUNG CHANG
+IBUKUN OLUMUYIWA
+IGOR MURZOV
+IVÁN BRIANO
+JAEHWAN KIM
+JÉRÉMY ZURCHER
+JÉRÔME PINOT
+JIHOON KIM
+JIM KUKUNAS
+JIYOUN PARK
+JONAS M. GASTAL
+JORGE LUIS ZAPATA
+JOSE O GONZALEZ
+JOSÉ ROBERTO DE SOUZA
+KEITH MARSHALL
+KIM SHINWOO
+KIM WOELDERS
+KIM YUNHAN
+LANCE FETTERS
+LARS MUNCH
+LEANDRO DORILEO
+LEANDRO PEREIRA
+LEANDRO SANTIAGO
+LEIF MIDDELSCHULTE
+LIONEL ORRY
+LUCAS DE MARCHI
+LUIS FELIPE STRANO MORAES
+MATHIEU TAILLEFUMIER
+MATT BARCLAY
+MICHAEL BOUCHAUD
+MICHAEL LAUER
+MICHAL PAKULA VEL RUTKA
+MIKAEL SANS
+MIKE BLUMENKRANTZ
+MIKE MCCORMACK
+MYOUNGWOON ROY KIM
+MYUNGJAE LEE
+NATHAN INGERSOLL
+NATHAN INGERSOLL
+NICHOLAS CURRAN
+NICHOLAS HUGHART
+NICOLAS AGUIRRE
+PATRYK KACZMAREK
+PAUL VIXIE
+PETER WEHRFRITZ
+PIERRE LE MAGOUROU
+PRINCE KUMAR DUBEY
+RAFAEL ANTOGNOLLI
+RAFAL KRYPA
+RAJEEV RANJAN
+RAPHAEL KUBO DA COSTA
+RICARDO DE ALMEIDA GONZAGA
+ROBERT DAVID
+RUI MIGUEL SILVA SEABRA
+SANGHO PARK
+SEBASTIAN DRANSFELD
+SEONG-HO CHO
+SEUNGSOO WOO
+SHILPA SINGH
+SIMON POOLE
+SOHYUN KIM
+STEFAN SCHMIDT
+STEPHEN HOUSTON
+STEVE IRELAND
+SUNG W. PARK
+THIERRY EL BORGI
+TIAGO FALCÃO
+TILL ADAM
+TILMAN SAUERBECK
+TIM HORTON
+TOM GILBERT
+TOM HACOHEN
+TOR LILLQVIST
+VIKRAM NARAYANAN
+VINCENT TORRI
+VINCENT RICHOMME
+WILLEM MONSUWE
+WOOHYUN JUNG
+YAKOV GOLDBERG
+YOUNESS ALAOUI
+YURI HUDOBIN
+ZBIGNIEW KOSINSKI
+ZIGSMCKENZIE
+
+
+<info>author special thanks</>
+SARA
+TEODORO
+MONOPOLIO DI STATO
+
+
+<info>license</>
+Copyright © 2010-2016 Davide Andreoli
+dave@gurumeditation.it
+
+EpyMC is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+EpyMC is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along with EpyMC. If not, see http://www.gnu.org/licenses/
+"""

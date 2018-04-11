@@ -750,6 +750,11 @@ class _EmcFocusable(object):
       if level == 0:
          print("===== TREE END ==================\n")
 
+   @property
+   def focused_geometry(self):
+      """ can be overriden to provide accurate geometry (fe: items in list) """
+      return self.geometry
+
    def focus_move(self, direction):
       """ Move the focus in the given direction (only between obj children) """
 
@@ -761,13 +766,15 @@ class _EmcFocusable(object):
 
       # Search the nearest widget in the given direction
       DBG_FOCUS('Search the nearest widget in direction: %s ...' % direction)
-      if   direction == 'LEFT':   focus_point = focused.left_center
-      elif direction == 'RIGHT':  focus_point = focused.right_center
-      elif direction == 'UP':     focus_point = focused.top_center
-      elif direction == 'DOWN':   focus_point = focused.bottom_center
+      x, y, w, h = focused.focused_geometry
+      if   direction == 'LEFT':  focus_point = (x, y + h / 2)      # left-center
+      elif direction == 'RIGHT': focus_point = (x + w, y + h / 2)  # right-center
+      elif direction == 'UP':    focus_point = (x + w / 2, y)      # top-center
+      elif direction == 'DOWN':  focus_point = (x + w / 2, y + h)  # bottom-center
 
-      x1, x2 = focused.left_center[0], focused.right_center[0]
-      y1, y2 = focused.top_center[1], focused.bottom_center[1]
+      # those are used later to check linearity
+      x1, x2 = x, x + w
+      y1, y2 = y, y + h
 
       nearest = nearest_linear = None
       distance = distance_linear = 9999999
@@ -870,6 +877,16 @@ class EmcList(_EmcFocusable, elm.List, elm.Scrollable):
       item.selected = True
       item.bring_in()
 
+   @property
+   def focused_geometry(self):
+      item = self.focused_item
+      if item:
+         geometry = item.track_object.geometry
+         item.untrack()
+         return geometry
+      else:
+         return self.geometry
+
    def _item_highlighted_cb(self, obj, item):
       self._focused_item = item
 
@@ -918,6 +935,16 @@ class _EmcGenBase(_EmcFocusable):
          self._focused_item.signal_emit('emc,action,unfocus', 'emc')
       self._focused_item = item
       item.signal_emit('emc,action,focus', 'emc')
+
+   @property
+   def focused_geometry(self):
+      item = self.focused_item
+      if item:
+         geometry = item.track_object.geometry
+         item.untrack()
+         return geometry
+      else:
+         return self.geometry
 
    def _focused_cb(self, obj):
       item = self.focused_item or self.selected_item or self.first_item

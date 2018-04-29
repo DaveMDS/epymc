@@ -31,7 +31,8 @@ _list = None # MainmenuList widget (the main horizontal list)
 def init():
    global _list
 
-   _list = gui.EmcList(parent=gui.layout, horizontal=True, focus_allow=True,
+   _list = gui.EmcList(parent=gui.layout, horizontal=True,
+                       focus_allow=True, focus_on_select=False,
                        select_mode=elm.ELM_OBJECT_SELECT_MODE_ALWAYS,
                        style='mainmenu', name='MainMenuList')
    _list.policy = elm.ELM_SCROLLER_POLICY_OFF, elm.ELM_SCROLLER_POLICY_OFF
@@ -63,8 +64,8 @@ def item_add(name, weight, label, icon, callback, subitems=[]):
 
    img = gui.load_image(icon)
 
-   sublist = gui.EmcList(_list, style='mainmenu_sublist', focus_allow=False,
-                         name='MainMenuSubList')
+   sublist = gui.EmcList(_list, style='mainmenu_sublist', name='MainMenuSubList',
+                         focus_allow=False, focus_on_select=False)
    for _label, _icon, _url in subitems:
       si = sublist.item_append(_label, gui.load_icon(_icon) if _icon else None)
       si.data['url'] = _url

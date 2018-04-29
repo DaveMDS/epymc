@@ -50,12 +50,7 @@ class FilemanList(gui.EmcList):
       self.current_folder = None
       self.fmonitor = None
       gui.EmcList.__init__(self, gui.layout, style='browser', name=name)
-      self.callback_focused_add(self._focused_cb)
       self.callback_clicked_double_add(self.item_activated_cb)
-
-   def _focused_cb(self, obj):
-      item = self.focused_item or self.first_item
-      item.selected = True
 
    def item_activated_cb(self, li=None, item=None):
       if item is None:

@@ -834,6 +834,75 @@ class _EmcFocusable(object):
          DBG_FOCUS('Nothing to focus!')
          return False
 
+class _EmcFocusableWithItems(_EmcFocusable):
+   """ Common base class for EmcList, EmcGenlist and EmcGengrid """
+   def __init__(self, parent,
+                select_on_focus=True,
+                focus_on_select=True,
+                **kargs):
+
+      _EmcFocusable.__init__(self, parent, is_focus_manager=True, **kargs)
+      self._select_on_focus = select_on_focus
+      self._focus_on_select = focus_on_select
+      self._focused_item = None
+
+      self.callback_focused_add(self._focused_cb)
+      self.callback_unfocused_add(self._unfocused_cb)
+      if isinstance(self, elm.List):
+         self.callback_highlighted_add(self._item_selected_cb)
+      else:  # Genlist, Gengrid
+         self.callback_selected_add(self._item_selected_cb)
+         self.callback_realized_add(self._item_realized_cb)
+
+   @property
+   def focused_item(self):
+      return self._focused_item
+
+   @focused_item.setter
+   def focused_item(self, item):
+      if self._focused_item and self._focused_item != item:
+         self._focused_item.signal_emit('emc,action,unfocus', 'emc')
+
+      self._focused_item = item
+      item.signal_emit('emc,action,focus', 'emc')
+
+      if self._select_on_focus and not item.selected:
+         item.selected = True
+
+   @property
+   def focused_geometry(self):
+      item = self.focused_item
+      if item:
+         geometry = item.track_object.geometry
+         item.untrack()
+         return geometry
+      else:
+         return self.geometry
+
+   def clear(self):
+      self._focused_item = None
+      super().clear()
+
+   def _focused_cb(self, obj):
+      item = self.focused_item or self.selected_item or self.first_item
+      if item:
+         self.focused_item = item
+
+   def _unfocused_cb(self, obj):
+      if self.focused_item:
+         self.focused_item.signal_emit('emc,action,unfocus', 'emc')
+
+   def _item_selected_cb(self, obj, item):
+      if self._focus_on_select and self.focused_item != item:
+         self.focused_item = item
+         self.focus = True
+
+   def _item_realized_cb(self, obj, item):
+      if item == self.focused_item and self.focus == True:
+         item.signal_emit('emc,action,focus', 'emc')
+      else:
+         item.signal_emit('emc,action,unfocus', 'emc')
+
 ################################################################################
 class EmcWindow(_EmcFocusable, elm.Window):
    def __init__(self, *args, **kargs):
@@ -859,36 +928,17 @@ class EmcLayout(_EmcFocusable, elm.Layout):
       return self.focus_move(direction)
 
 ################################################################################
-class EmcList(_EmcFocusable, elm.List, elm.Scrollable):
-   def __init__(self, parent, focus_allow=True, **kargs):
-      self._focused_item = None
-
+class EmcList(_EmcFocusableWithItems, elm.List, elm.Scrollable):
+   def __init__(self, parent,
+                focus_allow=True,
+                select_on_focus=True,
+                focus_on_select=True,
+                **kargs):
       elm.List.__init__(self, parent, **kargs)
-      _EmcFocusable.__init__(self, parent, focus_allow=focus_allow,
-                             is_focus_manager=True)
-      self.callback_highlighted_add(self._item_highlighted_cb)
-
-   @property
-   def focused_item(self):
-      return self._focused_item
-
-   @focused_item.setter
-   def focused_item(self, item):
-      item.selected = True
-      item.bring_in()
-
-   @property
-   def focused_geometry(self):
-      item = self.focused_item
-      if item:
-         geometry = item.track_object.geometry
-         item.untrack()
-         return geometry
-      else:
-         return self.geometry
-
-   def _item_highlighted_cb(self, obj, item):
-      self._focused_item = item
+      _EmcFocusableWithItems.__init__(self, parent,
+                                      focus_allow=focus_allow,
+                                      select_on_focus=select_on_focus,
+                                      focus_on_select=focus_on_select)
 
    def focus_move_internal(self, direction):
       item = self.focused_item or self.selected_item or self.first_item
@@ -907,77 +957,21 @@ class EmcList(_EmcFocusable, elm.List, elm.Scrollable):
             to_item = to_item.prev
       if to_item:
          self.focused_item = to_item
+         to_item.bring_in()
          return True
 
 ################################################################################
-class _EmcGenBase(_EmcFocusable):
-   def __init__(self, parent, focus_allow=True,
-                select_on_focus=True, focus_on_select=True):
-      self._focused_item = None
-      self._select_on_focus = select_on_focus
-      self._focus_on_select = focus_on_select
-
-      _EmcFocusable.__init__(self, parent, is_focus_manager=True,
-                             focus_allow=focus_allow)
-
-      self.callback_selected_add(self._item_selected_cb)
-      self.callback_realized_add(self._item_realized_cb)
-      self.callback_focused_add(self._focused_cb)
-      self.callback_unfocused_add(self._unfocused_cb)
-
-   @property
-   def focused_item(self):
-      return self._focused_item
-
-   @focused_item.setter
-   def focused_item(self, item):
-      if self._focused_item:
-         self._focused_item.signal_emit('emc,action,unfocus', 'emc')
-      self._focused_item = item
-      item.signal_emit('emc,action,focus', 'emc')
-
-   @property
-   def focused_geometry(self):
-      item = self.focused_item
-      if item:
-         geometry = item.track_object.geometry
-         item.untrack()
-         return geometry
-      else:
-         return self.geometry
-
-   def _focused_cb(self, obj):
-      item = self.focused_item or self.selected_item or self.first_item
-      if item:
-         self.focused_item = item
-
-   def _unfocused_cb(self, obj):
-      if self.focused_item:
-         self.focused_item.signal_emit('emc,action,unfocus', 'emc')
-
-   def _item_selected_cb(self, obj, item):
-      if self._focus_on_select:
-         self.focused_item = item
-         self.focus = True
-
-   def _item_realized_cb(self, obj, item):
-      if item == self.focused_item and self.focus == True:
-         item.signal_emit('emc,action,focus', 'emc')
-      else:
-         item.signal_emit('emc,action,unfocus', 'emc')
-
-################################################################################
-class EmcGenlist(_EmcGenBase, elm.Genlist):
-   def __init__(self, parent, focus_allow=True, select_on_focus=True,
-                focus_on_select=True, **kargs):
+class EmcGenlist(_EmcFocusableWithItems, elm.Genlist):
+   def __init__(self, parent,
+                focus_allow=True,
+                select_on_focus=True,
+                focus_on_select=True,
+                **kargs):
       elm.Genlist.__init__(self, parent, **kargs)
-      _EmcGenBase.__init__(self, parent, focus_allow=focus_allow,
-                           focus_on_select=focus_on_select,
-                           select_on_focus=select_on_focus)
-
-   def clear(self):
-      self._focused_item = None
-      elm.Genlist.clear(self)
+      _EmcFocusableWithItems.__init__(self, parent,
+                                      focus_allow=focus_allow,
+                                      focus_on_select=focus_on_select,
+                                      select_on_focus=select_on_focus)
 
    def focus_move_internal(self, direction):
       item = self.focused_item or self.selected_item or self.first_item
@@ -995,22 +989,23 @@ class EmcGenlist(_EmcGenBase, elm.Genlist):
 
       if to_item:
          self.focused_item = to_item
-         if self._select_on_focus:
-            to_item.selected = True
          to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
          return True
 
       return False
 
 ################################################################################
-class EmcGengrid(_EmcGenBase, elm.Gengrid):
-   def __init__(self, parent, focus_allow=True, **kargs):
+class EmcGengrid(_EmcFocusableWithItems, elm.Gengrid):
+   def __init__(self, parent,
+                focus_allow=True,
+                select_on_focus=True,
+                focus_on_select=True,
+                **kargs):
       elm.Gengrid.__init__(self, parent, **kargs)
-      _EmcGenBase.__init__(self, parent, focus_allow=focus_allow)
-
-   def clear(self):
-      self._focused_item = None
-      elm.Gengrid.clear(self)
+      _EmcFocusableWithItems.__init__(self, parent,
+                                      focus_allow=focus_allow,
+                                      select_on_focus=select_on_focus,
+                                      focus_on_select=focus_on_select)
 
    def focus_move_internal(self, direction):
       item = self.focused_item or self.selected_item or self.first_item
@@ -1063,7 +1058,6 @@ class EmcGengrid(_EmcGenBase, elm.Gengrid):
 
       if to_item:
          self.focused_item = to_item
-         to_item.selected = True
          to_item.bring_in(elm.ELM_GENLIST_ITEM_SCROLLTO_MIDDLE)
          return True
 

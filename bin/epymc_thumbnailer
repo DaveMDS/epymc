@@ -32,6 +32,7 @@ GEN|src|dst|frame_style\n
 
 OUT Protocol:
 =============
+UP\n
 OK\n
 ERR\n
 """
@@ -107,6 +108,12 @@ def stdin_data_received_cb(fdh):
    return ecore.ECORE_CALLBACK_RENEW
 
 
+def startup_timer():
+   sys.stdout.write('UP\n')
+   sys.stdout.flush()
+   return ecore.ECORE_CALLBACK_CANCEL
+
+
 def shutdown_timer():
    ecore.main_loop_quit()
    return ecore.ECORE_CALLBACK_CANCEL
@@ -121,6 +128,7 @@ if __name__ == '__main__':
 
    fdh = ecore.FdHandler(sys.stdin, ecore.ECORE_FD_READ, stdin_data_received_cb)
 
+   ecore.Timer(0.001, startup_timer)
    timer = ecore.Timer(SHUTDOWN_TIMEOUT, shutdown_timer)
    ecore.main_loop_begin()
 

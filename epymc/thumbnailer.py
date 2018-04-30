@@ -176,20 +176,15 @@ class EmcThumbWorker_EThumbSubprocess(EmcThumbWorker_Base):
                             ecore.ECORE_EXE_PIPE_READ_LINE_BUFFERED |
                             ecore.ECORE_EXE_TERM_WITH_PARENT |
                             ecore.ECORE_EXE_USE_SH)
-      self._exe.on_add_event_add(self._slave_started_cb)
       self._exe.on_del_event_add(self._slave_died_cb)
       self._exe.on_data_event_add(self._slave_stdout_cb)
-
-   def _slave_started_cb(self, exe, event):
-      DBG('slave started succesfully')
-      self._starting = False
-      if self._item is not None:
-         self._send_request()
 
    def _slave_died_cb(self, exe, event):
       DBG('slave exited')
       self._exe = None
       self._starting = False
+      if self._item is not None:
+         self.item_completed(False)
 
    def _slave_stdout_cb(self, exe, event):
       for line in event.lines:
@@ -203,6 +198,12 @@ class EmcThumbWorker_EThumbSubprocess(EmcThumbWorker_Base):
    def _parse_response(self, msg):
       if msg == 'OK':
          success = True
+      elif msg == 'UP':
+         DBG('slave started succesfully')
+         self._starting = False
+         if self._item is not None:
+            self._send_request()
+         return
       else:
          success = False
          ERR('error or unknown msg from slave "%s"' % msg)

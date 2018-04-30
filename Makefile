@@ -50,3 +50,7 @@ check_po:
 	$(PY) setup.py check_po
 
 
+.PHONY: develop
+develop:
+	$(PY) setup.py develop
+

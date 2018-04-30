@@ -2,6 +2,7 @@
 #
 # usage:
 #
+# python3 setup.py develop  (run in place)
 # python3 setup.py install [--prefix=]
 # python3 setup.py uninstall [--prefix=]
 # python3 setup.py build_themes
@@ -271,6 +272,38 @@ class Build(build):
       build.run(self)
 
 
+class Develop(Command):
+   description = 'Run in-place from build dir without any install need'
+   user_options = []
+
+   def initialize_options(self):
+      pass
+
+   def finalize_options(self):
+      pass
+
+   def env_prepend(self, name, value):
+      if name in os.environ:
+         os.environ[name] = value + os.pathsep + os.environ[name]
+      else:
+         os.environ[name] = value
+
+   def run(self):
+      self.run_command("build")
+      # augment PATH for thumbnailer bin to be found
+      self.env_prepend('PATH', './build/scripts-{0}.{1}/'.format(*sys.version_info))
+      # augment PYTHONPATH for epymc.extapi to be found by scrapers
+      self.env_prepend('PYTHONPATH', './build/lib/')
+      # augment sys.path for the next import to work
+      sys.path.insert(0, './build/lib/')
+      # delete any previously imported epymc package
+      if 'epymc' in sys.modules:
+         del sys.modules['epymc']
+      # start epymc in this process (from the ./build folder)
+      from epymc.main import start_epymc
+      sys.exit(start_epymc())
+
+
 class Install(install):
    user_options = install.user_options + [
                   ('no-runtime-deps-check', None,
@@ -315,7 +348,7 @@ setup (
    platforms = 'linux',
 
    requires = [
-      'efl (>= 1.18.0)',
+      'efl (>= 1.20.0)',
       'beautifulsoup4',
       'lxml',
       'mutagen',
@@ -393,6 +426,7 @@ setup (
       'build_themes': build_themes,
       'build_i18n': build_i18n,
       'build': Build,
+      'develop': Develop,
       'install': Install,
       'install_lib': InstallLib,
       'uninstall': Uninstall,

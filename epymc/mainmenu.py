@@ -32,7 +32,7 @@ def init():
    global _list
 
    _list = gui.EmcList(parent=gui.layout, horizontal=True,
-                       focus_allow=True, focus_on_select=False,
+                       focus_allow=True, focus_on_select=True,
                        select_mode=elm.ELM_OBJECT_SELECT_MODE_ALWAYS,
                        style='mainmenu', name='MainMenuList')
    _list.policy = elm.ELM_SCROLLER_POLICY_OFF, elm.ELM_SCROLLER_POLICY_OFF

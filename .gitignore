@@ -5,6 +5,7 @@ epymc/locale/*
 epymc/themes/*.edj
 data/locale/*.po~
 installed_files*
+develop/
 
 ## below files are created by makepkg
 ## when building the PKGBUILD

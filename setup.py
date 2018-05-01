@@ -291,18 +291,22 @@ class Develop(Command):
 
    def run(self):
       self.run_command("build")
-      # augment PATH for thumbnailer bin to be found
+      # PATH for the binaries to be searched in build/scripts-X.Y/
       self.env_prepend('PATH', './build/scripts-{0}.{1}/'.format(*sys.version_info))
-      # augment PYTHONPATH for epymc.extapi to be found by scrapers
+      # PYTHONPATH for the epymc modules be searched in build/lib/
       self.env_prepend('PYTHONPATH', './build/lib/')
-      # augment sys.path for the next import to work
-      sys.path.insert(0, './build/lib/')
-      # delete any previously imported epymc package
-      if 'epymc' in sys.modules:
-         del sys.modules['epymc']
-      # start epymc in this process (from the ./build folder)
-      from epymc.main import start_epymc
-      sys.exit(start_epymc())
+      # XDG config home in develop/config/
+      conf = os.path.abspath('./develop/config/')
+      if not os.path.exists(conf):
+         os.makedirs(conf)
+      os.environ['XDG_CONFIG_HOME'] = conf
+      # XDG cache home in develop/cache/
+      cache = os.path.abspath('./develop/cache/')
+      if not os.path.exists(cache):
+         os.makedirs(cache)
+      os.environ['XDG_CACHE_HOME'] = cache
+      # run epymc !
+      os.system('epymc')  # TODO pass additional args
 
 
 class Install(install):

@@ -83,8 +83,7 @@ def shutdown():
    del _memorydb
 
 def topbar_button_add(label=None, icon=None, cb=None, cb_data=None):
-   bt = EmcButton(parent=gui.layout, label=label, icon=icon,
-                  cb=cb, cb_data=cb_data,
+   bt = EmcButton(gui.layout, label, icon, cb=cb, cb_data=cb_data,
                   focus_allow=False, name=label or icon)
    gui.box_append('topbar.box', bt)
    _topbar_btns.append(bt)

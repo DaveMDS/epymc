@@ -259,7 +259,7 @@ class FileManagerModule(EmcModule):
          return
 
       def btn_add(label, cb):
-         b = gui.EmcButton(label, parent=gui.layout, cb=cb,
+         b = gui.EmcButton(gui.layout, label, cb=cb,
                            name=label, size_hint_fill=FILL_HORIZ)
          gui.box_append('fileman.buttons.box', b)
          self.widgets.append(b)

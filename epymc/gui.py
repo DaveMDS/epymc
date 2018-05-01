@@ -1068,8 +1068,8 @@ class EmcGengrid(_EmcFocusableWithItems, elm.Gengrid):
 class EmcButton(_EmcFocusable, elm.Button):
    """ A simple wrapper around the elm Button class """
 
-   def __init__(self, label=None, icon=None, cb=None, cb_data=None,
-                      parent=None, toggle=False, focus_allow=True, **kargs):
+   def __init__(self, parent, label=None, icon=None, cb=None, cb_data=None,
+                      toggle=False, focus_allow=True, **kargs):
 
       elm.Button.__init__(self, parent, style='emc', **kargs)
       _EmcFocusable.__init__(self, parent, focus_allow=focus_allow)
@@ -1597,7 +1597,7 @@ class EmcDialog(EmcLayout):
       return self._user_data
 
    def button_add(self, label, selected_cb=None, cb_data=None, icon=None, default=False):
-      b = EmcButton(label, icon, selected_cb, cb_data, parent=self)
+      b = EmcButton(self, label, icon, selected_cb, cb_data)
       self.box_prepend('emc.box.buttons', b)
       self._buttons.append(b)
       if len(self._buttons) == 1:
@@ -1807,16 +1807,16 @@ class EmcSlideshow(elm.Slideshow):
       self._ly.signal_emit('show', 'emc')
 
       # fill the controls bar with buttons
-      bt = EmcButton(parent=self._ly, icon='icon/prev',
+      bt = EmcButton(self._ly, icon='icon/prev',
                      cb=lambda b: self.previous())
       self._ly.box_append('controls.btn_box', bt)
 
-      bt = EmcButton(parent=self._ly, icon='icon/pause',
+      bt = EmcButton(self._ly, icon='icon/pause',
                      cb=lambda b: self.pause_toggle())
       self._ly.box_append('controls.btn_box', bt)
       self._pause_btn = bt
 
-      bt = EmcButton(parent=self._ly, icon='icon/next',
+      bt = EmcButton(self._ly, icon='icon/next',
                      cb=lambda b: self.next())
       self._ly.box_append('controls.btn_box', bt)
 
@@ -2228,8 +2228,7 @@ class EmcVKeyboard(EmcDialog):
       self.entry.focus = True
 
    def _pack_btn(self, x, y, w, h, label, icon=None, cb=None):
-      b = EmcButton(parent=self, label=label, icon=icon, cb=cb,
-                    size_hint_align=FILL_HORIZ)
+      b = EmcButton(self, label, icon, cb=cb, size_hint_align=FILL_HORIZ)
       self._table.pack(b, x, y, w, h)
       self.buttons.append(b)
       return b

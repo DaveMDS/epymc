@@ -471,14 +471,14 @@ class MyItemClass(EmcItemClass):
          vbox = Box(gui.win)
          vbox.show()
          # label
-         b = EmcButton('only label', parent=d, cb=_buttons_cb)
+         b = EmcButton(d, 'only label', cb=_buttons_cb)
          vbox.pack_end(b)
          # icon
-         b = EmcButton(icon='icon/star', parent=d, cb=_buttons_cb)
+         b = EmcButton(d, icon='icon/star', cb=_buttons_cb)
          b.focus = True
          vbox.pack_end(b)
          # label + icon
-         b = EmcButton('label + icon', 'icon/star', parent=d, cb=_buttons_cb)
+         b = EmcButton(d, 'label + icon', 'icon/star', cb=_buttons_cb)
          vbox.pack_end(b)
          hbox.pack_end(vbox)
 
@@ -486,15 +486,15 @@ class MyItemClass(EmcItemClass):
          vbox = Box(gui.win)
          vbox.show()
          # label
-         b = EmcButton('only label disabled', parent=d, cb=_buttons_cb)
+         b = EmcButton(d, 'only label disabled', cb=_buttons_cb)
          b.disabled_set(True)
          vbox.pack_end(b)
          # icon
-         b = EmcButton(icon='icon/mame', parent=d, cb=_buttons_cb)
+         b = EmcButton(d, icon='icon/mame', cb=_buttons_cb)
          b.disabled_set(True)
          vbox.pack_end(b)
          # label + icon
-         b = EmcButton('label + icon disabled', 'icon/back', parent=d, cb=_buttons_cb)
+         b = EmcButton(d, 'label + icon disabled', 'icon/back', cb=_buttons_cb)
          b.disabled_set(True)
          vbox.pack_end(b)
          hbox.pack_end(vbox)
@@ -503,16 +503,16 @@ class MyItemClass(EmcItemClass):
          hbox2 = Box(gui.win)
          hbox2.horizontal_set(True)
          hbox2.show()
-         b = EmcButton('toggle label', parent=d, toggle=True, cb=_buttons_cb)
+         b = EmcButton(d, 'toggle label', toggle=True, cb=_buttons_cb)
          hbox2.pack_end(b)
-         b = EmcButton('toggle label + icon', 'icon/star', parent=d, toggle=True, cb=_buttons_cb)
+         b = EmcButton(d, 'toggle label + icon', 'icon/star', toggle=True, cb=_buttons_cb)
          hbox2.pack_end(b)
-         b = EmcButton(icon='icon/star', parent=d, toggle=True, cb=_buttons_cb)
+         b = EmcButton(d, icon='icon/star', toggle=True, cb=_buttons_cb)
          hbox2.pack_end(b)
-         b = EmcButton(icon='icon/star', parent=d, toggle=True, cb=_buttons_cb)
+         b = EmcButton(d, icon='icon/star', toggle=True, cb=_buttons_cb)
          b.toggled = True
          hbox2.pack_end(b)
-         b = EmcButton('toggle disabled', 'icon/star', parent=d, toggle=True, cb=_buttons_cb)
+         b = EmcButton(d, 'toggle disabled', 'icon/star', toggle=True, cb=_buttons_cb)
          b.disabled_set(True)
          hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
@@ -522,7 +522,7 @@ class MyItemClass(EmcItemClass):
          hbox2.horizontal_set(True)
          hbox2.show()
          for i in range(0,8):
-            b = EmcButton(str(i), parent=d, cb=_buttons_cb)
+            b = EmcButton(d, str(i), cb=_buttons_cb)
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
 
@@ -532,7 +532,7 @@ class MyItemClass(EmcItemClass):
          hbox2.show()
          icons = ['icon/prev', 'icon/fbwd','icon/bwd','icon/stop','icon/play','icon/fwd','icon/ffwd','icon/next']
          for i in icons:
-            b = EmcButton(parent=d, icon=i, cb=_buttons_cb)
+            b = EmcButton(d, icon=i, cb=_buttons_cb)
             hbox2.pack_end(b)
          vbox0.pack_end(hbox2)
 
@@ -544,7 +544,7 @@ class MyItemClass(EmcItemClass):
                   hbox2 = Box(gui.win, horizontal=True)
                   vbox0.pack_end(hbox2)
                   hbox2.show()
-               b = EmcButton(parent=d, icon=group, cb=_buttons_cb)
+               b = EmcButton(d, icon=group, cb=_buttons_cb)
                hbox2.pack_end(b)
                i += 1
 
@@ -553,7 +553,7 @@ class MyItemClass(EmcItemClass):
          d = EmcDialog(title='Focus corner cases', content=grid, style='panel')
 
          def btn_add(label, x, y, w, h, focus=False):
-            bt = EmcButton(parent=d, text=label)
+            bt = EmcButton(d, label)
             grid.pack(bt, x, y, w, h)
             bt.focus = focus
 

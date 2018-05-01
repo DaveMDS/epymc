@@ -1,19 +1,30 @@
 
+FOCUS
+=====
+SLIDER TEST, no focus getting focus :/
+
 EPYMC RELEASE PROCESS
 ======================
+ * check and comment all DBG functions
  * update i18n stuff
  * update the Changelog file
  * change version in epymc/__init__.py
  * check efl min requirement in setup.py
+ * update the stable arch PKGBUILD
 
  !!!!! TODO BEFORE 1.3  !!!!!!!!
 
  - attors info missing ?
- - EFL ERROR dialer=0x80000053ad4bf281 could not get effective HTTP version: An unknown option was passed in to libcurl
 
  - playlist editor in a separate dialog, with the songs list and the buttons:
    remove/moveup/movedown/close
    In another release we can also add save/load and edit id3
+
+
+RaspberryPI
+===========
+ * Thumbnailer do not work (need emotion-gstreamer1)
+
 
 
 TMP
@@ -38,6 +49,9 @@ BUGS
 
 CORE
 =====
+ * browser show/hide/freeze/unfreeze is now bad managed, it is not clear who is
+   responsable for that. The module? the broswer? the mainmenu?
+   ...currently is a mess, need to find a better way
  * joy/webserver need a key-repetition handling
  * subtitles font and size configuration
  * subtitles upload to opensubtitles.org
@@ -47,6 +61,16 @@ CORE
  * better icons for dialogs background
  * more semantic text styles (likes, views, etc...)
  * cache musicbrainz discid results
+ * add a new statistic_db
+   - num of audio/video/photo/games/etc... played
+   - total hours of audio/video playback
+   - num times epymc has been launched/closed(successfully)
+   - total hours of epymc alive ?
+   - num thumbnails generater
+   - num file downloaded ? also cached images?
+   - total key pressed
+   - total browser page viewed
+   - ....
 
 CORE (minor)
 ============
@@ -77,4 +101,5 @@ MAME
  * catver.ini: instead of reading a single file, scan a directory (~/.mame/cats/)
    for *.ini files and create a menu entry for each. The name in the root could
    be the name of the file (minus the extension)
+
 

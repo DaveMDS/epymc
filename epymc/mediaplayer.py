@@ -765,20 +765,20 @@ class EmcAudioPlayer(gui.EmcLayout, EmcPlayerBase):
       self.url = url
 
       ### control buttons
-      self.box_append('buttons.box', EmcButton(parent=self, icon='icon/prev',
+      self.box_append('buttons.box', EmcButton(self, icon='icon/prev',
                         cb=lambda b: input_events.event_emit('PLAYLIST_PREV')))
-      self.box_append('buttons.box', EmcButton(parent=self, icon='icon/pause',
+      self.box_append('buttons.box', EmcButton(self, icon='icon/pause',
                         cb=lambda b: input_events.event_emit('TOGGLE_PAUSE'),
                         name='PlayPauseBtn'))
-      self.box_append('buttons.box', EmcButton(parent=self, icon='icon/next',
+      self.box_append('buttons.box', EmcButton(self, icon='icon/next',
                         cb=lambda b: input_events.event_emit('PLAYLIST_NEXT')))
-      self.box_append('buttons.box', EmcButton(parent=self, icon='icon/stop',
+      self.box_append('buttons.box', EmcButton(self, icon='icon/stop',
                         cb=lambda b: input_events.event_emit('STOP')))
-      b = EmcButton(parent=self, icon='icon/loop', toggle=True,
+      b = EmcButton(self, icon='icon/loop', toggle=True,
                     cb=self._toggle_loop_cb)
       b.toggled = playlist.loop
       self.box_append('buttons.box', b)
-      b = EmcButton(parent=self, icon='icon/shuffle', toggle=True,
+      b = EmcButton(self, icon='icon/shuffle', toggle=True,
                     cb=self._toggle_shuffle_cb)
       b.toggled = playlist.shuffle
       self.box_append('buttons.box', b)
@@ -1044,33 +1044,33 @@ class EmcVideoPlayer(gui.EmcLayout, EmcPlayerBase):
       self.url = url
 
       ### control buttons
-      bt = EmcButton(icon='icon/fbwd', parent=self, cb=lambda b: self.fbackward())
+      bt = EmcButton(self, icon='icon/fbwd', cb=lambda b: self.fbackward())
       self.box_append('controls.btn_box', bt)
 
-      bt = EmcButton(icon='icon/bwd', parent=self, cb=lambda b: self.backward())
+      bt = EmcButton(self, icon='icon/bwd', cb=lambda b: self.backward())
       self.box_append('controls.btn_box', bt)
 
-      bt = EmcButton(icon='icon/stop', parent=self, cb=lambda b: stop(True))
+      bt = EmcButton(self, icon='icon/stop', cb=lambda b: stop(True))
       self.box_append('controls.btn_box', bt)
 
-      bt = EmcButton(icon='icon/pause', parent=self, cb=lambda b: self.pause_toggle())
+      bt = EmcButton(self, icon='icon/pause', cb=lambda b: self.pause_toggle())
       self.box_append('controls.btn_box', bt)
       self._play_pause_btn = bt
       bt.name = 'VideoPlayer.PlayBtn'
 
-      bt = EmcButton(icon='icon/fwd', parent=self, cb=lambda b: self.forward())
+      bt = EmcButton(self, icon='icon/fwd', cb=lambda b: self.forward())
       self.box_append('controls.btn_box', bt)
       
-      bt = EmcButton(icon='icon/ffwd', parent=self, cb=lambda b: self.fforward())
+      bt = EmcButton(self, icon='icon/ffwd', cb=lambda b: self.fforward())
       self.box_append('controls.btn_box', bt)
 
-      bt = EmcButton(_('Audio'), parent=self, cb=self._audio_menu_build)
+      bt = EmcButton(self, _('Audio'), cb=self._audio_menu_build)
       self.box_append('controls.btn_box2', bt)
 
-      bt = EmcButton(_('Video'), parent=self, cb=self._video_menu_build)
+      bt = EmcButton(self, _('Video'), cb=self._video_menu_build)
       self.box_append('controls.btn_box2', bt)
 
-      bt = EmcButton(_('Subtitles'), parent=self, cb=self._subs_menu_build)
+      bt = EmcButton(self, _('Subtitles'), cb=self._subs_menu_build)
       self.box_append('controls.btn_box2', bt)
 
       ### position slider

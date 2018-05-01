@@ -480,8 +480,10 @@ def box_remove_all(part, clear=True):
 key_down_func = None
 
 def _on_key_down(event):
+   # This is a second HACK to let the VirtualKeyboard be usable with the keyboard
    if isinstance(win.focused_object, EmcTextEntry) and event.key not in ('Up', 'Down'):
       return ecore.ECORE_CALLBACK_PASS_ON
+   # hack2 end
    if key_down_func:
       return key_down_func(event)
    return ecore.ECORE_CALLBACK_DONE
@@ -560,9 +562,8 @@ class _EmcFocusable(object):
       self._cbs_focused = None
       self._cbs_unfocused = None
 
-      if not isinstance(self, EmcTextEntry):
-         # TODO do this for entry on focus/unfocus ?
-         elm.Object.focus_allow_set(self, False)
+      # fully disable elm focus handling for this object
+      elm.Object.focus_allow_set(self, False)
 
       # build the focusable tree hierarchy
       if parent:
@@ -1136,9 +1137,20 @@ class EmcSlider(_EmcFocusable, elm.Slider):
 
 ################################################################################
 class EmcTextEntry(_EmcFocusable, elm.Entry):
+   """ direct keyboard input works for an hack in the _on_key_down func """
    def __init__(self, parent, focus_allow=True, **kargs):
       elm.Entry.__init__(self, parent, **kargs)
       _EmcFocusable.__init__(self, parent, focus_allow=focus_allow)
+      self.callback_focused_add(self._focused_cb)
+      self.callback_unfocused_add(self._unfocused_cb)
+
+   def _focused_cb(self, obj):
+      elm.Object.focus_allow_set(self, True)
+      elm.Object.focus_set(self, True)
+
+   def _unfocused_cb(self, obj):
+      elm.Object.focus_set(self, False)
+      elm.Object.focus_allow_set(self, False)
 
 ################################################################################
 class EmcMenu(_EmcFocusable, elm.Ctxpopup):

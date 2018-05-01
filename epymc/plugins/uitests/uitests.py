@@ -606,7 +606,7 @@ class MyItemClass(EmcItemClass):
 
          # no focus
          sl = EmcSlider(d, text='no focus', value=0.5, indicator_show=False,
-                        focusable=False, size_hint_fill=FILL_HORIZ)
+                        focus_allow=False, size_hint_fill=FILL_HORIZ)
          vbox.pack_end(sl)
 
          # unit + indicator format

@@ -52,7 +52,6 @@ CORE
  * subtitles font and size configuration
  * subtitles upload to opensubtitles.org
  * add an option to disable exit confirmation (but show credit somewhere else)
- * apply the volume using a logaritic curve
  * better icons for dialogs background
  * more semantic text styles (likes, views, etc...)
  * cache musicbrainz discid results

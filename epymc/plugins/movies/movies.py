@@ -817,12 +817,17 @@ class MoviesModule(EmcModule):
 ######## Tags
    def _cb_panel_6(self, button):
       m = EmcMenu(relto=button, dismiss_on_select=False)
-      for tag in sorted(self._tags_db.keys()):
-         if self._movie_id in self._tags_db.get_data(tag):
-            end = 'icon/check_on'
-         else:
-            end = 'icon/check_off'
-         m.item_add(tag, 'icon/tag', end, callback=self._tag_menu_cb)
+      if self._tags_db:
+         for tag in sorted(self._tags_db.keys()):
+            if self._movie_id in self._tags_db.get_data(tag):
+               end = 'icon/check_on'
+            else:
+               end = 'icon/check_off'
+            m.item_add(tag, 'icon/tag', end, callback=self._tag_menu_cb)
+      else:
+         m.item_add(_('No tags present')).disabled = True
+      m.item_add(_('Tags manager'), end='icon/tag',
+                 callback=self._tag_menu_manager_cb)
       m.show()
 
    def _tag_menu_cb(self, menu, item):
@@ -836,6 +841,9 @@ class MoviesModule(EmcModule):
          menu.item_icon_end_set(item, 'icon/check_on')
       self._tags_db.set_data(tag_name, tag_ids)
 
+   def _tag_menu_manager_cb(self, menu, item):
+      menu.close()
+      EmcTagsManager(self._tags_db)
 
 class BackgroundScanner(ecore.Idler):
    def __init__(self, browser, movie_db, idler_db):

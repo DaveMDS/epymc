@@ -31,6 +31,9 @@ Improvements:
  * Stronger, faster and more flexible EmcThumbnailer implementation
  * Movie scanner now also clean not existent files (configurable)
  * Better youtube-dl integration
+ * Fully redone the focus management, should fix all the focus related bug
+   on every efl releases
+ * Respect XDG config and cache folders (now require python-xdg)
 
 
 New Translations:

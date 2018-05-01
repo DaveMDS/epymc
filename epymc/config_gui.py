@@ -692,6 +692,7 @@ def _sys_info():
           '<br><title>%s</><br>' \
           '<name>%s:</name> %s<br>' \
           '<name>%s:</name> %s<br>' \
+          '<name>%s:</name> %s<br>' \
           '<br><title>%s</><br>' \
           '<name>%s:</name> %s <name> %s:</name> %s<br>' \
           '<name>%s:</name> %s<br>' \
@@ -706,6 +707,7 @@ def _sys_info():
             _('Paths'),
             _('Base folder'), utils.emc_base_dir,
             _('Config folder'), utils.user_conf_dir,
+            _('Cache folder'), utils.user_cache_dir,
             _('Versions'),
             _('EpyMC'), emc_version, _('EpyMC themes API'), _theme_generation,
             _('Python'), sys.version,

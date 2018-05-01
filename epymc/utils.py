@@ -23,6 +23,13 @@ from __future__ import absolute_import, print_function
 import sys, os, tempfile, glob, re, hashlib, pwd
 
 try:
+   from xdg.BaseDirectory import xdg_config_home as XDG_CONFIG_HOME
+   from xdg.BaseDirectory import xdg_cache_home as XDG_CACHE_HOME
+except ImportError:
+   XDG_CONFIG_HOME = ''
+   XDG_CACHE_HOME = ''
+
+try:
    from urllib.parse import quote as urllib_quote
 except:
    from urllib import quote as urllib_quote
@@ -31,15 +38,35 @@ from efl import ecore
 from efl import ecore_con
 
 
+def LOG(*args):
+   print('UTILS:', *args)
+
 def DBG(msg):
    # print('UTILS: %s' % msg)
    pass
 
 
-emc_base_dir = os.path.dirname(__file__)
-user_conf_dir = os.path.expanduser('~/.config/epymc') # TODO use xdg-stuff
-user_cache_dir = os.path.expanduser('~/.cache/epymc') # TODO use xdg-stuff
+# base epymc folder
+emc_base_dir = os.path.abspath(os.path.dirname(__file__))
+LOG('Running from:', emc_base_dir)
+
+# user config folder (xdg or default)
+if os.path.exists(XDG_CONFIG_HOME):
+   user_conf_dir = os.path.join(XDG_CONFIG_HOME, 'epymc')
+else:
+   user_conf_dir = os.path.expanduser('~/.config/epymc')
+LOG('Config folder:', user_conf_dir)
+
+# user cache folder (xdg or default)
+if os.path.exists(XDG_CACHE_HOME):
+   user_cache_dir = os.path.join(XDG_CACHE_HOME, 'epymc')
+else:
+   user_cache_dir = os.path.expanduser('~/.cache/epymc')
+LOG('Cache folder:', user_cache_dir)
+
+# will be filled with the used theme file
 in_use_theme_file = None
+
 
 supported_uris = ['file','http','https']
 supported_mimes = ['application/mxf','application/ogg','application/ram', 

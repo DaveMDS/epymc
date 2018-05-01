@@ -208,7 +208,7 @@ class check_runtime_deps(Command):
          "\n\n" + msg + "\n\n" \
          "NOTE: this dependency is not needed for building, but " \
          "is mandatory at runtime.\n\n" \
-         "You can skip this test for the build/install stages using: \n"
+         "You can skip this test for the install stages using: \n"
          "setup.py install --no-runtime-deps-check\n")
 
    def run(self):
@@ -248,6 +248,7 @@ class check_runtime_deps(Command):
 
       # checking all other simpler deps
       deps = [
+         ('XDG', 'xdg', 'python-xdg'),
          ('DBus', 'dbus', 'python-dbus'),
          ('PyUdev', 'pyudev', 'python-pyudev'),
          ('DiscID', 'discid', 'python-discid'),
@@ -355,6 +356,7 @@ setup (
       'dbus',
       'pyudev',
       'libdiscid',
+      'xdg'
    ],
 
    provides = ['epymc'],

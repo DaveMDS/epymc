@@ -30,7 +30,6 @@ TMP
 
  * use the new sdb.items() generator where needed, it's fastest
  * clean dead files in music db like in movies
- * cast panel: movie list is not complete, see directors panel
 
 BUGS
 =====

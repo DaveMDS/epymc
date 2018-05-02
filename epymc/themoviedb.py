@@ -568,10 +568,27 @@ class CastPanel(EmcDialog):
       EmcDialog.__init__(self, title=self.info['name'], style='panel',
                                content=image, text=text)
 
-      c = len(self.info['credits']['cast'])
-      self.button_add(_('Movies (%s)') % c, lambda b: self.movies_dialog())
-      c = len(self.info['images']['profiles'])
-      self.button_add(_('Photos (%s)') % c, lambda b: self.photos_dialog())
+      # merge cast and crew in a single movies list
+      movies = {}  # key: tmdbid val: tmdb-data-dict + 'jobs'
+      for movie in self.info['credits']['crew']:
+         tid = movie['id']
+         if tid in movies:
+            movies[tid]['jobs'].append(movie.get('job'))
+         else:
+            movie['jobs'] = [ movie.get('job') ]
+            movies[tid] = movie
+
+      for movie in self.info['credits']['cast']:
+         tid = movie['id']
+         if tid in movies:
+            movies[tid]['character'] = movie.get('character')
+         else:
+            movies[tid] = movie
+
+      self.button_add(_('Movies (%s)') % len(movies),
+                      lambda b: self.movies_dialog(movies))
+      self.button_add(_('Photos (%s)') % len(self.info['images']['profiles']),
+                      lambda b: self.photos_dialog())
 
    def photos_dialog(self):
       dia = EmcDialog(style='image_list_horiz', title=self.info['name'])
@@ -580,11 +597,18 @@ class CastPanel(EmcDialog):
          dia.list_item_append(None, img)
       dia.list_go()
 
-   def movies_dialog(self):
+   def movies_dialog(self, movies):
       dia = EmcDialog(style='list', title=self.info['name'])
-      for movie in self.info['credits']['cast']:
-         label = _('%(title)s as %(character)s') % (movie)
-         icon = EmcImage(movie['poster_path'])
-         icon.size_hint_min_set(100, 100) # TODO FIXME
+      for movie in sorted(movies.values(), key=itemgetter('title')):
+         label = '<big>{}</big>'.format(movie['title'])
+         if 'character' in movie:
+            label += ' <i>{} <big>{}</big></i>'.format(_('as'), movie['character'])
+         if 'jobs' in movie:
+            label += ' <i>({})</i>'.format(', '.join(movie['jobs']))
+         if movie.get('poster_path'):
+            icon = EmcImage(movie.get('poster_path']))
+            icon.size_hint_min_set(100, 100) # TODO FIXME
+         else:
+            icon = None
          dia.list_item_append(label, icon)
       dia.list_go()

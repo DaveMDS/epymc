@@ -895,9 +895,10 @@ class _EmcFocusableWithItems(_EmcFocusable):
          self.focused_item.signal_emit('emc,action,unfocus', 'emc')
 
    def _item_selected_cb(self, obj, item):
-      if self._focus_on_select and self.focused_item != item:
-         self.focused_item = item
-         self.focus = True
+      if self.focus_allow and self._focus_on_select:
+         if self.focused_item != item:
+            self.focused_item = item
+            self.focus = True
 
    def _item_realized_cb(self, obj, item):
       if item == self.focused_item and self.focus == True:

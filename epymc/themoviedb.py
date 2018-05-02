@@ -606,7 +606,7 @@ class CastPanel(EmcDialog):
          if 'jobs' in movie:
             label += ' <i>({})</i>'.format(', '.join(movie['jobs']))
          if movie.get('poster_path'):
-            icon = EmcImage(movie.get('poster_path']))
+            icon = EmcImage(movie.get('poster_path'))
             icon.size_hint_min_set(100, 100) # TODO FIXME
          else:
             icon = None

@@ -21,6 +21,7 @@
 from __future__ import absolute_import, print_function
 
 import os
+import random
 from datetime import datetime
 
 from efl import evas
@@ -1288,6 +1289,7 @@ class EmcImage(elm.Image):
          label2: For the special style 'icon', you can here specify the
                  secondary label text.
    """
+   _in_progress_downloads = {}  # key:url  val:[instance1, instance2, ...]
 
    def __init__(self, url=None, dest=None, icon=None, label2=None,
                       aspect_fixed=True, fill_outside=False, thumb=False):
@@ -1322,12 +1324,7 @@ class EmcImage(elm.Image):
          if os.path.exists(dest):
             self.file_set(dest)
          else:
-            try:
-               utils.download_url_async(url, dest, urlencode=False,
-                                        complete_cb=self._download_complete_cb)
-               self.file_set(theme_file, 'emc/image/downloading')
-            except:
-               self.file_set(theme_file, 'emc/image/error')
+            self._start_download(url, dest)
          return
 
       # do we want to use/generate a thumbnail?
@@ -1393,20 +1390,49 @@ class EmcImage(elm.Image):
          self.file_set(thumb)
       else:
          self.file_set(theme_file, 'emc/image/error')
-   
-   def _download_complete_cb(self, dest, status):
-      if self.is_deleted(): return
-      if status == 200:
-         self.file_set(dest)
-      else:
+
+   def _start_download(self, url, dest):
+      # already downloading the same url ?
+      if dest in EmcImage._in_progress_downloads:
+         # append ourself in the list of in-progress for this url
+         EmcImage._in_progress_downloads[dest].append(self)
+         self.file_set(theme_file, 'emc/image/downloading')
+         return
+
+      # or start a real download
+      dest_tmp = '{}.temp{}'.format(dest, random.randint(100000, 999999))
+      try:
+         utils.download_url_async(url, dest_tmp, urlencode=False,
+                                  complete_cb=self._download_complete_cb)
+      except:
          self.file_set(theme_file, 'emc/image/error')
+      else:
+         # create a new list of in-progress for this url
+         EmcImage._in_progress_downloads[dest] = [self,]
+         self.file_set(theme_file, 'emc/image/downloading')
+
+   @staticmethod
+   def _download_complete_cb(dest_tmp, status):
+      dest = dest_tmp[:-11]  # strip '.tempXXXXXX'
+      if status == 200:
+         os.rename(dest_tmp, dest)
+
+      if dest in EmcImage._in_progress_downloads:
+         for instance in EmcImage._in_progress_downloads[dest]:
+            if instance.is_deleted():
+               continue
+            if status == 200:
+               instance.file_set(dest)
+            else:
+               instance.file_set(theme_file, 'emc/image/error')
+
+         # remove the whole in-progress list for this url
+         del EmcImage._in_progress_downloads[dest]
 
    def _del_cb(self, obj):
       if self._icon_obj:
          self._icon_obj.delete()
          self._icon_obj = None
-
-      # TODO abort download  ??
 
       if self._thumb_request_id is not None:
          emc_thumbnailer.cancel_request(self._thumb_request_id)

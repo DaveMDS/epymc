@@ -56,7 +56,7 @@ class YoutubeDL(object):
             '<info>rg3.github.io/youtube-dl</>'
       self._url_dialog = gui.EmcDialog(style='minimal', title=_('Youtube-DL'),
                                        text=txt, spinner=True)
-      utils.EmcExec('{} --get-url "{}"'.format(self.exe, url),
+      utils.EmcExec('{} --get-url --format best "{}"'.format(self.exe, url),
                     grab_output=True, done_cb=self._get_real_video_url_cb)
 
    def _get_real_video_url_cb(self, cmd_output):

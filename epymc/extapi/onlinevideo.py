@@ -133,7 +133,7 @@ def ydl_executable():
 
 def call_ydl(url):
    """ Call youtube-dl with the given url and return the direct video url """
-   p = subprocess.Popen([ydl_executable(), '--get-url', url],
+   p = subprocess.Popen([ydl_executable(), '--get-url', '--format', 'best', url],
                         stdout=subprocess.PIPE)
    out, err = p.communicate()
    return out.decode('utf8') if isinstance(out, bytes) else out

@@ -57,6 +57,7 @@ Bug fixed:
  * Fixed standalone mode (requiring efl 1.20)
  * Fixed Virtual Keybord oversize when display the % character
  * Thumbnailer no more stop working if the child process hang
+ * Hopefully fixed yt videos without sound
 
 
 ===============================================================================

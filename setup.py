@@ -275,10 +275,11 @@ class Build(build):
 
 class Develop(Command):
    description = 'Run in-place from build dir without any install need'
-   user_options = []
+   user_options = [('args=', 'a',
+                    'Additional arguments for the epymc executable')]
 
    def initialize_options(self):
-      pass
+      self.args = ''
 
    def finalize_options(self):
       pass
@@ -306,7 +307,7 @@ class Develop(Command):
          os.makedirs(cache)
       os.environ['XDG_CACHE_HOME'] = cache
       # run epymc !
-      os.system('epymc')  # TODO pass additional args
+      os.system('epymc %s' % self.args)
 
 
 class Install(install):

@@ -404,6 +404,7 @@ setup (
          'zapiks/*',
          'fantasticc/*',
          'porncom/*',
+         'pornhub/*',
          'southparkstudios/*',
       ],
       'epymc.plugins.input_webserver': [

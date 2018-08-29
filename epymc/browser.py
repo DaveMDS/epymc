@@ -290,10 +290,8 @@ class EmcBrowser(object):
       file:///home/user/some/dir, it MUST be unique in all the browser
       and MUST not contain any strange chars.
       """
-      if url == self.autoselect_url:
-         self.current_view.item_add(item_class, url, user_data, True)
-      else:
-         self.current_view.item_add(item_class, url, user_data)
+      self.current_view.item_add(item_class, url, user_data,
+            True if (url and url == self.autoselect_url) else False)
 
    def group_add(self, label, icon=None):
       """ TODO DOC """

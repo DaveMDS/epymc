@@ -50,6 +50,7 @@ Changes:
 
 Bug fixed:
 
+ * Fixed a bug related to ngettex that prevent the mediacenter to run on py3.8
  * Remove screensaver config item on module shutdown
  * Fixed menu icons when using a FDO icon theme in elm config
  * Fixed mouse hide feature when running on top of efl 1.19

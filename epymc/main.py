@@ -39,7 +39,7 @@ import epymc.utils as utils
 # install the _() and ngettext() func in the main namespace
 # localle .mo files are searched directly inside the epymc package
 localedir = os.path.join(utils.emc_base_dir, 'locale')
-gettext.install('epymc', names='ngettext', localedir=localedir)
+gettext.install('epymc', names=['ngettext'], localedir=localedir)
 
 # set locale to user preferred (aka the one set in env) locale
 locale.setlocale(locale.LC_ALL, '')

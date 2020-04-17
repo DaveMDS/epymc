@@ -1020,7 +1020,7 @@ def get_movie_name_from_url(url):
 
    # apply the user regexp (must capure 'name' and 'year')
    p = re.compile(ini.get('movies', 'movie_regexp'))
-   m = p.match(movie)
+   m = p.match(movie.strip())
    if m:
       name = m.group('name')
       year = m.group('year')

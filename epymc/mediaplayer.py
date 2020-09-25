@@ -263,7 +263,7 @@ def play_url(url, only_audio=False, start_from=None):
    global _player, _saved_player
 
    # default to 'file://' if not given
-   if url.find('://', 2, 15) is -1:
+   if url.find('://', 2, 15) == -1:
       url = 'file://' + url
 
    # check url

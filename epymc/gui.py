@@ -84,8 +84,8 @@ def DBG(msg):
    pass
 
 def DBG_FOCUS(*args):
-   print('FOCUS:', *args)
-   # pass  # don't forget to comment the dump_focus_tree call !!
+   # print('FOCUS:', *args)
+   pass  # don't forget to comment the dump_focus_tree call !!
 
 
 def init():
@@ -494,7 +494,7 @@ def focus_move(direction):
    DBG_FOCUS('==== FOCUS MOVE ===========================================')
    focused = win.focused_object
    DBG_FOCUS('FOCUSED:', focused)
-   win.dump_focus_tree()  # TODO REMOVE ME !!!!
+   # win.dump_focus_tree()  # NOTE: Do not commit !!!
 
    # try to move all the focus managers (starting from nested one)
    manager = focused if focused.is_focus_manager else focused.parent_manager

@@ -21,10 +21,9 @@
 from __future__ import absolute_import, print_function, unicode_literals, division
 
 from epymc.extapi.onlinevideo import api_version, state_get, \
-   fetch_url, play_url, item_add, call_ydl, report_error, \
-   seconds_to_duration, relative_date, url_encode, \
-   ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
-
+    fetch_url, play_url, item_add, call_ydl, report_error, \
+    seconds_to_duration, relative_date, url_encode, \
+    ACT_NONE, ACT_FOLDER, ACT_MORE, ACT_PLAY, ACT_SEARCH
 
 API_BASE = 'http://www.pornhub.com/webmasters'
 
@@ -137,107 +136,105 @@ STATE, URL = state_get()
 
 
 def build_video_list(url, videos):
-   for video in videos:
-      title = video['title'] or 'Untitled video'
-      likes = int(float(video['ratings']) / 100 * float(video['rating']))
-      actors = [ p['pornstar_name'] for p in video['pornstars']]
-      cats = [ c['category'] for c in video['categories']]
-      tags = [ t['tag_name'] for t in video['tags']]
-      info = '<title>{}</title> <small>{}</small><br>' \
-              '<small><name>{}</name> {}<br>' \
-              '<success>{} {}</success> <name>/</name> ' \
-              '<warning>{} {:.0f}%</warning> <name>/</name> ' \
-              '<info>{} {}</info><br>' \
-              '<name>{}:</name> {}<br>' \
-              '<name>{}:</name> {}<br>' \
-              '<name>{}:</name> {}<br>' \
-              .format(
-                  title, video['duration'],
-                  _('uploaded'), relative_date(video['publish_date']),
-                  video['views'], ngettext('view', 'views', int(video['views'])),
-                  _('rated'), float(video['rating']),
-                  likes, ngettext('like', 'likes', likes),
-                  _('Actors'), ', '.join(actors),
-                  _('Categories'), ', '.join(cats),
-                  _('Tags'), ', '.join(tags),
-              )
-      item_add(ST_PLAY, title, video['url'], poster=video['thumb'], info=info)
+    for video in videos:
+        title = video['title'] or 'Untitled video'
+        likes = int(float(video['ratings']) / 100 * float(video['rating']))
+        actors = [p['pornstar_name'] for p in video['pornstars']]
+        cats = [c['category'] for c in video['categories']]
+        tags = [t['tag_name'] for t in video['tags']]
+        info = '<title>{}</title> <small>{}</small><br>' \
+               '<small><name>{}</name> {}<br>' \
+               '<success>{} {}</success> <name>/</name> ' \
+               '<warning>{} {:.0f}%</warning> <name>/</name> ' \
+               '<info>{} {}</info><br>' \
+               '<name>{}:</name> {}<br>' \
+               '<name>{}:</name> {}<br>' \
+               '<name>{}:</name> {}<br>' \
+            .format(
+            title, video['duration'],
+            _('uploaded'), relative_date(video['publish_date']),
+            video['views'], ngettext('view', 'views', int(video['views'])),
+            _('rated'), float(video['rating']),
+            likes, ngettext('like', 'likes', likes),
+            _('Actors'), ', '.join(actors),
+            _('Categories'), ', '.join(cats),
+            _('Tags'), ', '.join(tags),
+        )
+        item_add(ST_PLAY, title, video['url'], poster=video['thumb'], info=info)
 
-   if len(videos) == 30:
-      build_next_page_item(url, ST_VIDEO_LIST)
+    if len(videos) == 30:
+        build_next_page_item(url, ST_VIDEO_LIST)
 
 
 def build_next_page_item(url, next_state):
-   # NOTE: this assume 'page=X' is ALWAYS the last param!! don't forget it!
-   # num_pages = int(total / ITEMS_PER_PAGE) + 1
-   url, cur_page = url.split('page=')
-   next_page = int(cur_page) + 1
-   # if next_page <= num_pages:
-   url += 'page=' + str(next_page)
-   item_add(next_state, _('More items...'), url, action=ACT_MORE)
+    # NOTE: this assume 'page=X' is ALWAYS the last param!! don't forget it!
+    # num_pages = int(total / ITEMS_PER_PAGE) + 1
+    url, cur_page = url.split('page=')
+    next_page = int(cur_page) + 1
+    # if next_page <= num_pages:
+    url += 'page=' + str(next_page)
+    item_add(next_state, _('More items...'), url, action=ACT_MORE)
 
 
 # the first page, show fixed categories
 if STATE == ST_HOME:
 
-   url = 'http://it.pornhub.com/random'
-   item_add(ST_PLAY, _('Play a random video'), url, icon='icon/play')
+    url = 'http://it.pornhub.com/random'
+    item_add(ST_PLAY, _('Play a random video'), url, icon='icon/play')
 
-   item_add(ST_SEARCH, _('Search videos'), 'search', action=ACT_SEARCH)
+    item_add(ST_SEARCH, _('Search videos'), 'search', action=ACT_SEARCH)
 
-   url =  API_BASE + '/categories'
-   item_add(ST_CATEGORIES, _('Categories'), url, action=ACT_FOLDER)
+    url = API_BASE + '/categories'
+    item_add(ST_CATEGORIES, _('Categories'), url, action=ACT_FOLDER)
 
-   url = API_BASE + '/search?ordering=newest&page=1'
-   item_add(ST_VIDEO_LIST, _('Recently added'), url, action=ACT_FOLDER)
+    url = API_BASE + '/search?ordering=newest&page=1'
+    item_add(ST_VIDEO_LIST, _('Recently added'), url, action=ACT_FOLDER)
 
-   url = API_BASE + '/search?ordering=mostviewed&period=alltime&page=1'
-   item_add(ST_VIDEO_LIST, _('Most viewed'), url, action=ACT_FOLDER)
+    url = API_BASE + '/search?ordering=mostviewed&period=alltime&page=1'
+    item_add(ST_VIDEO_LIST, _('Most viewed'), url, action=ACT_FOLDER)
 
-   url = API_BASE + '/search?ordering=rating&period=alltime&page=1'
-   item_add(ST_VIDEO_LIST, _('Top rated'), url, action=ACT_FOLDER)
+    url = API_BASE + '/search?ordering=rating&period=alltime&page=1'
+    item_add(ST_VIDEO_LIST, _('Top rated'), url, action=ACT_FOLDER)
 
-   # url =  API_BASE + '/stars_detailed'
-   # item_add(ST_PORNSTARS, _('All pornstars'), url, action=ACT_FOLDER)
+    # url =  API_BASE + '/stars_detailed'
+    # item_add(ST_PORNSTARS, _('All pornstars'), url, action=ACT_FOLDER)
 
 
 # search query from virtual keyboard
 elif STATE == ST_SEARCH:
-   url = API_BASE + '/search?' + \
-         url_encode({'search': URL, 'thumbsize': 'large'})
-   data = fetch_url(url, parser='json')
-   build_video_list(url + '&page=1', data['videos'])
+    url = API_BASE + '/search?' + \
+          url_encode({'search': URL, 'thumbsize': 'large'})
+    data = fetch_url(url, parser='json')
+    build_video_list(url + '&page=1', data['videos'])
 
 
 # videos list
 elif STATE == ST_VIDEO_LIST:
-   data = fetch_url(URL, parser='json')
-   try:
-      build_video_list(URL, data['videos'])
-   except KeyError:  # last page probably reached
-      pass
+    data = fetch_url(URL, parser='json')
+    try:
+        build_video_list(URL, data['videos'])
+    except KeyError:  # last page probably reached
+        pass
 
 
 # categories list
 elif STATE == ST_CATEGORIES:
-   data = fetch_url(URL, parser='json')
-   for cat in data['categories']:
-      url = API_BASE + '/search?' + url_encode({'category': cat['category']})
-      item_add(ST_VIDEO_LIST, cat['category'], url + '&page=1')
+    data = fetch_url(URL, parser='json')
+    for cat in data['categories']:
+        url = API_BASE + '/search?' + url_encode({'category': cat['category']})
+        item_add(ST_VIDEO_LIST, cat['category'], url + '&page=1')
 
 
 # pornstars list
 # elif STATE == ST_PORNSTARS:
-   # data = fetch_url(URL, parser='json')
-   # for star in data['stars']:
-      # star = star['star']
-      # url = star['star_url'] + '&page=1'  ## THIS IS WRONG (or must be scraped)
-      # title = '{} ({} vids)'.format(star['star_name'], star['videos_count_all'])
-      # item_add(ST_VIDEO_LIST, title, url, poster=star['star_thumb'])
-
+# data = fetch_url(URL, parser='json')
+# for star in data['stars']:
+# star = star['star']
+# url = star['star_url'] + '&page=1'  ## THIS IS WRONG (or must be scraped)
+# title = '{} ({} vids)'.format(star['star_name'], star['videos_count_all'])
+# item_add(ST_VIDEO_LIST, title, url, poster=star['star_thumb'])
 
 # play (using youtube-dl)
 elif STATE == ST_PLAY:
-   url = call_ydl(URL)
-   play_url(url) if url else report_error('Video not found')
-
+    url = call_ydl(URL)
+    play_url(url) if url else report_error('Video not found')

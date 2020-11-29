@@ -32,103 +32,103 @@ from epymc.musicbrainz import MusicBrainz
 
 
 def DBG(msg):
-   # print('OPTICALS: %s' % msg)
-   pass
+    # print('OPTICALS: %s' % msg)
+    pass
 
 
 class OpticalsModule(EmcModule):
-   name = 'opticals'
-   label = _('Optical Discs')
-   icon = 'icon/optical'
-   info = _('This module add support for playing DVD and Audio CD')
+    name = 'opticals'
+    label = _('Optical Discs')
+    icon = 'icon/optical'
+    info = _('This module add support for playing DVD and Audio CD')
 
-   _supported_types = (EmcDevType.DVD, EmcDevType.AUDIOCD)
+    _supported_types = (EmcDevType.DVD, EmcDevType.AUDIOCD)
 
-   def __init__(self):
-      DBG('Init module')
-      self.insert_disk_dialog = None
-      subitems = [
-         (_('Play'), None, 'opticals://play'),
-         (_('Eject'), None, 'opticals://eject'),
-      ]
-      mainmenu.item_add(self.name, 4, self.label, self.icon,
-                        self.mainmenu_cb, subitems)
+    def __init__(self):
+        DBG('Init module')
+        self.insert_disk_dialog = None
+        subitems = [
+            (_('Play'), None, 'opticals://play'),
+            (_('Eject'), None, 'opticals://eject'),
+        ]
+        mainmenu.item_add(self.name, 4, self.label, self.icon,
+                          self.mainmenu_cb, subitems)
 
-   def __shutdown__(self):
-      DBG('Shutdown module')
-      mainmenu.item_del(self.name)
+    def __shutdown__(self):
+        DBG('Shutdown module')
+        mainmenu.item_del(self.name)
 
-   def check_and_play_disk(self):
-      for device in storage.list_devices(self._supported_types):
-         if device.type == EmcDevType.DVD:
-            self.play_dvd(device)
-            return True
-         elif device.type ==  EmcDevType.AUDIOCD:
-            self.play_audiocd(device)
-            return True
-      return False
-      
-   def play_dvd(self, device):
-      self.insert_disk_dialog_destroy()
-      mediaplayer.play_url('dvd://' + device.device)
+    def check_and_play_disk(self):
+        for device in storage.list_devices(self._supported_types):
+            if device.type == EmcDevType.DVD:
+                self.play_dvd(device)
+                return True
+            elif device.type == EmcDevType.AUDIOCD:
+                self.play_audiocd(device)
+                return True
+        return False
 
-   def play_audiocd(self, device):
-      self.insert_disk_dialog_destroy()
-      ret = MusicBrainz().get_cdrom_info(device.device, self._audiocd_info_cb,
-                                         device=device)
-      if isinstance(ret, dict):
-         self._audiocd_info_cb(ret, device)
-      elif ret == False:
-         self._audiocd_info_cb(None, device)
+    def play_dvd(self, device):
+        self.insert_disk_dialog_destroy()
+        mediaplayer.play_url('dvd://' + device.device)
 
-   def _audiocd_info_cb(self, album, device):
-      playlist = mediaplayer.playlist
-      playlist.clear()
-      if album is None:
-         # MusicBrainz failed, just show plain tracks
-         for i in range(1, device.audio_tracks + 1):
-            url = 'cdda://{}'.format(i)
-            meta = {
-               'url': url, 'tracknumber': i,
-               'title': _('Audio track {}').format(i),
-            }
-            playlist.append(url=url, metadata=meta)
-      else:
-         # Use MusicBrainz infos
-         for trk in album['tracks']:
-            url = 'cdda://{}'.format(trk['num'])
-            meta = {
-               'url': url,
-               'title': trk['title'],
-               'length': trk['length'],
-               'tracknumber': trk['num'],
-               'artist': ', '.join(album['artists']),
-               'album': album['title'],
-               'poster': album['cover_url'],
-            }
-            playlist.append(url=url, metadata=meta)
+    def play_audiocd(self, device):
+        self.insert_disk_dialog_destroy()
+        ret = MusicBrainz().get_cdrom_info(device.device, self._audiocd_info_cb,
+                                           device=device)
+        if isinstance(ret, dict):
+            self._audiocd_info_cb(ret, device)
+        elif ret is False:
+            self._audiocd_info_cb(None, device)
 
-   def mainmenu_cb(self, url=None):
-      if url is None or url == 'opticals://play':
-         if not self.check_and_play_disk():
-            self.insert_disk_dialog_create()
-      elif url == 'opticals://eject':
-         utils.EmcExec('eject')
+    @staticmethod
+    def _audiocd_info_cb(album, device):
+        playlist = mediaplayer.playlist
+        playlist.clear()
+        if album is None:
+            # MusicBrainz failed, just show plain tracks
+            for i in range(1, device.audio_tracks + 1):
+                url = 'cdda://{}'.format(i)
+                meta = {
+                    'url': url, 'tracknumber': i,
+                    'title': _('Audio track {}').format(i),
+                }
+                playlist.append(url=url, metadata=meta)
+        else:
+            # Use MusicBrainz infos
+            for trk in album['tracks']:
+                url = 'cdda://{}'.format(trk['num'])
+                meta = {
+                    'url': url,
+                    'title': trk['title'],
+                    'length': trk['length'],
+                    'tracknumber': trk['num'],
+                    'artist': ', '.join(album['artists']),
+                    'album': album['title'],
+                    'poster': album['cover_url'],
+                }
+                playlist.append(url=url, metadata=meta)
 
-   def insert_disk_dialog_create(self):
-      self.insert_disk_dialog = \
-         EmcDialog(style='cancel', title=_('No disc found'),
-                   text=_('Please insert a disc (DVD or Audio CD)'),
-                   canc_cb=self.insert_disk_dialog_destroy)
-      events.listener_add('opticals', self.events_cb)
-      
-   def insert_disk_dialog_destroy(self, dia=None):
-      events.listener_del('opticals')
-      if self.insert_disk_dialog is not None:
-         self.insert_disk_dialog.delete()
-         self.insert_disk_dialog = None
-      
-   def events_cb(self, event):
-      if event == 'STORAGE_CHANGED':
-         self.check_and_play_disk()
+    def mainmenu_cb(self, url=None):
+        if url is None or url == 'opticals://play':
+            if not self.check_and_play_disk():
+                self.insert_disk_dialog_create()
+        elif url == 'opticals://eject':
+            utils.EmcExec('eject')
 
+    def insert_disk_dialog_create(self):
+        self.insert_disk_dialog = \
+            EmcDialog(style='cancel', title=_('No disc found'),
+                      text=_('Please insert a disc (DVD or Audio CD)'),
+                      canc_cb=self.insert_disk_dialog_destroy)
+        events.listener_add('opticals', self.events_cb)
+
+    def insert_disk_dialog_destroy(self, dia=None):
+        events.listener_del('opticals')
+        if self.insert_disk_dialog is not None:
+            self.insert_disk_dialog.delete()
+            self.insert_disk_dialog = None
+
+    def events_cb(self, event):
+        if event == 'STORAGE_CHANGED':
+            self.check_and_play_disk()

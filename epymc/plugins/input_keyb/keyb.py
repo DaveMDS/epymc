@@ -32,178 +32,179 @@ import epymc.ini as ini
 
 
 def DBG(msg):
-   # print('KEYB: %s' % msg)
-   pass
+    # print('KEYB: %s' % msg)
+    pass
 
 
 # map ecore keys to emc input events
-DEFAULTS = { 
-   'Up': 'UP',
-   'Down': 'DOWN',
-   'Left': 'LEFT',
-   'Right': 'RIGHT',
-   'Return': 'OK',
-   'KP_Enter': 'OK',
-   'Escape': 'EXIT',
-   'BackSpace': 'BACK',
-   'space': 'TOGGLE_PAUSE',
-   'Pause': 'TOGGLE_PAUSE',
-   'XF86AudioPlay': 'TOGGLE_PAUSE',
-   'plus': 'VOLUME_UP',
-   'minus': 'VOLUME_DOWN',
-   'KP_Add': 'VOLUME_UP',
-   'KP_Subtract': 'VOLUME_DOWN',
-   'm': 'VOLUME_MUTE',
-   'p': 'TOGGLE_PAUSE',
-   'f': 'TOGGLE_FULLSCREEN',
-   'F1': 'VIEW_LIST',
-   'F2': 'VIEW_POSTERGRID',
-   'F3': 'VIEW_COVERGRID',
-   'F5': 'SCALE_SMALLER',
-   'F6': 'SCALE_BIGGER',
-   'F7': 'SCALE_RESET',
-   's': 'STOP',
-   'z': 'FAST_BACKWARD',
-   'x': 'BACKWARD',
-   'c': 'FORWARD',
-   'v': 'FAST_FORWARD',
-   'b': 'PLAYLIST_PREV',
-   'n': 'PLAYLIST_NEXT',
-   'q': 'SUBS_DELAY_LESS',
-   'w': 'SUBS_DELAY_MORE',
-   'e': 'SUBS_DELAY_ZERO',
-   'd': 'TOGGLE_DVD_MENU',
+DEFAULTS = {
+    'Up': 'UP',
+    'Down': 'DOWN',
+    'Left': 'LEFT',
+    'Right': 'RIGHT',
+    'Return': 'OK',
+    'KP_Enter': 'OK',
+    'Escape': 'EXIT',
+    'BackSpace': 'BACK',
+    'space': 'TOGGLE_PAUSE',
+    'Pause': 'TOGGLE_PAUSE',
+    'XF86AudioPlay': 'TOGGLE_PAUSE',
+    'plus': 'VOLUME_UP',
+    'minus': 'VOLUME_DOWN',
+    'KP_Add': 'VOLUME_UP',
+    'KP_Subtract': 'VOLUME_DOWN',
+    'm': 'VOLUME_MUTE',
+    'p': 'TOGGLE_PAUSE',
+    'f': 'TOGGLE_FULLSCREEN',
+    'F1': 'VIEW_LIST',
+    'F2': 'VIEW_POSTERGRID',
+    'F3': 'VIEW_COVERGRID',
+    'F5': 'SCALE_SMALLER',
+    'F6': 'SCALE_BIGGER',
+    'F7': 'SCALE_RESET',
+    's': 'STOP',
+    'z': 'FAST_BACKWARD',
+    'x': 'BACKWARD',
+    'c': 'FORWARD',
+    'v': 'FAST_FORWARD',
+    'b': 'PLAYLIST_PREV',
+    'n': 'PLAYLIST_NEXT',
+    'q': 'SUBS_DELAY_LESS',
+    'w': 'SUBS_DELAY_MORE',
+    'e': 'SUBS_DELAY_ZERO',
+    'd': 'TOGGLE_DVD_MENU',
 }
 
+
 class KeyboardModule(EmcModule):
-   name = 'input_keyb'
-   label = _('Input - Keyboard')
-   icon = 'icon/keyboard'
-   info = _('The keyboard module lets you control the application using '
-            'your keyboard, or any other device that act as a keyboard.')
+    name = 'input_keyb'
+    label = _('Input - Keyboard')
+    icon = 'icon/keyboard'
+    info = _('The keyboard module lets you control the application using '
+             'your keyboard, or any other device that act as a keyboard.')
 
-   def __init__(self):
-      DBG('Init module')
+    def __init__(self):
+        DBG('Init module')
 
-      self.grab_key_func = None
+        self.grab_key_func = None
 
-      # set up default bindings
-      section = 'keyboard'
-      if not ini.has_section(section):
-         ini.add_section(section)
-         for key, event in DEFAULTS.items():
-            ini.set(section, key, event)
+        # set up default bindings
+        section = 'keyboard'
+        if not ini.has_section(section):
+            ini.add_section(section)
+            for key, event in DEFAULTS.items():
+                ini.set(section, key, event)
 
-      # read mapping from config
-      self.keys = dict()
-      for key, event in ini.get_options(section):
-         DBG('Map key "%s" to event %s' % (key, event))
-         self.keys[key] = event
-      
-      # add an entry in the config gui section
-      config_gui.root_item_add('keyb', 50, _('Keyboard'), icon='icon/keyboard',
-                               callback=self.config_panel_cb)
+        # read mapping from config
+        self.keys = dict()
+        for key, event in ini.get_options(section):
+            DBG('Map key "%s" to event %s' % (key, event))
+            self.keys[key] = event
 
-      # ask the gui to forward key events to us
-      gui.key_down_func = self._key_down_cb
+        # add an entry in the config gui section
+        config_gui.root_item_add('keyb', 50, _('Keyboard'), icon='icon/keyboard',
+                                 callback=self.config_panel_cb)
 
-   def __shutdown__(self):
-      DBG('Shutdown module')
-      config_gui.root_item_del('keyb')
-      gui.key_down_func = None
+        # ask the gui to forward key events to us
+        gui.key_down_func = self._key_down_cb
 
-   def _key_down_cb(self, event):
-      key = event.key.lower()
-      DBG('Key: %s (%s)' % (key, event.key))
+    def __shutdown__(self):
+        DBG('Shutdown module')
+        config_gui.root_item_del('keyb')
+        gui.key_down_func = None
 
-      # if grabbed request call the grab function, else emit the signal
-      if self.grab_key_func and callable(self.grab_key_func):
-         self.grab_key_func(key)
-      else:
-         if key in self.keys:
-            input_events.event_emit(self.keys[key])
-         else:
-            print('Unhandled key: ' + event.key)
+    def _key_down_cb(self, event):
+        key = event.key.lower()
+        DBG('Key: %s (%s)' % (key, event.key))
 
-      return ecore.ECORE_CALLBACK_DONE
+        # if grabbed request call the grab function, else emit the signal
+        if self.grab_key_func and callable(self.grab_key_func):
+            self.grab_key_func(key)
+        else:
+            if key in self.keys:
+                input_events.event_emit(self.keys[key])
+            else:
+                print('Unhandled key: ' + event.key)
 
-   ### config panel stuff
-   class KeyItemClass(EmcItemClass):
-      def item_selected(self, url, data):
-         key, event, mod = data
-         txt = '%s<br><br>%s ⇾ %s' % (
-               _('Are you sure you want to remove the mapping?'),
-               key, event)
-         EmcDialog(style='yesno', title=_('Remove key'), text=txt,
-                   done_cb=self._remove_confirmed, user_data=data)
+        return ecore.ECORE_CALLBACK_DONE
 
-      def _remove_confirmed(self, dia):
-         key, event, mod = dia.data_get()
+    # config panel stuff
+    class KeyItemClass(EmcItemClass):
+        def item_selected(self, url, data):
+            key, event, mod = data
+            txt = '%s<br><br>%s ⇾ %s' % (
+                _('Are you sure you want to remove the mapping?'),
+                key, event)
+            EmcDialog(style='yesno', title=_('Remove key'), text=txt,
+                      done_cb=self._remove_confirmed, user_data=data)
 
-         # remove key from mapping and from config
-         mod.keys.pop(key, None)
-         ini.remove_option('keyboard', key)
+        @staticmethod
+        def _remove_confirmed(dia):
+            key, event, mod = dia.data_get()
 
-         # kill the dialog and refresh the browser
-         bro = config_gui.browser_get()
-         bro.refresh(hard=True)
-         dia.delete()
+            # remove key from mapping and from config
+            mod.keys.pop(key, None)
+            ini.remove_option('keyboard', key)
 
-      def label_get(self, url, data):
-         key, event, mod = data
-         return key
+            # kill the dialog and refresh the browser
+            bro = config_gui.browser_get()
+            bro.refresh(hard=True)
+            dia.delete()
 
-      def label_end_get(self, url, data):
-         key, event, mod = data
-         return event
+        def label_get(self, url, data):
+            key, event, mod = data
+            return key
 
-      def icon_get(self, url, data):
-         return 'icon/key'
+        def label_end_get(self, url, data):
+            key, event, mod = data
+            return event
 
-   def config_panel_cb(self):
-      bro = config_gui.browser_get()
-      bro.page_add('config://keyb/', _('Keyboard'), None, self.populate_keyb)
+        def icon_get(self, url, data):
+            return 'icon/key'
 
-   def populate_keyb(self, browser, url):
-      config_gui.standard_item_action_add(_('Add a new key'), icon='icon/plus',
-                                          cb=self._add_item_cb)
-      for key, event in sorted(self.keys.items(), key=lambda x: x[1]):
-         browser.item_add(self.KeyItemClass(), 'config://keyb/button', (key, event, self))
-      
+    def config_panel_cb(self):
+        bro = config_gui.browser_get()
+        bro.page_add('config://keyb/', _('Keyboard'), None, self.populate_keyb)
 
-   def _add_item_cb(self):
-      # grab the next pressed key and show the first dialog
-      self.grab_key_func = self.grabbed_key_func
-      self.dia = EmcDialog(title=_('Add a new key'), style='cancel',
-                           text=_('Press a key on your keyboard'),
-                           canc_cb=self.ungrab_key)
+    def populate_keyb(self, browser, url):
+        config_gui.standard_item_action_add(_('Add a new key'), icon='icon/plus',
+                                            cb=self._add_item_cb)
+        for key, event in sorted(self.keys.items(), key=lambda x: x[1]):
+            browser.item_add(self.KeyItemClass(), 'config://keyb/button', (key, event, self))
 
-   def ungrab_key(self, dialog):
-      self.grab_key_func = None
-      dialog.delete()
+    def _add_item_cb(self):
+        # grab the next pressed key and show the first dialog
+        self.grab_key_func = self.grabbed_key_func
+        self.dia = EmcDialog(title=_('Add a new key'), style='cancel',
+                             text=_('Press a key on your keyboard'),
+                             canc_cb=self.ungrab_key)
 
-   def grabbed_key_func(self, key):
-      # ungrab remote keys & delete the first dialog
-      self.grab_key_func = None
-      self.pressed_key = key
-      self.dia.delete()
+    def ungrab_key(self, dialog):
+        self.grab_key_func = None
+        dialog.delete()
 
-      # create the dialog to choose the event to bind
-      dia = EmcDialog(title=_('Choose an event to bind'), style='list',
-                      done_cb=self.event_choosed_cb)
-      for event in input_events.STANDARD_EVENTS.split():
-         dia.list_item_append(event)
-      dia.list_go()
+    def grabbed_key_func(self, key):
+        # ungrab remote keys & delete the first dialog
+        self.grab_key_func = None
+        self.pressed_key = key
+        self.dia.delete()
 
-   def event_choosed_cb(self, dia):
-      event = str(dia.list_item_selected_get().text_get())
-      key = str(self.pressed_key)
+        # create the dialog to choose the event to bind
+        dia = EmcDialog(title=_('Choose an event to bind'), style='list',
+                        done_cb=self.event_choosed_cb)
+        for event in input_events.STANDARD_EVENTS.split():
+            dia.list_item_append(event)
+        dia.list_go()
 
-      # save the pressed key in mapping and config
-      self.keys[key] = event
-      ini.set('keyboard', key, event)
+    def event_choosed_cb(self, dia):
+        event = str(dia.list_item_selected_get().text_get())
+        key = str(self.pressed_key)
 
-      # kill the dialog and refresh the browser
-      dia.delete()
-      bro = config_gui.browser_get()
-      bro.refresh(hard=True)
+        # save the pressed key in mapping and config
+        self.keys[key] = event
+        ini.set('keyboard', key, event)
+
+        # kill the dialog and refresh the browser
+        dia.delete()
+        bro = config_gui.browser_get()
+        bro.refresh(hard=True)

@@ -1,0 +1,13 @@
+[MASTER]
+additional-builtins=_
+
+disable=
+    missing-module-docstring,
+    missing-function-docstring,
+    missing-class-docstring,
+    arguments-differ,
+    super-init-not-called,
+    unused-argument,
+    global-statement
+
+

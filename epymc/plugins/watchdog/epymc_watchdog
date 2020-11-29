@@ -27,7 +27,6 @@ import atexit
 import signal
 import fcntl
 
-
 # lock file to run a single instance of this process
 LOCK_FILE = '/tmp/epymc_watchdog.lock'
 
@@ -41,69 +40,69 @@ WD_FILE = '/tmp/epymc_watchdog'
 
 
 def DBG(msg):
-   # with open(LOG_FILE, 'a') as fp:
-   #    fp.write('WATCHDOG: %s\n' % msg)
-   pass
+    # with open(LOG_FILE, 'a') as fp:
+    #    fp.write('WATCHDOG: %s\n' % msg)
+    pass
 
 
 def ensure_single_instance():
+    # create the lock file
+    umask_original = os.umask(0)
+    try:
+        fp = os.open(LOCK_FILE, os.O_WRONLY | os.O_CREAT, 0o666)
+    finally:
+        os.umask(umask_original)
 
-   # create the lock file
-   umask_original = os.umask(0)
-   try:
-      fp = os.open(LOCK_FILE, os.O_WRONLY | os.O_CREAT, 0o666)
-   finally:
-      os.umask(umask_original)
-
-   # acquire an unique lock on the file
-   try:
-      fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
-   except OSError:
-      DBG('another instance is running!')
-      sys.exit(2)
-
+    # acquire an unique lock on the file
+    try:
+        fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        DBG('another instance is running!')
+        sys.exit(2)
 
 
 def kill_and_respawn():
-   DBG('RESPAWN !!!!!')
-   os.system('killall -9 epymc')
-   os.system('epymc &')
-   time.sleep(7)
+    DBG('RESPAWN !!!!!')
+    os.system('killall -9 epymc')
+    os.system('epymc &')
+    time.sleep(7)
 
 
 def signal_func(signal, stack):
-   sys.exit(0)
+    sys.exit(0)
+
 
 def atexit_do():
-   try:
-      os.unlink(LOCK_FILE)
-   except:
-      pass
-   DBG('exiting.')
+    try:
+        os.unlink(LOCK_FILE)
+    except:
+        pass
+    DBG('exiting.')
+
 
 if __name__ == '__main__':
 
-   # do not run more than one watchdog process at the same time
-   ensure_single_instance()
+    # do not run more than one watchdog process at the same time
+    ensure_single_instance()
 
-   # epymc will send a TERM signal to shutdown the deamon (this script)
-   signal.signal(signal.SIGTERM, signal_func)
+    # epymc will send a TERM signal to shutdown the deamon (this script)
+    signal.signal(signal.SIGTERM, signal_func)
 
-   # cleanup on exit
-   atexit.register(atexit_do)
+    # cleanup on exit
+    atexit.register(atexit_do)
 
-   DBG('startup.')
-   while 1:
-      time.sleep(3)
-      try:
-         # get wd file mod-time
-         mtime = os.path.getmtime(WD_FILE)
-      except:
-         # epymc not running ??
-         kill_and_respawn()
-      finally:
-         # if the mod-time is older than 30 secs restart epymc
-         delta = time.time() - mtime
-         DBG('epymc pinged %.3f seconds ago' % delta)
-         if delta > 30:
+    DBG('startup.')
+    while 1:
+        time.sleep(3)
+        try:
+            # get wd file mod-time
+            mtime = os.path.getmtime(WD_FILE)
+        except:
+            # epymc not running ??
             kill_and_respawn()
+        finally:
+            # if the mod-time is older than 30 secs restart epymc
+            delta = time.time() - mtime
+            DBG('epymc pinged %.3f seconds ago' % delta)
+            if delta > 30:
+                kill_and_respawn()

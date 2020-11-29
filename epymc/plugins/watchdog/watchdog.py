@@ -28,39 +28,38 @@ from epymc.modules import EmcModule
 
 
 def DBG(msg):
-   print('WATCHDOG: %s' % msg)
+    print('WATCHDOG: %s' % msg)
 
 
 class Watchdog(EmcModule):
-   name = 'watchdog'
-   label = _('Watchdog')
-   icon = 'icon/watchdog'
-   info = _('This module, if enabled, will respawn epymc in the rare cases '
-            'of application crash/hang. So you dont have to leave your '
-            'couch in case of problems...just wait 30 seconds and the module '
-            'will restart epymc for you.')
+    name = 'watchdog'
+    label = _('Watchdog')
+    icon = 'icon/watchdog'
+    info = _('This module, if enabled, will respawn epymc in the rare cases '
+             'of application crash/hang. So you dont have to leave your '
+             'couch in case of problems...just wait 30 seconds and the module '
+             'will restart epymc for you.')
 
-   WD_FILE = '/tmp/epymc_watchdog'
+    WD_FILE = '/tmp/epymc_watchdog'
 
-   def __init__(self):
-      DBG('Init module')
+    def __init__(self):
+        DBG('Init module')
 
-      # report we are alive every 5 seconds...
-      self._timer = ecore.Timer(5.0, self.timer_cb)
-      self.timer_cb() # ...and a first time now
+        # report we are alive every 5 seconds...
+        self._timer = ecore.Timer(5.0, self.timer_cb)
+        self.timer_cb()  # ...and a first time now
 
-      # run the watchdog daemon
-      ecore.Exe('epymc_watchdog')
+        # run the watchdog daemon
+        ecore.Exe('epymc_watchdog')
 
-   def __shutdown__(self):
-      DBG('Shutdown module')
-      # kill the timer and the daemon
-      self._timer.delete()
-      ecore.Exe('killall epymc_watchdog')
+    def __shutdown__(self):
+        DBG('Shutdown module')
+        # kill the timer and the daemon
+        self._timer.delete()
+        ecore.Exe('killall epymc_watchdog')
 
-   def timer_cb(self):
-      # update file modification time of the watchdog file (WE ARE ALIVE!)
-      with open(self.WD_FILE, 'a'):
-         os.utime(self.WD_FILE)
-      return ecore.ECORE_CALLBACK_RENEW
-
+    def timer_cb(self):
+        # update file modification time of the watchdog file (WE ARE ALIVE!)
+        with open(self.WD_FILE, 'a'):
+            os.utime(self.WD_FILE)
+        return ecore.ECORE_CALLBACK_RENEW

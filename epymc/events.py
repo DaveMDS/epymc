@@ -42,8 +42,8 @@ from __future__ import absolute_import, print_function
 
 
 def DBG(msg):
-   # print('EVENTS: %s' % msg)
-   pass
+    # print('EVENTS: %s' % msg)
+    pass
 
 
 _listeners = []
@@ -51,44 +51,46 @@ _listeners_single = []
 
 
 def listener_add(name, func, *a, **ka):
-   """ Add a new listener to the events chain.
-       The callback will be called until you delete the listener.
-   """
-   _listeners.append((name, func, a, ka))
+    """ Add a new listener to the events chain.
+        The callback will be called until you delete the listener.
+    """
+    _listeners.append((name, func, a, ka))
 
-   DBG('Listener Add: ' + name)
-   for (name, cb, a, ka) in _listeners:
-      DBG('  * ' + name)
+    DBG('Listener Add: ' + name)
+    for (name, cb, a, ka) in _listeners:
+        DBG('  * ' + name)
+
 
 def listener_add_single_shot(event, func, *a, **ka):
-   """ Add a new listener to the specific event.
-       The callback will be called only one time.
-   """
-   _listeners_single.append((event, func, a, ka))
+    """ Add a new listener to the specific event.
+        The callback will be called only one time.
+    """
+    _listeners_single.append((event, func, a, ka))
+
 
 def listener_del(name):
-   """ Remove a listener by name """
+    """ Remove a listener by name """
 
-   DBG('Listener Del: ' + name)
+    DBG('Listener Del: ' + name)
 
-   for lis in _listeners:
-      (n, cb, a, ka) = lis
-      if n == name:
-         _listeners.remove(lis)
-         return
+    for lis in _listeners:
+        (n, cb, a, ka) = lis
+        if n == name:
+            _listeners.remove(lis)
+            return
+
 
 def event_emit(event):
-   """ Emit the given event to all listeners, event is just a string """
+    """ Emit the given event to all listeners, event is just a string """
 
-   DBG('Emit Event: ' + event + '  listeners: ' + str(len(_listeners)))
+    DBG('Emit Event: ' + event + '  listeners: ' + str(len(_listeners)))
 
-   for lis in _listeners_single:
-      (evt, cb, a, ka) = lis
-      if evt == event:
-         cb(*a, **ka)
-         _listeners_single.remove(lis)
+    for lis in _listeners_single:
+        (evt, cb, a, ka) = lis
+        if evt == event:
+            cb(*a, **ka)
+            _listeners_single.remove(lis)
 
-   for lis in _listeners:
-      (name, cb, a, ka) = lis
-      cb(event, *a, **ka)
-
+    for lis in _listeners:
+        (name, cb, a, ka) = lis
+        cb(event, *a, **ka)

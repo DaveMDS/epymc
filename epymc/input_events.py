@@ -22,9 +22,11 @@ from __future__ import absolute_import, print_function
 
 from epymc import events
 
+
 def DBG(msg):
-   # print('INPUT_EVENTS: %s' % msg)
-   pass
+    # print('INPUT_EVENTS: %s' % msg)
+    pass
+
 
 STANDARD_EVENTS = """
 UP DOWN LEFT RIGHT OK BACK EXIT
@@ -44,51 +46,55 @@ EVENT_BLOCK = False
 
 _listeners = []
 
-def listener_add(name, event_cb, cb_data = None):
-   global _listeners
 
-   _listeners.append((name, event_cb, cb_data))
+def listener_add(name, event_cb, cb_data=None):
+    global _listeners
 
-   DBG('Listener Add: ' + name)
-   for lis in _listeners:
-      (name, cb, data) = lis
-      DBG('  * ' + name)
+    _listeners.append((name, event_cb, cb_data))
+
+    DBG('Listener Add: ' + name)
+    for lis in _listeners:
+        (name, cb, data) = lis
+        DBG('  * ' + name)
+
 
 def listener_del(name):
-   global _listeners
+    global _listeners
 
-   DBG('Listener Del: ' + name)
-   for lis in _listeners:
-      (n, cb, data) = lis
-      if n == name:
-         _listeners.remove(lis)
-         return
+    DBG('Listener Del: ' + name)
+    for lis in _listeners:
+        (n, cb, data) = lis
+        if n == name:
+            _listeners.remove(lis)
+            return
+
 
 def listener_promote(name):
-   global _listeners
+    global _listeners
 
-   DBG('Listener Promote: ' + name)
-   for lis in _listeners:
-      (n, cb, data) = lis
-      if n == name:
-         _listeners.remove(lis)
-         _listeners.append(lis)
-         return
+    DBG('Listener Promote: ' + name)
+    for lis in _listeners:
+        (n, cb, data) = lis
+        if n == name:
+            _listeners.remove(lis)
+            _listeners.append(lis)
+            return
+
 
 def event_emit(event):
-   DBG('Emit Event: ' + event + '  listeners: ' + str(len(_listeners)))
+    DBG('Emit Event: ' + event + '  listeners: ' + str(len(_listeners)))
 
-   events.event_emit('KEEP_ALIVE')
+    events.event_emit('KEEP_ALIVE')
 
-   for lis in reversed(_listeners):
-      (name, cb, data) = lis
+    for lis in reversed(_listeners):
+        (name, cb, data) = lis
 
-      if data:
-         res = cb(event, data)
-      else:
-         res = cb(event)
+        if data:
+            res = cb(event, data)
+        else:
+            res = cb(event)
 
-      # print("  ->  '%s' (%s)" %  (name, ('continue' if res else 'block')))
+        # print("  ->  '%s' (%s)" %  (name, ('continue' if res else 'block')))
 
-      if res == EVENT_BLOCK:
-         return
+        if res == EVENT_BLOCK:
+            return

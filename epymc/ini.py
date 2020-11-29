@@ -21,6 +21,7 @@
 from __future__ import absolute_import, print_function
 
 import os
+from pathlib import Path
 import configparser
 
 _config = configparser.RawConfigParser()
@@ -109,6 +110,10 @@ def get_bool(section, option):
 
 def get_string(section, option):
     return str(_config.get(section, option))
+
+
+def get_path(section, option):
+    return Path(_config.get(section, option))
 
 
 def set(section, option, value):

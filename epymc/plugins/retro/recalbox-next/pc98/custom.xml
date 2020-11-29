@@ -1,0 +1,39 @@
+<theme>
+	<formatVersion>4</formatVersion>
+
+	<view name="system">
+		<text name="info1" extra="true">
+			<text>Manufacturer : NEC Corporation</text>
+		</text>
+		<text name="info2" extra="true">
+			<text>Year of Release : 1982</text>
+		</text>
+		<text name="info3" extra="true">
+			<text>OS : CP/M-86, MS-DOS, OS/2, Windows </text>
+		</text>
+		<text name="info4" extra="true">
+			<text>CPU : 8086 @ 5 MHz and higher</text>
+		</text>
+		<text name="info5" extra="true">
+			<text>RAM : 128 KB and higher</text>
+		</text>
+		<text name="info6" extra="true">
+			<text>Sound Chip : Internal beeper, FM Sound, PCM</text>
+		</text>
+	</view>
+
+	<view name="system, basic, detailed">
+		<image name="band1" extra="true">
+			<color>951610</color>
+		</image>
+		<image name="band2" extra="true">
+			<color>16643C</color>
+		</image>
+		<image name="band3" extra="true">
+			<color>00499A</color>
+		</image>
+		<image name="band4" extra="true">
+			<color>3B3431</color>
+		</image>
+	</view>
+</theme>

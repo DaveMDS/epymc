@@ -1,0 +1,52 @@
+<theme>
+	<formatVersion>4</formatVersion>
+
+	<view name="system">
+		<text name="info1" extra="true">
+			<text>An arcade game or coin-op game is a coin-operated entertainment</text>
+		</text>
+		<text name="info2" extra="true">
+			<text>machine. Most arcade games are video games, pinball machines,</text>
+		</text>
+		<text name="info3" extra="true">
+			<text>electro-mechanical games, redemption games or merchandisers. While</text>
+		</text>
+		<text name="info4" extra="true">
+			<text>exact dates are debated, the golden age of arcade video games is</text>
+		</text>
+		<text name="info5" extra="true">
+			<text>usually defined as a period beginning sometime in the late 1970s and</text>
+		</text>
+		<text name="info6" extra="true">
+			<text>ending sometime in the mid-1980s. Excluding abrief resurgence in the</text>
+		</text>
+		<text name="info7" extra="true">
+			<text>early 1990s, the arcade industry subsequently declined in the</text>
+		</text>
+		<text name="info8" extra="true">
+			<text>Western hemisphere as competing home video game consoles increased</text>
+		</text>
+		<text name="info9" extra="true">
+			<text>in their graphics and game-play capability and decreased in cost.</text>
+		</text>
+		<text name="info10" extra="true">
+			<text>This system gathers all arcade emulators in one.</text>
+		</text>
+		
+	</view>
+
+	<view name="system, basic, detailed">
+		<image name="band1" extra="true">
+			<color>FB0B47</color>
+		</image>
+		<image name="band2" extra="true">
+			<color>FCE236</color>
+		</image>
+		<image name="band3" extra="true">
+			<color>1229B8</color>
+		</image>
+		<image name="band4" extra="true">
+			<color>5D9EED</color>
+		</image>
+	</view>
+</theme>

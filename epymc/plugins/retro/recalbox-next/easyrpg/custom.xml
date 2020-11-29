@@ -1,0 +1,27 @@
+<theme>
+	<formatVersion>4</formatVersion>
+
+	<view name="system">
+		<text name="info1" extra="true">
+			<text>EasyRPG is a community project to create a free, open source, role</text>
+		</text>
+		<text name="info2" extra="true">
+			<text>playing game creation tool, compatible with RPG Maker 2000/2003 games.</text>
+		</text>
+	</view>
+
+	<view name="system, basic, detailed">
+		<image name="band1" extra="true">
+			<color>4D603D</color>
+		</image>
+		<image name="band2" extra="true">
+			<color>5F7057</color>
+		</image>
+		<image name="band3" extra="true">
+			<color>424241</color>
+		</image>
+		<image name="band4" extra="true">
+			<color>838382</color>
+		</image>
+	</view>
+</theme>

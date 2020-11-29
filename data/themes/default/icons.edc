@@ -92,6 +92,7 @@ ICON("harddisk")
 // Those should go in a module specific edc...
 ICON("movie")
 ICON("mame")
+ICON("retro")
 ICON("music")
 ICON("photo")
 ICON("joystick")

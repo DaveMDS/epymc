@@ -1,0 +1,45 @@
+<theme>
+	<formatVersion>4</formatVersion>
+
+	<view name="system">
+		<text name="info1" extra="true">
+			<text>FB Neo or FBN as it is commonly known is an emulator</text>
+		</text>
+		<text name="info2" extra="true">
+			<text>of arcade games, that is, it takes the program code, graphic data, ...</text>
+		</text>
+		<text name="info3" extra="true">
+			<text>from an orginal arcade game and emulate the hardware to make</text>
+		</text>
+		<text name="info4" extra="true">
+			<text>the game run in it's original form. As far as the game is concerned</text>
+		</text>
+		<text name="info5" extra="true">
+			<text>it is running in it's original cabinet. FBN is an open-source project</text>
+		</text>
+		<text name="info6" extra="true">
+			<text> and it is programmed by a group of people known as the FBNeo team.</text>
+		</text>
+		<text name="info7" extra="true">
+			<text>Many of the developers of this project also worked on FB Alpha.</text>
+		</text>
+		<text name="info8" extra="true">
+			<text>FBN is based on FinalBurn and old versions of MAME.</text>
+		</text>
+	</view>
+
+	<view name="system, basic, detailed">
+		<image name="band1" extra="true">
+			<color>B7151D</color>
+		</image>
+		<image name="band2" extra="true">
+			<color>00BAFF</color>
+		</image>
+		<image name="band3" extra="true">
+			<color>FF8200</color>
+		</image>
+		<image name="band4" extra="true">
+			<color>FFDBA1</color>
+		</image>
+	</view>
+</theme>

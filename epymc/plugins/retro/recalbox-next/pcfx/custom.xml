@@ -1,0 +1,48 @@
+<theme>
+	<formatVersion>4</formatVersion>
+
+	<view name="system">
+		<text name="info1" extra="true">
+			<text>Manufacturer : NEC Home Electronics</text>
+		</text>
+		<text name="info2" extra="true">
+			<text>Year of Release : 1994</text>
+		</text>
+		<text name="info3" extra="true">
+			<text>Units sold : 400000</text>
+		</text>
+		<text name="info4" extra="true">
+			<text>CPU : 32-bit NEC V810 RISC @ 21.5 MHz</text>
+		</text>
+		<text name="info5" extra="true">
+			<text>RAM : 2 MB (32 KB backup)</text>
+		</text>
+		<text name="info6" extra="true">
+			<text>VRAM : 1.25 MB</text>
+		</text>
+		<text name="info7" extra="true">
+			<text>Sound : 16-bit stereo with ADPCM</text>
+		</text>
+		<text name="info8" extra="true">
+			<text>Resolution: 640x480 pixels</text>
+		</text>
+		<text name="info9" extra="true">
+			<text>Media : CD-ROM</text>
+		</text>
+	</view>
+
+	<view name="system, basic, detailed">
+		<image name="band1" extra="true">
+			<color>FEC101</color>
+		</image>
+		<image name="band2" extra="true">
+			<color>01015B</color>
+		</image>
+		<image name="band3" extra="true">
+			<color>5C3073</color>
+		</image>
+		<image name="band4" extra="true">
+			<color>F00020</color>
+		</image>
+	</view>
+</theme>

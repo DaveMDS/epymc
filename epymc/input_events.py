@@ -18,14 +18,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, print_function
+from typing import Callable, Any
 
 from epymc import events
-
-
-def DBG(msg):
-    # print('INPUT_EVENTS: %s' % msg)
-    pass
 
 
 STANDARD_EVENTS = """
@@ -45,56 +40,75 @@ EVENT_CONTINUE = True
 EVENT_BLOCK = False
 
 _listeners = []
+_freezed = False
 
 
-def listener_add(name, event_cb, cb_data=None):
-    global _listeners
+def DBG(*args):
+    # print('INPUT_EVENTS: ', *args)
+    pass
 
-    _listeners.append((name, event_cb, cb_data))
 
-    DBG('Listener Add: ' + name)
+class Listener:
+    """ Class to hold the info for each listener """
+    def __init__(self, name: str, cb: Callable, data: Any):
+        self.name: str = name
+        self.cb: Callable = cb
+        self.data: Any = data
+
+
+def listener_add(name: str, event_cb: Callable, cb_data: Any = None):
+    """ Add a new listener to the events chain """
+    lis = Listener(name, event_cb, cb_data)
+    _listeners.append(lis)
+
+    DBG('Listener Added:', lis)
     for lis in _listeners:
-        (name, cb, data) = lis
-        DBG('  * ' + name)
+        DBG('  *', lis.name)
 
 
-def listener_del(name):
-    global _listeners
-
-    DBG('Listener Del: ' + name)
+def listener_del(name: str):
+    """ Delete the given listener """
+    DBG('Listener Del:', name)
     for lis in _listeners:
-        (n, cb, data) = lis
-        if n == name:
+        if lis.name == name:
             _listeners.remove(lis)
-            return
+            break
 
 
-def listener_promote(name):
-    global _listeners
-
+def listener_promote(name: str):
+    """ Put the given listener on top of the listeners stack """
     DBG('Listener Promote: ' + name)
     for lis in _listeners:
-        (n, cb, data) = lis
-        if n == name:
+        if lis.name == name:
             _listeners.remove(lis)
             _listeners.append(lis)
-            return
+            break
 
 
-def event_emit(event):
-    DBG('Emit Event: ' + event + '  listeners: ' + str(len(_listeners)))
-
+def event_emit(event: str):
+    """ Emit the given event """
     events.event_emit('KEEP_ALIVE')
+    if _freezed:
+        return
 
+    DBG('Emit Event:', event, ' listeners:', len(_listeners))
     for lis in reversed(_listeners):
-        (name, cb, data) = lis
-
-        if data:
-            res = cb(event, data)
+        if lis.data:
+            res = lis.cb(event, lis.data)
         else:
-            res = cb(event)
-
-        # print("  ->  '%s' (%s)" %  (name, ('continue' if res else 'block')))
-
+            res = lis.cb(event)
+        DBG(f"  ->  '{lis.name}' ({'continue' if res else 'block'})")
         if res == EVENT_BLOCK:
-            return
+            break
+
+
+def events_freeze():
+    """ Stop the emission of all events """
+    global _freezed
+    _freezed = True
+
+
+def events_unfreeze():
+    """ Restart the emission of all events """
+    global _freezed
+    _freezed = False

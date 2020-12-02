@@ -21,12 +21,13 @@
 # Inspired from the work on:
 # http://www.jezra.net/blog/Python_Joystick_Class_using_Gobject
 
+import os
 import struct
 
 from efl import ecore
 
 from epymc.modules import EmcModule
-from epymc.gui import EmcDialog
+from epymc.gui import EmcDialog, EmcNotify
 import epymc.input_events as input_events
 import epymc.ini as ini
 import epymc.config_gui as config_gui
@@ -52,12 +53,13 @@ class JoystickModule(EmcModule):
 
     def __init__(self):
         DBG('Init module')
-
+        self.dev = None
+        self.fdh = None
         self.grab_key_func = None
         self.axis_h = self.axis_v = self.button_ok = self.button_back = None
         self.invert_h = self.invert_v = False
-        self.dia_state = None
         self.dia = None
+        self.dia_state = None
 
         # get joystick device from config
         ini.add_section('joystick')
@@ -81,28 +83,55 @@ class JoystickModule(EmcModule):
                                  icon='icon/joystick',
                                  callback=self.config_panel_cb)
 
-        # open the joystick device
-        try:
-            self.dev = open(self.device, 'rb')
-            self.fdh = ecore.FdHandler(self.dev, ecore.ECORE_FD_READ,
-                                       self.joy_event_cb)
-        except Exception as e:
-            self.dev = None
-            self.fdh = None
-            print('Error: can not open joystick device: ' + self.device)
-            print('Error', e)
+        # try connect to joy device
+        self.connect()
+        self.reconnect_timer = ecore.Timer(2.0, self.reconnect_timer_cb)
 
     def __shutdown__(self):
         DBG('Shutdown module: Joystick')
         config_gui.root_item_del('joystick')
-        if self.fdh:
+        self.reconnect_timer.delete()
+        self.disconnect()
+
+    def connect(self):
+        # open the joystick device
+        if os.path.exists(self.device):
+            try:
+                self.dev = open(self.device, 'rb')
+                self.fdh = ecore.FdHandler(self.dev, ecore.ECORE_FD_READ,
+                                           self.joy_event_cb)
+                EmcNotify(_('Joystick connected'), icon='icon/joystick')
+            except Exception as e:
+                self.dev = None
+                self.fdh = None
+                print('Error: cannot open joystick device: ' + self.device)
+                print('Error', e)
+
+    def disconnect(self):
+        if self.fdh is not None:
             self.fdh.delete()
-        if self.dev:
+            self.fdh = None
+        if self.dev is not None:
             self.dev.close()
+            self.dev = None
+
+    @property
+    def connected(self):
+        return self.fdh is not None
+
+    def reconnect_timer_cb(self):
+        if not self.connected:
+            self.connect()
+        return ecore.ECORE_CALLBACK_RENEW
 
     def joy_event_cb(self, handler):
         # read self.EVENT_SIZE bytes from the joystick
-        read_event = self.dev.read(self.EVENT_SIZE)
+        try:
+            read_event = self.dev.read(self.EVENT_SIZE)
+        except OSError:
+            self.disconnect()
+            EmcNotify(_('Joystick disconnected'), icon='icon/joystick')
+            return
 
         # get the event structure values from the read event
         time, value, ev_type, number = struct.unpack(self.EVENT_FORMAT, read_event)
@@ -168,7 +197,7 @@ class JoystickModule(EmcModule):
         self.check_device()
 
     def check_device(self):
-        if not self.dev or not self.fdh:
+        if not self.connected:
             EmcDialog(title=_('No joystick found'), style='error',
                       text=_('Try to adjust your joystick device'))
             return False

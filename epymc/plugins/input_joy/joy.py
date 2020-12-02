@@ -21,22 +21,19 @@
 # Inspired from the work on:
 # http://www.jezra.net/blog/Python_Joystick_Class_using_Gobject
 
-from __future__ import absolute_import, print_function
-
 import struct
 
 from efl import ecore
 
 from epymc.modules import EmcModule
-from epymc.gui import EmcDialog, EmcVKeyboard
-from epymc.browser import EmcItemClass
+from epymc.gui import EmcDialog
 import epymc.input_events as input_events
 import epymc.ini as ini
 import epymc.config_gui as config_gui
 
 
-def DBG(msg):
-    # print('JOY: %s' % msg)
+def DBG(*args):
+    print('JOY:', *args)
     pass
 
 
@@ -59,6 +56,8 @@ class JoystickModule(EmcModule):
         self.grab_key_func = None
         self.axis_h = self.axis_v = self.button_ok = self.button_back = None
         self.invert_h = self.invert_v = False
+        self.dia_state = None
+        self.dia = None
 
         # get joystick device from config
         ini.add_section('joystick')
@@ -72,8 +71,9 @@ class JoystickModule(EmcModule):
             self.button_back = ini.get_int('joystick', 'button_back')
             self.invert_h = ini.get_bool('joystick', 'invert_h')
             self.invert_v = ini.get_bool('joystick', 'invert_v')
-        except:
+        except Exception as e:
             print('Error: Joystick configuration value missed')
+            print('Error:', e)
             # TODO spawn the configurator
 
         # add an entry in the config gui
@@ -86,29 +86,32 @@ class JoystickModule(EmcModule):
             self.dev = open(self.device, 'rb')
             self.fdh = ecore.FdHandler(self.dev, ecore.ECORE_FD_READ,
                                        self.joy_event_cb)
-        except:
+        except Exception as e:
             self.dev = None
             self.fdh = None
             print('Error: can not open joystick device: ' + self.device)
+            print('Error', e)
 
     def __shutdown__(self):
         DBG('Shutdown module: Joystick')
         config_gui.root_item_del('joystick')
-        if self.fdh: self.fdh.delete()
-        if self.dev: self.dev.close()
+        if self.fdh:
+            self.fdh.delete()
+        if self.dev:
+            self.dev.close()
 
     def joy_event_cb(self, handler):
         # read self.EVENT_SIZE bytes from the joystick
         read_event = self.dev.read(self.EVENT_SIZE)
 
-        # get the event structure values from  the read event
-        time, value, type, number = struct.unpack(self.EVENT_FORMAT, read_event)
+        # get the event structure values from the read event
+        time, value, ev_type, number = struct.unpack(self.EVENT_FORMAT, read_event)
         # get just the button/axis press event from the event type
-        event = type & ~self.EVENT_INIT
+        event = ev_type & ~self.EVENT_INIT
         # get just the INIT event from the event type
-        init = type & ~event
-        signal = None
-        DBG("EVENT RECEIVED: %s %s %s %s" % (time, value, type, number))
+        init = ev_type & ~event
+        emc_event = None
+        DBG(f'EVENT RECEIVED: time={time} value={value} ev_type={ev_type} num={number}')
 
         # if grabbed request call the grab function and return
         if self.grab_key_func and callable(self.grab_key_func):
@@ -120,33 +123,33 @@ class JoystickModule(EmcModule):
         if event == self.EVENT_AXIS and not init:
             if number == self.axis_v:
                 if value > 0:
-                    signal = 'DOWN' if self.invert_v else 'UP'
+                    emc_event = 'DOWN' if self.invert_v else 'UP'
                 if value < 0:
-                    signal = 'UP' if self.invert_v else 'DOWN'
+                    emc_event = 'UP' if self.invert_v else 'DOWN'
             elif number == self.axis_h:
                 if value > 0:
-                    signal = 'LEFT' if self.invert_h else 'RIGHT'
+                    emc_event = 'LEFT' if self.invert_h else 'RIGHT'
                 elif value < 0:
-                    signal = 'RIGHT' if self.invert_h else 'LEFT'
+                    emc_event = 'RIGHT' if self.invert_h else 'LEFT'
             else:
-                DBG('Unknow Joystick Axis: %s  Value: %s' % (number, value))
+                DBG(f'Unknow Joystick Axis: {number}  Value: {value}')
 
         # buttons event
         elif event == self.EVENT_BUTTON and not init and value > 0:
             if number == self.button_ok:
-                signal = 'OK'
+                emc_event = 'OK'
             elif number == self.button_back:
-                signal = 'BACK'
+                emc_event = 'BACK'
             else:
-                DBG('Unknow Joystick Button: %s  Value: %s' % (number, value))
+                DBG(f'Unknow Joystick Button: {number}  Value: {value}')
 
         # init event
         elif init:
-            DBG('EVENT IS INIT %s %s %s' % (number, value, init))
+            DBG(f'EVENT IS INIT number={number} value={value} init={init}')
 
         # emit the emc input event
-        if signal:
-            input_events.event_emit(signal)
+        if emc_event:
+            input_events.event_emit(emc_event)
 
         return ecore.ECORE_CALLBACK_RENEW  # keep tha handler alive
 

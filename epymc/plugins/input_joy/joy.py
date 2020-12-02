@@ -51,6 +51,9 @@ class JoystickModule(EmcModule):
     EVENT_FORMAT = 'IhBB'
     EVENT_SIZE = struct.calcsize(EVENT_FORMAT)
 
+    REPEAT_DELAY = 0.6
+    REPEAT_INTERVAL = 0.05
+
     def __init__(self):
         DBG('Init module')
         self.dev = None
@@ -61,6 +64,8 @@ class JoystickModule(EmcModule):
         self.invert_h = self.invert_v = False
         self.dia = None
         self.dia_state = None
+        self.repeat_timer = None
+        self.repeat_event = None
 
         # get joystick device from config
         ini.add_section('joystick')
@@ -136,6 +141,11 @@ class JoystickModule(EmcModule):
         return ecore.ECORE_CALLBACK_RENEW
 
     def joy_event_cb(self, handler):
+        # stop the repeat timer
+        if self.repeat_timer is not None:
+            self.repeat_timer.delete()
+            self.repeat_timer = None
+
         # read self.EVENT_SIZE bytes from the joystick
         try:
             read_event = self.dev.read(self.EVENT_SIZE)
@@ -190,8 +200,16 @@ class JoystickModule(EmcModule):
         # emit the emc input event
         if emc_event:
             input_events.event_emit(emc_event)
+            self.repeat_event = emc_event
+            self.repeat_timer = ecore.Timer(self.REPEAT_DELAY, self.repeat_timer_cb)
 
         return ecore.ECORE_CALLBACK_RENEW  # keep tha handler alive
+
+    def repeat_timer_cb(self):
+        if self.repeat_timer.interval == self.REPEAT_DELAY:
+            self.repeat_timer.interval = self.REPEAT_INTERVAL
+        input_events.event_emit(self.repeat_event)
+        return ecore.ECORE_CALLBACK_RENEW
 
     @staticmethod
     def notify(title: str, text: str):

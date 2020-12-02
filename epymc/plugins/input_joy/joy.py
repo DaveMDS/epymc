@@ -55,6 +55,7 @@ class JoystickModule(EmcModule):
         DBG('Init module')
         self.dev = None
         self.fdh = None
+        self.joy_name = None
         self.grab_key_func = None
         self.axis_h = self.axis_v = self.button_ok = self.button_back = None
         self.invert_h = self.invert_v = False
@@ -94,18 +95,28 @@ class JoystickModule(EmcModule):
         self.disconnect()
 
     def connect(self):
+        if not os.path.exists(self.device):
+            return
+
         # open the joystick device
-        if os.path.exists(self.device):
-            try:
-                self.dev = open(self.device, 'rb')
-                self.fdh = ecore.FdHandler(self.dev, ecore.ECORE_FD_READ,
-                                           self.joy_event_cb)
-                EmcNotify(_('Joystick connected'), icon='icon/joystick')
-            except Exception as e:
-                self.dev = None
-                self.fdh = None
-                print('Error: cannot open joystick device: ' + self.device)
-                print('Error', e)
+        try:
+            self.dev = open(self.device, 'rb')
+            self.fdh = ecore.FdHandler(self.dev, ecore.ECORE_FD_READ,
+                                       self.joy_event_cb)
+        except Exception as e:
+            self.dev = None
+            self.fdh = None
+            print('Error: cannot open joystick device: ' + self.device)
+            print('Error', e)
+            return
+
+        # get joystick name
+        dev = os.path.basename(self.device)
+        try:
+            self.joy_name = open(f'/sys/class/input/{dev}/device/name').read()
+        except OSError:
+            self.joy_name = _('Unknown joystick')
+        self.notify(_('Joystick connected'), self.joy_name)
 
     def disconnect(self):
         if self.fdh is not None:
@@ -130,7 +141,7 @@ class JoystickModule(EmcModule):
             read_event = self.dev.read(self.EVENT_SIZE)
         except OSError:
             self.disconnect()
-            EmcNotify(_('Joystick disconnected'), icon='icon/joystick')
+            self.notify(_('Joystick disconnected'), self.joy_name)
             return
 
         # get the event structure values from the read event
@@ -181,6 +192,11 @@ class JoystickModule(EmcModule):
             input_events.event_emit(emc_event)
 
         return ecore.ECORE_CALLBACK_RENEW  # keep tha handler alive
+
+    @staticmethod
+    def notify(title: str, text: str):
+        EmcNotify(f'<title>{title}</title><br>{text}',
+                  icon='icon/joystick', hidein=3.0)
 
     # config panel stuff
     def config_panel_cb(self):

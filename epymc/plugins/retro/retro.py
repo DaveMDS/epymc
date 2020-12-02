@@ -31,6 +31,7 @@ from epymc.browser import EmcBrowser, EmcItemClass
 from epymc.gui import EmcDialog
 from epymc.utils import EmcExec
 import epymc.mainmenu as mainmenu
+import epymc.input_events as input_events
 # import epymc.browser as browser
 import epymc.utils as utils
 import epymc.gui as gui
@@ -60,9 +61,11 @@ class Emulator:
             core_path = MOD.cores_path / (core + '_libretro.so')
             if core_path.exists():
                 cmd = f'{self.emulator} -v -f -L "{core_path}" "{rom_path}"'
-                EmcExec(cmd)
+                input_events.events_freeze()
+                EmcExec(cmd, done_cb=lambda _: input_events.events_unfreeze())
                 return True
-        EmcDialog(style='error', title='Cannot find a retroarch core',
+
+        EmcDialog(style='error', title='Cannot find a suitable retroarch core',
                   text=f'Cores: {", ".join(self.cores)}<br>'
                        f'Cores path: {MOD.cores_path}')
         return False
@@ -98,7 +101,9 @@ def read_emulators_ini_files():
 
 class RetroarchItemClass(EmcItemClass):
     def item_selected(self, url, emu):
-        EmcExec('retroarch --fullscreen')
+        input_events.events_freeze()
+        EmcExec('retroarch --fullscreen',
+                done_cb=lambda _: input_events.events_unfreeze())
 
     def label_get(self, url, emu):
         return _('Run retroarch')

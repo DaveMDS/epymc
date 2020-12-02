@@ -2902,6 +2902,24 @@ youtube.com
 vimeo.com
 zapiks.com
 
+<info>retroarch</>
+THE RECALBOX COMMUNITY
+Supernature2k
+Paradadf
+Zuco
+Sm3ck
+Th4Shin
+Shub
+Lester
+MarbleMad
+Odissine
+Zarroun
+Reivaax
+RockAddicted
+Bigboo3000
+Paradadf
+Nayok
+
 <info>efl team</>
 ADAM SIMPKINS
 AHARON HILLEL
@@ -3042,7 +3060,7 @@ MONOPOLIO DI STATO
 
 
 <info>license</>
-Copyright © 2010-2016 Davide Andreoli
+Copyright © 2010-2021 Davide Andreoli
 dave@gurumeditation.it
 
 EpyMC is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Mapping
+from typing import Dict, Mapping, List
 
 import os
 from pathlib import Path
@@ -39,8 +39,8 @@ import epymc.ini as ini
 
 
 # pylint: disable=invalid-name
-def DBG(msg):
-    print('RETRO: %s' % msg)
+def DBG(*args):
+    print('RETRO:', *args)
     #  pass
 
 
@@ -55,20 +55,6 @@ class Emulator:
 
     def __repr__(self):
         return f'<Emulator "{self.name}" cores="{self.cores}">'
-
-    def run_game(self, rom_path):
-        for core in self.cores:
-            core_path = MOD.cores_path / (core + '_libretro.so')
-            if core_path.exists():
-                cmd = f'{self.emulator} -v -f -L "{core_path}" "{rom_path}"'
-                input_events.events_freeze()
-                EmcExec(cmd, done_cb=lambda _: input_events.events_unfreeze())
-                return True
-
-        EmcDialog(style='error', title='Cannot find a suitable retroarch core',
-                  text=f'Cores: {", ".join(self.cores)}<br>'
-                       f'Cores path: {MOD.cores_path}')
-        return False
 
 
 MOD_PATH = Path(os.path.dirname(__file__))
@@ -88,22 +74,9 @@ def get_image_path(emu_name: str, image_name: str):
             return path.as_posix()
 
 
-def read_emulators_ini_files():
-    """ read emulators.ini (system and user) and populate EMULATORS """
-    if not EMULATORS:
-        ini_path_sys = MOD_PATH / 'emulators.ini'
-        ini_path_user = Path(utils.user_conf_dir) / 'emulators.ini'
-        parser = ConfigParser()
-        parser.read((ini_path_sys, ini_path_user))
-        for section in parser.sections():
-            EMULATORS[section] = Emulator(section, parser[section])
-
-
 class RetroarchItemClass(EmcItemClass):
     def item_selected(self, url, emu):
-        input_events.events_freeze()
-        EmcExec('retroarch --fullscreen',
-                done_cb=lambda _: input_events.events_unfreeze())
+        MOD.run_retroarch('--menu')
 
     def label_get(self, url, emu):
         return _('Run retroarch')
@@ -134,12 +107,13 @@ class EmulatorItemClass(EmcItemClass):
 
     def info_get(self, url, emu):
         return f'<title>{emu.label}</title><br>' \
-               f'<name>Roms path</name> {MOD.roms_path}/{emu.name}'
+               f'<name>Roms path:</name> {MOD.roms_path}/{emu.name}<br>' \
+               f'<name>Cores:</name> {", ".join(emu.cores)}'
 
 
 class GameItemClass(EmcItemClass):
     def item_selected(self, url, emu):
-        emu.run_game(url)
+        MOD.run_game(emu, url)
 
     def label_get(self, url, emu):
         return os.path.basename(url)
@@ -161,6 +135,7 @@ class RetroModule(EmcModule):
         self.roms_path: Path  # default to ~/.config/epymc/roms
         self.retroa_path: Path  # default to ~/.config/retroarch
         self.cores_path: Path  # default to ~/.config/retroarch/cores
+        self.retroa_cfg_paths: List[str]  # MOD_PATH/retroarch.conf, ~/.config/epymc/retroarch.cfg
 
         # init browser and mainmenu
         self.browser = EmcBrowser('RETRO', icon='icon/retro')
@@ -168,19 +143,25 @@ class RetroModule(EmcModule):
                           'icon/retro', self.cb_mainmenu)
         ini.add_section('retro')
 
-        # default roms_path (in epymc.ini)
+        # default roms_path (from epymc.ini)
         if not ini.has_option('retro', 'roms_path'):
-            path = os.path.join(utils.user_conf_dir, 'roms')
+            path = utils.user_conf_path / 'roms'
+            if not path.exists():
+                path.mkdir()
             ini.set('retro', 'roms_path', path)
         self.roms_path = ini.get_path('retro', 'roms_path')
-        if not self.roms_path.exists():
-            self.roms_path.mkdir()
 
-        # default retroarch_path (in epymc.ini)
+        # default retroarch_path (from epymc.ini)
         if not ini.has_option('retro', 'retroarch_path'):
-            path = os.path.expanduser('~/.config/retroarch')
-            ini.set('retro', 'retroarch_path', path)
+            path = Path.home() / '.config' / 'retroarch'
+            ini.set('retro', 'retroarch_path', str(path))
         self.retroa_path = ini.get_path('retro', 'retroarch_path')
+
+        # appendend retroarch.cfg files
+        self.retroa_cfg_paths = [
+            str(MOD_PATH / 'retroarch.cfg'),
+            str(utils.user_conf_path / 'retroarch.cfg'),
+        ]
 
         # cores path
         self.cores_path = self.retroa_path / 'cores'
@@ -193,7 +174,7 @@ class RetroModule(EmcModule):
     def cb_mainmenu(self):
         """ Mainmenu clicked, build the root page """
         # read emulators.ini
-        read_emulators_ini_files()
+        self.read_emulators_ini_files()
 
         # set backdrop image
         gui.background_set((MOD_PATH / 'mainbg.jpg').as_posix())
@@ -209,10 +190,21 @@ class RetroModule(EmcModule):
         mainmenu.hide()
 
         # check the retroarch executable exists and is in PATH
-        EmcExec('retroarch --version', grab_output=True, 
-                done_cb=self._retroarch_check_cb)
+        EmcExec('retroarch --version', grab_output=True,
+                done_cb=self.retroarch_check_cb)
 
-    def _retroarch_check_cb(self, output):
+    @staticmethod
+    def read_emulators_ini_files():
+        """ read emulators.ini (system and user) and populate EMULATORS """
+        if not EMULATORS:
+            ini_path_sys = MOD_PATH / 'emulators.ini'
+            ini_path_user = Path(utils.user_conf_dir) / 'emulators.ini'
+            parser = ConfigParser()
+            parser.read((ini_path_sys, ini_path_user))
+            for section in parser.sections():
+                EMULATORS[section] = Emulator(section, parser[section])
+
+    def retroarch_check_cb(self, output):
         if not output:
             EmcDialog(style='error', title='Cannot find retroarch executable',
                       text='Make sure retroarch is installed and it is in PATH')
@@ -240,3 +232,24 @@ class RetroModule(EmcModule):
             if rom.suffix.lower() in emu.extensions:
                 game_url = path / rom
                 self.browser.item_add(GameItemClass(), game_url, emu)
+
+    def run_game(self, emu: Emulator, rom_path: str):
+        for core in emu.cores:
+            core_path = self.cores_path / (core + '_libretro.so')
+            if core_path.exists():
+                self.run_retroarch(f'--libretro "{core_path}"', f'"{rom_path}"')
+                return
+        EmcDialog(style='error', title='Cannot find a suitable retroarch core',
+                  text=f'Cores: {", ".join(emu.cores)}<br>'
+                       f'Cores path: {self.cores_path}')
+
+    def run_retroarch(self, *args):
+        args = list(args)
+        args.append('--appendconfig="%s"' % '|'.join(self.retroa_cfg_paths))
+        args.append('--fullscreen')
+        args.append('--verbose')
+
+        cmd = 'retroarch ' + ' '.join(args)
+        DBG('RUNNING:', cmd)
+        input_events.events_freeze()
+        EmcExec(cmd, done_cb=lambda _: input_events.events_unfreeze())

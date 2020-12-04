@@ -27,6 +27,7 @@ import pwd
 import re
 import sys
 import tempfile
+from pathlib import Path
 
 try:
     from xdg.BaseDirectory import xdg_config_home as XDG_CONFIG_HOME
@@ -59,6 +60,7 @@ if os.path.exists(XDG_CONFIG_HOME):
     user_conf_dir = os.path.join(XDG_CONFIG_HOME, 'epymc')
 else:
     user_conf_dir = os.path.expanduser('~/.config/epymc')
+user_conf_path = Path(user_conf_dir)
 LOG('Config folder:', user_conf_dir)
 
 # user cache folder (xdg or default)
@@ -66,6 +68,7 @@ if os.path.exists(XDG_CACHE_HOME):
     user_cache_dir = os.path.join(XDG_CACHE_HOME, 'epymc')
 else:
     user_cache_dir = os.path.expanduser('~/.cache/epymc')
+user_cache_path = Path(user_cache_dir)
 LOG('Cache folder:', user_cache_dir)
 
 # will be filled with the used theme file

@@ -407,7 +407,7 @@ setup(
         'epymc.plugins.movies': ['*.png'],
         'epymc.plugins.tvshows': ['*.png'],
         'epymc.plugins.mame': ['*.png', '*.jpg'],
-        'epymc.plugins.retro': ['*.jpg', '*.ini',
+        'epymc.plugins.retro': ['*.jpg', 'emulators.ini', 'retroarch.cfg',
                                 'recalbox-next/*',
                                 'recalbox-next/*/data/*.svg',
                                 'recalbox-next/*/data/*/*.svg'],
